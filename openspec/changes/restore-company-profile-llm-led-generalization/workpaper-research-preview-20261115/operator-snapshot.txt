@@ -1,0 +1,159 @@
+"""6.CN: one read-only, source-linked preview of existing research snapshots."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import sys
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE / 'workpaper-research-preview-20261115'
+REFERENCE = CHANGE / 'workpaper-core-readiness-20261114/source-first-contract.json'
+CURRENT = ROOT / 'docs/development/company_profile_research_preview.md'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+from research.company_profile.workpaper import CompanyProfileWorkpaper, ELEMENT_LABELS, SUPPLY_CHAIN_LABELS
+
+reference = read(REFERENCE)
+overrides = {s: CHANGE / f'workpaper-prose-binding-result-20261115/{s}/query.json'
+             for s in ('600094', '600103', '600100', '600107')}
+overrides.update({
+    '600104': CHANGE / 'workpaper-saic-compact-core-result-20261115/600104/query.json',
+    '600000': CHANGE / 'workpaper-preserve-core-result-20261115/600000/query.json',
+    '600097': CHANGE / 'workpaper-kaichuang-candidate-final-20261115/run/query.json',
+})
+notes = {
+    '600094': 'CH保存响应安全读回，原模型作者继承；本地新复核明确失败，不是新的真实模型通过。投资/布局不等于已自产。',
+    '600103': 'CH保存响应安全读回，不是新真实调用；公司营业收入与主营表合计/内部抵销分开。',
+    '600100': 'CH保存响应安全读回，不是新真实调用；公司总额、业务小计和内部抵销不能相互替代。',
+    '600107': 'CH安全读回已撤无据医疗收入零值，原服装主业/公司总收入与亏损保留；不是重新抽取或模型最终接受。',
+    '600098': '使用原可读真实稿；最新CI全新入口截断无稿，不用该旧稿洗白新失败。',
+    '600104': 'CJ真实修订稿；mc-02把不适用改成无重大变化，已知不可靠，本预览禁用。具体产品/金融客群及营业总收入仍有缺项。',
+    '600088': '使用原可读真实稿；最新CI入口stop但JSON不完整，无新稿。模型复核未证明全报告完整。',
+    '600099': '使用原较完整真实稿；最新CI限用稿有31条，因整组止损未完成修订，不拼成当前同版成功。',
+    '600082': '使用BZ真实修订后的旧42条稿；最新CK37条稿的初核消费失败，CK组末仅离线隔离投影25条，不用旧成功替代新失败。',
+    '600097': 'CM新增1候选真实最终接受，32条/54指标；原31不变，跨授权窗口闭环，不是同版首发或全稿准确。',
+    '600054': '使用原64条真实稿；最新CK仅选章后本地边界失败无正文，之后零调用供源修正不能算新画像。',
+    '600000': 'CL保存真实响应离线读回31条，正确营收保住，重要补充仍待核；不是新真实修订成功。净/毛收入、集团/母公司、AUM/余额不混。',
+}
+mandatory_ids = {
+    '600094': {'F-RM-02', 'F-SM-02'}, '600103': {'F016', 'F017', 'F023', 'F024'},
+    '600100': {'F014', 'F015', 'F016'}, '600107': {'F-RM-01', 'F-RM-03'},
+    '600098': {'F018'}, '600104': {'rm-04'}, '600088': {'F012', 'F015'},
+    '600099': {'F-RM-03', 'F-RM-04', 'F-BS-03'}, '600082': {'F009', 'F010'},
+    '600097': {'sm-01', 'sm-02', 'review-add:F001'}, '600054': {'F-SM-01', 'F-RM-01'},
+    '600000': {'RM-01', 'RM-03', 'RM-04'},
+}
+excluded_ids = {'600104': {'mc-02'}}
+rows = []
+original_hashes = {}
+for company in reference['companies']:
+    symbol = company['instrument_id'][:6]
+    source = overrides.get(symbol, ROOT / company['current_query'])
+    original_hashes[str(source.relative_to(ROOT))] = sha(source)
+    payload = read(source)['profiles'][0]['workpaper']
+    # Compatibility/source-reference validation is not semantic scoring.
+    CompanyProfileWorkpaper.model_validate(payload)
+    assert payload['report']['document_version'] == company['document_version']
+    sources = {e['evidence_id']: e for e in payload['evidence']}
+    groups = {**payload['elements'], **(payload.get('supply_chain') or {})}
+    all_facts = {f['fact_id']: f for e in groups.values() for f in e['facts']}
+    assert mandatory_ids[symbol] <= all_facts.keys(), (symbol, mandatory_ids[symbol] - all_facts.keys())
+    assert excluded_ids.get(symbol, set()) <= all_facts.keys()
+    if symbol == '600107':
+        assert 'F-RM-02' not in all_facts  # Known unsupported medical zero stays absent.
+    sections = []
+    for name, element in groups.items():
+        selected = [f for i, f in enumerate(element['facts'])
+                    if (i < (1 if name in SUPPLY_CHAIN_LABELS else 2) or f['fact_id'] in mandatory_ids[symbol])
+                    and f['fact_id'] not in excluded_ids.get(symbol, set())]
+        excerpts = []
+        for fact in selected:
+            assert not (set(fact['evidence_ids']) - sources.keys())
+            excerpts.append({'fact': fact, 'citations': [{
+                'evidence_id': eid, 'document_version': sources[eid]['document_version'],
+                'section_path': sources[eid]['section_path'], 'physical_pages': sources[eid]['physical_pages'],
+            } for eid in fact['evidence_ids']]})
+        sections.append({'key': name, 'label': {**ELEMENT_LABELS, **SUPPLY_CHAIN_LABELS}[name],
+                         'facts': excerpts, 'scope': '原稿摘录，未展示不等于未披露或抽取遗漏'})
+    quality = payload.get('quality_review') or {}
+    generation = payload.get('generation') or {}
+    extraction = generation.get('extraction') or {}
+    row = {'instrument_id': company['instrument_id'], 'name': company['name'],
+           'report': payload['report'], 'source_query': str(source.relative_to(ROOT)), 'source_sha256': sha(source),
+           'origin': payload['origin'], 'actual_extraction_model': extraction.get('model'),
+           'actual_extraction_source': extraction.get('source_label'), 'prompt_version': generation.get('prompt_version'),
+           'model_review_status_not_quality_grade': quality.get('status'), 'note': notes[symbol],
+           'source_snapshot_fact_count': len(all_facts),
+           'source_snapshot_metric_count': sum(len(f['metrics']) for f in all_facts.values()),
+           'known_do_not_use_fact_ids': sorted(excluded_ids.get(symbol, set())),
+           'formal_acceptance': 'not_assessed', 'sections': sections}
+    rows.append(row)
+assert len(rows) == 12
+preview = {'schema_version': 'research_preview_index.v1', 'new_model_calls': 0,
+           'source_reference': str(REFERENCE.relative_to(ROOT)), 'source_reference_sha256': sha(REFERENCE),
+           'research_only': True, 'same_version': False, 'production_authorization': 'not_authorized',
+           's1': '0/12', 'companies': rows}
+dump(DEST / 'index.json', preview)
+head = [
+    '# 公司画像研究预览：12家公司', '',
+    '这是已有底稿的跨版本、跨窗口内容预览，不是本轮新抽取、正式S1、准确率证明或生产发布。所有摘录沿用原事实文字及来源，统一标为研究待核；模型复核完成只表示其检查范围完成。', '',
+    '公司主营、产品服务、收入与主要构成、经营方式优先；供应链尽力获取。此页只摘录已有事实，完整底稿及未展示内容见原JSON。不同口径不强行加总，已知错误不作为结论展示。', '',
+    '[结构化索引](/home/python/Quote/' + str((DEST / 'index.json').relative_to(ROOT)) + ') · [发布差距与下一步](/home/python/Quote/' + str((DEST / 'release-readiness.md').relative_to(ROOT)) + ')', '',
+    '| 公司 | 选用稿事实/指标（非质量分） | 版本与限制 |', '| --- | ---: | --- |',
+]
+for row in rows:
+    head.append(f"| [{row['name']} {row['instrument_id'][:6]}](#{row['instrument_id'][:6]}) | {row['source_snapshot_fact_count']}/{row['source_snapshot_metric_count']} | {row['note']} |")
+for row in rows:
+    symbol = row['instrument_id'][:6]
+    head.extend(['', f'<a id="{symbol}"></a>', '', f"## {row['name']} {symbol}", '', row['note'], '',
+        f"报告期：{row['report']['report_period']}；正文原作者：{row['actual_extraction_source']} / {row['actual_extraction_model']}；当前选用稿origin：`{row['origin']}`。", '',
+        f"[原始JSON（保留原状态，仅供研究审查）](/home/python/Quote/{row['source_query']})；本页不是独立可信发布。"])
+    for section in row['sections']:
+        if not section['facts']:
+            continue
+        head.extend(['', f"### {section['label']}（摘录，待核）", ''])
+        for item in section['facts']:
+            fact = item['fact']
+            refs = '；'.join(' / '.join(c['section_path']) + '，物理页' + '、'.join(map(str, c['physical_pages']))
+                            + '，' + c['evidence_id'] for c in item['citations'])
+            head.extend([f"- `{fact['fact_id']}`：{fact['text']}", f"  来源：{refs}"])
+    if row['known_do_not_use_fact_ids']:
+        head.extend(['', '禁用原稿对象：' + '、'.join(row['known_do_not_use_fact_ids']) + '。原件保留审查，不进入本预览的结论。'])
+CURRENT.write_text('\n'.join(head) + '\n')
+# Demonstrate that the JSON index and human preview use the exact same facts.
+for row in rows:
+    source = read(ROOT / row['source_query'])['profiles'][0]['workpaper']
+    original = {f['fact_id']: f for e in [*source['elements'].values(), *(source.get('supply_chain') or {}).values()] for f in e['facts']}
+    for section in row['sections']:
+        for item in section['facts']:
+            assert item['fact'] == original[item['fact']['fact_id']]
+            assert item['fact']['fact_id'] not in row['known_do_not_use_fact_ids']
+assert all(sha(ROOT / p) == value for p, value in original_hashes.items())
+dump(DEST / 'validation.json', {
+    'new_model_calls': 0, 'source_snapshots_unchanged': original_hashes,
+    'companies': 12, 'llm_generated_snapshots': sum(r['origin'] == 'llm_generated' for r in rows),
+    'controlled_saved_response_snapshots': sum(r['origin'] == 'controlled_fixture' for r in rows),
+    'source_snapshot_fact_count': sum(r['source_snapshot_fact_count'] for r in rows),
+    'source_snapshot_metric_count': sum(r['source_snapshot_metric_count'] for r in rows),
+    'displayed_unique_company_fact_pairs': sum(len(s['facts']) for r in rows for s in r['sections']),
+    'all_excerpts_equal_original_fact_objects': True, 'all_citations_bound_to_original_source_version': True,
+    'known_saic_mc02_not_displayed_as_conclusion': True, 'formal_quality_score': None,
+    'same_version_acceptance': False, 's1': '0/12', 'production_authorization': 'not_authorized',
+    'current_preview_sha256': sha(CURRENT), 'index_sha256': sha(DEST / 'index.json'),
+})
+print(json.dumps(read(DEST / 'validation.json') | {'source_snapshots_unchanged': len(original_hashes)}, ensure_ascii=False))

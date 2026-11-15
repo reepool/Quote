@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-15 6.CN已交[12家集中研究预览](company_profile_research_preview.md)和[发布差距](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-preview-20261115/release-readiness.md)，不再重复建立6.CE参考或增加画像栏目。当前有内容不等于当前同版稳定，已知上汽误述不作结论；7真实稿/5受控读回、225摘录与原502对象/719指标只是内容量，0新模型/S1/生产变化。唯一下一候选为章节卡6.CO：原12份已有公开年报各一次当前同版新入口，原133参考不送模型，现有DeepSeek/Grok、有界并发4，整批执行/末端源核/资源/清理；新的明确合并批准前不绑定不发送。不再开创/浦发逐句补窗或立即跑20家，供应链精度/次要明细后置，先清本人垃圾及必要证据一套后收尾，保护既有/并行。
+
 2026-11-15 6.CK四家一次观察结束：[三家真实画像与黄山失败](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-concentrated-source-result-20261115/profiles.md)。当前不是再扩选章提示或画像要素，而是把复核发现可靠转为局部处置：海泰重复目标吞14意见、黄山数字伪标题已组末零调用窄修，海泰25独立事实限用投影及黄山供源验证不改原真实失败。开创/浦发修订合同仍拒绝，浦发正确总收入因纯补充遗漏被整体撤回；下一只先复用保存响应收口这条消费链，不重抽12家/追可选供应链/逐项付费补句。原三稿97事实/148指标及44内容对照非质量分，13物理365532用量1恢复unknown/680.710业务墙钟，完整真实闭环0/4，S1/生产不变。本卡用尽，新的真实验证另裁；本人过程物一套证据后清，正式源/有效缓存/旧失败/attempt及既有并行保护。
 
 2026-11-15 6.CJ已交[真实上汽画像及5候选采纳](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-compact-core-result-20261115/profiles.md)：一次完整JSON和自动纠错链有实际进展，不再为上汽追加窗口。35事实/64指标是内容量、10核心仍4支持/6部分，独立mc-02不采用，原稿仅审查；S1/生产不变。下一主矛盾转为来源集中与内容覆盖：经营讨论/经营总述的公司总收入和产品信息未集中带入，不能只增加数值规则。仅拟[6.CK余四家观察](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#下一6ck余四家集中来源与内容观察待新合并授权)，一处通用选章主次纠正/必要直测后冻结同版，再直接交海泰/开创/黄山/浦发四份实际内容和限制；新合并授权前不调用，不重抽上汽/追供应链/拼正式分数。已在途按原硬限收尾，避免因别家失败打断正常纠错；范围失控仍封发送。本人3051730字节清，源/有效缓存/旧结果/attempt/并行保护。

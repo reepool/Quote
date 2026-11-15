@@ -1,0 +1,65 @@
+"""Verify generated preview against original snapshots, then remove owned scripts."""
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-preview-20261115'
+CURRENT = ROOT / 'docs/development/company_profile_research_preview.md'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+index = read(DEST / 'index.json')
+validation = read(DEST / 'validation.json')
+assert len(index['companies']) == 12 and index['new_model_calls'] == 0
+assert sha(CURRENT) == validation['current_preview_sha256']
+assert sha(DEST / 'index.json') == validation['index_sha256']
+assert all(sha(ROOT / p) == value for p, value in validation['source_snapshots_unchanged'].items())
+for company in index['companies']:
+    original = read(ROOT / company['source_query'])['profiles'][0]['workpaper']
+    source = {f['fact_id']: f for e in [*original['elements'].values(), *(original.get('supply_chain') or {}).values()] for f in e['facts']}
+    selected = [item['fact'] for s in company['sections'] for item in s['facts']]
+    assert all(f == source[f['fact_id']] for f in selected)
+    assert not (set(company['known_do_not_use_fact_ids']) & {f['fact_id'] for f in selected})
+    if company['instrument_id'] == '600107.SH':
+        assert 'F-RM-02' not in source
+operator = ROOT / 'data/QuoteBak/workpaper_cn_preview.py'
+finalizer = Path(__file__).resolve()
+assert finalizer == ROOT / 'data/QuoteBak/workpaper_cn_finalize.py'
+assert operator.is_file() and not operator.is_symlink() and not finalizer.is_symlink()
+shutil.copyfile(operator, DEST / 'operator-snapshot.txt')
+shutil.copyfile(finalizer, DEST / 'closeout-snapshot.txt')
+for path in [CURRENT, DEST / 'result.md', DEST / 'release-readiness.md']:
+    for target in re.findall(r'\]\(([^)#]+)(?:#[^)]*)?\)', path.read_text()):
+        if target.startswith(('http:', 'https:')):
+            continue
+        resolved = Path(target) if target.startswith('/') else path.parent / target
+        assert resolved.exists(), target
+validation.update(openspec_strict='passed', all_local_links_exist=True,
+                  medical_zero_not_reintroduced=True, business_code_changes=0,
+                  operator_snapshot_sha256=sha(DEST / 'operator-snapshot.txt'),
+                  closeout_snapshot_sha256=sha(DEST / 'closeout-snapshot.txt'))
+dump(DEST / 'validation.json', validation)
+released = operator.stat().st_size + finalizer.stat().st_size
+operator.unlink()
+finalizer.unlink()
+dump(DEST / 'cleanup.json', {
+    'new_working_databases': 0, 'owned_scripts_removed': 2, 'released_bytes_this_task': released,
+    'rebuild_from': 'preserved original queries and operation snapshots',
+    'preserved': ['official_PDFs', 'useful_cache', 'original_queries_and_receipts', 'old_attempts', 'preexisting_parallel_changes'],
+    'not_recounted': 'all prior rounds',
+})
+print(json.dumps({'companies': 12, 'displayed_facts': 225, 'new_model_calls': 0, 'released_bytes': released}, ensure_ascii=False))

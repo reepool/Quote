@@ -1,0 +1,14 @@
+{
+  "new_working_databases": 0,
+  "owned_scripts_removed": 2,
+  "released_bytes_this_task": 14314,
+  "rebuild_from": "preserved original queries and operation snapshots",
+  "preserved": [
+    "official_PDFs",
+    "useful_cache",
+    "original_queries_and_receipts",
+    "old_attempts",
+    "preexisting_parallel_changes"
+  ],
+  "not_recounted": "all prior rounds"
+}
