@@ -131,21 +131,12 @@ def test_build_local_core_import_manifest_marks_lifecycle_excluded_periods():
     )
 
     by_id = {target["instrument_id"]: target for target in manifest["targets"]}
-    assert by_id["600355.SH"]["excluded_report_periods"] == [
-        {
-            "report_period": "2026-03-31",
-            "classification": "post_delisting_or_no_disclosure",
-            "reason": "退市日在该报告期法定披露截止日前，未披露结构化财报视为正常待记录事项。",
-            "listed_date": "2002-06-13",
-            "delisted_date": "2026-04-27",
-            "disclosure_deadline": "2026-04-30",
-        }
-    ]
+    # Q1 ends before delisting: the disclosure deadline alone is no exemption.
+    assert by_id["600355.SH"]["excluded_report_periods"] == []
     assert by_id["688999.SH"]["excluded_report_periods"][0]["classification"] == (
         "pre_listing_period"
     )
     assert manifest["report_period_lifecycle_summary"]["by_classification"] == {
-        "post_delisting_or_no_disclosure": 1,
         "pre_listing_period": 1,
     }
 
@@ -191,12 +182,15 @@ def test_build_local_core_import_manifest_marks_financial_disclosure_events():
 def test_classify_report_period_lifecycle_supports_quarter_aliases():
     lifecycle = classify_report_period_lifecycle(
         instrument={"listed_date": "2021-07-27", "delisted_date": "2026-04-27"},
-        report_periods=["2021Q2", "2026Q1"],
+        report_periods=["2021Q2", "2026Q1", "2026Q2"],
     )
 
     assert [item["classification"] for item in lifecycle["excluded_report_periods"]] == [
         "pre_listing_period",
         "post_delisting_or_no_disclosure",
+    ]
+    assert [item["report_period"] for item in lifecycle["excluded_report_periods"]] == [
+        "2021-06-30", "2026-06-30",
     ]
 
 

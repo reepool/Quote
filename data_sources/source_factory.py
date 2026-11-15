@@ -1047,6 +1047,7 @@ class DataSourceFactory:
         force_refresh: bool = False,
         instrument_types: List[str] = None,
         enrich_from_backup_sources: bool = True,
+        persist: bool = True,
     ) -> List[Dict[str, Any]]:
         """获取交易品种列表 - 智能降级策略
 
@@ -1055,6 +1056,7 @@ class DataSourceFactory:
             force_refresh: 是否强制刷新
             instrument_types: 要获取的品种类型列表, 如 ['stock', 'index', 'etf']
             enrich_from_backup_sources: 官方源成功后是否使用备源补充非生命周期字段
+            persist: 是否写入 instruments 缓存；audit_only 必须设为 False
         """
         exchange = exchange.upper()
 
@@ -1212,8 +1214,14 @@ class DataSourceFactory:
                         else:
                             diagnostics['selected_source_authority'] = selected_base
                         diagnostics['source_usage'] = self._summarize_instrument_source_usage(instruments)
-                        # 保存到缓存
-                        await self._save_instruments_cache(exchange, instruments)
+                        coverage = getattr(primary_source, 'current_list_coverage', {})
+                        diagnostics['official_current_list_complete'] = bool(
+                            primary_is_official and isinstance(coverage, dict)
+                            and (coverage.get(exchange) or {}).get('complete')
+                        )
+                        # This cache writes instruments; audit must disable it.
+                        if persist:
+                            await self._save_instruments_cache(exchange, instruments)
                         self.last_instrument_list_diagnostics[diag_key] = diagnostics
                         ds_logger.info(f"[DataSourceFactory] Got fresh instruments from {primary_source.name}: {len(instruments)} items")
                         return instruments
@@ -1256,7 +1264,9 @@ class DataSourceFactory:
                         diagnostics['fallback_reason'] = 'primary_source_unavailable_or_invalid'
                         diagnostics['fallback_sources'].append(selected_base)
                         diagnostics['source_usage'] = self._summarize_instrument_source_usage(instruments)
-                        await self._save_instruments_cache(exchange, instruments)
+                        diagnostics['official_current_list_complete'] = False
+                        if persist:
+                            await self._save_instruments_cache(exchange, instruments)
                         self.last_instrument_list_diagnostics[diag_key] = diagnostics
                         ds_logger.info(
                             "[DataSourceFactory] Got fresh instruments from backup %s: %s items",
@@ -1343,6 +1353,13 @@ class DataSourceFactory:
         except Exception as e:
             ds_logger.warning(f"[DataSourceFactory] Failed to get cached instruments: {e}")
             return []
+
+    async def get_official_delisting_snapshot(self, exchange: str) -> Dict[str, Any]:
+        """Read the configured official terminal source without fallback writes."""
+        source = self._get_source_instance('exchange_official', exchange=exchange)
+        if source is None or not callable(getattr(source, 'get_delisting_snapshot', None)):
+            return {'rows': [], 'complete': False, 'errors': ['official terminal source unavailable']}
+        return await source.get_delisting_snapshot(exchange)
 
     async def _save_instruments_cache(self, exchange: str, instruments: List[Dict[str, Any]]):
         """保存交易品种列表到缓存"""

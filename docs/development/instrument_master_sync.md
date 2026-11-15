@@ -113,15 +113,30 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 官方 current list 缺失不能单独写退市；只有官方终止上市、摘牌、退市公告或等价终局证据才允许写 `status=delisted,is_active=0,trading_status=0,delisted_date`。当前列表缺失但无终局证据的标的会进入 `instrument_master_discrepancies`，作为待复核候选。
 
+## 沪深终止上市核对
+
+每次实际股票主数据刷新都会读取沪深官方终止上市名单：SZSE使用 `1793_ssgs/tab2` 的终止上市XLSX，SSE使用 `COMPANY_STATUS=3` 的官方JSON及实际分页；不再依赖“退市××／××退”简称。XLSX的字符串代码也可能被表读取器推断为整数，例如000016变为16，provider负责恢复六位代码，fixture保留原始单元格并经过完整读取链。
+
+`instrument_master_delisting.AShareDelistingReconciler` 只核对本地本任务A股身份；同公告B股／债券不导入也不连带停用。已审核code lineage用于区分前身与当前主体，历史同码终态不能覆盖现主体。空表、缺板块、缺页只使来源降级，不直接确认退市；独立有效终态正记录仍可用于其明确对象。
+
+终止名单未覆盖的已知候选才复用现有官方公告获取与附件读取：按市场关键词有界扫描，每关键词最多2页、每轮最多5个PDF、单PDF最多2MB及前10页。标题仅用于发现；正文必须明确股票身份及正式决定／已完成事实，实际摘牌日与公告日分开，无法可靠确认则待核。已有日期或主体冲突保留原状态并报告，不批量猜测修订。
+
+`delisting_reconciliation` 报告保留来源覆盖、确认／实际停用／日期补足／待核／未来生效／冲突／来源错误／写入失败及有限样例。样例截断不影响完整计数。股票与指数同时治理时，报告从stock child保留这组明细。
+
+未来计划唯一保存于现有差异表，reason为 `a_share_terminal_future_effective`；成功应用时同一生命周期事务写状态、受保护证据及 `a_share_terminal_future_applied`。按交易所的 `a_share_terminal_verification` 保存实际核验及失败／未决。fresh gate先读生产scope/mode的未闭合计划与最新核验，生效日优先于48小时fresh窗口；重启后仍能恢复，读取或JSON失败不能被当作空集合。audit记录不建立生产fresh基线，也不闭合生产计划。
+
+`audit_only` 的只读约束贯穿policy、source factory名单缓存及metadata，不只是跳过最后的退市writer。普通fallback缓存同样不能凭BaoStock单独的outDate先写终态或将未知历史退市行伪造为active。
+
 ## BSE 退市确认
 
 北交所当前上市名单使用 BSE 官方 `nqxxController/nqxxCnzq.do` 当前列表口径。2026-05-26 现场验证显示，`xxfcbj[]=2` 返回当前 BSE 上市股票 `315` 只，且包含停牌未退市股票：名单中 `xxtpbz=T` 的 `920058.BJ`、`920305.BJ` 仍在当前列表内；已公告终止上市并摘牌的 `920680.BJ` 不在当前列表中。因此，BSE 当前名单“消失”可以作为退市候选信号，但不能单独作为正式退市依据。
 
 `DataManager.sync_instrument_master()` 在 BSE 主数据刷新后会执行二次确认：
 
+- 保留 `bse_delisting_check_enabled` 开关和 `bse_delisting_scan_days` 窗口；扫描不超过既有页数上界及本轮2页安全上界。关闭时不扫描或写终态，并显式报告未核验。旧 `bse_delisting` 计数／样例字段继续提供，新明细位于 `delisting_reconciliation`。
 - 用本地刷新前 active BSE 股票集合减去本次 BSE 当前名单，得到候选。
 - 通过现有 CNInfo 公告扫描器按市场级入口扫描 `column=neeq, plate=bj`，不逐股抓取。
-- 只有标题命中“股票终止上市暨摘牌”“摘牌”等终局公告时，才调用 `DatabaseOperations.mark_instrument_delisted()` 写入 `status=delisted,is_active=0,trading_status=0,delisted_date`。
+- 标题匹配后必须读取有界正文，确认对应股票和实际摘牌日或明确已完成事实，再通过同一个reconciler及生命周期owner写终态；不得直接把 `published_at` 当作退市日。
 - “可能被终止上市”“拟终止上市”“退市风险警示”“事先告知书”等只作为风险或待确认事项，不反写正式退市状态。
 - 若当前名单消失但未找到终局公告，报告中的 `bse_delisting.unconfirmed_count` 和样例会提示人工或后续周度复核，不会直接误杀。
 
@@ -131,7 +146,9 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 ## Upsert 防线
 
-数据库写入保留既有 `delisted_date`，且基于已过期的 `delisted_date` 强制设置 `is_active=False`、`status=delisted`。对已有 `delisted` 或 `auto_deactivated*` 状态的记录，缺少 `delisted_date` 的 BaoStock/AkShare/pytdx 等非官方当前名单源不能自动重新激活，避免备用源把退市股或幽灵股唤醒；只有 `sse_official`、`szse_official`、`bse_official` 等官方源确认在市时，才允许恢复 active 状态。
+数据库写入保留既有 `delisted_date`，并按上海业务日规范化已生效状态。已确认 `delisted` 的三字段必须保持 `delisted / false / 0`；即使准确日期未知，普通官方或备源current行也不能自动复活。普通metadata刷新保留 `metadata.a_share_terminal_evidence` 及已有reviewed lineage。正式writer拒绝未来日期提前停用、空日期清除已有日期和未核实的日期冲突；终态、必要证据与计划闭合由同一 `quotes.db` 事务提交。其他auto-deactivated／HKEX受控复活仍遵循其现有独立合同。
+
+`scripts/fix_delisted_status.py` 保留兼容路径及Step 3主板／科创板诊断；退市写入只转发 `DataManager.sync_instrument_master(audit_only=...)`，不再有独立ORM修复循环。删除该兼容入口须另行更新仍有效的规范合同。
 
 ## 交易规格字段：lot_size / tick_size
 

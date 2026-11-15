@@ -10,7 +10,6 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-from datetime import datetime
 from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
@@ -44,6 +43,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         self.parser_version = self.config.get("parser_version") or PARSER_VERSION
         self.timeout_sec = float(self.config.get("timeout_sec", 30) or 30)
         self._session_loop = None
+        self.current_list_coverage: Dict[str, Dict[str, Any]] = {}
         self.user_agent = self.config.get(
             "user_agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -81,6 +81,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         if instrument_types and "stock" not in {str(item).lower() for item in instrument_types}:
             return []
         exchange = str(exchange or "").upper()
+        self.current_list_coverage[exchange] = {"complete": False}
         await self.rate_limiter.acquire()
 
         if exchange == "SSE":
@@ -103,6 +104,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         frames: List[pd.DataFrame] = []
         source_urls: List[str] = []
         raw_hashes: List[str] = []
+        missing_boards: List[str] = []
 
         stock_types = cfg.get("stock_types") or [
             {"label": "main_board_a", "stock_type": "1", "board": "main_board"},
@@ -111,15 +113,27 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         for item in stock_types:
             raw, source_url = await self._load_sse_payload(cfg, str(item.get("stock_type") or "1"))
             if raw is None:
+                missing_boards.append(str(item.get("stock_type")))
                 continue
             source_urls.append(source_url)
             raw_hashes.append(_sha256_bytes(raw))
             frame = _read_any_table(raw, source_url=source_url)
             if frame.empty:
+                missing_boards.append(str(item.get("stock_type")))
                 continue
+            try:
+                page = json.loads(_decode(raw)).get("pageHelp") or {}
+                if int(page.get("total") or 0) > len(frame):
+                    missing_boards.append(str(item.get("stock_type")))
+            except (ValueError, TypeError, AttributeError):
+                pass
             frame["__board"] = item.get("board") or item.get("label") or ""
             frames.append(frame)
 
+        self.current_list_coverage["SSE"] = {
+            "complete": bool(frames) and not missing_boards,
+            "missing_boards": missing_boards,
+        }
         if not frames:
             return []
         df = pd.concat(frames, ignore_index=True)
@@ -137,12 +151,108 @@ class AShareOfficialStockMasterSource(BaseDataSource):
             return []
         raw_hash = _sha256_bytes(raw)
         df = _read_any_table(raw, source_url=source_url)
+        self.current_list_coverage["SZSE"] = {"complete": not df.empty}
         return self._normalize_records(
             _records(df),
             exchange="SZSE",
             source_urls=[source_url],
             raw_hashes=[raw_hash],
         )
+
+    async def get_delisting_snapshot(self, exchange: str) -> Dict[str, Any]:
+        """Read official completed-termination lists without writing instruments.
+
+        Returned positive rows remain usable when another page fails; callers
+        must retain ``complete``/``errors`` instead of interpreting missing rows
+        as evidence of an active or terminated security.
+        """
+        exchange = exchange.upper()
+        if exchange not in {"SSE", "SZSE"}:
+            raise ValueError(f"No terminal-list adapter for {exchange}")
+        cfg = _market_cfg(self.config, exchange.lower())
+        snapshot: Dict[str, Any] = {"rows": [], "complete": True, "errors": []}
+        fixture = cfg.get("terminal_list_file")
+        url = cfg.get("terminal_list_url") or (
+            "https://www.szse.cn/api/report/ShowReport" if exchange == "SZSE"
+            else "https://query.sse.com.cn/commonQuery.do"
+        )
+        page_no, expected_total = 1, None
+        while True:
+            if fixture:
+                raw = _read_file_bytes(fixture)
+            elif exchange == "SZSE":
+                raw = await self._http_get(url, params={
+                    "SHOWTYPE": "xlsx", "CATALOGID": "1793_ssgs", "TABKEY": "tab2",
+                })
+            else:
+                await self.rate_limiter.acquire()
+                raw = await self._http_get(url, params={
+                    "sqlId": "COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L",
+                    "COMPANY_STATUS": "3", "STOCK_TYPE": "1,2,8",
+                    "STOCK_CODE": "", "CSRC_CODE": "", "REG_PROVINCE": "",
+                    "type": "inParams", "isPagination": "true",
+                    "pageHelp.cacheSize": "1", "pageHelp.beginPage": str(page_no),
+                    "pageHelp.endPage": str(page_no), "pageHelp.pageNo": str(page_no),
+                    "pageHelp.pageSize": str(cfg.get("terminal_page_size") or 500),
+                }, headers={"Referer": "https://www.sse.com.cn/"})
+            if raw is None:
+                snapshot["errors"].append(f"terminal list page {page_no} unavailable")
+                break
+            frame = _read_any_table(raw, source_url=str(fixture or url))
+            if frame.empty:
+                snapshot["errors"].append(f"terminal list page {page_no} empty or unparseable")
+                break
+            columns = set(frame.columns)
+            code_keys = ["证券代码", "COMPANY_CODE", "SECURITY_CODE", "code"]
+            date_keys = ["终止上市日期", "DELIST_DATE", "delisted_date"]
+            if not columns.intersection(code_keys) or not columns.intersection(date_keys):
+                snapshot["errors"].append("terminal list required columns missing")
+                break
+            for row in _records(frame):
+                symbol = _first_text(row, code_keys).split(".")[0].strip().zfill(6)
+                if not symbol.isdigit() or len(symbol) != 6:
+                    snapshot["errors"].append("invalid terminal security code")
+                    continue
+                # An A-share adapter must not import B shares from the same list.
+                if (exchange == "SZSE" and not symbol.startswith(("00", "30"))) or (
+                    exchange == "SSE" and not symbol.startswith(("60", "68"))
+                ):
+                    continue
+                date_text = _first_text(row, date_keys)
+                effective = _parse_date(date_text)
+                if date_text and effective is None:
+                    snapshot["errors"].append(f"invalid termination date for {symbol}")
+                    continue
+                snapshot["rows"].append({
+                    "instrument_id": _instrument_id(symbol, exchange), "symbol": symbol,
+                    "exchange": exchange, "type": "stock",
+                    "name": _first_text(row, ["证券简称", "COMPANY_ABBR", "name"]),
+                    "listed_date": _parse_date(_first_text(row, ["上市日期", "LIST_DATE"])),
+                    "delisted_date": effective, "completion_confirmed": True,
+                    "source": f"{exchange.lower()}_official_terminal_list",
+                    "source_url": url, "raw_snapshot_hash": _sha256_bytes(raw),
+                    "parser_version": self.parser_version + ".terminal.v1",
+                    "observed_at": get_shanghai_time().isoformat(),
+                })
+            if exchange != "SSE" or fixture:
+                break
+            payload = json.loads(_decode(raw))
+            page = payload.get("pageHelp") or {}
+            total = page.get("total")
+            if total is None:
+                snapshot["errors"].append("SSE terminal pagination total missing")
+                break
+            expected_total = int(total)
+            page_size = int(cfg.get("terminal_page_size") or 500)
+            if page_no * page_size >= expected_total:
+                break
+            page_no += 1
+            if page_no > int(cfg.get("terminal_max_pages") or 100):
+                snapshot["errors"].append("SSE terminal pagination bound reached")
+                break
+        snapshot["complete"] = not snapshot["errors"]
+        snapshot["source_url"] = url
+        return snapshot
 
     async def _get_bse_stock_list(self) -> List[Dict[str, Any]]:
         cfg = _market_cfg(self.config, "bse")
@@ -151,6 +261,8 @@ class AShareOfficialStockMasterSource(BaseDataSource):
             return []
         raw_hash = _sha256_bytes(raw)
         df = _read_any_table(raw, source_url=source_url)
+        if df.empty:
+            self.current_list_coverage["BSE"] = {"complete": False}
         if not df.empty:
             df = _normalize_bse_frame(df)
         return self._normalize_records(
@@ -217,6 +329,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         if raw is None:
             return None, url
         pages = _extract_bse_pages(raw)
+        self.current_list_coverage["BSE"] = {"complete": True}
         if pages <= 1:
             return raw, url
         payloads = [raw]
@@ -226,6 +339,8 @@ class AShareOfficialStockMasterSource(BaseDataSource):
             page_raw = await self._http_post(url, data=page_payload)
             if page_raw:
                 payloads.append(page_raw)
+            else:
+                self.current_list_coverage["BSE"] = {"complete": False}
         merged_content = []
         for item in payloads:
             merged_content.extend(_extract_bse_content(item))

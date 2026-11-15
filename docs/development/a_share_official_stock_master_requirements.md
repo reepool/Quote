@@ -163,6 +163,10 @@ AkShare 调整为第二备源：
 
 ## 验证要求
 
+2026-11-15终态闭环已实现于现有stock policy：沪深正式终止名单批量核对、同码主体隔离、原始XLSX代码补零、future_effective/applied/verification差异表协议、audit端到端禁写及生命周期事务防复活。简称带退或当前名单消失都不再作为单独终态证据；BSE沿用公告来源，但正文确认实际生效日，不再以发布日期代替。
+
+受控写入仅纠正已核实的康佳A股；真实audit发现的其他历史日期／主体差异继续待核，不据此批量覆盖旧数据。运维及财务范围说明以 `instrument_master_sync.md`、`docs/financial_data_system.md` 为准；来源fixture及hash见 `tests/fixtures/a_share_official_master/sources.json`。
+
 - 单元测试覆盖 SSE/SZSE/BSE 官方源解析、字段规范化、异常返回、分页/空结果。
 - fixture 测试覆盖退市公告、停牌标识、当前列表缺失但无终局公告的候选处理。
 - governance 测试覆盖 official-first、BaoStock fallback、AkShare fallback、fail-open/fail-closed。

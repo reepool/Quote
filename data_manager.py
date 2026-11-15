@@ -16365,6 +16365,13 @@ class DataManager:
         if not exchanges or freshness_threshold_hours is None:
             return None
 
+        from instrument_master_delisting import reusable_terminal_verifications
+        terminal_verifications = await reusable_terminal_verifications(
+            self.db_ops, exchanges, float(freshness_threshold_hours),
+        )
+        if terminal_verifications is None:
+            return None
+
         now = datetime.now()
         exchange_results: Dict[str, Dict[str, Any]] = {}
         active_count = 0
@@ -16383,8 +16390,11 @@ class DataManager:
                 return None
 
             active_count += int(snapshot.get('active_count', 0) or 0)
+            terminal_verification = terminal_verifications[exchange]
+            terminal_warnings = list(terminal_verification.get('warnings') or [])
+            warnings.extend(f"{exchange}: {value}" for value in terminal_warnings)
             exchange_results[exchange] = {
-                'status': 'fresh',
+                'status': 'warning' if terminal_warnings else 'fresh',
                 'reason': 'master_data_within_freshness_window',
                 'before': {},
                 'after': {
@@ -16402,7 +16412,8 @@ class DataManager:
                 'deactivated_samples': [],
                 'freshness': freshness,
                 'pytdx_validation': None,
-                'warnings': [],
+                'delisting_reconciliation': terminal_verification.get('summary') or {},
+                'warnings': terminal_warnings,
                 'errors': [],
             }
 
@@ -16421,7 +16432,7 @@ class DataManager:
             'started_at': started_at.isoformat(),
             'finished_at': finished_at.isoformat(),
             'elapsed_sec': round((finished_at - started_at).total_seconds(), 3),
-            'source_priority': ['local_freshness', 'baostock', 'akshare', 'pytdx_validation_only'],
+            'source_priority': ['local_freshness', 'exchange_official', 'baostock', 'akshare', 'pytdx_validation_only'],
             'exchanges': exchange_results,
             'unsupported_exchanges': unsupported,
             'summary': {
@@ -16720,60 +16731,6 @@ class DataManager:
                 break
         return rows
 
-    async def _deactivate_official_absent_delisting_prefixed_stocks(
-        self,
-        *,
-        exchange: str,
-        before: Dict[str, Any],
-        instruments: List[Dict[str, Any]],
-        source_authority: Optional[str],
-    ) -> Dict[str, Any]:
-        """Deactivate delisting-period A-share stocks after official current-list disappearance."""
-        result: Dict[str, Any] = {
-            'checked_count': 0,
-            'deactivated_count': 0,
-            'samples': [],
-        }
-        if source_authority not in {'official', 'official_with_fallback_fields'}:
-            return result
-        official_ids = {
-            item.get('instrument_id')
-            for item in instruments or []
-            if item.get('instrument_id')
-        }
-        before_rows = before.get('rows_by_id') or {}
-        for instrument_id in sorted((before.get('active_ids') or set()) - official_ids):
-            row = before_rows.get(instrument_id) or {}
-            name = str(row.get('name') or '').strip()
-            if not (name.startswith('退市') or name.endswith('退')):
-                continue
-            result['checked_count'] += 1
-            latest_quote_date = None
-            try:
-                latest_quote = await self.db_ops.get_latest_quote_date(instrument_id)
-                latest_quote_date = self._date_from_any(latest_quote)
-            except Exception:
-                latest_quote_date = None
-            marker = getattr(self.db_ops, 'mark_instrument_delisted', None)
-            if not callable(marker):
-                continue
-            updated = marker(
-                instrument_id,
-                delisted_date=None,
-                source=f'{exchange.lower()}_official_current_list_absence',
-            )
-            if inspect.isawaitable(updated):
-                updated = await updated
-            if updated:
-                result['deactivated_count'] += 1
-                if len(result['samples']) < 20:
-                    result['samples'].append({
-                        'instrument_id': instrument_id,
-                        'name': name,
-                        'last_quote_date': self._date_text(latest_quote_date),
-                    })
-        return result
-
     async def _validate_instrument_master_with_pytdx(
         self,
         exchange: str,
@@ -16879,161 +16836,20 @@ class DataManager:
         except Exception:
             return None
 
-    async def _scan_bse_delisting_announcements(
-        self,
-        *,
-        start_date: str,
-        end_date: str,
-        max_pages: int,
-    ) -> List[Any]:
-        """Scan CNInfo BSE delisting-related metadata without per-stock requests."""
-        from research.announcements import (
-            AnnouncementQuery,
-            AnnouncementScope,
-        )
-
+    async def _load_a_share_terminal_announcements(self, exchange, targets):
+        """Read bounded official attachments through the existing acquisition service."""
+        from instrument_master_delisting import scan_terminal_announcements
         service = self._build_official_announcement_acquisition_service(
-            request_timeout_seconds=20.0,
-            request_interval_seconds=0.2,
+            request_timeout_seconds=20.0, request_interval_seconds=0.2,
         )
-        filters = [
-            {"category": "category_tbclts_szsh"},
-            {"category": "category_tszlq_szsh"},
-            {"keyword": "终止上市"},
-            {"keyword": "摘牌"},
-        ]
-
-        records_by_id: Dict[str, Any] = {}
-        for query_filter in filters:
-            route_result = await asyncio.to_thread(
-                service.acquire,
-                AnnouncementQuery(
-                    purpose_key="instrument_master_bse_delisting",
-                    scope=AnnouncementScope(
-                        exchange="BSE",
-                        market="BSE",
-                        category=query_filter.get("category"),
-                        keyword=query_filter.get("keyword"),
-                        start_date=start_date,
-                        end_date=end_date,
-                        page_size=30,
-                        max_pages=max_pages,
-                    ),
-                ),
-            )
-            result = route_result.scan_result
-            if result is None:
-                continue
-            for record in result.records:
-                if record.source_announcement_id:
-                    records_by_id[record.source_announcement_id] = record
-        return list(records_by_id.values())
-
-    async def _sync_bse_delisting_status(
-        self,
-        *,
-        before_snapshot: Dict[str, Any],
-        fetched_instruments: List[Dict[str, Any]],
-    ) -> Dict[str, Any]:
-        """Confirm BSE current-list disappearances through CNInfo terminal announcements."""
         config = self._get_instrument_master_sync_config()
-        result: Dict[str, Any] = {
-            "status": "skipped",
-            "enabled": bool(config.get("bse_delisting_check_enabled", True)),
-            "candidate_count": 0,
-            "confirmed_count": 0,
-            "risk_only_count": 0,
-            "unconfirmed_count": 0,
-            "updated_samples": [],
-            "unconfirmed_samples": [],
-            "warnings": [],
-            "errors": [],
-        }
-        if not result["enabled"]:
-            result["reason"] = "disabled_by_config"
-            return result
-
-        current_ids = {
-            str(item.get("instrument_id") or "")
-            for item in (fetched_instruments or [])
-            if str(item.get("exchange") or "").upper() == "BSE"
-            and str(item.get("type") or "stock").lower() == "stock"
-            and item.get("instrument_id")
-        }
-        if not current_ids:
-            result["status"] = "warning"
-            result["warnings"].append("BSE current list empty; delisting check skipped")
-            return result
-
-        candidates = sorted(before_snapshot.get("active_ids", set()) - current_ids)
-        result["candidate_count"] = len(candidates)
-        if not candidates:
-            result["status"] = "success"
-            return result
-
-        symbol_to_instrument = {
-            instrument_id.split(".")[0]: instrument_id
-            for instrument_id in candidates
-            if instrument_id.endswith(".BJ")
-        }
-        end_dt = get_shanghai_time().date()
-        start_dt = end_dt - timedelta(days=int(config.get("bse_delisting_scan_days", 730)))
-        records = await self._scan_bse_delisting_announcements(
-            start_date=start_dt.isoformat(),
-            end_date=end_dt.isoformat(),
-            max_pages=int(config.get("bse_delisting_scan_max_pages", 30)),
-        )
-
-        confirmed_ids: Set[str] = set()
-        for record in records:
-            classification = self._classify_bse_delisting_title(record.title)
-            if classification == "irrelevant":
-                continue
-            for raw_symbol in record.symbols or []:
-                symbol = str(raw_symbol).strip().zfill(6)
-                instrument_id = symbol_to_instrument.get(symbol)
-                if not instrument_id:
-                    continue
-                if classification != "confirmed_delisted":
-                    result["risk_only_count"] += 1
-                    continue
-
-                delisted_on = self._announcement_local_date(
-                    getattr(record, "published_at", None)
-                    or getattr(record, "announcement_time", None)
-                )
-                if delisted_on is None:
-                    result["errors"].append(f"{instrument_id}: confirmed announcement has no parseable date")
-                    continue
-                updated = await self.db_ops.mark_instrument_delisted(
-                    instrument_id,
-                    delisted_date=delisted_on,
-                    source="cninfo_bse_delisting",
-                )
-                if updated:
-                    confirmed_ids.add(instrument_id)
-                    result["confirmed_count"] += 1
-                    if len(result["updated_samples"]) < 20:
-                        result["updated_samples"].append(
-                            {
-                                "instrument_id": instrument_id,
-                                "delisted_date": delisted_on.isoformat(),
-                                "announcement_id": record.source_announcement_id,
-                                "title": self._normalize_cninfo_title(record.title),
-                            }
-                        )
-
-        unconfirmed = sorted(set(candidates) - confirmed_ids)
-        result["unconfirmed_count"] = len(unconfirmed)
-        result["unconfirmed_samples"] = unconfirmed[:20]
-        if result["errors"]:
-            result["status"] = "error"
-        elif result["unconfirmed_count"]:
-            result["status"] = "warning"
-            result["warnings"].append("BSE current-list disappearance has no confirmed delisting announcement")
-        else:
-            result["status"] = "success"
-        return result
+        options = {}
+        if exchange == 'BSE':
+            options = {
+                'scan_days': int(config.get('bse_delisting_scan_days', 730)),
+                'max_pages': max(1, min(2, int(config.get('bse_delisting_scan_max_pages', 30)))),
+            }
+        return await asyncio.to_thread(scan_terminal_announcements, service, exchange, targets, **options)
 
     def _read_hkex_master_file(self, file_path: Optional[str]) -> Optional[str]:
         if not file_path:
@@ -18112,6 +17928,7 @@ class DataManager:
         timeout_sec: Optional[int] = None,
         freshness_threshold_hours: Optional[int] = None,
         enrich_from_backup_sources: bool = True,
+        audit_only: bool = False,
     ) -> Dict[str, Any]:
         """Refresh A-share stock master data and return structured diagnostics."""
         config = self._get_instrument_master_sync_config()
@@ -18177,11 +17994,13 @@ class DataManager:
             }
             try:
                 before = await self._get_instrument_master_snapshot(exchange)
+                fetch_options = {"persist": False} if audit_only else {}
                 fetch_coro = self.source_factory.get_instrument_list(
                     exchange,
                     force_refresh=True,
                     instrument_types=['stock'],
                     enrich_from_backup_sources=enrich_from_backup_sources,
+                    **fetch_options,
                 )
                 if effective_timeout:
                     instruments = await asyncio.wait_for(fetch_coro, timeout=effective_timeout)
@@ -18199,19 +18018,31 @@ class DataManager:
                     if isinstance(source_diagnostics, dict) else None
                 ) or self._infer_stock_source_authority(instruments)
 
+                from instrument_master_delisting import AShareDelistingReconciler
+                delisting_reconciliation = await AShareDelistingReconciler(
+                    self.db_ops, self.source_factory, self._load_a_share_terminal_announcements,
+                ).reconcile(exchange, before, instruments or [], source_diagnostics,
+                            audit_only=audit_only, freshness_hours=freshness_hours or 48,
+                            enabled=exchange != 'BSE' or bool(config.get('bse_delisting_check_enabled', True)))
                 bse_delisting = None
-                if exchange == 'BSE':
-                    bse_delisting = await self._sync_bse_delisting_status(
-                        before_snapshot=before,
-                        fetched_instruments=instruments or [],
-                    )
-                official_absent_delisting = await self._deactivate_official_absent_delisting_prefixed_stocks(
-                    exchange=exchange,
-                    before=before,
-                    instruments=instruments or [],
-                    source_authority=source_authority,
-                )
+                official_absent_delisting = None  # compatibility report field; name-only writes retired
                 after = await self._get_instrument_master_snapshot(exchange)
+
+                if exchange == 'BSE':
+                    current_ids = {row.get('instrument_id') for row in instruments or []}
+                    missing = before['active_ids'] - current_ids
+                    remaining = sorted(missing & after['active_ids'])
+                    newly_inactive = before['active_ids'] - after['active_ids']
+                    bse_delisting = {
+                        **delisting_reconciliation,
+                        'enabled': bool(config.get('bse_delisting_check_enabled', True)),
+                        'candidate_count': len(missing),
+                        'confirmed_count': delisting_reconciliation['deactivated_count'],
+                        'risk_only_count': delisting_reconciliation.get('risk_only_count', 0),
+                        'updated_samples': [row for row in delisting_reconciliation['samples']
+                                            if row['instrument_id'] in newly_inactive],
+                        'unconfirmed_count': len(remaining), 'unconfirmed_samples': remaining[:20],
+                    }
 
                 added_ids = sorted(after['all_ids'] - before['all_ids'])
                 deactivated_ids = sorted(before['active_ids'] - after['active_ids'])
@@ -18219,7 +18050,7 @@ class DataManager:
                 metadata_rows_saved = 0
                 discrepancy_rows_saved = 0
                 metadata_saver = getattr(self.db_ops, 'save_instrument_master_metadata_batch', None)
-                if instruments and callable(metadata_saver):
+                if instruments and callable(metadata_saver) and not audit_only:
                     maybe_saved = metadata_saver(
                         self._build_a_share_stock_metadata_rows(
                             instruments,
@@ -18282,8 +18113,15 @@ class DataManager:
                     'freshness': after['freshness'],
                     'bse_delisting': bse_delisting,
                     'official_absent_delisting': official_absent_delisting,
+                    'delisting_reconciliation': delisting_reconciliation,
+                    'audit_only': audit_only,
                 })
 
+                if delisting_reconciliation:
+                    exchange_result['warnings'].extend(delisting_reconciliation['warnings'])
+                    exchange_result['errors'].extend(delisting_reconciliation['errors'])
+                    if delisting_reconciliation['status'] != 'success':
+                        exchange_result['status'] = delisting_reconciliation['status']
                 if not instruments:
                     exchange_result['status'] = 'warning'
                     exchange_result['warnings'].append('empty instrument list from primary route')

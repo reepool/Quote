@@ -24,6 +24,21 @@ def test_format_instrument_master_governance_summary_success():
     assert "新增: 0，停用: 0，停牌: 0，复活: 0，待复核: 0，活跃合计: 5519" in summary
 
 
+def test_stock_terminal_detail_survives_index_exchange_merging():
+    summary = _format_instrument_master_governance_summary({
+        "status": "warning", "summary": {},
+        "exchanges": {"SZSE": {"scope": "a_share_index"}},
+        "children": [{"scope": "a_share_stock", "status": "warning", "summary": {},
+                      "exchanges": {"SZSE": {"source_authority": "official",
+                          "delisting_reconciliation": {"confirmed_count": 1,
+                              "deactivated_count": 1, "unconfirmed_count": 2}}}}],
+        "warnings": ["SZSE: official current absence without terminal evidence: 2"],
+    })
+    assert "SZSE 退市核验: 确认=1，停用=1，待核=2" in summary
+    assert "A股股票源: SZSE:official" in summary
+    assert "警告:" in summary
+
+
 def test_format_instrument_master_governance_summary_skipped_warning_and_error():
     skipped = _format_instrument_master_governance_summary({
         "status": "skipped",
@@ -160,12 +175,13 @@ async def test_hk_daily_data_update_passes_hkex_master_governance_job_name():
 
 
 @pytest.mark.asyncio
-async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
+async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports(tmp_path):
     task = ScheduledTasks()
     task.telegram_enabled = False
     task._send_task_report = AsyncMock(return_value=False)
 
     with patch("scheduler.tasks.data_manager") as dm:
+        dm.db_ops.db.db_path = str(tmp_path / "quotes.db")
         dm.run_master_governance = AsyncMock(return_value={
             "status": "success",
             "mode": "audit_only",
@@ -203,12 +219,13 @@ async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
 
 
 @pytest.mark.asyncio
-async def test_hkex_instrument_master_sync_manual_task_passes_lifecycle_write_mode():
+async def test_hkex_instrument_master_sync_manual_task_passes_lifecycle_write_mode(tmp_path):
     task = ScheduledTasks()
     task.telegram_enabled = False
     task._send_task_report = AsyncMock(return_value=False)
 
     with patch("scheduler.tasks.data_manager") as dm:
+        dm.db_ops.db.db_path = str(tmp_path / "quotes.db")
         dm.run_master_governance = AsyncMock(return_value={
             "status": "success",
             "mode": "lifecycle_write",
@@ -231,12 +248,13 @@ async def test_hkex_instrument_master_sync_manual_task_passes_lifecycle_write_mo
 
 
 @pytest.mark.asyncio
-async def test_a_share_stock_master_sync_manual_task_runs_without_daily_quotes():
+async def test_a_share_stock_master_sync_manual_task_runs_without_daily_quotes(tmp_path):
     task = ScheduledTasks()
     task.telegram_enabled = False
     task._send_task_report = AsyncMock(return_value=False)
 
     with patch("scheduler.tasks.data_manager") as dm:
+        dm.db_ops.db.db_path = str(tmp_path / "quotes.db")
         dm.run_master_governance = AsyncMock(return_value={
             "status": "success",
             "summary": {
@@ -280,12 +298,13 @@ async def test_a_share_stock_master_sync_manual_task_runs_without_daily_quotes()
 
 
 @pytest.mark.asyncio
-async def test_index_master_governance_sync_manual_task_runs_without_daily_quotes():
+async def test_index_master_governance_sync_manual_task_runs_without_daily_quotes(tmp_path):
     task = ScheduledTasks()
     task.telegram_enabled = False
     task._send_task_report = AsyncMock(return_value=False)
 
     with patch("scheduler.tasks.data_manager") as dm:
+        dm.db_ops.db.db_path = str(tmp_path / "quotes.db")
         dm.run_master_governance = AsyncMock(return_value={
             "status": "success",
             "summary": {

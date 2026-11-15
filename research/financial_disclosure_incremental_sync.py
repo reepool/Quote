@@ -340,7 +340,7 @@ class FinancialDisclosureIncrementalSyncService:
                     "pages_scanned": 0,
                     "errors": [],
                 }
-                if reconciliation
+                if reconciliation or not instruments
                 else self._scan_announcements(
                     exchanges=target_exchanges,
                     instruments=instruments,
@@ -542,6 +542,13 @@ class FinancialDisclosureIncrementalSyncService:
                 if target_ids and instrument_id not in target_ids:
                     continue
                 if target_symbol_set and symbol not in target_symbol_set:
+                    continue
+                delisted = self._parse_date_text(row.get("delisted_date"))
+                if row.get("status") == "delisted" or (
+                    delisted is not None and delisted.date() <= get_shanghai_time().date()
+                ):
+                    if row.get("is_active"):
+                        dm_logger.warning("Financial current scope rejected inconsistent delisted row: %s", instrument_id)
                     continue
                 if row.get("type") == "stock" and row.get("is_active", True):
                     instruments.append(dict(row))

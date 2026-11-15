@@ -7,6 +7,7 @@ The system SHALL use exchange-official sources as the primary A-share instrument
 - **WHEN** BaoStock returns `ipoDate`, `outDate`, and status for an instrument
 - **THEN** the system SHALL use those fields only within the configured fallback or cross-check role
 - **AND** official lifecycle evidence SHALL take precedence, with conflicting fallback evidence reported as a discrepancy
+- **AND** ordinary production list-cache/upsert SHALL NOT establish or alter terminal lifecycle state from BaoStock-only fields before required official confirmation
 
 #### Scenario: AkShare fallback is used
 - **WHEN** official and BaoStock routes fail or require permitted metadata supplementation and AkShare provides current-list evidence

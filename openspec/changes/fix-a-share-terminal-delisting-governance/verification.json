@@ -1,0 +1,207 @@
+{
+  "change": "fix-a-share-terminal-delisting-governance",
+  "date": "2026-11-15",
+  "targeted_production_apply": {
+    "instrument_id": "000016.SZ",
+    "before": {
+      "instrument_id": "000016.SZ",
+      "symbol": "000016",
+      "name": "*ST康佳A",
+      "exchange": "SZSE",
+      "type": "stock",
+      "status": "active",
+      "is_active": 1,
+      "listed_date": "1992-03-27 00:00:00.000000",
+      "delisted_date": null,
+      "source": "szse_official",
+      "updated_at": "2026-10-23 00:15:22.577783"
+    },
+    "after": {
+      "instrument_id": "000016.SZ",
+      "symbol": "000016",
+      "name": "*ST康佳A",
+      "exchange": "SZSE",
+      "type": "stock",
+      "status": "delisted",
+      "is_active": 0,
+      "listed_date": "1992-03-27 00:00:00.000000",
+      "delisted_date": "2026-10-23 00:00:00.000000",
+      "source": "szse_official_terminal_list",
+      "updated_at": "2026-11-15 15:49:51.387033",
+      "trading_status": 0
+    },
+    "newly_deactivated": 1,
+    "repeat_newly_deactivated": 0,
+    "date_preserved_on_missing_repeat": true,
+    "official_evidence": {
+      "instrument_id": "000016.SZ",
+      "symbol": "000016",
+      "exchange": "SZSE",
+      "type": "stock",
+      "name": "*ST康佳A",
+      "listed_date": "1992-03-27",
+      "delisted_date": "2026-10-23",
+      "completion_confirmed": true,
+      "source": "szse_official_terminal_list",
+      "source_url": "https://www.szse.cn/api/report/ShowReport",
+      "raw_snapshot_hash": "a0ad3f20398dbce887af6f4e1d84e3e6520903ff227731e003b7ea23c3369e98",
+      "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v1",
+      "observed_at": "2026-11-15T15:37:04.173606+08:00"
+    }
+  },
+  "financial_verification": {
+    "mode": "targeted_reconciliation_dry_run",
+    "candidate_count": 0,
+    "blocking_gap_count": 0,
+    "cninfo_attempts": 0,
+    "fallback_attempts": 0,
+    "old_event_state_sha256": "07261336c824e5145eef0fd68ca754b0d786bba57bf36b2e1ddbdf4b73af4a2b",
+    "old_event_state_unchanged": true,
+    "explicit_q3_ready": false,
+    "explicit_q3_missing": [
+      "revenue",
+      "net_income_parent",
+      "equity_parent",
+      "total_assets",
+      "total_liabilities"
+    ],
+    "prior_q2_facts_readable": true
+  },
+  "live_audit": {
+    "mode": "audit_only",
+    "markets": {
+      "SZSE": {
+        "current_rows": 2905,
+        "terminal_rows": 190,
+        "would_deactivate": 1,
+        "historical_conflicts": [
+          "000003.SZ: listing_interval_conflict",
+          "000004.SZ: listing_interval_conflict",
+          "000015.SZ: official effective-date conflict",
+          "000556.SZ: official effective-date conflict",
+          "000588.SZ: official effective-date conflict"
+        ],
+        "source_error_count": 0
+      },
+      "SSE": {
+        "current_rows": 2319,
+        "terminal_rows": 154,
+        "would_deactivate": 0,
+        "historical_conflicts": [
+          "600069.SH: official effective-date conflict",
+          "600074.SH: official effective-date conflict",
+          "600086.SH: official effective-date conflict",
+          "600175.SH: official effective-date conflict",
+          "600190.SH: listing_interval_conflict",
+          "600240.SH: official effective-date conflict",
+          "600401.SH: official effective-date conflict",
+          "600555.SH: listing_interval_conflict",
+          "600614.SH: listing_interval_conflict",
+          "600625.SH: listing_interval_conflict",
+          "600634.SH: official effective-date conflict",
+          "600646.SH: official effective-date conflict",
+          "600680.SH: listing_interval_conflict",
+          "600687.SH: official effective-date conflict",
+          "600695.SH: listing_interval_conflict",
+          "600701.SH: official effective-date conflict",
+          "600709.SH: official effective-date conflict",
+          "600747.SH: official effective-date conflict",
+          "600786.SH: official effective-date conflict",
+          "600799.SH: official effective-date conflict",
+          "601558.SH: official effective-date conflict"
+        ],
+        "source_error_count": 0
+      }
+    },
+    "other_conflicts_not_written": 26,
+    "financial_state_unchanged": true
+  },
+  "tests": {
+    "passed": 221,
+    "failures": 0,
+    "errors": 0,
+    "deselected_existing_profile_case": 1,
+    "files": [
+      "test_a_share_delisting_reconciliation.py",
+      "test_a_share_official_stock_master.py",
+      "test_instrument_master_sync.py",
+      "test_master_governance_orchestration.py",
+      "test_prepare_sina_ths_local_core_import_manifest.py",
+      "test_financial_disclosure_incremental_sync.py",
+      "test_scheduler_instrument_master_governance_report.py",
+      "test_delisted_a_share_quote_backfill.py",
+      "test_hkex_instrument_master.py"
+    ],
+    "black_check": "pass for new modules/test",
+    "flake8_correctness": "pass",
+    "openspec_strict": "pass",
+    "targeted_followups": [
+      {
+        "phase": "bse-compatibility-tests.xml",
+        "passed": 96,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "phase": "bse-final-tests.xml",
+        "passed": 5,
+        "failures": 0,
+        "errors": 0
+      }
+    ]
+  },
+  "preexisting_out_of_scope": {
+    "profile_case": {
+      "baseline_profiles": {
+        "bank": 1,
+        "insurance": 1,
+        "nonbank": 2
+      },
+      "working_profiles": {
+        "bank": 1,
+        "insurance": 1,
+        "nonbank": 2
+      },
+      "same": true,
+      "expected_securities_count": 1
+    },
+    "expanded_legacy_database_fixture": {
+      "errors": 26,
+      "reason": "tests/conftest.py awaits synchronous DatabaseManager.initialize before reaching tests",
+      "initialize_is_coroutine": false,
+      "affected_fixture_and_connection_code_modified": false
+    }
+  },
+  "failure_trace": [
+    {
+      "stage": "initial_SSE_probe",
+      "http_status": 200,
+      "rows": 0,
+      "cause": "query omitted type=inParams; completed protocol subsequently returned 161 rows",
+      "response_sha256": "da781f5360f567bf16a5151499c55fd1d44a176c52b540ae89ff92761a2ebbb2"
+    },
+    {
+      "stage": "sandbox_SQLite_tests",
+      "result": "thread/event-loop wakeup stalled; tests passed in approved execution environment"
+    }
+  ],
+  "review": {
+    "blocking": "fixed strict plan payload validation, stable plan identity, terminal source/cache gate, audit side effects, lifecycle/issuer bounds and test output paths; restored BSE disable/window configuration and legacy report projections; verified announcement-source failure preserves lifecycle",
+    "remaining_blocking": 0,
+    "unrelated_existing_workspace_changes": "preserved"
+  },
+  "deployment": {
+    "production_service_restarted": false,
+    "scope": "Only Konka lifecycle/evidence applied; no full-market production refresh or scheduled job triggered; new code requires normal process loading."
+  },
+  "frozen_manifests_containing_konka": [],
+  "cleanup": {
+    "owned_task_directory": "data/QuoteBak/instrument_delisting_20261115",
+    "related_old_task_artifacts_found_at_start": 0,
+    "strategy": "Removed owned temporary databases, baseline copies, probe script/logs, isolated staging patch and recovered test artifacts after retaining source fixtures/hashes and this record.",
+    "shared_or_unattributed_artifacts": "not touched",
+    "completed": true,
+    "estimated_removed_file_bytes": 3730334,
+    "retained_owned_task_temporary_items": []
+  }
+}

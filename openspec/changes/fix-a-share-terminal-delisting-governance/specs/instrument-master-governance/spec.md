@@ -1,7 +1,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Governance reuses fresh master state
-The system SHALL avoid repeated upstream instrument-list fetches when local master data and its applicable terminal-reconciliation evidence satisfy the configured freshness policy. Reuse SHALL preserve unresolved or degraded evidence rather than equating recent current-row updates with complete lifecycle verification.
+The system SHALL avoid repeated upstream instrument-list fetches when local master data and its applicable terminal-reconciliation evidence satisfy the configured freshness policy. Reuse SHALL preserve unresolved or degraded evidence rather than equating recent current-row updates with complete lifecycle verification, and SHALL NOT bypass a known terminal decision becoming effective.
 
 #### Scenario: Master data is already fresh
 - **WHEN** a guarded job starts and supported exchange master data and applicable lifecycle checks satisfy the configured freshness window
@@ -21,6 +21,13 @@ The system SHALL avoid repeated upstream instrument-list fetches when local mast
 - **WHEN** a reusable governance result still contains unconfirmed terminal candidates or conflicts
 - **THEN** the reused result SHALL retain their counts, representative identities, and degraded status
 - **AND** the next actual refresh SHALL reevaluate them rather than treating cached unresolved evidence as resolved
+
+#### Scenario: Known terminal decision reaches its effective day
+- **WHEN** a cached future decision becomes effective on the Shanghai business date while the ordinary freshness window remains valid
+- **THEN** the guard SHALL invalidate the previous not-yet-effective conclusion and reevaluate the due decision before exposing the current universe
+- **AND** it SHALL first load applicable production plans and the latest production verification result from the existing discrepancy table using the fixed durable protocol, including after a restart
+- **AND** it SHALL apply still-reliable evidence through the existing lifecycle owner or perform the necessary actual refresh
+- **AND** it SHALL NOT return the old active state solely because the ordinary freshness duration has not elapsed; failure SHALL retain visible degraded continuation semantics
 
 ### Requirement: Governance preserves A-share source authority
 The system SHALL use exchange-official sources as primary A-share lifecycle authority, BaoStock as first fallback and cross-check, AkShare as second fallback, and pytdx as diagnostic-only when governance triggers a sync.

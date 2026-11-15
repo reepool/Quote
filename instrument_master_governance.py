@@ -354,6 +354,8 @@ class AShareStockPolicy:
             sync_kwargs["enrich_from_backup_sources"] = bool(
                 requirement.options["enrich_from_backup_sources"]
             )
+        if requirement.mode == "audit_only":
+            sync_kwargs["audit_only"] = True
         result = await self.manager.sync_instrument_master(exchanges, **sync_kwargs)
         result["action"] = "synced"
         result.setdefault("reason", "master_sync_executed")

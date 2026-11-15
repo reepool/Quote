@@ -1,0 +1,24 @@
+{
+  "szse_url": "https://www.szse.cn/api/report/ShowReport?SHOWTYPE=xlsx&CATALOGID=1793_ssgs&TABKEY=tab2",
+  "sse_url": "https://query.sse.com.cn/commonQuery.do",
+  "sse_parameters": {
+    "sqlId": "COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L",
+    "COMPANY_STATUS": "3",
+    "STOCK_TYPE": "1,2,8",
+    "type": "inParams",
+    "pageHelp.pageSize": 500
+  },
+  "fixtures": {
+    "szse_terminated.xlsx": {
+      "sha256": "ec37af7d3fe5a2ad7844d42b25f7a928baf93477edd02ef90d02ee5562173e2b",
+      "kind": "official_public_snapshot",
+      "observed_on": "2026-11-15"
+    },
+    "sse_terminated.json": {
+      "sha256": "d5e5dec58882aef4aba8be707087e9c3483ee1be9c2d1fcb6070e1ae9abc8990",
+      "kind": "official_public_snapshot",
+      "observed_on": "2026-11-15"
+    }
+  },
+  "numeric_cell_variants": "synthetic workbooks generated in tests; never substituted for official snapshots"
+}

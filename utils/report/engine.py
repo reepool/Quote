@@ -448,6 +448,17 @@ class ReportEngine:
                 f"+{item.get('added_count', 0)}/-{item.get('deactivated_count', 0)} "
                 f"source={source_text}"
             )
+            terminal = item.get('delisting_reconciliation')
+            if isinstance(terminal, dict):
+                lines.append(
+                    f"{exchange} 退市核验: 确认={terminal.get('confirmed_count', 0)} "
+                    f"实际停用={terminal.get('deactivated_count', 0)} "
+                    f"待核={terminal.get('unconfirmed_count', 0)} "
+                    f"未来生效={terminal.get('future_effective_count', 0)} "
+                    f"冲突={terminal.get('conflict_count', 0)} "
+                    f"来源错误={terminal.get('source_error_count', 0)} "
+                    f"写入失败={terminal.get('write_failed_count', 0)}"
+                )
         if exchange_parts:
             lines.append('市场: ' + '；'.join(exchange_parts))
 

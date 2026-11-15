@@ -61,6 +61,25 @@ def _manager() -> DataManager:
         return DataManager()
 
 
+def _terminal_dependencies(manager):
+    """Supply the official-terminal dependency for orchestration-only tests."""
+    manager.db_ops.get_instrument_master_lineage_metadata = AsyncMock(return_value={})
+    manager.db_ops.load_a_share_delisting_state = AsyncMock(return_value={"plans": []})
+    manager.db_ops.save_instrument_master_discrepancies = AsyncMock(
+        side_effect=lambda rows, **kwargs: len(rows)
+    )
+    manager.source_factory = Mock()
+    manager.source_factory.get_official_delisting_snapshot = AsyncMock(
+        return_value={"rows": [], "complete": True, "errors": []}
+    )
+    manager.source_factory.get_last_instrument_list_diagnostics.return_value = {
+        "selected_source_authority": "official", "official_current_list_complete": True,
+    }
+    manager._load_a_share_terminal_announcements = AsyncMock(
+        return_value={"rows": [], "complete": True, "errors": []}
+    )
+
+
 @pytest.mark.asyncio
 async def test_daily_update_master_governance_honors_force_refresh_job_names():
     manager = _manager()
@@ -355,7 +374,7 @@ def test_akshare_fallback_cannot_reactivate_existing_delisted_without_delist_dat
     assert DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'akshare', None)
     assert DatabaseOperations._should_preserve_protected_inactive_status('auto_deactivated_zombie', 'akshare', None)
     assert DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'baostock', None)
-    assert not DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'sse_official', None)
+    assert DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'sse_official', None)
     assert not DatabaseOperations._should_preserve_protected_inactive_status('active', 'akshare', None)
 
 
@@ -387,7 +406,8 @@ async def test_sync_instrument_master_reports_added_and_deactivated_rows():
     ]
     manager.db_ops = Mock()
     manager.db_ops.execute_read_query = AsyncMock(side_effect=[before_rows, after_rows])
-    manager.source_factory = Mock()
+    _terminal_dependencies(manager)
+    manager.source_factory.get_last_instrument_list_diagnostics.return_value = {"selected_source_authority": "baostock_fallback", "official_current_list_complete": False}
     manager.source_factory.get_instrument_list = AsyncMock(return_value=[
         {'instrument_id': '600355.SH', 'source': 'baostock', 'delisted_date': '2026-04-15', 'status': 'delisted', 'is_active': False},
         {'instrument_id': '600000.SH', 'source': 'baostock', 'status': 'active', 'is_active': True},
@@ -415,7 +435,7 @@ async def test_sync_instrument_master_reports_added_and_deactivated_rows():
 
 
 @pytest.mark.asyncio
-async def test_sync_instrument_master_deactivates_delisting_named_official_absence():
+async def test_sync_instrument_master_keeps_delisting_names_unconfirmed_without_evidence():
     manager = _manager()
     before_rows = [
         {
@@ -463,17 +483,12 @@ async def test_sync_instrument_master_deactivates_delisting_named_official_absen
             'updated_at': '2026-07-07 20:00:00',
         },
     ]
-    after_rows = [
-        {**before_rows[0], 'status': 'delisted', 'is_active': 0},
-        {**before_rows[1], 'status': 'delisted', 'is_active': 0},
-        before_rows[2],
-        before_rows[3],
-    ]
+    after_rows = list(before_rows)
     manager.db_ops = Mock()
     manager.db_ops.execute_read_query = AsyncMock(side_effect=[before_rows, after_rows])
     manager.db_ops.get_latest_quote_date = AsyncMock(return_value=datetime(2026, 7, 3))
     manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
-    manager.source_factory = Mock()
+    _terminal_dependencies(manager)
     manager.source_factory.get_instrument_list = AsyncMock(return_value=[
         {
             'instrument_id': '600000.SH',
@@ -495,25 +510,9 @@ async def test_sync_instrument_master_deactivates_delisting_named_official_absen
         freshness_threshold_hours=9999,
     )
 
-    assert manager.db_ops.mark_instrument_delisted.await_args_list == [
-        call(
-            '600355.SH',
-            delisted_date=None,
-            source='sse_official_current_list_absence',
-        ),
-        call(
-            '600356.SH',
-            delisted_date=None,
-            source='sse_official_current_list_absence',
-        ),
-    ]
-    assert result['summary']['deactivated_instruments'] == 2
-    assert result['exchanges']['SSE']['official_absent_delisting']['deactivated_count'] == 2
-    assert (
-        result['exchanges']['SSE']['official_absent_delisting']['samples'][0]['last_quote_date']
-        == '2026-07-03'
-    )
-    assert result['exchanges']['SSE']['deactivated_samples'] == ['600355.SH', '600356.SH']
+    manager.db_ops.mark_instrument_delisted.assert_not_awaited()
+    assert result['summary']['deactivated_instruments'] == 0
+    assert result['exchanges']['SSE']['delisting_reconciliation']['unconfirmed_count'] == 3
 
 
 @pytest.mark.asyncio
@@ -612,6 +611,13 @@ async def test_governance_reuses_fresh_master_without_sync():
             'updated_at': recent_ts,
         }
     ])
+    from utils.date_utils import get_shanghai_time
+    manager.db_ops.load_a_share_delisting_state = AsyncMock(return_value={
+        'plans': [], 'has_baseline': True, 'verifications': {'SSE': {
+            'verified_at': get_shanghai_time().isoformat(), 'status': 'success',
+            'warnings': [], 'summary': {},
+        }},
+    })
     manager.sync_instrument_master = AsyncMock()
 
     result = await manager.ensure_instrument_master_fresh(
@@ -2123,72 +2129,49 @@ def test_bse_delisting_title_classifier_separates_terminal_and_risk_events():
 
 @pytest.mark.asyncio
 async def test_bse_delisting_sync_confirms_current_list_disappearance_with_cninfo():
+    from instrument_master_delisting import AShareDelistingReconciler, announcement_terminal_evidence
     manager = _manager()
     manager.db_ops = Mock()
     manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
-    manager._scan_bse_delisting_announcements = AsyncMock(return_value=[
-        _announcement_record(
-            announcement_id="ann-920680",
-            title="关于公司股票终止上市暨摘牌的公告",
-            symbols=["920680"],
-            published_at="2025-12-30T16:00:00+00:00",
-        )
-    ])
-
-    result = await manager._sync_bse_delisting_status(
-        before_snapshot={"active_ids": {"920680.BJ", "920305.BJ"}},
-        fetched_instruments=[
-            {
-                "instrument_id": "920305.BJ",
-                "exchange": "BSE",
-                "type": "stock",
-            }
-        ],
+    _terminal_dependencies(manager)
+    record = _announcement_record(
+        announcement_id="ann-920680", title="关于公司股票终止上市暨摘牌的公告",
+        symbols=["920680"], published_at="2025-12-30T16:00:00+00:00",
     )
-
-    assert result["status"] == "success"
-    assert result["candidate_count"] == 1
+    evidence = announcement_terminal_evidence(
+        record, "证券代码：920680。北京证券交易所决定公司股票终止上市。摘牌日期：2026年1月5日。",
+        "920680.BJ",
+    )
+    assert evidence["delisted_date"] == "2026-01-05"
+    row = {"instrument_id": "920680.BJ", "symbol": "920680", "exchange": "BSE",
+           "type": "stock", "is_active": True, "status": "active"}
+    result = await AShareDelistingReconciler(manager.db_ops, None).reconcile(
+        "BSE", {"rows_by_id": {"920680.BJ": row}}, [],
+        {"official_current_list_complete": True},
+        snapshot={"rows": [evidence], "complete": True, "errors": []},
+    )
     assert result["confirmed_count"] == 1
-    assert result["unconfirmed_count"] == 0
-    manager.db_ops.mark_instrument_delisted.assert_awaited_once()
-    kwargs = manager.db_ops.mark_instrument_delisted.await_args.kwargs
-    assert kwargs["delisted_date"].isoformat() == "2025-12-31"
-    assert result["updated_samples"] == [
-        {
-            "instrument_id": "920680.BJ",
-            "delisted_date": "2025-12-31",
-            "announcement_id": "ann-920680",
-            "title": "关于公司股票终止上市暨摘牌的公告",
-        }
-    ]
+    assert manager.db_ops.mark_instrument_delisted.await_args.kwargs["delisted_date"] == date(2026, 1, 5)
 
 
 @pytest.mark.asyncio
 async def test_bse_delisting_sync_keeps_risk_only_disappearance_unconfirmed():
+    from instrument_master_delisting import AShareDelistingReconciler, announcement_terminal_evidence
     manager = _manager()
     manager.db_ops = Mock()
     manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
-    manager._scan_bse_delisting_announcements = AsyncMock(return_value=[
-        _announcement_record(
-            announcement_id="ann-920305",
-            title="关于公司股票可能被终止上市的风险提示公告",
-            symbols=["920305"],
-            published_at="2026-04-28T16:00:00+00:00",
-        )
-    ])
-
-    result = await manager._sync_bse_delisting_status(
-        before_snapshot={"active_ids": {"920305.BJ", "920000.BJ"}},
-        fetched_instruments=[
-            {
-                "instrument_id": "920000.BJ",
-                "exchange": "BSE",
-                "type": "stock",
-            }
-        ],
+    _terminal_dependencies(manager)
+    record = _announcement_record(
+        announcement_id="ann-920305", title="关于公司股票可能被终止上市的风险提示公告",
+        symbols=["920305"], published_at="2026-04-28T16:00:00+00:00",
     )
-
-    assert result["status"] == "warning"
-    assert result["candidate_count"] == 1
-    assert result["confirmed_count"] == 0
+    assert announcement_terminal_evidence(record, "证券代码：920305。可能终止上市。", "920305.BJ") is None
+    row = {"instrument_id": "920305.BJ", "symbol": "920305", "exchange": "BSE",
+           "type": "stock", "is_active": True, "status": "active"}
+    result = await AShareDelistingReconciler(manager.db_ops, None).reconcile(
+        "BSE", {"rows_by_id": {"920305.BJ": row}}, [],
+        {"official_current_list_complete": True},
+        snapshot={"rows": [], "complete": True, "errors": []},
+    )
+    assert result["unconfirmed_count"] == 1
     manager.db_ops.mark_instrument_delisted.assert_not_awaited()

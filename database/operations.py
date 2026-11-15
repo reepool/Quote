@@ -1123,7 +1123,7 @@ class DatabaseOperations:
             delisted_val = final_delisted
         else:
             return
-        if delisted_val <= date_type.today():
+        if delisted_val <= get_shanghai_time().date():
             record.is_active = False
             record.status = 'delisted'
             record.trading_status = 0
@@ -1147,7 +1147,11 @@ class DatabaseOperations:
             or source.endswith('_official')
             or source in {'sse_official', 'szse_official', 'bse_official'}
         )
-        return protected_status and incoming_delisted_date is None and not official_source
+        # A routine official current list is not a revocation of a confirmed
+        # terminal event, including when its exact date is unknown.
+        return status == 'delisted' or (
+            protected_status and incoming_delisted_date is None and not official_source
+        )
 
     async def save_instruments_batch(self, instruments: List[Dict[str, Any]]) -> bool:
         """批量保存交易品种信息"""
@@ -1208,6 +1212,23 @@ class DatabaseOperations:
                         result = await session.execute(stmt)
                         existing = result.scalar_one_or_none()
 
+                        # Ordinary fallback ingestion is not an official terminal
+                        # decision. In particular, do not turn unknown historical
+                        # BaoStock rows into new active or delisted instruments.
+                        source_text = str(processed_data.get('source') or '').lower()
+                        fallback_terminal = (
+                            processed_data.get('type') == 'stock'
+                            and processed_data.get('exchange') in {'SSE', 'SZSE', 'BSE'}
+                            and any(name in source_text for name in ('baostock', 'akshare', 'pytdx'))
+                            and (processed_data.get('delisted_date') is not None
+                                 or processed_data.get('status') == 'delisted')
+                        )
+                        if fallback_terminal:
+                            if existing is None:
+                                continue
+                            for key in ('delisted_date', 'status', 'is_active', 'trading_status'):
+                                processed_data.pop(key, None)
+
                         if existing:
                             existing_type = getattr(existing, 'type', None)
                             incoming_type = processed_data.get('type')
@@ -1237,7 +1258,7 @@ class DatabaseOperations:
                                 incoming_source = processed_data.get('source')
                                 incoming_delisted_date = processed_data.get('delisted_date')
                                 if (
-                                    key in ('is_active', 'status')
+                                    key in ('is_active', 'status', 'trading_status', 'delisted_date')
                                     and self._should_preserve_protected_inactive_status(
                                         existing_status,
                                         incoming_source,
@@ -1250,6 +1271,9 @@ class DatabaseOperations:
                                 if hasattr(existing, key) and getattr(existing, key) != value:
                                     setattr(existing, key, value)
                             existing.updated_at = get_shanghai_time()
+                            if existing.status == 'delisted':
+                                existing.is_active = False
+                                existing.trading_status = 0
                             # 防线 B: 基于最终 delisted_date 强制校正 is_active/status
                             self._apply_delisted_status(existing)
                         else:
@@ -1295,55 +1319,24 @@ class DatabaseOperations:
         *,
         delisted_date: Optional[Union[str, date, datetime]] = None,
         source: str = "cninfo_bse_delisting",
+        evidence: Optional[Dict[str, Any]] = None,
+        plan_keys: Sequence[str] = (),
     ) -> bool:
         """Mark one instrument as formally delisted using confirmed evidence.
 
         This mutates only lifecycle status fields; historical quotes remain
         intact and available for research.
         """
-        if not instrument_id:
-            return False
+        from database.instrument_lifecycle import mark_delisted
+        return await mark_delisted(
+            self, instrument_id, delisted_date=delisted_date, source=source,
+            evidence=evidence, plan_keys=plan_keys,
+        )
 
-        parsed_date = None
-        if isinstance(delisted_date, datetime):
-            parsed_date = delisted_date
-        elif isinstance(delisted_date, date):
-            parsed_date = datetime.combine(delisted_date, datetime.min.time())
-        elif isinstance(delisted_date, str):
-            text_value = delisted_date.strip()
-            if text_value:
-                try:
-                    parsed_date = datetime.fromisoformat(text_value[:10])
-                except ValueError:
-                    self.db_logger.warning(
-                        "Invalid delisted_date for %s: %s",
-                        instrument_id,
-                        delisted_date,
-                    )
-                    return False
-        elif delisted_date is not None:
-            return False
-
-        try:
-            async with self.get_async_session() as session:
-                result = await session.execute(
-                    select(InstrumentDB).filter(InstrumentDB.instrument_id == instrument_id)
-                )
-                record = result.scalar_one_or_none()
-                if record is None:
-                    return False
-
-                record.delisted_date = parsed_date
-                record.status = "delisted"
-                record.is_active = False
-                record.trading_status = 0
-                record.source = source
-                record.updated_at = get_shanghai_time()
-                await session.commit()
-                return True
-        except Exception as exc:
-            self.db_logger.error("Failed to mark %s delisted: %s", instrument_id, exc)
-            return False
+    async def load_a_share_delisting_state(self, exchanges: Sequence[str]) -> Dict[str, Any]:
+        """Load production terminal plans; propagate failures instead of returning []."""
+        from database.instrument_lifecycle import read_governance_state
+        return await read_governance_state(self, exchanges)
 
     async def mark_instrument_active(
         self,
@@ -1742,7 +1735,7 @@ class DatabaseOperations:
             if isinstance(raw_incoming_metadata, dict)
             else {}
         )
-        if "a_share_code_lineage" in incoming_metadata or not existing_metadata_json:
+        if not existing_metadata_json:
             result["metadata"] = incoming_metadata
             return result
         try:
@@ -1755,13 +1748,12 @@ class DatabaseOperations:
             if isinstance(existing_payload, dict)
             else None
         )
-        if (
-            isinstance(existing_metadata, dict)
-            and "a_share_code_lineage" in existing_metadata
-        ):
-            incoming_metadata["a_share_code_lineage"] = existing_metadata[
-                "a_share_code_lineage"
-            ]
+        if isinstance(existing_metadata, dict):
+            for key in ("a_share_code_lineage", "a_share_terminal_evidence"):
+                if key in existing_metadata and (
+                    key == "a_share_terminal_evidence" or key not in incoming_metadata
+                ):
+                    incoming_metadata[key] = existing_metadata[key]
         result["metadata"] = incoming_metadata
         return result
 

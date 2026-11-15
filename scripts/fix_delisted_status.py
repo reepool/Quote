@@ -1,14 +1,6 @@
-"""
-存量数据退市状态修复脚本
+"""Compatibility delisting operator; shared official governance owns all writes.
 
-三步修复：
-  Step 1: BaoStock 精确修复（基于 status/outDate 权威数据）
-  Step 2: AkShare 退市列表交叉补充（沪深退市股票）
-  Step 3: AkShare 独有品种差集报告（仅报告，不自动标记）
-
-用法:
-  python scripts/fix_delisted_status.py           # 执行修复
-  python scripts/fix_delisted_status.py --dry-run  # 仅预览，不修改
+--dry-run audits the same policy; Step 3 retains main-board and STAR diagnostics.
 """
 
 import asyncio
@@ -16,7 +8,6 @@ import sys
 import os
 import argparse
 import logging
-from datetime import datetime, date
 from typing import Dict, List, Any
 
 logging.basicConfig(
@@ -28,218 +19,6 @@ logger = logging.getLogger("fix_delisted")
 
 # 添加项目根目录
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
-async def _update_instrument(db_ops, instrument_id: str,
-                             is_active: bool, status: str,
-                             delisted_date_str: str = None) -> bool:
-    """通过 ORM 更新单个品种的退市状态"""
-    from sqlalchemy.future import select
-    from database.models import InstrumentDB
-
-    try:
-        async with db_ops.get_async_session() as session:
-            stmt = select(InstrumentDB).filter(
-                InstrumentDB.instrument_id == instrument_id
-            )
-            result = await session.execute(stmt)
-            record = result.scalar_one_or_none()
-            if not record:
-                return False
-
-            record.is_active = is_active
-            record.status = status
-            if delisted_date_str and not record.delisted_date:
-                try:
-                    record.delisted_date = datetime.strptime(delisted_date_str[:10], '%Y-%m-%d')
-                except (ValueError, TypeError):
-                    pass
-            record.updated_at = datetime.now()
-            await session.commit()
-            return True
-    except Exception as e:
-        logger.error(f"更新 {instrument_id} 失败: {e}")
-        return False
-
-
-async def step1_baostock_fix(db_ops, dry_run: bool = False) -> Dict[str, int]:
-    """Step 1: 基于 BaoStock status/outDate 精确标记退市品种"""
-    import baostock as bs
-
-    stats = {"updated": 0, "already_correct": 0, "not_in_db": 0, "errors": 0}
-
-    logger.info("=" * 60)
-    logger.info("Step 1: BaoStock 精确修复")
-    logger.info("=" * 60)
-
-    # 获取 BaoStock 全量品种列表
-    bs.login()
-    rs = bs.query_stock_basic()
-    bs_data: List[List[str]] = []
-    while rs.error_code == '0' and rs.next():
-        bs_data.append(rs.get_row_data())
-    bs.logout()
-
-    # 筛选退市品种 (status=0 且有 outDate)
-    delisted_items: List[Dict[str, Any]] = []
-    for row in bs_data:
-        code, name, ipo_date, out_date, bs_type, bs_status = row
-        if bs_status != '0' or not out_date.strip():
-            continue
-        # 转换 instrument_id
-        if code.startswith('sh.'):
-            instrument_id = f"{code.replace('sh.', '')}.SH"
-        elif code.startswith('sz.'):
-            instrument_id = f"{code.replace('sz.', '')}.SZ"
-        elif code.startswith('bj.'):
-            instrument_id = f"{code.replace('bj.', '')}.BJ"
-        else:
-            continue
-        delisted_items.append({
-            'instrument_id': instrument_id,
-            'name': name,
-            'delisted_date': out_date,
-        })
-
-    logger.info(f"BaoStock 退市品种总数: {len(delisted_items)}")
-
-    # 逐个匹配 DB 并更新
-    for item in delisted_items:
-        iid = item['instrument_id']
-        try:
-            query = "SELECT instrument_id, is_active, status, delisted_date FROM instruments WHERE instrument_id = :iid"
-            result = await db_ops.execute_read_query(query, {'iid': iid})
-
-            if not result:
-                stats["not_in_db"] += 1
-                continue
-
-            db_record = result[0]
-            needs_update = False
-            updates: List[str] = []
-
-            # 检查是否需要更新
-            if db_record.get('delisted_date') is None:
-                updates.append(f"delisted_date={item['delisted_date']}")
-                needs_update = True
-            if db_record.get('is_active') != 0:
-                updates.append("is_active=0")
-                needs_update = True
-            if db_record.get('status') != 'delisted':
-                updates.append("status=delisted")
-                needs_update = True
-
-            if not needs_update:
-                stats["already_correct"] += 1
-                continue
-
-            if dry_run:
-                logger.info(f"  [DRY] {iid} {item['name']}: {', '.join(updates)}")
-                stats["updated"] += 1
-                continue
-
-            success = await _update_instrument(
-                db_ops, iid, False, 'delisted', item['delisted_date']
-            )
-            if success:
-                stats["updated"] += 1
-                logger.info(f"  ✅ {iid} {item['name']}: {', '.join(updates)}")
-            else:
-                stats["errors"] += 1
-
-        except Exception as e:
-            stats["errors"] += 1
-            logger.error(f"  ❌ {iid}: {e}")
-
-    logger.info(f"Step 1 结果: 更新={stats['updated']}, 已正确={stats['already_correct']}, "
-                f"不在DB={stats['not_in_db']}, 错误={stats['errors']}")
-    return stats
-
-
-async def step2_akshare_supplement(db_ops, dry_run: bool = False) -> Dict[str, int]:
-    """Step 2: AkShare 退市列表交叉补充"""
-    import akshare as ak
-
-    stats = {"updated": 0, "already_correct": 0, "not_in_db": 0, "errors": 0}
-
-    logger.info("=" * 60)
-    logger.info("Step 2: AkShare 退市列表交叉补充")
-    logger.info("=" * 60)
-
-    delist_records: List[Dict[str, str]] = []
-
-    # 上交所退市
-    try:
-        sh_df = ak.stock_info_sh_delist()
-        for _, row in sh_df.iterrows():
-            code = str(row['公司代码']).zfill(6)
-            delist_records.append({
-                'instrument_id': f"{code}.SH",
-                'name': str(row.get('公司简称', '')),
-                'delisted_date': str(row.get('暂停上市日期', '')),
-            })
-        logger.info(f"  上交所退市列表: {len(sh_df)} 条")
-    except Exception as e:
-        logger.warning(f"  获取上交所退市列表失败: {e}")
-
-    # 深交所退市
-    try:
-        sz_df = ak.stock_info_sz_delist(symbol="终止上市公司")
-        for _, row in sz_df.iterrows():
-            code = str(row['证券代码']).zfill(6)
-            delist_records.append({
-                'instrument_id': f"{code}.SZ",
-                'name': str(row.get('证券简称', '')),
-                'delisted_date': str(row.get('终止上市日期', '')),
-            })
-        logger.info(f"  深交所退市列表: {len(sz_df)} 条")
-    except Exception as e:
-        logger.warning(f"  获取深交所退市列表失败: {e}")
-
-    logger.info(f"AkShare 退市品种合计: {len(delist_records)}")
-
-    # 匹配 DB 中尚未标记退市的品种
-    for item in delist_records:
-        iid = item['instrument_id']
-        try:
-            query = "SELECT instrument_id, is_active, status, delisted_date FROM instruments WHERE instrument_id = :iid"
-            result = await db_ops.execute_read_query(query, {'iid': iid})
-
-            if not result:
-                stats["not_in_db"] += 1
-                continue
-
-            db_record = result[0]
-            if db_record.get('is_active') == 0 and db_record.get('status') == 'delisted':
-                stats["already_correct"] += 1
-                continue
-
-            delist_date_str = item['delisted_date']
-            if not delist_date_str or delist_date_str in ('None', 'nan', ''):
-                stats["errors"] += 1
-                continue
-
-            if dry_run:
-                logger.info(f"  [DRY] {iid} {item['name']}: 补充退市标记, delisted_date={delist_date_str}")
-                stats["updated"] += 1
-                continue
-
-            success = await _update_instrument(
-                db_ops, iid, False, 'delisted', delist_date_str
-            )
-            if success:
-                stats["updated"] += 1
-                logger.info(f"  ✅ {iid} {item['name']}: 退市日期={delist_date_str}")
-            else:
-                stats["errors"] += 1
-
-        except Exception as e:
-            stats["errors"] += 1
-            logger.error(f"  ❌ {iid}: {e}")
-
-    logger.info(f"Step 2 结果: 更新={stats['updated']}, 已正确={stats['already_correct']}, "
-                f"不在DB={stats['not_in_db']}, 错误={stats['errors']}")
-    return stats
 
 
 async def step3_diff_report(db_ops) -> Dict[str, Any]:
@@ -330,50 +109,24 @@ async def step3_diff_report(db_ops) -> Dict[str, Any]:
 
 
 async def main(args: argparse.Namespace):
-    """主流程"""
-    from database import db_ops
-    await db_ops.initialize()
+    """Compatibility operator: forward writes to the stock-governance owner.
 
-    logger.info("=" * 60)
-    logger.info("🔧 退市状态修复工具")
-    logger.info(f"   模式: {'预览 (DRY RUN)' if args.dry_run else '执行修复'}")
-    logger.info("=" * 60)
+    Replacement: DataManager.sync_instrument_master(audit_only=...). Keep this
+    path and Step 3 until its documented CLI/STAR diagnostic contract is retired.
+    """
+    from scripts.research_cli_support import initialize_manager_for_research_cli
+    import json
 
-    # Step 1
-    stats1 = await step1_baostock_fix(db_ops, dry_run=args.dry_run)
-
-    # Step 2
-    stats2 = await step2_akshare_supplement(db_ops, dry_run=args.dry_run)
-
-    # Step 3（仅报告）
-    report3 = await step3_diff_report(db_ops)
-
-    # 汇总
-    print("\n" + "=" * 60)
-    print("📊 修复汇总报告")
-    print("=" * 60)
-    print(f"Step 1 (BaoStock 精确修复):  更新 {stats1['updated']}, 已正确 {stats1['already_correct']}")
-    print(f"Step 2 (AkShare 退市补充):   更新 {stats2['updated']}, 已正确 {stats2['already_correct']}")
-    print(f"Step 3 (差集报告):           检查 {report3['total_checked']} 只, "
-          f"疑似退市 {report3['disappeared']} 只")
-    print("=" * 60)
-
-    if args.dry_run:
-        print("⚠️ 以上为预览模式，未做任何修改。去掉 --dry-run 参数以执行修复。")
-    else:
-        # 验证
-        verify_sql = """
-            SELECT count(*) as cnt FROM instruments 
-            WHERE delisted_date IS NOT NULL 
-              AND delisted_date <= datetime('now') 
-              AND is_active = 1
-        """
-        result = await db_ops.execute_read_query(verify_sql)
-        remaining = result[0]['cnt'] if result else -1
-        if remaining == 0:
-            print("✅ 验证通过：所有有退市日期的品种均已标记为 is_active=0")
-        else:
-            print(f"⚠️ 验证发现 {remaining} 条记录仍未修正（可能需要人工检查）")
+    from data_manager import DataManager
+    manager = DataManager()
+    await initialize_manager_for_research_cli(manager)
+    result = await manager.sync_instrument_master(
+        ["SSE", "SZSE", "BSE"], audit_only=args.dry_run,
+        include_pytdx_validation=False, enrich_from_backup_sources=False,
+    )
+    report = await step3_diff_report(manager.db_ops)
+    print(json.dumps({"master_governance": result, "step3_diagnostics": report},
+                     ensure_ascii=False, default=str, indent=2))
 
 
 def parse_args() -> argparse.Namespace:

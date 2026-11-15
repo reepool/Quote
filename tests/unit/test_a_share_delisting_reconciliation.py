@@ -1,0 +1,750 @@
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from unittest.mock import AsyncMock, Mock
+
+import pandas as pd
+import pytest
+import pytest_asyncio
+from openpyxl import Workbook
+from sqlalchemy import select, text
+from sqlalchemy import event
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+from data_sources.a_share_official_stock_master import AShareOfficialStockMasterSource
+from database.instrument_lifecycle import APPLIED, FUTURE, VERIFICATION
+from database.models import InstrumentDB
+from database.operations import DatabaseOperations
+from instrument_master_delisting import (
+    AShareDelistingReconciler,
+    reusable_terminal_verifications,
+)
+from research.financial_disclosure_incremental_sync import (
+    FinancialDisclosureIncrementalSyncService,
+)
+from utils.date_utils import get_shanghai_time
+
+
+FIXTURES = Path(__file__).parents[1] / "fixtures" / "a_share_official_master"
+KONKA = dict(
+    instrument_id="000016.SZ",
+    symbol="000016",
+    name="*ST康佳A",
+    exchange="SZSE",
+    type="stock",
+    currency="CNY",
+    listed_date="1992-03-27",
+    status="active",
+    is_active=True,
+    trading_status=1,
+    source="szse_official",
+)
+
+
+@pytest_asyncio.fixture
+async def owner(tmp_path):
+    engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'quotes.db'}")
+    async with engine.begin() as connection:
+        await connection.run_sync(InstrumentDB.__table__.create)
+    operations = DatabaseOperations(auto_initialize=False)
+    sessions = async_sessionmaker(engine, expire_on_commit=False)
+    operations.get_async_session = sessions
+    operations._test_engine = engine
+    yield operations
+    await engine.dispose()
+
+
+async def local_record(owner):
+    async with owner.get_async_session() as session:
+        row = (
+            await session.execute(
+                select(InstrumentDB).where(
+                    InstrumentDB.instrument_id == KONKA["instrument_id"]
+                )
+            )
+        ).scalar_one()
+        return {
+            "status": row.status,
+            "is_active": row.is_active,
+            "trading_status": row.trading_status,
+            "delisted_date": row.delisted_date,
+        }
+
+
+@pytest.mark.asyncio
+async def test_real_xlsx_to_delisting_to_financial_scope(owner):
+    assert await owner.save_instruments_batch([KONKA])
+    source = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock",
+        config={
+            "szse": {"terminal_list_file": str(FIXTURES / "szse_terminated.xlsx")},
+        },
+    )
+    snapshot = await source.get_delisting_snapshot("SZSE")
+    assert snapshot["complete"], snapshot["errors"]
+    assert "200016.SZ" not in {row["instrument_id"] for row in snapshot["rows"]}
+    result = await AShareDelistingReconciler(owner, None).reconcile(
+        "SZSE",
+        {"rows_by_id": {KONKA["instrument_id"]: KONKA}},
+        [],
+        {"official_current_list_complete": True},
+        snapshot=snapshot,
+    )
+    assert result["deactivated_count"] == 1
+    row = await local_record(owner)
+    assert row == {
+        "status": "delisted",
+        "is_active": False,
+        "trading_status": 0,
+        "delisted_date": datetime(2026, 10, 23),
+    }
+    financial = FinancialDisclosureIncrementalSyncService.__new__(
+        FinancialDisclosureIncrementalSyncService
+    )
+    financial.db_ops = owner
+    assert await financial._load_active_instruments(["SZSE"]) == []
+    repeated = await AShareDelistingReconciler(owner, None).reconcile(
+        "SZSE",
+        {"rows_by_id": {KONKA["instrument_id"]: {**KONKA, **row}}},
+        [],
+        {"official_current_list_complete": True},
+        snapshot=snapshot,
+    )
+    assert repeated["deactivated_count"] == 0
+    assert (await local_record(owner))["delisted_date"] == row["delisted_date"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("value", [16, "16", "000016"])
+async def test_xlsx_code_normalization_uses_raw_cells(tmp_path, value):
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.append(["证券代码", "证券简称", "上市日期", "终止上市日期"])
+    sheet.append([value, "*ST康佳A", "1992-03-27", "2026-10-23"])
+    path = tmp_path / "synthetic.xlsx"
+    workbook.save(path)
+    # Deliberately retain inferred 16 instead of pre-padding fixture rows.
+    assert pd.read_excel(path).iloc[0, 0] == 16
+    source = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock",
+        config={
+            "szse": {"terminal_list_file": str(path)},
+        },
+    )
+    snapshot = await source.get_delisting_snapshot("SZSE")
+    assert snapshot["rows"][0]["instrument_id"] == "000016.SZ"
+
+
+@pytest.mark.asyncio
+async def test_real_sse_terminal_dates_and_a_share_scope():
+    source = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock",
+        config={
+            "sse": {"terminal_list_file": str(FIXTURES / "sse_terminated.json")},
+        },
+    )
+    snapshot = await source.get_delisting_snapshot("SSE")
+    assert snapshot["complete"], snapshot["errors"]
+    row = next(
+        item for item in snapshot["rows"] if item["instrument_id"] == "600001.SH"
+    )
+    assert row["delisted_date"] == "2009-12-29"
+
+
+def evidence(**overrides):
+    return {
+        "instrument_id": "000016.SZ",
+        "symbol": "000016",
+        "exchange": "SZSE",
+        "type": "stock",
+        "listed_date": "1992-03-27",
+        "delisted_date": "2026-10-23",
+        "completion_confirmed": True,
+        "source": "szse_official_terminal_list",
+        "source_url": "https://www.szse.cn/api/report/ShowReport",
+        "raw_snapshot_hash": "fixture",
+        "parser_version": "test.v1",
+        "observed_at": get_shanghai_time().isoformat(),
+        **overrides,
+    }
+
+
+async def reconcile(owner, rows, *, local=None, audit=False, complete=True, errors=()):
+    return await AShareDelistingReconciler(owner, None).reconcile(
+        "SZSE",
+        {"rows_by_id": {"000016.SZ": local or KONKA}},
+        [],
+        {"official_current_list_complete": True},
+        audit_only=audit,
+        snapshot={"rows": rows, "complete": complete, "errors": list(errors)},
+    )
+
+
+@pytest.mark.asyncio
+async def test_future_plan_survives_restart_and_closes_atomically(owner, monkeypatch):
+    now = get_shanghai_time()
+    future = now.date() + timedelta(days=1)
+    monkeypatch.setattr("instrument_master_delisting.get_shanghai_time", lambda: now)
+    monkeypatch.setattr("database.instrument_lifecycle.get_shanghai_time", lambda: now)
+    assert await owner.save_instruments_batch([KONKA])
+    row = evidence(delisted_date=future.isoformat())
+    result = await reconcile(owner, [row])
+    assert result["future_effective_count"] == 1
+    assert (await local_record(owner))["is_active"]
+    assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is not None
+    initial_plan = (await owner.load_a_share_delisting_state(["SZSE"]))["plans"][0]
+
+    next_day = now + timedelta(days=1)
+    monkeypatch.setattr(
+        "instrument_master_delisting.get_shanghai_time", lambda: next_day
+    )
+    monkeypatch.setattr(
+        "database.instrument_lifecycle.get_shanghai_time", lambda: next_day
+    )
+    assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is None
+    # Recreate the reconciler, fetch no new matching row, recover the persisted plan.
+    applied = await reconcile(owner, [])
+    assert applied["deactivated_count"] == 1
+    assert not (await owner.load_a_share_delisting_state(["SZSE"]))["plans"]
+    await owner.save_instrument_master_discrepancies(
+        [{**initial_plan, "reason": FUTURE}],
+        exchange="SZSE",
+        run_id="duplicate-observation",
+    )
+    assert not (await owner.load_a_share_delisting_state(["SZSE"]))["plans"]
+    assert (await local_record(owner))["delisted_date"].date() == future
+
+
+@pytest.mark.asyncio
+async def test_atomic_plan_failure_rolls_back_and_can_retry(owner):
+    assert await owner.save_instruments_batch([KONKA])
+
+    def fail_closure(connection, cursor, statement, parameters, context, executemany):
+        if (
+            "INSERT INTO instrument_master_discrepancies" in statement
+            and APPLIED in str(parameters)
+        ):
+            raise RuntimeError("injected closure failure")
+
+    event.listen(owner._test_engine.sync_engine, "before_cursor_execute", fail_closure)
+    assert not await owner.mark_instrument_delisted(
+        "000016.SZ",
+        delisted_date="2026-10-23",
+        source="szse_official_terminal_list",
+        evidence=evidence(),
+        plan_keys=["plan-1"],
+    )
+    assert (await local_record(owner))["is_active"]
+    event.remove(owner._test_engine.sync_engine, "before_cursor_execute", fail_closure)
+    assert await owner.mark_instrument_delisted(
+        "000016.SZ",
+        delisted_date="2026-10-23",
+        source="szse_official_terminal_list",
+        evidence=evidence(),
+        plan_keys=["plan-1"],
+    )
+    assert not (await local_record(owner))["is_active"]
+
+
+@pytest.mark.asyncio
+async def test_future_writer_rejects_and_missing_date_preserves_known_date(owner):
+    assert await owner.save_instruments_batch([KONKA])
+    assert not await owner.mark_instrument_delisted(
+        "000016.SZ",
+        delisted_date=date.today() + timedelta(days=10),
+        source="szse_official",
+    )
+    assert (await local_record(owner))["is_active"]
+    assert await owner.mark_instrument_delisted("000016.SZ", delisted_date="2026-10-23")
+    assert await owner.mark_instrument_delisted("000016.SZ", delisted_date=None)
+    assert (await local_record(owner))["delisted_date"] == datetime(2026, 10, 23)
+    assert not await owner.mark_instrument_delisted(
+        "000016.SZ", delisted_date="2026-10-22"
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("source", ["szse_official", "baostock", "akshare"])
+async def test_unknown_date_terminal_and_metadata_cannot_be_revived(owner, source):
+    assert await owner.save_instruments_batch([KONKA])
+    proof = evidence(delisted_date=None)
+    assert await owner.mark_instrument_delisted("000016.SZ", evidence=proof)
+    assert await owner.save_instruments_batch([{**KONKA, "source": source}])
+    assert (
+        await owner.save_instrument_master_metadata_batch(
+            [
+                {
+                    "instrument_id": "000016.SZ",
+                    "exchange": "SZSE",
+                    "metadata": {"ordinary": True},
+                }
+            ]
+        )
+        == 1
+    )
+    row = await local_record(owner)
+    assert row == {
+        "status": "delisted",
+        "is_active": False,
+        "trading_status": 0,
+        "delisted_date": None,
+    }
+    async with owner.get_async_session() as session:
+        stored = (
+            await session.execute(
+                text(
+                    "SELECT metadata_json FROM instrument_master_metadata WHERE instrument_id='000016.SZ'"
+                )
+            )
+        ).scalar_one()
+    assert (
+        __import__("json").loads(stored)["metadata"]["a_share_terminal_evidence"]
+        == proof
+    )
+
+
+@pytest.mark.asyncio
+async def test_fallback_cache_cannot_establish_delisting_or_invent_history(owner):
+    assert await owner.save_instruments_batch([KONKA])
+    fallback = {
+        **KONKA,
+        "source": "baostock",
+        "status": "delisted",
+        "is_active": False,
+        "delisted_date": "2026-10-23",
+    }
+    assert await owner.save_instruments_batch([fallback])
+    assert (await local_record(owner))["is_active"]
+    assert not await owner.save_instruments_batch(
+        [{**fallback, "instrument_id": "000099.SZ", "symbol": "000099"}]
+    )
+    assert len(await owner.get_instruments_by_exchange("SZSE", is_active=None)) == 1
+
+
+@pytest.mark.asyncio
+async def test_audit_records_never_form_a_production_baseline(owner):
+    assert await owner.save_instruments_batch([KONKA])
+    result = await reconcile(owner, [evidence()], audit=True)
+    assert result["would_deactivate_count"] == 1
+    assert result["deactivated_count"] == 0
+    assert (await local_record(owner))["is_active"]
+    state = await owner.load_a_share_delisting_state(["SZSE"])
+    assert not state["has_baseline"] and not state["plans"]
+    assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is None
+
+
+@pytest.mark.asyncio
+async def test_bad_plan_json_and_missing_baseline_never_mean_fresh(owner):
+    assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is None
+    await owner.save_instrument_master_discrepancies(
+        [
+            {
+                "reason": FUTURE,
+                "scope": "a_share_stock",
+                "mode": "production",
+                "instrument_id": "000016.SZ",
+                "plan_key": "bad",
+                "effective_date": "2026-10-23",
+            }
+        ],
+        exchange="SZSE",
+        run_id="bad-payload",
+    )
+    async with owner.get_async_session() as session:
+        await session.execute(
+            text("UPDATE instrument_master_discrepancies SET payload_json='{bad'")
+        )
+        await session.commit()
+    with pytest.raises(ValueError):
+        await owner.load_a_share_delisting_state(["SZSE"])
+    assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is None
+
+
+@pytest.mark.asyncio
+async def test_conflicting_dates_do_not_guess_and_partial_positive_evidence_is_usable(
+    owner,
+):
+    assert await owner.save_instruments_batch([KONKA])
+    result = await reconcile(owner, [evidence(), evidence(delisted_date="2026-10-22")])
+    assert result["conflict_count"] == 1
+    assert (await local_record(owner))["is_active"]
+    result = await reconcile(
+        owner, [evidence()], complete=False, errors=["page 2 missing"]
+    )
+    assert result["deactivated_count"] == 1
+    assert result["status"] == "warning"
+
+
+@pytest.mark.asyncio
+async def test_reviewed_predecessor_terminal_does_not_deactivate_current_issuer(owner):
+    row = {
+        **KONKA,
+        "instrument_id": "600018.SH",
+        "symbol": "600018",
+        "exchange": "SSE",
+        "name": "上港集团",
+        "listed_date": "2000-07-19",
+    }
+    assert await owner.save_instruments_batch([row])
+    terminal = evidence(
+        instrument_id="600018.SH",
+        symbol="600018",
+        exchange="SSE",
+        listed_date="2000-07-19",
+        delisted_date="2006-09-25",
+    )
+    result = await AShareDelistingReconciler(owner, None).reconcile(
+        "SSE",
+        {"rows_by_id": {"600018.SH": row}},
+        [row],
+        {"official_current_list_complete": True},
+        snapshot={"rows": [terminal], "complete": True, "errors": []},
+    )
+    assert result["deactivated_count"] == 0
+    assert len(await owner.get_instruments_by_exchange("SSE")) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("audit", [False, True])
+async def test_real_policy_and_factory_obey_audit_and_terminal_contract(owner, audit):
+    from data_manager import DataManager
+    from data_sources.source_factory import DataSourceFactory
+    from instrument_master_governance import (
+        AShareStockPolicy,
+        MasterGovernanceRequirement,
+    )
+
+    assert await owner.save_instruments_batch([KONKA])
+    official = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock",
+        config={
+            "szse": {"terminal_list_file": str(FIXTURES / "szse_terminated.xlsx")},
+        },
+    )
+    official.current_list_coverage["SZSE"] = {"complete": True}
+    official.get_instrument_list = AsyncMock(
+        return_value=[
+            {
+                **KONKA,
+                "instrument_id": f"000{i:03}.SZ",
+                "symbol": f"000{i:03}",
+                "name": f"正常{i}",
+                "source_authority": "official",
+            }
+            for i in range(100, 160)
+        ]
+    )
+    factory = DataSourceFactory(owner)
+    factory.routing = {"instrument_list": {"a_stock": ["exchange_official"]}}
+    factory.source_instances_by_region = {"a_stock": {"exchange_official": official}}
+    manager = DataManager.__new__(DataManager)
+    manager.db_ops, manager.source_factory = owner, factory
+    manager._get_instrument_master_sync_config = lambda: {
+        "pytdx_validation_enabled": False
+    }
+    manager._load_a_share_terminal_announcements = AsyncMock(
+        return_value={"rows": [], "complete": True, "errors": []}
+    )
+    result = await AShareStockPolicy(manager, {}).execute(
+        MasterGovernanceRequirement(
+            scope="a_share_stock",
+            exchanges=["SZSE"],
+            instrument_types=["stock"],
+            mode="audit_only" if audit else "force_refresh",
+            include_pytdx_validation=False,
+        )
+    )
+    assert result["status"] == "success", result
+    assert (await local_record(owner))["is_active"] is audit
+    rows = await owner.get_instruments_by_exchange("SZSE", is_active=None)
+    assert len(rows) == (1 if audit else 61)
+    terminal = result["exchanges"]["SZSE"]["delisting_reconciliation"]
+    assert terminal["deactivated_count"] == (0 if audit else 1)
+    assert terminal["would_deactivate_count"] == (1 if audit else 0)
+
+
+@pytest.mark.asyncio
+async def test_sse_terminal_pagination_is_not_truncated_at_500():
+    import json
+
+    source = AShareOfficialStockMasterSource("exchange_official_a_stock")
+    first = [
+        {
+            "COMPANY_CODE": f"600{i:03}",
+            "COMPANY_ABBR": "终止样本",
+            "LIST_DATE": "20000101",
+            "DELIST_DATE": "20200101",
+        }
+        for i in range(500)
+    ]
+    final = [
+        {
+            "COMPANY_CODE": "688001",
+            "COMPANY_ABBR": "最后一页",
+            "LIST_DATE": "20190101",
+            "DELIST_DATE": "20260101",
+        }
+    ]
+    source._http_get = AsyncMock(
+        side_effect=[
+            json.dumps({"result": first, "pageHelp": {"total": 501}}).encode(),
+            json.dumps({"result": final, "pageHelp": {"total": 501}}).encode(),
+        ]
+    )
+    result = await source.get_delisting_snapshot("SSE")
+    assert result["complete"]
+    assert len(result["rows"]) == 501
+    assert result["rows"][-1]["instrument_id"] == "688001.SH"
+    assert (
+        source._http_get.await_args_list[-1].kwargs["params"]["pageHelp.pageNo"] == "2"
+    )
+
+
+@pytest.mark.asyncio
+async def test_sse_missing_terminal_page_retains_positive_rows_and_reports_incomplete():
+    import json
+
+    source = AShareOfficialStockMasterSource("exchange_official_a_stock")
+    source._http_get = AsyncMock(
+        side_effect=[
+            json.dumps(
+                {
+                    "result": [{"COMPANY_CODE": "600001", "DELIST_DATE": "20200101"}],
+                    "pageHelp": {"total": 501},
+                }
+            ).encode(),
+            None,
+        ]
+    )
+    snapshot = await source.get_delisting_snapshot("SSE")
+    assert not snapshot["complete"] and snapshot["errors"]
+    assert snapshot["rows"][0]["instrument_id"] == "600001.SH"
+
+
+@pytest.mark.asyncio
+async def test_sse_missing_current_board_does_not_claim_full_coverage():
+    source = AShareOfficialStockMasterSource("exchange_official_a_stock")
+    source._load_sse_payload = AsyncMock(
+        side_effect=[
+            (b"code,name,listed_date\n600000,bank,2000-01-01\n", "main.csv"),
+            (None, "star.csv"),
+        ]
+    )
+    rows = await source.get_instrument_list("SSE", ["stock"])
+    assert rows
+    assert not source.current_list_coverage["SSE"]["complete"]
+
+
+@pytest.mark.asyncio
+async def test_current_financial_target_cannot_override_effective_delisting():
+    financial = FinancialDisclosureIncrementalSyncService.__new__(
+        FinancialDisclosureIncrementalSyncService
+    )
+    financial.db_ops = Mock()
+    financial.db_ops.get_instruments_by_exchange = AsyncMock(
+        return_value=[
+            {**KONKA, "status": "delisted"},
+            {
+                **KONKA,
+                "instrument_id": "000001.SZ",
+                "symbol": "000001",
+                "delisted_date": "2026-10-23",
+            },
+        ]
+    )
+    assert (
+        await financial._load_active_instruments(["SZSE"], target_symbols=["000016"])
+        == []
+    )
+    assert await financial._load_active_instruments(["SZSE"]) == []
+
+
+@pytest.mark.asyncio
+async def test_new_failed_verification_is_not_hidden_by_older_success(owner):
+    now = get_shanghai_time()
+    await owner.save_instrument_master_discrepancies(
+        [
+            {
+                "reason": VERIFICATION,
+                "scope": "a_share_stock",
+                "mode": "production",
+                "verified_at": (now - timedelta(hours=1)).isoformat(),
+                "status": "success",
+                "summary": {},
+            },
+            {
+                "reason": VERIFICATION,
+                "scope": "a_share_stock",
+                "mode": "production",
+                "verified_at": now.isoformat(),
+                "status": "error",
+                "summary": {},
+            },
+        ],
+        exchange="SZSE",
+        run_id="verification-failure",
+    )
+    assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is None
+
+
+@pytest.mark.asyncio
+async def test_empty_current_target_skips_announcement_and_repair_providers(owner):
+    from contextlib import nullcontext
+    from utils.config_manager import config_manager
+
+    assert await owner.save_instruments_batch([KONKA])
+    assert await owner.mark_instrument_delisted("000016.SZ", delisted_date="2026-10-23")
+    storage = Mock()
+    storage.financial_database_scope.side_effect = nullcontext
+    storage.list_announcement_audit.return_value = []
+    storage.list_financial_disclosure_event_states.return_value = []
+    from research.financial_statement_maintenance_repair import (
+        FinancialMaintenanceRepairRouter,
+    )
+
+    router = FinancialMaintenanceRepairRouter(
+        storage=storage,
+        research_config=config_manager.get_research_config(),
+    )
+    router.repair_targets = AsyncMock(
+        side_effect=AssertionError("must not repair an empty current scope")
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=owner,
+        storage=storage,
+        research_config=config_manager.get_research_config(),
+        announcement_service=Mock(),
+        repair_router=router,
+    )
+    service._scan_announcements = Mock(
+        side_effect=AssertionError("must not scan an empty current scope")
+    )
+    result = await service.sync(
+        exchanges=["SZSE"],
+        target_instrument_ids=["000016.SZ"],
+        report_periods=["2026-09-30"],
+        dry_run=True,
+    )
+    assert result["candidate_count"] == 0
+    service._scan_announcements.assert_not_called()
+    router.repair_targets.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "title,body,expected",
+    [
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000016、200016。深圳证券交易所同意公司股票主动终止上市。终止上市决定日期：2026年10月16日。摘牌日期：2026年10月23日。",
+            "2026-10-23",
+        ),
+        ("关于股票终止上市暨摘牌的公告", "证券代码：000016。公司股票已摘牌。", None),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定股票终止上市，股票将摘牌。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票可能被终止上市的风险提示公告",
+            "证券代码：000016。股票将被终止上市。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000017。深圳证券交易所决定股票终止上市，摘牌日期：2026年10月23日。",
+            "unconfirmed",
+        ),
+    ],
+)
+def test_announcement_requires_stock_identity_and_actual_completion(
+    title, body, expected
+):
+    from research.announcements import AnnouncementRecord, build_announcement_key
+    from instrument_master_delisting import announcement_terminal_evidence
+
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="test-1",
+        announcement_key=build_announcement_key("cninfo", "test-1"),
+        title=title,
+        published_at="2026-10-17T00:00:00+08:00",
+        exchange="SZSE",
+        symbols=("000016",),
+    )
+    proof = announcement_terminal_evidence(record, body, "000016.SZ")
+    if expected == "unconfirmed":
+        assert proof is None
+    else:
+        assert proof["delisted_date"] == expected
+        assert proof["completion_confirmed"]
+        assert proof["hash_kind"] == "canonical_announcement_record"
+
+
+def test_bounded_bse_scan_reuses_existing_purpose_and_body_evidence():
+    from types import SimpleNamespace
+    from research.announcements import AnnouncementRecord, build_announcement_key
+    from instrument_master_delisting import scan_terminal_announcements
+
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="bse-final",
+        announcement_key=build_announcement_key("cninfo", "bse-final"),
+        title="关于股票终止上市暨摘牌的公告",
+        published_at="2026-01-01T00:00:00+08:00",
+        exchange="BSE",
+        symbols=("920680",),
+        raw_payload={
+            "body_text": "证券代码：920680。北京证券交易所决定公司股票终止上市。摘牌日期：2026年1月5日。"
+        },
+    )
+    service = Mock()
+    service.config.provider_configs = {}
+    service.acquire.return_value = SimpleNamespace(
+        scan_result=SimpleNamespace(records=[record])
+    )
+    result = scan_terminal_announcements(service, "BSE", ["920680.BJ"])
+    assert result["rows"][0]["delisted_date"] == "2026-01-05"
+    assert len(result["rows"]) == 1
+    assert service.acquire.call_count == 2
+    query = service.acquire.call_args.args[0]
+    assert query.purpose_key == "instrument_master_bse_delisting"
+    assert query.scope.max_pages == 2
+
+
+@pytest.mark.asyncio
+async def test_disabled_bse_check_neither_scans_nor_applies_plans(owner):
+    loader = AsyncMock(side_effect=AssertionError("disabled BSE check must not scan"))
+    factory = Mock()
+    factory.get_official_delisting_snapshot = AsyncMock(
+        side_effect=AssertionError("must not fetch")
+    )
+    result = await AShareDelistingReconciler(owner, factory, loader).reconcile(
+        "BSE",
+        {"rows_by_id": {}},
+        [],
+        {},
+        enabled=False,
+    )
+    assert result["reason"] == "delisting_check_disabled"
+    assert result["status"] == "warning"
+    loader.assert_not_awaited()
+    factory.get_official_delisting_snapshot.assert_not_awaited()
+    state = await owner.load_a_share_delisting_state(["BSE"])
+    assert (
+        state["verifications"]["BSE"]["summary"]["reason"] == "delisting_check_disabled"
+    )
+
+
+@pytest.mark.asyncio
+async def test_announcement_failure_preserves_state_and_is_visible(owner):
+    assert await owner.save_instruments_batch([KONKA])
+    loader = AsyncMock(side_effect=RuntimeError("official announcement unavailable"))
+    result = await AShareDelistingReconciler(owner, None, loader).reconcile(
+        "SZSE",
+        {"rows_by_id": {"000016.SZ": KONKA}},
+        [],
+        {"official_current_list_complete": True},
+        snapshot={"rows": [], "complete": True, "errors": []},
+    )
+    assert result["status"] == "warning"
+    assert result["source_error_count"] == 1 and result["unconfirmed_count"] == 1
+    assert (await local_record(owner))["is_active"]

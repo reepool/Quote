@@ -2414,15 +2414,31 @@ def _format_instrument_master_governance_summary(governance: Optional[Dict[str, 
 
     exchanges = governance.get("exchanges")
     if isinstance(exchanges, dict):
+        stock_exchanges = exchanges
+        for child in children if isinstance(children, list) else []:
+            if isinstance(child, dict) and child.get("scope") == "a_share_stock":
+                stock_exchanges = child.get("exchanges") or exchanges
+                break
         a_share_lines = []
         for exchange in ("SSE", "SZSE", "BSE"):
-            item = exchanges.get(exchange)
+            item = stock_exchanges.get(exchange)
             if not isinstance(item, dict):
                 continue
             source_diag = item.get("source_diagnostics") if isinstance(item.get("source_diagnostics"), dict) else {}
             source_authority = item.get("source_authority") or source_diag.get("selected_source_authority")
             if source_authority:
                 a_share_lines.append(f"{exchange}:{source_authority}")
+            terminal = item.get("delisting_reconciliation")
+            if isinstance(terminal, dict):
+                lines.append(
+                    f"{exchange} 退市核验: 确认={terminal.get('confirmed_count', 0)}，"
+                    f"停用={terminal.get('deactivated_count', 0)}，"
+                    f"待核={terminal.get('unconfirmed_count', 0)}，"
+                    f"未来={terminal.get('future_effective_count', 0)}，"
+                    f"冲突={terminal.get('conflict_count', 0)}，"
+                    f"来源错误={terminal.get('source_error_count', 0)}，"
+                    f"写入失败={terminal.get('write_failed_count', 0)}"
+                )
         if a_share_lines:
             lines.append("A股股票源: " + "；".join(a_share_lines))
     if isinstance(exchanges, dict) and "HKEX" in exchanges:

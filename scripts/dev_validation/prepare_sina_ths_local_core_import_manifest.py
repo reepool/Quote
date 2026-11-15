@@ -40,6 +40,7 @@ from scripts.research_cli_support import (  # noqa: E402
     json_ready,
     parse_exchanges,
 )
+from utils.date_utils import get_shanghai_time  # noqa: E402
 
 
 DEFAULT_EXCHANGES = ("SSE", "SZSE", "BSE")
@@ -71,6 +72,11 @@ async def collect_target_instruments(
             instrument
             for instrument in instruments
             if instrument.get("instrument_id") and instrument.get("is_active", True)
+            and instrument.get("status") != "delisted"
+            and not (
+                parse_optional_date(instrument.get("delisted_date")) is not None
+                and parse_optional_date(instrument.get("delisted_date")) <= get_shanghai_time().date()
+            )
         ]
         if limit_per_exchange is not None:
             stock_instruments = stock_instruments[: int(limit_per_exchange)]
@@ -283,18 +289,12 @@ def classify_report_period_lifecycle(
                 }
             )
             continue
-        if delisted_date is not None and (
-            period_end > delisted_date
-            or (
-                period_end == latest_quarter_end_before(delisted_date)
-                and delisted_date <= disclosure_deadline
-            )
-        ):
+        if delisted_date is not None and period_end > delisted_date:
             excluded.append(
                 {
                     "report_period": period_end.isoformat(),
                     "classification": "post_delisting_or_no_disclosure",
-                    "reason": "退市日在该报告期法定披露截止日前，未披露结构化财报视为正常待记录事项。",
+                    "reason": "报告期末严格晚于已确认退市日；保留缺失事实，退出当前上市公司维护范围。",
                     "listed_date": listed_date.isoformat()
                     if listed_date is not None
                     else None,
