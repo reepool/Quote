@@ -1,0 +1,40 @@
+{
+  "instrument_id": "600104.SH",
+  "name": "上汽集团",
+  "run_id": "v15-remaining-eight-600104-20261115",
+  "three_reads_equal": true,
+  "exception": null,
+  "provider_constructor_binding_verified_before_entry": true,
+  "business_started_monotonic": 9913120.538559403,
+  "preparation_seconds": 57.534,
+  "state": "incomplete",
+  "business_ended_monotonic": 9913218.470031325,
+  "business_seconds": 97.931,
+  "contract_errors": [],
+  "failed_calls": [
+    {
+      "stage": "extract",
+      "code": "provider_unavailable",
+      "detail": "LLM response was truncated"
+    }
+  ],
+  "readable": false,
+  "facts": 0,
+  "review_status": null,
+  "core_missing_elements": [
+    "business_structure",
+    "products_services",
+    "revenue_model"
+  ],
+  "review_limit_error": null,
+  "failure_signature": "{\"code\": \"provider_unavailable\", \"detail\": \"LLM response was truncated\", \"stage\": \"extract\"}",
+  "physical_requests": 3,
+  "charged_tokens": 89293,
+  "cost": "unknown",
+  "stopped_reason": null,
+  "recoveries": 1,
+  "supervision_seconds": 99.688,
+  "captured_model_contents": 3,
+  "failed_contents_retained": 2,
+  "cleanup_bytes": 1838306
+}

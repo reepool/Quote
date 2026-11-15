@@ -1,0 +1,41 @@
+[
+  {
+    "request_id": "bp-work-7e797b024d0cf3bb5f31b31b:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "1528e58e3bf950337c80b369389ca18fcde2ccc8722bb9ca1902a786e9bec5aa",
+    "response_hash": "63ef99656392f873978230130758c7925e0e4eaeb6aeeaa303268503727d153c",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0049\",\"section-0062\",\"section-0072\",\"section-0074\",\"section-0088\",\"section-0117\",\"section-0057\"],\"rationale\":\"本报告为影视、广告、旅游、基金多元业务公司。选择业务情况(section-0049)说明各板块产品/服务与经营模式；经营情况讨论与分析(section-0062)提供各业务本期经营变化；主营业务分析(section-0072)及收入和成本分析(section-0074)提供收入构成、成本与毛利结构，是理解赚钱方式与业务权重的核心；营业收入和营业成本附注(section-0088)补充分业务/分产品收入明细；主要控股参股公司分析(section-0117)反映子公司经营规模；行业情况(section-0057)提供市场与竞争背景。以上共同覆盖业务结构、变现、规模与变化，且避免父子节重复选择。\",\"stop_reason\":\"已覆盖业务介绍、经营讨论、收入构成与成本分析、子公司经营及行业背景，足以回答业务与收入结构问题；治理、薪酬、诉讼、会计政策及完整财务报表等与收入构成关系较弱，不再扩展。\",\"deferred\":[\"section-0048 管理层讨论与分析整章：包含治理、风险等非收入核心内容，仅取实质子节\",\"section-0317 财务报告整章：仅按需使用收入附注，不展开全部报表与会计政策\",\"section-0137 公司治理、环境和社会：与业务与收入结构无关\",\"section-0196 重要事项：诉讼与关联交易细节非本次收入结构重点\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0049",
+        "section-0062",
+        "section-0072",
+        "section-0074",
+        "section-0088",
+        "section-0117",
+        "section-0057"
+      ],
+      "rationale": "本报告为影视、广告、旅游、基金多元业务公司。选择业务情况(section-0049)说明各板块产品/服务与经营模式；经营情况讨论与分析(section-0062)提供各业务本期经营变化；主营业务分析(section-0072)及收入和成本分析(section-0074)提供收入构成、成本与毛利结构，是理解赚钱方式与业务权重的核心；营业收入和营业成本附注(section-0088)补充分业务/分产品收入明细；主要控股参股公司分析(section-0117)反映子公司经营规模；行业情况(section-0057)提供市场与竞争背景。以上共同覆盖业务结构、变现、规模与变化，且避免父子节重复选择。",
+      "stop_reason": "已覆盖业务介绍、经营讨论、收入构成与成本分析、子公司经营及行业背景，足以回答业务与收入结构问题；治理、薪酬、诉讼、会计政策及完整财务报表等与收入构成关系较弱，不再扩展。",
+      "deferred": [
+        "section-0048 管理层讨论与分析整章：包含治理、风险等非收入核心内容，仅取实质子节",
+        "section-0317 财务报告整章：仅按需使用收入附注，不展开全部报表与会计政策",
+        "section-0137 公司治理、环境和社会：与业务与收入结构无关",
+        "section-0196 重要事项：诉讼与关联交易细节非本次收入结构重点"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20624,
+      "output_tokens": 354,
+      "total_tokens": 20978
+    }
+  }
+]

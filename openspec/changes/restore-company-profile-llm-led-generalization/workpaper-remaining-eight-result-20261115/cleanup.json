@@ -1,0 +1,13 @@
+{
+  "task": "6.CI",
+  "opening_release_bytes": 0,
+  "runtime_roots_removed_by_original_finally": 7423783,
+  "preparation_and_logs_removed": 8316078,
+  "compiled_operator_cache_removed": 56308,
+  "duplicate_failure_body_bytes_removed": 143368,
+  "operator_script_bytes_removed_after_snapshot": 27168,
+  "operator_script_removed": true,
+  "total_release_bytes": 15966705,
+  "protected": "official PDF / useful shared parse cache / prior raw and first results / attempt markers / pre-existing changes",
+  "active_workers": 0
+}

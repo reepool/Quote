@@ -1,0 +1,41 @@
+[
+  {
+    "request_id": "bp-work-e386efd1bc8a9cc32db24a25:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "3b3aa0870f6192a9c1bfcc150e7752903b9febbb7b1a4472b930422d186f6239",
+    "response_hash": "da8fd74e1052343714f47ceff1ed146c3b00deb2d2baa66f8960b623c862e7df",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0035\",\"section-0036\",\"section-0064\",\"section-0066\",\"section-0093\",\"section-0116\",\"section-1255\"],\"rationale\":\"选取公司业务介绍（section-0035）说明产品/服务与经营模式；行业情况（section-0036）说明电力、煤炭、天然气、新能源、储能等业务所处环境；主营业务分析（section-0064）及其收入和成本分析（section-0066）提供营业收入构成、分业务/分产品收入与成本、毛利率等核心变现与收入结构信息；行业经营性信息分析（section-0093）补充电量电价、装机容量、发电效率、电力市场化交易与售电业务等经营规模与驱动；主要控股参股公司分析（section-0116）说明主要经营主体；分部信息（section-1255）用于核对分板块收入与利润结构。以上均为信息密集的完整子节，避免选取父节与其子节重复，也未扩展到整份财务报告。\",\"deferred\":[\"section-0034 管理层讨论与分析整章：包含大量荣誉、治理与细碎经营叙述，仅按需选取其下实质子节\",\"section-0063 报告期内主要经营情况整节：范围过大，已用其下主营业务分析与行业经营性信息子节替代\",\"section-0391 财务报告整章及会计政策、附注：仅在收入构成存在缺口时定向补充，不整体纳入\",\"section-0118 未来发展讨论：属前瞻性计划，非本期经营事实，暂不纳入\"],\"stop_reason\":\"已覆盖业务结构、产品用途、收入构成与主要业务权重、经营规模与主要驱动、主要经营主体及分部收入结构，足以回答核心问题；剩余为治理、债券、会计政策与前瞻计划等非必要范围，停止扩展。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0035",
+        "section-0036",
+        "section-0064",
+        "section-0066",
+        "section-0093",
+        "section-0116",
+        "section-1255"
+      ],
+      "rationale": "选取公司业务介绍（section-0035）说明产品/服务与经营模式；行业情况（section-0036）说明电力、煤炭、天然气、新能源、储能等业务所处环境；主营业务分析（section-0064）及其收入和成本分析（section-0066）提供营业收入构成、分业务/分产品收入与成本、毛利率等核心变现与收入结构信息；行业经营性信息分析（section-0093）补充电量电价、装机容量、发电效率、电力市场化交易与售电业务等经营规模与驱动；主要控股参股公司分析（section-0116）说明主要经营主体；分部信息（section-1255）用于核对分板块收入与利润结构。以上均为信息密集的完整子节，避免选取父节与其子节重复，也未扩展到整份财务报告。",
+      "deferred": [
+        "section-0034 管理层讨论与分析整章：包含大量荣誉、治理与细碎经营叙述，仅按需选取其下实质子节",
+        "section-0063 报告期内主要经营情况整节：范围过大，已用其下主营业务分析与行业经营性信息子节替代",
+        "section-0391 财务报告整章及会计政策、附注：仅在收入构成存在缺口时定向补充，不整体纳入",
+        "section-0118 未来发展讨论：属前瞻性计划，非本期经营事实，暂不纳入"
+      ],
+      "stop_reason": "已覆盖业务结构、产品用途、收入构成与主要业务权重、经营规模与主要驱动、主要经营主体及分部收入结构，足以回答核心问题；剩余为治理、债券、会计政策与前瞻计划等非必要范围，停止扩展。"
+    },
+    "usage": {
+      "input_tokens": 24316,
+      "output_tokens": 395,
+      "total_tokens": 24711
+    }
+  }
+]

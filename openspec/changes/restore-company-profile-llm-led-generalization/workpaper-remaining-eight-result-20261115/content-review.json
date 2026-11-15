@@ -1,0 +1,861 @@
+{
+  "task": "6.CI",
+  "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/source-first-contract.json",
+  "not_model_input": true,
+  "summary": {
+    "reference_conditions": 89,
+    "started_conditions": 45,
+    "supported_in_limited_source_review": 12,
+    "not_delivered": 33,
+    "not_started": 44,
+    "formal_accuracy": null,
+    "formal_recall": null,
+    "supplemental_twenty_per_company": "not_completed",
+    "six_risk_complete": false
+  },
+  "companies": [
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "status": "not_delivered",
+      "core_comparison": [
+        {
+          "condition_id": "600098-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600098-C1",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K02",
+          "dimension": "business_structure",
+          "source_context_id": "600098-C1",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K03",
+          "dimension": "products_services",
+          "source_context_id": "600098-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K04",
+          "dimension": "products_services",
+          "source_context_id": "600098-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600098-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600098-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600098-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600098-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C4",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C4",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C5",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600098-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C5",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        }
+      ]
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "status": "not_delivered",
+      "core_comparison": [
+        {
+          "condition_id": "600104-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600104-C1",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K02",
+          "dimension": "products_services",
+          "source_context_id": "600104-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K03",
+          "dimension": "products_services",
+          "source_context_id": "600104-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K04",
+          "dimension": "products_services",
+          "source_context_id": "600104-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600104-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K06",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600104-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K07",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C4",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C5",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C5",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600104-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C5",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        }
+      ]
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+      "status": "not_delivered",
+      "core_comparison": [
+        {
+          "condition_id": "600088-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600088-C1",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K02",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K03",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K04",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K05",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600088-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600088-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600088-C3",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600088-C4",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600088-C5",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600088-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600088-C5",
+          "status": "not_delivered",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        }
+      ]
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+      "status": "supported_in_limited_source_review",
+      "core_comparison": [
+        {
+          "condition_id": "600099-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600099-C1",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-BS-01"
+          ],
+          "actual_evidence_ids": [
+            "source-0001"
+          ]
+        },
+        {
+          "condition_id": "600099-K02",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-PS-01"
+          ],
+          "actual_evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ]
+        },
+        {
+          "condition_id": "600099-K03",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-PS-02"
+          ],
+          "actual_evidence_ids": [
+            "source-0002"
+          ]
+        },
+        {
+          "condition_id": "600099-K04",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-PS-03"
+          ],
+          "actual_evidence_ids": [
+            "source-0002"
+          ]
+        },
+        {
+          "condition_id": "600099-K05",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-PS-04"
+          ],
+          "actual_evidence_ids": [
+            "source-0003"
+          ]
+        },
+        {
+          "condition_id": "600099-K06",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600099-C3",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-BS-02"
+          ],
+          "actual_evidence_ids": [
+            "source-0003"
+          ]
+        },
+        {
+          "condition_id": "600099-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600099-C3",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-BS-02",
+            "F-CC-03"
+          ],
+          "actual_evidence_ids": [
+            "source-0003",
+            "source-0005"
+          ]
+        },
+        {
+          "condition_id": "600099-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C4",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-RM-01"
+          ],
+          "actual_evidence_ids": [
+            "source-0004"
+          ],
+          "note": "本稿保源文113124.69万元舍入值；不补造精确元数。"
+        },
+        {
+          "condition_id": "600099-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-RM-02"
+          ],
+          "actual_evidence_ids": [
+            "source-0015"
+          ]
+        },
+        {
+          "condition_id": "600099-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-RM-02"
+          ],
+          "actual_evidence_ids": [
+            "source-0015"
+          ]
+        },
+        {
+          "condition_id": "600099-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-RM-02"
+          ],
+          "actual_evidence_ids": [
+            "source-0015"
+          ]
+        },
+        {
+          "condition_id": "600099-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "status": "supported_in_limited_source_review",
+          "actual_fact_ids": [
+            "F-RM-02"
+          ],
+          "actual_evidence_ids": [
+            "source-0015"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "status": "not_started",
+      "core_comparison": [
+        {
+          "condition_id": "600082-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600082-C1",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K02",
+          "dimension": "business_structure",
+          "source_context_id": "600082-C1",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K03",
+          "dimension": "products_services",
+          "source_context_id": "600082-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K04",
+          "dimension": "products_services",
+          "source_context_id": "600082-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600082-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600082-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600082-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600082-C4",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600082-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600082-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600082-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        }
+      ]
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "status": "not_started",
+      "core_comparison": [
+        {
+          "condition_id": "600097-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600097-C1",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K02",
+          "dimension": "products_services",
+          "source_context_id": "600097-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K03",
+          "dimension": "products_services",
+          "source_context_id": "600097-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K04",
+          "dimension": "products_services",
+          "source_context_id": "600097-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600097-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600097-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600097-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600097-C4",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600097-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600097-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600097-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        }
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "status": "not_started",
+      "core_comparison": [
+        {
+          "condition_id": "600054-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600054-C1",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K02",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K03",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K04",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K05",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600054-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600054-C3",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C4",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600054-K13",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        }
+      ]
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+      "status": "not_started",
+      "core_comparison": [
+        {
+          "condition_id": "600000-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600000-C1",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K02",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K03",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K04",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K05",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600000-C6",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600000-C6",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600000-C6",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600000-C4",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600000-C5",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        },
+        {
+          "condition_id": "600000-K11",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600000-C2",
+          "status": "not_started",
+          "actual_fact_ids": [],
+          "actual_evidence_ids": []
+        }
+      ]
+    }
+  ],
+  "linhai_review_effect": {
+    "quarantined": [
+      "F-BS-03",
+      "F-MC-01",
+      "F-SC-U2"
+    ],
+    "open_omissions": [
+      "FND-003",
+      "FND-004"
+    ],
+    "repairs_sent": 0,
+    "reason": "group_stop_requested rejected the next stage before sending",
+    "source_support": "原文不适用不改为绝对未发生；风险/将采取措施不记成本期已实现。"
+  },
+  "limits": "12为窄核心复合问题，不是31条全事实准确率、全报告召回、同版8家或正式S1。"
+}

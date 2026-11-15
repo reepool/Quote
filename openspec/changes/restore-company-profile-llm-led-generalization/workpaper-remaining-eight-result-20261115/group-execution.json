@@ -1,0 +1,171 @@
+{
+  "task": "6.CI",
+  "outcome": "stopped_after_first_batch_consecutive_core_output_failure",
+  "entries_started": 4,
+  "not_started": [
+    "600082.SH",
+    "600097.SH",
+    "600054.SH",
+    "600000.SH"
+  ],
+  "readable": 1,
+  "model_review_completed": 0,
+  "facts_including_optional_supply_chain": 31,
+  "metrics_including_optional_supply_chain": 74,
+  "physical_requests": 12,
+  "actual_supplier_total_usage": 365990,
+  "recoveries": 3,
+  "fee": "unknown",
+  "business_wall_seconds": 355.292,
+  "records": [
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "state": "incomplete",
+      "readable": false,
+      "fact_count_including_supply_chain": 0,
+      "metric_count_including_supply_chain": 0,
+      "query_sha256": "076d7648ba03ee32b254de08c6948c99ae369b69659d1dfd6b3fa349b3ecf880",
+      "physical_requests": 3,
+      "actual_supplier_total_usage": 103923,
+      "recoveries": 1,
+      "fee": "unknown",
+      "preparation_seconds": 59.286,
+      "business_seconds": 100.287,
+      "business_started_monotonic": 9913122.404624812,
+      "business_ended_monotonic": 9913222.691800045,
+      "review_status": null,
+      "three_reads_equal": true,
+      "runtime_cleanup_bytes": 1921334
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "state": "incomplete",
+      "readable": false,
+      "fact_count_including_supply_chain": 0,
+      "metric_count_including_supply_chain": 0,
+      "query_sha256": "19c25642206d148db5c0c3b664c25174d085a108361da8a632ff7fe8387d6c62",
+      "physical_requests": 3,
+      "actual_supplier_total_usage": 89293,
+      "recoveries": 1,
+      "fee": "unknown",
+      "preparation_seconds": 57.534,
+      "business_seconds": 97.931,
+      "business_started_monotonic": 9913120.538559403,
+      "business_ended_monotonic": 9913218.470031325,
+      "review_status": null,
+      "three_reads_equal": true,
+      "runtime_cleanup_bytes": 1838306
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "state": "incomplete",
+      "readable": false,
+      "fact_count_including_supply_chain": 0,
+      "metric_count_including_supply_chain": 0,
+      "query_sha256": "fe4d33141f5491c3eb1e2bd7ddeca842a37e6a78b5baa311b55d3b7d919dffe6",
+      "physical_requests": 3,
+      "actual_supplier_total_usage": 78144,
+      "recoveries": 1,
+      "fee": "unknown",
+      "preparation_seconds": 58.732,
+      "business_seconds": 87.769,
+      "business_started_monotonic": 9913122.067328576,
+      "business_ended_monotonic": 9913209.836189227,
+      "review_status": null,
+      "three_reads_equal": true,
+      "runtime_cleanup_bytes": 1709899
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "state": "completed",
+      "readable": true,
+      "fact_count_including_supply_chain": 31,
+      "metric_count_including_supply_chain": 74,
+      "query_sha256": "4f3bfa178a529da183ee2e4887c9bbfcb22ed1286a78881c33e9a8694304b031",
+      "physical_requests": 3,
+      "actual_supplier_total_usage": 94630,
+      "recoveries": 0,
+      "fee": "unknown",
+      "preparation_seconds": 58.241,
+      "business_seconds": 353.231,
+      "business_started_monotonic": 9913122.599502228,
+      "business_ended_monotonic": 9913475.830239637,
+      "review_status": "incomplete",
+      "three_reads_equal": true,
+      "runtime_cleanup_bytes": 1954244
+    }
+  ],
+  "failure_diagnostics": [
+    {
+      "instrument_id": "600098.SH",
+      "finish_reasons": [
+        "length",
+        "length"
+      ],
+      "output_tokens": [
+        12000,
+        12000
+      ],
+      "declared_output_tokens": 12000,
+      "response_characters": 34056,
+      "json_error": {
+        "message": "Unterminated string starting at",
+        "position": 34055
+      },
+      "recovery_content_identical": true,
+      "content_sha256": "53d369add7255071b95903997d298755af269784da6ef3554f2b5019c0fc6c53",
+      "raw_file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-remaining-eight-result-20261115/600098/failed-model-content/content-002.json"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "finish_reasons": [
+        "length",
+        "length"
+      ],
+      "output_tokens": [
+        12000,
+        12000
+      ],
+      "declared_output_tokens": 12000,
+      "response_characters": 35365,
+      "json_error": {
+        "message": "Unterminated string starting at",
+        "position": 35359
+      },
+      "recovery_content_identical": true,
+      "content_sha256": "dca34e61650ee71b341f3c1aae24a8b9f3d1376e314d2696477191c5e841a938",
+      "raw_file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-remaining-eight-result-20261115/600104/failed-model-content/content-002.json"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "finish_reasons": [
+        "stop",
+        "stop"
+      ],
+      "output_tokens": [
+        10123,
+        10123
+      ],
+      "declared_output_tokens": 12000,
+      "response_characters": 28281,
+      "json_error": {
+        "message": "Expecting ',' delimiter",
+        "position": 28281
+      },
+      "recovery_content_identical": true,
+      "content_sha256": "283c302edc324152507bb59b451bb257d95d69eb67ad648f35e4226d48097e0b",
+      "raw_file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-remaining-eight-result-20261115/600088/failed-model-content/content-002.json"
+    }
+  ],
+  "execution_source_and_config_matched_freeze": true,
+  "old_source_queries_CG_CH_unchanged": true,
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "s1_changed": false,
+  "production_authorization": "not_authorized",
+  "tests": "No production change during run; reuse 0c93b54b 94 targeted checks and four saved-snapshot entry proofs"
+}

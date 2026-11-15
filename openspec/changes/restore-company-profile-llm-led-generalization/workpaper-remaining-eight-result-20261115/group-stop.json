@@ -1,0 +1,5 @@
+{
+  "reason": "consecutive_same_core_failure: {\"code\": \"provider_unavailable\", \"detail\": \"LLM response was truncated\", \"stage\": \"extract\"}",
+  "batch": 1,
+  "at_monotonic": 9913225.035214443
+}

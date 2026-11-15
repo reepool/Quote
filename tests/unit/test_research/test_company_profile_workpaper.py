@@ -500,6 +500,12 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert "source_conditions" not in extraction["messages"][1]["content"]
         assert "WorkpaperElements" in json.dumps(extraction)
         instructions = extraction["messages"][0]["content"]
+        assert "compact, complete JSON object" in instructions
+        assert "12-24 distinct facts" in instructions and "40 metrics overall" in instructions
+        assert "not a completeness gate" in instructions
+        assert "reading a section does not require copying all of its numbers" in instructions
+        assert "Never infer zero from blank cells" in instructions
+        assert workpaper_processing_identity(real=False)["prompt_version"].endswith("compact-core.v14")
         assert "conditional disclosure heading is not a fact" in instructions
         assert "denominator of each percentage" in instructions
         assert "preserve the displayed subtotal and elimination separately" in instructions

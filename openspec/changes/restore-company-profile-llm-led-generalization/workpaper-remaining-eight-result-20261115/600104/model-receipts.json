@@ -1,0 +1,41 @@
+[
+  {
+    "request_id": "bp-work-d191e4a4463582573f14cc5f:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "94aa18f21f7655295e2a285a08fbea413021f7462301cd903a8db6a3cc7164ea",
+    "response_hash": "6b14cfafe9171cd70fa7242ef5cb6d2a18148f12261d79d6a289c0a22fae22e6",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0039\",\"section-0044\",\"section-0045\",\"section-0053\",\"section-0055\",\"section-0078\",\"section-0082\",\"section-0083\"],\"rationale\":\"选取管理层讨论与分析中业务与经营的核心实质子节：section-0039说明公司从事的业务与经营模式；section-0044行业情况；section-0045经营情况讨论；section-0053主营业务分析及section-0055收入与成本分析提供收入构成、分业务/分产品收入与成本、毛利率等变现与结构信息；section-0078行业经营性信息分析下含产能、整车产销量、新能源汽车业务、汽车金融业务等规模与经营要素。这些子节共同覆盖业务结构、产品用途、变现方式、规模与主要构成、经营角色与资源、客户市场及本期变化，且避免同时选取父子节。\",\"stop_reason\":\"已覆盖业务介绍、收入构成与成本分析、产销量与新能源/金融业务规模等核心问题；财务报告附注、治理、股东、债券及投资明细等与业务经营解释关系较弱，不再扩展，故在此停止。\",\"deferred\":[\"section-0296财务报告全文及分部信息附注：仅在收入构成存在实质缺口时定向补充，当前主营业务分析已提供收入成本构成，暂不展开\",\"section-0106主要控股参股公司分析：属子公司层面补充，非核心收入结构，暂缓\",\"section-0111公司发展战略与section-0112经营计划：属前瞻性计划，非本期实际经营与变现事实，暂缓\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0039",
+        "section-0044",
+        "section-0045",
+        "section-0053",
+        "section-0055",
+        "section-0078",
+        "section-0082",
+        "section-0083"
+      ],
+      "rationale": "选取管理层讨论与分析中业务与经营的核心实质子节：section-0039说明公司从事的业务与经营模式；section-0044行业情况；section-0045经营情况讨论；section-0053主营业务分析及section-0055收入与成本分析提供收入构成、分业务/分产品收入与成本、毛利率等变现与结构信息；section-0078行业经营性信息分析下含产能、整车产销量、新能源汽车业务、汽车金融业务等规模与经营要素。这些子节共同覆盖业务结构、产品用途、变现方式、规模与主要构成、经营角色与资源、客户市场及本期变化，且避免同时选取父子节。",
+      "stop_reason": "已覆盖业务介绍、收入构成与成本分析、产销量与新能源/金融业务规模等核心问题；财务报告附注、治理、股东、债券及投资明细等与业务经营解释关系较弱，不再扩展，故在此停止。",
+      "deferred": [
+        "section-0296财务报告全文及分部信息附注：仅在收入构成存在实质缺口时定向补充，当前主营业务分析已提供收入成本构成，暂不展开",
+        "section-0106主要控股参股公司分析：属子公司层面补充，非核心收入结构，暂缓",
+        "section-0111公司发展战略与section-0112经营计划：属前瞻性计划，非本期实际经营与变现事实，暂缓"
+      ]
+    },
+    "usage": {
+      "input_tokens": 24161,
+      "output_tokens": 343,
+      "total_tokens": 24504
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "task": "6.CI",
+  "execution_code_config_matched_frozen_v13": true,
+  "post_run_engineering": "only workpaper_llm.py prompt v14 after all workers exited; test file checks public gateway wire",
+  "old_results_unchanged": true,
+  "query_export_original_new_reader": "4/4 profiles equal; first three are empty, not successes",
+  "remaining_four_not_started": true,
+  "model_requests": 12,
+  "actual_supplier_total_usage": 365990,
+  "all_unique_failed_contents_preserved": true,
+  "duplicate_retry_contents_canonicalized": 3,
+  "post_run_tests": "5 passed / 75 deselected / 6.50 seconds; no new real calls",
+  "production_authorization": "not_authorized"
+}

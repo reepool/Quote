@@ -217,7 +217,13 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** this does not change historical model results, authorize a call or claim llm_generated completion
 
 ### Requirement: Cost-aware section work stops without fabricating completeness
+
 The v9 workpaper path MUST optimize useful business content per reading and model cost, not perfect appendix coverage. It MUST record the chosen source set and why the scope stopped, using a high-value section pack followed only by targeted material-gap recovery. Actual and unknown resource use MUST follow the current explicit execution authority; no complete-report hypothetical synthesis/verification reserve may be imposed as a prerequisite to a pending workpaper. This does not waive the real request/context/output limits or cumulative budget, recovery and permission caps. Formal evaluation thresholds remain versioned separately from basic workpaper display.
+
+#### Scenario: A response budget cannot hold an exhaustive numeric inventory
+- **WHEN** selected chapters disclose more subsidiary, operating or supplementary figures than a useful core workpaper needs
+- **THEN** extraction MUST prioritize a complete core-profile JSON over exhaustive numeric copying, keeping every material business line and its main revenue/scale basis before optional detail
+- **AND** soft writing targets MUST NOT become company-completeness gates or remove source checks, uncertainty, required element keys or resource limits; a prompt-only correction is not proof that a new real extraction succeeds
 
 #### Scenario: Additional sources offer only marginal detail
 - **WHEN** the chosen chapters already explain the business and a further appendix would add only minor examples or a supplementary quantity

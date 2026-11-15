@@ -1,0 +1,76 @@
+from pathlib import Path
+import json,hashlib,subprocess
+R=Path("/home/python/Quote");C=R/"openspec/changes/restore-company-profile-llm-led-generalization";D=C/"workpaper-remaining-eight-result-20261115"
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+a=json.loads((D/"authorization.json").read_text())
+assert a["base_commit"]=="0c93b54b7d4c5" if False else a["base_commit"].startswith("0c93b54b")
+assert all(sha(R/p)==h for p,h in a["code_sha256"].items())
+assert sha(R/"config/13_llm.json")==a["shared_config_sha256"]
+assert sha(R/"data/QuoteBak/workpaper_ci_run.py")==a["operator_sha256"]
+assert sha(D/"network-preflight.json")==a["network_preflight_sha256"]
+ref=json.loads((C/"workpaper-core-readiness-20261114/source-first-contract.json").read_text())
+for c in ref["companies"]:
+ assert sha(Path(c["source_pdf"]))==c["document_version"]
+ assert sha(R/c["current_query"])==c["current_query_sha256"]
+ch=json.loads((C/"workpaper-prose-binding-result-20261115/result.json").read_text())
+for c in ch["results"]:
+ s=c["instrument_id"][:6];assert sha(C/"workpaper-prose-binding-result-20261115"/s/"query.json")==c["current_query_sha256"]
+ assert sha(R/c["source_query"])==c["source_query_sha256"]
+records=[];failures=[]
+for s in ("600098","600104","600088","600099"):
+ p=D/s;q=json.loads((p/"query.json").read_text());b=json.loads((p/"budget.json").read_text());smy=json.loads((p/"summary.json").read_text());binding=json.loads((p/"binding.json").read_text())
+ assert smy["three_reads_equal"] and binding["code_sha256"]==a["code_sha256"]
+ assert binding["network_context"]==a["network_context"]
+ assert binding["identity"]["source_binding_policy"]=="company_workpaper_source_literals.prose-numerals.v2"
+ assert smy["physical_requests"]==b["physical_requests"]==3
+ assert all(x["usage"] and x["status"]=="success" for x in b["attempts"])
+ usage=sum(x["usage"]["total_tokens"] for x in b["attempts"])
+ assert usage==b["charged_tokens"] and b["charged_cost_cny"]=="unknown"
+ marker=R/"data/QuoteBak/s1-attempts"/f"workpaper-ci-{s}-20261115.json"
+ assert json.loads(marker.read_text())["binding_sha256"]==sha(p/"binding.json")
+ w=q["profiles"][0].get("workpaper") if q["profiles"] else None
+ facts=[f for e in [*w["elements"].values(),*(w.get("supply_chain") or {}).values()] for f in e["facts"]] if w else []
+ if w:
+  assert w["origin"]=="llm_generated"
+  assert json.loads((p/"export"/f"{s}.SH_2025-12-31.json").read_text())==q["profiles"][0]
+  assert json.loads((p/"source-check.json").read_text())["all_retained_evidence_coordinates_equal"]
+  assert not q["profiles"][0].get("real_semantic_complete")
+  assert q["profiles"][0]["production_authorization"]=="not_authorized"
+ rs=json.loads((p/"model-receipts.json").read_text())
+ captured=json.loads((p/"content-capture-index.json").read_text())
+ raw_hashes={hashlib.sha256(x["raw_content"].encode()).hexdigest() for x in rs}
+ for x in captured["responses"]:
+  assert x["content_sha256"] in raw_hashes or x["retained_path"]
+ if not w:
+  fs=sorted((p/"failed-model-content").glob("*.json"))
+  ds=[json.loads(f.read_text()) for f in fs]
+  assert len(ds)==2 and ds[0]["content_sha256"]==ds[1]["content_sha256"]
+  try:json.loads(ds[0]["content"]);err=None
+  except json.JSONDecodeError as e:err={"message":e.msg,"position":e.pos}
+  assert err
+  failures.append({"instrument_id":s+".SH","finish_reasons":[x["finish_reason"] for x in ds],
+   "output_tokens":[x["usage"]["completion_tokens"] for x in ds],"declared_output_tokens":binding["identity"]["workpaper_max_output_tokens"],
+   "response_characters":len(ds[0]["content"]),"json_error":err,"recovery_content_identical":True,
+   "content_sha256":ds[0]["content_sha256"],"raw_file":str(fs[0].relative_to(R))})
+ assert not list((R/"data/QuoteBak").glob(f"workpaper-ci-{s}-*"))
+ records.append({"instrument_id":smy["instrument_id"],"name":smy["name"],"state":smy["state"],
+  "readable":bool(w),"fact_count_including_supply_chain":len(facts),"metric_count_including_supply_chain":sum(len(f["metrics"]) for f in facts),
+  "query_sha256":sha(p/"query.json"),"physical_requests":3,"actual_supplier_total_usage":usage,"recoveries":smy["recoveries"],
+  "fee":"unknown","preparation_seconds":smy["preparation_seconds"],"business_seconds":smy["business_seconds"],
+  "business_started_monotonic":smy["business_started_monotonic"],"business_ended_monotonic":smy["business_ended_monotonic"],
+  "review_status":smy.get("review_status"),"three_reads_equal":True,"runtime_cleanup_bytes":smy["cleanup_bytes"]})
+assert len(records)==4
+assert not any((D/s).exists() for s in ("600082","600097","600054","600000"))
+starts=[r["business_started_monotonic"] for r in records];ends=[r["business_ended_monotonic"] for r in records]
+out={"task":"6.CI","outcome":"stopped_after_first_batch_consecutive_core_output_failure",
+ "entries_started":4,"not_started":a["order"][4:],"readable":1,"model_review_completed":0,
+ "facts_including_optional_supply_chain":sum(r["fact_count_including_supply_chain"] for r in records),
+ "metrics_including_optional_supply_chain":sum(r["metric_count_including_supply_chain"] for r in records),
+ "physical_requests":sum(r["physical_requests"] for r in records),"actual_supplier_total_usage":sum(r["actual_supplier_total_usage"] for r in records),
+ "recoveries":sum(r["recoveries"] for r in records),"fee":"unknown",
+ "business_wall_seconds":round(max(ends)-min(starts),3),"records":records,"failure_diagnostics":failures,
+ "execution_source_and_config_matched_freeze":True,"old_source_queries_CG_CH_unchanged":True,
+ "formal_accuracy":None,"formal_recall":None,"s1_changed":False,"production_authorization":"not_authorized",
+ "tests":"No production change during run; reuse 0c93b54b 94 targeted checks and four saved-snapshot entry proofs"}
+print(json.dumps(out,ensure_ascii=False,indent=2))
+
