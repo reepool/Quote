@@ -73,4 +73,3 @@ out={"task":"6.CI","outcome":"stopped_after_first_batch_consecutive_core_output_
  "formal_accuracy":None,"formal_recall":None,"s1_changed":False,"production_authorization":"not_authorized",
  "tests":"No production change during run; reuse 0c93b54b 94 targeted checks and four saved-snapshot entry proofs"}
 print(json.dumps(out,ensure_ascii=False,indent=2))
-
