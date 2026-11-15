@@ -115,6 +115,8 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 ## 沪深终止上市核对
 
+SSE终止名单请求仅取 `STOCK_TYPE=1,8`，解析时继续排除B股类型2，优先按 `A_STOCK_CODE` 确认证券；不能仅凭共用的 `COMPANY_CODE` 判为A股。`LIST_DATE` 属于证券类别对应的上市日，A/B股共用公司代码时不可混用。沪深真实终止名单请求均经过现有rate limiter，本地fixture不占额度。终止名单parser版本为 `.terminal.v2`。
+
 每次实际股票主数据刷新都会读取沪深官方终止上市名单：SZSE使用 `1793_ssgs/tab2` 的终止上市XLSX，SSE使用 `COMPANY_STATUS=3` 的官方JSON及实际分页；不再依赖“退市××／××退”简称。XLSX的字符串代码也可能被表读取器推断为整数，例如000016变为16，provider负责恢复六位代码，fixture保留原始单元格并经过完整读取链。
 
 `instrument_master_delisting.AShareDelistingReconciler` 只核对本地本任务A股身份；同公告B股／债券不导入也不连带停用。已审核code lineage用于区分前身与当前主体，历史同码终态不能覆盖现主体。空表、缺板块、缺页只使来源降级，不直接确认退市；独立有效终态正记录仍可用于其明确对象。当前名单归一化发生拒绝行时同样降低覆盖状态，保留原始／成功／拒绝／重复行数及最多20条拒绝样例，并经 `source_diagnostics.official_current_list_coverage` 展示；合法重复行仅去重，不作为解析失败。覆盖不完整时不产生名单消失候选或对应缺失差异记录。
@@ -126,6 +128,14 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 未来计划唯一保存于现有差异表，reason为 `a_share_terminal_future_effective`；成功应用时同一生命周期事务写状态、受保护证据及 `a_share_terminal_future_applied`。过期计划仍保留身份／日期冲突检查及原plan_key，但不能单独作为写入依据；新证据核验一致后，在该事务闭合对应旧计划。公告parser当前版本为 `official_stock_terminal_body.v3`，恢复非当前版本的公告计划时同样需要重新核验，不能沿用旧的日期／证券范围判断；结构化交易所名单不受这一版本限制。按交易所的 `a_share_terminal_verification` 保存实际核验及失败／未决。fresh gate先读生产scope/mode的未闭合计划与最新核验，生效日优先于48小时fresh窗口；重启后仍能恢复，读取或JSON失败不能被当作空集合。audit记录不建立生产fresh基线，也不闭合生产计划。
 
 `audit_only` 的只读约束贯穿policy、source factory名单缓存及metadata，不只是跳过最后的退市writer。普通fallback缓存同样不能凭BaoStock单独的outDate先写终态或将未知历史退市行伪造为active。
+
+### 已有退市日期的受控更正
+
+普通治理仍拒绝覆盖不同的已有退市日。经明确审核的历史日期纠错通过同一入口 `DatabaseOperations.mark_instrument_delisted(..., date_correction=...)` 执行；不能直接SQL覆盖，不能在普通同步自动打开此参数。
+
+`date_correction` 必须包含 `expected_delisted_date`、`expected_listed_date`、`reason`、`reference`，并传入同证券/交易所/类型/上市日相符的正式终止名单evidence和source。只允许已退市A股、非空旧日、已生效且晚于上市日的新日；writer核URL/hash/parser/观察时间及预期旧值，再以条件UPDATE防止并发覆盖。日期、受保护证据和差异表 `reason=a_share_terminal_date_corrected` 的before/after记录原子提交，失败整笔回滚；同reference及相同前后日期可幂等复跑，内容冲突则拒绝。不创建第二个writer或新表。
+
+2026-11-16固定26项清理的来源、预览与验收见 [受控清理证据](../../openspec/changes/archive/2026-11-16-correct-a-share-terminal-evidence-and-dates/verification.md)。保留000003.SZ与000004.SZ上市日待核，不为消除warning修改上市日；定向audit不能替代全市场生产freshness核验。
 
 ## BSE 退市确认
 

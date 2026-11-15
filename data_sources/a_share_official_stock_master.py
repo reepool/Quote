@@ -181,6 +181,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
             if fixture:
                 raw = _read_file_bytes(fixture)
             elif exchange == "SZSE":
+                await self.rate_limiter.acquire()
                 raw = await self._http_get(url, params={
                     "SHOWTYPE": "xlsx", "CATALOGID": "1793_ssgs", "TABKEY": "tab2",
                 })
@@ -188,7 +189,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
                 await self.rate_limiter.acquire()
                 raw = await self._http_get(url, params={
                     "sqlId": "COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L",
-                    "COMPANY_STATUS": "3", "STOCK_TYPE": "1,2,8",
+                    "COMPANY_STATUS": "3", "STOCK_TYPE": "1,8",
                     "STOCK_CODE": "", "CSRC_CODE": "", "REG_PROVINCE": "",
                     "type": "inParams", "isPagination": "true",
                     "pageHelp.cacheSize": "1", "pageHelp.beginPage": str(page_no),
@@ -203,12 +204,23 @@ class AShareOfficialStockMasterSource(BaseDataSource):
                 snapshot["errors"].append(f"terminal list page {page_no} empty or unparseable")
                 break
             columns = set(frame.columns)
-            code_keys = ["证券代码", "COMPANY_CODE", "SECURITY_CODE", "code"]
+            code_keys = (
+                ["A_STOCK_CODE", "证券代码", "COMPANY_CODE", "SECURITY_CODE", "code"]
+                if exchange == "SSE"
+                else ["证券代码", "COMPANY_CODE", "SECURITY_CODE", "code"]
+            )
             date_keys = ["终止上市日期", "DELIST_DATE", "delisted_date"]
             if not columns.intersection(code_keys) or not columns.intersection(date_keys):
                 snapshot["errors"].append("terminal list required columns missing")
                 break
             for row in _records(frame):
+                if exchange == "SSE" and "STOCK_TYPE" in columns:
+                    share_type = _first_text(row, ["STOCK_TYPE"])
+                    if share_type == "2":
+                        continue
+                    if share_type not in {"1", "8"}:
+                        snapshot["errors"].append("invalid SSE terminal share class")
+                        continue
                 symbol = _first_text(row, code_keys).split(".")[0].strip().zfill(6)
                 if not symbol.isdigit() or len(symbol) != 6:
                     snapshot["errors"].append("invalid terminal security code")
@@ -231,7 +243,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
                     "delisted_date": effective, "completion_confirmed": True,
                     "source": f"{exchange.lower()}_official_terminal_list",
                     "source_url": url, "raw_snapshot_hash": _sha256_bytes(raw),
-                    "parser_version": self.parser_version + ".terminal.v1",
+                    "parser_version": self.parser_version + ".terminal.v2",
                     "observed_at": get_shanghai_time().isoformat(),
                 })
             if exchange != "SSE" or fixture:

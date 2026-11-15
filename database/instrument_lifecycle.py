@@ -10,7 +10,7 @@ import json
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
-from sqlalchemy import select, text
+from sqlalchemy import select, text, update
 
 from utils.date_utils import get_shanghai_time
 from .models import InstrumentDB
@@ -20,6 +20,7 @@ FUTURE = "a_share_terminal_future_effective"
 APPLIED = "a_share_terminal_future_applied"
 VERIFICATION = "a_share_terminal_verification"
 TERMINAL_EVIDENCE = "a_share_terminal_evidence"
+DATE_CORRECTED = "a_share_terminal_date_corrected"
 
 METADATA_DDL = """
 CREATE TABLE IF NOT EXISTS instrument_master_metadata (
@@ -57,6 +58,7 @@ async def mark_delisted(
     source: str,
     evidence: Mapping[str, Any] | None = None,
     plan_keys: Sequence[str] = (),
+    date_correction: Mapping[str, Any] | None = None,
 ) -> bool:
     """Commit lifecycle, protected evidence and plan closure in one transaction."""
     try:
@@ -76,20 +78,45 @@ async def mark_delisted(
             if record is None:
                 return False
             previous = lifecycle_date(record.delisted_date)
-            if previous and effective and previous != effective:
+            correction_payload = None
+            if date_correction is not None:
+                correction_payload = await _prepare_date_correction(
+                    session, record, date_correction, evidence, effective, source, now
+                )
+                if correction_payload is None:  # An identical correction committed.
+                    return True
+            elif previous and effective and previous != effective:
                 raise ValueError("conflicting effective delisting dates")
             final_date = effective or previous
-            record.delisted_date = (
+            final_datetime = (
                 datetime.combine(final_date, datetime.min.time())
                 if final_date
                 else None
             )
-            record.status, record.is_active, record.trading_status = (
-                "delisted",
-                False,
-                0,
+            values = dict(
+                delisted_date=final_datetime, status="delisted", is_active=False,
+                trading_status=0, source=source, updated_at=now,
             )
-            record.source, record.updated_at = source, now
+            if correction_payload is not None:
+                changed = await session.execute(
+                    update(InstrumentDB).where(
+                        InstrumentDB.instrument_id == instrument_id,
+                        InstrumentDB.symbol == record.symbol,
+                        InstrumentDB.exchange == record.exchange,
+                        InstrumentDB.type == record.type,
+                        InstrumentDB.delisted_date == record.delisted_date,
+                        InstrumentDB.listed_date == record.listed_date,
+                        InstrumentDB.source == record.source,
+                        InstrumentDB.status == "delisted",
+                        InstrumentDB.is_active.is_(False),
+                        InstrumentDB.trading_status == 0,
+                    ).values(**values).execution_options(synchronize_session=False)
+                )
+                if changed.rowcount != 1:
+                    raise ValueError("lifecycle changed during date correction")
+            else:
+                for key, value in values.items():
+                    setattr(record, key, value)
             if evidence is not None:
                 await session.execute(text(METADATA_DDL))
                 old = (
@@ -128,6 +155,22 @@ async def mark_delisted(
                         "iid": instrument_id,
                         "exchange": record.exchange,
                         "payload": json.dumps(payload, ensure_ascii=False, default=str),
+                        "now": now.isoformat(),
+                    },
+                )
+            if correction_payload is not None:
+                await session.execute(
+                    text(
+                        "INSERT INTO instrument_master_discrepancies "
+                        "(run_id,exchange,instrument_id,reason,payload_json,created_at) "
+                        "VALUES (:run,:exchange,:iid,:reason,:payload,:now)"
+                    ),
+                    {
+                        "run": date_correction["reference"],
+                        "exchange": record.exchange,
+                        "iid": instrument_id,
+                        "reason": DATE_CORRECTED,
+                        "payload": json.dumps(correction_payload, ensure_ascii=False, default=str),
                         "now": now.isoformat(),
                     },
                 )
@@ -180,6 +223,82 @@ async def mark_delisted(
     except Exception as exc:
         owner.db_logger.error("Delisting write failed for %s: %s", instrument_id, exc)
         return False
+
+
+async def _prepare_date_correction(
+    session: Any, record: InstrumentDB, request: Mapping[str, Any],
+    evidence: Mapping[str, Any] | None, effective: date | None,
+    source: str, now: datetime,
+) -> dict[str, Any] | None:
+    """Validate an explicit correction; None means a matching committed retry."""
+    expected = lifecycle_date(request.get("expected_delisted_date"))
+    listed = lifecycle_date(request.get("expected_listed_date"))
+    reason = str(request.get("reason") or "").strip()
+    reference = str(request.get("reference") or "").strip()
+    exchange = record.exchange
+    symbol, _, suffix = record.instrument_id.partition(".")
+    if (
+        not expected or not listed or not reason or not reference
+        or effective is None or effective == expected or effective <= listed
+        or exchange not in {"SSE", "SZSE"}
+        or suffix != {"SSE": "SH", "SZSE": "SZ"}.get(exchange)
+        or record.symbol != symbol
+        or not symbol.isdigit() or len(symbol) != 6
+        or not symbol.startswith(("60", "68") if exchange == "SSE" else ("00", "30"))
+        or record.type != "stock" or record.status != "delisted"
+        or record.is_active or record.trading_status != 0
+        or lifecycle_date(record.listed_date) != listed
+        or not evidence or evidence.get("completion_confirmed") is not True
+        or evidence.get("instrument_id") != record.instrument_id
+        or evidence.get("symbol") != symbol or evidence.get("exchange") != exchange
+        or evidence.get("type") != "stock"
+        or lifecycle_date(evidence.get("listed_date")) != listed
+        or lifecycle_date(evidence.get("delisted_date")) != effective
+        or source != f"{exchange.lower()}_official_terminal_list"
+        or evidence.get("source") != source
+        or not all(evidence.get(key) for key in (
+            "source_url", "raw_snapshot_hash", "parser_version", "observed_at"
+        ))
+    ):
+        raise ValueError("date correction requires matching dated official A-share evidence and expectations")
+    if datetime.fromisoformat(str(evidence["observed_at"])).tzinfo is None:
+        raise ValueError("date correction evidence observation must have a timezone")
+    await session.execute(text(DISCREPANCY_DDL))
+    prior = (await session.execute(
+        text(
+            "SELECT payload_json FROM instrument_master_discrepancies "
+            "WHERE instrument_id=:iid AND reason=:reason "
+            "AND json_extract(payload_json,'$.reference')=:reference"
+        ),
+        {"iid": record.instrument_id, "reason": DATE_CORRECTED, "reference": reference},
+    )).scalars().all()
+    before = {
+        "delisted_date": expected.isoformat(), "listed_date": listed.isoformat(),
+        "status": record.status, "is_active": record.is_active,
+        "trading_status": record.trading_status, "source": record.source,
+    }
+    after = {**before, "delisted_date": effective.isoformat(), "source": source}
+    if prior:
+        if len(prior) != 1:
+            raise ValueError("duplicate date correction reference")
+        saved = json.loads(prior[0])
+        if (
+            saved.get("mode") == "production" and saved.get("scope") == "a_share_stock"
+            and saved.get("reason") == reason
+            and saved.get("before", {}).get("delisted_date") == expected.isoformat()
+            and saved.get("before", {}).get("listed_date") == listed.isoformat()
+            and saved.get("after") == after
+            and lifecycle_date(record.delisted_date) == effective
+        ):
+            return None
+        raise ValueError("date correction reference does not match committed state")
+    if lifecycle_date(record.delisted_date) != expected:
+        raise ValueError("date correction expected old date no longer matches")
+    return {
+        "scope": "a_share_stock", "mode": "production", "reference": reference,
+        "reason": reason, "before": before, "after": after,
+        "evidence": dict(evidence), "corrected_at": now.isoformat(),
+    }
 
 
 async def read_governance_state(owner: Any, exchanges: Sequence[str]) -> dict[str, Any]:

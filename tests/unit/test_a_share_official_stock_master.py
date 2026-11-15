@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -11,6 +12,38 @@ from data_sources.source_factory import DataSourceFactory
 def _csv(path, text):
     path.write_text(text, encoding="utf-8")
     return str(path)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("exchange", ["SSE", "SZSE"])
+async def test_terminal_request_takes_one_rate_limit_per_page_and_fixture_takes_none(exchange):
+    fixture = Path(__file__).parents[1] / "fixtures" / "a_share_official_master" / (
+        "sse_terminated.json" if exchange == "SSE" else "szse_terminated.xlsx"
+    )
+    raw = fixture.read_bytes()
+    source = AShareOfficialStockMasterSource("exchange_official_a_stock")
+    events = []
+
+    async def acquire():
+        events.append("acquire")
+
+    async def http(url, *, params, **kwargs):
+        events.append("http")
+        if exchange == "SSE":
+            assert params["STOCK_TYPE"] == "1,8"
+        return raw
+
+    source.rate_limiter.acquire = AsyncMock(side_effect=acquire)
+    source._http_get = AsyncMock(side_effect=http)
+    snapshot = await source.get_delisting_snapshot(exchange)
+    assert snapshot["complete"]
+    assert events == ["acquire", "http"]
+    source.config = {exchange.lower(): {"terminal_list_file": str(fixture)}}
+    source.rate_limiter.acquire.reset_mock()
+    source._http_get.reset_mock()
+    assert (await source.get_delisting_snapshot(exchange))["complete"]
+    source.rate_limiter.acquire.assert_not_awaited()
+    source._http_get.assert_not_awaited()
 
 
 def test_official_source_recreates_session_when_event_loop_changes():

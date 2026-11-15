@@ -1321,16 +1321,19 @@ class DatabaseOperations:
         source: str = "cninfo_bse_delisting",
         evidence: Optional[Dict[str, Any]] = None,
         plan_keys: Sequence[str] = (),
+        date_correction: Optional[Dict[str, Any]] = None,
     ) -> bool:
         """Mark one instrument as formally delisted using confirmed evidence.
 
         This mutates only lifecycle status fields; historical quotes remain
-        intact and available for research.
+        intact and available for research. A differing existing date requires
+        an explicit date_correction (expected dates, reason and reference).
         """
         from database.instrument_lifecycle import mark_delisted
         return await mark_delisted(
             self, instrument_id, delisted_date=delisted_date, source=source,
             evidence=evidence, plan_keys=plan_keys,
+            date_correction=date_correction,
         )
 
     async def load_a_share_delisting_state(self, exchanges: Sequence[str]) -> Dict[str, Any]:

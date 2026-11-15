@@ -1,0 +1,1426 @@
+{
+  "change": "correct-a-share-terminal-evidence-and-dates",
+  "completed_at": "2026-11-16T00:30:50.027823+08:00",
+  "preview_sha256": "6d7205372904477f5e4aed671e154b31b7e078e4a7087bb471a7461db152a0f5",
+  "corrected_count": 23,
+  "unresolved_listing_ids": [
+    "000003.SZ",
+    "000004.SZ"
+  ],
+  "unchanged_false_positive": "600680.SH",
+  "audit_scope": "fixed_26_only_not_full_market_freshness",
+  "before_audit": {
+    "SSE": {
+      "checked_count": 21,
+      "confirmed_count": 1,
+      "deactivated_count": 0,
+      "date_enriched_count": 0,
+      "confirmed_unchanged_count": 0,
+      "unconfirmed_count": 0,
+      "future_effective_count": 0,
+      "conflict_count": 20,
+      "source_error_count": 0,
+      "write_failed_count": 0,
+      "status": "warning",
+      "warnings": [
+        "600069.SH: official effective-date conflict",
+        "600074.SH: official effective-date conflict",
+        "600086.SH: official effective-date conflict",
+        "600175.SH: official effective-date conflict",
+        "600190.SH: official effective-date conflict",
+        "600240.SH: official effective-date conflict",
+        "600401.SH: official effective-date conflict",
+        "600555.SH: official effective-date conflict",
+        "600614.SH: official effective-date conflict",
+        "600625.SH: official effective-date conflict",
+        "600634.SH: official effective-date conflict",
+        "600646.SH: official effective-date conflict",
+        "600687.SH: official effective-date conflict",
+        "600695.SH: official effective-date conflict",
+        "600701.SH: official effective-date conflict",
+        "600709.SH: official effective-date conflict",
+        "600747.SH: official effective-date conflict",
+        "600786.SH: official effective-date conflict",
+        "600799.SH: official effective-date conflict",
+        "601558.SH: official effective-date conflict",
+        "official current-list coverage not verified"
+      ],
+      "errors": [],
+      "audit_only": true,
+      "would_deactivate_count": 0,
+      "coverage_complete": true,
+      "risk_only_count": 0,
+      "conflict_ids": [
+        "600069.SH",
+        "600074.SH",
+        "600086.SH",
+        "600175.SH",
+        "600190.SH",
+        "600240.SH",
+        "600401.SH",
+        "600555.SH",
+        "600614.SH",
+        "600625.SH",
+        "600634.SH",
+        "600646.SH",
+        "600687.SH",
+        "600695.SH",
+        "600701.SH",
+        "600709.SH",
+        "600747.SH",
+        "600786.SH",
+        "600799.SH",
+        "601558.SH"
+      ],
+      "conflict_ids_note": "bounded report samples; full 26-item classification is in preview.json"
+    },
+    "SZSE": {
+      "checked_count": 5,
+      "confirmed_count": 0,
+      "deactivated_count": 0,
+      "date_enriched_count": 0,
+      "confirmed_unchanged_count": 0,
+      "unconfirmed_count": 0,
+      "future_effective_count": 0,
+      "conflict_count": 5,
+      "source_error_count": 0,
+      "write_failed_count": 0,
+      "status": "warning",
+      "warnings": [
+        "000003.SZ: listing_interval_conflict",
+        "000004.SZ: listing_interval_conflict",
+        "000015.SZ: official effective-date conflict",
+        "000556.SZ: official effective-date conflict",
+        "000588.SZ: official effective-date conflict",
+        "official current-list coverage not verified"
+      ],
+      "errors": [],
+      "audit_only": true,
+      "would_deactivate_count": 0,
+      "coverage_complete": true,
+      "risk_only_count": 0,
+      "conflict_ids": [
+        "000003.SZ",
+        "000004.SZ",
+        "000015.SZ",
+        "000556.SZ",
+        "000588.SZ"
+      ],
+      "conflict_ids_note": "bounded report samples; full 26-item classification is in preview.json"
+    }
+  },
+  "after_audit": {
+    "SSE": {
+      "checked_count": 21,
+      "confirmed_count": 21,
+      "deactivated_count": 0,
+      "date_enriched_count": 0,
+      "confirmed_unchanged_count": 0,
+      "unconfirmed_count": 0,
+      "future_effective_count": 0,
+      "conflict_count": 0,
+      "source_error_count": 0,
+      "write_failed_count": 0,
+      "status": "warning",
+      "warnings": [
+        "official current-list coverage not verified"
+      ],
+      "errors": [],
+      "audit_only": true,
+      "would_deactivate_count": 0,
+      "coverage_complete": true,
+      "risk_only_count": 0,
+      "conflict_ids": []
+    },
+    "SZSE": {
+      "checked_count": 5,
+      "confirmed_count": 3,
+      "deactivated_count": 0,
+      "date_enriched_count": 0,
+      "confirmed_unchanged_count": 0,
+      "unconfirmed_count": 0,
+      "future_effective_count": 0,
+      "conflict_count": 2,
+      "source_error_count": 0,
+      "write_failed_count": 0,
+      "status": "warning",
+      "warnings": [
+        "000003.SZ: listing_interval_conflict",
+        "000004.SZ: listing_interval_conflict",
+        "official current-list coverage not verified"
+      ],
+      "errors": [],
+      "audit_only": true,
+      "would_deactivate_count": 0,
+      "coverage_complete": true,
+      "risk_only_count": 0,
+      "conflict_ids": [
+        "000003.SZ",
+        "000004.SZ"
+      ]
+    }
+  },
+  "checks": {
+    "instrument_count_unchanged": true,
+    "unrelated_instruments_unchanged": true,
+    "audit_business_state_unchanged": true,
+    "production_verification_unchanged": true,
+    "financial_facts_unchanged": true,
+    "all_26_excluded_from_current_financial_scope": true,
+    "idempotent_retry_unchanged": true
+  },
+  "financial_affected": {
+    "financial_disclosure_event_state": {
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "financial_statements_raw": {
+      "rows": 30,
+      "sha256": "e3a1d0d1ed83472689d28dd86b9d5ac1c1e04b4bb0e8c4712da9b67f4c25727f"
+    },
+    "financial_summaries": {
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "financial_core_facts_hot": {
+      "rows": 10,
+      "sha256": "61d80b44f0f4e2628842bf1863ff70fe368ba8fbdc04db0679b931e3669f0d22"
+    },
+    "financial_indicator_snapshots_hot": {
+      "rows": 10,
+      "sha256": "7eec7f0a6f766df5e0f41d278fba136b73c68fc9573d43a2845e7ccfcad77346"
+    }
+  },
+  "results": [
+    {
+      "instrument_id": "000003.SZ",
+      "result": "unresolved_listing_date",
+      "written": false
+    },
+    {
+      "instrument_id": "000004.SZ",
+      "result": "unresolved_listing_date",
+      "written": false
+    },
+    {
+      "instrument_id": "000015.SZ",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2001-10-22",
+        "expected_listed_date": "1992-06-25",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2001-10-22",
+      "to": "2001-10-25"
+    },
+    {
+      "instrument_id": "000556.SZ",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2002-05-29",
+        "expected_listed_date": "1994-05-25",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2002-05-29",
+      "to": "2002-06-03"
+    },
+    {
+      "instrument_id": "000588.SZ",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2001-06-15",
+        "expected_listed_date": "1996-01-23",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2001-06-15",
+      "to": "2001-06-16"
+    },
+    {
+      "instrument_id": "600069.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2020-08-27",
+        "expected_listed_date": "1997-04-30",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2020-08-27",
+      "to": "2020-08-28"
+    },
+    {
+      "instrument_id": "600074.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2020-06-02",
+        "expected_listed_date": "1997-06-23",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2020-06-02",
+      "to": "2020-06-03"
+    },
+    {
+      "instrument_id": "600086.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2021-03-17",
+        "expected_listed_date": "1997-06-06",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2021-03-17",
+      "to": "2021-03-18"
+    },
+    {
+      "instrument_id": "600175.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2020-08-14",
+        "expected_listed_date": "1999-04-08",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2020-08-14",
+      "to": "2020-08-17"
+    },
+    {
+      "instrument_id": "600190.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2025-07-25",
+        "expected_listed_date": "1999-06-09",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2025-07-25",
+      "to": "2025-07-28"
+    },
+    {
+      "instrument_id": "600240.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2020-02-05",
+        "expected_listed_date": "2000-06-28",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2020-02-05",
+      "to": "2020-02-06"
+    },
+    {
+      "instrument_id": "600401.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2019-07-12",
+        "expected_listed_date": "2003-09-24",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2019-07-12",
+      "to": "2019-07-15"
+    },
+    {
+      "instrument_id": "600555.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2022-07-13",
+        "expected_listed_date": "2001-03-28",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2022-07-13",
+      "to": "2022-07-14"
+    },
+    {
+      "instrument_id": "600614.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2021-07-21",
+        "expected_listed_date": "1992-08-28",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2021-07-21",
+      "to": "2021-07-22"
+    },
+    {
+      "instrument_id": "600625.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2001-04-23",
+        "expected_listed_date": "1993-01-06",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2001-04-23",
+      "to": "2001-04-25"
+    },
+    {
+      "instrument_id": "600634.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2021-07-21",
+        "expected_listed_date": "1993-03-04",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2021-07-21",
+      "to": "2021-07-22"
+    },
+    {
+      "instrument_id": "600646.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2003-09-22",
+        "expected_listed_date": "1993-05-04",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2003-09-22",
+      "to": "2003-09-23"
+    },
+    {
+      "instrument_id": "600680.SH",
+      "result": "unchanged",
+      "written": false
+    },
+    {
+      "instrument_id": "600687.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2021-03-03",
+        "expected_listed_date": "1993-11-08",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2021-03-03",
+      "to": "2021-03-04"
+    },
+    {
+      "instrument_id": "600695.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2022-06-14",
+        "expected_listed_date": "1993-11-22",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2022-06-14",
+      "to": "2022-06-15"
+    },
+    {
+      "instrument_id": "600701.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2021-04-30",
+        "expected_listed_date": "1996-05-28",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2021-04-30",
+      "to": "2021-05-06"
+    },
+    {
+      "instrument_id": "600709.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2003-05-23",
+        "expected_listed_date": "1996-06-18",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2003-05-23",
+      "to": "2003-05-26"
+    },
+    {
+      "instrument_id": "600747.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2019-12-12",
+        "expected_listed_date": "1996-09-16",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2019-12-12",
+      "to": "2019-12-13"
+    },
+    {
+      "instrument_id": "600786.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2008-03-18",
+        "expected_listed_date": "1996-12-27",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2008-03-18",
+      "to": "2008-03-24"
+    },
+    {
+      "instrument_id": "600799.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2005-12-31",
+        "expected_listed_date": "1997-04-16",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2005-12-31",
+      "to": "2006-01-04"
+    },
+    {
+      "instrument_id": "601558.SH",
+      "result": "corrected",
+      "written": true,
+      "request": {
+        "expected_delisted_date": "2020-07-02",
+        "expected_listed_date": "2011-01-13",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "reference": "correct-a-share-terminal-evidence-and-dates"
+      },
+      "from": "2020-07-02",
+      "to": "2020-07-03"
+    }
+  ],
+  "after_rows": {
+    "000003.SZ": {
+      "instrument_id": "000003.SZ",
+      "listed_date": "1991-07-03 00:00:00.000000",
+      "delisted_date": "2002-06-14 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "baostock",
+      "updated_at": "2026-08-19 00:15:41.609837"
+    },
+    "000004.SZ": {
+      "instrument_id": "000004.SZ",
+      "listed_date": "1991-01-14 00:00:00.000000",
+      "delisted_date": "2026-07-14 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "baostock",
+      "updated_at": "2026-08-19 00:15:41.611358"
+    },
+    "000015.SZ": {
+      "instrument_id": "000015.SZ",
+      "listed_date": "1992-06-25 00:00:00.000000",
+      "delisted_date": "2001-10-25 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "szse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:44.309988"
+    },
+    "000556.SZ": {
+      "instrument_id": "000556.SZ",
+      "listed_date": "1994-05-25 00:00:00.000000",
+      "delisted_date": "2002-06-03 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "szse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:44.514519"
+    },
+    "000588.SZ": {
+      "instrument_id": "000588.SZ",
+      "listed_date": "1996-01-23 00:00:00.000000",
+      "delisted_date": "2001-06-16 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "szse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:44.625927"
+    },
+    "600069.SH": {
+      "instrument_id": "600069.SH",
+      "listed_date": "1997-04-30 00:00:00.000000",
+      "delisted_date": "2020-08-28 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:44.738214"
+    },
+    "600074.SH": {
+      "instrument_id": "600074.SH",
+      "listed_date": "1997-06-23 00:00:00.000000",
+      "delisted_date": "2020-06-03 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:44.884246"
+    },
+    "600086.SH": {
+      "instrument_id": "600086.SH",
+      "listed_date": "1997-06-06 00:00:00.000000",
+      "delisted_date": "2021-03-18 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.011762"
+    },
+    "600175.SH": {
+      "instrument_id": "600175.SH",
+      "listed_date": "1999-04-08 00:00:00.000000",
+      "delisted_date": "2020-08-17 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.127607"
+    },
+    "600190.SH": {
+      "instrument_id": "600190.SH",
+      "listed_date": "1999-06-09 00:00:00.000000",
+      "delisted_date": "2025-07-28 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.237125"
+    },
+    "600240.SH": {
+      "instrument_id": "600240.SH",
+      "listed_date": "2000-06-28 00:00:00.000000",
+      "delisted_date": "2020-02-06 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.361457"
+    },
+    "600401.SH": {
+      "instrument_id": "600401.SH",
+      "listed_date": "2003-09-24 00:00:00.000000",
+      "delisted_date": "2019-07-15 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.471673"
+    },
+    "600555.SH": {
+      "instrument_id": "600555.SH",
+      "listed_date": "2001-03-28 00:00:00.000000",
+      "delisted_date": "2022-07-14 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.579729"
+    },
+    "600614.SH": {
+      "instrument_id": "600614.SH",
+      "listed_date": "1992-08-28 00:00:00.000000",
+      "delisted_date": "2021-07-22 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.696641"
+    },
+    "600625.SH": {
+      "instrument_id": "600625.SH",
+      "listed_date": "1993-01-06 00:00:00.000000",
+      "delisted_date": "2001-04-25 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.806725"
+    },
+    "600634.SH": {
+      "instrument_id": "600634.SH",
+      "listed_date": "1993-03-04 00:00:00.000000",
+      "delisted_date": "2021-07-22 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:45.917456"
+    },
+    "600646.SH": {
+      "instrument_id": "600646.SH",
+      "listed_date": "1993-05-04 00:00:00.000000",
+      "delisted_date": "2003-09-23 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.027724"
+    },
+    "600680.SH": {
+      "instrument_id": "600680.SH",
+      "listed_date": "1993-10-18 00:00:00.000000",
+      "delisted_date": "2019-05-24 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "baostock",
+      "updated_at": "2026-10-13 19:15:59.883404"
+    },
+    "600687.SH": {
+      "instrument_id": "600687.SH",
+      "listed_date": "1993-11-08 00:00:00.000000",
+      "delisted_date": "2021-03-04 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.137057"
+    },
+    "600695.SH": {
+      "instrument_id": "600695.SH",
+      "listed_date": "1993-11-22 00:00:00.000000",
+      "delisted_date": "2022-06-15 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.255391"
+    },
+    "600701.SH": {
+      "instrument_id": "600701.SH",
+      "listed_date": "1996-05-28 00:00:00.000000",
+      "delisted_date": "2021-05-06 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.363556"
+    },
+    "600709.SH": {
+      "instrument_id": "600709.SH",
+      "listed_date": "1996-06-18 00:00:00.000000",
+      "delisted_date": "2003-05-26 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.473570"
+    },
+    "600747.SH": {
+      "instrument_id": "600747.SH",
+      "listed_date": "1996-09-16 00:00:00.000000",
+      "delisted_date": "2019-12-13 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.589596"
+    },
+    "600786.SH": {
+      "instrument_id": "600786.SH",
+      "listed_date": "1996-12-27 00:00:00.000000",
+      "delisted_date": "2008-03-24 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.719950"
+    },
+    "600799.SH": {
+      "instrument_id": "600799.SH",
+      "listed_date": "1997-04-16 00:00:00.000000",
+      "delisted_date": "2006-01-04 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.826874"
+    },
+    "601558.SH": {
+      "instrument_id": "601558.SH",
+      "listed_date": "2011-01-13 00:00:00.000000",
+      "delisted_date": "2020-07-03 00:00:00.000000",
+      "status": "delisted",
+      "is_active": 0,
+      "trading_status": 0,
+      "source": "sse_official_terminal_list",
+      "updated_at": "2026-11-16 00:30:46.936003"
+    }
+  },
+  "correction_records": [
+    {
+      "instrument_id": "000015.SZ",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2001-10-22",
+          "listed_date": "1992-06-25",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2001-10-25",
+          "listed_date": "1992-06-25",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "szse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:44.309988+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=000015.SZ].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "000556.SZ",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2002-05-29",
+          "listed_date": "1994-05-25",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2002-06-03",
+          "listed_date": "1994-05-25",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "szse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:44.514519+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=000556.SZ].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "000588.SZ",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2001-06-15",
+          "listed_date": "1996-01-23",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2001-06-16",
+          "listed_date": "1996-01-23",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "szse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:44.625927+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=000588.SZ].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600069.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2020-08-27",
+          "listed_date": "1997-04-30",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2020-08-28",
+          "listed_date": "1997-04-30",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:44.738214+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600069.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600074.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2020-06-02",
+          "listed_date": "1997-06-23",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2020-06-03",
+          "listed_date": "1997-06-23",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:44.884246+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600074.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600086.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2021-03-17",
+          "listed_date": "1997-06-06",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2021-03-18",
+          "listed_date": "1997-06-06",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.011762+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600086.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600175.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2020-08-14",
+          "listed_date": "1999-04-08",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2020-08-17",
+          "listed_date": "1999-04-08",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.127607+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600175.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600190.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2025-07-25",
+          "listed_date": "1999-06-09",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2025-07-28",
+          "listed_date": "1999-06-09",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.237125+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600190.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600240.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2020-02-05",
+          "listed_date": "2000-06-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2020-02-06",
+          "listed_date": "2000-06-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.361457+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600240.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600401.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2019-07-12",
+          "listed_date": "2003-09-24",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2019-07-15",
+          "listed_date": "2003-09-24",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.471673+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600401.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600555.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2022-07-13",
+          "listed_date": "2001-03-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2022-07-14",
+          "listed_date": "2001-03-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.579729+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600555.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600614.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2021-07-21",
+          "listed_date": "1992-08-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2021-07-22",
+          "listed_date": "1992-08-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.696641+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600614.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600625.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2001-04-23",
+          "listed_date": "1993-01-06",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2001-04-25",
+          "listed_date": "1993-01-06",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.806725+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600625.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600634.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2021-07-21",
+          "listed_date": "1993-03-04",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2021-07-22",
+          "listed_date": "1993-03-04",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:45.917456+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600634.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600646.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2003-09-22",
+          "listed_date": "1993-05-04",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2003-09-23",
+          "listed_date": "1993-05-04",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.027724+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600646.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600687.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2021-03-03",
+          "listed_date": "1993-11-08",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2021-03-04",
+          "listed_date": "1993-11-08",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.137057+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600687.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600695.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2022-06-14",
+          "listed_date": "1993-11-22",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2022-06-15",
+          "listed_date": "1993-11-22",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.255391+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600695.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600701.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2021-04-30",
+          "listed_date": "1996-05-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2021-05-06",
+          "listed_date": "1996-05-28",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.363556+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600701.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600709.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2003-05-23",
+          "listed_date": "1996-06-18",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2003-05-26",
+          "listed_date": "1996-06-18",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.473570+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600709.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600747.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2019-12-12",
+          "listed_date": "1996-09-16",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2019-12-13",
+          "listed_date": "1996-09-16",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.589596+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600747.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600786.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2008-03-18",
+          "listed_date": "1996-12-27",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2008-03-24",
+          "listed_date": "1996-12-27",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.719950+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600786.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "600799.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2005-12-31",
+          "listed_date": "1997-04-16",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2006-01-04",
+          "listed_date": "1997-04-16",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.826874+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=600799.SH].evidence[0]"
+      }
+    },
+    {
+      "instrument_id": "601558.SH",
+      "payload": {
+        "scope": "a_share_stock",
+        "mode": "production",
+        "reference": "correct-a-share-terminal-evidence-and-dates",
+        "reason": "Reviewed official completed-termination list supersedes legacy BaoStock outDate; same A-share listing interval verified",
+        "before": {
+          "delisted_date": "2020-07-02",
+          "listed_date": "2011-01-13",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "baostock"
+        },
+        "after": {
+          "delisted_date": "2020-07-03",
+          "listed_date": "2011-01-13",
+          "status": "delisted",
+          "is_active": false,
+          "trading_status": 0,
+          "source": "sse_official_terminal_list"
+        },
+        "corrected_at": "2026-11-16T00:30:46.936003+08:00",
+        "evidence_reference": "preview.json: rows[instrument_id=601558.SH].evidence[0]"
+      }
+    }
+  ],
+  "validation": {
+    "pytest": {
+      "passed": 289,
+      "deselected": 1,
+      "warnings": 12,
+      "seconds": 300.019,
+      "cases_by_module": {
+        "tests.unit.test_a_share_delisting_reconciliation": 90,
+        "tests.unit.test_a_share_official_stock_master": 14,
+        "tests.unit.test_instrument_master_sync": 48,
+        "tests.unit.test_master_governance_orchestration": 17,
+        "tests.unit.test_scripts.test_prepare_sina_ths_local_core_import_manifest": 8,
+        "tests.unit.test_research.test_financial_disclosure_incremental_sync": 47,
+        "tests.unit.test_scheduler_instrument_master_governance_report": 10,
+        "tests.unit.test_delisted_a_share_quote_backfill": 5,
+        "tests.unit.test_hkex_instrument_master": 50
+      },
+      "excluded_baseline_failure": "test_build_local_core_import_manifest_profiles_and_mapping_readiness"
+    },
+    "openspec_strict": "passed",
+    "python_syntax": "5 changed Python files passed",
+    "diff_check": "passed",
+    "review": "No remaining blocking defect; existing writer reused, normal conflict protection unchanged; no stock-ID conditions in production code",
+    "source_hashes": {
+      "data_sources/a_share_official_stock_master.py": "ce94a1519348aaceadfbffc3c8381cecd754585f13dc9d2e264a94b48bb13825",
+      "database/instrument_lifecycle.py": "4261b7f810d7a20f8e808eff1cbd35aa1d1cb29b1d5209e5939ad67bf6382be2",
+      "database/operations.py": "af4fcb4579b93e504cecdb81890354b022fcfe37c2214437a1ea5eebde222303",
+      "tests/unit/test_a_share_official_stock_master.py": "d10f055445ebfd665bf402fefb92f54355cb362014c05e5cc61ed2506ec106a4",
+      "tests/unit/test_a_share_delisting_reconciliation.py": "c805c01e000215c4bce17837a2514fa52182d3f133ffd21ffe46cb40abd9f7ca"
+    }
+  }
+}

@@ -1,0 +1,965 @@
+{
+  "change": "correct-a-share-terminal-evidence-and-dates",
+  "created_at": "2026-11-16T00:26:02.266450+08:00",
+  "scope": "fixed_26_existing_delisted_a_shares",
+  "production_write": false,
+  "sources": {
+    "sse-terminal-1.json": {
+      "url": "https://query.sse.com.cn/commonQuery.do",
+      "params": {
+        "sqlId": "COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L",
+        "COMPANY_STATUS": "3",
+        "STOCK_TYPE": "1,8",
+        "STOCK_CODE": "",
+        "CSRC_CODE": "",
+        "REG_PROVINCE": "",
+        "type": "inParams",
+        "isPagination": "true",
+        "pageHelp.cacheSize": "1",
+        "pageHelp.beginPage": "1",
+        "pageHelp.endPage": "1",
+        "pageHelp.pageNo": "1",
+        "pageHelp.pageSize": "500"
+      },
+      "sha256": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+      "bytes": 159703,
+      "observed_at": "2026-11-16T00:26:01.316078+08:00"
+    },
+    "szse-terminal-1.xlsx": {
+      "url": "https://www.szse.cn/api/report/ShowReport",
+      "params": {
+        "SHOWTYPE": "xlsx",
+        "CATALOGID": "1793_ssgs",
+        "TABKEY": "tab2"
+      },
+      "sha256": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+      "bytes": 10981,
+      "observed_at": "2026-11-16T00:26:01.807907+08:00"
+    }
+  },
+  "source_summary": {
+    "SSE": {
+      "complete": true,
+      "errors": [],
+      "normalized_rows": 148
+    },
+    "SZSE": {
+      "complete": true,
+      "errors": [],
+      "normalized_rows": 190
+    }
+  },
+  "instrument_count_before": 13267,
+  "rows": [
+    {
+      "instrument_id": "000003.SZ",
+      "classification": "unresolved_listing_date",
+      "before": {
+        "instrument_id": "000003.SZ",
+        "symbol": "000003",
+        "name": "PT金田A",
+        "exchange": "SZSE",
+        "type": "stock",
+        "listed_date": "1991-07-03 00:00:00.000000",
+        "delisted_date": "2002-06-14 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-08-19 00:15:41.609837"
+      },
+      "evidence": [
+        {
+          "instrument_id": "000003.SZ",
+          "symbol": "000003",
+          "exchange": "SZSE",
+          "type": "stock",
+          "name": "PT金田Ａ",
+          "listed_date": "1991-01-14",
+          "delisted_date": "2002-06-14",
+          "completion_confirmed": true,
+          "source": "szse_official_terminal_list",
+          "source_url": "https://www.szse.cn/api/report/ShowReport",
+          "raw_snapshot_hash": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:02.055769+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "000004.SZ",
+      "classification": "unresolved_listing_date",
+      "before": {
+        "instrument_id": "000004.SZ",
+        "symbol": "000004",
+        "name": "国华退",
+        "exchange": "SZSE",
+        "type": "stock",
+        "listed_date": "1991-01-14 00:00:00.000000",
+        "delisted_date": "2026-07-14 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-08-19 00:15:41.611358"
+      },
+      "evidence": [
+        {
+          "instrument_id": "000004.SZ",
+          "symbol": "000004",
+          "exchange": "SZSE",
+          "type": "stock",
+          "name": "国华退",
+          "listed_date": "1990-12-01",
+          "delisted_date": "2026-07-14",
+          "completion_confirmed": true,
+          "source": "szse_official_terminal_list",
+          "source_url": "https://www.szse.cn/api/report/ShowReport",
+          "raw_snapshot_hash": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:02.056901+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "000015.SZ",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "000015.SZ",
+        "symbol": "000015",
+        "name": "PT中浩A",
+        "exchange": "SZSE",
+        "type": "stock",
+        "listed_date": "1992-06-25 00:00:00.000000",
+        "delisted_date": "2001-10-22 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-08-19 00:15:41.626244"
+      },
+      "evidence": [
+        {
+          "instrument_id": "000015.SZ",
+          "symbol": "000015",
+          "exchange": "SZSE",
+          "type": "stock",
+          "name": "PT中浩Ａ",
+          "listed_date": "1992-06-25",
+          "delisted_date": "2001-10-25",
+          "completion_confirmed": true,
+          "source": "szse_official_terminal_list",
+          "source_url": "https://www.szse.cn/api/report/ShowReport",
+          "raw_snapshot_hash": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:02.060291+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "000556.SZ",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "000556.SZ",
+        "symbol": "000556",
+        "name": "PT南洋",
+        "exchange": "SZSE",
+        "type": "stock",
+        "listed_date": "1994-05-25 00:00:00.000000",
+        "delisted_date": "2002-05-29 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-08-19 00:15:41.849882"
+      },
+      "evidence": [
+        {
+          "instrument_id": "000556.SZ",
+          "symbol": "000556",
+          "exchange": "SZSE",
+          "type": "stock",
+          "name": "PT 南 洋",
+          "listed_date": "1994-05-25",
+          "delisted_date": "2002-06-03",
+          "completion_confirmed": true,
+          "source": "szse_official_terminal_list",
+          "source_url": "https://www.szse.cn/api/report/ShowReport",
+          "raw_snapshot_hash": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:02.089845+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "000588.SZ",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "000588.SZ",
+        "symbol": "000588",
+        "name": "PT粤金曼",
+        "exchange": "SZSE",
+        "type": "stock",
+        "listed_date": "1996-01-23 00:00:00.000000",
+        "delisted_date": "2001-06-15 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-08-19 00:15:41.901816"
+      },
+      "evidence": [
+        {
+          "instrument_id": "000588.SZ",
+          "symbol": "000588",
+          "exchange": "SZSE",
+          "type": "stock",
+          "name": "PT粤金曼",
+          "listed_date": "1996-01-23",
+          "delisted_date": "2001-06-16",
+          "completion_confirmed": true,
+          "source": "szse_official_terminal_list",
+          "source_url": "https://www.szse.cn/api/report/ShowReport",
+          "raw_snapshot_hash": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:02.098564+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600069.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600069.SH",
+        "symbol": "600069",
+        "name": "退市银鸽",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1997-04-30 00:00:00.000000",
+        "delisted_date": "2020-08-27 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:57.983698"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600069.SH",
+          "symbol": "600069",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市银鸽",
+          "listed_date": "1997-04-30",
+          "delisted_date": "2020-08-28",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.363623+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600074.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600074.SH",
+        "symbol": "600074",
+        "name": "退市保千",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1997-06-23 00:00:00.000000",
+        "delisted_date": "2020-06-02 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:57.999739"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600074.SH",
+          "symbol": "600074",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市保千",
+          "listed_date": "1997-06-23",
+          "delisted_date": "2020-06-03",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.369414+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600086.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600086.SH",
+        "symbol": "600086",
+        "name": "退市金钰",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1997-06-06 00:00:00.000000",
+        "delisted_date": "2021-03-17 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:58.040095"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600086.SH",
+          "symbol": "600086",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市金钰",
+          "listed_date": "1997-06-06",
+          "delisted_date": "2021-03-18",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.378814+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600175.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600175.SH",
+        "symbol": "600175",
+        "name": "退市美都",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1999-04-08 00:00:00.000000",
+        "delisted_date": "2020-08-14 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:58.325547"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600175.SH",
+          "symbol": "600175",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市美都",
+          "listed_date": "1999-04-08",
+          "delisted_date": "2020-08-17",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.415382+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600190.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600190.SH",
+        "symbol": "600190",
+        "name": "退市锦港",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1999-06-09 00:00:00.000000",
+        "delisted_date": "2025-07-25 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:58.383666"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600190.SH",
+          "symbol": "600190",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市锦港",
+          "listed_date": "1999-06-09",
+          "delisted_date": "2025-07-28",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.421076+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600240.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600240.SH",
+        "symbol": "600240",
+        "name": "退市华业",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "2000-06-28 00:00:00.000000",
+        "delisted_date": "2020-02-05 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:58.545640"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600240.SH",
+          "symbol": "600240",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市华业",
+          "listed_date": "2000-06-28",
+          "delisted_date": "2020-02-06",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.445770+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600401.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600401.SH",
+        "symbol": "600401",
+        "name": "退市海润",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "2003-09-24 00:00:00.000000",
+        "delisted_date": "2019-07-12 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.026970"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600401.SH",
+          "symbol": "600401",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市海润",
+          "listed_date": "2003-09-24",
+          "delisted_date": "2019-07-15",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.512042+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600555.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600555.SH",
+        "symbol": "600555",
+        "name": "退市海创",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "2001-03-28 00:00:00.000000",
+        "delisted_date": "2022-07-13 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.412680"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600555.SH",
+          "symbol": "600555",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市海创",
+          "listed_date": "2001-03-28",
+          "delisted_date": "2022-07-14",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.526717+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600614.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600614.SH",
+        "symbol": "600614",
+        "name": "退市鹏起",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1992-08-28 00:00:00.000000",
+        "delisted_date": "2021-07-21 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.624317"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600614.SH",
+          "symbol": "600614",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市鹏起",
+          "listed_date": "1992-08-28",
+          "delisted_date": "2021-07-22",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.536646+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600625.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600625.SH",
+        "symbol": "600625",
+        "name": "PT水仙",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1993-01-06 00:00:00.000000",
+        "delisted_date": "2001-04-23 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.670710"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600625.SH",
+          "symbol": "600625",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "PT水  仙",
+          "listed_date": "1993-01-06",
+          "delisted_date": "2001-04-25",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.538296+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600634.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600634.SH",
+        "symbol": "600634",
+        "name": "退市富控",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1993-03-04 00:00:00.000000",
+        "delisted_date": "2021-07-21 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.707465"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600634.SH",
+          "symbol": "600634",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市富控",
+          "listed_date": "1993-03-04",
+          "delisted_date": "2021-07-22",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.544686+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600646.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600646.SH",
+        "symbol": "600646",
+        "name": "ST国嘉",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1993-05-04 00:00:00.000000",
+        "delisted_date": "2003-09-22 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.757774"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600646.SH",
+          "symbol": "600646",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "ST国  嘉",
+          "listed_date": "1993-05-04",
+          "delisted_date": "2003-09-23",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.547794+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600680.SH",
+      "classification": "unchanged",
+      "before": {
+        "instrument_id": "600680.SH",
+        "symbol": "600680",
+        "name": "*ST上普",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1993-10-18 00:00:00.000000",
+        "delisted_date": "2019-05-24 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.883404"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600680.SH",
+          "symbol": "600680",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "*ST上普",
+          "listed_date": "1993-10-18",
+          "delisted_date": "2019-05-24",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.561385+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600687.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600687.SH",
+        "symbol": "600687",
+        "name": "退市刚泰",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1993-11-08 00:00:00.000000",
+        "delisted_date": "2021-03-03 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.907631"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600687.SH",
+          "symbol": "600687",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市刚泰",
+          "listed_date": "1993-11-08",
+          "delisted_date": "2021-03-04",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.562931+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600695.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600695.SH",
+        "symbol": "600695",
+        "name": "退市绿庭",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1993-11-22 00:00:00.000000",
+        "delisted_date": "2022-06-14 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.933732"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600695.SH",
+          "symbol": "600695",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市绿庭",
+          "listed_date": "1993-11-22",
+          "delisted_date": "2022-06-15",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.564414+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600701.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600701.SH",
+        "symbol": "600701",
+        "name": "退市工新",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1996-05-28 00:00:00.000000",
+        "delisted_date": "2021-04-30 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.953859"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600701.SH",
+          "symbol": "600701",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市工新",
+          "listed_date": "1996-05-28",
+          "delisted_date": "2021-05-06",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.568928+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600709.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600709.SH",
+        "symbol": "600709",
+        "name": "ST生态",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1996-06-18 00:00:00.000000",
+        "delisted_date": "2003-05-23 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:15:59.979056"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600709.SH",
+          "symbol": "600709",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "ST生  态",
+          "listed_date": "1996-06-18",
+          "delisted_date": "2003-05-26",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.572050+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600747.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600747.SH",
+        "symbol": "600747",
+        "name": "退市大控",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1996-09-16 00:00:00.000000",
+        "delisted_date": "2019-12-12 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:16:00.103926"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600747.SH",
+          "symbol": "600747",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市大控",
+          "listed_date": "1996-09-16",
+          "delisted_date": "2019-12-13",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.575017+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600786.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600786.SH",
+        "symbol": "600786",
+        "name": "东方锅炉",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1996-12-27 00:00:00.000000",
+        "delisted_date": "2008-03-18 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:16:00.231731"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600786.SH",
+          "symbol": "600786",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "东锅退市",
+          "listed_date": "1996-12-27",
+          "delisted_date": "2008-03-24",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.585755+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600799.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "600799.SH",
+        "symbol": "600799",
+        "name": "*ST龙科",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "1997-04-16 00:00:00.000000",
+        "delisted_date": "2005-12-31 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:16:00.275996"
+      },
+      "evidence": [
+        {
+          "instrument_id": "600799.SH",
+          "symbol": "600799",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "*ST龙 科",
+          "listed_date": "1997-04-16",
+          "delisted_date": "2006-01-04",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.588666+08:00"
+        }
+      ]
+    },
+    {
+      "instrument_id": "601558.SH",
+      "classification": "correct_delisted_date",
+      "before": {
+        "instrument_id": "601558.SH",
+        "symbol": "601558",
+        "name": "退市锐电",
+        "exchange": "SSE",
+        "type": "stock",
+        "listed_date": "2011-01-13 00:00:00.000000",
+        "delisted_date": "2020-07-02 00:00:00.000000",
+        "status": "delisted",
+        "is_active": 0,
+        "trading_status": 0,
+        "source": "baostock",
+        "updated_at": "2026-10-13 19:16:01.349014"
+      },
+      "evidence": [
+        {
+          "instrument_id": "601558.SH",
+          "symbol": "601558",
+          "exchange": "SSE",
+          "type": "stock",
+          "name": "退市锐电",
+          "listed_date": "2011-01-13",
+          "delisted_date": "2020-07-03",
+          "completion_confirmed": true,
+          "source": "sse_official_terminal_list",
+          "source_url": "https://query.sse.com.cn/commonQuery.do",
+          "raw_snapshot_hash": "23527feb01621472d04fdbb8b8193f4c3d5dda2f75dcb5ced9da72d41c404582",
+          "parser_version": "a_share_exchange_official_stock_master.v1.terminal.v2",
+          "observed_at": "2026-11-16T00:26:01.629792+08:00"
+        }
+      ]
+    }
+  ]
+}

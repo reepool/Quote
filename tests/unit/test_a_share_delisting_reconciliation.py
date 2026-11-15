@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+import json
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 
@@ -11,7 +12,9 @@ from sqlalchemy import event
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from data_sources.a_share_official_stock_master import AShareOfficialStockMasterSource
-from database.instrument_lifecycle import APPLIED, FUTURE, VERIFICATION
+from database.instrument_lifecycle import (
+    APPLIED, DATE_CORRECTED, FUTURE, METADATA_DDL, VERIFICATION,
+)
 from database.models import InstrumentDB
 from database.operations import DatabaseOperations
 from instrument_master_delisting import (
@@ -149,6 +152,30 @@ async def test_real_sse_terminal_dates_and_a_share_scope():
         item for item in snapshot["rows"] if item["instrument_id"] == "600001.SH"
     )
     assert row["delisted_date"] == "2009-12-29"
+    rows = [item for item in snapshot["rows"] if item["instrument_id"] == "600680.SH"]
+    assert len(rows) == 1
+    assert rows[0]["listed_date"] == "1993-10-18"
+    assert rows[0]["delisted_date"] == "2019-05-24"
+
+
+@pytest.mark.asyncio
+async def test_sse_terminal_share_type_is_not_inferred_from_company_code(tmp_path):
+    raw = json.loads((FIXTURES / "sse_terminated.json").read_text())
+    b_row = next(
+        row for row in raw["result"]
+        if row["COMPANY_CODE"] == "600680" and row["STOCK_TYPE"] == "2"
+    )
+    a_row = {**b_row, "STOCK_TYPE": "1", "A_STOCK_CODE": "600625"}
+    bad_row = {**b_row, "STOCK_TYPE": ""}
+    path = tmp_path / "share-classes.json"
+    path.write_text(json.dumps({"result": [b_row, a_row, bad_row]}))
+    source = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock", config={"sse": {"terminal_list_file": str(path)}},
+    )
+    snapshot = await source.get_delisting_snapshot("SSE")
+    assert [row["instrument_id"] for row in snapshot["rows"]] == ["600625.SH"]
+    assert not snapshot["complete"]
+    assert snapshot["errors"] == ["invalid SSE terminal share class"]
 
 
 def evidence(**overrides):
@@ -1308,3 +1335,165 @@ async def test_partial_current_parse_never_creates_absence_but_accepts_positive_
             )
         ).scalar_one()
     assert count == 0
+
+
+DATE_CORRECTION = {
+    "expected_delisted_date": "2026-10-22",
+    "expected_listed_date": "1992-03-27",
+    "reason": "Reviewed official completed-termination list supersedes legacy fallback date",
+    "reference": "bounded-terminal-date-test",
+}
+
+
+async def legacy_delisted(owner):
+    assert await owner.save_instruments_batch([KONKA])
+    # Reconstruct an old persisted row, bypassing today's fallback-ingress guard
+    # only in this isolated test fixture.
+    async with owner.get_async_session() as session:
+        record = (await session.execute(select(InstrumentDB))).scalar_one()
+        record.status, record.is_active, record.trading_status = "delisted", False, 0
+        record.delisted_date = datetime(2026, 10, 22)
+        record.source = "baostock"
+        await session.commit()
+
+
+async def correction_rows(owner):
+    async with owner.get_async_session() as session:
+        return (await session.execute(
+            text("SELECT payload_json FROM instrument_master_discrepancies WHERE reason=:reason"),
+            {"reason": DATE_CORRECTED},
+        )).scalars().all()
+
+
+@pytest.mark.asyncio
+async def test_controlled_date_correction_is_atomic_idempotent_and_preserves_evidence(owner):
+    await legacy_delisted(owner)
+    async with owner.get_async_session() as session:
+        await session.execute(text(METADATA_DDL))
+        await session.execute(text(
+            "INSERT INTO instrument_master_metadata "
+            "(instrument_id,exchange,metadata_json,updated_at) VALUES "
+            "(:iid,'SZSE',:payload,'2026-10-01')"
+        ), {"iid": KONKA["instrument_id"], "payload": json.dumps({
+            "metadata": {"unrelated": {"keep": True}}, "name": KONKA["name"],
+        })})
+        await session.commit()
+    proof = evidence()
+    assert not await owner.mark_instrument_delisted(
+        KONKA["instrument_id"], delisted_date=proof["delisted_date"],
+        source=proof["source"], evidence=proof,
+    )
+    for _ in range(2):
+        assert await owner.mark_instrument_delisted(
+            KONKA["instrument_id"], delisted_date=proof["delisted_date"],
+            source=proof["source"], evidence=proof, date_correction=DATE_CORRECTION,
+        )
+    assert (await local_record(owner))["delisted_date"] == datetime(2026, 10, 23)
+    rows = await correction_rows(owner)
+    assert len(rows) == 1
+    saved = json.loads(rows[0])
+    assert saved["before"]["delisted_date"] == "2026-10-22"
+    assert saved["before"]["source"] == "baostock"
+    assert saved["after"]["delisted_date"] == "2026-10-23"
+    assert saved["mode"] == "production"
+    async with owner.get_async_session() as session:
+        metadata = json.loads((await session.execute(text(
+            "SELECT metadata_json FROM instrument_master_metadata WHERE instrument_id=:iid"
+        ), {"iid": KONKA["instrument_id"]})).scalar_one())
+        assert metadata["metadata"]["a_share_terminal_evidence"] == proof
+        assert metadata["metadata"]["unrelated"] == {"keep": True}
+        assert metadata["name"] == KONKA["name"]
+        assert (await session.execute(select(InstrumentDB.listed_date))).scalar_one() == datetime(1992, 3, 27)
+    assert (await owner.load_a_share_delisting_state(["SZSE"]))["has_baseline"] is False
+    # Reusing the reference for a different request must fail.
+    assert not await owner.mark_instrument_delisted(
+        KONKA["instrument_id"], delisted_date=proof["delisted_date"],
+        source=proof["source"], evidence=proof,
+        date_correction={**DATE_CORRECTION, "expected_delisted_date": "2026-10-21"},
+    )
+    assert len(await correction_rows(owner)) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("problem", [
+    "old_date", "listed_date", "missing_reason", "other_id", "other_exchange",
+    "other_type", "other_source", "other_listing", "missing_hash", "future", "active",
+])
+async def test_controlled_date_correction_rejects_invalid_expectations_and_evidence(owner, problem):
+    await legacy_delisted(owner)
+    proof, request = evidence(), dict(DATE_CORRECTION)
+    if problem == "old_date":
+        request["expected_delisted_date"] = "2026-10-21"
+    elif problem == "listed_date":
+        request["expected_listed_date"] = "1994-01-01"
+    elif problem == "missing_reason":
+        request["reason"] = ""
+    elif problem == "other_id":
+        proof["instrument_id"] = "200016.SZ"
+    elif problem == "other_exchange":
+        proof["exchange"] = "SSE"
+    elif problem == "other_type":
+        proof["type"] = "bond"
+    elif problem == "other_source":
+        proof["source"] = "baostock"
+    elif problem == "other_listing":
+        proof["listed_date"] = "1994-01-01"
+    elif problem == "missing_hash":
+        proof["raw_snapshot_hash"] = ""
+    elif problem == "future":
+        proof["delisted_date"] = (get_shanghai_time().date() + timedelta(days=1)).isoformat()
+    elif problem == "active":
+        async with owner.get_async_session() as session:
+            await session.execute(text("UPDATE instruments SET status='active',is_active=1,trading_status=1"))
+            await session.commit()
+    before = await local_record(owner)
+    assert not await owner.mark_instrument_delisted(
+        KONKA["instrument_id"], delisted_date=proof["delisted_date"],
+        source=proof["source"], evidence=proof, date_correction=request,
+    )
+    assert await local_record(owner) == before
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("failing_table", ["instrument_master_metadata", "instrument_master_discrepancies"])
+async def test_controlled_correction_rolls_back_if_evidence_or_audit_write_fails(owner, failing_table):
+    await legacy_delisted(owner)
+    proof = evidence()
+    before = await local_record(owner)
+
+    def fail_insert(conn, cursor, statement, parameters, context, executemany):
+        if f"INSERT INTO {failing_table}" in statement:
+            raise RuntimeError("injected correction persistence failure")
+
+    event.listen(owner._test_engine.sync_engine, "before_cursor_execute", fail_insert)
+    try:
+        assert not await owner.mark_instrument_delisted(
+            KONKA["instrument_id"], delisted_date=proof["delisted_date"],
+            source=proof["source"], evidence=proof, date_correction=DATE_CORRECTION,
+        )
+    finally:
+        event.remove(owner._test_engine.sync_engine, "before_cursor_execute", fail_insert)
+    assert await local_record(owner) == before
+    assert await correction_rows(owner) == []
+
+
+@pytest.mark.asyncio
+async def test_controlled_correction_cas_rejects_a_change_after_validation(owner, monkeypatch):
+    import database.instrument_lifecycle as lifecycle
+
+    await legacy_delisted(owner)
+    original = lifecycle._prepare_date_correction
+
+    async def change_after_validation(session, *args):
+        payload = await original(session, *args)
+        await session.execute(text("UPDATE instruments SET source='concurrent_refresh'"))
+        return payload
+
+    monkeypatch.setattr(lifecycle, "_prepare_date_correction", change_after_validation)
+    proof = evidence()
+    assert not await owner.mark_instrument_delisted(
+        KONKA["instrument_id"], delisted_date=proof["delisted_date"],
+        source=proof["source"], evidence=proof, date_correction=DATE_CORRECTION,
+    )
+    assert (await local_record(owner))["delisted_date"] == datetime(2026, 10, 22)
+    assert await correction_rows(owner) == []
