@@ -1,0 +1,107 @@
+"""6.CH: original TaskService, controlled reuse of saved real snapshots, no network."""
+from pathlib import Path
+import asyncio,hashlib,json,sys,tempfile,time
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+OLD=C/'workpaper-core-networked-result-20261114'
+DEST=C/'workpaper-prose-binding-result-20261115'
+from research.announcements import AnnouncementAttachment,AnnouncementRecord
+from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+from research.company_profile.operations import CompanyProfileTaskService
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+from research.company_profile.workpaper import CompanyProfileWorkpaper
+from research.company_profile.workpaper_llm import workpaper_processing_identity
+from research.company_profile.workpaper_review import workpaper_hash
+from research.company_profile.workpaper_sections import extract_selected_layout
+from research.storage import ResearchStorageManager
+from utils.config_manager import ResearchConfig,ResearchStorageConfig
+from utils.llm.client import LlmClient
+from utils.llm.errors import LlmTransientTransportError
+from utils.llm.testing import ScriptedTransport
+from tests.unit.test_utils.test_llm_gateway import _config
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def dump(p,x):
+ p.parent.mkdir(parents=True,exist_ok=True)
+ p.write_text(json.dumps(x,ensure_ascii=False,indent=2,default=str)+'\n')
+def facts(paper):
+ return {f['fact_id']:f for e in list(paper['elements'].values())+list((paper.get('supply_chain') or {}).values()) for f in e['facts']}
+assert str(__import__('os').environ['TMPDIR'])==str(ROOT/'data/QuoteBak')
+assert not DEST.exists();DEST.mkdir()
+results=[];started=time.monotonic()
+with tempfile.TemporaryDirectory(prefix='workpaper-ch-entry-') as directory:
+ root=Path(directory);db=str(root/'research.db')
+ storage=ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(db_path=db,financials_db_path=db,
+  valuation_db_path=db,interests_db_path=db,quotes_db_path=str(root/'quotes.db'),attach_quotes_db=False)))
+ init=time.monotonic();storage.initialize();init_seconds=round(time.monotonic()-init,3)
+ for symbol in ('600094','600103','600100','600107'):
+  begin=time.monotonic();input_path=OLD/symbol/'query.json';old=json.loads(input_path.read_text())['profiles'][0]['workpaper']
+  seed_payload={**old,'origin':'controlled_fixture','quality_review':None}
+  seed=CompanyProfileWorkpaper.model_validate(seed_payload)
+  asset=json.loads((OLD/symbol/'binding.json').read_text())['asset']
+  manifest=json.loads((C/'workpaper-quality-and-regression-readiness-20261113/source-readiness.json').read_text())
+  source=next(i for i in manifest['companies'] if i['instrument_id']==seed.report.instrument_id)
+  announcement=json.loads((ROOT/source['source_binding']).read_text())['announcement']
+  BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+   instrument={'instrument_id':seed.report.instrument_id,'symbol':symbol,'exchange':'SSE'},
+   record=AnnouncementRecord(source='cninfo',source_announcement_id=asset['filing_id'],
+    announcement_key='cninfo:'+asset['filing_id'],title=announcement['title'],published_at=asset['published_at'],
+    exchange='SSE',symbols=(symbol,),attachments=(AnnouncementAttachment(source_url=announcement['source_url'],
+     resolved_url=announcement['source_url'],file_extension='PDF'),)))
+  assert sha(Path(asset['archive_path']))==seed.report.document_version
+  pages=extract_selected_layout(Path(asset['archive_path']).read_bytes(),sorted({s.page for e in seed.evidence for s in e.source_spans}))
+  # Fail closed at the public gateway's external boundary. No invented pass,
+  # old review result or new repair is supplied for the changed fact set.
+  transport=ScriptedTransport([LlmTransientTransportError('offline_new_review_not_authorized')])
+  client=LlmClient(_config(max_retries=0,max_schema_repair_attempts=0),transport=transport,
+   environment={'TEST_LLM_KEY':'offline-fixture-key'},owns_transport=True)
+  provider=CommonGatewaySemanticProvider(client=client,profile='test',max_output_tokens=16384,timeout_seconds=10)
+  provider.offline_only=True
+  identity=workpaper_processing_identity(real=False,review=True)
+  identity.update(quality_review_profile='test',repair_profile='test',review_existing_draft_hash=workpaper_hash(seed),
+   review_max_output_tokens=16384,reading_replay_source_sha256=sha(input_path))
+  service=CompanyProfileTaskService(storage=storage,output_root=root/'output',checkpoint_root=root/'checkpoints',
+   page_source=lambda _,seed=seed,pages=pages,asset=asset:{'report':seed.report,'pages':pages,
+    'review_seed':seed.model_dump(mode='json'),'source_pdf_path':asset['archive_path']},
+   provider=provider,processing_identity=identity,token_budget=500000)
+  try:
+   execution=asyncio.run(service.execute('run',knowledge_cutoff='2026-11-15',instrument_ids=(seed.report.instrument_id,),
+    max_items=1,max_elapsed_seconds=180))
+   query=asyncio.run(service.execute('query',instrument_ids=(seed.report.instrument_id,)))
+   exported=asyncio.run(service.execute('export',instrument_ids=(seed.report.instrument_id,),output_directory=DEST/symbol/'export'))
+   again=CompanyProfileReadService(root/'output').query((seed.report.instrument_id,))
+   assert execution['state']=='completed',execution
+   assert query['profiles']==exported['profiles']==again['profiles']
+   current=query['profiles'][0]['workpaper'];before=facts(old);after=facts(current)
+   expected={'F-RM-02'} if symbol=='600107' else set()
+   assert set(before)-set(after)==expected,(symbol,set(before)-set(after))
+   assert not (set(after)-set(before))
+   assert all(after[fid]==before[fid] for fid in after)
+   assert current['origin']=='controlled_fixture'
+   assert current['generation']==old['generation']
+   assert current['quality_review']['status'] in ('failed','incomplete')
+   assert not query['profiles'][0].get('real_semantic_complete')
+   if expected:
+    assert any('F-RM-02' in note and 'narrative' in note for note in current['standardization_notes'])
+    assert any('23,619.50' in f['text'] and '-8,909.26' in f['text'] for f in after.values())
+   assert len(transport.calls)<=1 and not provider.workpaper_receipts or all(
+    r.get('contract_status')!='accepted' for r in provider.workpaper_receipts)
+   dump(DEST/symbol/'query.json',query);dump(DEST/symbol/'execution.json',execution)
+   dump(DEST/symbol/'gateway-receipts.json',provider.workpaper_receipts)
+   result={'instrument_id':seed.report.instrument_id,'source_query':str(input_path.relative_to(ROOT)),
+    'source_query_sha256':sha(input_path),'old_real_receipts_sha256':sha(OLD/symbol/'model-receipts.json'),
+    'original_facts':len(before),'retained_facts':len(after),'withheld_fact_ids':sorted(expected),
+    'all_retained_objects_equal':True,'three_reads_equal':True,'current_query_sha256':sha(DEST/symbol/'query.json'),
+    'origin':'controlled_fixture','old_generation_inherited_not_new_model_author':True,
+    'new_review_status':current['quality_review']['status'],'new_real_model_requests':0,
+    'offline_transport_attempts':len(transport.calls),'seconds_excluding_storage_init':round(time.monotonic()-begin,3)}
+   dump(DEST/symbol/'validation.json',result);results.append(result)
+   print('COMPANY '+json.dumps(result,ensure_ascii=False),flush=True)
+  finally:asyncio.run(client.close())
+ cleanup_bytes=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+summary={'task':'6.CH','controlled_saved_snapshot_replays':4,'new_real_model_requests':0,'new_model_score':False,
+ 'original_facts':sum(x['original_facts'] for x in results),'retained_facts':sum(x['retained_facts'] for x in results),
+ 'results':results,'storage_initialization_seconds':init_seconds,'total_wall_seconds':round(time.monotonic()-started,3),
+ 'runtime_bytes_removed_by_finally':cleanup_bytes,'production_authorization':'not_authorized'}
+dump(DEST/'result.json',summary)
+print('DONE '+json.dumps({k:v for k,v in summary.items() if k!='results'},ensure_ascii=False))

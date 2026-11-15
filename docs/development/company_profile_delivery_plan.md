@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-15当前6.CH已交[4份安全读回画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prose-binding-result-20261115/result.md)：原171保170条，仅美尔雅无据医疗零值事实隔离，其余业务/产品/总额/亏损不改，原TaskService三读一致。正文漏metrics不再跳数值源核，source-only保真不冒称语义全核；本轮零新模型/绑定，受控复用最终快照不改旧真稿/成绩。主要P1至此收口，不继续扩数字平台或付费重抽四家；下一按[章节卡6.CI](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#下一6ci仅余八家同版真实画像待新的合并授权)合并询新授权后直接处理余八家，交实际画像/遗漏/核心原文核查与资源，不逐公司等待、不拼正式同版12/12/S1。可控局部错误隔离、供应链可选；范围失控或同核心根因连续两家失败才停派。先清后做/必要一套后清本人3449035字节，源/有效缓存/旧失败及既有并行保护，生产不启。
+
 2026-11-14当前6.CG已交[4份真实画像与独立限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-networked-result-20261114/profiles.md)，按美尔雅空医疗收入被写为0的未隔离底线错误停止后8家；不是网络失败，原CF失败保留。实际联网DNS/TLS/namespace及20响应已验证，联网测试规则入AGENTS§2.5。4家公司内容保留，美尔雅确定零禁用，不清空独立主业/总额/亏损。未完成补充审查/六类全组/正式资源/S1，生产不启；本外呼授权结束。下一主矛盾是正文确定金额断言没有进入结构化核查、模型复核未找全，不是继续补细句/换模型或重抽4家；需要真实接续另裁范围，先做共性局部隔离/保存响应验证。每轮先清后做，本人20095120字节已收尾清，源/缓存/首次/既有并行保护。
 
 2026-11-14当前6.CF已按失败结束：[首4家operator环境错误/余8未启动](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-same-version-result-20261114/result.md)。用户已批但本会话误用受限联网环境，4物理尝试没有模型响应/新稿，不是模型能力结论；未热修/重开/借余额，旧S1/源/结果/生产不改。本人运行库/准备副本/临时脚本19239400字节已清。下一必须先纠正实际启动权限并经新明确运行裁决，不再围此失败修语义或单公司细句；下面6.CF待授权/执行措辞仅保原规划时点，不自动恢复已结束授权。

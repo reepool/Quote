@@ -287,6 +287,46 @@ def _check_fact_source(
         } if metric.unit in rate_unit and Decimal(metric.value) < 0 else set()
         if Decimal(metric.value) not in numbers | negative_rates:
             raise ValueError(f"metric number is absent from cited source: {metric.name}")
+    if check_units:
+        _check_prose_quantities(fact, sources, numbers)
+
+
+def _check_prose_quantities(
+    fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], numbers: set[Decimal],
+) -> None:
+    """Bind written financial numerals too, without inventing semantic metrics.
+
+    This is a literal/unit check, not a claim that a number belongs to the right
+    subject or table column. Those still require semantic source review. Called
+    only on new binding/repairs, so historical deserialization is not rewritten.
+    """
+    units = {"%": "%", "％": "%", "百分点": "百分点", "个百分点": "百分点"}
+    money = {"元", "千元", "万元", "亿元"}
+    financial = r"收入|成本|利润|金额|费用|补贴|余额|资产|负债|资本|减值|毛利率|占比|现金流"
+    token = r"(?<![\d.,A-Za-z])(-?\d[\d,]*(?:\.\d+)?|零(?=亿元|万元|千元|元|个百分点|百分点|%|％|[，,；;。）、）()\s]|$))\s*(亿元|万元|千元|元|个百分点|百分点|%|％)?(?![\d.,A-Za-z])"
+    checked = {(Decimal(m.value), units.get(m.unit, m.unit)) for m in fact.metrics if m.value is not None}
+    clauses = {"".join(clause.split()) for eid in fact.evidence_ids for span in sources[eid].source_spans
+               for clause in re.split(r"[，,；;。\n]", span.quote)}
+    for match in re.finditer(token, fact.text):
+        amount = Decimal("0" if match.group(1) == "零" else match.group(1).replace(",", ""))
+        unit = match.group(2)
+        prefix = re.split(r"[，,；;。\n]", fact.text[:match.start()])[-1]
+        if not unit and not (amount == 0 and re.search(financial, prefix)):
+            continue  # Years, model names and operating counts are not financial amounts.
+        signed = -amount if unit in units and re.search(r"(?:下降|减少|降低)\s*(?:近|约|超|突破)?\s*$", prefix) else amount
+        normalized_unit = units.get(unit, unit)
+        literal_zero = amount == 0 and "".join((prefix + match.group(0)).split()) in clauses
+        if amount == 0 and unit is None and not literal_zero and not any(
+            value == 0 and measured_unit in money | set(units.values()) for value, measured_unit in checked
+        ):
+            raise ValueError("narrative financial zero lacks a corresponding metric or explicit source clause")
+        if not literal_zero and amount not in numbers and signed not in numbers and not ({(amount, normalized_unit), (signed, normalized_unit)} & checked):
+            raise ValueError(f"narrative number is absent from cited source: {match.group(0).strip()}")
+        if unit in money:
+            metric = WorkpaperMetric(name="正文金额（技术源核，非新增指标）", raw_value=str(amount),
+                value=str(amount), unit=unit, source_unit=unit, currency=None,
+                subject_scope=fact.subject_scope, period=fact.period)
+            _check_explicit_money_unit(metric, fact, sources)
 
 
 def _check_explicit_money_unit(

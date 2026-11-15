@@ -17,7 +17,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-14.income-mechanism-sections.v12"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-15.prose-numeric-binding.v13"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-14.income-composition.v2"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "主要业务/经营模式/核心竞争力/业务回顾的实质子节", "priority": "primary"},
@@ -38,7 +38,7 @@ def workpaper_processing_identity(
         "prompt_version": WORKPAPER_PROMPT_VERSION,
         "section_guide_version": SECTION_GUIDE_VERSION,
         "preprocessing_version": "toc_sections_native_layout.v2",
-        "source_binding_policy": "company_workpaper_source_literals.signed-rate.v1",
+        "source_binding_policy": "company_workpaper_source_literals.prose-numerals.v2",
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
         "execution_mode": "provider" if real else "offline_fake",
         "semantic_reuse": False,
@@ -94,6 +94,10 @@ Every fact must cite supplied source-XXXX IDs, never invented IDs, quotes or pag
 For a table metric cite BOTH the amount block and the governing header/unit/continuation blocks.
 Copy source metric name, raw number, currency, period and basis; normalize a same-unit
 decimal-string value only when it can safely preserve the source meaning.
+Every definite financial amount, percentage and reported zero in fact text must have
+a corresponding metric and cited source. Never infer zero from blank cells or a -100%
+comparison. Missing numeric structure does not exempt narrative assertions from source
+checks; keep faithful source uncertainty instead of inventing a definite number.
 Keep 近/约/超 in raw_value: qualifier is approximate for 近/约, greater_than for 超,
 and exact otherwise. value is the same-unit numerical reference, never an exact claim
 when a qualifier is present. Do not remove source qualifiers from fact text.

@@ -122,7 +122,7 @@ def test_new_processing_identity_versions_signed_source_rate_binding():
 
     for real in (False, True):
         identity = workpaper_processing_identity(real=real)
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.signed-rate.v1"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.prose-numerals.v2"
         assert identity["semantic_reuse"] is False
 
 
@@ -149,3 +149,57 @@ def test_rate_wording_does_not_supply_wrong_sign_magnitude_unit_or_absolute_loss
     with pytest.raises(ValueError, match="absent"):
         source_check(metric(raw_value="-28.32", value="-28.32", unit=unit,
                             source_unit=unit, currency=None), quote)
+
+
+def prose_check(text, quote, metrics=()):
+    evidence = WorkpaperEvidence(evidence_id="prose", document_version="source-v1",
+        section_path=("管理层讨论",), physical_pages=(1,),
+        source_spans=(WorkpaperSpan(page=1, start=0, end=len(quote), quote=quote),))
+    fact = WorkpaperFact(fact_id="prose", text=text, subject_scope="consolidated_group",
+        period="2025", evidence_ids=("prose",), metrics=metrics)
+    _check_fact_source(fact, {"prose": evidence}, check_units=True)
+    return fact
+
+
+@pytest.mark.parametrize("text,quote", [
+    ("医疗收入与成本均为0（同比-100.00%）。", "医疗 营业收入 营业成本 同比\n -100.00 -100.00"),
+    ("医疗收入为零。", "医疗收入未列金额，其他业务收入0元。"),
+    ("医疗收入为0。", "单位：元\n医疗收入 空白\n其他收入 0.00"),
+    ("收入999元。", "收入100元。"),
+    ("毛利率9.99%。", "毛利率10.00%。"),
+    ("收入100万元。", "财务表\n单位：元\n收入100"),
+])
+def test_narrative_numbers_cannot_bypass_source_checks_with_empty_metrics(text, quote):
+    with pytest.raises(ValueError, match="narrative|monetary unit conflict"):
+        prose_check(text, quote)
+
+
+@pytest.mark.parametrize("text,quote", [
+    ("公司收入为0。", "公司收入为0。"),
+    ("公司收入为零。", "公司收入为零。"),
+    ("公司收入0.00元。", "财务表\n单位：元\n公司收入 0.00"),
+    ("收入100万元，毛利率10%。", "财务表\n单位：万元\n收入100 毛利率10%"),
+    ("公司收入同比下降28.32%。", "公司收入同比下降 28.32%。"),
+    ("2025年公司有6G产品和零部件零售业务。", "公司经营零部件零售与6G产品。"),
+])
+def test_explicit_source_zero_and_source_only_literals_are_not_blanket_rejected(text, quote):
+    assert prose_check(text, quote).text == text
+
+
+def test_source_rate_direction_and_faithful_qualification_remain_supported():
+    checked = WorkpaperMetric.model_validate(metric(name="收入同比", raw_value="-16.25",
+        value="-16.25", unit="%", source_unit="%", currency=None))
+    prose_check("公司收入下降约16.25%。", "收入变动比例 -16.25%", (checked,))
+    prose_check("公司收入约100万元，口径未明确。", "公司收入约100万元，口径未明确。")
+
+
+def test_legacy_read_keeps_original_narrative_but_new_source_binding_checks_it():
+    quote = "单位：元\n医疗收入 未列金额\n收入同比 -100.00%"
+    fact = prose_check("公司保留源文。", quote)
+    old = fact.model_copy(update={"text": "医疗收入为0。"})
+    evidence = WorkpaperEvidence(evidence_id="prose", document_version="source-v1",
+        section_path=("管理层讨论",), physical_pages=(1,),
+        source_spans=(WorkpaperSpan(page=1,start=0,end=len(quote),quote=quote),))
+    _check_fact_source(old, {"prose": evidence})
+    with pytest.raises(ValueError, match="narrative"):
+        _check_fact_source(old, {"prose": evidence}, check_units=True)

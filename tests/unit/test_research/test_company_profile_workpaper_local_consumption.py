@@ -119,3 +119,25 @@ def test_minor_omission_of_existing_fact_does_not_withdraw_or_request_repair():
     assert result.quality_review.findings[0].resolution=='omission_candidate'
     assert result.quality_review.findings[0].affected_fact_id is None
     assert any('不撤回原事实或触发修订' in note for note in result.standardization_notes)
+
+
+def test_new_seed_review_rebinds_narrative_without_mutating_old_seed():
+    from research.company_profile.workpaper_review import seed_material
+    original, packet, _, _, _ = material()
+    payload = original.model_dump(mode="json")
+    payload["elements"]["scale_and_mix"]["facts"][0]["text"] += "医疗收入为0。"
+    old = CompanyProfileWorkpaper.model_validate(payload)
+    checked, _, _ = seed_material(old, report=old.report, source_pdf_path=None, real=False)
+    assert old.elements.scale_and_mix.facts
+    assert checked.elements.business_structure == old.elements.business_structure
+    assert not checked.elements.scale_and_mix.facts
+    assert any("narrative" in x for x in checked.standardization_notes)
+
+
+def test_repair_cannot_hide_unsupported_narrative_zero_behind_valid_metrics():
+    _, _, fixed, review, verify = material()
+    fixed["text"] += "医疗收入为0。"
+    _, result, provider, _ = invoke([review, {"repaired_facts": [fixed]}, verify])
+    assert not result.elements.scale_and_mix.facts
+    assert result.quality_review.findings[0].resolution == "repair_rejected"
+    assert len(provider.calls) == 2  # No verification for a rejected candidate.

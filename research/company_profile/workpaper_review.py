@@ -17,7 +17,7 @@ from .workpaper import (
     WorkpaperQualityReview, WorkpaperRepairResponse,
     WorkpaperRepairVerificationResponse, WorkpaperReviewFinding,
     WorkpaperReviewResponse, _check_fact_source,
-    standardize_workpaper_metrics,
+    standardize_workpaper_metrics, WorkpaperDraftResponse, bind_workpaper_draft,
 )
 from .workpaper_sections import SectionPacket, extract_selected_layout
 
@@ -91,6 +91,16 @@ def seed_material(seed, *, report, source_pdf_path, real: bool):
         numbers = sorted({span.page for item in paper.evidence for span in item.source_spans})
         pages = extract_selected_layout(content, numbers)
         paper.validate_pages(pages)
+    # A new review entry is a new source binding, not a legacy read. Do not let
+    # persisted text bypass the same checks used for extraction and repairs.
+    rebound = bind_workpaper_draft(
+        WorkpaperDraftResponse(elements=paper.elements, limitations=paper.limitations,
+            supply_chain=paper.supply_chain), report=paper.report,
+        reading_scope=paper.reading_scope, evidence=paper.evidence,
+        origin=paper.origin, generation=paper.generation,
+    )
+    paper = rebound.model_copy(update={"standardization_notes": tuple(dict.fromkeys(
+        (*paper.standardization_notes, *rebound.standardization_notes)))})
     packet = SectionPacket(report=report, reading_scope=paper.reading_scope, evidence=paper.evidence)
     return paper, packet, pages
 

@@ -1,0 +1,51 @@
+{
+  "task": "6.CH",
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "retained": 41,
+      "isolated": [],
+      "old_query_raw_pdf_hashes_unchanged": true,
+      "export_equals_query": true,
+      "exactly_one_offline_attempt": true
+    },
+    {
+      "instrument_id": "600103.SH",
+      "retained": 49,
+      "isolated": [],
+      "old_query_raw_pdf_hashes_unchanged": true,
+      "export_equals_query": true,
+      "exactly_one_offline_attempt": true
+    },
+    {
+      "instrument_id": "600100.SH",
+      "retained": 41,
+      "isolated": [],
+      "old_query_raw_pdf_hashes_unchanged": true,
+      "export_equals_query": true,
+      "exactly_one_offline_attempt": true
+    },
+    {
+      "instrument_id": "600107.SH",
+      "retained": 39,
+      "isolated": [
+        "F-RM-02"
+      ],
+      "old_query_raw_pdf_hashes_unchanged": true,
+      "export_equals_query": true,
+      "exactly_one_offline_attempt": true
+    }
+  ],
+  "original_facts": 171,
+  "retained_facts": 170,
+  "new_real_model_requests": 0,
+  "source_script_sha256": "780bbea8592025453d7d32555723221beb424a35dda97949a610209d52fd51b9",
+  "code_sha256": {
+    "research/company_profile/workpaper.py": "a84273e5bc3be242b3e0feccfa25014c149c7edaf0f050525f217872da255451",
+    "research/company_profile/workpaper_llm.py": "5a53ec54ce2afcfb0cf743361a3687a2c92a289aca870355a05e9f53432c74df",
+    "research/company_profile/workpaper_review.py": "d9f846bb6aab02533ff598f106037595322461bfb5be57d31630ffad5f546092",
+    "tests/unit/test_research/test_company_profile_workpaper_source_cells.py": "edca08ebf5cdeb281f561488d3a9c2fe9747cfa7c4c18a1bb9d56b804d7e95c4",
+    "tests/unit/test_research/test_company_profile_workpaper_local_consumption.py": "5651ca8308b6eed9ab15fa0af8976541b21aa5e082dbb7068aa974d1db2c3d29"
+  },
+  "runtime_roots_remaining": 0
+}

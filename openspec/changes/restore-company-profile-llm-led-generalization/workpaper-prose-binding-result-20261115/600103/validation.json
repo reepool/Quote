@@ -1,0 +1,18 @@
+{
+  "instrument_id": "600103.SH",
+  "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-networked-result-20261114/600103/query.json",
+  "source_query_sha256": "bd30d8c6a7b22e1f4df59fe23e5757b30d3f465476681a77e0925fb4c616127d",
+  "old_real_receipts_sha256": "b2e521cb7877ad2f10427217ff752e8782870d94632d599e9ce1dbc4b436c6cf",
+  "original_facts": 49,
+  "retained_facts": 49,
+  "withheld_fact_ids": [],
+  "all_retained_objects_equal": true,
+  "three_reads_equal": true,
+  "current_query_sha256": "be5cf6d1a0deecfee33973450c26a12f6d61cf64abb0a53692bf25174f018114",
+  "origin": "controlled_fixture",
+  "old_generation_inherited_not_new_model_author": true,
+  "new_review_status": "failed",
+  "new_real_model_requests": 0,
+  "offline_transport_attempts": 1,
+  "seconds_excluding_storage_init": 23.178
+}
