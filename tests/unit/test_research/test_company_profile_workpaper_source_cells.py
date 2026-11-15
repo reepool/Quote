@@ -152,7 +152,7 @@ def test_new_processing_identity_versions_signed_source_rate_binding():
 
     for real in (False, True):
         identity = workpaper_processing_identity(real=real)
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.directional-money.v3"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.financial-absence.v4"
         assert identity["semantic_reuse"] is False
 
 
@@ -221,6 +221,38 @@ def test_source_rate_direction_and_faithful_qualification_remain_supported():
         value="-16.25", unit="%", source_unit="%", currency=None))
     prose_check("公司收入下降约16.25%。", "收入变动比例 -16.25%", (checked,))
     prose_check("公司收入约100万元，口径未明确。", "公司收入约100万元，口径未明确。")
+
+
+@pytest.mark.parametrize("absence", ["无收入", "没有营业收入", "未产生收入", "无成本", "未发生费用"])
+def test_qualitative_financial_absence_cannot_borrow_another_column_zero(absence):
+    quote = "单位：元\n板块 收入 成本 收入同比\n医药     0.00 -100.00\n其他业务收入0元。"
+    with pytest.raises(ValueError, match="financial absence"):
+        prose_check("医药板块本期" + absence + "。", quote)
+
+
+@pytest.mark.parametrize("text", ["公司医药板块本期无收入。", "公司本期没有营业收入。", "公司本期未发生费用。"])
+def test_explicit_scoped_financial_absence_keeps_original_wording(text):
+    assert prose_check(text, text.replace("本期", "本\n期")).text == text
+
+
+def test_nondisclosure_is_not_financial_zero_and_legacy_read_is_unchanged():
+    text = "所读章节未列医药收入，不能据此认定无收入披露或收入为零。"
+    assert prose_check(text, text).text == text
+    old = WorkpaperFact(fact_id="old", text="医药板块本期无收入。",
+        subject_scope="consolidated_group", period="2025", evidence_ids=("source",))
+    quote = "单位：元\n医药 成本0元 收入同比-100%"
+    source = WorkpaperEvidence(evidence_id="source", document_version="v1",
+        section_path=("主营分析",), physical_pages=(1,),
+        source_spans=(WorkpaperSpan(page=1, start=0, end=len(quote), quote=quote),))
+    _check_fact_source(old, {"source": source})
+    with pytest.raises(ValueError, match="financial absence"):
+        _check_fact_source(old, {"source": source}, check_units=True)
+
+
+@pytest.mark.parametrize("warning", ["不能据此认定无收入", "无法判断是否无收入", "空栏不代表无收入"])
+def test_explicit_warning_not_to_infer_zero_is_not_a_zero_assertion(warning):
+    text = "所读章节未列该业务收入，" + warning + "。"
+    assert prose_check(text, "业务金额未列示，另有成本0元。").text == text
 
 
 def test_legacy_read_keeps_original_narrative_but_new_source_binding_checks_it():

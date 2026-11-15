@@ -336,6 +336,24 @@ def _check_prose_quantities(
     checked = {(Decimal(m.value), units.get(m.unit, m.unit)) for m in fact.metrics if m.value is not None}
     clauses = {"".join(clause.split()) for eid in fact.evidence_ids for span in sources[eid].source_spans
                for clause in re.split(r"[，,；;。\n]", span.quote)}
+    # A categorical financial absence is a zero-like assertion without a digit.
+    # Require its scoped source wording, rather than borrowing some other row's
+    # zero or teaching this binder to infer business/column semantics.
+    absence = (
+        r"(?:(?:无|没有|未产生|未实现|未取得)(?:任何)?(?:营业)?收入|"
+        r"(?:无|没有|未发生)(?:任何)?(?:营业)?(?:成本|费用|支出))$"
+    )
+    source_texts = ["".join(span.quote.split()) for eid in fact.evidence_ids for span in sources[eid].source_spans]
+    for clause in re.split(r"[，,；;。\n]", fact.text):
+        literal = "".join(clause.split())
+        assertion = re.search(absence, literal)
+        if assertion and re.search(
+            r"(?:(?:不能|无法|不应|不得)(?:据此)?(?:认定|判断|确定|推断|证明|视为)(?:是否)?|"
+            r"不代表|不意味着|不等于|是否)$", literal[:assertion.start()],
+        ):
+            continue  # An explicit warning not to infer zero is not a zero claim.
+        if assertion and not any(literal in text for text in source_texts):
+            raise ValueError("categorical financial absence lacks explicit scoped source wording")
     for match in re.finditer(token, fact.text):
         amount = Decimal("0" if match.group(1) == "零" else match.group(1).replace(",", ""))
         unit = match.group(2)

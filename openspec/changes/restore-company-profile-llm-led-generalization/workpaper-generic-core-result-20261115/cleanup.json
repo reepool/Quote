@@ -1,0 +1,12 @@
+{
+  "task": "6.CP",
+  "pre_development_freed_bytes": 0,
+  "freed_bytes": 6851,
+  "removed": ["data/QuoteBak/workpaper-cp-calibration.py"],
+  "reason": "finished local calibration script; authoritative operator snapshot and output verified before removal",
+  "test_directories": "removed by existing test finally/TemporaryDirectory",
+  "no_pdf_or_full_parse_copy_created": true,
+  "preserved": ["formal PDFs", "valid shared caches", "original CO query and model receipts", "attempt markers", "unrelated pre-existing and parallel artifacts"],
+  "recoverable_from": "operator-snapshot.txt",
+  "old_cleanup_bytes_not_recounted": true
+}

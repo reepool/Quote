@@ -152,3 +152,19 @@ def test_repair_cannot_hide_unsupported_narrative_zero_behind_valid_metrics():
     assert not result.elements.scale_and_mix.facts
     assert result.quality_review.findings[0].resolution == "repair_rejected"
     assert len(provider.calls) == 2  # No verification for a rejected candidate.
+
+
+def test_bad_separate_absence_fact_preserves_supported_company_income():
+    from research.company_profile.workpaper import WorkpaperDraftResponse
+
+    packet = build_section_packet(_report(), PAGES, index_sections(PAGES), _selection(index_sections(PAGES)))
+    response = _draft(packet)
+    raw = response.model_dump(mode="json")
+    core = raw['elements']['scale_and_mix']['facts'][0]
+    bad = {**core, 'fact_id': 'unsupported-absence', 'text': '医药板块本期无收入。', 'metrics': []}
+    raw['elements']['scale_and_mix']['facts'].append(bad)
+    result = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
+        reading_scope=packet.reading_scope, evidence=packet.evidence)
+    assert result.elements.scale_and_mix.facts == response.elements.scale_and_mix.facts
+    assert result.elements.business_structure == response.elements.business_structure
+    assert any('unsupported-absence' in note for note in result.standardization_notes)

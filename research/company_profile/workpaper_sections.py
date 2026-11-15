@@ -42,6 +42,8 @@ def _numeric_table_row(title: str) -> bool:
     if not match:
         return False
     return any(len(part) > 1 and part.startswith("0") for part in match[1].split(".")) or bool(
+        re.match(r"^[+−\-]?\d[\d,]*\.\d+(?:%|％)?(?:\s|$)", match[2])
+    ) or bool(
         re.fullmatch(r"[\d\s.,，%％+−—–\-()（）/]+", match[2])
     )
 

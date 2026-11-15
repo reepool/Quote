@@ -81,6 +81,10 @@ def test_source_column_repair_preserves_unrelated_business_and_original():
     assert [c["purpose"] for c in provider.calls] == [
         "review_profile_workpaper", "repair_profile_workpaper", "verify_profile_workpaper_repair"]
     assert len(receipts) == 3
+    assert "Optional margin changes" in provider.calls[0]["instructions"]
+    assert "no-income/no-cost/no-expense" in provider.calls[0]["instructions"]
+    assert "Prefer the supported core assertion" in provider.calls[1]["instructions"]
+    assert "Accept a correctly narrowed core fact" in provider.calls[2]["instructions"]
     assert "requested_reasoning=high" in render_workpaper(result)
     result.validate_pages(PAGES)
 

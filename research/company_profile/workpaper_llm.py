@@ -17,7 +17,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-15.operating-summary-first.v15"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-15.independent-core-facts.v16"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-15.operating-summary.v3"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "公司业务/经营模式；公司经营讨论/经营综述/业务回顾的实质子节，优先于纯行业背景和泛化核心竞争力", "priority": "primary"},
@@ -37,8 +37,8 @@ def workpaper_processing_identity(
         "reading_strategy": WORKPAPER_READING_STRATEGY,
         "prompt_version": WORKPAPER_PROMPT_VERSION,
         "section_guide_version": SECTION_GUIDE_VERSION,
-        "preprocessing_version": "toc_sections_native_layout.v3.numeric-row-boundary",
-        "source_binding_policy": "company_workpaper_source_literals.directional-money.v3",
+        "preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+        "source_binding_policy": "company_workpaper_source_literals.financial-absence.v4",
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
         "execution_mode": "provider" if real else "offline_fake",
         "semantic_reuse": False,
@@ -96,6 +96,13 @@ Return JSON matching the schema. Write all text and limitations in Chinese.
 Deliver a compact, complete JSON object, not an exhaustive financial inventory.
 Prioritize the core profile: every main business and product/service, how it earns,
 company-period revenue and main business mix, operating role and customer/channel scope.
+Use independent facts for independently usable core assertions. Keep company revenue
+separate from net profit, optional growth-rate comparisons, event timing and unresolved
+source-basis differences. Keep each main business revenue with its own subject/basis;
+do not hide several unrelated assertions in a single long fact. This lets a local error
+be withheld without losing a correct company total or another business line.
+Use the same eight-element JSON for manufacturing, services, banks and multi-business
+companies; industry-specific products stay source-native, not new mandatory fields.
 Aim for 12-24 distinct facts and at most about 40 metrics overall, including optional
 supply-chain content. This is a writing target, not a completeness gate or a reason
 to hide a major business. Keep major lines before optional detail; do not repeat the
@@ -115,6 +122,11 @@ Every definite financial amount, percentage and reported zero in fact text must 
 a corresponding metric and cited source. Never infer zero from blank cells or a -100%
 comparison. Missing numeric structure does not exempt narrative assertions from source
 checks; keep faithful source uncertainty instead of inventing a definite number.
+No revenue/cost/expense is also a definite zero-like assertion, even without digits.
+For 无收入/没有收入/未产生收入 or analogous cost/expense wording, copy the explicit
+scoped source clause, or use an explicitly reported numeric zero with its own evidence.
+A blank cell means no supplied amount, not no income. Unknown/not disclosed in the
+selected scope is different from zero; preserve that limitation or omit the optional fact.
 Keep 近/约/超 in raw_value: qualifier is approximate for 近/约, greater_than for 超,
 and exact otherwise. value is the same-unit numerical reference, never an exact claim
 when a qualifier is present. Do not remove source qualifiers from fact text.

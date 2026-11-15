@@ -1,0 +1,100 @@
+"""Read-only saved-run calibration of generic source packets and fact binding."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+import types
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+SAVED = CHANGE/'workpaper-twelve-current-version-result-20261115'
+DEST = CHANGE/'workpaper-generic-core-result-20261115'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def facts(paper):
+    groups=[getattr(paper.elements,k) for k in type(paper.elements).model_fields]
+    if paper.supply_chain:
+        groups.extend(getattr(paper.supply_chain,k) for k in type(paper.supply_chain).model_fields)
+    return {f.fact_id:f for e in groups for f in e.facts}
+
+
+def main():
+    from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.workpaper import CompanyProfileWorkpaper, WorkpaperDraftResponse, bind_workpaper_draft
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.company_profile.workpaper_sections import index_sections, selected_pages, extract_selected_layout, build_section_packet, SectionSelection
+    path='research/company_profile/workpaper_sections.py'
+    module=types.ModuleType('research.company_profile._cp_baseline_sections')
+    module.__package__='research.company_profile'
+    sys.modules[module.__name__]=module
+    old_code=subprocess.check_output(['git','show','abdce2c5:'+path],cwd=ROOT,text=True)
+    exec(compile(old_code,'<abdce2c5:'+path+'>','exec'),module.__dict__)
+    manifest=json.loads((CHANGE/'workpaper-quality-and-regression-readiness-20261113/source-readiness.json').read_text())
+    order=json.loads((SAVED/'authorization.json').read_text())['order']
+    by_id={c['instrument_id']:c for c in manifest['companies']}
+    records=[]; started=time.monotonic()
+    for iid in order:
+        begun=time.monotonic(); item=by_id[iid]; asset=item['asset']; folder=SAVED/iid[:6]
+        paths=[folder/'query.json',folder/'model-receipts.json']
+        before={str(p.relative_to(ROOT)):sha(p)for p in paths}
+        assert sha(Path(asset['archive_path']))==asset['content_hash']
+        artifact=ensure_archived_pdf_page_artifact(asset)['artifact']
+        pages=[{'page':p.page_number,'text':p.text}for p in artifact.pages]
+        old=module.index_sections(pages); new=index_sections(pages)
+        receipt=next(r for r in json.loads(paths[1].read_text())if r['purpose']=='select_profile_sections')
+        selection=SectionSelection.model_validate(receipt['response_payload'])
+        old_by_id={s.section_id:s for s in old}
+        new_by_position={(s.start_page,s.start_offset,s.section_path[-1]):s for s in new}
+        mapping={sid:new_by_position[(old_by_id[sid].start_page,old_by_id[sid].start_offset,old_by_id[sid].section_path[-1])].section_id for sid in selection.selected_section_ids}
+        changed=selection.model_copy(update={'selected_section_ids':tuple(mapping.values())})
+        numbers=sorted(set(selected_pages(old,selection))|set(selected_pages(new,changed)))
+        layout=extract_selected_layout(Path(asset['archive_path']).read_bytes(),numbers)
+        report=ReportIdentity(instrument_id=iid,report_id=asset['filing_id'],document_version=asset['content_hash'],report_period=asset['report_period'],published_at=asset['published_at'])
+        old_error=None
+        try:module.build_section_packet(report,layout,old,selection,remap_layout=True)
+        except ValueError as exc:old_error=str(exc)
+        packet=build_section_packet(report,layout,new,changed,remap_layout=True)
+        source_pages={p['page']:p['text']for p in layout}
+        assert all(source_pages[s.page][s.start:s.end]==s.quote for e in packet.evidence for s in e.source_spans)
+        record={'instrument_id':iid,'old_boundary_error':old_error,'selected_heading_mapping':mapping,
+                'source_packet_ready':True,'sections':[s.model_dump(mode='json')for s in packet.reading_scope.sections],
+                'pages':sorted({s.page for e in packet.evidence for s in e.source_spans}),
+                'characters':sum(len(s.quote)for e in packet.evidence for s in e.source_spans),
+                'packet_model_text_sha256':hashlib.sha256(packet.model_text().encode()).hexdigest(),
+                'all_coordinates_equal_to_native_pages':True,'old_receipt_hashes':before}
+        query=json.loads(paths[0].read_text())
+        if query['profiles'] and query['profiles'][0].get('workpaper'):
+            original=CompanyProfileWorkpaper.model_validate(query['profiles'][0]['workpaper'])
+            response=WorkpaperDraftResponse(elements=original.elements,limitations=original.limitations,supply_chain=original.supply_chain)
+            rebound=bind_workpaper_draft(response,report=original.report,reading_scope=original.reading_scope,
+                evidence=original.evidence,origin='controlled_fixture',generation=original.generation)
+            original_facts=facts(original); retained=facts(rebound)
+            assert set(retained)<=set(original_facts)
+            assert all(v==original_facts[k]for k,v in retained.items())
+            record['saved_final_binding']={'origin':rebound.origin,'old_objects':len(original_facts),
+                'retained_objects':len(retained),'retained_ids':sorted(retained),'withheld_ids':sorted(set(original_facts)-set(retained)),
+                'all_retained_objects_unchanged':True,'old_review_not_inherited':rebound.quality_review is None,
+                'new_isolation_notes':[n for n in rebound.standardization_notes if 'financial absence' in n]}
+        assert all(sha(ROOT/p)==value for p,value in before.items())
+        record['seconds']=round(time.monotonic()-begun,3);records.append(record)
+        print(json.dumps({'company':iid,'packet':True,'old_error':old_error,'binding':record.get('saved_final_binding',{}).get('withheld_ids'),'seconds':record['seconds']},ensure_ascii=False),flush=True)
+    result={'task':'6.CP','kind':'saved_real_run_local_engineering_calibration_not_new_LLM',
+            'base_commit':'abdce2c5','current_identity':workpaper_processing_identity(real=False,review=True),
+            'old_navigation_ids_mapped_by_same_source_heading_and_position':True,
+            'new_model_requests':0,'sendable_bindings':0,'production_authorization':'not_authorized',
+            'formal_quality_score':None,'all_12_source_packets_ready':len(records)==12,
+            'seconds':round(time.monotonic()-started,3),'companies':records}
+    DEST.mkdir(parents=True,exist_ok=True)
+    (DEST/'calibration.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+
+
+if __name__=='__main__':
+    main()

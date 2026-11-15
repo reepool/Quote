@@ -142,10 +142,11 @@ def test_heading_joined_to_previous_paragraph_keeps_original_source_boundary():
     assert text[discussion.start_offset:discussion.end_offset] == "三、经营讨论\n公司收入增长。 "
 
 
-def test_decimal_table_continuations_do_not_terminate_operating_section():
+@pytest.mark.parametrize("continuation", ["1.47 -69.51", "1.47 -41.72 一年内到期的", "1.47 −69.51 长期应付款"])
+def test_decimal_table_continuations_do_not_terminate_operating_section(continuation):
     pages = (
         {"page": 13, "text": "第三节 管理层讨论与分析\n五、报告期内主要经营情况\n(一) 主营业务分析\n公司经营收入。\n"},
-        {"page": 14, "text": "000.00 自有资金\n1.47 -69.51\n本表续行。\n六、其他情况\n其他内容。\n"},
+        {"page": 14, "text": "000.00 自有资金\n" + continuation + "\n本表续行。\n六、其他情况\n其他内容。\n"},
     )
     index = index_sections(pages)
     operating = next(s for s in index if s.section_path[-1] == "五、报告期内主要经营情况")
@@ -155,7 +156,7 @@ def test_decimal_table_continuations_do_not_terminate_operating_section():
         selected_section_ids=(operating.section_id,), rationale="经营情况", stop_reason="集中阅读",
     ), remap_layout=True)
     text = packet.model_text()
-    assert "000.00 自有资金" in text and "1.47 -69.51" in text
+    assert "000.00 自有资金" in text and continuation in text
     assert "其他内容" not in text
 
 
@@ -526,11 +527,15 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert "not a completeness gate" in instructions
         assert "reading a section does not require copying all of its numbers" in instructions
         assert "Never infer zero from blank cells" in instructions
+        assert "independently usable core assertions" in instructions
+        assert "Keep company revenue" in instructions
+        assert "No revenue/cost/expense is also a definite zero-like assertion" in instructions
         identity = workpaper_processing_identity(real=False)
-        assert identity["prompt_version"].endswith("operating-summary-first.v15")
+        assert identity["prompt_version"].endswith("independent-core-facts.v16")
         assert identity["section_guide_version"].endswith("operating-summary.v3")
         assert identity["workpaper_max_output_tokens"] == 12000
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.directional-money.v3"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.financial-absence.v4"
+        assert identity["preprocessing_version"].endswith("v4.labelled-numeric-row")
         assert "conditional disclosure heading is not a fact" in instructions
         assert "denominator of each percentage" in instructions
         assert "preserve the displayed subtotal and elimination separately" in instructions

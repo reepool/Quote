@@ -1,0 +1,1636 @@
+{
+  "task": "6.CP",
+  "kind": "saved_real_run_local_engineering_calibration_not_new_LLM",
+  "base_commit": "abdce2c5",
+  "current_identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-15.independent-core-facts.v16",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.operating-summary.v3",
+    "preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+    "source_binding_policy": "company_workpaper_source_literals.financial-absence.v4",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "offline_fake",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620,
+    "workpaper_review_policy": "company_profile_workpaper_review.v6",
+    "quality_review_profile": null,
+    "repair_profile": null
+  },
+  "old_navigation_ids_mapped_by_same_source_heading_and_position": true,
+  "new_model_requests": 0,
+  "sendable_bindings": 0,
+  "production_authorization": "not_authorized",
+  "formal_quality_score": null,
+  "all_12_source_packets_ready": true,
+  "seconds": 21.491,
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0035": "section-0034",
+        "section-0044": "section-0043",
+        "section-0053": "section-0052",
+        "section-0055": "section-0054",
+        "section-0057": "section-0056",
+        "section-0058": "section-0057",
+        "section-0021": "section-0021",
+        "section-0022": "section-0022"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0021",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 7,
+          "end_page": 7,
+          "rationale": "选择公司业务情况（section-0035）说明传统地产主业与转型业务布局；经营情况讨论与分析（section-0044）提供本期经营综述与转型进展；主营业务分析（section-0053）及其收入成本分析（section-0055）、房地产区域毛利率与收入占比（section-0057）、算力服务毛利率变化（section-0058）构成收入构成与主要业务权重的实质披露；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面营业收入总额与规模变化，避免仅依赖分部表。上述子节互不重叠且覆盖业务结构、产品服务、盈利来源、规模与本期变化。"
+        },
+        {
+          "section_id": "section-0034",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 10,
+          "end_page": 11,
+          "rationale": "选择公司业务情况（section-0035）说明传统地产主业与转型业务布局；经营情况讨论与分析（section-0044）提供本期经营综述与转型进展；主营业务分析（section-0053）及其收入成本分析（section-0055）、房地产区域毛利率与收入占比（section-0057）、算力服务毛利率变化（section-0058）构成收入构成与主要业务权重的实质披露；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面营业收入总额与规模变化，避免仅依赖分部表。上述子节互不重叠且覆盖业务结构、产品服务、盈利来源、规模与本期变化。"
+        },
+        {
+          "section_id": "section-0043",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 13,
+          "end_page": 14,
+          "rationale": "选择公司业务情况（section-0035）说明传统地产主业与转型业务布局；经营情况讨论与分析（section-0044）提供本期经营综述与转型进展；主营业务分析（section-0053）及其收入成本分析（section-0055）、房地产区域毛利率与收入占比（section-0057）、算力服务毛利率变化（section-0058）构成收入构成与主要业务权重的实质披露；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面营业收入总额与规模变化，避免仅依赖分部表。上述子节互不重叠且覆盖业务结构、产品服务、盈利来源、规模与本期变化。"
+        },
+        {
+          "section_id": "section-0052",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 15,
+          "end_page": 19,
+          "rationale": "选择公司业务情况（section-0035）说明传统地产主业与转型业务布局；经营情况讨论与分析（section-0044）提供本期经营综述与转型进展；主营业务分析（section-0053）及其收入成本分析（section-0055）、房地产区域毛利率与收入占比（section-0057）、算力服务毛利率变化（section-0058）构成收入构成与主要业务权重的实质披露；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面营业收入总额与规模变化，避免仅依赖分部表。上述子节互不重叠且覆盖业务结构、产品服务、盈利来源、规模与本期变化。"
+        }
+      ],
+      "pages": [
+        7,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "characters": 15055,
+      "packet_model_text_sha256": "dc1bdc08c87d2f8c6499d4370cc0a6682becc1a8595cdf99217c7751acbfbd3c",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600094/query.json": "c6e71b35a7333f1dfa12f2003f55b6c43e8d4d44b346217083b5dafc9efe5eb8",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600094/model-receipts.json": "d18071f6f82c4c0bf7dd782fb9c655f903c49b39e9a6ed590b30ad39eae8a7a1"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 34,
+        "retained_objects": 34,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "bs-04",
+          "bs-05",
+          "cc-01",
+          "cc-02",
+          "cc-03",
+          "cc-04",
+          "mc-01",
+          "mc-02",
+          "mc-03",
+          "mc-04",
+          "mc-05",
+          "od-01",
+          "od-02",
+          "od-03",
+          "od-04",
+          "oi-01",
+          "oi-02",
+          "oi-04",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "review-add:F-005",
+          "review-add:F-006",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "rm-04",
+          "sc-01",
+          "sm-04",
+          "sm-05"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 1.999
+    },
+    {
+      "instrument_id": "600103.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0034": "section-0034",
+        "section-0035": "section-0035",
+        "section-0036": "section-0036",
+        "section-0043": "section-0043",
+        "section-0062": "section-0062",
+        "section-0064": "section-0064",
+        "section-0106": "section-0106",
+        "section-0021": "section-0021"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0021",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 6,
+          "end_page": 7,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0034（业务情况）及其子节0035（主要业务、产品及用途）、0036（主要经营模式）覆盖“做什么、怎么经营”；section-0043（经营情况讨论与分析）提供本期经营综述；section-0062（主营业务分析）与section-0064（收入和成本分析）提供营业收入总额、分产品/分行业收入构成与成本，是货币化与主要业务权重的核心；section-0106（主要控股参股公司分析）补充子公司经营与业务板块；section-0021（近三年主要会计数据和财务指标）作为紧凑公司层面汇总，保留公司总收入与主要指标，避免与明细表重叠。未选纯行业背景（0037）与泛化核心竞争力（0044），因其对公司层面解释次要。"
+        },
+        {
+          "section_id": "section-0034",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 9,
+          "end_page": 11,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0034（业务情况）及其子节0035（主要业务、产品及用途）、0036（主要经营模式）覆盖“做什么、怎么经营”；section-0043（经营情况讨论与分析）提供本期经营综述；section-0062（主营业务分析）与section-0064（收入和成本分析）提供营业收入总额、分产品/分行业收入构成与成本，是货币化与主要业务权重的核心；section-0106（主要控股参股公司分析）补充子公司经营与业务板块；section-0021（近三年主要会计数据和财务指标）作为紧凑公司层面汇总，保留公司总收入与主要指标，避免与明细表重叠。未选纯行业背景（0037）与泛化核心竞争力（0044），因其对公司层面解释次要。"
+        },
+        {
+          "section_id": "section-0043",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 13,
+          "end_page": 13,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0034（业务情况）及其子节0035（主要业务、产品及用途）、0036（主要经营模式）覆盖“做什么、怎么经营”；section-0043（经营情况讨论与分析）提供本期经营综述；section-0062（主营业务分析）与section-0064（收入和成本分析）提供营业收入总额、分产品/分行业收入构成与成本，是货币化与主要业务权重的核心；section-0106（主要控股参股公司分析）补充子公司经营与业务板块；section-0021（近三年主要会计数据和财务指标）作为紧凑公司层面汇总，保留公司总收入与主要指标，避免与明细表重叠。未选纯行业背景（0037）与泛化核心竞争力（0044），因其对公司层面解释次要。"
+        },
+        {
+          "section_id": "section-0062",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 16,
+          "end_page": 24,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0034（业务情况）及其子节0035（主要业务、产品及用途）、0036（主要经营模式）覆盖“做什么、怎么经营”；section-0043（经营情况讨论与分析）提供本期经营综述；section-0062（主营业务分析）与section-0064（收入和成本分析）提供营业收入总额、分产品/分行业收入构成与成本，是货币化与主要业务权重的核心；section-0106（主要控股参股公司分析）补充子公司经营与业务板块；section-0021（近三年主要会计数据和财务指标）作为紧凑公司层面汇总，保留公司总收入与主要指标，避免与明细表重叠。未选纯行业背景（0037）与泛化核心竞争力（0044），因其对公司层面解释次要。"
+        },
+        {
+          "section_id": "section-0106",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 31,
+          "end_page": 32,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0034（业务情况）及其子节0035（主要业务、产品及用途）、0036（主要经营模式）覆盖“做什么、怎么经营”；section-0043（经营情况讨论与分析）提供本期经营综述；section-0062（主营业务分析）与section-0064（收入和成本分析）提供营业收入总额、分产品/分行业收入构成与成本，是货币化与主要业务权重的核心；section-0106（主要控股参股公司分析）补充子公司经营与业务板块；section-0021（近三年主要会计数据和财务指标）作为紧凑公司层面汇总，保留公司总收入与主要指标，避免与明细表重叠。未选纯行业背景（0037）与泛化核心竞争力（0044），因其对公司层面解释次要。"
+        }
+      ],
+      "pages": [
+        6,
+        7,
+        9,
+        10,
+        11,
+        13,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        31,
+        32
+      ],
+      "characters": 47977,
+      "packet_model_text_sha256": "5694973de6cb7ae063fab7792fe66aade4e04423dacf9d70b73b6bddc3d18ba9",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600103/query.json": "39a9322291dd3fb624d0798e02ff99e1ca44ba6f4e8008e707fd7652f64d4624",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600103/model-receipts.json": "cf0f6c2d71aa5ec91222dc2ecf7155b96ab531439cbf710eb5a803c12fa496dd"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 31,
+        "retained_objects": 31,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "cc-01",
+          "cc-02",
+          "cc-03",
+          "mc-01",
+          "mc-02",
+          "mc-03",
+          "od-01",
+          "od-02",
+          "od-03",
+          "od-04",
+          "oi-01",
+          "oi-02",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "ps-05",
+          "ps-06",
+          "review-add:f-01",
+          "review-add:f-03",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "sc-01",
+          "sc-02",
+          "sc-03",
+          "sm-01",
+          "sm-05"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 2.156
+    },
+    {
+      "instrument_id": "600100.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0035": "section-0034",
+        "section-0037": "section-0036",
+        "section-0052": "section-0051",
+        "section-0053": "section-0052",
+        "section-0054": "section-0053",
+        "section-0056": "section-0055",
+        "section-0057": "section-0056",
+        "section-0058": "section-0057"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0034",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 12,
+          "end_page": 13,
+          "rationale": "优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0036",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 14,
+          "end_page": 17,
+          "rationale": "优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0051",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 20,
+          "end_page": 22,
+          "rationale": "优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0055",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "（一）公共安全"
+          ],
+          "start_page": 22,
+          "end_page": 22,
+          "rationale": "优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0056",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "（二）数智产业"
+          ],
+          "start_page": 22,
+          "end_page": 23,
+          "rationale": "优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0057",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "（三）智慧能源"
+          ],
+          "start_page": 23,
+          "end_page": 27,
+          "rationale": "优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。"
+        }
+      ],
+      "pages": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "characters": 21767,
+      "packet_model_text_sha256": "68d8f3b5963c10c6bb5e34695c481749d35d1600b2561e76ec6532e200e35928",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600100/query.json": "4f815ea3322fbc8c0d829b138d7028a6e39610239a17e2ee821d50887f5fb3e7",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600100/model-receipts.json": "c74829d1a693f95df230bfbf9ac0f13a7c7f96d6905bfaba745abba6c830b5d1"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 25,
+        "retained_objects": 25,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "cc-03",
+          "mc-01",
+          "mc-02",
+          "mc-03",
+          "od-01",
+          "od-02",
+          "oi-01",
+          "oi-02",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "review-add:F002",
+          "review-add:F003",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "sc-01",
+          "sc-02",
+          "sm-01",
+          "sm-02",
+          "sm-04",
+          "sm-05"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 1.408
+    },
+    {
+      "instrument_id": "600107.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0047": "section-0047",
+        "section-0049": "section-0049",
+        "section-0054": "section-0054",
+        "section-0056": "section-0056",
+        "section-0077": "section-0077",
+        "section-0090": "section-0090",
+        "section-0018": "section-0018",
+        "section-0019": "section-0019"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0018",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 6,
+          "end_page": 8,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0047（报告期内公司从事的业务情况）说明主业与经营模式；section-0049（经营情况讨论与分析）为经营综述；section-0054（主营业务分析）及其子节section-0056（收入和成本分析）提供营业收入、成本与主要业务构成，是货币化与收入结构核心；section-0077（行业经营性信息分析）含门店、品牌、直营/加盟、线上线下及地区盈利，直接反映渠道与市场结构；section-0090（主要控股参股公司分析）补充经营主体层面情况；section-0018/0019（近三年主要会计数据）提供公司层面收入与规模总量，避免仅依赖明细表而缺失公司合计口径。未选纯行业背景、核心竞争力泛述及治理、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0047",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 12,
+          "end_page": 13,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0047（报告期内公司从事的业务情况）说明主业与经营模式；section-0049（经营情况讨论与分析）为经营综述；section-0054（主营业务分析）及其子节section-0056（收入和成本分析）提供营业收入、成本与主要业务构成，是货币化与收入结构核心；section-0077（行业经营性信息分析）含门店、品牌、直营/加盟、线上线下及地区盈利，直接反映渠道与市场结构；section-0090（主要控股参股公司分析）补充经营主体层面情况；section-0018/0019（近三年主要会计数据）提供公司层面收入与规模总量，避免仅依赖明细表而缺失公司合计口径。未选纯行业背景、核心竞争力泛述及治理、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0049",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 14,
+          "end_page": 14,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0047（报告期内公司从事的业务情况）说明主业与经营模式；section-0049（经营情况讨论与分析）为经营综述；section-0054（主营业务分析）及其子节section-0056（收入和成本分析）提供营业收入、成本与主要业务构成，是货币化与收入结构核心；section-0077（行业经营性信息分析）含门店、品牌、直营/加盟、线上线下及地区盈利，直接反映渠道与市场结构；section-0090（主要控股参股公司分析）补充经营主体层面情况；section-0018/0019（近三年主要会计数据）提供公司层面收入与规模总量，避免仅依赖明细表而缺失公司合计口径。未选纯行业背景、核心竞争力泛述及治理、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0054",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 14,
+          "end_page": 20,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0047（报告期内公司从事的业务情况）说明主业与经营模式；section-0049（经营情况讨论与分析）为经营综述；section-0054（主营业务分析）及其子节section-0056（收入和成本分析）提供营业收入、成本与主要业务构成，是货币化与收入结构核心；section-0077（行业经营性信息分析）含门店、品牌、直营/加盟、线上线下及地区盈利，直接反映渠道与市场结构；section-0090（主要控股参股公司分析）补充经营主体层面情况；section-0018/0019（近三年主要会计数据）提供公司层面收入与规模总量，避免仅依赖明细表而缺失公司合计口径。未选纯行业背景、核心竞争力泛述及治理、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0077",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "start_page": 22,
+          "end_page": 25,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0047（报告期内公司从事的业务情况）说明主业与经营模式；section-0049（经营情况讨论与分析）为经营综述；section-0054（主营业务分析）及其子节section-0056（收入和成本分析）提供营业收入、成本与主要业务构成，是货币化与收入结构核心；section-0077（行业经营性信息分析）含门店、品牌、直营/加盟、线上线下及地区盈利，直接反映渠道与市场结构；section-0090（主要控股参股公司分析）补充经营主体层面情况；section-0018/0019（近三年主要会计数据）提供公司层面收入与规模总量，避免仅依赖明细表而缺失公司合计口径。未选纯行业背景、核心竞争力泛述及治理、财务报告附注等非经营核心内容。"
+        },
+        {
+          "section_id": "section-0090",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 26,
+          "end_page": 27,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0047（报告期内公司从事的业务情况）说明主业与经营模式；section-0049（经营情况讨论与分析）为经营综述；section-0054（主营业务分析）及其子节section-0056（收入和成本分析）提供营业收入、成本与主要业务构成，是货币化与收入结构核心；section-0077（行业经营性信息分析）含门店、品牌、直营/加盟、线上线下及地区盈利，直接反映渠道与市场结构；section-0090（主要控股参股公司分析）补充经营主体层面情况；section-0018/0019（近三年主要会计数据）提供公司层面收入与规模总量，避免仅依赖明细表而缺失公司合计口径。未选纯行业背景、核心竞争力泛述及治理、财务报告附注等非经营核心内容。"
+        }
+      ],
+      "pages": [
+        6,
+        7,
+        8,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "characters": 31248,
+      "packet_model_text_sha256": "62a76b134849964effeb528527ddd1981678e5a0c817e503e06117f2d74ea51d",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600107/query.json": "91eb4638068486ea2f0a7168c92d2ba02756bd0e2129c924d5b3c58c0cc81faf",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600107/model-receipts.json": "be8b71af163a8ac449e1bfa8941143045c204bb6684183ae3a4e984eb392d2e4"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 30,
+        "retained_objects": 29,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "cc-01",
+          "cc-02",
+          "cc-03",
+          "cc-04",
+          "mc-01",
+          "mc-02",
+          "mc-03",
+          "od-01",
+          "od-02",
+          "od-03",
+          "od-04",
+          "oi-01",
+          "oi-02",
+          "oi-03",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "sc-01",
+          "sc-02",
+          "sc-03",
+          "sc-04",
+          "sm-03"
+        ],
+        "withheld_ids": [
+          "sm-02"
+        ],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": [
+          "事实sm-02已隔离，未作为结论采用：categorical financial absence lacks explicit scoped source wording"
+        ]
+      },
+      "seconds": 1.469
+    },
+    {
+      "instrument_id": "600098.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0035": "section-0035",
+        "section-0042": "section-0042",
+        "section-0044": "section-0044",
+        "section-0049": "section-0049",
+        "section-0064": "section-0064",
+        "section-0066": "section-0066",
+        "section-0093": "section-0093",
+        "section-0116": "section-0116"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0035",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 9,
+          "end_page": 10,
+          "rationale": "所选章节覆盖公司业务概况（section-0035）、经营情况讨论与分析（section-0042及其子节section-0044、section-0049）、主营业务分析（section-0064）及收入和成本分析（section-0066），可解释业务结构、产品服务、收入构成与主要业务权重；行业经营性信息分析（section-0093）提供电量电价、装机容量、发电效率等经营规模与驱动因素；主要控股参股公司分析（section-0116）补充子公司经营情况。这些均为公司层面实质经营讨论，信息密度高且相互补充，避免选择纯行业背景或治理类章节。"
+        },
+        {
+          "section_id": "section-0042",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 11,
+          "end_page": 11,
+          "rationale": "所选章节覆盖公司业务概况（section-0035）、经营情况讨论与分析（section-0042及其子节section-0044、section-0049）、主营业务分析（section-0064）及收入和成本分析（section-0066），可解释业务结构、产品服务、收入构成与主要业务权重；行业经营性信息分析（section-0093）提供电量电价、装机容量、发电效率等经营规模与驱动因素；主要控股参股公司分析（section-0116）补充子公司经营情况。这些均为公司层面实质经营讨论，信息密度高且相互补充，避免选择纯行业背景或治理类章节。"
+        },
+        {
+          "section_id": "section-0044",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "3.3 倍"
+          ],
+          "start_page": 11,
+          "end_page": 13,
+          "rationale": "所选章节覆盖公司业务概况（section-0035）、经营情况讨论与分析（section-0042及其子节section-0044、section-0049）、主营业务分析（section-0064）及收入和成本分析（section-0066），可解释业务结构、产品服务、收入构成与主要业务权重；行业经营性信息分析（section-0093）提供电量电价、装机容量、发电效率等经营规模与驱动因素；主要控股参股公司分析（section-0116）补充子公司经营情况。这些均为公司层面实质经营讨论，信息密度高且相互补充，避免选择纯行业背景或治理类章节。"
+        },
+        {
+          "section_id": "section-0049",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "3.8 亿立方米，同比增长 33%"
+          ],
+          "start_page": 13,
+          "end_page": 15,
+          "rationale": "所选章节覆盖公司业务概况（section-0035）、经营情况讨论与分析（section-0042及其子节section-0044、section-0049）、主营业务分析（section-0064）及收入和成本分析（section-0066），可解释业务结构、产品服务、收入构成与主要业务权重；行业经营性信息分析（section-0093）提供电量电价、装机容量、发电效率等经营规模与驱动因素；主要控股参股公司分析（section-0116）补充子公司经营情况。这些均为公司层面实质经营讨论，信息密度高且相互补充，避免选择纯行业背景或治理类章节。"
+        },
+        {
+          "section_id": "section-0064",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 17,
+          "end_page": 24,
+          "rationale": "所选章节覆盖公司业务概况（section-0035）、经营情况讨论与分析（section-0042及其子节section-0044、section-0049）、主营业务分析（section-0064）及收入和成本分析（section-0066），可解释业务结构、产品服务、收入构成与主要业务权重；行业经营性信息分析（section-0093）提供电量电价、装机容量、发电效率等经营规模与驱动因素；主要控股参股公司分析（section-0116）补充子公司经营情况。这些均为公司层面实质经营讨论，信息密度高且相互补充，避免选择纯行业背景或治理类章节。"
+        },
+        {
+          "section_id": "section-0093",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "start_page": 25,
+          "end_page": 30,
+          "rationale": "所选章节覆盖公司业务概况（section-0035）、经营情况讨论与分析（section-0042及其子节section-0044、section-0049）、主营业务分析（section-0064）及收入和成本分析（section-0066），可解释业务结构、产品服务、收入构成与主要业务权重；行业经营性信息分析（section-0093）提供电量电价、装机容量、发电效率等经营规模与驱动因素；主要控股参股公司分析（section-0116）补充子公司经营情况。这些均为公司层面实质经营讨论，信息密度高且相互补充，避免选择纯行业背景或治理类章节。"
+        },
+        {
+          "section_id": "section-0116",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 32,
+          "end_page": 33,
+          "rationale": "所选章节覆盖公司业务概况（section-0035）、经营情况讨论与分析（section-0042及其子节section-0044、section-0049）、主营业务分析（section-0064）及收入和成本分析（section-0066），可解释业务结构、产品服务、收入构成与主要业务权重；行业经营性信息分析（section-0093）提供电量电价、装机容量、发电效率等经营规模与驱动因素；主要控股参股公司分析（section-0116）补充子公司经营情况。这些均为公司层面实质经营讨论，信息密度高且相互补充，避免选择纯行业背景或治理类章节。"
+        }
+      ],
+      "pages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        33
+      ],
+      "characters": 62788,
+      "packet_model_text_sha256": "c1f9d1d6cf2e435288c14193543b4d4ab8a783528fff788f19e0549a7681402c",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600098/query.json": "b48daa0085cb789afea934caeba29823ccd454751f914b367190b88878d0fc6a",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600098/model-receipts.json": "ca722ad22d50f878042e1c02266866c4eb2d7e2e90e5486a7443c62ad96af84a"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 43,
+        "retained_objects": 43,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "cc-01",
+          "cc-02",
+          "cc-03",
+          "cc-04",
+          "mc-01",
+          "mc-02",
+          "mc-03",
+          "mc-04",
+          "od-02",
+          "od-04",
+          "od-05",
+          "od-06",
+          "oi-01",
+          "oi-02",
+          "oi-03",
+          "oi-04",
+          "oi-05",
+          "oi-06",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "review-add:f005",
+          "review-add:f006",
+          "review-add:f007",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "rm-04",
+          "sc-01",
+          "sc-02",
+          "sc-03",
+          "sc-04",
+          "sc-05",
+          "sm-01",
+          "sm-02",
+          "sm-03",
+          "sm-04",
+          "sm-05",
+          "sm-06"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 3.154
+    },
+    {
+      "instrument_id": "600104.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0039": "section-0039",
+        "section-0045": "section-0045",
+        "section-0053": "section-0053",
+        "section-0055": "section-0055",
+        "section-0078": "section-0078",
+        "section-0080": "section-0080",
+        "section-0082": "section-0082",
+        "section-0083": "section-0083"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0039",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 8,
+          "end_page": 9,
+          "rationale": "所选章节覆盖公司业务概况（section-0039）、经营情况讨论（section-0045）、主营业务分析（section-0053）及收入与成本分析（section-0055），可解释公司产品/服务、经营模式、收入总额与主要业务构成；行业经营性信息分析下的整车产销量（section-0080）、新能源汽车业务（section-0082）和汽车金融业务（section-0083）补充了规模、产品结构与金融业务收入来源。未选纯行业背景、核心竞争力、治理及财务报告附注，避免与经营综述重复或过度扩展。"
+        },
+        {
+          "section_id": "section-0045",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 9,
+          "end_page": 10,
+          "rationale": "所选章节覆盖公司业务概况（section-0039）、经营情况讨论（section-0045）、主营业务分析（section-0053）及收入与成本分析（section-0055），可解释公司产品/服务、经营模式、收入总额与主要业务构成；行业经营性信息分析下的整车产销量（section-0080）、新能源汽车业务（section-0082）和汽车金融业务（section-0083）补充了规模、产品结构与金融业务收入来源。未选纯行业背景、核心竞争力、治理及财务报告附注，避免与经营综述重复或过度扩展。"
+        },
+        {
+          "section_id": "section-0053",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 10,
+          "end_page": 15,
+          "rationale": "所选章节覆盖公司业务概况（section-0039）、经营情况讨论（section-0045）、主营业务分析（section-0053）及收入与成本分析（section-0055），可解释公司产品/服务、经营模式、收入总额与主要业务构成；行业经营性信息分析下的整车产销量（section-0080）、新能源汽车业务（section-0082）和汽车金融业务（section-0083）补充了规模、产品结构与金融业务收入来源。未选纯行业背景、核心竞争力、治理及财务报告附注，避免与经营综述重复或过度扩展。"
+        },
+        {
+          "section_id": "section-0078",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "start_page": 16,
+          "end_page": 20,
+          "rationale": "所选章节覆盖公司业务概况（section-0039）、经营情况讨论（section-0045）、主营业务分析（section-0053）及收入与成本分析（section-0055），可解释公司产品/服务、经营模式、收入总额与主要业务构成；行业经营性信息分析下的整车产销量（section-0080）、新能源汽车业务（section-0082）和汽车金融业务（section-0083）补充了规模、产品结构与金融业务收入来源。未选纯行业背景、核心竞争力、治理及财务报告附注，避免与经营综述重复或过度扩展。"
+        }
+      ],
+      "pages": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "characters": 30499,
+      "packet_model_text_sha256": "722982e3ea15525888b8fb3d9bc89caf6d798ad65fb5d673c33b4bded81e0614",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600104/query.json": "2e08932292ec37adfb35aba9f9314350fe00b550a29349334c0ec25f3e1b4aac",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600104/model-receipts.json": "0a46583ebe8611240ef4e12c063cf9fbdfcdeaa2835bf1398c9c9b077ff5d51a"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 37,
+        "retained_objects": 37,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "bs-04",
+          "cc-04",
+          "cc-05",
+          "cc-06",
+          "mc-01",
+          "mc-03",
+          "mc-04",
+          "mc-05",
+          "od-01",
+          "od-04",
+          "od-05",
+          "oi-04",
+          "oi-05",
+          "oi-07",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "ps-05",
+          "ps-06",
+          "review-add:F-003",
+          "review-add:F-004",
+          "review-add:F-005",
+          "rm-01",
+          "sc-down-01",
+          "sc-pos-01",
+          "sc-up-01",
+          "sc-up-02",
+          "sm-01",
+          "sm-02",
+          "sm-03",
+          "sm-04",
+          "sm-08",
+          "sm-09"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 1.819
+    },
+    {
+      "instrument_id": "600088.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0049": "section-0049",
+        "section-0050": "section-0050",
+        "section-0054": "section-0054",
+        "section-0055": "section-0055",
+        "section-0056": "section-0056",
+        "section-0062": "section-0062",
+        "section-0072": "section-0072",
+        "section-0074": "section-0074",
+        "section-0088": "section-0088"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0049",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 11,
+          "end_page": 12,
+          "rationale": "本报告为中视传媒年度报告，业务涵盖影视、广告、旅游、基金四大板块。选择第三节管理层讨论与分析中的核心经营子节：section-0049（报告期内公司从事的业务情况，含各业务板块说明）及其子节section-0050/0054/0055/0056，完整覆盖业务结构、产品服务与经营模式；section-0062（经营情况讨论与分析）及其子节反映各板块本期经营变化；section-0072（主营业务分析）与section-0074（收入和成本分析）提供营业收入总额、分业务收入构成与成本结构，是理解盈利来源与业务权重的关键；section-0088（营业收入和营业成本附注）补充收入确认与分板块明细。以上共同解释业务、产品用途、变现方式、规模与结构、经营变化，符合primary与material_only优先级。"
+        },
+        {
+          "section_id": "section-0062",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 13,
+          "end_page": 14,
+          "rationale": "本报告为中视传媒年度报告，业务涵盖影视、广告、旅游、基金四大板块。选择第三节管理层讨论与分析中的核心经营子节：section-0049（报告期内公司从事的业务情况，含各业务板块说明）及其子节section-0050/0054/0055/0056，完整覆盖业务结构、产品服务与经营模式；section-0062（经营情况讨论与分析）及其子节反映各板块本期经营变化；section-0072（主营业务分析）与section-0074（收入和成本分析）提供营业收入总额、分业务收入构成与成本结构，是理解盈利来源与业务权重的关键；section-0088（营业收入和营业成本附注）补充收入确认与分板块明细。以上共同解释业务、产品用途、变现方式、规模与结构、经营变化，符合primary与material_only优先级。"
+        },
+        {
+          "section_id": "section-0072",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 16,
+          "end_page": 20,
+          "rationale": "本报告为中视传媒年度报告，业务涵盖影视、广告、旅游、基金四大板块。选择第三节管理层讨论与分析中的核心经营子节：section-0049（报告期内公司从事的业务情况，含各业务板块说明）及其子节section-0050/0054/0055/0056，完整覆盖业务结构、产品服务与经营模式；section-0062（经营情况讨论与分析）及其子节反映各板块本期经营变化；section-0072（主营业务分析）与section-0074（收入和成本分析）提供营业收入总额、分业务收入构成与成本结构，是理解盈利来源与业务权重的关键；section-0088（营业收入和营业成本附注）补充收入确认与分板块明细。以上共同解释业务、产品用途、变现方式、规模与结构、经营变化，符合primary与material_only优先级。"
+        },
+        {
+          "section_id": "section-0088",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "（一）、1",
+            "4、 研发投入",
+            "(2).研发人员情况表"
+          ],
+          "start_page": 20,
+          "end_page": 20,
+          "rationale": "本报告为中视传媒年度报告，业务涵盖影视、广告、旅游、基金四大板块。选择第三节管理层讨论与分析中的核心经营子节：section-0049（报告期内公司从事的业务情况，含各业务板块说明）及其子节section-0050/0054/0055/0056，完整覆盖业务结构、产品服务与经营模式；section-0062（经营情况讨论与分析）及其子节反映各板块本期经营变化；section-0072（主营业务分析）与section-0074（收入和成本分析）提供营业收入总额、分业务收入构成与成本结构，是理解盈利来源与业务权重的关键；section-0088（营业收入和营业成本附注）补充收入确认与分板块明细。以上共同解释业务、产品用途、变现方式、规模与结构、经营变化，符合primary与material_only优先级。"
+        }
+      ],
+      "pages": [
+        11,
+        12,
+        13,
+        14,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "characters": 17564,
+      "packet_model_text_sha256": "7f174c74ddaa230d4aeafaf20cd6636f81570ca6acfa9a382394be7345a7a746",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600088/query.json": "f6a597d464ef3cf0162d9a23f79603ee15452b3f7d4748b84540bd0d0777353c",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600088/model-receipts.json": "a2891ac14e14ff54692a837ce030503b0f5080507ff765f8668b258269b48f70"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 43,
+        "retained_objects": 43,
+        "retained_ids": [
+          "bs-1",
+          "bs-2",
+          "bs-3",
+          "bs-4",
+          "bs-5",
+          "cc-1",
+          "cc-2",
+          "cc-3",
+          "cc-4",
+          "mc-1",
+          "mc-2",
+          "mc-3",
+          "mc-4",
+          "od-1",
+          "od-2",
+          "od-3",
+          "od-4",
+          "od-5",
+          "oi-1",
+          "oi-2",
+          "oi-3",
+          "oi-4",
+          "oi-5",
+          "ps-1",
+          "ps-2",
+          "ps-3",
+          "ps-4",
+          "ps-5",
+          "review-add:f-001",
+          "review-add:f-002",
+          "review-add:f-003",
+          "review-add:f-004",
+          "rm-1",
+          "rm-2",
+          "rm-3",
+          "sc-1",
+          "sc-2",
+          "sc-3",
+          "sc-4",
+          "sc-5",
+          "sm-1",
+          "sm-2",
+          "sm-3"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 1.229
+    },
+    {
+      "instrument_id": "600099.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0033": "section-0033",
+        "section-0034": "section-0034",
+        "section-0041": "section-0041",
+        "section-0053": "section-0053",
+        "section-0083": "section-0083",
+        "section-0020": "section-0020",
+        "section-0021": "section-0021"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0020",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、近三年主要会计数据和财务指标"
+          ],
+          "start_page": 5,
+          "end_page": 6,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0033（公司从事的业务情况）及其子节section-0034（公司经营情况，含森林消防机械、农业机械、特种车辆、摩托车四类产品）覆盖“做什么、产品用途、怎么经营”；section-0041（经营情况讨论与分析）说明本期经营变化与驱动因素；section-0053（主营业务分析）与section-0083（收入和成本分析）提供营业收入总额、分产品/分地区收入构成与毛利率，是货币化与主要业务权重的核心来源；section-0020/0021（近三年主要会计数据）提供公司层面营收、利润等总量指标，与前述明细互补且不重叠。未选纯行业背景（section-0040）与泛化核心竞争力（section-0046），因其对公司层面解释价值次要。"
+        },
+        {
+          "section_id": "section-0033",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 8,
+          "end_page": 10,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0033（公司从事的业务情况）及其子节section-0034（公司经营情况，含森林消防机械、农业机械、特种车辆、摩托车四类产品）覆盖“做什么、产品用途、怎么经营”；section-0041（经营情况讨论与分析）说明本期经营变化与驱动因素；section-0053（主营业务分析）与section-0083（收入和成本分析）提供营业收入总额、分产品/分地区收入构成与毛利率，是货币化与主要业务权重的核心来源；section-0020/0021（近三年主要会计数据）提供公司层面营收、利润等总量指标，与前述明细互补且不重叠。未选纯行业背景（section-0040）与泛化核心竞争力（section-0046），因其对公司层面解释价值次要。"
+        },
+        {
+          "section_id": "section-0041",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 12,
+          "end_page": 16,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0033（公司从事的业务情况）及其子节section-0034（公司经营情况，含森林消防机械、农业机械、特种车辆、摩托车四类产品）覆盖“做什么、产品用途、怎么经营”；section-0041（经营情况讨论与分析）说明本期经营变化与驱动因素；section-0053（主营业务分析）与section-0083（收入和成本分析）提供营业收入总额、分产品/分地区收入构成与毛利率，是货币化与主要业务权重的核心来源；section-0020/0021（近三年主要会计数据）提供公司层面营收、利润等总量指标，与前述明细互补且不重叠。未选纯行业背景（section-0040）与泛化核心竞争力（section-0046），因其对公司层面解释价值次要。"
+        },
+        {
+          "section_id": "section-0053",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 18,
+          "end_page": 27,
+          "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0033（公司从事的业务情况）及其子节section-0034（公司经营情况，含森林消防机械、农业机械、特种车辆、摩托车四类产品）覆盖“做什么、产品用途、怎么经营”；section-0041（经营情况讨论与分析）说明本期经营变化与驱动因素；section-0053（主营业务分析）与section-0083（收入和成本分析）提供营业收入总额、分产品/分地区收入构成与毛利率，是货币化与主要业务权重的核心来源；section-0020/0021（近三年主要会计数据）提供公司层面营收、利润等总量指标，与前述明细互补且不重叠。未选纯行业背景（section-0040）与泛化核心竞争力（section-0046），因其对公司层面解释价值次要。"
+        }
+      ],
+      "pages": [
+        5,
+        6,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "characters": 34800,
+      "packet_model_text_sha256": "2f5e08f9d8afc4cffd7f9c5da41ef9c034592b6ae147ba36c8dd339f7db555cc",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600099/query.json": "730147224a1c830072fa837872049265a52f3c272f5b1e3fa94f3db845039495",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600099/model-receipts.json": "4395a28cd04ef23389f679c08659c92c11ebf3de42899c0e908bdb586a032777"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 29,
+        "retained_objects": 29,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "cc-01",
+          "cc-02",
+          "cc-03",
+          "mc-01",
+          "mc-02",
+          "mc-03",
+          "od-01",
+          "od-02",
+          "od-03",
+          "od-04",
+          "oi-01",
+          "oi-02",
+          "oi-03",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "review-add:F003",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "sc-01",
+          "sc-03",
+          "sm-01",
+          "sm-02",
+          "sm-03"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 1.541
+    },
+    {
+      "instrument_id": "600082.SH",
+      "old_boundary_error": "layout section boundary cannot be located: section-0063:20",
+      "selected_heading_mapping": {
+        "section-0049": "section-0049",
+        "section-0051": "section-0051",
+        "section-0063": "section-0063",
+        "section-0064": "section-0064",
+        "section-0066": "section-0066",
+        "section-0094": "section-0093",
+        "section-0112": "section-0111",
+        "section-0125": "section-0124"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0049",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 11,
+          "end_page": 11,
+          "rationale": "本报告为园区开发运营类公司。选择逻辑：section-0049说明公司从事的业务与经营模式；section-0051经营情况讨论与分析（含盘活存量资产、精耕园区运营、聚焦产业投资等实质子节）覆盖经营综述；section-0063报告期内主要经营情况为经营总览；section-0064主营业务分析及section-0066收入和成本分析提供营业收入构成、分业务/分产品收入与成本，是收入来源与主要业务权重的核心；section-0094为资产及负债状况分析，说明经营资源与财务结构；section-0112行业经营性信息分析含房地产储备、开发投资、销售结转、出租及财务融资，直接反映园区/房地产业务规模与经营节奏；section-0125主要控股参股公司分析补充子公司经营与投资平台情况。以上共同覆盖业务结构、产品服务、盈利来源、规模与主要构成、经营资源与本期变化。"
+        },
+        {
+          "section_id": "section-0051",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 12,
+          "end_page": 13,
+          "rationale": "本报告为园区开发运营类公司。选择逻辑：section-0049说明公司从事的业务与经营模式；section-0051经营情况讨论与分析（含盘活存量资产、精耕园区运营、聚焦产业投资等实质子节）覆盖经营综述；section-0063报告期内主要经营情况为经营总览；section-0064主营业务分析及section-0066收入和成本分析提供营业收入构成、分业务/分产品收入与成本，是收入来源与主要业务权重的核心；section-0094为资产及负债状况分析，说明经营资源与财务结构；section-0112行业经营性信息分析含房地产储备、开发投资、销售结转、出租及财务融资，直接反映园区/房地产业务规模与经营节奏；section-0125主要控股参股公司分析补充子公司经营与投资平台情况。以上共同覆盖业务结构、产品服务、盈利来源、规模与主要构成、经营资源与本期变化。"
+        },
+        {
+          "section_id": "section-0063",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "start_page": 13,
+          "end_page": 29,
+          "rationale": "本报告为园区开发运营类公司。选择逻辑：section-0049说明公司从事的业务与经营模式；section-0051经营情况讨论与分析（含盘活存量资产、精耕园区运营、聚焦产业投资等实质子节）覆盖经营综述；section-0063报告期内主要经营情况为经营总览；section-0064主营业务分析及section-0066收入和成本分析提供营业收入构成、分业务/分产品收入与成本，是收入来源与主要业务权重的核心；section-0094为资产及负债状况分析，说明经营资源与财务结构；section-0112行业经营性信息分析含房地产储备、开发投资、销售结转、出租及财务融资，直接反映园区/房地产业务规模与经营节奏；section-0125主要控股参股公司分析补充子公司经营与投资平台情况。以上共同覆盖业务结构、产品服务、盈利来源、规模与主要构成、经营资源与本期变化。"
+        }
+      ],
+      "pages": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "characters": 34623,
+      "packet_model_text_sha256": "e7af8db78cd46fd16831c6d39e46880cb2b0681406fb5b7a6dcc9ac0c1bf37b7",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600082/query.json": "974757094c5a70e84cbe7aa21d71b89513c5500b50fe40b3c8bdd46713f3e387",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600082/model-receipts.json": "c4f6229771863038451cb4d487ee9fdd9894b9b1548f5b8bc283bead7da92b7a"
+      },
+      "seconds": 1.666
+    },
+    {
+      "instrument_id": "600097.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0034": "section-0034",
+        "section-0036": "section-0036",
+        "section-0042": "section-0042",
+        "section-0044": "section-0044",
+        "section-0080": "section-0080",
+        "section-0021": "section-0021",
+        "section-0022": "section-0022",
+        "section-0085": "section-0085"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0021",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 6,
+          "end_page": 7,
+          "rationale": "选取公司业务情况（section-0034）说明主营业务与经营模式；经营情况讨论与分析（section-0036）提供本期经营综述；主营业务分析（section-0042）及其收入和成本分析（section-0044）给出营业收入构成、成本与主要业务权重，是收入与盈利来源的核心；主要控股参股公司分析（section-0080）补充子公司经营规模；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面收入与利润总额；经营计划（section-0085）说明经营因素与未来安排。上述子节均为完整、信息密集的经营与收入讨论，避免与父节重复。"
+        },
+        {
+          "section_id": "section-0034",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 8,
+          "end_page": 9,
+          "rationale": "选取公司业务情况（section-0034）说明主营业务与经营模式；经营情况讨论与分析（section-0036）提供本期经营综述；主营业务分析（section-0042）及其收入和成本分析（section-0044）给出营业收入构成、成本与主要业务权重，是收入与盈利来源的核心；主要控股参股公司分析（section-0080）补充子公司经营规模；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面收入与利润总额；经营计划（section-0085）说明经营因素与未来安排。上述子节均为完整、信息密集的经营与收入讨论，避免与父节重复。"
+        },
+        {
+          "section_id": "section-0036",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 9,
+          "end_page": 9,
+          "rationale": "选取公司业务情况（section-0034）说明主营业务与经营模式；经营情况讨论与分析（section-0036）提供本期经营综述；主营业务分析（section-0042）及其收入和成本分析（section-0044）给出营业收入构成、成本与主要业务权重，是收入与盈利来源的核心；主要控股参股公司分析（section-0080）补充子公司经营规模；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面收入与利润总额；经营计划（section-0085）说明经营因素与未来安排。上述子节均为完整、信息密集的经营与收入讨论，避免与父节重复。"
+        },
+        {
+          "section_id": "section-0042",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 10,
+          "end_page": 15,
+          "rationale": "选取公司业务情况（section-0034）说明主营业务与经营模式；经营情况讨论与分析（section-0036）提供本期经营综述；主营业务分析（section-0042）及其收入和成本分析（section-0044）给出营业收入构成、成本与主要业务权重，是收入与盈利来源的核心；主要控股参股公司分析（section-0080）补充子公司经营规模；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面收入与利润总额；经营计划（section-0085）说明经营因素与未来安排。上述子节均为完整、信息密集的经营与收入讨论，避免与父节重复。"
+        },
+        {
+          "section_id": "section-0080",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 18,
+          "end_page": 19,
+          "rationale": "选取公司业务情况（section-0034）说明主营业务与经营模式；经营情况讨论与分析（section-0036）提供本期经营综述；主营业务分析（section-0042）及其收入和成本分析（section-0044）给出营业收入构成、成本与主要业务权重，是收入与盈利来源的核心；主要控股参股公司分析（section-0080）补充子公司经营规模；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面收入与利润总额；经营计划（section-0085）说明经营因素与未来安排。上述子节均为完整、信息密集的经营与收入讨论，避免与父节重复。"
+        },
+        {
+          "section_id": "section-0085",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "六、公司关于公司未来发展的讨论与分析",
+            "(三)经营计划"
+          ],
+          "start_page": 20,
+          "end_page": 21,
+          "rationale": "选取公司业务情况（section-0034）说明主营业务与经营模式；经营情况讨论与分析（section-0036）提供本期经营综述；主营业务分析（section-0042）及其收入和成本分析（section-0044）给出营业收入构成、成本与主要业务权重，是收入与盈利来源的核心；主要控股参股公司分析（section-0080）补充子公司经营规模；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面收入与利润总额；经营计划（section-0085）说明经营因素与未来安排。上述子节均为完整、信息密集的经营与收入讨论，避免与父节重复。"
+        }
+      ],
+      "pages": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        18,
+        19,
+        20,
+        21
+      ],
+      "characters": 25452,
+      "packet_model_text_sha256": "e14b9efe2599ba65b4c2365c8d9d43cf82599b5b80eceb9632d21ce2f298c01f",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600097/query.json": "e63f69a5e7f7f56bd20f49b8df6caac4506ac82799dad831e0c99962091d1ef2",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600097/model-receipts.json": "6b1a02967e0f786cbd92f3392c814c228d329d208a735835b92a8e2f237fb458"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 20,
+        "retained_objects": 20,
+        "retained_ids": [
+          "BS-01",
+          "BS-02",
+          "CC-01",
+          "MC-01",
+          "MC-02",
+          "OD-01",
+          "OD-02",
+          "OD-03",
+          "OI-01",
+          "PS-01",
+          "PS-02",
+          "PS-03",
+          "PS-04",
+          "SC-D-01",
+          "SC-P-01",
+          "SC-U-01",
+          "SM-05",
+          "review-add:F-01",
+          "review-add:F-02",
+          "review-add:F-03"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 1.431
+    },
+    {
+      "instrument_id": "600054.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0036": "section-0036",
+        "section-0044": "section-0044",
+        "section-0059": "section-0059",
+        "section-0061": "section-0061",
+        "section-0023": "section-0023",
+        "section-0120": "section-0120",
+        "section-1174": "section-1174"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0023",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 6,
+          "end_page": 7,
+          "rationale": "选择公司业务情况（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是变现与收入结构核心；近三年主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营；分部信息（section-1174）用于核对业务分部收入口径。未选行业背景、核心竞争力、治理、薪酬、分红及财务报告附注细节，因与经营结构解释重叠或属次要范围。"
+        },
+        {
+          "section_id": "section-0036",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 9,
+          "end_page": 10,
+          "rationale": "选择公司业务情况（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是变现与收入结构核心；近三年主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营；分部信息（section-1174）用于核对业务分部收入口径。未选行业背景、核心竞争力、治理、薪酬、分红及财务报告附注细节，因与经营结构解释重叠或属次要范围。"
+        },
+        {
+          "section_id": "section-0044",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 11,
+          "end_page": 12,
+          "rationale": "选择公司业务情况（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是变现与收入结构核心；近三年主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营；分部信息（section-1174）用于核对业务分部收入口径。未选行业背景、核心竞争力、治理、薪酬、分红及财务报告附注细节，因与经营结构解释重叠或属次要范围。"
+        },
+        {
+          "section_id": "section-0059",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 13,
+          "end_page": 17,
+          "rationale": "选择公司业务情况（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是变现与收入结构核心；近三年主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营；分部信息（section-1174）用于核对业务分部收入口径。未选行业背景、核心竞争力、治理、薪酬、分红及财务报告附注细节，因与经营结构解释重叠或属次要范围。"
+        },
+        {
+          "section_id": "section-0120",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 22,
+          "end_page": 22,
+          "rationale": "选择公司业务情况（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是变现与收入结构核心；近三年主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营；分部信息（section-1174）用于核对业务分部收入口径。未选行业背景、核心竞争力、治理、薪酬、分红及财务报告附注细节，因与经营结构解释重叠或属次要范围。"
+        },
+        {
+          "section_id": "section-1174",
+          "section_path": [
+            "第八节 财务报告",
+            "十八、 其他重要事项",
+            "6、 分部信息"
+          ],
+          "start_page": 172,
+          "end_page": 173,
+          "rationale": "选择公司业务情况（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是变现与收入结构核心；近三年主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营；分部信息（section-1174）用于核对业务分部收入口径。未选行业背景、核心竞争力、治理、薪酬、分红及财务报告附注细节，因与经营结构解释重叠或属次要范围。"
+        }
+      ],
+      "pages": [
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        22,
+        172,
+        173
+      ],
+      "characters": 21210,
+      "packet_model_text_sha256": "6f94cf94d7eabb6a8977dfb1c622242371cdade4a720c22135c5e56a817faabb",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600054/query.json": "7d66c49b3b3c26941115f30ef628103e55ef6918196565523c858a2fde2c8566",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600054/model-receipts.json": "9995c50a99fcb752a4e5cd2791917ea3d8291cae55fda2bb0a9d59ca001234b3"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 33,
+        "retained_objects": 33,
+        "retained_ids": [
+          "BS-01",
+          "BS-02",
+          "BS-03",
+          "BS-04",
+          "CC-01",
+          "CC-02",
+          "CC-03",
+          "MC-01",
+          "MC-02",
+          "MC-03",
+          "MC-04",
+          "OD-01",
+          "OD-02",
+          "OD-03",
+          "OD-04",
+          "OD-05",
+          "OI-01",
+          "OI-02",
+          "OI-03",
+          "OI-04",
+          "PS-01",
+          "PS-02",
+          "PS-03",
+          "PS-04",
+          "RM-01",
+          "RM-02",
+          "RM-03",
+          "RM-04",
+          "SC-D-01",
+          "SC-P-01",
+          "SC-U-01",
+          "SM-02",
+          "SM-03"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 1.612
+    },
+    {
+      "instrument_id": "600000.SH",
+      "old_boundary_error": null,
+      "selected_heading_mapping": {
+        "section-0071": "section-0071",
+        "section-0101": "section-0101",
+        "section-0103": "section-0103",
+        "section-0104": "section-0104",
+        "section-0105": "section-0105",
+        "section-0106": "section-0106",
+        "section-0107": "section-0107",
+        "section-0108": "section-0108"
+      },
+      "source_packet_ready": true,
+      "sections": [
+        {
+          "section_id": "section-0071",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "3.1 公司总体经营情况"
+          ],
+          "start_page": 32,
+          "end_page": 33,
+          "rationale": "选取管理层讨论与分析中的公司总体经营情况（section-0071）作为公司层面经营综述，涵盖总体经营与主要指标；选取公司主要业务情况（section-0101）及其下公司金融、零售金融、金融市场与金融机构、跨境及境外机构业务四个实质子节（section-0103至section-0106），完整说明业务结构、产品服务、客户与经营角色；选取利润表分析（section-0107）及其营业收入子节（section-0108），提供公司期间营业收入总额与收入构成，满足盈利来源与主要业务权重问题。上述均为信息密集的经营/业务实质子节，且未同时选择父子重叠项（section-0101与其子节不并存，section-0107与section-0108不并存）。"
+        },
+        {
+          "section_id": "section-0101",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "3.6 公司主要业务情况"
+          ],
+          "start_page": 62,
+          "end_page": 71,
+          "rationale": "选取管理层讨论与分析中的公司总体经营情况（section-0071）作为公司层面经营综述，涵盖总体经营与主要指标；选取公司主要业务情况（section-0101）及其下公司金融、零售金融、金融市场与金融机构、跨境及境外机构业务四个实质子节（section-0103至section-0106），完整说明业务结构、产品服务、客户与经营角色；选取利润表分析（section-0107）及其营业收入子节（section-0108），提供公司期间营业收入总额与收入构成，满足盈利来源与主要业务权重问题。上述均为信息密集的经营/业务实质子节，且未同时选择父子重叠项（section-0101与其子节不并存，section-0107与section-0108不并存）。"
+        },
+        {
+          "section_id": "section-0107",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "3.7 利润表分析"
+          ],
+          "start_page": 71,
+          "end_page": 74,
+          "rationale": "选取管理层讨论与分析中的公司总体经营情况（section-0071）作为公司层面经营综述，涵盖总体经营与主要指标；选取公司主要业务情况（section-0101）及其下公司金融、零售金融、金融市场与金融机构、跨境及境外机构业务四个实质子节（section-0103至section-0106），完整说明业务结构、产品服务、客户与经营角色；选取利润表分析（section-0107）及其营业收入子节（section-0108），提供公司期间营业收入总额与收入构成，满足盈利来源与主要业务权重问题。上述均为信息密集的经营/业务实质子节，且未同时选择父子重叠项（section-0101与其子节不并存，section-0107与section-0108不并存）。"
+        }
+      ],
+      "pages": [
+        32,
+        33,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74
+      ],
+      "characters": 27719,
+      "packet_model_text_sha256": "b6d5bdeb930e1a6cae685c4465350ca3662e3ed7a84d3d2d560d2126d7a643fd",
+      "all_coordinates_equal_to_native_pages": true,
+      "old_receipt_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600000/query.json": "d18e0ecf5c45af7bb64f6f8d74c39bb6b65fb191fd32eaf55146680b683ee3c5",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600000/model-receipts.json": "a93fe69a5ed6d73cb32f4e450df33635dfce8ade3d926870246eb8a86b66203e"
+      },
+      "saved_final_binding": {
+        "origin": "controlled_fixture",
+        "old_objects": 40,
+        "retained_objects": 40,
+        "retained_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "bs-04",
+          "cc-02",
+          "cc-03",
+          "cc-04",
+          "cc-05",
+          "mc-01",
+          "mc-02",
+          "mc-03",
+          "mc-04",
+          "od-01",
+          "od-02",
+          "od-03",
+          "od-04",
+          "od-05",
+          "oi-01",
+          "oi-02",
+          "oi-03",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "ps-05",
+          "review-add:F-05",
+          "review-add:F-07",
+          "review-add:F-08",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "rm-04",
+          "sc-01",
+          "sc-02",
+          "sc-03",
+          "sm-01",
+          "sm-02",
+          "sm-03",
+          "sm-05",
+          "sm-07"
+        ],
+        "withheld_ids": [],
+        "all_retained_objects_unchanged": true,
+        "old_review_not_inherited": true,
+        "new_isolation_notes": []
+      },
+      "seconds": 2.002
+    }
+  ]
+}

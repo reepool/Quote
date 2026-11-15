@@ -205,6 +205,21 @@ Each element MUST carry status, facts and limitations. Status MUST map explicitl
 
 Evidence MUST bind evidence_id, document version, section_path, physical pages and exact source spans or existing Evidence references, with printed-page labels when available. Table evidence MUST preserve its owning header, row/column, unit, period and necessary footnotes through linked source spans; it need not force all context into one giant quotation. No fact may rely on an unsupported citation or an invented section title. Readable output MUST be rendered from the same structured facts, with evidence and uncertainty retained, not authored as an unrelated second answer.
 
+#### Scenario: Core facts remain independent of optional detail
+- **WHEN** a new model reads a concentrated source packet to produce the shared eight-element workpaper
+- **THEN** it MUST express independently usable company revenue and main business assertions separately from optional growth comparisons, subsidiary detail or unresolved event timing, using the existing fact structure rather than a new schema
+- **AND** review MUST prioritize wrong content and omissions that change the main business interpretation; missing optional margin changes, rankings, counterparties or subsidiary profits alone MUST NOT require another repair, and a failed separate fact MUST NOT withdraw valid independent core facts
+
+#### Scenario: A qualitative financial absence asserts a zero without digits
+- **WHEN** a new fact categorically asserts no revenue/cost/expense without a numeral, rather than saying that the value is unknown or not disclosed in the read scope
+- **THEN** its cited source MUST explicitly support that scoped absence; a blank table cell, a zero in another column or a -100% comparison MUST NOT supply it
+- **AND** the source binder MAY conservatively require that explicit absence clause to be retained in the original source wording; failure withholds that fact only, leaves valid independent facts available, and does not rewrite historical workpapers or claim complete semantic verification
+
+#### Scenario: A numeric continuation includes a following text label
+- **WHEN** a line begins with decimal table values followed by another cell's text label
+- **THEN** the report-local section index MUST retain it as table source rather than terminate a true chapter at a fabricated heading
+- **AND** genuine numbered headings remain selectable, with original physical coordinates and complete table continuations unchanged
+
 #### Scenario: A narrative amount is absent from the metric list
 - **WHEN** a new draft or repair states a monetary amount, percentage, percentage-point change or explicit financial zero in its narrative, including an assertion omitted from `metrics`
 - **THEN** the existing source binder MUST check that assertion too; an omitted metric MUST NOT bypass numeric source constraints, and a blank cell or a -100% comparison MUST NOT supply a reported zero
