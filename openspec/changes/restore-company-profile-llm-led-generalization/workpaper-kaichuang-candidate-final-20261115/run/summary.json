@@ -1,0 +1,45 @@
+{
+  "task": "6.CM",
+  "instrument_id": "600097.SH",
+  "three_reads_equal": true,
+  "exception": null,
+  "preparation_seconds": 26.58,
+  "business_seconds": 153.44,
+  "facts": 32,
+  "metric_count": 54,
+  "original_31_fact_objects_unchanged": true,
+  "adopted_candidate_ids": [
+    "review-add:F001"
+  ],
+  "origin": "llm_generated",
+  "review_status": "completed",
+  "review_error": null,
+  "query_sha256": "763f133bb7eadd1aee8971fe348e2cbb85c68c935d349b0f4797aa27c8c5817a",
+  "source_coordinates_equal": true,
+  "old_all_stages_usage_inherited": 89133,
+  "retained_review_and_repair_usage_inherited": [
+    {
+      "purpose": "review_profile_workpaper",
+      "usage": {
+        "input_tokens": 17873,
+        "output_tokens": 383,
+        "total_tokens": 41023
+      }
+    },
+    {
+      "purpose": "repair_profile_workpaper",
+      "usage": {
+        "input_tokens": 8973,
+        "output_tokens": 930,
+        "total_tokens": 9903
+      }
+    }
+  ],
+  "physical_requests": 1,
+  "charged_tokens": 23054,
+  "recoveries": 0,
+  "cost": "unknown",
+  "stopped_reason": null,
+  "supervision_seconds": 153.729,
+  "runtime_cleanup_bytes": 1775235
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "request_id": "bp-work-2196d7cc7ec2473aca6b62c3:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "bd5fbc8e7134c97d6d31a64060357e4cd77398e8068f8396306d4a686ba94e80",
+    "response_hash": "409f8687fc63c968d57613e3a4d1d0046e89fb176585100d17954e92567360a7",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:F001\"],\"checks\":[{\"fact_id\":\"review-add:F001\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"该候选实质补入了F001所指source-0007的量化收入调整，主体、期间、栏目、单位和比较口径均与原文一致。原文在“驱动业务收入变化的因素分析”下载明：金枪鱼围网销售价上涨、销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。相邻实物销售分析亦载明金枪鱼捕捞88,561吨、增加755吨、增幅1%，销售67,096吨、减少7,814吨、减幅10%，销售收入79,698万元、减少2,947万元、减幅4%；深蓝轮加工磷虾粉9,041吨（捕捞磷虾70,092吨），捕捞量增幅97%，销售收入15,378万元、增幅14%；罐头、鱼柳、渔货贸易营业收入分别为81,635万元增23%、23,826万元减23%、31,867万元减9%。候选保留各项增减方向，未把捕捞业务收入减少额与金枪鱼销售收入减少额混同，也未将抵消项目轧差，故接受。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:F001"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:F001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "该候选实质补入了F001所指source-0007的量化收入调整，主体、期间、栏目、单位和比较口径均与原文一致。原文在“驱动业务收入变化的因素分析”下载明：金枪鱼围网销售价上涨、销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。相邻实物销售分析亦载明金枪鱼捕捞88,561吨、增加755吨、增幅1%，销售67,096吨、减少7,814吨、减幅10%，销售收入79,698万元、减少2,947万元、减幅4%；深蓝轮加工磷虾粉9,041吨（捕捞磷虾70,092吨），捕捞量增幅97%，销售收入15,378万元、增幅14%；罐头、鱼柳、渔货贸易营业收入分别为81,635万元增23%、23,826万元减23%、31,867万元减9%。候选保留各项增减方向，未把捕捞业务收入减少额与金枪鱼销售收入减少额混同，也未将抵消项目轧差，故接受。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12523,
+      "output_tokens": 313,
+      "total_tokens": 23054
+    }
+  }
+]

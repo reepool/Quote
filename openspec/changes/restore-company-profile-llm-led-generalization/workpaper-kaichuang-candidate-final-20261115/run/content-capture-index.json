@@ -1,0 +1,16 @@
+{
+  "representation": "model_content_not_HTTP_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "409f8687fc63c968d57613e3a4d1d0046e89fb176585100d17954e92567360a7",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 12523,
+        "completion_tokens": 313,
+        "total_tokens": 23054
+      },
+      "retained": false
+    }
+  ]
+}

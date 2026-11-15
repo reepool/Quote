@@ -1,0 +1,21 @@
+{
+  "scope": "new candidate and its 13 metrics; not a full 32-fact quality score",
+  "fact_id": "review-add:F001",
+  "evidence_id": "source-0007",
+  "physical_pages": [
+    11
+  ],
+  "section_path": [
+    "第三节 管理层讨论与分析",
+    "五、报告期内主要经营情况",
+    "(一) 主营业务分析"
+  ],
+  "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+  "all_13_raw_metric_spellings_present": true,
+  "directional_money_is_source_wording_with_null_value": true,
+  "independent_semantic_check": "四类收入变动与各自量价/业务栏对应；保捕捞-2805与金枪鱼销售-2947为不同披露，其他规模/变化同原段，不自行轧差或改口径。",
+  "old_31_objects_unchanged": true,
+  "all_retained_source_coordinates_equal": true,
+  "full_profile_accuracy": null,
+  "full_report_recall": null
+}

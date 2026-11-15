@@ -1,0 +1,129 @@
+"""Read-only result checks followed by retirement of exact owned 6.CM artifacts."""
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import sys
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE / 'workpaper-kaichuang-candidate-final-20261115'
+SOURCE = CHANGE / 'workpaper-four-concentrated-source-result-20261115/600097'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def facts(paper):
+    groups = [*paper['elements'].values(), *(paper.get('supply_chain') or {}).values()]
+    return {f['fact_id']: f for e in groups for f in e['facts']}
+
+
+from research.company_profile.workpaper import WorkpaperFact
+
+authorization = read(DEST / 'authorization.json')
+summary = read(DEST / 'run/summary.json')
+assert summary['exception'] is None and summary['three_reads_equal']
+assert summary['adopted_candidate_ids'] == ['review-add:F001']
+assert summary['physical_requests'] == 1 and summary['charged_tokens'] == 23054 and summary['recoveries'] == 0
+assert read(DEST / 'supervisor.json')['returncode'] == 0 and not (DEST / 'supervisor-stop.json').exists()
+assert not Path(read(DEST / 'runtime-location.json')['root']).exists()
+assert all(sha(ROOT / p) == value for p, value in authorization['code_sha256'].items())
+assert sha(ROOT / 'config/13_llm.json') == authorization['shared_config_sha256']
+assert all(sha(ROOT / p) == value for p, value in authorization['ready']['original_hashes'].items())
+old = read(SOURCE / 'query.json')['profiles'][0]['workpaper']
+current = read(DEST / 'run/query.json')['profiles'][0]['workpaper']
+before, after = facts(old), facts(current)
+assert len(before) == 31 and len(after) == 32
+assert all(after[key] == value for key, value in before.items())
+assert current['generation'] == old['generation'] and current['origin'] == 'llm_generated'
+old_receipts = {r['purpose']: r for r in read(SOURCE / 'model-receipts.json')}
+repair = old_receipts['repair_profile_workpaper']
+assert repair['contract_status'] == 'rejected' and repair['contract_error'] == 'schema_validation_error'
+candidate = WorkpaperFact.model_validate(repair['response_payload']['repaired_facts'][0]).model_dump(mode='json')
+assert after['review-add:F001'] == candidate
+review = current['quality_review']
+assert review['status'] == 'completed' and review['error'] is None
+assert review['locally_revalidated_request_ids'] == [repair['request_id']]
+assert review['calls'][1]['contract_status'] == 'rejected'
+source = next(e for e in current['evidence'] if e['evidence_id'] == 'source-0007')
+assert source['physical_pages'] == [11]
+compact = ''.join(''.join(s['quote'] for s in source['source_spans']).split())
+assert len(candidate['metrics']) == 13 and all(''.join(m['raw_value'].split()) in compact for m in candidate['metrics'])
+assert all(m['value'] is None for m in candidate['metrics'][:4])
+receipts = read(DEST / 'run/model-receipts.json')
+assert len(receipts) == 1 and receipts[0]['purpose'] == 'verify_profile_workpaper_repair'
+for receipt in receipts:
+    assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+    assert json.loads(receipt['raw_content']) == receipt['response_payload']
+    assert receipt['response_payload']['checks'][0]['accepted'] is True
+ledger = read(DEST / 'run/budget.json')
+assert ledger['physical_requests'] == len(ledger['attempts']) == 1
+assert ledger['charged_tokens'] == 23054 and ledger['charged_cost_cny'] == 'unknown'
+assert ledger['attempts'][0]['source_label'] == 'scorpio:grok-4.7'
+assert ledger['attempts'][0]['finish_reason'] == 'stop'
+operator = ROOT / 'data/QuoteBak/workpaper_cm_run.py'
+finalizer = Path(__file__).resolve()
+assert sha(operator) == authorization['operator_sha256']
+assert finalizer == ROOT / 'data/QuoteBak/workpaper_cm_finalize.py'
+shutil.copyfile(operator, DEST / 'operator-snapshot.txt')
+shutil.copyfile(finalizer, DEST / 'closeout-snapshot.txt')
+dump(DEST / 'source-check.json', {
+    'scope': 'new candidate and its 13 metrics; not a full 32-fact quality score',
+    'fact_id': candidate['fact_id'], 'evidence_id': source['evidence_id'], 'physical_pages': [11],
+    'section_path': source['section_path'], 'document_version': source['document_version'],
+    'all_13_raw_metric_spellings_present': True, 'directional_money_is_source_wording_with_null_value': True,
+    'independent_semantic_check': '四类收入变动与各自量价/业务栏对应；保捕捞-2805与金枪鱼销售-2947为不同披露，其他规模/变化同原段，不自行轧差或改口径。',
+    'old_31_objects_unchanged': True, 'all_retained_source_coordinates_equal': summary['source_coordinates_equal'],
+    'full_profile_accuracy': None, 'full_report_recall': None,
+})
+dump(DEST / 'validation.json', {
+    'task': '6.CM', 'original_code_configuration_and_source_hashes_unchanged': True,
+    'original_draft_hash_reconstructed': True, 'original_receipts_unchanged': True,
+    'new_actual_provider_receipts': 1, 'only_final_was_sent': True,
+    'actual_checked_candidate_ids': ['review-add:F001'], 'actual_accepted_candidate_ids': ['review-add:F001'],
+    'new_object_equals_sent_candidate': True, 'old_31_objects_and_generation_unchanged': True,
+    'three_reads_equal': True, 'all_source_coordinates_equal': True,
+    'query_sha256': sha(DEST / 'run/query.json'), 'operator_snapshot_sha256': sha(DEST / 'operator-snapshot.txt'),
+    'closeout_snapshot_sha256': sha(DEST / 'closeout-snapshot.txt'),
+    'tests_reused_not_rerun': ['6.CL: 108 passed/23.81 seconds', '6.CL: 6 passed/3.92 seconds', 'original TaskService proof'],
+    'business_code_changes': 0, 'openspec_strict': 'passed',
+    'review': {'new_blocking_findings': 0, 'nonblocking_deferred': ['fine_supply_chain', 'minor_detail_completeness'],
+               'unrelated_preexisting_changes': 'untouched_not_included'},
+    's1': '0/12', 'production': 'not_authorized', 'not_same_version_first_pass': True,
+})
+for path in DEST.rglob('*.json'):
+    read(path)
+log_dir = Path(read(DEST / 'supervisor.json')['log_directory']).resolve()
+assert log_dir.parent == ROOT / 'data/QuoteBak' and log_dir.name.startswith('workpaper-cm-supervisor-')
+assert {p.name for p in log_dir.iterdir()} == {'worker.log'} and not log_dir.is_symlink()
+log_bytes = sum(p.stat().st_size for p in log_dir.iterdir())
+script_bytes = operator.stat().st_size + finalizer.stat().st_size
+shutil.rmtree(log_dir)
+operator.unlink()
+finalizer.unlink()
+dump(DEST / 'cleanup.json', {
+    'worker_runtime_removed_bytes': summary['runtime_cleanup_bytes'], 'supervisor_log_removed_bytes': log_bytes,
+    'owned_scripts_removed_bytes': script_bytes,
+    'released_bytes_this_task': summary['runtime_cleanup_bytes'] + log_bytes + script_bytes,
+    'runtime_and_supervisor_roots_removed': True,
+    'preserved': ['official_PDF', 'useful_parse_cache', 'old_CK_and_CL_results', 'current_attempt_marker', 'preexisting_parallel_changes'],
+    'recovery': 'rebuild from preserved original sources/responses and operator snapshots',
+    'not_recounted': 'all CK/CL/earlier releases',
+})
+for name in ('profiles.md', 'result.md'):
+    path = DEST / name
+    for link in re.findall(r'\]\(([^)#]+)(?:#[^)]*)?\)', path.read_text()):
+        assert (path.parent / link).exists(), link
+print(json.dumps({'validation': 'passed', 'facts': 32, 'metrics': 54, 'cleanup': read(DEST / 'cleanup.json')}, ensure_ascii=False))

@@ -203,5 +203,16 @@
     "completed": true,
     "estimated_removed_file_bytes": 3730334,
     "retained_owned_task_temporary_items": []
+  },
+  "delivery": {
+    "implementation_commit": "480ff036",
+    "implementation_pushed": true,
+    "archive_path": "openspec/changes/archive/2026-11-15-fix-a-share-terminal-delisting-governance",
+    "tasks_complete": 35,
+    "main_specs_synced": {
+      "added_requirements": 12,
+      "modified_requirements": 8
+    },
+    "prior_official_source_change_archived": false
   }
 }

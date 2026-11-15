@@ -150,6 +150,8 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 `scripts/fix_delisted_status.py` 保留兼容路径及Step 3主板／科创板诊断；退市写入只转发 `DataManager.sync_instrument_master(audit_only=...)`，不再有独立ORM修复循环。删除该兼容入口须另行更新仍有效的规范合同。
 
+2026-11-15交付的来源、受控修复、回归及清理证据见[归档验收记录](../../openspec/changes/archive/2026-11-15-fix-a-share-terminal-delisting-governance/verification.json)。
+
 ## 交易规格字段：lot_size / tick_size
 
 `instruments` 表含可空字段 `lot_size`（每手股数 board lot）与 `tick_size`（最小价位），由主数据同步填充，供量化侧计算手数/最低佣金/整手约束：

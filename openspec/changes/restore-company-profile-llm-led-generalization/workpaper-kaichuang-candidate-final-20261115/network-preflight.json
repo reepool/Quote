@@ -1,0 +1,8 @@
+{
+  "host": "scorpio.reepool.com",
+  "dns_addresses": 1,
+  "tls": "TLSv1.3",
+  "seconds": 0.223,
+  "namespace": "net:[4026531840]",
+  "model_requests": 0
+}

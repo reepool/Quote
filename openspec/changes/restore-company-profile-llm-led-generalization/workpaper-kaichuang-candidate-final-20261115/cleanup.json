@@ -1,0 +1,16 @@
+{
+  "worker_runtime_removed_bytes": 1775235,
+  "supervisor_log_removed_bytes": 13926,
+  "owned_scripts_removed_bytes": 28878,
+  "released_bytes_this_task": 1818039,
+  "runtime_and_supervisor_roots_removed": true,
+  "preserved": [
+    "official_PDF",
+    "useful_parse_cache",
+    "old_CK_and_CL_results",
+    "current_attempt_marker",
+    "preexisting_parallel_changes"
+  ],
+  "recovery": "rebuild from preserved original sources/responses and operator snapshots",
+  "not_recounted": "all CK/CL/earlier releases"
+}

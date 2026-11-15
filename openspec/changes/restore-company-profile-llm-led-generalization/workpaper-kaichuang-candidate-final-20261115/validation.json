@@ -1,0 +1,39 @@
+{
+  "task": "6.CM",
+  "original_code_configuration_and_source_hashes_unchanged": true,
+  "original_draft_hash_reconstructed": true,
+  "original_receipts_unchanged": true,
+  "new_actual_provider_receipts": 1,
+  "only_final_was_sent": true,
+  "actual_checked_candidate_ids": [
+    "review-add:F001"
+  ],
+  "actual_accepted_candidate_ids": [
+    "review-add:F001"
+  ],
+  "new_object_equals_sent_candidate": true,
+  "old_31_objects_and_generation_unchanged": true,
+  "three_reads_equal": true,
+  "all_source_coordinates_equal": true,
+  "query_sha256": "763f133bb7eadd1aee8971fe348e2cbb85c68c935d349b0f4797aa27c8c5817a",
+  "operator_snapshot_sha256": "1b8f07c38576ed19f2d57359ea3edb084e6c255d29e1798b382b024dc02991ef",
+  "closeout_snapshot_sha256": "4880c778961dd06d220014b17bca9a36e674a6dcb0009cd81529ee2863b1dbd2",
+  "tests_reused_not_rerun": [
+    "6.CL: 108 passed/23.81 seconds",
+    "6.CL: 6 passed/3.92 seconds",
+    "original TaskService proof"
+  ],
+  "business_code_changes": 0,
+  "openspec_strict": "passed",
+  "review": {
+    "new_blocking_findings": 0,
+    "nonblocking_deferred": [
+      "fine_supply_chain",
+      "minor_detail_completeness"
+    ],
+    "unrelated_preexisting_changes": "untouched_not_included"
+  },
+  "s1": "0/12",
+  "production": "not_authorized",
+  "not_same_version_first_pass": true
+}
