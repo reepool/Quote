@@ -119,11 +119,11 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 `instrument_master_delisting.AShareDelistingReconciler` 只核对本地本任务A股身份；同公告B股／债券不导入也不连带停用。已审核code lineage用于区分前身与当前主体，历史同码终态不能覆盖现主体。空表、缺板块、缺页只使来源降级，不直接确认退市；独立有效终态正记录仍可用于其明确对象。
 
-终止名单未覆盖的已知候选才复用现有官方公告获取与附件读取：按市场关键词有界扫描，每关键词最多2页、每轮最多5个PDF、单PDF最多2MB及前10页。标题仅用于发现；正文必须明确股票身份及正式决定／已完成事实，实际摘牌日与公告日分开，无法可靠确认则待核。已有日期或主体冲突保留原状态并报告，不批量猜测修订。
+终止名单未覆盖的已知候选才复用现有官方公告获取与附件读取：按市场关键词有界扫描，沪深默认每关键词最多2页，BSE沿用下述既有页数配置；每轮最多5个PDF、单PDF最多2MB及前10页。标题仅用于发现；正文必须明确终止事件所属的股票类别及正式决定／已完成事实，共同代码栏不能把B股或债券事件传播到A股。实际摘牌日与公告日、收到决定日分开，无法可靠确认则待核。已有日期或主体冲突保留原状态并报告，不批量猜测修订。
 
-`delisting_reconciliation` 报告保留来源覆盖、确认／实际停用／日期补足／待核／未来生效／冲突／来源错误／写入失败及有限样例。样例截断不影响完整计数。股票与指数同时治理时，报告从stock child保留这组明细。
+`delisting_reconciliation` 报告保留来源覆盖、确认／实际停用／日期补足／待核／未来生效／冲突／来源错误／写入失败及有限样例。来源返回partial／failed、不完整或抛出异常时保留降级；其他已取得的可靠正证据仍可使用。current仍报active与有效终态相矛盾时，终态优先且报告冲突；日期／身份冲突则保持原生命周期。每个冲突在原差异表保存 `a_share_terminal_conflict`，包含既有生命周期、双方日期及来源URL／公告ID／hash等引用；报告仅保留最多20个 `conflict_samples`，不截断完整证据保存。股票与指数同时治理时，报告从stock child保留这组明细。
 
-未来计划唯一保存于现有差异表，reason为 `a_share_terminal_future_effective`；成功应用时同一生命周期事务写状态、受保护证据及 `a_share_terminal_future_applied`。按交易所的 `a_share_terminal_verification` 保存实际核验及失败／未决。fresh gate先读生产scope/mode的未闭合计划与最新核验，生效日优先于48小时fresh窗口；重启后仍能恢复，读取或JSON失败不能被当作空集合。audit记录不建立生产fresh基线，也不闭合生产计划。
+未来计划唯一保存于现有差异表，reason为 `a_share_terminal_future_effective`；成功应用时同一生命周期事务写状态、受保护证据及 `a_share_terminal_future_applied`。过期计划仍保留身份／日期冲突检查及原plan_key，但不能单独作为写入依据；新证据核验一致后，在该事务闭合对应旧计划。旧公告parser `official_stock_terminal_body.v1` 产生的计划同样需要重新核验，不能沿用已修正的日期／证券范围判断；结构化交易所名单不受这一版本限制。按交易所的 `a_share_terminal_verification` 保存实际核验及失败／未决。fresh gate先读生产scope/mode的未闭合计划与最新核验，生效日优先于48小时fresh窗口；重启后仍能恢复，读取或JSON失败不能被当作空集合。audit记录不建立生产fresh基线，也不闭合生产计划。
 
 `audit_only` 的只读约束贯穿policy、source factory名单缓存及metadata，不只是跳过最后的退市writer。普通fallback缓存同样不能凭BaoStock单独的outDate先写终态或将未知历史退市行伪造为active。
 
@@ -133,7 +133,7 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 `DataManager.sync_instrument_master()` 在 BSE 主数据刷新后会执行二次确认：
 
-- 保留 `bse_delisting_check_enabled` 开关和 `bse_delisting_scan_days` 窗口；扫描不超过既有页数上界及本轮2页安全上界。关闭时不扫描或写终态，并显式报告未核验。旧 `bse_delisting` 计数／样例字段继续提供，新明细位于 `delisting_reconciliation`。
+- 保留 `bse_delisting_check_enabled` 开关、`bse_delisting_scan_days` 窗口及 `bse_delisting_scan_max_pages` 页数上界（默认30页）；沪深补充扫描默认每个关键词2页。扫描触及上界或来源部分失败时显式报告覆盖不足，保留独立有效正证据。关闭时不扫描或写终态，并显式报告未核验。旧 `bse_delisting` 计数／样例字段继续提供，新明细位于 `delisting_reconciliation`。
 - 用本地刷新前 active BSE 股票集合减去本次 BSE 当前名单，得到候选。
 - 通过现有 CNInfo 公告扫描器按市场级入口扫描 `column=neeq, plate=bj`，不逐股抓取。
 - 标题匹配后必须读取有界正文，确认对应股票和实际摘牌日或明确已完成事实，再通过同一个reconciler及生命周期owner写终态；不得直接把 `published_at` 当作退市日。
@@ -150,7 +150,7 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 `scripts/fix_delisted_status.py` 保留兼容路径及Step 3主板／科创板诊断；退市写入只转发 `DataManager.sync_instrument_master(audit_only=...)`，不再有独立ORM修复循环。删除该兼容入口须另行更新仍有效的规范合同。
 
-2026-11-15交付的来源、受控修复、回归及清理证据见[归档验收记录](../../openspec/changes/archive/2026-11-15-fix-a-share-terminal-delisting-governance/verification.json)。
+2026-11-15交付的来源、受控修复、回归及清理证据见[归档验收记录](../../openspec/changes/archive/2026-11-15-fix-a-share-terminal-delisting-governance/verification.json)，归档后的7项缺陷复核和修复见[后续审核记录](../../openspec/changes/archive/2026-11-15-fix-a-share-terminal-delisting-governance/post-archive-review.md)。
 
 ## 交易规格字段：lot_size / tick_size
 

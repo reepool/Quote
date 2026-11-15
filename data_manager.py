@@ -16847,7 +16847,7 @@ class DataManager:
         if exchange == 'BSE':
             options = {
                 'scan_days': int(config.get('bse_delisting_scan_days', 730)),
-                'max_pages': max(1, min(2, int(config.get('bse_delisting_scan_max_pages', 30)))),
+                'max_pages': max(1, int(config.get('bse_delisting_scan_max_pages', 30))),
             }
         return await asyncio.to_thread(scan_terminal_announcements, service, exchange, targets, **options)
 

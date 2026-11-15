@@ -653,6 +653,36 @@ async def test_empty_current_target_skips_announcement_and_repair_providers(owne
             "证券代码：000017。深圳证券交易所决定股票终止上市，摘牌日期：2026年10月23日。",
             "unconfirmed",
         ),
+        (
+            "关于收到公司股票终止上市决定的公告",
+            "证券代码：000016。公司股票于2026年10月16日收到深圳证券交易所《关于股票终止上市的决定》，具体摘牌安排将另行公告。",
+            "unconfirmed",
+        ),
+        (
+            "关于收到公司股票终止上市决定的公告",
+            "证券代码：000016。公司股票于2026年10月16日收到深圳证券交易所《关于股票终止上市的决定》。股票将于2026年10月23日在深圳证券交易所终止上市。",
+            "2026-10-23",
+        ),
+        (
+            "关于公司B股股票终止上市暨摘牌的公告",
+            "证券代码：000016、200016。深圳证券交易所决定终止公司B股股票上市。B股摘牌日期：2026年10月23日；公司A股继续正常上市。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000016、200016。深圳证券交易所决定终止公司B股股票上市。B股股票已摘牌。公司A股继续正常上市。",
+            "unconfirmed",
+        ),
+        (
+            "关于公司债券终止上市暨摘牌的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司债券上市。摘牌日期：2026年10月23日。",
+            "unconfirmed",
+        ),
+        (
+            "关于公司A股股票终止上市暨摘牌的公告",
+            "证券代码：000016、200016。深圳证券交易所决定终止公司A股股票上市。A股摘牌日期：2026年10月23日。B股摘牌日期：2026年10月30日。",
+            "2026-10-23",
+        ),
     ],
 )
 def test_announcement_requires_stock_identity_and_actual_completion(
@@ -699,7 +729,13 @@ def test_bounded_bse_scan_reuses_existing_purpose_and_body_evidence():
     service = Mock()
     service.config.provider_configs = {}
     service.acquire.return_value = SimpleNamespace(
-        scan_result=SimpleNamespace(records=[record])
+        scan_result=SimpleNamespace(
+            records=[record],
+            status="success",
+            is_complete=True,
+            errors=(),
+            stop_reason="completed",
+        )
     )
     result = scan_terminal_announcements(service, "BSE", ["920680.BJ"])
     assert result["rows"][0]["delisted_date"] == "2026-01-05"
@@ -748,3 +784,318 @@ async def test_announcement_failure_preserves_state_and_is_visible(owner):
     assert result["status"] == "warning"
     assert result["source_error_count"] == 1 and result["unconfirmed_count"] == 1
     assert (await local_record(owner))["is_active"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "refresh,audit",
+    [
+        ("matching", False),
+        ("matching", True),
+        ("missing", False),
+        ("conflicting", False),
+    ],
+)
+async def test_expired_plan_requires_reverification_and_closes_with_fresh_proof(
+    owner,
+    monkeypatch,
+    refresh,
+    audit,
+):
+    now = get_shanghai_time()
+    assert await owner.save_instruments_batch([KONKA])
+    original = evidence(delisted_date=(now.date() + timedelta(days=1)).isoformat())
+    await reconcile(owner, [original])
+    initial = (await owner.load_a_share_delisting_state(["SZSE"]))["plans"][0]
+    later = now + timedelta(days=3)
+    monkeypatch.setattr("instrument_master_delisting.get_shanghai_time", lambda: later)
+    monkeypatch.setattr(
+        "database.instrument_lifecycle.get_shanghai_time", lambda: later
+    )
+    fresh = {
+        **original,
+        "raw_snapshot_hash": "fresh-official-proof",
+        "observed_at": later.isoformat(),
+    }
+    if refresh == "conflicting":
+        fresh["delisted_date"] = (now.date() + timedelta(days=2)).isoformat()
+    result = await reconcile(
+        owner, [] if refresh == "missing" else [fresh], audit=audit
+    )
+    applied = refresh == "matching" and not audit
+    assert result["deactivated_count"] == int(applied)
+    assert (await local_record(owner))["is_active"] is not applied
+    state = await owner.load_a_share_delisting_state(["SZSE"])
+    assert len(state["plans"]) == int(not applied)
+    if applied:
+        assert result["status"] == "success"
+        assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is not None
+        async with owner.get_async_session() as session:
+            payload = (
+                await session.execute(
+                    text(
+                        "SELECT payload_json FROM instrument_master_discrepancies WHERE reason=:reason"
+                    ),
+                    {"reason": APPLIED},
+                )
+            ).scalar_one()
+        import json
+
+        assert json.loads(payload)["plan_key"] == initial["plan_key"]
+    elif audit:
+        assert result["would_deactivate_count"] == 1
+    else:
+        assert result["status"] == "warning"
+        assert result["conflict_count"] == int(refresh == "conflicting")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("audit", [False, True])
+async def test_stale_current_row_conflict_is_visible_and_survives_reuse(owner, audit):
+    assert await owner.save_instruments_batch([KONKA])
+    result = await AShareDelistingReconciler(owner, None).reconcile(
+        "SZSE",
+        {"rows_by_id": {"000016.SZ": KONKA}},
+        [KONKA],
+        {"official_current_list_complete": True},
+        audit_only=audit,
+        snapshot={"rows": [evidence()], "complete": True, "errors": []},
+    )
+    assert result["status"] == "warning" and result["conflict_count"] == 1
+    assert result["deactivated_count"] == int(not audit)
+    assert (await local_record(owner))["is_active"] is audit
+    sample = result["conflict_samples"][0]
+    assert sample["current_evidence"]["is_active"] is True
+    assert sample["terminal_evidence"][0]["delisted_date"] == "2026-10-23"
+    assert sample["mode"] == ("audit_only" if audit else "production")
+    reused = await reusable_terminal_verifications(owner, ["SZSE"], 48)
+    if audit:
+        assert reused is None
+    else:
+        assert reused["SZSE"]["status"] == "warning"
+        assert reused["SZSE"]["summary"]["conflict_samples"] == [sample]
+
+
+@pytest.mark.asyncio
+async def test_conflicts_preserve_all_evidence_beyond_the_report_sample_limit(owner):
+    import json
+
+    rows = {}
+    observations = []
+    for number in range(100, 125):
+        symbol = f"000{number}"
+        iid = f"{symbol}.SZ"
+        rows[iid] = {**KONKA, "instrument_id": iid, "symbol": symbol}
+        for effective, announcement in (
+            ("2026-10-22", "left"),
+            ("2026-10-23", "right"),
+        ):
+            observations.append(
+                evidence(
+                    instrument_id=iid,
+                    symbol=symbol,
+                    delisted_date=effective,
+                    announcement_id=f"{iid}:{announcement}",
+                    raw_snapshot_hash=f"hash:{iid}:{announcement}",
+                )
+            )
+    assert await owner.save_instruments_batch(list(rows.values()))
+    result = await AShareDelistingReconciler(owner, None).reconcile(
+        "SZSE",
+        {"rows_by_id": rows},
+        [],
+        {"official_current_list_complete": True},
+        snapshot={"rows": observations, "complete": True, "errors": []},
+    )
+    assert result["conflict_count"] == 25
+    assert len(result["conflict_samples"]) == 20
+    async with owner.get_async_session() as session:
+        payloads = (
+            (
+                await session.execute(
+                    text(
+                        "SELECT payload_json FROM instrument_master_discrepancies "
+                        "WHERE reason='a_share_terminal_conflict'"
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert len(payloads) == 25
+    for payload in payloads:
+        conflict = json.loads(payload)
+        proof = conflict["terminal_evidence"]
+        assert {row["delisted_date"] for row in proof} == {"2026-10-22", "2026-10-23"}
+        assert {row["raw_snapshot_hash"] for row in proof} == {
+            f"hash:{conflict['instrument_id']}:left",
+            f"hash:{conflict['instrument_id']}:right",
+        }
+        assert conflict["existing_lifecycle"]["is_active"] is True
+    assert len(await owner.get_instruments_by_exchange("SZSE")) == 25
+
+
+@pytest.mark.asyncio
+async def test_conflict_persistence_failure_cannot_form_healthy_verification(
+    owner, monkeypatch
+):
+    assert await owner.save_instruments_batch([KONKA])
+    original = owner.save_instrument_master_discrepancies
+
+    async def save(rows, **kwargs):
+        if rows[0]["reason"] == "a_share_terminal_conflict":
+            return 0
+        return await original(rows, **kwargs)
+
+    monkeypatch.setattr(owner, "save_instrument_master_discrepancies", save)
+    result = await reconcile(owner, [evidence(), evidence(delisted_date="2026-10-22")])
+    assert result["status"] == "error" and result["write_failed_count"] == 1
+    assert await reusable_terminal_verifications(owner, ["SZSE"], 48) is None
+    assert (await local_record(owner))["is_active"]
+
+
+@pytest.mark.asyncio
+async def test_old_announcement_parser_plan_requires_fresh_reverification(
+    owner, monkeypatch
+):
+    now = get_shanghai_time()
+    assert await owner.save_instruments_batch([KONKA])
+    old = evidence(
+        delisted_date=(now.date() + timedelta(days=1)).isoformat(),
+        parser_version="official_stock_terminal_body.v1",
+        source="cninfo_szse_delisting",
+        announcement_id="legacy-plan",
+    )
+    await reconcile(owner, [old])
+    later = now + timedelta(days=1)
+    monkeypatch.setattr("instrument_master_delisting.get_shanghai_time", lambda: later)
+    monkeypatch.setattr(
+        "database.instrument_lifecycle.get_shanghai_time", lambda: later
+    )
+    result = await reconcile(owner, [])
+    assert result["status"] == "warning" and result["deactivated_count"] == 0
+    assert (await local_record(owner))["is_active"]
+    fresh = {
+        **old,
+        "parser_version": "official_stock_terminal_body.v2",
+        "observed_at": later.isoformat(),
+    }
+    result = await reconcile(owner, [fresh])
+    assert result["deactivated_count"] == 1
+    assert not (await owner.load_a_share_delisting_state(["SZSE"]))["plans"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("scan_status", ["partial", "failed", "exception"])
+async def test_announcement_partial_failure_retains_positive_evidence_and_degradation(
+    owner,
+    scan_status,
+):
+    from types import SimpleNamespace
+    from research.announcements import AnnouncementRecord, build_announcement_key
+    from instrument_master_delisting import scan_terminal_announcements
+
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="partial-final",
+        announcement_key=build_announcement_key("cninfo", "partial-final"),
+        published_at="2026-10-23T00:00:00+08:00",
+        title="关于股票终止上市暨摘牌的公告",
+        exchange="SZSE",
+        symbols=("000016",),
+        raw_payload={
+            "body_text": "证券代码：000016。深圳证券交易所决定终止公司股票上市。摘牌日期：2026年10月23日。"
+        },
+    )
+    service = Mock()
+    service.config.provider_configs = {}
+    successful = SimpleNamespace(
+        scan_result=SimpleNamespace(
+            records=[record],
+            status="success",
+            is_complete=True,
+            errors=(),
+            stop_reason="completed",
+        )
+    )
+    unsuccessful = SimpleNamespace(
+        scan_result=SimpleNamespace(
+            records=[record] if scan_status == "partial" else [],
+            status=scan_status,
+            is_complete=False,
+            errors=("page 2 timed out",),
+            stop_reason="page_limit",
+        )
+    )
+    service.acquire.side_effect = [
+        successful,
+        (
+            RuntimeError("page 2 timed out")
+            if scan_status == "exception"
+            else unsuccessful
+        ),
+    ]
+    snapshot = scan_terminal_announcements(service, "SZSE", ["000016.SZ"])
+    assert not snapshot["complete"] and len(snapshot["rows"]) == 1
+    assert any("timed out" in error for error in snapshot["errors"])
+    assert await owner.save_instruments_batch([KONKA])
+    result = await reconcile(
+        owner, snapshot["rows"], complete=False, errors=snapshot["errors"]
+    )
+    assert result["status"] == "warning" and result["source_error_count"] > 0
+    assert result["deactivated_count"] == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("max_pages", [1, 3, 30])
+async def test_bse_manager_honors_configured_scan_bound_and_can_reach_third_page(
+    max_pages,
+):
+    from types import SimpleNamespace
+    from data_manager import DataManager
+    from research.announcements import AnnouncementRecord, build_announcement_key
+
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="third-page-final",
+        announcement_key=build_announcement_key("cninfo", "third-page-final"),
+        published_at="2026-01-05T00:00:00+08:00",
+        title="关于股票终止上市暨摘牌的公告",
+        exchange="BSE",
+        symbols=("920680",),
+        raw_payload={
+            "body_text": "证券代码：920680。北京证券交易所决定终止公司股票上市。摘牌日期：2026年1月5日。"
+        },
+    )
+    service = Mock()
+    service.config.provider_configs = {}
+
+    def acquire(query):
+        reached = query.scope.max_pages >= 3
+        return SimpleNamespace(
+            scan_result=SimpleNamespace(
+                records=[record] if reached else [],
+                status="success" if reached else "partial",
+                is_complete=reached,
+                errors=(),
+                stop_reason="completed" if reached else "page_limit",
+            )
+        )
+
+    service.acquire.side_effect = acquire
+    manager = DataManager.__new__(DataManager)
+    manager._get_instrument_master_sync_config = lambda: {
+        "bse_delisting_scan_days": 90,
+        "bse_delisting_scan_max_pages": max_pages,
+    }
+    manager._build_official_announcement_acquisition_service = lambda **kwargs: service
+    snapshot = await manager._load_a_share_terminal_announcements("BSE", ["920680.BJ"])
+    assert {
+        call.args[0].scope.max_pages for call in service.acquire.call_args_list
+    } == {max_pages}
+    assert len(snapshot["rows"]) == int(max_pages >= 3)
+    assert snapshot["complete"] is (max_pages >= 3)
+    scope = service.acquire.call_args.args[0].scope
+    assert (
+        date.fromisoformat(scope.end_date) - date.fromisoformat(scope.start_date)
+    ).days == 90
