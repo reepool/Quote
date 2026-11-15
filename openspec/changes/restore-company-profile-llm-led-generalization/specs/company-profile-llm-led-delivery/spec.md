@@ -205,6 +205,18 @@ Each element MUST carry status, facts and limitations. Status MUST map explicitl
 
 Evidence MUST bind evidence_id, document version, section_path, physical pages and exact source spans or existing Evidence references, with printed-page labels when available. Table evidence MUST preserve its owning header, row/column, unit, period and necessary footnotes through linked source spans; it need not force all context into one giant quotation. No fact may rely on an unsupported citation or an invented section title. Readable output MUST be rendered from the same structured facts, with evidence and uncertainty retained, not authored as an unrelated second answer.
 
+#### Scenario: A model discovers distinctive information outside the baseline
+- **WHEN** the selected original sections contain company-specific information the model judges useful beyond the baseline eight elements
+- **THEN** the model MAY populate optional company_features using the existing element/fact/metric/evidence contract, without a fixed feature taxonomy, mandatory number of extras or a parallel writer
+- **AND** extraction, source binding, secondary review, bounded repair/recheck and JSON/readable export MUST preserve valid feature facts and their model attribution; novelty is not itself a rejection reason
+- **AND** a malformed or unsupported optional feature is withheld locally without losing valid baseline or other feature facts, absence of extras is not failure, and old workpapers without the extension remain readable with unchanged historical hash inputs
+- **AND** reviewers MAY suggest a genuinely informative source-backed feature through the existing bounded omission-repair path, but MUST NOT demand every possible enhancement or invent unsupported company traits
+
+#### Scenario: Useful local corrections do not imply perfectionism
+- **WHEN** a real defect affects core correctness or reusable reading capability
+- **THEN** a minimal local correction remains permitted; avoiding unbounded per-company rules does not ban all local fixes
+- **AND** source-backed uncertainty, small isolated defects and optional omissions MAY remain limited while independent content is delivered; known wrong facts are not silently published as reliable and formal thresholds or production authority do not change automatically
+
 #### Scenario: Core facts remain independent of optional detail
 - **WHEN** a new model reads a concentrated source packet to produce the shared eight-element workpaper
 - **THEN** it MUST express independently usable company revenue and main business assertions separately from optional growth comparisons, subsidiary detail or unresolved event timing, using the existing fact structure rather than a new schema

@@ -1,0 +1,256 @@
+{
+  "task": "6.CQ",
+  "kind": "controlled_reorganization_of_saved_real_facts",
+  "new_model_requests": 0,
+  "formal_quality_claim": false,
+  "examples": [
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "origin": "controlled_fixture",
+      "original_element": "operations_and_inputs",
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600104/query.json",
+      "original_query_sha256": "2e08932292ec37adfb35aba9f9314350fe00b550a29349334c0ec25f3e1b4aac",
+      "feature": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "oi-07",
+            "text": "安吉物流自营远洋滚装船已达21艘，报告期内有8艘滚装新船启航。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "安吉物流自营远洋滚装船数量",
+                "raw_value": "21",
+                "value": "21",
+                "unit": "艘",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "报告期内安吉物流滚装新船启航数量",
+                "raw_value": "8",
+                "value": "8",
+                "unit": "艘",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "已有真实模型内容的受控位置重排，非新发现或新增复核。"
+        ]
+      },
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            8
+          ],
+          "source_spans": [
+            {
+              "page": 8,
+              "start": 1330,
+              "end": 2968,
+              "quote": "一、报告期内公司从事的业务情况\n\n    2025  年，面对市场竞争内卷与技术变革加速的双重挑战，公司坚定不移深化改革，全力以赴\n开拓市场，全年实现整车销售                    450.7 万辆，同比增长           12.3%，市场占有率            13.1%，同比上升         0.3 个\n百分点。其中，自主品牌销量达到                      292.8 万辆，同比增长          21.6%，占公司整体销量的比重达到                      65%，\n同比提升约        5 个百分点；新能源车销售                  164.3 万辆，同比增长           33.1%，高于全国新能源车市场平\n均增速近      5 个百分点；出口及海外市场销售                      107.1 万辆，同比增长            3.1%，成为中国汽车品牌“出\n海”的中坚力量。\n     1. 加快自主品牌整车业务发展。一是深化自主乘用车业务一体化管理。以市场用户为导向，\n深入推进组织变革和流程优化，进一步打通产品定义、设计研发、市场营销等全链路，加快市场\n响应速度。二是实施商用车业务扁平化管理。撤销了商用车事业部，将职能整合并入上汽大通，\n压缩管理层级和决策链条，并聚焦轻型商用车核心产品，积极开拓新能源商用车和海外商用车市\n场。三是与华为合作推出“尚界”品牌。2                           月签署战略合作协议，9                月下旬投放首款产品尚界                 H5，\n并快速跻身国内           15-20 万元级市场主流产品阵营。\n    2. 聚焦经营提质推进瘦身健体。一是加快“调产能”。上汽大众、上汽通用优化基地布局，\n释放出的产能用于生产“尚界”等自主品牌产品，着力提高产能利用率，降低运营成本。二是加\n力“减亏损”。通过分析研判、分类施策并采取果断措施，持续缩减亏损企业数量。三是加速“去\n风险”。上汽大通累计退出近百家直营店，不断优化网络渠道提升效率；上汽红岩司法重整方案\n获法院批准，并已启动实施。\n     3. 巩固提升产业链综合优势。一是整合智电零部件业务资源，加快推进全固态电池、一体化\n智能底盘等技术的产业化落地。二是拓展海外物流，安吉物流自营远洋滚装船已达                                                      21 艘，不断加\n快提升全链国际物流能力。三是建设智慧出行，“无驾驶人”Robotaxi                                          启动专线商业化运营。四\n是深化产融结合，围绕主业搭建起产投联动平台，并通过推进司库建设、设立自保公司，增强产\n业链风险防范能力，进一步延链、补链、强链。\n     4. 深化干部人事制度改革。一是深入推进“能上能下”，在企业层面，大力实施管理岗位竞\n聘；在总部层面，对业绩考核不达标的中层干部实施变岗变薪。二是加快年轻干部选拔任用，新\n提任的中层干部中，年轻干部比例显著提升。三是优化考核激励，对                                              7 家重点整车企业实施季度\n考核，对      MG4   等项目团队实施项目奖励，并首批授予                           13 名技术领军人才“上汽首席专家”“上\n汽特级专家”称号，激励干部员工挑战更高目标、创造更大价值。\n\n报告期内公司新增重要非主营业务的说明\n                                                 8 /205"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            9
+          ],
+          "source_spans": [
+            {
+              "page": 9,
+              "start": 681,
+              "end": 2526,
+              "quote": "三、经营情况讨论与分析\n    报告期内，公司扎实推进全面深化改革各项工作，聚焦整车业务，优化业务结构，抢抓结构\n性市场机会，推动自主品牌率先发展及合资业务焕新转型；推进核心技术攻关，做优产业生态，\n夯实国际经营，提升发展能级；强化零部件、移动出行和服务、金融等业务协同，稳定产品附加\n值，助力公司整体转型。全年公司实现合并营业总收入                           6562.4亿元，同比增长        4.6%，归属于上\n市公司股东的净利润          101.1亿元，同比增长        506.5%，归属于上市公司股东的扣除非经常性损益的\n净利润   74.2 亿元，同比增长        237.2%，经营筑底企稳基本实现、回升提速态势渐显。\n    1．抢抓机遇奋进新赛道。自主品牌集中推出了全新                      MG4、荣威M7、尚界        H5、智己全新     LS6/LS9、\n五菱缤果    S、大通大拿等新能源产品，持续放大“以旧换新”政策效应，全年公司自主品牌新能\n源车销量增速近        50%。上汽大众、上汽通用强化与自主品牌的资源协同，利用本土研发力量，分\n别推出   AUDI  E5、别克至境       L7等中高端智电新品，加快焕新转型步伐。\n    2. 合力拓展海外新市场。面对国际贸易壁垒升级等不利因素，公司通过推出多款                                     HEV 混动车\n型，MG  品牌在欧洲市场销量超过             30 万辆，成为欧洲最畅销的中国品牌，并在澳新、中东、拉美、\n东南亚等地区的        18个国家乘用车市场排名跻身当地前十；上汽通用五菱深化“印马泰”一体化战\n略，印尼基地新能源汽车产销占比提升至                    80%；智己    IM5 和 IM6 相继登陆泰国、英国、澳大利亚\n等市场；上汽商用车的轻客和皮卡产品在欧洲、澳洲、拉美三大市场也实现快速增长。同时，公\n司通过在海外设立代工厂、CKD             等方式，积极推进本地化生产。\n    3. 培育壮大新质生产力。“恒星”超级增程、“灵蜥”底盘                           2.0 等新技术实现量产装车，技\n术水平达到行业领先。公司积极参与上海“高级别自动驾驶引领区”建设，获颁上海市新一批智\n能网联汽车示范运营牌照，成为行业唯一获得乘用车和商用车领域“双牌照”企业；Robotaxi                                        3.0\n已正式进入商业化运营新阶段，全程可实现“零接管”。推进固态电池与汽车芯片研发应用，在\n国内率先实现第二代半固态电池技术在全新                     MG4 上搭载并批量交付，全固态电池“中试线”正式\n贯通，低温续航、电池安全等核心技术指标行业领先；同时，上汽国产芯片应用率已超过                                           30%，\n正加快推进全国产芯片车型的开发和验证工作。\n    4. 不断深化新营销变革。结合全新                MG4 上市，在     86城布局    120 家快闪店，通过“轻量化引\n流”促进    4S店高效率转化。搭建运营管理看板与新车流量追踪体系，实现流量到销量的闭环管理，\n并依托   AI 工具提升订单转化。联动抖音、小红书等平台，实现内容深度共创，各品牌的线上互动\n量和触达率显著提升。\n    5. 构建板块联动新优势。零部件、金融、移动出行和服务板块协同联动，持续为整车业务提\n供有力支撑。零部件板块完善智能电动化核心技术布局，整合优势资源，加快推进固态电池、智\n能底盘等技术的产业化落地。金融板块加强汽车金融服务的精细化发展，积极支持尚界等新业务，\n并加快拓展海外金融服务。移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有                                           8 艘滚\n装新船启航，进一步提升至南美、欧洲等航线的运能。\n\n\n\n\n                                         9 /205"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ],
+      "original_extraction_model": "deepseek-flash",
+      "all_fact_objects_unchanged": true,
+      "business_and_revenue_baseline_unchanged": true,
+      "old_review_not_inherited": true
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "origin": "controlled_fixture",
+      "original_element": "products_services",
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600100/query.json",
+      "original_query_sha256": "4f815ea3322fbc8c0d829b138d7028a6e39610239a17e2ee821d50887f5fb3e7",
+      "feature": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "review-add:F003",
+            "text": "数智产业知识服务领域依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务；核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等。来源未单列统计截止日。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "CNKI平台服务机构数",
+                "raw_value": "3.5万家",
+                "value": null,
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "来源表述为“全球3.5万家机构”，未单列统计截止日，未拆分精确家数。"
+              },
+              {
+                "name": "CNKI平台服务个人用户数",
+                "raw_value": "1.5亿",
+                "value": null,
+                "unit": "人",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "来源表述为“1.5亿个人用户”，未单列统计截止日，未拆分精确人数。"
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "已有真实模型内容的受控位置重排，非新发现或新增复核。"
+        ]
+      },
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 93,
+              "end": 1281,
+              "quote": "一、报告期内公司从事的业务情况\n\n\n    公司传承清华基因、融入中核血脉，积极服务国家战略，巩固科技创新底蕴特色\n基础，健全现代化产业体系。结合“十五五”规划谋划，明确“数智技术与核技术创\n新融合的高科技企业”定位，聚焦公共安全、数智产业、智慧能源等产业领域，具体\n业务情况如下：\n\n    公共安全产业：公司依托在安检安保领域的领先市场地位及核心技术能力，不断\n拓展业务领域，延伸产业链条，培育战略新兴产业，形成了面向公共安全领域的产业\n布局。在公共安全产业，公司定位为“全球安检行业的领导者，成为安全领域新技术、\n新产品的引领者”，深耕民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、\n大型活动赛事等领域，以保护国境安全和人民生命财产安全为使命，提供基于辐射成\n像技术的智能检查系统、解决方案及全生命周期运维服务。依托雄厚的技术实力与全\n球化的服务能力，公司产品已获得全球客户的广泛认可，连续                             9 年全球稳居      EWC（爆\n炸物、武器和违禁品）市场份额第三的地位，其中，大型货物车辆检查系统全球市场\n份额连续    14 年（为    OMDIA 截止至    2024年的数据，2025       年数据尚未发布。）排名第\n一。与此同时，公司持续深化“AI+核技术”融合创新，加速向无损检测、矿石分选、\n工业自动化、核安保等新兴领域拓展，为公共安全业务打开更广阔的增长空间。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n     公司公共安全解决方案护航重大活动                  公司智慧解决方案助力广州、西安机场智能化升级\n\n\n    数智产业：公司依托在高质量可信数据资源、人工智能、政企市场方面的优势地\n位及核心技术，全面整合内部资源，打造统一的数智产业平台。在数智产业，公司定\n位为“数据要素与人工智能双轮驱动的世界一流数智科技平台”，以“数据要素、人\n工智能”两轮驱动，聚焦“知识服务”和“数智转型服务”两大主营业务方向。在知\n识服务领域，公司依托           CNKI 平台，为全球       3.5万家机构及      1.5 亿个人用户提供学术\n资源检索、知识管理及智能问答等服务。核心产品包括                         CNKI 系列数据库、CNKI       AI 工\n具及知网    AI+图书平台等。盈利模式以机构订阅为主，辅以个人按需付费等。在数智\n转型服务领域，公司以自研华知大模型为技术底座，面向政务、企业等行业提供智能\n化解决方案。核心产品包括定制化的行业数智化解决方案、数字化转型方案与系统等。\n盈利模式涵盖技术授权、软件设计与开发等。\n\n                                     12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ],
+      "original_extraction_model": "deepseek-flash",
+      "all_fact_objects_unchanged": true,
+      "business_and_revenue_baseline_unchanged": true,
+      "old_review_not_inherited": true
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "origin": "controlled_fixture",
+      "original_element": "operating_drivers",
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600097/query.json",
+      "original_query_sha256": "e63f69a5e7f7f56bd20f49b8df6caac4506ac82799dad831e0c99962091d1ef2",
+      "feature": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "OD-02",
+            "text": "ALBO公司围绕品牌升级与产品创新，优化金枪鱼、沙丁鱼等核心产品结构，积极拓展欧洲及海外市场，加强与美国市场合作；沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一，黄鳍金枪鱼品类罐头品牌市占率提升并稳定在第二位，国际市场销售额增幅126%，其中北美市场成为最大增长点。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "ALBO国际市场销售额增幅",
+                "raw_value": "126",
+                "value": "126",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "已有真实模型内容的受控位置重排，非新发现或新增复核。"
+        ]
+      },
+      "evidence": [
+        {
+          "evidence_id": "source-0005",
+          "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            9
+          ],
+          "source_spans": [
+            {
+              "page": 9,
+              "start": 330,
+              "end": 1168,
+              "quote": "三、经营情况讨论与分析\n    2025年，金枪鱼围网船队作为公司捕捞业务的核心力量，11                        艘船舶投入生产，实现满负荷运\n营，船队全员凝心聚力，优化作业流程，强化技术应用，全力弥补各类不利因素带来的影响，力\n求稳定捕捞产量与经营效益。“深蓝轮”精准把控磷虾中心渔场，优化捕捞作业流程，发挥传统\n拖网的优势，超额完成年度目标任务，并创下该项目捕捞量的新纪录。\n    ALBO公司围绕品牌升级与产品创新持续发力，优化金枪鱼、沙丁鱼等核心产品结构，强化品\n质管控和可持续渔业标准，提升生产效率与供应链稳定性。同时积极拓展欧洲及海外市场，加强\n与美国市场合作，进一步巩固百年海产品罐头品牌的国际影响力和市场竞争力。沙丁鱼、鱿鱼等\n罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市\n场销售额增幅      126%，其中北美市场成为最大增长点。环太公司在关税战带来的外部冲击下，市场\n环境持续波动，产品销售受到一定影响，公司通过持续提升加工能力，实现平稳运营。\n    贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑。\n加拿大   FCS 公司优化供应链管理，积极拓展采购销售渠道，推进多品类拓展，部分核心产品规模\n有所增长；Estelas     贸易公司依托母公司海产品资源优势，继续发挥欧洲贸易平台桥头堡作用，\n持续推进金枪鱼等水产品的国际贸易业务，强化与舟山环太食品等生产企业及终端市场的协同合\n作。公司不断优化供应链管理，拓展北非及亚洲市场渠道，推动金枪鱼、鲭鱼等原料产品的跨境\n流通，实现贸易规模和市场覆盖的稳步增长。\n    康隆公司聚焦远洋渔业配套服务，全力保障渔获运输、后勤保障等核心需求，通过强化运营\n合作、优化舱位运用等措施，加强各板块业务联动性，但仍面临船舶效率偏低、燃油成本上升等\n多重不利因素影响，整体经营业绩出现下滑，经营压力持续凸显。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ],
+      "original_extraction_model": "deepseek-flash",
+      "all_fact_objects_unchanged": true,
+      "business_and_revenue_baseline_unchanged": true,
+      "old_review_not_inherited": true
+    }
+  ]
+}

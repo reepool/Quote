@@ -1,0 +1,78 @@
+"""Local extension examples from saved real facts, never new model results."""
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+SAVED = CHANGE/'workpaper-twelve-current-version-result-20261115'
+DEST = CHANGE/'workpaper-company-features-result'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main():
+    from research.company_profile.workpaper import (
+        CompanyProfileWorkpaper, WorkpaperDraftResponse, bind_workpaper_draft, workpaper_elements,
+    )
+    from research.company_profile.workpaper_review import workpaper_hash
+    legacy=[]
+    for path in sorted(SAVED.glob('*/query.json')):
+        query=json.loads(path.read_text())
+        if not query['profiles'] or not query['profiles'][0].get('workpaper'):
+            continue
+        raw=query['profiles'][0]['workpaper']; paper=CompanyProfileWorkpaper.model_validate(raw)
+        expected=hashlib.sha256(json.dumps(raw,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+        assert paper.model_dump(mode='json')==raw and workpaper_hash(paper)==expected
+        legacy.append({'query':str(path.relative_to(ROOT)),'query_sha256':sha(path),'workpaper_hash':expected})
+    selections=[('600104','上汽集团','operations_and_inputs','oi-07'),
+                ('600100','同方股份','products_services','review-add:F003'),
+                ('600097','开创国际','operating_drivers','OD-02')]
+    examples=[]
+    markdown=['# 公司特色区能承载什么','',
+              '以下三条来自以前真实LLM稿，本轮仅受控重排到新特色容器，不是本轮自主发现、新模型调用或新的审核通过。文字、数字、主体、期间和引文都不改；原文件不覆盖。','']
+    for symbol,name,element_name,fact_id in selections:
+        path=SAVED/symbol/'query.json'; before=sha(path)
+        old=CompanyProfileWorkpaper.model_validate(json.loads(path.read_text())['profiles'][0]['workpaper'])
+        raw={'elements':old.elements.model_dump(mode='json'),'limitations':list(old.limitations),
+             'supply_chain':old.supply_chain.model_dump(mode='json') if old.supply_chain else None}
+        element=raw['elements'][element_name]
+        fact=next(f for f in element['facts']if f['fact_id']==fact_id)
+        element['facts']=[f for f in element['facts']if f['fact_id']!=fact_id]
+        assert element['facts']  # This optional example does not empty its baseline category.
+        raw['company_features']={'status':'observed','facts':[fact],
+            'limitations':['已有真实模型内容的受控位置重排，非新发现或新增复核。']}
+        new=bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw),report=old.report,
+            reading_scope=old.reading_scope,evidence=old.evidence,origin='controlled_fixture',generation=old.generation)
+        original={f.fact_id:f for e in workpaper_elements(old).values()for f in e.facts}
+        rebound={f.fact_id:f for e in workpaper_elements(new).values()for f in e.facts}
+        assert rebound==original
+        assert new.elements.business_structure==old.elements.business_structure
+        assert new.elements.revenue_model==old.elements.revenue_model
+        assert new.quality_review is None and sha(path)==before
+        source=[e.model_dump(mode='json')for e in old.evidence if e.evidence_id in fact['evidence_ids']]
+        examples.append({'instrument_id':old.report.instrument_id,'name':name,'origin':new.origin,
+            'original_element':element_name,'original_query':str(path.relative_to(ROOT)),
+            'original_query_sha256':before,'feature':new.company_features.model_dump(mode='json'),
+            'evidence':source,'original_extraction_model':old.generation.extraction.model if old.generation else None,
+            'all_fact_objects_unchanged':True,'business_and_revenue_baseline_unchanged':True,
+            'old_review_not_inherited':True})
+        markdown.extend([f'## {name}（{old.report.instrument_id}）','',fact['text'],''])
+        for ev in source:
+            markdown.append('来源：'+'/'.join(ev['section_path'])+'，物理页'+','.join(map(str,ev['physical_pages']))+'。')
+        markdown.extend(['',f'原文出处及原模型记录：[旧查询](../workpaper-twelve-current-version-result-20261115/{symbol}/query.json)。',''])
+    DEST.mkdir(parents=True,exist_ok=True)
+    (DEST/'examples.json').write_text(json.dumps({'task':'6.CQ','kind':'controlled_reorganization_of_saved_real_facts',
+        'new_model_requests':0,'formal_quality_claim':False,'examples':examples},ensure_ascii=False,indent=2)+'\n')
+    (DEST/'examples.md').write_text('\n'.join(markdown).rstrip()+'\n')
+    (DEST/'legacy-compatibility.json').write_text(json.dumps({'task':'6.CQ','checked_old_workpapers':len(legacy),
+        'all_shapes_and_canonical_hash_inputs_unchanged':True,'records':legacy},ensure_ascii=False,indent=2)+'\n')
+    print('Three controlled feature examples and eleven unchanged legacy hash inputs verified.')
+
+
+if __name__=='__main__':
+    main()

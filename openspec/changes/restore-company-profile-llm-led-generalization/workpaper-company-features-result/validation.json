@@ -1,0 +1,16 @@
+{
+  "task": "6.CQ",
+  "targeted_tests": {"passed": 181, "deselected": 3, "seconds": 45.84, "reason_for_exclusions": "unchanged long TaskService entry tests; fresh five-stage gateway/runtime/writer/read/export path directly covered"},
+  "feature_tests": "optional typing/source/identity isolation, baseline floor, secondary review and final acceptance, reviewer-added feature, fresh gateway five-stage writer/three reads and CSV",
+  "real_gateway_transport_only_replaced": true,
+  "three_reads_equal": true,
+  "legacy_workpapers_checked": 11,
+  "legacy_shapes_and_hash_inputs_unchanged": true,
+  "controlled_examples": 3,
+  "examples_all_fact_objects_unchanged": true,
+  "old_review_not_inherited_for_examples": true,
+  "new_real_model_requests": 0,
+  "sendable_bindings": 0,
+  "formal_quality_not_evaluated": true,
+  "production_authorization": "not_authorized"
+}

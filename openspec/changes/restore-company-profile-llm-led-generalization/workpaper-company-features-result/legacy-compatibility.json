@@ -1,0 +1,62 @@
+{
+  "task": "6.CQ",
+  "checked_old_workpapers": 11,
+  "all_shapes_and_canonical_hash_inputs_unchanged": true,
+  "records": [
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600000/query.json",
+      "query_sha256": "d18e0ecf5c45af7bb64f6f8d74c39bb6b65fb191fd32eaf55146680b683ee3c5",
+      "workpaper_hash": "a084641616f7697f71f3ed34f03d279cdac48a29d0921e418c23a683f3921baa"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600054/query.json",
+      "query_sha256": "7d66c49b3b3c26941115f30ef628103e55ef6918196565523c858a2fde2c8566",
+      "workpaper_hash": "18037779b10cb47ce35d3f4e95e96c2ede969e727b28fdc4c72e9a046ac35e39"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600088/query.json",
+      "query_sha256": "f6a597d464ef3cf0162d9a23f79603ee15452b3f7d4748b84540bd0d0777353c",
+      "workpaper_hash": "f05a61f50fa7a933fd9f1f659ad25b7e31c78e3ccf19223a3997f283648203c7"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600094/query.json",
+      "query_sha256": "c6e71b35a7333f1dfa12f2003f55b6c43e8d4d44b346217083b5dafc9efe5eb8",
+      "workpaper_hash": "149a67903ea4403685eea4a5a2a4c6053418a1c7e36f239f822924027dd268ea"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600097/query.json",
+      "query_sha256": "e63f69a5e7f7f56bd20f49b8df6caac4506ac82799dad831e0c99962091d1ef2",
+      "workpaper_hash": "9ac5d94ba404d50e13c75e7e197996695d97e50c02c8e6d9bafd894f7d44b1a6"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600098/query.json",
+      "query_sha256": "b48daa0085cb789afea934caeba29823ccd454751f914b367190b88878d0fc6a",
+      "workpaper_hash": "9b57ee1a4a3ba1da16a9c944f2d1121e3018e6e619d392f7e4281d0c83e336e3"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600099/query.json",
+      "query_sha256": "730147224a1c830072fa837872049265a52f3c272f5b1e3fa94f3db845039495",
+      "workpaper_hash": "df9bc0e681dabf7836f99e47a75b10e1600286f360ce5a59d5162cc14d4138e5"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600100/query.json",
+      "query_sha256": "4f815ea3322fbc8c0d829b138d7028a6e39610239a17e2ee821d50887f5fb3e7",
+      "workpaper_hash": "1f8dcb495310ffa8f66d58555808b799ca737941ac133293798a1123684675e0"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600103/query.json",
+      "query_sha256": "39a9322291dd3fb624d0798e02ff99e1ca44ba6f4e8008e707fd7652f64d4624",
+      "workpaper_hash": "9dee67fc1b6a25aefaeca9701c17d56168426b06425d1e977c6ce28b3fcdfedf"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600104/query.json",
+      "query_sha256": "2e08932292ec37adfb35aba9f9314350fe00b550a29349334c0ec25f3e1b4aac",
+      "workpaper_hash": "1b527320dec54fe9f4c9feda5fe9bce37abbd6df0a8da35429d94f1ffb14765c"
+    },
+    {
+      "query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600107/query.json",
+      "query_sha256": "91eb4638068486ea2f0a7168c92d2ba02756bd0e2129c924d5b3c58c0cc81faf",
+      "workpaper_hash": "d6370ee19f2ebdc00590007667e99159d047b28a5ba4bc645107897460346efa"
+    }
+  ]
+}

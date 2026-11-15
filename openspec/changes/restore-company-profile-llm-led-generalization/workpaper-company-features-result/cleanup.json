@@ -1,0 +1,11 @@
+{
+  "task": "6.CQ",
+  "pre_development_freed_bytes": 0,
+  "freed_bytes": 5167,
+  "removed": ["data/QuoteBak/workpaper-cq-examples.py"],
+  "recoverable_from": "operator-snapshot.txt",
+  "test_roots": "removed by TemporaryDirectory even on failed assertions",
+  "no_pdf_full_parse_or_business_database_copy_created": true,
+  "preserved": ["formal source PDFs", "valid shared cache", "original CO queries/model receipts and attempt markers", "unrelated pre-existing and parallel artifacts"],
+  "old_cleanup_bytes_not_recounted": true
+}

@@ -531,8 +531,9 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert "Keep company revenue" in instructions
         assert "No revenue/cost/expense is also a definite zero-like assertion" in instructions
         identity = workpaper_processing_identity(real=False)
-        assert identity["prompt_version"].endswith("independent-core-facts.v16")
-        assert identity["section_guide_version"].endswith("operating-summary.v3")
+        assert identity["prompt_version"].endswith("company-features.v17")
+        assert identity["section_guide_version"].endswith("company-features.v4")
+        assert "optional ROOT company_features" in instructions
         assert identity["workpaper_max_output_tokens"] == 12000
         assert identity["source_binding_policy"] == "company_workpaper_source_literals.financial-absence.v4"
         assert identity["preprocessing_version"].endswith("v4.labelled-numeric-row")

@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+当前6.CQ已交[基础＋特色同链工程](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-company-features-result/result.md)和[三条有源旧内容示意](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-company-features-result/examples.md)。框架保证下限，不锁死模型表达；company_features可自主选择、同链复核、局部容错，不设清单/数量强制，不另建平台。181直接/原owner三读与11旧hash兼容通过，零新模型，尚未证明真实特色效果。下一6.CR拟四类已有报告各一次同版新入口，合并有界授权后直接整卡观察基础/特色/复核和资源，不逐字段补卡；确认前0绑定/探针/模型，不复活旧窗口或启生产。每轮先清后做、必要一套后清本人脚本/库，源/缓存/回执/尝试及既有并行保护。
+
 2026-11-15当前6.CP已完成[通用主干与章节供源工程改进](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-generic-core-result-20261115/result.md)：现有八要素按主干/优先/重要/可选取舍，不新增字段平台或公司分支。12保存选章+正式PDF校准全部形成源包，364独立对象保持；新版提示真实效果未测，非新增公司或S1。当前不再追加单公司纠错/数字规则，下一只围绕通用主干真实内容整体观察，新调用另冻有界授权，不复活CO窗口。原writer/配置/生产边界不变，每轮先核清本人垃圾，必要证据一套后清脚本/库，既有及并行不纳。
 
 2026-11-15当前6.CO已按新整组批准完成12个同版全新入口，交[十一份新画像/海泰失败与整体结论](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/result.md)。不再只是跨版本旧稿：真实初核/修订/再核有42项纠正或补充获接受；9稿仍有开放意见，2稿模型问题处置完成，非全稿准确或生产许可。美尔雅sm-02独立禁用，原件不改；133核心内容对照及正式质量/常规资源分别报告。当前卡外呼已结束，不追加十二家重抽或单家补句。下一主线是一个零新模型的合并共性修正：章节边界导致无稿、正确核心因复合事实连带丢失、空栏被肯定化；复用本组真实响应及直接验证，不为可选供应链/同比/子公司尾项建规则平台。修正后整体裁定正式验收范围，新的真实调用另需明确限定授权。每轮先清本人无依赖垃圾，必要一套后收尾本人运行库/副本/日志/operator，旧源/有效缓存/结果/尝试及既有并行保护，S1/生产不改。

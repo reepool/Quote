@@ -11,7 +11,7 @@ from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_serializer, model_validator
 
 from .models import Evidence, ReportIdentity, TextAnchor
 
@@ -31,6 +31,7 @@ SUPPLY_CHAIN_LABELS = {
     "upstream_inputs": "上游原材料与资源",
     "downstream_customers": "下游用途与客户领域",
 }
+FEATURE_ELEMENT = "company_features"
 Subject = Literal[
     "consolidated_group", "issuer", "named_subsidiary", "business_segment", "unclear"
 ]
@@ -239,6 +240,25 @@ class WorkpaperSupplyChain(_Model):
     position: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
     upstream_inputs: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
     downstream_customers: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
+
+
+def workpaper_elements(paper) -> dict[str, WorkpaperElement]:
+    """All supplied fact groups, without making optional enrichment mandatory."""
+    elements = {name: getattr(paper.elements, name) for name in ELEMENT_LABELS}
+    if paper.supply_chain is not None:
+        elements.update({name: getattr(paper.supply_chain, name) for name in SUPPLY_CHAIN_LABELS})
+    if paper.company_features is not None:
+        elements[FEATURE_ELEMENT] = paper.company_features
+    return elements
+
+
+def workpaper_element_payloads(payload: Mapping) -> dict[str, dict]:
+    """Mutable views into a serialized workpaper for existing local projections."""
+    elements = dict(payload.get("elements") or {})
+    elements.update(payload.get("supply_chain") or {})
+    if payload.get(FEATURE_ELEMENT) is not None:
+        elements[FEATURE_ELEMENT] = payload[FEATURE_ELEMENT]
+    return elements
 
 
 def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
@@ -582,6 +602,14 @@ class CompanyProfileWorkpaper(_Model):
     generation: WorkpaperGenerationMetadata | None = None
     quality_review: WorkpaperQualityReview | None = None
     standardization_notes: tuple[str, ...] = ()
+    company_features: WorkpaperElement | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        if self.company_features is None:
+            payload.pop(FEATURE_ELEMENT, None)
+        return payload
 
     @model_validator(mode="after")
     def source_integrity(self):
@@ -603,10 +631,7 @@ class CompanyProfileWorkpaper(_Model):
                 if set(finding.evidence_ids) - sources_set:
                     raise ValueError("review finding cites unknown source evidence")
         ids: set[str] = set()
-        sections = [getattr(self.elements, name) for name in ELEMENT_LABELS]
-        if self.supply_chain is not None:
-            sections.extend(getattr(self.supply_chain, name) for name in SUPPLY_CHAIN_LABELS)
-        for section in sections:
+        for section in workpaper_elements(self).values():
             for fact in section.facts:
                 if fact.fact_id in ids:
                     raise ValueError("duplicate fact identity")
@@ -635,6 +660,7 @@ class WorkpaperDraftResponse(_Model):
     elements: WorkpaperElements
     limitations: tuple[str, ...] = ()
     supply_chain: WorkpaperSupplyChain | None = None
+    company_features: WorkpaperElement | None = None
 
 
 def workpaper_draft_wire_schema() -> dict:
@@ -644,6 +670,7 @@ def workpaper_draft_wire_schema() -> dict:
     # Preserve the intended shape as a model hint; malformed optional content
     # must reach the adapter receipt before it is locally withheld.
     schema["properties"]["supply_chain"]["anyOf"].append({})
+    schema["properties"][FEATURE_ELEMENT]["anyOf"].append({})
     return schema
 
 
@@ -687,6 +714,35 @@ def normalize_workpaper_draft(data):
         except (ValidationError, ValueError, TypeError):
             payload["supply_chain"] = None
             limitations.append("可选供应链结构无法解析，未作为结论采用；原内容保留在模型回执。")
+    feature = payload.get(FEATURE_ELEMENT)
+    if feature is not None:
+        try:
+            if isinstance(feature, Mapping) and isinstance(feature.get("facts"), (list, tuple)):
+                original_groups = list(elements.values()) if isinstance(elements, Mapping) else []
+                if isinstance(data.get("supply_chain"), Mapping):
+                    original_groups.extend(data["supply_chain"].values())
+                reserved_ids = {f.get("fact_id") for group in original_groups if isinstance(group, Mapping)
+                                and isinstance(group.get("facts"), (list, tuple)) for f in group["facts"]
+                                if isinstance(f, Mapping) and isinstance(f.get("fact_id"), str)}
+                kept, rejected = [], []
+                for fact in feature["facts"]:
+                    try:
+                        WorkpaperFact.model_validate(fact)
+                        if fact["fact_id"] in reserved_ids:
+                            raise ValueError("duplicate baseline/feature identity")
+                    except (ValidationError, ValueError, TypeError):
+                        identity = fact.get("fact_id", "未知编号") if isinstance(fact, Mapping) else "未知编号"
+                        rejected.append(f"特色事实{identity}格式错误，未采用；原内容保留在模型回执。")
+                    else:
+                        kept.append(fact)
+                feature = {**feature, "facts": kept,
+                           "limitations": [*(feature.get("limitations") or ()), *rejected]}
+                if rejected and not kept:
+                    feature["status"] = "unclear"
+            payload[FEATURE_ELEMENT] = WorkpaperElement.model_validate(feature).model_dump(mode="json")
+        except (ValidationError, ValueError, TypeError):
+            payload[FEATURE_ELEMENT] = None
+            limitations.append("可选公司特色结构无法解析，未采用；基础画像保留，原内容保留在模型回执。")
     payload["limitations"] = limitations
     return payload
 
@@ -756,6 +812,30 @@ def bind_workpaper_draft(
             })
             binding_notes.extend(rejected)
         supply_chain = WorkpaperSupplyChain(**cleaned)
+    company_features = response.company_features
+    if company_features is not None:
+        binding_notes.extend(note for note in company_features.limitations
+                             if note.startswith("特色事实") and "格式错误" in note)
+        used_ids = {f.fact_id for name in ELEMENT_LABELS for f in getattr(response.elements, name).facts}
+        if response.supply_chain is not None:
+            used_ids.update(f.fact_id for name in SUPPLY_CHAIN_LABELS for f in getattr(response.supply_chain, name).facts)
+        kept, rejected = [], []
+        for fact in company_features.facts:
+            try:
+                if fact.fact_id in used_ids:
+                    raise ValueError("duplicate fact identity")
+                _check_fact_source(fact, sources, check_units=True)
+            except ValueError as exc:
+                rejected.append(f"特色事实{fact.fact_id}未纳入：{exc}")
+                continue
+            kept.append(fact)
+            used_ids.add(fact.fact_id)
+        company_features = company_features.model_copy(update={
+            "facts": tuple(kept),
+            "status": "unclear" if rejected and not kept else company_features.status,
+            "limitations": (*company_features.limitations, *rejected),
+        })
+        binding_notes.extend(rejected)
     return standardize_workpaper_metrics(CompanyProfileWorkpaper(
         origin=origin,
         report=report,
@@ -764,6 +844,7 @@ def bind_workpaper_draft(
         evidence=tuple(evidence),
         limitations=response.limitations,
         supply_chain=supply_chain,
+        company_features=company_features,
         generation=generation,
         standardization_notes=tuple(binding_notes),
     ))
@@ -774,28 +855,27 @@ def standardize_workpaper_metrics(paper: CompanyProfileWorkpaper) -> CompanyProf
     payload = paper.model_dump(mode="json")
     notes = list(paper.standardization_notes)
     sources = {e.evidence_id: "".join("".join(s.quote.split()) for s in e.source_spans) for e in paper.evidence}
-    for key in ("elements", "supply_chain"):
-        for element in (payload.get(key) or {}).values():
-            for fact in element["facts"]:
-                context = "".join(sources[eid] for eid in fact["evidence_ids"])
-                for metric in fact["metrics"]:
-                    label = f"{fact['fact_id']}/{metric['name']}"
-                    if metric["unit"] == "个百分点":
-                        metric.update(source_unit=metric["source_unit"] or "个百分点", unit="百分点")
-                        notes.append(f"{label}：个百分点与百分点为同义单位，保留原文/来源单位，未改数值。")
-                    if (metric.get("uncertainty_reason") or "").startswith("程序说明："):
-                        notes.append(f"{label}：{metric['uncertainty_reason']}")
-                    if metric["unit"] in {"%", "％", "百分点", "基点", "bp", "bps"} and metric["currency"] is not None:
-                        notes.append(f"{label}：无量纲比例清除币种{metric['currency']}，原数值不变。")
-                        metric["currency"] = None
-                    is_margin_delta = "毛利率" in metric["name"] and any(
-                        word in metric["name"] for word in ("比上年增减", "同比变动", "同比变化"))
-                    points_in_answer = re.search(r"(-?\d+(?:\.\d+)?)\s*个百分点", fact["text"])
-                    if (metric["value"] is not None and metric["unit"] == "%" and is_margin_delta and points_in_answer
-                        and Decimal(points_in_answer.group(1)) == Decimal(metric["value"])
-                        and all(word in context for word in ("毛利率", "比上年", "增减"))):
-                        metric.update(source_unit="%", unit="百分点")
-                        notes.append(f"{label}：来源表印示%，按已明确的毛利率差值规范为百分点；保留原值及来源单位。")
+    for element in workpaper_element_payloads(payload).values():
+        for fact in element["facts"]:
+            context = "".join(sources[eid] for eid in fact["evidence_ids"])
+            for metric in fact["metrics"]:
+                label = f"{fact['fact_id']}/{metric['name']}"
+                if metric["unit"] == "个百分点":
+                    metric.update(source_unit=metric["source_unit"] or "个百分点", unit="百分点")
+                    notes.append(f"{label}：个百分点与百分点为同义单位，保留原文/来源单位，未改数值。")
+                if (metric.get("uncertainty_reason") or "").startswith("程序说明："):
+                    notes.append(f"{label}：{metric['uncertainty_reason']}")
+                if metric["unit"] in {"%", "％", "百分点", "基点", "bp", "bps"} and metric["currency"] is not None:
+                    notes.append(f"{label}：无量纲比例清除币种{metric['currency']}，原数值不变。")
+                    metric["currency"] = None
+                is_margin_delta = "毛利率" in metric["name"] and any(
+                    word in metric["name"] for word in ("比上年增减", "同比变动", "同比变化"))
+                points_in_answer = re.search(r"(-?\d+(?:\.\d+)?)\s*个百分点", fact["text"])
+                if (metric["value"] is not None and metric["unit"] == "%" and is_margin_delta and points_in_answer
+                    and Decimal(points_in_answer.group(1)) == Decimal(metric["value"])
+                    and all(word in context for word in ("毛利率", "比上年", "增减"))):
+                    metric.update(source_unit="%", unit="百分点")
+                    notes.append(f"{label}：来源表印示%，按已明确的毛利率差值规范为百分点；保留原值及来源单位。")
     payload["standardization_notes"] = list(dict.fromkeys(notes))
     return CompanyProfileWorkpaper.model_validate(payload)
 
@@ -834,8 +914,12 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         f"来源版本：`{report.document_version}`。发布时点：{report.published_at}。",
         "",
     ]
-    for name, label in ELEMENT_LABELS.items():
-        element = getattr(workpaper.elements, name)
+    labels = dict(ELEMENT_LABELS)
+    if workpaper.company_features is not None:
+        labels[FEATURE_ELEMENT] = "公司特色与自主发现（可选）"
+    elements = workpaper_elements(workpaper)
+    for name, label in labels.items():
+        element = elements[name]
         out.extend([f"## {label}", ""])
         for fact in element.facts:
             refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)

@@ -282,7 +282,7 @@ class CompanyProfileReadService:
             ),
         }
         if isinstance(record, CompanyProfileRuntimeRecordV3):
-            from .workpaper import ELEMENT_LABELS, SUPPLY_CHAIN_LABELS, render_workpaper
+            from .workpaper import workpaper_elements, render_workpaper
 
             profile["schema_version"] = "company_profile_common_core_profile.v3"
             profile["workpaper"] = record.workpaper.model_dump(mode="json")
@@ -295,9 +295,7 @@ class CompanyProfileReadService:
                 if review is not None else "pending_verification"
             )
             profile["workpaper_receipts"] = list(record.workpaper_receipts)
-            elements = {name: getattr(record.workpaper.elements, name) for name in ELEMENT_LABELS}
-            if record.workpaper.supply_chain is not None:
-                elements.update({name: getattr(record.workpaper.supply_chain, name) for name in SUPPLY_CHAIN_LABELS})
+            elements = workpaper_elements(record.workpaper)
             facts = [fact for element in elements.values() for fact in element.facts]
             generation = record.workpaper.generation
             profile["workpaper_summary"] = {
