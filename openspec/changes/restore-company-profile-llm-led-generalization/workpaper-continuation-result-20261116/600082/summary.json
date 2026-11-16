@@ -1,0 +1,45 @@
+{
+  "instrument_id": "600082.SH",
+  "name": "海泰发展",
+  "run_id": "cv-continuation-600082-20261116",
+  "three_reads_equal": true,
+  "exception": null,
+  "old_resources": {
+    "physical_requests": 3,
+    "charged_tokens": 91987,
+    "business_seconds": 529.08,
+    "cost": "unknown"
+  },
+  "business_started_monotonic": 10019049.727950849,
+  "preparation_seconds": 41.444,
+  "state": "completed",
+  "business_ended_monotonic": 10019141.951150054,
+  "business_seconds": 92.223,
+  "readable": true,
+  "facts": 28,
+  "metrics": 25,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": 2,
+  "core_complete": false,
+  "review_resolutions": [
+    {
+      "finding_id": "RF01",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "RF02",
+      "resolution": "omission_candidate"
+    }
+  ],
+  "physical_requests": 2,
+  "charged_tokens": 33820,
+  "cost": "unknown",
+  "stopped_reason": null,
+  "recoveries": 0,
+  "query_sha256": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+  "captured_model_contents": 2,
+  "failed_contents_retained": 0,
+  "supervision_seconds": 136.7,
+  "cleanup_bytes": 1808968
+}

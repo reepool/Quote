@@ -1,0 +1,147 @@
+"""Offline derivation of completed CV receipts; never issues model requests."""
+import hashlib
+import json
+import shutil
+from collections import Counter
+from pathlib import Path
+
+ROOT=Path('/home/python/Quote')
+BASE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116'
+
+
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path,value):path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+
+
+def fact_map(paper):
+    groups={**paper['elements'],**(paper.get('supply_chain') or {})}
+    if paper.get('company_features'):groups['company_features']=paper['company_features']
+    return {f['fact_id']:f for e in groups.values() for f in e['facts']}
+
+
+def main():
+    frozen=json.loads((BASE/'authorization.json').read_text());group=json.loads((BASE/'group-execution.json').read_text())
+    audit=json.loads((BASE/'independent-audit.json').read_text());prepared=Path(frozen['prepared_root'])
+    assert group['executed']==3 and all(v==0 for v in group['exit_codes'].values())
+    assert all(sha(ROOT/p)==h for p,h in frozen['code_sha256'].items())
+    assert sha(ROOT/'config/13_llm.json')==frozen['shared_config_sha256']
+    assert sha(BASE/'operator-snapshot.txt')==frozen['operator_sha256']
+    models=Counter();finishes=Counter();resolutions=Counter();entries=[]
+    lines=['# 三份真实后段结果（6.CV）','','本轮为用户新批准的有限接续，不是三家公司全新首发。仅上汽/海泰修订与再核、广州有反馈成稿；原前段/旧失败不改。研究限用、S1及生产未放行。','',
+           '模型接受不代表全部准确：3项被模型采纳，独立核源1项可普通采用、2项局部屏蔽或仅原文参考；1项候选被模型实际拒绝。上汽收入补充与CU已恢复内容重复，不造新增信息/召回分数。','',
+           '| 公司 | 新请求 | 新账本（供应商total usage） | 业务秒 | 实际结果 |',
+           '| --- | ---: | ---: | ---: | --- |']
+    for summary in group['results']:
+        code=summary['instrument_id'][:6];folder=BASE/code;budget=json.loads((folder/'budget.json').read_text())
+        query=json.loads((folder/'query.json').read_text())
+        if (prepared/(code+'.json')).exists():
+            source=json.loads((prepared/(code+'.json')).read_text())
+        else:
+            # Rebuild the comparison input from retained immutable references,
+            # not from a deleted temporary preparation copy or a new model call.
+            from research.company_profile.workpaper import CompanyProfileWorkpaper, WorkpaperDraftResponse, bind_workpaper_draft, normalize_workpaper_draft
+            binding=json.loads((folder/'binding.json').read_text())
+            refs=binding['original_refs'];source={'original_refs':refs,'extras':{}}
+            if code!='600098':
+                original_query=ROOT/next(p for p in refs if p.endswith('/query.json'))
+                original_receipts=ROOT/next(p for p in refs if p.endswith('/model-receipts.json'))
+                old=CompanyProfileWorkpaper.model_validate(json.loads(original_query.read_text())['profiles'][0]['workpaper'])
+                original=next(r['response_payload'] for r in json.loads(original_receipts.read_text()) if r['purpose']=='extract_profile_workpaper')
+                seed=bind_workpaper_draft(WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(original)),report=old.report,
+                    reading_scope=old.reading_scope,evidence=old.evidence,generation=old.generation)
+                source['extras']['review_seed']=seed.model_dump(mode='json')
+        assert summary['three_reads_equal'] and sha(folder/'query.json')==summary['query_sha256']
+        assert all(sha(ROOT/p)==h for p,h in source['original_refs'].items())
+        cap=frozen['each_limits'][code]
+        assert len(budget['attempts'])==summary['physical_requests']<=cap['requests']
+        assert budget['charged_tokens']==summary['charged_tokens']<=cap['tokens']
+        assert summary['business_seconds']<=cap['seconds'] and summary['recoveries']<=cap['recoveries']
+        ids=Counter(a['logical_request_id'] for a in budget['attempts']);assert max(ids.values())<=2
+        for attempt in budget['attempts']:
+            assert attempt['status']!='reserved'
+            models[attempt['source_label']]+=1;finishes[attempt.get('finish_reason') or 'missing']+=1
+        receipts=json.loads((folder/'model-receipts.json').read_text())
+        for receipt in receipts:
+            assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest()==receipt['response_hash']
+            assert json.loads(receipt['raw_content'])==receipt['response_payload']
+        purposes=[r['purpose'] for r in receipts]
+        if code!='600098':assert purposes==['repair_profile_workpaper','verify_profile_workpaper_repair']
+        else:assert not receipts
+        paper=query['profiles'][0].get('workpaper') if query['profiles'] else None
+        if paper:
+            assert json.loads((folder/'source-check.json').read_text())['all_retained_evidence_coordinates_equal']
+            before=fact_map(source['extras']['review_seed']);after=fact_map(paper)
+            delta={'unchanged':sum(before.get(k)==v for k,v in after.items()),
+                'changed':[k for k,v in after.items() if k in before and before[k]!=v],
+                'added':sorted(after.keys()-before.keys()),'removed':sorted(before.keys()-after.keys())}
+            if code=='600104':
+                assert delta=={'unchanged':36,'changed':['F23'],'added':['review-add:R1'],'removed':['F30']}
+                evidence={e['evidence_id']:e for e in paper['evidence']}
+                context=''.join(s['quote'] for s in evidence['source-0012']['source_spans'])
+                assert '报告期内产能为报告期内产量' in ''.join(context.split())
+                added=after['review-add:R1'];assert len(added['metrics'])==5
+                table=''.join(s['quote'] for s in evidence['source-0006']['source_spans'])
+                assert all(m['raw_value'] in table for m in added['metrics'])
+            else:
+                assert delta=={'unchanged':27,'changed':[],'added':['review-add:RF01'],'removed':[]}
+                assert after['review-add:RF01']['subject_scope']=='issuer'
+            resolutions.update(f['resolution'] for f in paper['quality_review']['findings'])
+        else:delta=None
+        entry={**summary,'fact_delta_from_rebound_original':delta,'query':f'{code}/query.json','model_receipts':f'{code}/model-receipts.json',
+               'independent_audit':audit['companies'][summary['instrument_id']],'production_authorization':'not_authorized'}
+        entries.append(entry)
+        result=(summary.get('review_status') or '无稿')
+        lines.append(f"| {summary['name']} | {summary['physical_requests']} | {summary['charged_tokens']} | {summary['business_seconds']} | {result} |")
+    labels={'business_structure':'做什么与业务结构','products_services':'产品、服务与用途','revenue_model':'如何赚钱',
+        'scale_and_mix':'规模与主要收入构成','operations_and_inputs':'经营方式与投入','customers_channels_markets':'客户、渠道和市场',
+        'operating_drivers':'经营驱动因素','material_changes':'重要变化','position':'供应链位置（可选）',
+        'upstream_inputs':'上游投入（可选）','downstream_customers':'下游领域（可选）','company_features':'公司特色与自主发现（可选）'}
+    for entry in entries:
+        code=entry['instrument_id'][:6];query=json.loads((BASE/code/'query.json').read_text())
+        paper=query['profiles'][0].get('workpaper') if query['profiles'] else None
+        local=entry['independent_audit']
+        lines+=['',f"## {entry['name']}（{entry['instrument_id']}）",'',f"[本次原查询]({code}/query.json)", '',local['conclusion'],'']
+        lines.extend('- 限制：'+note for note in local['limitations'])
+        if not paper:continue
+        evidence={e['evidence_id']:e for e in paper['evidence']}
+        groups={**paper['elements'],**(paper.get('supply_chain') or {})}
+        if paper.get('company_features'):groups['company_features']=paper['company_features']
+        for key,element in groups.items():
+            lines+=['','### '+labels[key],'']
+            for fact in element['facts']:
+                fid=fact['fact_id']
+                if fid in local['withhold_fact_ids']:
+                    lines.append('- '+fid+'：独立核源后本预览不采用；原件留存。');continue
+                if fid in local['duplicate_preview_fact_ids']:
+                    lines.append('- '+fid+'：与本次补充R1的同一主要构成不重复展示，原对象未删改。');continue
+                source_only=fid in local['source_only_fact_ids']
+                citations=[]
+                for eid in dict.fromkeys(fact['evidence_ids']+local['extra_source_ids'].get(fid,[])):
+                    ev=evidence[eid];citations.append('/'.join(ev['section_path'])+'，物理页'+','.join(map(str,ev['physical_pages'])))
+                lines.append('- '+('【仅公司原文参考，非标准化结论】' if source_only else '')+fact['text']+'（'+fid+'；'+'；'.join(dict.fromkeys(citations))+'）')
+                if fact.get('uncertainty_reason'):lines.append('  限定：'+fact['uncertainty_reason'])
+                if fid in local['fact_notices']:lines.append('  独立限用：'+local['fact_notices'][fid])
+                if fact['metrics'] and not source_only:
+                    lines.append('  原始数字：'+'；'.join(m['name']+'='+m['raw_value']+' '+str(m['unit']) for m in fact['metrics'])+'。')
+            lines.extend('- 范围限制：'+note for note in element.get('limitations',[]))
+    total={'new_physical_requests':sum(e['physical_requests'] for e in entries),'new_charged_tokens':sum(e['charged_tokens'] for e in entries),
+        'new_recoveries':sum(e['recoveries'] for e in entries),'business_wall_seconds':round(max(e['business_ended_monotonic'] for e in entries)-min(e['business_started_monotonic'] for e in entries),3),
+        'supervision_wall_seconds':group['supervision_wall_seconds'],'models':dict(models),'finish_reasons':dict(finishes),'model_resolutions':dict(resolutions),
+        'raw_retained_objects':sum(e['facts'] for e in entries),'cost':'unknown','raw_object_count_is_not_accuracy_or_semantic_deduplication':True}
+    assert total['new_physical_requests']==6 and total['new_charged_tokens']==159361 and total['new_recoveries']==1
+    assert total['business_wall_seconds']<=2400 and total['raw_retained_objects']==66
+    dump(BASE/'index.json',{'task':'6.CV','executed':3,'totals':total,'companies':entries,'formal_S1_counted':False,'production_authorization':'not_authorized'})
+    (BASE/'profiles.md').write_text('\n'.join(lines)+'\n')
+    dump(BASE/'validation.json',{'actual_original_TaskService_continuations':3,'controlled_transport_replacements':0,'frozen_business_code_and_shared_config_unchanged':True,
+        'all_three_reads_equal':True,'retained_source_coordinates_checked':2,'original_CT_and_CU_not_rewritten':True,
+        'new_pytest':False,'reused_engineering_commit':'ea812687','new_and_retained_usage_separate':True,
+        'current_company_and_group_resource_limits_checked':True,'model_acceptance_is_not_independent_truth':True,
+        'independent_changed_objects':3,'independent_ordinary_supported_changes':1,'independent_limited_changes':2,
+        'totals':total,'whole_report_accuracy_recall_not_evaluated':True,'formal_S1_pass':False})
+    shutil.copy2(__file__,BASE/'closeout-snapshot.txt')
+    print(json.dumps(total,ensure_ascii=False))
+
+
+if __name__=='__main__':main()

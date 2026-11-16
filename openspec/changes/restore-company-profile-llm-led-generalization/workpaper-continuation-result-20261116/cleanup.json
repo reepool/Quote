@@ -1,0 +1,17 @@
+{
+  "task": "6.CV",
+  "pre_development_released_bytes": 0,
+  "entry_roots_deleted_by_finally": 3,
+  "entry_roots_released_bytes": 5617847,
+  "closeout_deleted": {
+    "/home/python/Quote/data/QuoteBak/workpaper-cv-prepared-p91evga7": 1954956,
+    "/home/python/Quote/data/QuoteBak/workpaper-cv-operator.py": 22099,
+    "/home/python/Quote/data/QuoteBak/workpaper-cv-closeout.py": 11755
+  },
+  "closeout_released_bytes": 1988810,
+  "total_released_bytes": 7606657,
+  "active_CV_workers_before_closeout_cleanup": 0,
+  "owned_paths_remaining": [],
+  "protected": ["official PDFs", "useful source cache", "CT/CU receipts", "attempt markers", "pre-existing and parallel changes"],
+  "recovery": "Authoritative CV receipts, source references and script snapshots retained; preparation copies are rebuildable; consumed attempts remain consumed."
+}

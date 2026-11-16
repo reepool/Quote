@@ -1,0 +1,27 @@
+[
+  {
+    "call_type": "extract",
+    "semantic_request_id": "bp-work-24b64f62bcbaebad8c0a42ec:workpaper:extract",
+    "gateway_request_id": "df3e18a237b740c38a0122f9a075aee6",
+    "status": "failed",
+    "profile": "semantic_extraction__deepseek",
+    "provider": null,
+    "model": null,
+    "selected_profile": null,
+    "source_label": null,
+    "failover_count": 0,
+    "attempts": [],
+    "response_hash": null,
+    "latency_ms": null,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": "candidate_schema_invalid",
+    "error_detail": "LLM response is not valid JSON: Expecting ',' delimiter at line 1 column 23449 (char 23448)",
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  }
+]

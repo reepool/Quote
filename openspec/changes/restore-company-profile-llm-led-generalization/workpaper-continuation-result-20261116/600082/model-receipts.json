@@ -1,0 +1,96 @@
+[
+  {
+    "request_id": "bp-work-cf41933e7f10818573915ac8:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "7b3d55d1887611f0da84f824b6f656cee088b238611b823816e684d96b3d2141",
+    "response_hash": "50128dcf785f0b4a389704ed4a4935bd5c21ab68310e9350fc3a0fb1d3e7de8f",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:RF01\",\"text\":\"报告期内，公司资产减值损失为-45,477,408.86元（损失以负数表示），较上年同期-11,336,444.84元增加，主要系本期公司计提存货跌价准备及投资性房地产减值准备增加所致。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"资产减值损失\",\"raw_value\":\"-45,477,408.86\",\"value\":\"-45477408.86\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"comparison_basis\":\"本期数\"},{\"name\":\"资产减值损失\",\"raw_value\":\"-11,336,444.84\",\"value\":\"-11336444.84\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2024年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"comparison_basis\":\"上年同期数\"}]}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:RF01",
+          "text": "报告期内，公司资产减值损失为-45,477,408.86元（损失以负数表示），较上年同期-11,336,444.84元增加，主要系本期公司计提存货跌价准备及投资性房地产减值准备增加所致。",
+          "subject_scope": "issuer",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "资产减值损失",
+              "raw_value": "-45,477,408.86",
+              "value": "-45477408.86",
+              "unit": "元",
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "source_unit": "元",
+              "comparison_basis": "本期数"
+            },
+            {
+              "name": "资产减值损失",
+              "raw_value": "-11,336,444.84",
+              "value": "-11336444.84",
+              "unit": "元",
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2024年度",
+              "qualifier": "exact",
+              "source_unit": "元",
+              "comparison_basis": "上年同期数"
+            }
+          ]
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12865,
+      "output_tokens": 239,
+      "total_tokens": 13104
+    }
+  },
+  {
+    "request_id": "bp-work-cf41933e7f10818573915ac8:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "076d33ae23064ffc702b57045a9c6d9d1cb1e219e2bc18572551edfde793fd77",
+    "response_hash": "17cb02426e3d3fed0235edbfdb54c146adf142ed9f7b3f0422cf807e8393acf0",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:RF01\"],\"checks\":[{\"fact_id\":\"review-add:RF01\",\"accepted\":true,\"evidence_ids\":[\"source-0005\"],\"explanation\":\"该候选实质性补上了RF01所指遗漏。source-0005科目变动表列示资产减值损失本期数-45,477,408.86元、上年同期数-11,336,444.84元，单位为元、币种人民币，备注明确损失以负数表示；变动原因说明为损失增加，主要因计提存货跌价准备及投资性房地产减值准备增加。候选的主体、2025年度本期数与上年同期比较、符号口径、单位及原因均与该栏目一致，且未把变动比例“不适用”改写成具体百分比。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:RF01"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:RF01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "该候选实质性补上了RF01所指遗漏。source-0005科目变动表列示资产减值损失本期数-45,477,408.86元、上年同期数-11,336,444.84元，单位为元、币种人民币，备注明确损失以负数表示；变动原因说明为损失增加，主要因计提存货跌价准备及投资性房地产减值准备增加。候选的主体、2025年度本期数与上年同期比较、符号口径、单位及原因均与该栏目一致，且未把变动比例“不适用”改写成具体百分比。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 16090,
+      "output_tokens": 175,
+      "total_tokens": 20716
+    }
+  }
+]

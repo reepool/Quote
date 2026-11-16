@@ -1,0 +1,40 @@
+{
+  "actual_original_TaskService_continuations": 3,
+  "controlled_transport_replacements": 0,
+  "frozen_business_code_and_shared_config_unchanged": true,
+  "all_three_reads_equal": true,
+  "retained_source_coordinates_checked": 2,
+  "original_CT_and_CU_not_rewritten": true,
+  "new_pytest": false,
+  "reused_engineering_commit": "ea812687",
+  "new_and_retained_usage_separate": true,
+  "current_company_and_group_resource_limits_checked": true,
+  "model_acceptance_is_not_independent_truth": true,
+  "independent_changed_objects": 3,
+  "independent_ordinary_supported_changes": 1,
+  "independent_limited_changes": 2,
+  "totals": {
+    "new_physical_requests": 6,
+    "new_charged_tokens": 159361,
+    "new_recoveries": 1,
+    "business_wall_seconds": 121.601,
+    "supervision_wall_seconds": 170.177,
+    "models": {
+      "deepseek:deepseek-flash": 4,
+      "scorpio:grok-4.7": 2
+    },
+    "finish_reasons": {
+      "stop": 6
+    },
+    "model_resolutions": {
+      "corrected_pending_trust": 3,
+      "repair_rejected": 1,
+      "omission_candidate": 1
+    },
+    "raw_retained_objects": 66,
+    "cost": "unknown",
+    "raw_object_count_is_not_accuracy_or_semantic_deduplication": true
+  },
+  "whole_report_accuracy_recall_not_evaluated": true,
+  "formal_S1_pass": false
+}

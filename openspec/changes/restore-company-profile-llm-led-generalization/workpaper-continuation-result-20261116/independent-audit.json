@@ -1,0 +1,47 @@
+{
+  "task": "6.CV",
+  "scope": "actual adopted candidates and rejected repair, main income table, source qualifiers and existing independent restrictions; not a new full-profile accuracy or recall score",
+  "model_accepted_changes": 3,
+  "independently_ordinary_supported_changes": 1,
+  "independently_limited_changes": 2,
+  "companies": {
+    "600104.SH": {
+      "conclusion": "主要收入构成获真实最终再核，保持可读；产能修订虽获模型接受仍须限用，技术表述修订被实际拒绝。旧F19检查编号残留使复核仍incomplete，不通过改标志制造通过。",
+      "changed_object_verdicts": [
+        {"fact_id": "review-add:R1", "model_resolution": "corrected_pending_trust", "verdict": "supported", "source_ids": ["source-0006"], "physical_pages": [11], "notes": "主营业务分产品四类及合计、原表元/币种/本期科目均有据；各业务metric为business_segment、合计为consolidated_group。该信息与CU已恢复F13重复，不算新的经济信息或提升召回。"},
+        {"fact_id": "F23", "model_resolution": "corrected_pending_trust", "verdict": "withheld_missing_source_qualification", "source_ids": ["source-0011", "source-0012"], "physical_pages": [16, 17], "notes": "699.2/451.6为对所列工厂的加总，451.6纠正了原444.6的漏行，但原文续页明确报告期内产能为报告期内产量、利用率为产量/设计产能。修订未保该定义且没有披露合计原句，不作为可用产能结论。续页已在供模原文包中，不能归因于材料未给。"},
+        {"fact_id": "F30", "model_resolution": "repair_rejected", "verdict": "correctly_rejected", "source_ids": ["source-0003"], "physical_pages": [9], "notes": "新候选未恢复国内限定，被真实再核拒绝，当前正文不存在该事实；不为这一可选表述追加付费。"}
+      ],
+      "withhold_fact_ids": ["F23", "F37"],
+      "source_only_fact_ids": ["F38"],
+      "extra_source_ids": {"F38": ["source-0014"]},
+      "duplicate_preview_fact_ids": ["F13"],
+      "fact_notices": {"F38": "原F38的完整名单未被自身所引第18页覆盖；第19页原source-0014补足名单，仅作原文参考，不改原引证或自动升级为标准化事实。"},
+      "limitations": ["38是原owner保留对象数，不是38条独立且正确的经济事实；R1与F13是同一构成的重复表达。", "F37/F38原独立限制继续适用；不以本次只再核三候选声称全稿新复核完成。", "其他原有正文/来源保持，供应链粗粒度可选，次要地区合计与技术尾项不追补。"]
+    },
+    "600082.SH": {
+      "conclusion": "资产减值损失金额、负号、两期比较及原因有据，新增主体issuer无母公司依据，仅公司原文参考；27独立原对象未改，minor关联交易限定仍未决。",
+      "changed_object_verdicts": [
+        {"fact_id": "review-add:RF01", "model_resolution": "corrected_pending_trust", "verdict": "source_only_subject_scope_unsupported", "source_ids": ["source-0005"], "physical_pages": [14], "notes": "本期-45,477,408.86元/上期-11,336,444.84元及损失负数备注、存货跌价与投资性房地产减值原因均有据；该公司经营分析表未说明仅母公司，不能把issuer指标作为母公司事实。保原句参考，禁止母公司标准化比较。"}
+      ],
+      "withhold_fact_ids": [],
+      "source_only_fact_ids": ["review-add:RF01"],
+      "extra_source_ids": {},
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {"review-add:RF01": "金额及原因可引用公司原文；原JSON的issuer是母公司标签，原文不足以支持，两个指标均不作为母公司标准化数据。"},
+      "limitations": ["RF02是minor补充，正确F24未被撤回，也没有为补关联交易标签额外付费。", "completed_with_open_findings仅是模型流程状态；新增对象的主体问题未因最终accepted而消失。"]
+    },
+    "600098.SH": {
+      "conclusion": "本卡两次真实成稿均为stop、8150输出，原样返回相同23448字符坏JSON；有反馈的恢复策略未奏效，没有新画像或后续复核。",
+      "changed_object_verdicts": [],
+      "withhold_fact_ids": [],
+      "source_only_fact_ids": [],
+      "extra_source_ids": {},
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {},
+      "limitations": ["正文hash与旧CT坏响应相同，只证明响应未改善，不能据此认定供应商缓存或网络问题。", "没有length/预算耗尽/网络失败，不以余额再开逻辑请求；本卡停止，不程序补JSON或拼接旧稿。"]
+    }
+  },
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,137 @@
+{
+  "executed": 3,
+  "results": [
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "run_id": "cv-continuation-600104-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "old_resources": {
+        "physical_requests": 3,
+        "charged_tokens": 85856,
+        "business_seconds": 361.007,
+        "cost": "unknown"
+      },
+      "business_started_monotonic": 10019051.591656853,
+      "preparation_seconds": 43.855,
+      "state": "completed",
+      "business_ended_monotonic": 10019171.329007898,
+      "business_seconds": 119.737,
+      "readable": true,
+      "facts": 38,
+      "metrics": 49,
+      "review_status": "incomplete",
+      "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F19",
+      "findings": 3,
+      "core_complete": false,
+      "review_resolutions": [
+        {
+          "finding_id": "R1",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R2",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R3",
+          "resolution": "repair_rejected"
+        }
+      ],
+      "physical_requests": 2,
+      "charged_tokens": 35793,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "query_sha256": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+      "captured_model_contents": 2,
+      "failed_contents_retained": 0,
+      "supervision_seconds": 166.145,
+      "cleanup_bytes": 1877768
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "run_id": "cv-continuation-600082-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "old_resources": {
+        "physical_requests": 3,
+        "charged_tokens": 91987,
+        "business_seconds": 529.08,
+        "cost": "unknown"
+      },
+      "business_started_monotonic": 10019049.727950849,
+      "preparation_seconds": 41.444,
+      "state": "completed",
+      "business_ended_monotonic": 10019141.951150054,
+      "business_seconds": 92.223,
+      "readable": true,
+      "facts": 28,
+      "metrics": 25,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": 2,
+      "core_complete": false,
+      "review_resolutions": [
+        {
+          "finding_id": "RF01",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF02",
+          "resolution": "omission_candidate"
+        }
+      ],
+      "physical_requests": 2,
+      "charged_tokens": 33820,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "query_sha256": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+      "captured_model_contents": 2,
+      "failed_contents_retained": 0,
+      "supervision_seconds": 136.7,
+      "cleanup_bytes": 1808968
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "run_id": "cv-continuation-600098-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "old_resources": {
+        "physical_requests": 3,
+        "charged_tokens": 94059,
+        "business_seconds": 72.217,
+        "cost": "unknown"
+      },
+      "business_started_monotonic": 10019051.779279104,
+      "preparation_seconds": 43.406,
+      "state": "incomplete",
+      "business_ended_monotonic": 10019118.495184263,
+      "business_seconds": 66.716,
+      "readable": false,
+      "facts": 0,
+      "review_status": null,
+      "physical_requests": 2,
+      "charged_tokens": 89748,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 1,
+      "query_sha256": "5b83b6e04680aa68ee11cab259e4beb4329010f3e60173c748833cf72f4f76e2",
+      "captured_model_contents": 2,
+      "failed_contents_retained": 2,
+      "supervision_seconds": 110.808,
+      "cleanup_bytes": 1931111
+    }
+  ],
+  "source_code_unchanged": true,
+  "supervision_wall_seconds": 170.177,
+  "exit_codes": {
+    "600104": 0,
+    "600082": 0,
+    "600098": 0
+  }
+}

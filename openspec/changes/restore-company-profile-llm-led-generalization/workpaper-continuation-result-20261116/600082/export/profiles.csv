@@ -1,0 +1,3 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600082.SH,2025-12-31,2026-04-28T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司为天津滨海高新区国有控股上市公司，以工业园区运营为核心主业，形成“园区运营为存量根基、产业投资为增量引擎”的双轮驱动架构，稳步转型产业园区运营商及科技服务提供商。
+业务板块包括园区运营、产业投资和孵化服务；旗下海泰孵化器为在孵企业提供咨询、培训等专业化服务。",28,25,completed_with_open_findings,1,deepseek-flash,grok-4.7

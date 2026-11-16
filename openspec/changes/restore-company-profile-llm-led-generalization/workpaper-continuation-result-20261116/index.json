@@ -1,0 +1,294 @@
+{
+  "task": "6.CV",
+  "executed": 3,
+  "totals": {
+    "new_physical_requests": 6,
+    "new_charged_tokens": 159361,
+    "new_recoveries": 1,
+    "business_wall_seconds": 121.601,
+    "supervision_wall_seconds": 170.177,
+    "models": {
+      "deepseek:deepseek-flash": 4,
+      "scorpio:grok-4.7": 2
+    },
+    "finish_reasons": {
+      "stop": 6
+    },
+    "model_resolutions": {
+      "corrected_pending_trust": 3,
+      "repair_rejected": 1,
+      "omission_candidate": 1
+    },
+    "raw_retained_objects": 66,
+    "cost": "unknown",
+    "raw_object_count_is_not_accuracy_or_semantic_deduplication": true
+  },
+  "companies": [
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "run_id": "cv-continuation-600104-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "old_resources": {
+        "physical_requests": 3,
+        "charged_tokens": 85856,
+        "business_seconds": 361.007,
+        "cost": "unknown"
+      },
+      "business_started_monotonic": 10019051.591656853,
+      "preparation_seconds": 43.855,
+      "state": "completed",
+      "business_ended_monotonic": 10019171.329007898,
+      "business_seconds": 119.737,
+      "readable": true,
+      "facts": 38,
+      "metrics": 49,
+      "review_status": "incomplete",
+      "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F19",
+      "findings": 3,
+      "core_complete": false,
+      "review_resolutions": [
+        {
+          "finding_id": "R1",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R2",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R3",
+          "resolution": "repair_rejected"
+        }
+      ],
+      "physical_requests": 2,
+      "charged_tokens": 35793,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "query_sha256": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+      "captured_model_contents": 2,
+      "failed_contents_retained": 0,
+      "supervision_seconds": 166.145,
+      "cleanup_bytes": 1877768,
+      "fact_delta_from_rebound_original": {
+        "unchanged": 36,
+        "changed": [
+          "F23"
+        ],
+        "added": [
+          "review-add:R1"
+        ],
+        "removed": [
+          "F30"
+        ]
+      },
+      "query": "600104/query.json",
+      "model_receipts": "600104/model-receipts.json",
+      "independent_audit": {
+        "conclusion": "主要收入构成获真实最终再核，保持可读；产能修订虽获模型接受仍须限用，技术表述修订被实际拒绝。旧F19检查编号残留使复核仍incomplete，不通过改标志制造通过。",
+        "changed_object_verdicts": [
+          {
+            "fact_id": "review-add:R1",
+            "model_resolution": "corrected_pending_trust",
+            "verdict": "supported",
+            "source_ids": [
+              "source-0006"
+            ],
+            "physical_pages": [
+              11
+            ],
+            "notes": "主营业务分产品四类及合计、原表元/币种/本期科目均有据；各业务metric为business_segment、合计为consolidated_group。该信息与CU已恢复F13重复，不算新的经济信息或提升召回。"
+          },
+          {
+            "fact_id": "F23",
+            "model_resolution": "corrected_pending_trust",
+            "verdict": "withheld_missing_source_qualification",
+            "source_ids": [
+              "source-0011",
+              "source-0012"
+            ],
+            "physical_pages": [
+              16,
+              17
+            ],
+            "notes": "699.2/451.6为对所列工厂的加总，451.6纠正了原444.6的漏行，但原文续页明确报告期内产能为报告期内产量、利用率为产量/设计产能。修订未保该定义且没有披露合计原句，不作为可用产能结论。续页已在供模原文包中，不能归因于材料未给。"
+          },
+          {
+            "fact_id": "F30",
+            "model_resolution": "repair_rejected",
+            "verdict": "correctly_rejected",
+            "source_ids": [
+              "source-0003"
+            ],
+            "physical_pages": [
+              9
+            ],
+            "notes": "新候选未恢复国内限定，被真实再核拒绝，当前正文不存在该事实；不为这一可选表述追加付费。"
+          }
+        ],
+        "withhold_fact_ids": [
+          "F23",
+          "F37"
+        ],
+        "source_only_fact_ids": [
+          "F38"
+        ],
+        "extra_source_ids": {
+          "F38": [
+            "source-0014"
+          ]
+        },
+        "duplicate_preview_fact_ids": [
+          "F13"
+        ],
+        "fact_notices": {
+          "F38": "原F38的完整名单未被自身所引第18页覆盖；第19页原source-0014补足名单，仅作原文参考，不改原引证或自动升级为标准化事实。"
+        },
+        "limitations": [
+          "38是原owner保留对象数，不是38条独立且正确的经济事实；R1与F13是同一构成的重复表达。",
+          "F37/F38原独立限制继续适用；不以本次只再核三候选声称全稿新复核完成。",
+          "其他原有正文/来源保持，供应链粗粒度可选，次要地区合计与技术尾项不追补。"
+        ]
+      },
+      "production_authorization": "not_authorized"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "run_id": "cv-continuation-600082-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "old_resources": {
+        "physical_requests": 3,
+        "charged_tokens": 91987,
+        "business_seconds": 529.08,
+        "cost": "unknown"
+      },
+      "business_started_monotonic": 10019049.727950849,
+      "preparation_seconds": 41.444,
+      "state": "completed",
+      "business_ended_monotonic": 10019141.951150054,
+      "business_seconds": 92.223,
+      "readable": true,
+      "facts": 28,
+      "metrics": 25,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": 2,
+      "core_complete": false,
+      "review_resolutions": [
+        {
+          "finding_id": "RF01",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF02",
+          "resolution": "omission_candidate"
+        }
+      ],
+      "physical_requests": 2,
+      "charged_tokens": 33820,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "query_sha256": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+      "captured_model_contents": 2,
+      "failed_contents_retained": 0,
+      "supervision_seconds": 136.7,
+      "cleanup_bytes": 1808968,
+      "fact_delta_from_rebound_original": {
+        "unchanged": 27,
+        "changed": [],
+        "added": [
+          "review-add:RF01"
+        ],
+        "removed": []
+      },
+      "query": "600082/query.json",
+      "model_receipts": "600082/model-receipts.json",
+      "independent_audit": {
+        "conclusion": "资产减值损失金额、负号、两期比较及原因有据，新增主体issuer无母公司依据，仅公司原文参考；27独立原对象未改，minor关联交易限定仍未决。",
+        "changed_object_verdicts": [
+          {
+            "fact_id": "review-add:RF01",
+            "model_resolution": "corrected_pending_trust",
+            "verdict": "source_only_subject_scope_unsupported",
+            "source_ids": [
+              "source-0005"
+            ],
+            "physical_pages": [
+              14
+            ],
+            "notes": "本期-45,477,408.86元/上期-11,336,444.84元及损失负数备注、存货跌价与投资性房地产减值原因均有据；该公司经营分析表未说明仅母公司，不能把issuer指标作为母公司事实。保原句参考，禁止母公司标准化比较。"
+          }
+        ],
+        "withhold_fact_ids": [],
+        "source_only_fact_ids": [
+          "review-add:RF01"
+        ],
+        "extra_source_ids": {},
+        "duplicate_preview_fact_ids": [],
+        "fact_notices": {
+          "review-add:RF01": "金额及原因可引用公司原文；原JSON的issuer是母公司标签，原文不足以支持，两个指标均不作为母公司标准化数据。"
+        },
+        "limitations": [
+          "RF02是minor补充，正确F24未被撤回，也没有为补关联交易标签额外付费。",
+          "completed_with_open_findings仅是模型流程状态；新增对象的主体问题未因最终accepted而消失。"
+        ]
+      },
+      "production_authorization": "not_authorized"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "run_id": "cv-continuation-600098-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "old_resources": {
+        "physical_requests": 3,
+        "charged_tokens": 94059,
+        "business_seconds": 72.217,
+        "cost": "unknown"
+      },
+      "business_started_monotonic": 10019051.779279104,
+      "preparation_seconds": 43.406,
+      "state": "incomplete",
+      "business_ended_monotonic": 10019118.495184263,
+      "business_seconds": 66.716,
+      "readable": false,
+      "facts": 0,
+      "review_status": null,
+      "physical_requests": 2,
+      "charged_tokens": 89748,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 1,
+      "query_sha256": "5b83b6e04680aa68ee11cab259e4beb4329010f3e60173c748833cf72f4f76e2",
+      "captured_model_contents": 2,
+      "failed_contents_retained": 2,
+      "supervision_seconds": 110.808,
+      "cleanup_bytes": 1931111,
+      "fact_delta_from_rebound_original": null,
+      "query": "600098/query.json",
+      "model_receipts": "600098/model-receipts.json",
+      "independent_audit": {
+        "conclusion": "本卡两次真实成稿均为stop、8150输出，原样返回相同23448字符坏JSON；有反馈的恢复策略未奏效，没有新画像或后续复核。",
+        "changed_object_verdicts": [],
+        "withhold_fact_ids": [],
+        "source_only_fact_ids": [],
+        "extra_source_ids": {},
+        "duplicate_preview_fact_ids": [],
+        "fact_notices": {},
+        "limitations": [
+          "正文hash与旧CT坏响应相同，只证明响应未改善，不能据此认定供应商缓存或网络问题。",
+          "没有length/预算耗尽/网络失败，不以余额再开逻辑请求；本卡停止，不程序补JSON或拼接旧稿。"
+        ]
+      },
+      "production_authorization": "not_authorized"
+    }
+  ],
+  "formal_S1_counted": false,
+  "production_authorization": "not_authorized"
+}

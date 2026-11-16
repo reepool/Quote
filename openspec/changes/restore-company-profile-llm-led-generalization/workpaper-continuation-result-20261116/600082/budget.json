@@ -1,0 +1,80 @@
+{
+  "physical_requests": 2,
+  "charged_tokens": 33820,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": null,
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "b2d38e8ce26046b3843e64d53f7fa90a",
+      "logical_request_id": "f352bec6608bd64706b8ca4a5c4e73efcbf969f80d7fd4858b414f67582a0482",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 68763,
+      "reserved_output_tokens": 16384,
+      "charged_tokens": 13104,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 12865,
+        "output_tokens": 239,
+        "total_tokens": 13104
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 241,
+        "content_fragments": 239,
+        "content_chars": 649,
+        "content_sha256": "50128dcf785f0b4a389704ed4a4935bd5c21ab68310e9350fc3a0fb1d3e7de8f",
+        "reasoning_present": false,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    },
+    {
+      "sequence": 2,
+      "request_id": "b4f3efbdadd24592a8279c5e31a30d6e",
+      "logical_request_id": "8a9478149c5abf2f7bc6f2bf35f563a7be64768123459b329b60c17f4469be32",
+      "source_label": "scorpio:grok-4.7",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_grok",
+      "provider_resource": "scorpio:grok",
+      "model": "grok-4.7",
+      "reserved_input_tokens": 67078,
+      "reserved_output_tokens": 16384,
+      "charged_tokens": 20716,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 16090,
+        "output_tokens": 175,
+        "total_tokens": 20716
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 197,
+        "content_fragments": 175,
+        "content_chars": 349,
+        "content_sha256": "17cb02426e3d3fed0235edbfdb54c146adf142ed9f7b3f0422cf807e8393acf0",
+        "reasoning_present": true,
+        "reasoning_chars": 1487,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    }
+  ]
+}

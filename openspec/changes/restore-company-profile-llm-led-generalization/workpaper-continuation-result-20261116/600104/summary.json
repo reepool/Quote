@@ -1,0 +1,49 @@
+{
+  "instrument_id": "600104.SH",
+  "name": "上汽集团",
+  "run_id": "cv-continuation-600104-20261116",
+  "three_reads_equal": true,
+  "exception": null,
+  "old_resources": {
+    "physical_requests": 3,
+    "charged_tokens": 85856,
+    "business_seconds": 361.007,
+    "cost": "unknown"
+  },
+  "business_started_monotonic": 10019051.591656853,
+  "preparation_seconds": 43.855,
+  "state": "completed",
+  "business_ended_monotonic": 10019171.329007898,
+  "business_seconds": 119.737,
+  "readable": true,
+  "facts": 38,
+  "metrics": 49,
+  "review_status": "incomplete",
+  "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F19",
+  "findings": 3,
+  "core_complete": false,
+  "review_resolutions": [
+    {
+      "finding_id": "R1",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R2",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R3",
+      "resolution": "repair_rejected"
+    }
+  ],
+  "physical_requests": 2,
+  "charged_tokens": 35793,
+  "cost": "unknown",
+  "stopped_reason": null,
+  "recoveries": 0,
+  "query_sha256": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+  "captured_model_contents": 2,
+  "failed_contents_retained": 0,
+  "supervision_seconds": 166.145,
+  "cleanup_bytes": 1877768
+}

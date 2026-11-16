@@ -1,0 +1,219 @@
+[
+  {
+    "request_id": "bp-work-ddb8b8dc89cf1e05bc733df1:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "9f358092ea744dc932e296e861baba7ed25e00d6c45a05b6f46b6559bbbfe18f",
+    "response_hash": "9edab16385f6138b0d4fe42454584ac65efa2da10b75cf280d330d1e4e234363",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:R1\",\"text\":\"2025年度主营业务分产品营业收入（人民币元）：整车业务410,196,473,001.11元，零部件业务203,019,866,775.26元，劳务及其他32,935,762,112.94元，金融业务10,091,710,191.88元，合计656,243,812,081.18元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"整车业务营业收入\",\"raw_value\":\"410,196,473,001.11\",\"value\":\"410196473001.11\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"零部件业务营业收入\",\"raw_value\":\"203,019,866,775.26\",\"value\":\"203019866775.26\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"劳务及其他营业收入\",\"raw_value\":\"32,935,762,112.94\",\"value\":\"32935762112.94\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"金融业务营业收入\",\"raw_value\":\"10,091,710,191.88\",\"value\":\"10091710191.88\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品营业收入合计\",\"raw_value\":\"656,243,812,081.18\",\"value\":\"656243812081.18\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F23\",\"text\":\"公司主要工厂设计产能合计约699.2万辆，报告期内产能合计约451.6万辆；其中上汽通用五菱产能利用率95%，上汽集团乘用车分公司76%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"上汽通用五菱产能利用率\",\"raw_value\":\"95\",\"value\":\"95\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上汽集团乘用车分公司产能利用率\",\"raw_value\":\"76\",\"value\":\"76\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F30\",\"text\":\"公司在内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"上汽国产芯片应用率\",\"raw_value\":\"超30\",\"value\":\"30\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:R1",
+          "text": "2025年度主营业务分产品营业收入（人民币元）：整车业务410,196,473,001.11元，零部件业务203,019,866,775.26元，劳务及其他32,935,762,112.94元，金融业务10,091,710,191.88元，合计656,243,812,081.18元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "整车业务营业收入",
+              "raw_value": "410,196,473,001.11",
+              "value": "410196473001.11",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "零部件业务营业收入",
+              "raw_value": "203,019,866,775.26",
+              "value": "203019866775.26",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "劳务及其他营业收入",
+              "raw_value": "32,935,762,112.94",
+              "value": "32935762112.94",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "金融业务营业收入",
+              "raw_value": "10,091,710,191.88",
+              "value": "10091710191.88",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品营业收入合计",
+              "raw_value": "656,243,812,081.18",
+              "value": "656243812081.18",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F23",
+          "text": "公司主要工厂设计产能合计约699.2万辆，报告期内产能合计约451.6万辆；其中上汽通用五菱产能利用率95%，上汽集团乘用车分公司76%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "上汽通用五菱产能利用率",
+              "raw_value": "95",
+              "value": "95",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上汽集团乘用车分公司产能利用率",
+              "raw_value": "76",
+              "value": "76",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F30",
+          "text": "公司在内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "上汽国产芯片应用率",
+              "raw_value": "超30",
+              "value": "30",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12223,
+      "output_tokens": 893,
+      "total_tokens": 13116
+    }
+  },
+  {
+    "request_id": "bp-work-ddb8b8dc89cf1e05bc733df1:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "182dd876b6b323ce53135e5757f555bee6a5321bd51f145f87dd43db1fb25ab9",
+    "response_hash": "3ea88ca346b9b9bfda7e39155a5146279acf82d4b2fe97d9cd06b86a4461952a",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:R1\",\"F23\",\"F30\"],\"checks\":[{\"fact_id\":\"review-add:R1\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"source-0006主营业务分产品表列示2025年本期营业收入（人民币元）：整车业务410,196,473,001.11、零部件业务203,019,866,775.26、劳务及其他32,935,762,112.94、金融业务10,091,710,191.88，合计656,243,812,081.18。候选金额、栏目、单位、主体与期间均与该表一致，补入了所缺四类构成及合计，解决了分产品金额遗漏。\"},{\"fact_id\":\"F23\",\"accepted\":true,\"evidence_ids\":[\"source-0011\"],\"explanation\":\"source-0011主要工厂报告期内产能（万辆）105.8、53.4、88.5、167.1、22.4、3.0、2.1、7.0、2.3合计451.6，设计产能合计699.2；上汽通用五菱利用率95%、上汽集团乘用车分公司76%与表一致。候选已将报告期内产能合计更正为451.6万辆并保留上述项目，单位为万辆、期间为报告期，解决了漏计印度工厂7.0万辆的问题。\"},{\"fact_id\":\"F30\",\"accepted\":false,\"evidence_ids\":[\"source-0003\"],\"explanation\":\"source-0003原文为“在国内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付”。候选写成“在内率先实现”，未恢复“国内”限定，率先范围仍不正确，不能解决超出来源的问题。批量交付、中试线贯通及国产芯片应用率超过30%虽有支持，但核心限定未修复。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:R1",
+        "F23",
+        "F30"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:R1",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "source-0006主营业务分产品表列示2025年本期营业收入（人民币元）：整车业务410,196,473,001.11、零部件业务203,019,866,775.26、劳务及其他32,935,762,112.94、金融业务10,091,710,191.88，合计656,243,812,081.18。候选金额、栏目、单位、主体与期间均与该表一致，补入了所缺四类构成及合计，解决了分产品金额遗漏。"
+        },
+        {
+          "fact_id": "F23",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "source-0011主要工厂报告期内产能（万辆）105.8、53.4、88.5、167.1、22.4、3.0、2.1、7.0、2.3合计451.6，设计产能合计699.2；上汽通用五菱利用率95%、上汽集团乘用车分公司76%与表一致。候选已将报告期内产能合计更正为451.6万辆并保留上述项目，单位为万辆、期间为报告期，解决了漏计印度工厂7.0万辆的问题。"
+        },
+        {
+          "fact_id": "F30",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "source-0003原文为“在国内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付”。候选写成“在内率先实现”，未恢复“国内”限定，率先范围仍不正确，不能解决超出来源的问题。批量交付、中试线贯通及国产芯片应用率超过30%虽有支持，但核心限定未修复。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15405,
+      "output_tokens": 433,
+      "total_tokens": 22677
+    }
+  }
+]
