@@ -1,0 +1,16 @@
+{
+  "task": "6.CT",
+  "core_reference": "../workpaper-core-readiness-20261114/source-first-contract.json",
+  "core_conditions": 133,
+  "reference_not_model_input": true,
+  "sample_seed": "company-profile-core-20261114.v1",
+  "sample_unit": "instrument_id + fact_id unique retained workpaper object, not each metric or repeated view",
+  "supplemental_selection": "Exclude independently mapped core-support fact IDs. If <=20 objects remain, review all. Otherwise take the lowest SHA256(seed|instrument_id|fact_id) in each present group (metrics, qualitative, optional company_features/supply_chain), then fill by the same stable order to 20. Review all additional discovered doubts separately and deduplicate totals.",
+  "actual_projection_types": "WorkpaperFact with/without metric structure and optional feature/supply-chain elements. Do not fabricate typed Activity/Measurement counts not written by this path.",
+  "risk_reference": "../workpaper-fixed-pool-result-20261114/source-first-reference.json#risk_challenges",
+  "risk_categories": ["body", "income_columns_units", "subject_period", "purchase_sale_direction", "associated_leasing", "financial_disclosure"],
+  "source_review": "Read source-supported business meaning, subject/period, financial header/unit/column, qualifications and omissions. Coordinate/hash checks support source identity but do not replace semantic judgment.",
+  "counting": "Record each actually reviewed unique object verdict and core-condition verdict. Preserve original wrong candidates and first outcome. Independent withholding affects the derived research preview, never overwrites original query/raw receipts. Missing or unreviewed source does not imply correct/not_disclosed.",
+  "limitations": "No automatic S1/production release. Report formal negative-suite coverage separately from observed source/output risk challenges; do not count absent assertions or unchecked failures as a passed negative. Unknown/incomplete audit scopes remain explicit.",
+  "production_authorization": "not_authorized"
+}

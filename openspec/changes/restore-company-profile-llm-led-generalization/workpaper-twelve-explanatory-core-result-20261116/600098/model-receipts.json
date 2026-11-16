@@ -1,0 +1,42 @@
+[
+  {
+    "request_id": "bp-work-f144ce73637428b050cff286:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "195c39ae44f61f021c6317737ea9e12f60b6d5fab6ccb9b07bd33d5cfb1930cc",
+    "response_hash": "48dea978a389ecf5fc6243a45113301363751ba3aa4749de619b555ddfb13c73",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0035\",\"section-0042\",\"section-0044\",\"section-0049\",\"section-0064\",\"section-0066\",\"section-0093\",\"section-0116\"],\"rationale\":\"优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0035说明公司从事的业务情况；section-0042及其子节section-0044、section-0049为经营情况讨论与分析，涵盖经营质效、项目与市场开拓等本期变化；section-0064主营业务分析及section-0066收入和成本分析提供营业收入总额、分业务收入构成与成本，是货币化与主要业务权重的核心；section-0093行业经营性信息分析含电量电价、装机容量、发电效率等公司层面运营数据；section-0116主要控股参股公司分析补充业务主体结构。未选纯行业背景（section-0036）与泛化核心竞争力（section-0056），因公司层面经营讨论已覆盖且更直接解释公司个性。\",\"stop_reason\":\"已覆盖业务描述、经营讨论、收入构成与运营规模等核心经营信息，可停止；财务报告附注、治理、债券及行业背景等非本次经营阅读重点，不再扩展。\",\"deferred\":[\"section-0036行业情况：纯行业背景，非公司层面经营解释，暂不选\",\"section-0056核心竞争力：泛化竞争优势，信息密度低于经营讨论，暂不选\",\"section-1250分部信息：仅在主营业务收入构成仍有缺口时定向补充，当前section-0066已覆盖\",\"section-0391财务报告及附注：范围过大，仅按需定向补充，不整体选入\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0035",
+        "section-0042",
+        "section-0044",
+        "section-0049",
+        "section-0064",
+        "section-0066",
+        "section-0093",
+        "section-0116"
+      ],
+      "rationale": "优先选取能完整说明公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0035说明公司从事的业务情况；section-0042及其子节section-0044、section-0049为经营情况讨论与分析，涵盖经营质效、项目与市场开拓等本期变化；section-0064主营业务分析及section-0066收入和成本分析提供营业收入总额、分业务收入构成与成本，是货币化与主要业务权重的核心；section-0093行业经营性信息分析含电量电价、装机容量、发电效率等公司层面运营数据；section-0116主要控股参股公司分析补充业务主体结构。未选纯行业背景（section-0036）与泛化核心竞争力（section-0056），因公司层面经营讨论已覆盖且更直接解释公司个性。",
+      "stop_reason": "已覆盖业务描述、经营讨论、收入构成与运营规模等核心经营信息，可停止；财务报告附注、治理、债券及行业背景等非本次经营阅读重点，不再扩展。",
+      "deferred": [
+        "section-0036行业情况：纯行业背景，非公司层面经营解释，暂不选",
+        "section-0056核心竞争力：泛化竞争优势，信息密度低于经营讨论，暂不选",
+        "section-1250分部信息：仅在主营业务收入构成仍有缺口时定向补充，当前section-0066已覆盖",
+        "section-0391财务报告及附注：范围过大，仅按需定向补充，不整体选入"
+      ]
+    },
+    "usage": {
+      "input_tokens": 24419,
+      "output_tokens": 368,
+      "total_tokens": 24787
+    }
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "actual_original_taskservice_entries": 12,
+  "all_executed_three_reads_equal": true,
+  "retained_evidence_coordinates_valid": 11,
+  "frozen_code_and_shared_config_unchanged": true,
+  "operator_snapshot_matches_frozen_sha256": true,
+  "no_prior_semantics_or_reference_in_model_input": true,
+  "all_attempts_settled_and_each_and_group_bounds_checked": true,
+  "new_pytest": false,
+  "reused_engineering_validation": {
+    "commit": "7b8142bf",
+    "passed": 183,
+    "deselected": 3,
+    "seconds": 46.5
+  },
+  "formal_accuracy_recall_not_evaluated": true,
+  "totals": {
+    "core_supported": 112,
+    "core_partial": 8,
+    "core_missing": 13,
+    "independently_reviewed_objects": 333,
+    "independently_incorrect_objects": 7,
+    "physical_requests": 50,
+    "charged_tokens": 1238665,
+    "recoveries": 1,
+    "facts": 294,
+    "metrics": 436,
+    "feature_count": 8,
+    "feature_metrics": 7,
+    "supply_chain_facts": 31,
+    "all_facts": 333,
+    "all_metrics": 444,
+    "models": {
+      "deepseek:deepseek-flash": 32,
+      "scorpio:grok-4.7": 18
+    },
+    "finish_reasons": {
+      "stop": 50
+    },
+    "review_resolutions": {
+      "corrected_pending_trust": 11,
+      "repair_rejected": 2
+    },
+    "readable": 11,
+    "review_statuses": {
+      "completed": 7,
+      "null": 1,
+      "failed": 1,
+      "completed_with_open_findings": 2,
+      "incomplete": 1
+    },
+    "business_wall_seconds": 1372.653,
+    "company_business_median_seconds": 412.7475,
+    "supervision_wall_seconds": 1421.154,
+    "cost": "unknown"
+  }
+}

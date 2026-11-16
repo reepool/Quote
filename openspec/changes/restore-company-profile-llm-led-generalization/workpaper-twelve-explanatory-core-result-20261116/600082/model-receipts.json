@@ -1,0 +1,783 @@
+[
+  {
+    "request_id": "bp-work-81d3d4770b538fdccef95cb9:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "8f300c624c314dd0f1ea6ca108e430184ee3f0c1307bdf8679e40c03224caa0c",
+    "response_hash": "ac1c8df3bf7ff3e84e703b973355f73b288ceadbc55ce83bfaedcec33d497d47",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0049\",\"section-0051\",\"section-0063\",\"section-0064\",\"section-0066\",\"section-0111\",\"section-0124\",\"section-0939\"],\"rationale\":\"优先选取能完整解释公司业务结构、经营模式、收入构成与本期经营变化的实质章节：section-0049说明公司从事的业务与经营模式；section-0051为经营情况讨论与分析，覆盖盘活存量资产、园区运营、产业投资、财务与治理等经营主线；section-0063为报告期内主要经营情况总括；section-0064主营业务分析及section-0066收入和成本分析提供营业收入、成本与业务构成，是变现与收入结构的关键；section-0111行业经营性信息分析含房地产储备、开发投资、销售结转、出租及财务融资，解释园区/地产经营规模与资源投入；section-0124主要控股参股公司分析补充子公司经营与投资平台；section-0939营业收入和营业成本附注提供分业务收入明细，弥补正文表格口径。未选纯行业背景、核心竞争力泛述及治理、薪酬、关联交易等非经营核心内容。\",\"deferred\":[\"section-0050 行业情况：属行业背景，仅在影响公司解读时次要，暂不纳入\",\"section-0057 核心竞争力分析：偏泛化竞争优势描述，经营实质已由业务与经营讨论覆盖\",\"section-0126 未来发展讨论：含计划性前瞻，非本期经营事实，暂缓\",\"section-0318 关键审计事项及财务报告附注大部分：仅按需定向补充，不整体扩读\"],\"stop_reason\":\"已覆盖业务与经营模式、收入与成本构成、经营规模与资源投入、子公司经营及收入附注等核心经营信息，足以回答业务结构、变现方式、规模与本期变化；其余为行业背景、治理、前瞻或财务附注细节，继续扩读边际价值低，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0049",
+        "section-0051",
+        "section-0063",
+        "section-0064",
+        "section-0066",
+        "section-0111",
+        "section-0124",
+        "section-0939"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、经营模式、收入构成与本期经营变化的实质章节：section-0049说明公司从事的业务与经营模式；section-0051为经营情况讨论与分析，覆盖盘活存量资产、园区运营、产业投资、财务与治理等经营主线；section-0063为报告期内主要经营情况总括；section-0064主营业务分析及section-0066收入和成本分析提供营业收入、成本与业务构成，是变现与收入结构的关键；section-0111行业经营性信息分析含房地产储备、开发投资、销售结转、出租及财务融资，解释园区/地产经营规模与资源投入；section-0124主要控股参股公司分析补充子公司经营与投资平台；section-0939营业收入和营业成本附注提供分业务收入明细，弥补正文表格口径。未选纯行业背景、核心竞争力泛述及治理、薪酬、关联交易等非经营核心内容。",
+      "deferred": [
+        "section-0050 行业情况：属行业背景，仅在影响公司解读时次要，暂不纳入",
+        "section-0057 核心竞争力分析：偏泛化竞争优势描述，经营实质已由业务与经营讨论覆盖",
+        "section-0126 未来发展讨论：含计划性前瞻，非本期经营事实，暂缓",
+        "section-0318 关键审计事项及财务报告附注大部分：仅按需定向补充，不整体扩读"
+      ],
+      "stop_reason": "已覆盖业务与经营模式、收入与成本构成、经营规模与资源投入、子公司经营及收入附注等核心经营信息，足以回答业务结构、变现方式、规模与本期变化；其余为行业背景、治理、前瞻或财务附注细节，继续扩读边际价值低，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 19028,
+      "output_tokens": 420,
+      "total_tokens": 19448
+    }
+  },
+  {
+    "request_id": "bp-work-81d3d4770b538fdccef95cb9:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "63d651115beb09962d6797c6d388c5f4ab85ab13a63f6c2c553d208e659e4fd7",
+    "response_hash": "656740f69746e870292308ffebdb86e48d55a899aec053622177cfacafabc6a3",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司为天津滨海高新区国有控股上市公司，以工业园区运营为核心主业，形成“园区运营为存量根基、产业投资为增量引擎”的双轮驱动架构，稳步转型产业园区运营商及科技服务提供商。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"业务板块包括园区运营、产业投资和孵化服务；旗下海泰孵化器为在孵企业提供咨询、培训等专业化服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"科技园区开发业务以房产销售为主，报告期通过优化调整定价策略使房产销售成交量增长；科技园区运营业务以房产租赁及物业服务为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]},{\"fact_id\":\"F04\",\"text\":\"商品销售业务为公司仅作为代理人开展的净额法贸易业务，报告期业务量减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F05\",\"text\":\"产业投资方面，公司参与布局以新质生产力为投资方向的产业基金，聚焦园区主导产业及优质科创企业开展投资；持有之路海河（天津）投资合伙企业49%基金份额、新格局海河滨海股权投资基金3.33%基金份额。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0017\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F06\",\"text\":\"公司营业收入主要来自科技园区开发（房产销售）和科技园区运营（房产租赁及服务），另有少量商品销售贸易业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0022\"]},{\"fact_id\":\"F07\",\"text\":\"按收入确认时点划分，客户合同产生的收入中绝大部分在某一时点确认，另有少量服务收入在某一时段内确认；租赁收入单独列示。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\",\"source-0022\"]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F08\",\"text\":\"报告期公司实现营业收入44,924.06万元，较上年同期增加33.06%，主要系科技园区开发收入和科技园区运营收入增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"44,924.06\",\"value\":\"44924.06\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"33.06\",\"value\":\"33.06\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"科技园区开发业务营业收入418,710,800.51元，营业成本341,118,587.17元，毛利率18.53%，收入比上年增35.15%、成本增112.60%，毛利率减少29.68个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"科技园区开发营业收入\",\"raw_value\":\"418,710,800.51\",\"value\":\"418710800.51\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区开发营业成本\",\"raw_value\":\"341,118,587.17\",\"value\":\"341118587.17\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区开发毛利率\",\"raw_value\":\"18.53\",\"value\":\"18.53\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区开发毛利率比上年增减\",\"raw_value\":\"29.68\",\"value\":\"29.68\",\"unit\":\"百分点\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F10\",\"text\":\"科技园区运营业务营业收入30,105,192.48元，营业成本14,372,966.79元，毛利率52.26%，收入比上年增11.60%、成本增17.02%，毛利率减少2.21个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"科技园区运营营业收入\",\"raw_value\":\"30,105,192.48\",\"value\":\"30105192.48\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区运营营业成本\",\"raw_value\":\"14,372,966.79\",\"value\":\"14372966.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区运营毛利率\",\"raw_value\":\"52.26\",\"value\":\"52.26\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区运营毛利率比上年增减\",\"raw_value\":\"2.21\",\"value\":\"2.21\",\"unit\":\"百分点\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F11\",\"text\":\"商品销售业务营业收入424,569.35元，营业成本未列示，收入比上年减少49.75%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"商品销售业务营业收入\",\"raw_value\":\"424,569.35\",\"value\":\"424569.35\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"商品销售业务营业收入比上年增减\",\"raw_value\":\"-49.75\",\"value\":\"-49.75\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"报告期公司实现归属于母公司股东的净利润-7,298.33万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"-7,298.33\",\"value\":\"-7298.33\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"按收入明细，客户合同产生的收入419,178,838.16元，租赁收入30,061,724.18元，合计449,240,562.34元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\",\"source-0022\"],\"metrics\":[{\"name\":\"客户合同产生的收入\",\"raw_value\":\"419,178,838.16\",\"value\":\"419178838.16\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"租赁收入\",\"raw_value\":\"30,061,724.18\",\"value\":\"30061724.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F14\",\"text\":\"科技园区开发成本主要由土地成本和建安配套及其他构成，本期土地成本64,573,950.00元、建安配套及其他276,544,637.17元；科技园区运营成本主要为租赁成本14,286,183.40元和服务成本86,783.39元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"科技园区开发土地成本\",\"raw_value\":\"64,573,950.00\",\"value\":\"64573950.00\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区开发建安配套及其他成本\",\"raw_value\":\"276,544,637.17\",\"value\":\"276544637.17\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区运营租赁成本\",\"raw_value\":\"14,286,183.40\",\"value\":\"14286183.40\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"科技园区运营服务成本\",\"raw_value\":\"86,783.39\",\"value\":\"86783.39\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"公司通过市场化、专业化招商盘活存量资产，创新“科创合伙人”理念、打造“科创园中园”项目，上线一体化智慧园区管理平台，并组建海泰发展产业服务联盟。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F16\",\"text\":\"报告期公司股权投资总额1亿元，用于对全资子公司天津海泰企业孵化服务有限公司增资，增资款已投出并完成工商登记变更。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"对全资子公司增资金额\",\"raw_value\":\"1\",\"value\":\"1\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F17\",\"text\":\"公司业务全部为内销，主营业务分地区仅列示内销，营业收入449,240,562.34元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F18\",\"text\":\"前五名客户销售额42,853.20万元，占年度销售总额95.39%；其中客户一销售额41,871.42万元，占年度销售总额93.20%，为报告期内向单个客户销售比例超过总额50%的客户且为前五名中新增客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"42,853.20\",\"value\":\"42853.20\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"95.39\",\"value\":\"95.39\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"客户一销售额\",\"raw_value\":\"41,871.42\",\"value\":\"41871.42\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"客户一销售额占年度销售总额比例\",\"raw_value\":\"93.20\",\"value\":\"93.20\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"前五名供应商采购额1,322.63万元，占年度采购总额60.91%；其中供应商二、三、四为前五名中新增供应商。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"1,322.63\",\"value\":\"1322.63\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"60.91\",\"value\":\"60.91\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F20\",\"text\":\"营业收入增加主要系公司房产销售收入增加所致；营业成本增加主要系房产销售收入增加、房产销售成本相应增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F21\",\"text\":\"科技园区开发板块毛利率下降，主要原因是公司为加快资金回笼、推进低效资产去化，优化调整定价策略，导致房产销售毛利减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F22\",\"text\":\"科技园区运营板块营业收入和营业成本增加，主要原因是房产租赁业务增加；服务成本增加主要系物业服务成本增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]},{\"fact_id\":\"F23\",\"text\":\"财务费用减少主要系利息费用减少；报告期实现融资成本大幅压降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0005\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"2025年7月21日公司股东会审议通过将全资子公司天津海发方信置地有限公司100%股权以9,065.95万元价格转让给天津海泰房地产开发有限公司，报告期内已完成全款支付和股权交割。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0018\"],\"metrics\":[{\"name\":\"转让天津海发方信置地有限公司100%股权价格\",\"raw_value\":\"9,065.95\",\"value\":\"9065.95\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F25\",\"text\":\"公司筹划以现金方式购买知学云（北京）科技股份有限公司控股权，因交易双方未就交易对价、交易方式等关键条款达成一致，2025年12月5日董事会审议通过终止本次重大资产重组。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]}]},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"公司为天津滨海高新区唯一的国有控股上市公司，深度践行区域发展战略，发挥国有资本引领支撑作用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"公司作为产业园区运营商及科技服务提供商，主要开展园区开发销售、园区租赁运营、孵化服务及产业投资，属于园区开发运营与服务环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F28\",\"text\":\"科技园区开发的主要成本投入为土地成本和建安配套，报告期土地成本及建安配套成本增加主要系所售房地产项目土地成本及建安配套成本投入较上期销售项目高且房产销售数量增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"公司房产销售及租赁面向内销市场，客户集中度高，前五名客户销售额占年度销售总额95.39%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0008\"]}]}},\"limitations\":[\"未选行业背景、核心竞争力泛述、未来发展讨论及大部分财务报告附注，相关细节未纳入。\",\"商品销售业务营业成本在分行业表中未列示，未推断其金额。\",\"产业投资板块未单独披露营业收入及利润构成，相关规模无法量化。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司为天津滨海高新区国有控股上市公司，以工业园区运营为核心主业，形成“园区运营为存量根基、产业投资为增量引擎”的双轮驱动架构，稳步转型产业园区运营商及科技服务提供商。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "业务板块包括园区运营、产业投资和孵化服务；旗下海泰孵化器为在孵企业提供咨询、培训等专业化服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "科技园区开发业务以房产销售为主，报告期通过优化调整定价策略使房产销售成交量增长；科技园区运营业务以房产租赁及物业服务为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "商品销售业务为公司仅作为代理人开展的净额法贸易业务，报告期业务量减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "产业投资方面，公司参与布局以新质生产力为投资方向的产业基金，聚焦园区主导产业及优质科创企业开展投资；持有之路海河（天津）投资合伙企业49%基金份额、新格局海河滨海股权投资基金3.33%基金份额。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0017"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F06",
+              "text": "公司营业收入主要来自科技园区开发（房产销售）和科技园区运营（房产租赁及服务），另有少量商品销售贸易业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0022"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "按收入确认时点划分，客户合同产生的收入中绝大部分在某一时点确认，另有少量服务收入在某一时段内确认；租赁收入单独列示。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021",
+                "source-0022"
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F08",
+              "text": "报告期公司实现营业收入44,924.06万元，较上年同期增加33.06%，主要系科技园区开发收入和科技园区运营收入增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "44,924.06",
+                  "value": "44924.06",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "33.06",
+                  "value": "33.06",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "科技园区开发业务营业收入418,710,800.51元，营业成本341,118,587.17元，毛利率18.53%，收入比上年增35.15%、成本增112.60%，毛利率减少29.68个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "科技园区开发营业收入",
+                  "raw_value": "418,710,800.51",
+                  "value": "418710800.51",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区开发营业成本",
+                  "raw_value": "341,118,587.17",
+                  "value": "341118587.17",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区开发毛利率",
+                  "raw_value": "18.53",
+                  "value": "18.53",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区开发毛利率比上年增减",
+                  "raw_value": "29.68",
+                  "value": "29.68",
+                  "unit": "百分点",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "科技园区运营业务营业收入30,105,192.48元，营业成本14,372,966.79元，毛利率52.26%，收入比上年增11.60%、成本增17.02%，毛利率减少2.21个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "科技园区运营营业收入",
+                  "raw_value": "30,105,192.48",
+                  "value": "30105192.48",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区运营营业成本",
+                  "raw_value": "14,372,966.79",
+                  "value": "14372966.79",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区运营毛利率",
+                  "raw_value": "52.26",
+                  "value": "52.26",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区运营毛利率比上年增减",
+                  "raw_value": "2.21",
+                  "value": "2.21",
+                  "unit": "百分点",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "商品销售业务营业收入424,569.35元，营业成本未列示，收入比上年减少49.75%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "商品销售业务营业收入",
+                  "raw_value": "424,569.35",
+                  "value": "424569.35",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "商品销售业务营业收入比上年增减",
+                  "raw_value": "-49.75",
+                  "value": "-49.75",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "报告期公司实现归属于母公司股东的净利润-7,298.33万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于母公司股东的净利润",
+                  "raw_value": "-7,298.33",
+                  "value": "-7298.33",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "按收入明细，客户合同产生的收入419,178,838.16元，租赁收入30,061,724.18元，合计449,240,562.34元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021",
+                "source-0022"
+              ],
+              "metrics": [
+                {
+                  "name": "客户合同产生的收入",
+                  "raw_value": "419,178,838.16",
+                  "value": "419178838.16",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁收入",
+                  "raw_value": "30,061,724.18",
+                  "value": "30061724.18",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F14",
+              "text": "科技园区开发成本主要由土地成本和建安配套及其他构成，本期土地成本64,573,950.00元、建安配套及其他276,544,637.17元；科技园区运营成本主要为租赁成本14,286,183.40元和服务成本86,783.39元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "科技园区开发土地成本",
+                  "raw_value": "64,573,950.00",
+                  "value": "64573950.00",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区开发建安配套及其他成本",
+                  "raw_value": "276,544,637.17",
+                  "value": "276544637.17",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区运营租赁成本",
+                  "raw_value": "14,286,183.40",
+                  "value": "14286183.40",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "科技园区运营服务成本",
+                  "raw_value": "86,783.39",
+                  "value": "86783.39",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "公司通过市场化、专业化招商盘活存量资产，创新“科创合伙人”理念、打造“科创园中园”项目，上线一体化智慧园区管理平台，并组建海泰发展产业服务联盟。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "报告期公司股权投资总额1亿元，用于对全资子公司天津海泰企业孵化服务有限公司增资，增资款已投出并完成工商登记变更。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "对全资子公司增资金额",
+                  "raw_value": "1",
+                  "value": "1",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F17",
+              "text": "公司业务全部为内销，主营业务分地区仅列示内销，营业收入449,240,562.34元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "前五名客户销售额42,853.20万元，占年度销售总额95.39%；其中客户一销售额41,871.42万元，占年度销售总额93.20%，为报告期内向单个客户销售比例超过总额50%的客户且为前五名中新增客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "42,853.20",
+                  "value": "42853.20",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "95.39",
+                  "value": "95.39",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客户一销售额",
+                  "raw_value": "41,871.42",
+                  "value": "41871.42",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客户一销售额占年度销售总额比例",
+                  "raw_value": "93.20",
+                  "value": "93.20",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "前五名供应商采购额1,322.63万元，占年度采购总额60.91%；其中供应商二、三、四为前五名中新增供应商。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "1,322.63",
+                  "value": "1322.63",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "60.91",
+                  "value": "60.91",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F20",
+              "text": "营业收入增加主要系公司房产销售收入增加所致；营业成本增加主要系房产销售收入增加、房产销售成本相应增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "科技园区开发板块毛利率下降，主要原因是公司为加快资金回笼、推进低效资产去化，优化调整定价策略，导致房产销售毛利减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "科技园区运营板块营业收入和营业成本增加，主要原因是房产租赁业务增加；服务成本增加主要系物业服务成本增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "财务费用减少主要系利息费用减少；报告期实现融资成本大幅压降。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F24",
+              "text": "2025年7月21日公司股东会审议通过将全资子公司天津海发方信置地有限公司100%股权以9,065.95万元价格转让给天津海泰房地产开发有限公司，报告期内已完成全款支付和股权交割。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "转让天津海发方信置地有限公司100%股权价格",
+                  "raw_value": "9,065.95",
+                  "value": "9065.95",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "公司筹划以现金方式购买知学云（北京）科技股份有限公司控股权，因交易双方未就交易对价、交易方式等关键条款达成一致，2025年12月5日董事会审议通过终止本次重大资产重组。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            }
+          ]
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F26",
+              "text": "公司为天津滨海高新区唯一的国有控股上市公司，深度践行区域发展战略，发挥国有资本引领支撑作用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F27",
+              "text": "公司作为产业园区运营商及科技服务提供商，主要开展园区开发销售、园区租赁运营、孵化服务及产业投资，属于园区开发运营与服务环节。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F28",
+              "text": "科技园区开发的主要成本投入为土地成本和建安配套，报告期土地成本及建安配套成本增加主要系所售房地产项目土地成本及建安配套成本投入较上期销售项目高且房产销售数量增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F29",
+              "text": "公司房产销售及租赁面向内销市场，客户集中度高，前五名客户销售额占年度销售总额95.39%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0008"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "未选行业背景、核心竞争力泛述、未来发展讨论及大部分财务报告附注，相关细节未纳入。",
+        "商品销售业务营业成本在分行业表中未列示，未推断其金额。",
+        "产业投资板块未单独披露营业收入及利润构成，相关规模无法量化。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 15937,
+      "output_tokens": 3888,
+      "total_tokens": 19825
+    }
+  },
+  {
+    "request_id": "bp-work-81d3d4770b538fdccef95cb9:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "cf8ab3341103ddbd5c062cfb4c4a86dac975552de686cf4768e43253bfd7d6d4",
+    "response_hash": "2b78ed1c379fdc90ba1caea1d5371fb6461cdec25267c422fc1e254a32d5ec85",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F27\",\"F28\",\"F29\"],\"findings\":[{\"finding_id\":\"RF01\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0005\",\"source-0004\"],\"explanation\":\"底稿已正确列示营业收入、分行业构成、毛利率下降及归母净利润-7,298.33万元，但未纳入报告期资产减值损失45,477,408.86元（损失以负数填列）。来源说明该损失增加主要因计提存货跌价准备及投资性房地产减值准备，金额相对净亏损属于重大盈利调整；仅保留房产销售让利，不能完整说明亏损。应补充该减值事实，已支持的收入、成本和毛利率表述可保留。\"},{\"finding_id\":\"RF02\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F24\",\"evidence_ids\":[\"source-0008\",\"source-0018\"],\"explanation\":\"转让天津海发方信置地有限公司100%股权的价格9,065.95万元、受让方及报告期内完成付款和交割均有来源支持，但议案明确为关联交易，底稿未保留该限定。应保留已支持的转让事实，并补充关联交易属性。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F27",
+        "F28",
+        "F29"
+      ],
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0005",
+            "source-0004"
+          ],
+          "explanation": "底稿已正确列示营业收入、分行业构成、毛利率下降及归母净利润-7,298.33万元，但未纳入报告期资产减值损失45,477,408.86元（损失以负数填列）。来源说明该损失增加主要因计提存货跌价准备及投资性房地产减值准备，金额相对净亏损属于重大盈利调整；仅保留房产销售让利，不能完整说明亏损。应补充该减值事实，已支持的收入、成本和毛利率表述可保留。"
+        },
+        {
+          "finding_id": "RF02",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "possible_omission",
+          "affected_fact_id": "F24",
+          "evidence_ids": [
+            "source-0008",
+            "source-0018"
+          ],
+          "explanation": "转让天津海发方信置地有限公司100%股权的价格9,065.95万元、受让方及报告期内完成付款和交割均有来源支持，但议案明确为关联交易，底稿未保留该限定。应保留已支持的转让事实，并补充关联交易属性。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 21110,
+      "output_tokens": 404,
+      "total_tokens": 52714
+    }
+  }
+]

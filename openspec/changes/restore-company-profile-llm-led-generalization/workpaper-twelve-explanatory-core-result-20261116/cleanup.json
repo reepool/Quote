@@ -1,0 +1,20 @@
+{
+  "task": "6.CT",
+  "pre_development_unneeded_owned_artifacts": 0,
+  "pre_development_released_bytes": 0,
+  "settled_entry_roots_deleted_by_finally": 12,
+  "settled_entry_roots_released_bytes": 21559953,
+  "closeout_deleted": [
+    {"path": "/home/python/Quote/data/QuoteBak/workpaper-ct-prepared-cel7vbfi", "bytes": 12655027, "purpose": "settled preparation JSON copies and supervision logs"},
+    {"path": "/home/python/Quote/data/QuoteBak/workpaper-ct-operator.py", "bytes": 29088, "retained_snapshot": "operator-snapshot.txt"},
+    {"path": "/home/python/Quote/data/QuoteBak/workpaper-ct-audit.py", "bytes": 3460, "purpose": "read-only source inspection helper; authoritative source and audit retained"},
+    {"path": "/home/python/Quote/data/QuoteBak/workpaper-ct-closeout.py", "bytes": 14025, "retained_snapshot": "closeout-snapshot.txt"}
+  ],
+  "closeout_released_bytes": 12701600,
+  "total_released_bytes": 34261553,
+  "active_CT_processes_before_closeout_cleanup": 0,
+  "snapshot_hashes_verified_before_deletion": true,
+  "temporary_paths_remaining": [],
+  "recovery": "Preparation copies can be rebuilt from retained official sources, cache and snapshots; authoritative receipts retained once in this directory; consumed attempts are not restored.",
+  "protected": ["official PDFs", "useful parse cache", "historical receipts", "attempt markers", "pre-existing and parallel working-tree changes", "unrelated temporary artifacts"]
+}

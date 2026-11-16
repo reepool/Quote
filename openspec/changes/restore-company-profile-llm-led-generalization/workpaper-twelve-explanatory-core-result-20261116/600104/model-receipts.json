@@ -1,0 +1,1110 @@
+[
+  {
+    "request_id": "bp-work-e953bfa4c98f963e8e2c9c0c:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "5abd41376d99dc808e156cc3e7cbb7fdb232e265ea470770c9f81571dc74bc29",
+    "response_hash": "228b270c7fdd2118c0cd6a53df3589832628c6ca352c897fc0be8d55b25a85d2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0039\",\"section-0045\",\"section-0053\",\"section-0055\",\"section-0078\",\"section-0080\",\"section-0082\",\"section-0083\",\"section-0106\"],\"rationale\":\"选取管理层讨论与分析中公司业务情况（section-0039）说明整车、零部件、移动出行、金融、创新等板块及经营模式；经营情况讨论与分析（section-0045）概括本期经营举措与变化；主营业务分析（section-0053）及收入和成本分析（section-0055）提供营业收入总额、分业务/分产品收入构成与成本，是收入与主要业务权重的核心来源；行业经营性信息分析（section-0078）下的整车产销量（section-0080）、新能源汽车业务（section-0082）、汽车金融业务（section-0083）补充规模、产品结构与金融业务收入模式；主要控股参股公司分析（section-0106）补充重要子公司经营与利润贡献。以上共同覆盖业务结构、产品用途、盈利来源、规模与主要构成、经营变化，且避免选择父子重叠的纯目录或过细条目。\",\"deferred\":[\"section-0044 行业情况：属纯行业背景，对解释公司层面经营非必需，故不选\",\"section-0051 核心竞争力分析：偏泛化竞争力描述，信息密度低于经营与收入分析，故不选\",\"section-0054 利润表及现金流量表相关科目变动分析表：与收入成本分析部分重叠，且以财务科目变动为主，未纳入以保持精简\",\"section-0085 投资状况分析及后续基金明细：属投资与金融资产明细，非主营业务收入解释核心，故不选\",\"section-0108 未来发展讨论与分析：含计划性展望，非本期经营事实，按material_only原则不选\",\"第八节财务报告中的收入附注、分部信息等：主营业务分析已提供收入构成，暂不扩读整份财务报告\"],\"stop_reason\":\"已选取覆盖业务结构、产品与服务、收入来源与主要构成、产销量与新能源/金融业务规模、重要子公司贡献的完整经营子节，可回答主要经营问题；剩余为行业背景、治理、投资明细与财务报告附注，属次要或重复范围，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0039",
+        "section-0045",
+        "section-0053",
+        "section-0055",
+        "section-0078",
+        "section-0080",
+        "section-0082",
+        "section-0083",
+        "section-0106"
+      ],
+      "rationale": "选取管理层讨论与分析中公司业务情况（section-0039）说明整车、零部件、移动出行、金融、创新等板块及经营模式；经营情况讨论与分析（section-0045）概括本期经营举措与变化；主营业务分析（section-0053）及收入和成本分析（section-0055）提供营业收入总额、分业务/分产品收入构成与成本，是收入与主要业务权重的核心来源；行业经营性信息分析（section-0078）下的整车产销量（section-0080）、新能源汽车业务（section-0082）、汽车金融业务（section-0083）补充规模、产品结构与金融业务收入模式；主要控股参股公司分析（section-0106）补充重要子公司经营与利润贡献。以上共同覆盖业务结构、产品用途、盈利来源、规模与主要构成、经营变化，且避免选择父子重叠的纯目录或过细条目。",
+      "deferred": [
+        "section-0044 行业情况：属纯行业背景，对解释公司层面经营非必需，故不选",
+        "section-0051 核心竞争力分析：偏泛化竞争力描述，信息密度低于经营与收入分析，故不选",
+        "section-0054 利润表及现金流量表相关科目变动分析表：与收入成本分析部分重叠，且以财务科目变动为主，未纳入以保持精简",
+        "section-0085 投资状况分析及后续基金明细：属投资与金融资产明细，非主营业务收入解释核心，故不选",
+        "section-0108 未来发展讨论与分析：含计划性展望，非本期经营事实，按material_only原则不选",
+        "第八节财务报告中的收入附注、分部信息等：主营业务分析已提供收入构成，暂不扩读整份财务报告"
+      ],
+      "stop_reason": "已选取覆盖业务结构、产品与服务、收入来源与主要构成、产销量与新能源/金融业务规模、重要子公司贡献的完整经营子节，可回答主要经营问题；剩余为行业背景、治理、投资明细与财务报告附注，属次要或重复范围，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 23882,
+      "output_tokens": 494,
+      "total_tokens": 24376
+    }
+  },
+  {
+    "request_id": "bp-work-e953bfa4c98f963e8e2c9c0c:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "49972e78588aaf96c6f8346a534f80521a5039d28e0f21fc8e0a57147b07f08f",
+    "response_hash": "e83ee4962f459e637b3fa46408f24127548aafe96cc8609e6eddd1139a8ae01d",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司业务以整车为主，并协同发展零部件、移动出行和服务、金融等板块，形成多板块联动的汽车集团经营结构。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F02\",\"text\":\"报告期内公司撤销商用车事业部，将职能整合并入上汽大通，实施商用车业务扁平化管理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F03\",\"text\":\"零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F04\",\"text\":\"整车业务涵盖自主品牌乘用车、合资品牌乘用车及商用车，报告期推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F05\",\"text\":\"公司与华为合作推出“尚界”品牌，2月签署战略合作协议，9月下旬投放首款产品尚界H5。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F06\",\"text\":\"零部件板块完善智能电动化核心技术布局，推进固态电池、智能底盘等技术的产业化落地。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F07\",\"text\":\"金融板块加强汽车金融服务精细化发展，支持尚界等新业务，并加快拓展海外金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F08\",\"text\":\"移动出行和服务板块聚焦服务整车业务，安吉物流报告期内有8艘滚装新船启航，提升至南美、欧洲等航线运能。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F09\",\"text\":\"公司主要通过整车销售、零部件销售、劳务及其他服务以及金融服务取得收入；主营业务分产品包括整车业务、零部件业务、劳务及其他、金融业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F10\",\"text\":\"金融业务由汽车金融子公司开展，通过发放汽车贷款等取得利息及服务收入，报告期金融业务毛利率为88.47%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0013\"],\"metrics\":[{\"name\":\"金融业务毛利率\",\"raw_value\":\"88.47\",\"value\":\"88.47\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"公司存在贸易业务收入，本报告期主要系汽车芯片及相关汽车零部件的出口贸易业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"贸易业务本期营业收入\",\"raw_value\":\"206,508,725.66\",\"value\":\"206508725.66\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F12\",\"text\":\"2025年公司实现合并营业总收入6562.4亿元，同比增长4.6%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"合并营业总收入\",\"raw_value\":\"6562.4\",\"value\":\"6562.4\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"合并营业总收入同比增长率\",\"raw_value\":\"4.6\",\"value\":\"4.6\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"主营业务分产品收入构成：整车业务收入4101.96亿元，零部件业务收入2030.20亿元，劳务及其他收入329.36亿元，金融业务收入100.92亿元，合计6562.44亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"整车业务营业收入\",\"raw_value\":\"410,196,473,001.11\",\"value\":\"410196473001.11\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"零部件业务营业收入\",\"raw_value\":\"203,019,866,775.26\",\"value\":\"203019866775.26\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"劳务及其他营业收入\",\"raw_value\":\"32,935,762,112.94\",\"value\":\"32935762112.94\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"金融业务营业收入\",\"raw_value\":\"10,091,710,191.88\",\"value\":\"10091710191.88\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分产品合计营业收入\",\"raw_value\":\"656,243,812,081.18\",\"value\":\"656243812081.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"主营业务分行业收入构成：汽车制造业收入6461.52亿元，金融业收入100.92亿元，合计6562.44亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"汽车制造业营业收入\",\"raw_value\":\"646,152,101,889.30\",\"value\":\"646152101889.30\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"金融业营业收入\",\"raw_value\":\"10,091,710,191.88\",\"value\":\"10091710191.88\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业合计营业收入\",\"raw_value\":\"656,243,812,081.18\",\"value\":\"656243812081.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"全年整车销售450.7万辆，同比增长12.3%，市场占有率13.1%，同比上升0.3个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"整车销量\",\"raw_value\":\"450.7\",\"value\":\"450.7\",\"unit\":\"万辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"整车销量同比增长率\",\"raw_value\":\"12.3\",\"value\":\"12.3\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"市场占有率\",\"raw_value\":\"13.1\",\"value\":\"13.1\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"市场占有率同比变动\",\"raw_value\":\"0.3\",\"value\":\"0.3\",\"unit\":\"百分点\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F16\",\"text\":\"自主品牌销量292.8万辆，同比增长21.6%，占公司整体销量比重65%，同比提升约5个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"自主品牌销量\",\"raw_value\":\"292.8\",\"value\":\"292.8\",\"unit\":\"万辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"自主品牌销量同比增长率\",\"raw_value\":\"21.6\",\"value\":\"21.6\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"自主品牌销量占整体销量比重\",\"raw_value\":\"65\",\"value\":\"65\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"自主品牌销量占比同比提升\",\"raw_value\":\"约5\",\"value\":\"5\",\"unit\":\"百分点\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F17\",\"text\":\"新能源车销售164.3万辆，同比增长33.1%，高于全国新能源车市场平均增速近5个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"新能源车销量\",\"raw_value\":\"164.3\",\"value\":\"164.3\",\"unit\":\"万辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"新能源车销量同比增长率\",\"raw_value\":\"33.1\",\"value\":\"33.1\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F18\",\"text\":\"出口及海外市场销售107.1万辆，同比增长3.1%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"出口及海外市场销量\",\"raw_value\":\"107.1\",\"value\":\"107.1\",\"unit\":\"万辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"出口及海外市场销量同比增长率\",\"raw_value\":\"3.1\",\"value\":\"3.1\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"主营业务分地区收入：中国地区5041.39亿元，其他地区1521.05亿元，合计6562.44亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"中国地区营业收入\",\"raw_value\":\"504,138,835,950.64\",\"value\":\"504138835950.64\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"其他地区营业收入\",\"raw_value\":\"152,104,976,130.54\",\"value\":\"152104976130.54\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F20\",\"text\":\"公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统和智能车全栈解决方案的“七大技术底座”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F21\",\"text\":\"报告期研发投入合计217.06亿元，占营业收入比例3.36%，研发人员数量30329人，占公司总人数17.6%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"21,706,037,747.07\",\"value\":\"21706037747.07\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"3.36\",\"value\":\"3.36\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量\",\"raw_value\":\"30,329\",\"value\":\"30329\",\"unit\":\"人\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"17.6\",\"value\":\"17.6\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F22\",\"text\":\"成本构成中，汽车制造业成本主要为原材料、人工工资、折旧、能源等，本期金额5809.44亿元，占总成本比例99.80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"汽车制造业成本\",\"raw_value\":\"580,943,983,649.41\",\"value\":\"580943983649.41\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"汽车制造业成本占总成本比例\",\"raw_value\":\"99.80\",\"value\":\"99.80\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F23\",\"text\":\"公司主要工厂设计产能合计约699.2万辆，报告期内产能合计约444.6万辆；其中上汽通用五菱产能利用率95%，上汽集团乘用车分公司76%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"上汽通用五菱产能利用率\",\"raw_value\":\"95\",\"value\":\"95\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"上汽集团乘用车分公司产能利用率\",\"raw_value\":\"76\",\"value\":\"76\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"前五名客户销售额754.58亿元，占年度销售总额11.68%；前五名供应商采购额2149.67亿元，占年度采购总额37%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"7,545,821.15\",\"value\":\"7545821.15\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"11.68\",\"value\":\"11.68\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"21,496,663.81\",\"value\":\"21496663.81\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"37\",\"value\":\"37\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F25\",\"text\":\"MG品牌在欧洲市场销量超过30万辆，并在澳新、中东、拉美、东南亚等地区的18个国家乘用车市场排名跻身当地前十。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"MG品牌欧洲市场销量\",\"raw_value\":\"超30\",\"value\":\"30\",\"unit\":\"万辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F26\",\"text\":\"公司通过在海外设立代工厂、CKD等方式推进本地化生产；上汽通用五菱印尼基地新能源汽车产销占比提升至80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"上汽通用五菱印尼基地新能源汽车产销占比\",\"raw_value\":\"80\",\"value\":\"80\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F27\",\"text\":\"结合全新MG4上市，公司在86城布局120家快闪店，通过“轻量化引流”促进4S店高效率转化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F28\",\"text\":\"公司自主品牌新能源车销量增速近50%；上汽大众、上汽通用分别推出AUDI E5、别克至境L7等中高端智电新品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"自主品牌新能源车销量增速\",\"raw_value\":\"近50\",\"value\":\"50\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F29\",\"text\":\"“恒星”超级增程、“灵蜥”底盘2.0等新技术实现量产装车；公司获颁上海市新一批智能网联汽车示范运营牌照，成为行业唯一获得乘用车和商用车领域“双牌照”企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F30\",\"text\":\"公司率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"上汽国产芯片应用率\",\"raw_value\":\"超30\",\"value\":\"30\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"上汽大众、上汽通用优化基地布局，释放出的产能用于生产“尚界”等自主品牌产品；上汽大通累计退出近百家直营店。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F32\",\"text\":\"上汽红岩司法重整方案获法院批准并已启动实施；报告期内上汽红岩汽车有限公司以破产重整方式处置。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0016\"]},{\"fact_id\":\"F33\",\"text\":\"公司以2100万元对价转让原持有的上海大众联合汽车改装有限公司100%股权，交易完成后丧失控制权，不再纳入合并范围。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"大众联合改装100%股权转让对价\",\"raw_value\":\"21,000,000.00\",\"value\":\"21000000.00\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F34\",\"text\":\"公司以1380万元对价转让原持有的上海机动车回收服务中心有限公司51%股权，持股比例下降至5%，丧失控制权。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"服务中心51%股权转让对价\",\"raw_value\":\"13,800,000.00\",\"value\":\"13800000.00\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F35\",\"text\":\"公司处于汽车产业链的整车制造与销售环节，同时通过零部件、移动出行和服务、金融等板块向产业链上下游延伸。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F36\",\"text\":\"汽车制造业成本构成包括原材料、人工工资、折旧、能源等；公司推进固态电池与汽车芯片研发应用，国产芯片应用率已超过30%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0003\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F37\",\"text\":\"公司产品面向国内及海外乘用车和商用车市场，客户包括个人消费者及企业客户；前五名客户销售额占年度销售总额11.68%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0012\"]}]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F38\",\"text\":\"公司汽车金融业务由上海汽车集团财务有限责任公司、上汽通用汽车金融有限责任公司、上海东正汽车金融股份有限公司等子公司开展，报告期上汽财务公司营业收入60.76亿元、净利润42.70亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"上汽财务公司营业收入\",\"raw_value\":\"60.76\",\"value\":\"60.76\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"上汽财务公司净利润\",\"raw_value\":\"42.70\",\"value\":\"42.70\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F39\",\"text\":\"安吉物流自营远洋滚装船已达21艘，报告期内有8艘滚装新船启航，持续提升全链国际物流能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"metrics\":[{\"name\":\"安吉物流自营远洋滚装船数量\",\"raw_value\":\"21\",\"value\":\"21\",\"unit\":\"艘\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"limitations\":[\"未读取行业背景、核心竞争力分析、利润表及现金流量表相关科目变动分析表、投资状况分析、未来发展讨论与分析及财务报告附注等章节，相关补充信息未纳入。\",\"分产品收入中“劳务及其他”包含内容未在选定章节中详细说明。\",\"新能源汽车收入及补贴按车型类别列示，未按整车业务整体口径拆分。\",\"主要子公司分析仅列示部分子公司，未覆盖全部控股参股公司。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司业务以整车为主，并协同发展零部件、移动出行和服务、金融等板块，形成多板块联动的汽车集团经营结构。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "报告期内公司撤销商用车事业部，将职能整合并入上汽大通，实施商用车业务扁平化管理。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F04",
+              "text": "整车业务涵盖自主品牌乘用车、合资品牌乘用车及商用车，报告期推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "公司与华为合作推出“尚界”品牌，2月签署战略合作协议，9月下旬投放首款产品尚界H5。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "零部件板块完善智能电动化核心技术布局，推进固态电池、智能底盘等技术的产业化落地。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "金融板块加强汽车金融服务精细化发展，支持尚界等新业务，并加快拓展海外金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "移动出行和服务板块聚焦服务整车业务，安吉物流报告期内有8艘滚装新船启航，提升至南美、欧洲等航线运能。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F09",
+              "text": "公司主要通过整车销售、零部件销售、劳务及其他服务以及金融服务取得收入；主营业务分产品包括整车业务、零部件业务、劳务及其他、金融业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "金融业务由汽车金融子公司开展，通过发放汽车贷款等取得利息及服务收入，报告期金融业务毛利率为88.47%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "金融业务毛利率",
+                  "raw_value": "88.47",
+                  "value": "88.47",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "公司存在贸易业务收入，本报告期主要系汽车芯片及相关汽车零部件的出口贸易业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "贸易业务本期营业收入",
+                  "raw_value": "206,508,725.66",
+                  "value": "206508725.66",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F12",
+              "text": "2025年公司实现合并营业总收入6562.4亿元，同比增长4.6%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "合并营业总收入",
+                  "raw_value": "6562.4",
+                  "value": "6562.4",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "合并营业总收入同比增长率",
+                  "raw_value": "4.6",
+                  "value": "4.6",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "主营业务分产品收入构成：整车业务收入4101.96亿元，零部件业务收入2030.20亿元，劳务及其他收入329.36亿元，金融业务收入100.92亿元，合计6562.44亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "整车业务营业收入",
+                  "raw_value": "410,196,473,001.11",
+                  "value": "410196473001.11",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "零部件业务营业收入",
+                  "raw_value": "203,019,866,775.26",
+                  "value": "203019866775.26",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "劳务及其他营业收入",
+                  "raw_value": "32,935,762,112.94",
+                  "value": "32935762112.94",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "金融业务营业收入",
+                  "raw_value": "10,091,710,191.88",
+                  "value": "10091710191.88",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分产品合计营业收入",
+                  "raw_value": "656,243,812,081.18",
+                  "value": "656243812081.18",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "主营业务分行业收入构成：汽车制造业收入6461.52亿元，金融业收入100.92亿元，合计6562.44亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "汽车制造业营业收入",
+                  "raw_value": "646,152,101,889.30",
+                  "value": "646152101889.30",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "金融业营业收入",
+                  "raw_value": "10,091,710,191.88",
+                  "value": "10091710191.88",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业合计营业收入",
+                  "raw_value": "656,243,812,081.18",
+                  "value": "656243812081.18",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "全年整车销售450.7万辆，同比增长12.3%，市场占有率13.1%，同比上升0.3个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "整车销量",
+                  "raw_value": "450.7",
+                  "value": "450.7",
+                  "unit": "万辆",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "整车销量同比增长率",
+                  "raw_value": "12.3",
+                  "value": "12.3",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "市场占有率",
+                  "raw_value": "13.1",
+                  "value": "13.1",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "市场占有率同比变动",
+                  "raw_value": "0.3",
+                  "value": "0.3",
+                  "unit": "百分点",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "自主品牌销量292.8万辆，同比增长21.6%，占公司整体销量比重65%，同比提升约5个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "自主品牌销量",
+                  "raw_value": "292.8",
+                  "value": "292.8",
+                  "unit": "万辆",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "自主品牌销量同比增长率",
+                  "raw_value": "21.6",
+                  "value": "21.6",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "自主品牌销量占整体销量比重",
+                  "raw_value": "65",
+                  "value": "65",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "自主品牌销量占比同比提升",
+                  "raw_value": "约5",
+                  "value": "5",
+                  "unit": "百分点",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "新能源车销售164.3万辆，同比增长33.1%，高于全国新能源车市场平均增速近5个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "新能源车销量",
+                  "raw_value": "164.3",
+                  "value": "164.3",
+                  "unit": "万辆",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源车销量同比增长率",
+                  "raw_value": "33.1",
+                  "value": "33.1",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "出口及海外市场销售107.1万辆，同比增长3.1%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "出口及海外市场销量",
+                  "raw_value": "107.1",
+                  "value": "107.1",
+                  "unit": "万辆",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "出口及海外市场销量同比增长率",
+                  "raw_value": "3.1",
+                  "value": "3.1",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "主营业务分地区收入：中国地区5041.39亿元，其他地区1521.05亿元，合计6562.44亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "中国地区营业收入",
+                  "raw_value": "504,138,835,950.64",
+                  "value": "504138835950.64",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他地区营业收入",
+                  "raw_value": "152,104,976,130.54",
+                  "value": "152104976130.54",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F20",
+              "text": "公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统和智能车全栈解决方案的“七大技术底座”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "报告期研发投入合计217.06亿元，占营业收入比例3.36%，研发人员数量30329人，占公司总人数17.6%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "21,706,037,747.07",
+                  "value": "21706037747.07",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "3.36",
+                  "value": "3.36",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "30,329",
+                  "value": "30329",
+                  "unit": "人",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量占公司总人数比例",
+                  "raw_value": "17.6",
+                  "value": "17.6",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "成本构成中，汽车制造业成本主要为原材料、人工工资、折旧、能源等，本期金额5809.44亿元，占总成本比例99.80%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "汽车制造业成本",
+                  "raw_value": "580,943,983,649.41",
+                  "value": "580943983649.41",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车制造业成本占总成本比例",
+                  "raw_value": "99.80",
+                  "value": "99.80",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "公司主要工厂设计产能合计约699.2万辆，报告期内产能合计约444.6万辆；其中上汽通用五菱产能利用率95%，上汽集团乘用车分公司76%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "上汽通用五菱产能利用率",
+                  "raw_value": "95",
+                  "value": "95",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上汽集团乘用车分公司产能利用率",
+                  "raw_value": "76",
+                  "value": "76",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F24",
+              "text": "前五名客户销售额754.58亿元，占年度销售总额11.68%；前五名供应商采购额2149.67亿元，占年度采购总额37%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "7,545,821.15",
+                  "value": "7545821.15",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "11.68",
+                  "value": "11.68",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "21,496,663.81",
+                  "value": "21496663.81",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "37",
+                  "value": "37",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "MG品牌在欧洲市场销量超过30万辆，并在澳新、中东、拉美、东南亚等地区的18个国家乘用车市场排名跻身当地前十。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "MG品牌欧洲市场销量",
+                  "raw_value": "超30",
+                  "value": "30",
+                  "unit": "万辆",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "公司通过在海外设立代工厂、CKD等方式推进本地化生产；上汽通用五菱印尼基地新能源汽车产销占比提升至80%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "上汽通用五菱印尼基地新能源汽车产销占比",
+                  "raw_value": "80",
+                  "value": "80",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "结合全新MG4上市，公司在86城布局120家快闪店，通过“轻量化引流”促进4S店高效率转化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F28",
+              "text": "公司自主品牌新能源车销量增速近50%；上汽大众、上汽通用分别推出AUDI E5、别克至境L7等中高端智电新品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "自主品牌新能源车销量增速",
+                  "raw_value": "近50",
+                  "value": "50",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "“恒星”超级增程、“灵蜥”底盘2.0等新技术实现量产装车；公司获颁上海市新一批智能网联汽车示范运营牌照，成为行业唯一获得乘用车和商用车领域“双牌照”企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "公司率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "上汽国产芯片应用率",
+                  "raw_value": "超30",
+                  "value": "30",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F31",
+              "text": "上汽大众、上汽通用优化基地布局，释放出的产能用于生产“尚界”等自主品牌产品；上汽大通累计退出近百家直营店。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F32",
+              "text": "上汽红岩司法重整方案获法院批准并已启动实施；报告期内上汽红岩汽车有限公司以破产重整方式处置。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0016"
+              ]
+            },
+            {
+              "fact_id": "F33",
+              "text": "公司以2100万元对价转让原持有的上海大众联合汽车改装有限公司100%股权，交易完成后丧失控制权，不再纳入合并范围。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "大众联合改装100%股权转让对价",
+                  "raw_value": "21,000,000.00",
+                  "value": "21000000.00",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "text": "公司以1380万元对价转让原持有的上海机动车回收服务中心有限公司51%股权，持股比例下降至5%，丧失控制权。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "服务中心51%股权转让对价",
+                  "raw_value": "13,800,000.00",
+                  "value": "13800000.00",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F35",
+              "text": "公司处于汽车产业链的整车制造与销售环节，同时通过零部件、移动出行和服务、金融等板块向产业链上下游延伸。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F36",
+              "text": "汽车制造业成本构成包括原材料、人工工资、折旧、能源等；公司推进固态电池与汽车芯片研发应用，国产芯片应用率已超过30%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F37",
+              "text": "公司产品面向国内及海外乘用车和商用车市场，客户包括个人消费者及企业客户；前五名客户销售额占年度销售总额11.68%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0012"
+              ]
+            }
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F38",
+            "text": "公司汽车金融业务由上海汽车集团财务有限责任公司、上汽通用汽车金融有限责任公司、上海东正汽车金融股份有限公司等子公司开展，报告期上汽财务公司营业收入60.76亿元、净利润42.70亿元。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": [
+              {
+                "name": "上汽财务公司营业收入",
+                "raw_value": "60.76",
+                "value": "60.76",
+                "unit": "亿元",
+                "currency": "人民币",
+                "period": "2025年度",
+                "subject_scope": "named_subsidiary",
+                "qualifier": "exact"
+              },
+              {
+                "name": "上汽财务公司净利润",
+                "raw_value": "42.70",
+                "value": "42.70",
+                "unit": "亿元",
+                "currency": "人民币",
+                "period": "2025年度",
+                "subject_scope": "named_subsidiary",
+                "qualifier": "exact"
+              }
+            ]
+          },
+          {
+            "fact_id": "F39",
+            "text": "安吉物流自营远洋滚装船已达21艘，报告期内有8艘滚装新船启航，持续提升全链国际物流能力。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "安吉物流自营远洋滚装船数量",
+                "raw_value": "21",
+                "value": "21",
+                "unit": "艘",
+                "currency": null,
+                "period": "2025年度",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact"
+              }
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "未读取行业背景、核心竞争力分析、利润表及现金流量表相关科目变动分析表、投资状况分析、未来发展讨论与分析及财务报告附注等章节，相关补充信息未纳入。",
+        "分产品收入中“劳务及其他”包含内容未在选定章节中详细说明。",
+        "新能源汽车收入及补贴按车型类别列示，未按整车业务整体口径拆分。",
+        "主要子公司分析仅列示部分子公司，未覆盖全部控股参股公司。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14790,
+      "output_tokens": 5461,
+      "total_tokens": 20251
+    }
+  },
+  {
+    "request_id": "bp-work-e953bfa4c98f963e8e2c9c0c:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "99cf6d1e23d957b79f53f37a390011c9f369471a68731b1ff961775df78d6aa2",
+    "response_hash": "a816afc980f0c08d307f0c51e2b2d3fbfc1b2207ca81ee9a37df40a3e27a7a93",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"R1\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"草案仅保留合并营业总收入6562.4亿元及销量信息，并定性提及分产品类别，但未给出主营业务分产品的金额或占比。source-0006列示2025年分产品营业收入（人民币元）：整车业务410,196,473,001.11、零部件业务203,019,866,775.26、劳务及其他32,935,762,112.94、金融业务10,091,710,191.88，合计656,243,812,081.18。公司总额不能替代该构成；贸易收入、金融毛利率等补充数字已写入，而整车与零部件两大主业金额缺失，会改变对主要业务组合的理解。应据该表补入上述四类金额或相应占比。分行业中汽车制造业646,152,101,889.30元与金融业同额，系同一构成的另一口径，不另要求地区拆分、毛利率或尾项。\"},{\"finding_id\":\"R2\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F23\",\"evidence_ids\":[\"source-0011\"],\"explanation\":\"F23所称报告期内产能合计约444.6万辆与source-0011不符。表内各主要工厂报告期内产能（万辆）105.8、53.4、88.5、167.1、22.4、3.0、2.1、7.0、2.3合计为451.6万辆；444.6恰好漏计捷仕达名爵汽车印度有限公司7.0万辆。设计产能合计699.2万辆及上汽通用五菱95%、上汽集团乘用车分公司76%与来源一致，应保留，仅将报告期内产能合计更正为451.6万辆。\"},{\"finding_id\":\"R3\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F30\",\"evidence_ids\":[\"source-0003\"],\"explanation\":\"F30写“公司率先实现第二代半固态电池技术在全新MG4上搭载并批量交付”，但source-0003原文为“在国内率先实现”。去掉“在国内”会使率先范围超出来源。批量交付、全固态电池中试线贯通及国产芯片应用率超过30%均有支持，应保留，并将率先限定为国内。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\",\"F34\",\"F35\",\"F36\",\"F37\",\"F38\",\"F39\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "R1",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "草案仅保留合并营业总收入6562.4亿元及销量信息，并定性提及分产品类别，但未给出主营业务分产品的金额或占比。source-0006列示2025年分产品营业收入（人民币元）：整车业务410,196,473,001.11、零部件业务203,019,866,775.26、劳务及其他32,935,762,112.94、金融业务10,091,710,191.88，合计656,243,812,081.18。公司总额不能替代该构成；贸易收入、金融毛利率等补充数字已写入，而整车与零部件两大主业金额缺失，会改变对主要业务组合的理解。应据该表补入上述四类金额或相应占比。分行业中汽车制造业646,152,101,889.30元与金融业同额，系同一构成的另一口径，不另要求地区拆分、毛利率或尾项。"
+        },
+        {
+          "finding_id": "R2",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F23",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "F23所称报告期内产能合计约444.6万辆与source-0011不符。表内各主要工厂报告期内产能（万辆）105.8、53.4、88.5、167.1、22.4、3.0、2.1、7.0、2.3合计为451.6万辆；444.6恰好漏计捷仕达名爵汽车印度有限公司7.0万辆。设计产能合计699.2万辆及上汽通用五菱95%、上汽集团乘用车分公司76%与来源一致，应保留，仅将报告期内产能合计更正为451.6万辆。"
+        },
+        {
+          "finding_id": "R3",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F30",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "F30写“公司率先实现第二代半固态电池技术在全新MG4上搭载并批量交付”，但source-0003原文为“在国内率先实现”。去掉“在国内”会使率先范围超出来源。批量交付、全固态电池中试线贯通及国产芯片应用率超过30%均有支持，应保留，并将率先限定为国内。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19698,
+      "output_tokens": 747,
+      "total_tokens": 41229
+    }
+  }
+]

@@ -1,0 +1,113 @@
+[
+  {
+    "call_type": "extract",
+    "semantic_request_id": "bp-work-9025ee0227b76ca5c04956c4:workpaper:sections",
+    "gateway_request_id": "932c447de4474f93b78a5a92032e22d9",
+    "status": "success",
+    "profile": "semantic_extraction__deepseek",
+    "provider": "openai_compatible",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "source_label": "deepseek:deepseek-flash",
+    "failover_count": 0,
+    "attempts": [
+      {
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "attempt_sequence": 1,
+        "request_id": "932c447de4474f93b78a5a92032e22d9",
+        "provider_request_id": "250a1e31-db4b-41da-a368-88c1993915d3",
+        "status": "success",
+        "attempt_count": 1,
+        "latency_ms": 3019
+      }
+    ],
+    "response_hash": "d2f5d844973680b4f63965a9e8b313c0be00b2584a1857f8028c450d48bb4ce4",
+    "latency_ms": 3019,
+    "input_tokens": 12455,
+    "output_tokens": 301,
+    "total_tokens": 12756,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": null,
+    "error_detail": null,
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  },
+  {
+    "call_type": "extract",
+    "semantic_request_id": "bp-work-9025ee0227b76ca5c04956c4:workpaper:extract",
+    "gateway_request_id": "9c133ceecceb407a8350ca4e66e6fa8e",
+    "status": "success",
+    "profile": "semantic_extraction__deepseek",
+    "provider": "openai_compatible",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "source_label": "deepseek:deepseek-flash",
+    "failover_count": 0,
+    "attempts": [
+      {
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "attempt_sequence": 1,
+        "request_id": "9c133ceecceb407a8350ca4e66e6fa8e",
+        "provider_request_id": "3f527891-4348-4835-97a3-4c73ccc63184",
+        "status": "success",
+        "attempt_count": 1,
+        "latency_ms": 24866
+      }
+    ],
+    "response_hash": "734bb6ba00fe5d86d83be80e12a6a48274c1d148ff7500a8cf68c36de55bfca2",
+    "latency_ms": 24866,
+    "input_tokens": 21060,
+    "output_tokens": 7653,
+    "total_tokens": 28713,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": null,
+    "error_detail": null,
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  },
+  {
+    "call_type": "verify",
+    "semantic_request_id": "bp-work-9025ee0227b76ca5c04956c4:workpaper:review",
+    "gateway_request_id": "1970969e613b42a7993215380251ae91",
+    "status": "success",
+    "profile": "semantic_extraction__deepseek",
+    "provider": "openai_compatible",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "source_label": "scorpio:grok-4.7",
+    "failover_count": 0,
+    "attempts": [
+      {
+        "source_label": "scorpio:grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.7",
+        "attempt_sequence": 1,
+        "request_id": "1970969e613b42a7993215380251ae91",
+        "provider_request_id": "2c86e1ce-b632-4693-97f4-9fefe5300db4, e9790d16-6e4c-9d6d-ad91-43f21e463e37",
+        "status": "success",
+        "attempt_count": 1,
+        "latency_ms": 212146
+      }
+    ],
+    "response_hash": "2fcf86a9c95da8769a819dcb668cac776e82fb8cd44c8c951e55e2a4cd9b7387",
+    "latency_ms": 212146,
+    "input_tokens": 31784,
+    "output_tokens": 165,
+    "total_tokens": 51553,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": null,
+    "error_detail": null,
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  }
+]

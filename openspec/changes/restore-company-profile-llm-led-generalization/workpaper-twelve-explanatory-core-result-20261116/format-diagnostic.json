@@ -1,0 +1,20 @@
+{
+  "task": "6.CT",
+  "representation": "offline_diagnostic_only_not_a_recovered_run",
+  "source": "600098/failed-model-content/content-002.json",
+  "raw_content_sha256": "6465c28c656dcc7c592b9f3b6b5a13971d8cf48748f7095f2d707c461f4ca8bf",
+  "original_json_valid": false,
+  "append_exactly_one_final_object_closer_parses": true,
+  "candidate_root_keys": [
+    "schema_version",
+    "elements"
+  ],
+  "candidate_extra_element_keys": [
+    "company_features",
+    "limitations"
+  ],
+  "accepted_as_workpaper": false,
+  "new_model_calls": 0,
+  "old_failure_changed": false,
+  "note": "解析可行不等于合同/源检查通过；没有运行或采纳恢复候选。"
+}

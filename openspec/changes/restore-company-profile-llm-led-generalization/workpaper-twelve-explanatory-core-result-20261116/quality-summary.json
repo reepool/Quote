@@ -1,0 +1,1398 @@
+{
+  "task": "6.CT",
+  "method_reference": "quality-plan.json",
+  "object_identity": "instrument_id + fact_id; repeated read views counted once; semantic paraphrase deduplication not evaluated",
+  "reviewed_output_objects": 333,
+  "correct_output_objects": 326,
+  "core_support_objects": 142,
+  "supplemental_target_objects": 185,
+  "core_content_counts": {
+    "core_supported": 112,
+    "core_partial": 8,
+    "core_missing": 13
+  },
+  "not_full_report_recall": true,
+  "formal_negative_suite_complete": false,
+  "formal_S1_pass": false,
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "core_conditions": [
+        [
+          "600094-K01",
+          "supported"
+        ],
+        [
+          "600094-K02",
+          "supported"
+        ],
+        [
+          "600094-K03",
+          "partial"
+        ],
+        [
+          "600094-K04",
+          "supported"
+        ],
+        [
+          "600094-K05",
+          "supported"
+        ],
+        [
+          "600094-K06",
+          "supported"
+        ],
+        [
+          "600094-K07",
+          "supported"
+        ],
+        [
+          "600094-K08",
+          "supported"
+        ],
+        [
+          "600094-K09",
+          "supported"
+        ],
+        [
+          "600094-K10",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F03",
+        "F04",
+        "F06",
+        "F08",
+        "F10",
+        "F25",
+        "F26"
+      ],
+      "supplemental_pool": 14,
+      "supplemental_target_fact_ids": [
+        "F13",
+        "F23",
+        "F22",
+        "F12",
+        "F02",
+        "F18",
+        "F24",
+        "F27",
+        "F14",
+        "F20",
+        "F07",
+        "F16",
+        "F19",
+        "F17"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 22,
+      "correct_output_objects": 22,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "income_columns_units",
+          "verdict": "supported_output_with_source_conflict_limit",
+          "fact_ids": [
+            "F06",
+            "F08",
+            "F17"
+          ],
+          "notes": "净额法1534.83万元与实际11243.16/9708.33万元分开，金控本期收入空栏不造零；13页20.42亿元与7/15页22.47亿元原文冲突，采用表列金额但保源冲突限制。"
+        },
+        {
+          "category": "subject_period",
+          "verdict": "source_qualified_correction_supported",
+          "fact_ids": [
+            "F03",
+            "F07",
+            "F16",
+            "F22",
+            "F25",
+            "F26"
+          ],
+          "notes": "投资对象技术/应用场景非集团自产；20.45%及未并表按截至报告日，不推定交易精确发生年。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600103.SH",
+      "core_conditions": [
+        [
+          "600103-K01",
+          "supported"
+        ],
+        [
+          "600103-K02",
+          "supported"
+        ],
+        [
+          "600103-K03",
+          "supported"
+        ],
+        [
+          "600103-K04",
+          "supported"
+        ],
+        [
+          "600103-K05",
+          "supported"
+        ],
+        [
+          "600103-K06",
+          "supported"
+        ],
+        [
+          "600103-K07",
+          "partial"
+        ],
+        [
+          "600103-K08",
+          "supported"
+        ],
+        [
+          "600103-K09",
+          "partial"
+        ],
+        [
+          "600103-K10",
+          "supported"
+        ],
+        [
+          "600103-K11",
+          "supported"
+        ],
+        [
+          "600103-K12",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F10",
+        "F11",
+        "F13",
+        "review-add:REV-001"
+      ],
+      "supplemental_pool": 19,
+      "supplemental_target_fact_ids": [
+        "F26",
+        "F18",
+        "F27",
+        "F09",
+        "F21",
+        "F30",
+        "F19",
+        "F20",
+        "F15",
+        "F23",
+        "F25",
+        "F24",
+        "F31",
+        "F16",
+        "F29",
+        "F22",
+        "F14",
+        "F28",
+        "F17"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 31,
+      "correct_output_objects": 29,
+      "incorrect_output_fact_ids": [
+        "F29",
+        "review-add:REV-001"
+      ],
+      "core_incorrect": [
+        "review-add:REV-001"
+      ],
+      "supplemental_incorrect": [
+        "F29"
+      ],
+      "observed_risk_checks": [
+        {
+          "category": "purchase_sale_direction",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F11",
+            "F22",
+            "F30"
+          ],
+          "notes": "11页木竹片挂牌采购与22页另披露60.15万元贸易收入各保各的来源，不将采购当销售。"
+        },
+        {
+          "category": "income_columns_units",
+          "verdict": "supported_amounts_but_subject_error_limited",
+          "fact_ids": [
+            "F13",
+            "F14",
+            "review-add:REV-001"
+          ],
+          "notes": "16—18页收入/内抵销列正确；公司总收入未明确母公司限定，不支持issuer=parent-only。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600100.SH",
+      "core_conditions": [
+        [
+          "600100-K01",
+          "supported"
+        ],
+        [
+          "600100-K02",
+          "supported"
+        ],
+        [
+          "600100-K03",
+          "supported"
+        ],
+        [
+          "600100-K04",
+          "supported"
+        ],
+        [
+          "600100-K05",
+          "supported"
+        ],
+        [
+          "600100-K06",
+          "supported"
+        ],
+        [
+          "600100-K07",
+          "supported"
+        ],
+        [
+          "600100-K08",
+          "supported"
+        ],
+        [
+          "600100-K09",
+          "supported"
+        ],
+        [
+          "600100-K10",
+          "supported"
+        ],
+        [
+          "600100-K11",
+          "supported"
+        ],
+        [
+          "600100-K12",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14"
+      ],
+      "supplemental_pool": 16,
+      "supplemental_target_fact_ids": [
+        "F18",
+        "F30",
+        "F22",
+        "F25",
+        "F26",
+        "F04",
+        "F21",
+        "F23",
+        "F29",
+        "F02",
+        "F19",
+        "F16",
+        "F24",
+        "F15",
+        "F17",
+        "F03"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 27,
+      "correct_output_objects": 27,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "subject_period",
+          "verdict": "source_qualified_correction_supported",
+          "fact_ids": [
+            "F04",
+            "F25"
+          ],
+          "notes": "34页子公司定位/持股与历史成立、更名资料一致；不将子公司规模升集团。"
+        },
+        {
+          "category": "income_columns_units",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F13",
+            "F14",
+            "F15",
+            "F16"
+          ],
+          "notes": "21页表为万元，原符号抵销-28111.12、合计1497009.55与集团150.65亿元各自保留。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600107.SH",
+      "core_conditions": [
+        [
+          "600107-K01",
+          "supported"
+        ],
+        [
+          "600107-K02",
+          "supported"
+        ],
+        [
+          "600107-K03",
+          "supported"
+        ],
+        [
+          "600107-K04",
+          "supported"
+        ],
+        [
+          "600107-K05",
+          "supported"
+        ],
+        [
+          "600107-K06",
+          "supported"
+        ],
+        [
+          "600107-K07",
+          "supported"
+        ],
+        [
+          "600107-K08",
+          "partial"
+        ],
+        [
+          "600107-K09",
+          "supported"
+        ],
+        [
+          "600107-K10",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F09",
+        "F10",
+        "F25"
+      ],
+      "supplemental_pool": 12,
+      "supplemental_target_fact_ids": [
+        "F14",
+        "F23",
+        "F20",
+        "F22",
+        "F21",
+        "F26",
+        "F16",
+        "F15",
+        "F08",
+        "F11",
+        "F13",
+        "F19"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 22,
+      "correct_output_objects": 22,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "income_columns_units",
+          "verdict": "observed_candidates_isolated_and_retained_values_supported",
+          "fact_ids": [
+            "F05",
+            "F09",
+            "F10",
+            "F15"
+          ],
+          "notes": "医疗收入空栏只称无列示，不造零；17页成本表独立明确0.00，23页冲突单位不猜换算。"
+        },
+        {
+          "category": "subject_period",
+          "verdict": "source_qualified_correction_supported",
+          "fact_ids": [
+            "F20",
+            "F22"
+          ],
+          "notes": "原句只支持处置带来的当期影响，不确证处置日期；保原句限定。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600098.SH",
+      "core_conditions": [
+        [
+          "600098-K01",
+          "missing"
+        ],
+        [
+          "600098-K02",
+          "missing"
+        ],
+        [
+          "600098-K03",
+          "missing"
+        ],
+        [
+          "600098-K04",
+          "missing"
+        ],
+        [
+          "600098-K05",
+          "missing"
+        ],
+        [
+          "600098-K06",
+          "missing"
+        ],
+        [
+          "600098-K07",
+          "missing"
+        ],
+        [
+          "600098-K08",
+          "missing"
+        ],
+        [
+          "600098-K09",
+          "missing"
+        ],
+        [
+          "600098-K10",
+          "missing"
+        ],
+        [
+          "600098-K11",
+          "missing"
+        ],
+        [
+          "600098-K12",
+          "missing"
+        ]
+      ],
+      "core_support_fact_ids": [],
+      "supplemental_pool": 0,
+      "supplemental_target_fact_ids": [],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 0,
+      "correct_output_objects": 0,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "purchase_sale_direction",
+          "verdict": "not_assessed_no_output",
+          "fact_ids": []
+        },
+        {
+          "category": "financial_disclosure",
+          "verdict": "not_assessed_no_output",
+          "fact_ids": []
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600104.SH",
+      "core_conditions": [
+        [
+          "600104-K01",
+          "supported"
+        ],
+        [
+          "600104-K02",
+          "supported"
+        ],
+        [
+          "600104-K03",
+          "partial"
+        ],
+        [
+          "600104-K04",
+          "supported"
+        ],
+        [
+          "600104-K05",
+          "supported"
+        ],
+        [
+          "600104-K06",
+          "supported"
+        ],
+        [
+          "600104-K07",
+          "partial"
+        ],
+        [
+          "600104-K08",
+          "missing"
+        ],
+        [
+          "600104-K09",
+          "supported"
+        ],
+        [
+          "600104-K10",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F03",
+        "F04",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F12",
+        "F15",
+        "F26",
+        "F35"
+      ],
+      "supplemental_pool": 19,
+      "supplemental_target_fact_ids": [
+        "F37",
+        "F32",
+        "F31",
+        "F05",
+        "F27",
+        "F18",
+        "F36",
+        "F38",
+        "F29",
+        "F30",
+        "F16",
+        "F17",
+        "F20",
+        "F28",
+        "F23",
+        "F11",
+        "F39",
+        "F02",
+        "F25"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 31,
+      "correct_output_objects": 28,
+      "incorrect_output_fact_ids": [
+        "F23",
+        "F37",
+        "F38"
+      ],
+      "core_incorrect": [],
+      "supplemental_incorrect": [
+        "F23",
+        "F37",
+        "F38"
+      ],
+      "observed_risk_checks": [
+        {
+          "category": "financial_disclosure",
+          "verdict": "partial_core_missing_due_to_local_isolation",
+          "fact_ids": [
+            "F09",
+            "F10",
+            "F12",
+            "F38"
+          ],
+          "notes": "集团与汽车金融子公司分开，但646152101889.30元营业收入/行业构成未留可靠独立回答；原表元与正文亿元表达失配隔离，不是源里没有数据。"
+        },
+        {
+          "category": "body",
+          "verdict": "local_error_withheld",
+          "fact_ids": [
+            "F15",
+            "F23"
+          ],
+          "notes": "产能表无合计行，F23自加报告期内产能444.6万辆与所引各行相加不符；17页明言报告期内产能为产量，不可当设计产能。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600088.SH",
+      "core_conditions": [
+        [
+          "600088-K01",
+          "supported"
+        ],
+        [
+          "600088-K02",
+          "supported"
+        ],
+        [
+          "600088-K03",
+          "supported"
+        ],
+        [
+          "600088-K04",
+          "supported"
+        ],
+        [
+          "600088-K05",
+          "supported"
+        ],
+        [
+          "600088-K06",
+          "supported"
+        ],
+        [
+          "600088-K07",
+          "supported"
+        ],
+        [
+          "600088-K08",
+          "supported"
+        ],
+        [
+          "600088-K09",
+          "supported"
+        ],
+        [
+          "600088-K10",
+          "supported"
+        ],
+        [
+          "600088-K11",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F33"
+      ],
+      "supplemental_pool": 20,
+      "supplemental_target_fact_ids": [
+        "F35",
+        "F24",
+        "F36",
+        "F29",
+        "F34",
+        "F28",
+        "F19",
+        "F22",
+        "F18",
+        "F20",
+        "F17",
+        "F15",
+        "F23",
+        "F26",
+        "F21",
+        "F27",
+        "F25",
+        "F14",
+        "F30",
+        "F16"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 34,
+      "correct_output_objects": 34,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "associated_leasing",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F05",
+            "F20",
+            "F21",
+            "F22",
+            "F28",
+            "F29",
+            "F34"
+          ],
+          "notes": "设备出租是对外服务，租赁/场地等支出和餐饮业务出租原因分开；总台销售63.66%有具体行支持，不单靠OR标题。"
+        },
+        {
+          "category": "financial_disclosure",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F03",
+            "F09",
+            "F13",
+            "F14",
+            "F27",
+            "F30"
+          ],
+          "notes": "基金业务营收1503221.93元不是-4583169.75元投资收益，也不是基金总规模；成本空未造零。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600099.SH",
+      "core_conditions": [
+        [
+          "600099-K01",
+          "supported"
+        ],
+        [
+          "600099-K02",
+          "supported"
+        ],
+        [
+          "600099-K03",
+          "supported"
+        ],
+        [
+          "600099-K04",
+          "supported"
+        ],
+        [
+          "600099-K05",
+          "supported"
+        ],
+        [
+          "600099-K06",
+          "supported"
+        ],
+        [
+          "600099-K07",
+          "supported"
+        ],
+        [
+          "600099-K08",
+          "supported"
+        ],
+        [
+          "600099-K09",
+          "supported"
+        ],
+        [
+          "600099-K10",
+          "supported"
+        ],
+        [
+          "600099-K11",
+          "supported"
+        ],
+        [
+          "600099-K12",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F11",
+        "F12",
+        "F13",
+        "F14"
+      ],
+      "supplemental_pool": 16,
+      "supplemental_target_fact_ids": [
+        "F23",
+        "F30",
+        "F22",
+        "F21",
+        "F20",
+        "F10",
+        "F24",
+        "F25",
+        "F16",
+        "F19",
+        "F18",
+        "F28",
+        "F09",
+        "F29",
+        "F27",
+        "F17"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 28,
+      "correct_output_objects": 27,
+      "incorrect_output_fact_ids": [
+        "F16"
+      ],
+      "core_incorrect": [],
+      "supplemental_incorrect": [
+        "F16"
+      ],
+      "observed_risk_checks": [
+        {
+          "category": "body",
+          "verdict": "core_supported_with_local_error_withheld",
+          "fact_ids": [
+            "F01",
+            "F02",
+            "F05",
+            "F16"
+          ],
+          "notes": "15—16页措施具体为农业机械板块；引入第二厂家降低采购成本，国产替代降低制造成本，不能合成全公司两措施均降低采购成本。"
+        },
+        {
+          "category": "income_columns_units",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F08",
+            "F11",
+            "F12",
+            "F13",
+            "F14"
+          ],
+          "notes": "四行业收入/成本/毛利与21页列一致，总收入113124.69万元为源舍入叙述；补充地区修订未接受不算已纠正。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600082.SH",
+      "core_conditions": [
+        [
+          "600082-K01",
+          "supported"
+        ],
+        [
+          "600082-K02",
+          "supported"
+        ],
+        [
+          "600082-K03",
+          "supported"
+        ],
+        [
+          "600082-K04",
+          "supported"
+        ],
+        [
+          "600082-K05",
+          "supported"
+        ],
+        [
+          "600082-K06",
+          "supported"
+        ],
+        [
+          "600082-K07",
+          "supported"
+        ],
+        [
+          "600082-K08",
+          "supported"
+        ],
+        [
+          "600082-K09",
+          "supported"
+        ],
+        [
+          "600082-K10",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F13",
+        "F27"
+      ],
+      "supplemental_pool": 14,
+      "supplemental_target_fact_ids": [
+        "F20",
+        "F17",
+        "F16",
+        "F25",
+        "F18",
+        "F28",
+        "F19",
+        "F23",
+        "F21",
+        "F24",
+        "F29",
+        "F12",
+        "F22",
+        "F15"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 27,
+      "correct_output_objects": 27,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "body",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F01",
+            "F03",
+            "F04",
+            "F05",
+            "F27"
+          ],
+          "notes": "园区运营为核心，商品贸易仅代理净额法；产业基金份额非自产业务。"
+        },
+        {
+          "category": "associated_leasing",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F07",
+            "F10",
+            "F13",
+            "F24",
+            "F28"
+          ],
+          "notes": "租赁收入30061724.18元与园区运营30105192.48元/成本分开，关联股权转让交割有17/27页支持。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600097.SH",
+      "core_conditions": [
+        [
+          "600097-K01",
+          "supported"
+        ],
+        [
+          "600097-K02",
+          "supported"
+        ],
+        [
+          "600097-K03",
+          "supported"
+        ],
+        [
+          "600097-K04",
+          "supported"
+        ],
+        [
+          "600097-K05",
+          "supported"
+        ],
+        [
+          "600097-K06",
+          "supported"
+        ],
+        [
+          "600097-K07",
+          "partial"
+        ],
+        [
+          "600097-K08",
+          "supported"
+        ],
+        [
+          "600097-K09",
+          "supported"
+        ],
+        [
+          "600097-K10",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "cc-01",
+        "cc-03",
+        "oi-01",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "rm-01",
+        "rm-02",
+        "rm-03",
+        "rm-04",
+        "rm-05",
+        "rm-06",
+        "rm-07",
+        "sc-01",
+        "sm-01"
+      ],
+      "supplemental_pool": 15,
+      "supplemental_target_fact_ids": [
+        "sm-04",
+        "mc-02",
+        "oi-04",
+        "od-04",
+        "mc-01",
+        "sm-03",
+        "cc-02",
+        "sc-03",
+        "od-03",
+        "od-02",
+        "oi-02",
+        "oi-03",
+        "sm-02",
+        "sc-02",
+        "review-add:f-002"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 32,
+      "correct_output_objects": 31,
+      "incorrect_output_fact_ids": [
+        "review-add:f-002"
+      ],
+      "core_incorrect": [],
+      "supplemental_incorrect": [
+        "review-add:f-002"
+      ],
+      "observed_risk_checks": [
+        {
+          "category": "body",
+          "verdict": "core_supported_but_added_inference_withheld",
+          "fact_ids": [
+            "bs-01",
+            "oi-01",
+            "oi-04",
+            "review-add:f-002",
+            "sc-01"
+          ],
+          "notes": "8页明确江苏深蓝合作经营；11页表/叙述未明确零星鱼种与磷虾一一对应，不能仅因金额相近/加总关系并成同一主业科目。"
+        },
+        {
+          "category": "purchase_sale_direction",
+          "verdict": "partial_scope",
+          "fact_ids": [
+            "oi-03",
+            "rm-05",
+            "sc-02"
+          ],
+          "notes": "12页24300.45吨为内部转鱼，当前稿未把它当新增对外销量，但未实际输出该量，不冒充该负例已通过。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600054.SH",
+      "core_conditions": [
+        [
+          "600054-K01",
+          "supported"
+        ],
+        [
+          "600054-K02",
+          "supported"
+        ],
+        [
+          "600054-K03",
+          "supported"
+        ],
+        [
+          "600054-K04",
+          "supported"
+        ],
+        [
+          "600054-K05",
+          "supported"
+        ],
+        [
+          "600054-K06",
+          "supported"
+        ],
+        [
+          "600054-K07",
+          "supported"
+        ],
+        [
+          "600054-K08",
+          "supported"
+        ],
+        [
+          "600054-K09",
+          "supported"
+        ],
+        [
+          "600054-K10",
+          "supported"
+        ],
+        [
+          "600054-K11",
+          "supported"
+        ],
+        [
+          "600054-K12",
+          "supported"
+        ],
+        [
+          "600054-K13",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F08",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F38"
+      ],
+      "supplemental_pool": 26,
+      "supplemental_target_fact_ids": [
+        "F33",
+        "F34",
+        "F42",
+        "F22",
+        "F26",
+        "F29",
+        "F32",
+        "F30",
+        "F35",
+        "F19",
+        "F09",
+        "F18",
+        "F31",
+        "F24",
+        "F41",
+        "F20",
+        "F36",
+        "F23",
+        "F39",
+        "F27"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [
+        "F07",
+        "F10",
+        "F25",
+        "F28",
+        "F37",
+        "F40"
+      ],
+      "reviewed_output_objects": 41,
+      "correct_output_objects": 41,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "income_columns_units",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F11",
+            "F12",
+            "F13",
+            "F14",
+            "F15",
+            "F16",
+            "F17",
+            "F22"
+          ],
+          "notes": "五行业收入按未合并抵销，附注分部主营金额/内部抵销为不同口径，均不相加冒集团收入。"
+        },
+        {
+          "category": "subject_period",
+          "verdict": "supported_output",
+          "fact_ids": [
+            "F34",
+            "F35",
+            "F36",
+            "F42"
+          ],
+          "notes": "已投入运营、前期设计/改造、公开测试和部分租售保各自原文状态。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    },
+    {
+      "instrument_id": "600000.SH",
+      "core_conditions": [
+        [
+          "600000-K01",
+          "supported"
+        ],
+        [
+          "600000-K02",
+          "supported"
+        ],
+        [
+          "600000-K03",
+          "supported"
+        ],
+        [
+          "600000-K04",
+          "supported"
+        ],
+        [
+          "600000-K05",
+          "supported"
+        ],
+        [
+          "600000-K06",
+          "supported"
+        ],
+        [
+          "600000-K07",
+          "supported"
+        ],
+        [
+          "600000-K08",
+          "partial"
+        ],
+        [
+          "600000-K09",
+          "supported"
+        ],
+        [
+          "600000-K10",
+          "supported"
+        ],
+        [
+          "600000-K11",
+          "supported"
+        ]
+      ],
+      "core_support_fact_ids": [
+        "bs-1",
+        "bs-2",
+        "bs-3",
+        "od-6",
+        "od-7",
+        "ps-1",
+        "ps-2",
+        "ps-3",
+        "rm-1",
+        "rm-2",
+        "rm-3",
+        "sc-1",
+        "sc-2",
+        "sc-3",
+        "sm-1",
+        "sm-2",
+        "sm-4",
+        "sm-5"
+      ],
+      "supplemental_pool": 20,
+      "supplemental_target_fact_ids": [
+        "cf-1",
+        "od-3",
+        "cf-2",
+        "oi-1",
+        "mc-3",
+        "oi-4",
+        "mc-2",
+        "oi-2",
+        "mc-1",
+        "cc-2",
+        "sm-3",
+        "od-1",
+        "od-5",
+        "od-4",
+        "cc-3",
+        "cc-4",
+        "rm-4",
+        "cc-1",
+        "oi-3",
+        "od-8"
+      ],
+      "supplemental_targets_all_reviewed": true,
+      "additional_reviewed_fact_ids": [],
+      "reviewed_output_objects": 38,
+      "correct_output_objects": 38,
+      "incorrect_output_fact_ids": [],
+      "core_incorrect": [],
+      "supplemental_incorrect": [],
+      "observed_risk_checks": [
+        {
+          "category": "financial_disclosure",
+          "verdict": "supported_output_with_scope_limits",
+          "fact_ids": [
+            "rm-1",
+            "rm-2",
+            "rm-3",
+            "sm-1",
+            "sm-2",
+            "sm-4",
+            "sm-5",
+            "od-6",
+            "od-7",
+            "sc-2"
+          ],
+          "notes": "净收入/总业务收入、母公司/集团、AUM/托管存量与期间收入分别保原文；资金来源不是制造原料。"
+        }
+      ],
+      "formal_negative_suite_complete": false
+    }
+  ]
+}
