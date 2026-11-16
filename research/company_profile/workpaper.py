@@ -366,6 +366,15 @@ def _monetary_display_note(
     return None
 
 
+def qualify_workpaper_display(fact: WorkpaperFact, notes: Sequence[str]) -> WorkpaperFact:
+    """Keep generated display qualifications stable across source rebindings."""
+    original = fact.uncertainty_reason or ""
+    additions = [note for note in notes if note not in original]
+    if not additions:
+        return fact
+    return fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (original, *additions)))})
+
+
 def _check_prose_quantities(
     fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], numbers: set[Decimal],
 ) -> tuple[str, ...]:
@@ -812,7 +821,7 @@ def bind_workpaper_draft(
                 rejected.append(f"事实{fact.fact_id}已隔离，未作为结论采用：{exc}")
                 continue
             if display_notes:
-                fact = fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (fact.uncertainty_reason, *display_notes)))})
+                fact = qualify_workpaper_display(fact, display_notes)
                 binding_notes.extend(display_notes)
             kept.append(fact)
         cleaned_elements[name] = element.model_copy(update={
@@ -839,7 +848,7 @@ def bind_workpaper_draft(
                     rejected.append(f"可选事实{fact.fact_id}未纳入：{exc}")
                     continue
                 if display_notes:
-                    fact = fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (fact.uncertainty_reason, *display_notes)))})
+                    fact = qualify_workpaper_display(fact, display_notes)
                     binding_notes.extend(display_notes)
                 kept.append(fact)
                 used_ids.add(fact.fact_id)
@@ -867,7 +876,7 @@ def bind_workpaper_draft(
                 rejected.append(f"特色事实{fact.fact_id}未纳入：{exc}")
                 continue
             if display_notes:
-                fact = fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (fact.uncertainty_reason, *display_notes)))})
+                fact = qualify_workpaper_display(fact, display_notes)
                 binding_notes.extend(display_notes)
             kept.append(fact)
             used_ids.add(fact.fact_id)

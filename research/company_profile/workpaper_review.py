@@ -20,6 +20,7 @@ from .workpaper import (
     WorkpaperReviewResponse, _check_fact_source,
     standardize_workpaper_metrics, WorkpaperDraftResponse, bind_workpaper_draft,
     workpaper_elements, workpaper_element_payloads,
+    qualify_workpaper_display,
 )
 from .workpaper_sections import SectionPacket, extract_selected_layout
 
@@ -225,13 +226,23 @@ def review_workpaper(
     prior_receipts = tuple((resume or {}).get("receipts") or ())
     prior_by_purpose = {item.get("purpose"): item for item in prior_receipts}
     locally_revalidated = []
+    resume_mode = (resume or {}).get("mode", "verify_only")
     if resume is not None:
         if resume.get("original_draft_hash") != original_hash:
             raise ValueError("review continuation belongs to a different original draft")
         if resume.get("document_version") != paper.report.document_version:
             raise ValueError("review continuation belongs to a different source version")
-        if len(prior_receipts) != 2 or set(prior_by_purpose) != {"review_profile_workpaper", "repair_profile_workpaper"}:
-            raise ValueError("review continuation requires the accepted original review and repair receipts")
+        if resume_mode not in {"verify_only", "repair_and_verify"}:
+            raise ValueError("unknown review continuation mode")
+        expected = {"review_profile_workpaper"}
+        if resume_mode == "verify_only":
+            expected.add("repair_profile_workpaper")
+        if len(prior_receipts) != len(expected) or set(prior_by_purpose) != expected:
+            raise ValueError("review continuation requires exactly its original stage receipts; do not repeat a completed repair")
+        if resume_mode == "repair_and_verify" and resume.get("repair_response") is not None:
+            raise ValueError("review-only continuation must not contain an existing repair")
+        if resume_mode == "repair_and_verify" and prior_by_purpose["review_profile_workpaper"].get("finish_reason") != "stop":
+            raise ValueError("review-only continuation requires a complete stopped review response")
         for purpose, receipt in prior_by_purpose.items():
             eligible_repair = (
                 purpose == "repair_profile_workpaper"
@@ -248,6 +259,8 @@ def review_workpaper(
                 locally_revalidated.append(receipt["request_id"])
         for purpose, key in (("review_profile_workpaper", "review_response"),
                              ("repair_profile_workpaper", "repair_response")):
+            if purpose not in expected:
+                continue
             receipt = prior_by_purpose[purpose]
             raw = receipt.get("raw_content")
             if (
@@ -375,7 +388,7 @@ def review_workpaper(
         status = "incomplete" if contract_errors else "completed"
         if targets:
             repaired = (WorkpaperRepairResponse.model_validate(resume["repair_response"])
-                        if resume is not None else request(repair_id, "repair_profile_workpaper", WorkpaperRepairResponse,
+                        if resume is not None and resume_mode == "verify_only" else request(repair_id, "repair_profile_workpaper", WorkpaperRepairResponse,
                                REPAIR_INSTRUCTIONS, {"repair_targets": [
                                    {"target_fact_id": target, "finding": issues[0].model_dump(mode="json"),
                                     **({"additional_findings": [issue.model_dump(mode="json") for issue in issues[1:]]} if len(issues) > 1 else {}),
@@ -393,7 +406,7 @@ def review_workpaper(
                     fact = WorkpaperFact.model_validate(raw_fact)
                     display_notes = _check_fact_source(fact, sources, check_units=True)
                     if display_notes:
-                        fact = fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (fact.uncertainty_reason, *display_notes)))})
+                        fact = qualify_workpaper_display(fact, display_notes)
                         target_notes.extend(display_notes)
                 except (ValueError, TypeError) as exc:
                     rejected[fact_id] = fact

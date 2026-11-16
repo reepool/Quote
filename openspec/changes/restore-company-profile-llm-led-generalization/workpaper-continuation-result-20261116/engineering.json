@@ -1,0 +1,64 @@
+{
+  "task": "6.CV",
+  "phase": "engineering_ready_pending_real_call_authorization",
+  "base_commit": "c4ea3c006ecd7fea02c770b288668012c4c5ee22",
+  "new_model_calls": 0,
+  "network_probes": 0,
+  "sendable_bindings_created": 0,
+  "executed_real_continuations": 0,
+  "source_code_and_test_sha256": {
+    "research/company_profile/runtime.py": "f32f9355ef1ef7a3ddfaa2f353f72eb4b9cc88d3374fcaf3b56e569d6a75250c",
+    "research/company_profile/workpaper.py": "92c2b33ce0273055b5f8753f4730d52d6f3aadd219315aa4b07a724bb377c825",
+    "research/company_profile/workpaper_llm.py": "0a041c1d6cb8413f0619bf3338d3bbcbdf5e8cc9337fdbe437cd0066514b5fbd",
+    "research/company_profile/workpaper_review.py": "3b979ab14964d1092a279290169dcc8748b0e2906884cd6ab41e05ad294c8066",
+    "tests/unit/test_research/test_company_profile_workpaper_continuation.py": "3ad244cc88001e61d262acb6e1fe328c1de3c779122d7985a867e0cd97997f9c"
+  },
+  "shared_config_13_sha256": "7650f2960b036815a6c05649ca9caba7d518b73380e561e334db49d062d82233",
+  "inputs": [
+    {
+      "instrument_id": "600104.SH",
+      "receipts_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600104/model-receipts.json",
+      "receipts_sha256": "0b5ee29de3f8a2dee2a25020fe73be1fcf32e20c959bbff030c9320b3c68e842",
+      "query_sha256": "1087e7fd870ca76d50c00b68efc5a5e4c7068a32a921e4b3b5a1ed4b98a51081",
+      "first_new_stage": "repair_profile_workpaper",
+      "offline_boundary_verified": true
+    },
+    {
+      "instrument_id": "600082.SH",
+      "receipts_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600082/model-receipts.json",
+      "receipts_sha256": "20e9a52975f3c9521cc69c39ca9476b1fb73ab0e80cc94d05d1904a421ccbe70",
+      "query_sha256": "1b9274e59698673ae9156c3639e21d8f4faa6629941179fa21b4f7cec5e1ebd6",
+      "first_new_stage": "repair_profile_workpaper",
+      "offline_boundary_verified": true
+    },
+    {
+      "instrument_id": "600098.SH",
+      "receipts_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600098/model-receipts.json",
+      "receipts_sha256": "78bd88cb87695f23bb0464c102eeabcf1848ffe22180911f2d3cab0e1441400a",
+      "query_sha256": "b61581034306e70a59d6446ccec5f0c6c3f0e6400e008d6586c450b613f19688",
+      "first_new_stage": "extract_profile_workpaper",
+      "offline_boundary_verified": true
+    }
+  ],
+  "tests": {
+    "source_review_and_preliminary_continuation": {
+      "passed": 155,
+      "deselected": 3,
+      "seconds": 35.93
+    },
+    "final_continuation_including_checkpoint_tampering": {
+      "passed": 30,
+      "seconds": 14.16
+    },
+    "other_workpaper_direct": {
+      "passed": 74,
+      "seconds": 30.79
+    }
+  },
+  "test_counts_overlap_do_not_sum": true,
+  "real_model_quality_proven": false,
+  "production_authorization": "not_authorized",
+  "owned_temporary_roots_remaining": [],
+  "temporary_roots_cleanup": "TemporaryDirectory/finally; sizes unmeasured, not claimed as zero or added to old release counts",
+  "formal_S1_counted": false
+}

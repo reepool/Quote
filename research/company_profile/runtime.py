@@ -211,6 +211,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "workpaper_review_policy",
             "review_existing_draft_hash",
             "review_resume_hash",
+            "workpaper_extraction_resume_hash",
             "quality_review_profile",
             "repair_profile",
             "discovery_scope",
@@ -240,6 +241,7 @@ class _WorkState:
     workpaper_receipts: list[dict[str, Any]] = field(default_factory=list)
     review_seed: CompanyProfileWorkpaper | None = None
     review_resume: dict[str, Any] | None = None
+    workpaper_extraction_resume: dict[str, Any] | None = None
     source_pdf_path: str | None = None
     completed_scopes: dict[str, CompanyProfileTaskResult] = field(default_factory=dict)
     scope_digests: dict[str, str] = field(default_factory=dict)
@@ -463,6 +465,8 @@ class CompanyProfileStageRuntime:
         state.processing_identity = processing_identity_from_item(item)
         if not state.processing_identity.get("review_resume_hash"):
             state.review_resume = None
+        if not state.processing_identity.get("workpaper_extraction_resume_hash"):
+            state.workpaper_extraction_resume = None
         if item.get("review_seed") is not None:
             from .workpaper_review import REVIEW_POLICY, workpaper_hash
 
@@ -483,6 +487,12 @@ class CompanyProfileStageRuntime:
             ):
                 raise ValueError("explicit hash-bound review continuation is required")
             state.review_resume = resume
+        if item.get("workpaper_extraction_resume") is not None:
+            resume = dict(item["workpaper_extraction_resume"])
+            if (state.review_seed is not None or state.processing_identity.get("workpaper_extraction_resume_hash")
+                != hashlib.sha256(json.dumps(resume, ensure_ascii=False, sort_keys=True).encode()).hexdigest()):
+                raise ValueError("explicit hash-bound extraction continuation is required")
+            state.workpaper_extraction_resume = resume
         if state.workpaper is not None and (
             state.workpaper.report != state.report
             or prior_policy != _reading_policy(state.processing_identity)
@@ -600,6 +610,7 @@ class CompanyProfileStageRuntime:
                         processing_identity=state.processing_identity,
                         provider=self._report_provider, work_id=state.work_id,
                         source_pdf_path=state.source_pdf_path,
+                        extraction_resume=state.workpaper_extraction_resume,
                     )
                     state.workpaper = result.workpaper
                     state.workpaper_packet = result.packet
@@ -613,6 +624,10 @@ class CompanyProfileStageRuntime:
                     raise ValueError("unknown workpaper review policy")
                 if state.processing_identity.get("review_resume_hash") and state.review_resume is None:
                     raise ValueError("hash-bound review continuation payload is missing")
+                if state.review_resume is not None and state.processing_identity.get("review_resume_hash") != hashlib.sha256(
+                    json.dumps(state.review_resume, ensure_ascii=False, sort_keys=True).encode()
+                ).hexdigest():
+                    raise ValueError("persisted review continuation does not match its bound hash")
                 if state.workpaper.quality_review is None:
                     # Make useful extraction readable before the slower review call.
                     self._verify(state)
@@ -1070,6 +1085,8 @@ class CompanyProfileStageRuntime:
             state.review_seed = CompanyProfileWorkpaper.model_validate(payload["review_seed"])
         if payload.get("review_resume") is not None:
             state.review_resume = dict(payload["review_resume"])
+        if payload.get("workpaper_extraction_resume") is not None:
+            state.workpaper_extraction_resume = dict(payload["workpaper_extraction_resume"])
         if payload.get("workpaper_packet") is not None:
             state.workpaper_packet = SectionPacket.model_validate_json(
                 json.dumps(payload["workpaper_packet"], ensure_ascii=False)
@@ -1248,6 +1265,7 @@ class CompanyProfileStageRuntime:
                     "workpaper_receipts": state.workpaper_receipts,
                     "review_seed": state.review_seed.model_dump(mode="json") if state.review_seed else None,
                     "review_resume": state.review_resume,
+                    "workpaper_extraction_resume": state.workpaper_extraction_resume,
                     "source_pdf_path": state.source_pdf_path,
                 } if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY else {}),
                 **(

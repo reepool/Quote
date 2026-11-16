@@ -155,6 +155,16 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **THEN** the original owner may consume the retained accepted responses after binding the source version, original draft and response hashes, and send only final verification
 - **AND** retained model calls and usage are identified separately from the current run, original failures remain unchanged, and exhausted logical recovery limits are not reset to reissue earlier stages
 
+#### Scenario: A retained initial review resumes at the first repair
+- **WHEN** a new bounded authorization explicitly selects repair_and_verify mode and supplies only the unchanged accepted original review receipt for the matching source and draft hash
+- **THEN** the existing owner validates original raw bytes, payload and source binding before sending only the one combined repair and its final source verification
+- **AND** the initial review is not repeated or relabelled as a new successful call; missing/mismatched history fails before sending, already performed repairs cannot be replayed through review-only mode, and the legacy final-only mode still requires both original receipts
+
+#### Scenario: Rebinding a qualified display preserves the draft hash
+- **WHEN** an existing source-backed workpaper already contains the program's monetary display qualifications and is rebound for review continuation
+- **THEN** binding MUST NOT duplicate those qualifications or mutate its otherwise unchanged facts, metrics and hash
+- **AND** original response hashes remain untouched and the display qualification does not establish semantic approval
+
 #### Scenario: A retained repair failed an older local schema contract
 - **WHEN** a hash-bound continuation explicitly requests local revalidation of a retained repair rejected only as schema_validation_error
 - **THEN** the current typed repair decoder and all target/source constraints MUST validate the unchanged original response before any final request
@@ -296,6 +306,11 @@ The v9 workpaper path MUST optimize useful business content per reading and mode
 - **WHEN** an explicitly opted-in workpaper request fails JSON or Schema validation and its existing profile/card still permits a physical retry
 - **THEN** that retry carries the concrete validation error and previous response instead of blindly repeating the original request
 - **AND** logical identity, deadline and physical/recovery/usage budgets remain cumulative, no extra retry is created, no local JSON repair fabricates a valid draft, and requests without the opt-in retain their prior behavior
+
+#### Scenario: An explicitly authorized extraction continuation reuses navigation
+- **WHEN** a new bounded authorization provides a hash-bound matching source, accepted original section selection and an original finish=stop malformed JSON response
+- **THEN** the existing task owner may rebuild the same selected source packet and request extraction with the original response and precise JSON error, without reissuing navigation or locally completing the malformed draft
+- **AND** the retained section-selection attribution and original failed usage remain separate from new extraction/review calls, the continuation survives the existing checkpoint, and missing/tampered/wrong-source or actually valid prior JSON is rejected before any send
 
 #### Scenario: A response budget cannot hold an exhaustive numeric inventory
 - **WHEN** selected chapters disclose more subsidiary, operating or supplementary figures than a useful core workpaper needs

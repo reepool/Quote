@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -241,6 +242,7 @@ def run_workpaper(
     *, report: ReportIdentity, pages: Sequence[Mapping],
     processing_identity: Mapping[str, Any], provider: Any, work_id: str,
     source_pdf_path: str | None = None,
+    extraction_resume: Mapping[str, Any] | None = None,
 ) -> WorkpaperRun:
     """One selection and one company extraction, never eight per-element loops."""
     real = processing_identity.get("execution_mode") == "provider"
@@ -260,28 +262,68 @@ def run_workpaper(
     path_ids = {section.section_path: section.section_id for section in index}
     limit = int(processing_identity.get("max_section_characters", 160_000))
     timeout = float(processing_identity.get("logical_request_timeout_seconds", 300))
-    selected = complete(
-        request_id=selection_id, purpose="select_profile_sections",
-        report=report,
-        payload={
-            "report": report.model_dump(mode="json"),
-            "section_columns": ["section_id", "parent_id", "title", "characters"],
-            "sections": [
-                [
-                    section.section_id,
-                    path_ids.get(section.section_path[:-1]),
-                    section.section_path[-1],
-                    section.characters,
-                ]
-                for section in index if section.level <= 3
-            ],
-            "max_selected_characters": limit,
-            "section_guide_version": SECTION_GUIDE_VERSION,
-            "reading_questions": SECTION_GUIDE,
-        },
-        instructions=SELECTION_INSTRUCTIONS, response_model=SectionSelection,
-        max_output_tokens=2500, timeout_seconds=timeout,
-    )
+    retained_selection = None
+    recovery_content = {}
+    if extraction_resume is not None:
+        bound_hash = hashlib.sha256(json.dumps(extraction_resume, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        if (processing_identity.get("workpaper_extraction_resume_hash") != bound_hash
+            or extraction_resume.get("document_version") != report.document_version):
+            raise ValueError("explicit matching extraction continuation identity is required")
+        retained_selection = extraction_resume.get("selection_receipt") or {}
+        raw_selection = retained_selection.get("raw_content")
+        if (retained_selection.get("purpose") != "select_profile_sections"
+            or retained_selection.get("contract_status") != "accepted"
+            or retained_selection.get("finish_reason") != "stop"
+            or not retained_selection.get("request_id")
+            or not isinstance(raw_selection, str)
+            or hashlib.sha256(raw_selection.encode()).hexdigest() != retained_selection.get("response_hash")
+            or json.loads(raw_selection) != retained_selection.get("response_payload")
+            or retained_selection.get("response_payload") != extraction_resume.get("selection_response")):
+            raise ValueError("retained section response must match its accepted receipt")
+        if real and (not retained_selection.get("model") or not retained_selection.get("source_label")):
+            raise ValueError("retained navigation model attribution is missing")
+        failure = extraction_resume.get("failed_response") or {}
+        raw_failure = failure.get("content")
+        if (failure.get("finish_reason") != "stop" or not isinstance(raw_failure, str)
+            or not raw_failure or hashlib.sha256(raw_failure.encode()).hexdigest() != failure.get("content_sha256")):
+            raise ValueError("retained malformed response must match its original content hash")
+        try:
+            json.loads(raw_failure)
+        except json.JSONDecodeError as exc:
+            recovery_content = {"format_recovery": {
+                "validation_error": f"{exc.msg} at line {exc.lineno} column {exc.colno} (char {exc.pos})",
+                "prior_response": raw_failure,
+                "instructions": "Return a complete schema-conforming JSON object grounded only in the supplied source; correct the format, do not invent or infer missing business facts.",
+            }}
+        else:
+            raise ValueError("extraction continuation requires an actually malformed original JSON response")
+        selected = extraction_resume["selection_response"]
+        selection_id = retained_selection["request_id"]
+    elif processing_identity.get("workpaper_extraction_resume_hash"):
+        raise ValueError("hash-bound extraction continuation payload is missing")
+    else:
+        selected = complete(
+            request_id=selection_id, purpose="select_profile_sections",
+            report=report,
+            payload={
+                "report": report.model_dump(mode="json"),
+                "section_columns": ["section_id", "parent_id", "title", "characters"],
+                "sections": [
+                    [
+                        section.section_id,
+                        path_ids.get(section.section_path[:-1]),
+                        section.section_path[-1],
+                        section.characters,
+                    ]
+                    for section in index if section.level <= 3
+                ],
+                "max_selected_characters": limit,
+                "section_guide_version": SECTION_GUIDE_VERSION,
+                "reading_questions": SECTION_GUIDE,
+            },
+            instructions=SELECTION_INSTRUCTIONS, response_model=SectionSelection,
+            max_output_tokens=2500, timeout_seconds=timeout,
+        )
     selection = SectionSelection.model_validate(selected)
     chosen_pages = selected_pages(index, selection)
     by_id = {section.section_id: section for section in index}
@@ -313,6 +355,7 @@ def run_workpaper(
             "report": report.model_dump(mode="json"),
             "reading_scope": packet.reading_scope.model_dump(mode="json"),
             "source_text": packet.model_text(),
+            **recovery_content,
         },
         instructions=EXTRACTION_INSTRUCTIONS, response_model=WorkpaperDraftResponse,
         max_output_tokens=int(processing_identity.get("workpaper_max_output_tokens", 12_000)),
@@ -320,6 +363,8 @@ def run_workpaper(
     )
     receipts = tuple(item for item in getattr(provider, "workpaper_receipts", ())
                      if item.get("request_id") in {selection_id, extraction_id})
+    if retained_selection is not None:
+        receipts = (dict(retained_selection, receipt_origin="retained_receipt"), *receipts)
     generation = WorkpaperGenerationMetadata(
         prompt_version=str(processing_identity.get("prompt_version") or WORKPAPER_PROMPT_VERSION),
         preprocessing_version=str(processing_identity.get("preprocessing_version") or "unknown"),

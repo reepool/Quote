@@ -10,6 +10,14 @@
 
 ## Decisions
 
+### 6.CV：只继承成功前段，真实完成必要纠错
+
+review_resume显式mode=repair_and_verify只允许一份accepted原初核回执，原稿hash/源版本/原raw SHA及解析payload先核，再从原一次合并修订发起最终再核；默认旧verify_only仍要求初核与修订两份，不可用新mode重复已做修订。旧初核可能在应用消费失败，当前重新解释不改原raw/contract/usage，未核范围继续incomplete，不冒充新初核。新绑定显示说明必须幂等，不能在seed_material重绑定时重复追加而使合法原稿hash失配。
+
+广州仅增加hash-bound extraction_resume：同报告原选章响应及accepted回执、finish=stop的原坏JSON和内容hash，先核真实JSON确实无效，再用当前相同章节包发一次带具体格式反馈的成稿，不调用选章或本地拼正文。旧选章模型/请求以retained_receipt归因，正文作者来自本次真实成功回执；旧坏JSON/usage保留但不冒充合法抽取。resume随原runtime checkpoint持久，身份缺失/错hash/错版本/坏回执在发送前拒绝，旧正常处理路径不变。
+
+两种接续均沿原TaskService/网关/writer。新的明确合并有界调用批准前只有离线实现及替传输验证；批准后冻结同版原输入与接线连续跑，原与新资源分列、不借CT余额。只补后段、无框架/字段扩张，不自动处理既有时序回归或启生产；逐轮先清后做及finally清本人过程物。
+
 ### 6.CU：保合法局部意见、金额原值与有效格式恢复
 
 复核根结构有效后，对已核ID取已知唯一交集，缺失/多余/重复及单条非法目标/证据留下具体错误和incomplete，不清掉独立合法意见；每个合法错误仍撤其对象，并可进入原至多一次合并修订/再核，不能因部分处理成功变全绿。possible_omission无论issue_type是否material_omission，挂已有事实都只关联新补充；其严重性继续决定是否值得修订。重复finding ID全部隔离避免歧义，未知引用不改任何事实，原raw/checked范围不重写。
