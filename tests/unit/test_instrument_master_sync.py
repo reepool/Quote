@@ -64,6 +64,7 @@ def _manager() -> DataManager:
 def _terminal_dependencies(manager):
     """Supply the official-terminal dependency for orchestration-only tests."""
     manager.db_ops.get_instrument_master_lineage_metadata = AsyncMock(return_value={})
+    manager.db_ops.get_instrument_master_listing_date_reviews = AsyncMock(return_value={})
     manager.db_ops.load_a_share_delisting_state = AsyncMock(return_value={"plans": []})
     manager.db_ops.save_instrument_master_discrepancies = AsyncMock(
         side_effect=lambda rows, **kwargs: len(rows)

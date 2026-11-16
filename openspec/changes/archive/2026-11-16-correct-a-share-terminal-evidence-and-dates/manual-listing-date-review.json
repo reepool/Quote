@@ -1,0 +1,108 @@
+{
+  "reference": "manual-listing-date-review-20261116",
+  "reviewed_at": "2026-11-16T11:13:01.824965+08:00",
+  "authorization": "explicit_human_user_confirmation",
+  "reviews": {
+    "000003.SZ": {
+      "status": "approved",
+      "instrument_id": "000003.SZ",
+      "exchange": "SZSE",
+      "type": "stock",
+      "listed_date": "1991-07-03",
+      "source_listed_date": "1991-01-14",
+      "delisted_date": "2002-06-14",
+      "source": "szse_official_terminal_list",
+      "source_url": "https://www.szse.cn/api/report/ShowReport",
+      "source_snapshot_hash": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+      "reviewed_by": "user",
+      "reviewed_at": "2026-11-16T11:13:01.824965+08:00",
+      "reference": "manual-listing-date-review-20261116",
+      "reason": "用户明确确认保留本地BaoStock历史上市日，并要求标记人工审核",
+      "user_instruction": "就用这个吧，标记一下人工审核"
+    },
+    "000004.SZ": {
+      "status": "approved",
+      "instrument_id": "000004.SZ",
+      "exchange": "SZSE",
+      "type": "stock",
+      "listed_date": "1991-01-14",
+      "source_listed_date": "1990-12-01",
+      "delisted_date": "2026-07-14",
+      "source": "szse_official_terminal_list",
+      "source_url": "https://www.szse.cn/api/report/ShowReport",
+      "source_snapshot_hash": "50863fb3ae6fe4f7c03536ee7ead184210b5287ee3cf854ac0e4a1ac0d04ca87",
+      "reviewed_by": "user",
+      "reviewed_at": "2026-11-16T11:13:01.824965+08:00",
+      "reference": "manual-listing-date-review-20261116",
+      "reason": "用户明确确认保留本地BaoStock历史上市日，并要求标记人工审核",
+      "user_instruction": "就用这个吧，标记一下人工审核"
+    }
+  },
+  "scope": "fixed_26_terminal_audit_only",
+  "audit": {
+    "SSE": {
+      "checked_count": 21,
+      "confirmed_count": 21,
+      "conflict_count": 0,
+      "write_failed_count": 0,
+      "status": "warning",
+      "warnings": [
+        "official current-list coverage not verified"
+      ]
+    },
+    "SZSE": {
+      "checked_count": 5,
+      "confirmed_count": 5,
+      "conflict_count": 0,
+      "write_failed_count": 0,
+      "status": "warning",
+      "warnings": [
+        "official current-list coverage not verified"
+      ]
+    }
+  },
+  "checks": {
+    "canonical_instruments_unchanged": true,
+    "accepted_dates_persisted": true,
+    "review_records_durable": true,
+    "all_26_date_conflicts_resolved": true,
+    "production_verifications_unchanged": true,
+    "audit_business_state_unchanged": true
+  },
+  "instruments_sha256": "3464a5cda2da5b5e2524089dd81d8fd77dce3edadab33c43643cb14de51a602c",
+  "validation": {
+    "regression": {
+      "passed": 163,
+      "seconds": 268.76,
+      "modules": [
+        "tests/unit/test_a_share_delisting_reconciliation.py",
+        "tests/unit/test_instrument_master_sync.py",
+        "tests/unit/test_master_governance_orchestration.py",
+        "tests/unit/test_delisted_a_share_quote_backfill.py"
+      ]
+    },
+    "new_review_scenarios": 3,
+    "openspec_strict": "passed",
+    "syntax_and_diff_check": "passed",
+    "review": "No remaining blocking defect; original metadata writer reused; review matches exact identity/source/listing dates/terminal date; no security-ID conditions in production logic",
+    "source_sha256": {
+      "database/instrument_lifecycle.py": "3f768c79b8bd0424327ee2c93dcfa25afa61b4c55f5999cc544c9953aba9585a",
+      "database/operations.py": "55647588c933e420508c926e2cd81ae2ffb68ba307249ebe4efdd5b6cf6c1f49",
+      "instrument_master_delisting.py": "8ae1bf374e8142a125a66e84addbd755924839776f13f164161f2b3b4145a09a",
+      "tests/unit/test_a_share_delisting_reconciliation.py": "1954e87a14ef5d437ed1b642609e0d564e26554b094c78cc0366ce687669031c",
+      "tests/unit/test_instrument_master_sync.py": "c20f3ac4784894ffca908c8dd52014e1842217f8e678c95e0d1a1c8a7ed39dc1"
+    }
+  },
+  "deployment_note": "常驻服务未重启；需加载新代码后执行正常完整治理，更新旧生产核验记录。定向audit不作为全市场生产freshness。",
+  "cleanup": {
+    "removed_owned_artifacts": [
+      "pytest",
+      "regression",
+      "apply_review.py",
+      "regression.xml"
+    ],
+    "bytes_removed": 5531162,
+    "baseline_retained_until_commit": true,
+    "shared_caches_and_other_tasks": "preserved"
+  }
+}

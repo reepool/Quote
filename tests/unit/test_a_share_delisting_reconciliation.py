@@ -1497,3 +1497,91 @@ async def test_controlled_correction_cas_rejects_a_change_after_validation(owner
     )
     assert (await local_record(owner))["delisted_date"] == datetime(2026, 10, 22)
     assert await correction_rows(owner) == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("iid,name,accepted,source_listed,terminal", [
+    ("000003.SZ", "PT金田A", "1991-07-03", "1991-01-14", "2002-06-14"),
+    ("000004.SZ", "国华退", "1991-01-14", "1990-12-01", "2026-07-14"),
+])
+async def test_human_listing_date_review_resolves_only_approved_source_discrepancy(
+    owner, iid, name, accepted, source_listed, terminal,
+):
+    local = {**KONKA, "instrument_id": iid, "symbol": iid[:6], "name": name,
+             "listed_date": accepted, "delisted_date": terminal,
+             "status": "delisted", "is_active": False, "trading_status": 0}
+    # Build a persisted legacy instrument, with both date values kept intact.
+    async with owner.get_async_session() as session:
+        session.add(InstrumentDB(**{
+            **local, "listed_date": datetime.fromisoformat(accepted),
+            "delisted_date": datetime.fromisoformat(terminal),
+        }))
+        await session.commit()
+    source = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock",
+        config={"szse": {"terminal_list_file": str(FIXTURES / "szse_terminated.xlsx")}},
+    )
+    snapshot = await source.get_delisting_snapshot("SZSE")
+    proof = next(r for r in snapshot["rows"] if r["instrument_id"] == iid)
+    assert proof["listed_date"] == source_listed
+
+    async def audit():
+        return await AShareDelistingReconciler(owner, None).reconcile(
+            "SZSE", {"rows_by_id": {iid: local}}, [],
+            {"official_current_list_complete": True}, audit_only=True,
+            snapshot={"rows": [proof], "complete": True, "errors": []},
+        )
+
+    assert (await audit())["conflict_count"] == 1
+    review = {
+        "status": "approved", "instrument_id": iid, "exchange": "SZSE", "type": "stock",
+        "listed_date": accepted, "source_listed_date": source_listed,
+        "delisted_date": terminal, "source": proof["source"],
+        "reviewed_by": "user", "reviewed_at": get_shanghai_time().isoformat(),
+        "reference": "human-listing-review-test", "reason": "User confirmed local listing date",
+    }
+    assert await owner.save_instrument_master_metadata_batch([{
+        "instrument_id": iid, "exchange": "SZSE", "product_type": "stock",
+        "metadata": {"a_share_listing_date_review": review},
+    }]) == 1
+    result = await audit()
+    assert result["status"] == "success" and result["conflict_count"] == 0
+    assert result["confirmed_count"] == 1
+    # Routine metadata refresh cannot erase the review; the next run reads it anew.
+    assert await owner.save_instrument_master_metadata_batch([{
+        "instrument_id": iid, "exchange": "SZSE", "product_type": "stock",
+        "metadata": {"source_authority": "official"},
+    }]) == 1
+    assert (await owner.get_instrument_master_listing_date_reviews([iid]))[iid] == review
+    assert (await audit())["status"] == "success"
+    async with owner.get_async_session() as session:
+        record = (await session.execute(select(InstrumentDB))).scalar_one()
+        assert record.listed_date == datetime.fromisoformat(accepted)
+        assert record.delisted_date == datetime.fromisoformat(terminal)
+        assert not record.is_active and record.status == "delisted"
+    assert (await owner.load_a_share_delisting_state(["SZSE"]))["has_baseline"] is False
+
+
+def test_human_listing_date_review_does_not_cover_changed_dates_or_other_identity():
+    from instrument_master_delisting import _identity_issue
+
+    local = {**KONKA, "delisted_date": "2026-10-23"}
+    proof = evidence(listed_date="1991-01-14")
+    review = {
+        "status": "approved", "instrument_id": KONKA["instrument_id"],
+        "exchange": "SZSE", "type": "stock", "listed_date": KONKA["listed_date"],
+        "source_listed_date": "1991-01-14", "delisted_date": "2026-10-23",
+        "source": proof["source"], "reviewed_by": "user",
+        "reviewed_at": get_shanghai_time().isoformat(),
+        "reference": "human-listing-review-test", "reason": "User confirmation",
+    }
+    assert _identity_issue(local, proof, None, review) is None
+    assert _identity_issue(local, {**proof, "listed_date": "1991-02-01"}, None, review) == "listing_interval_conflict"
+    assert _identity_issue(local, {**proof, "delisted_date": "2026-10-22"}, None, review) == "listing_interval_conflict"
+    assert _identity_issue({**local, "listed_date": "1992-04-01"}, proof, None, review) == "listing_interval_conflict"
+    for change in [
+        {"instrument_id": "200016.SZ"}, {"status": "pending"},
+        {"reviewed_at": "bad-time"}, {"source": "different_source"},
+    ]:
+        assert _identity_issue(local, proof, None, {**review, **change}) == "listing_interval_conflict"
+    assert _identity_issue(local, proof, None) == "listing_interval_conflict"

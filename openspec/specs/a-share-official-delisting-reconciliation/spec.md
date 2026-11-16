@@ -232,3 +232,18 @@ Reconcile official A-share delisting evidence with the current security lifecycl
 - **WHEN** 固定26项处理完成
 - **THEN** 交付 SHALL 保留一套官方来源/hash、逐项预期旧值/目标值、实际结果及未决项；同一reconciler的audit_only SHALL 验证已解决项不再冲突
 - **AND** audit SHALL 不写业务生命周期、正式证据或生产verification；其他证券及财务事实 SHALL 保持不变
+
+### Requirement: Human listing-date reviews resolve only explicitly approved discrepancies
+系统 SHALL 在已有主数据metadata中保存人工上市日审核（a_share_listing_date_review），记录审核人、时间、依据/reference、采纳上市日、原来源上市日、证券身份、来源及对应退市日。核对 SHALL 仅对与审核记录完全匹配的来源日期差异采纳人工结论；原始来源记录及本地上市日 SHALL 保留。系统 SHALL NOT 为处理该差异修改年报入口的成功判断，也不得伪造主体沿革或硬编码证券豁免。
+
+#### Scenario: Human confirms the existing local listing date
+- **WHEN** 用户明确确认000003.SZ上市日为1991-07-03、000004.SZ上市日为1991-01-14，对应SZSE终止名单分别记为1991-01-14、1990-12-01，双方退市日一致
+- **THEN** 系统 SHALL 保存人工审核并仅消除该已审核的上市日冲突，不修改两条本地上市日或退市日
+
+#### Scenario: Subsequent evidence differs from the reviewed case
+- **WHEN** 来源上市日、采纳上市日、证券身份、来源或退市日与审核记录不同，或审核尚未批准/记录不可用
+- **THEN** 系统 SHALL 继续按原冲突规则判断，不得用旧审核放行新的差异
+
+#### Scenario: Routine metadata refresh follows manual review
+- **WHEN** 普通主数据metadata刷新或进程重启后再次核对
+- **THEN** 已审核记录 SHALL 保留并从持久metadata读取，audit SHALL 不修改业务生命周期或伪造全市场生产核验结果

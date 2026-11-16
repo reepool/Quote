@@ -312,7 +312,8 @@ def in_a_share_scope(row: Mapping[str, Any], exchange: str) -> bool:
 
 
 def _identity_issue(
-    local: Mapping[str, Any], evidence: Mapping[str, Any], lineage: Any
+    local: Mapping[str, Any], evidence: Mapping[str, Any], lineage: Any,
+    listing_date_review: Mapping[str, Any] | None = None,
 ) -> str | None:
     effective = lifecycle_date(evidence.get("delisted_date"))
     listed = lifecycle_date(evidence.get("listed_date"))
@@ -341,10 +342,40 @@ def _identity_issue(
         if listed is None and effective is None:
             return "issuer_regime_unresolved"
     elif listed and local_listed and listed != local_listed:
-        return "listing_interval_conflict"
+        if not _listing_date_review_matches(local, evidence, listing_date_review):
+            return "listing_interval_conflict"
     if effective and local_listed and effective < local_listed:
         return "terminal_precedes_current_listing"
     return None
+
+
+def _listing_date_review_matches(
+    local: Mapping[str, Any], evidence: Mapping[str, Any],
+    review: Mapping[str, Any] | None,
+) -> bool:
+    """Honor only the exact source/date discrepancy explicitly approved by a human."""
+    if not isinstance(review, Mapping):
+        return False
+    try:
+        reviewed_at = datetime.fromisoformat(str(review.get("reviewed_at") or ""))
+        accepted = lifecycle_date(review.get("listed_date"))
+        rejected = lifecycle_date(review.get("source_listed_date"))
+        terminal = lifecycle_date(review.get("delisted_date"))
+        return bool(
+            review.get("status") == "approved"
+            and all(review.get(key) for key in ("reviewed_by", "reference", "reason"))
+            and reviewed_at.tzinfo is not None
+            and review.get("instrument_id") == local.get("instrument_id") == evidence.get("instrument_id")
+            and review.get("exchange") == local.get("exchange") == evidence.get("exchange")
+            and review.get("type") == local.get("type") == evidence.get("type") == "stock"
+            and review.get("source") == evidence.get("source")
+            and accepted is not None and accepted == lifecycle_date(local.get("listed_date"))
+            and rejected is not None and rejected == lifecycle_date(evidence.get("listed_date"))
+            and terminal is not None
+            and terminal == lifecycle_date(local.get("delisted_date")) == lifecycle_date(evidence.get("delisted_date"))
+        )
+    except (TypeError, ValueError):
+        return False
 
 
 def _plan_key(evidence: Mapping[str, Any], local: Mapping[str, Any]) -> str:
@@ -534,6 +565,16 @@ class AShareDelistingReconciler:
         )
         if isinstance(persisted_lineage, dict):
             lineage_catalog.update(persisted_lineage)
+        listing_date_reviews = {}
+        try:
+            listing_date_reviews = await self.db_ops.get_instrument_master_listing_date_reviews(
+                list(local_rows)
+            )
+            if not isinstance(listing_date_reviews, Mapping):
+                raise ValueError("invalid listing-date review result")
+        except Exception as exc:
+            listing_date_reviews = {}
+            result["warnings"].append(f"listing-date review read failed: {exc}")
         future_rows = []
         conflict_rows = []
         current_by_id = {row.get("instrument_id"): row for row in current}
@@ -541,7 +582,7 @@ class AShareDelistingReconciler:
         for iid, observations in grouped.items():
             local = local_rows[iid]
             issues = {
-                _identity_issue(local, item, lineage_catalog.get(iid))
+                _identity_issue(local, item, lineage_catalog.get(iid), listing_date_reviews.get(iid))
                 for item in observations
             }
             if issues == {"predecessor_terminal_evidence"}:
@@ -549,7 +590,7 @@ class AShareDelistingReconciler:
             observations = [
                 item
                 for item in observations
-                if _identity_issue(local, item, lineage_catalog.get(iid))
+                if _identity_issue(local, item, lineage_catalog.get(iid), listing_date_reviews.get(iid))
                 != "predecessor_terminal_evidence"
             ]
             if not observations:
@@ -560,7 +601,7 @@ class AShareDelistingReconciler:
             usable_observations = [
                 item
                 for item in usable[iid]
-                if _identity_issue(local, item, lineage_catalog.get(iid))
+                if _identity_issue(local, item, lineage_catalog.get(iid), listing_date_reviews.get(iid))
                 != "predecessor_terminal_evidence"
             ]
             usable_dates = {
@@ -672,7 +713,7 @@ class AShareDelistingReconciler:
                 for plan in pending_plans[iid]
                 if effective is not None
                 and lifecycle_date(plan["effective_date"]) == effective
-                and _identity_issue(local, plan["evidence"], lineage_catalog.get(iid))
+                and _identity_issue(local, plan["evidence"], lineage_catalog.get(iid), listing_date_reviews.get(iid))
                 is None
             ]
             was_active = bool(local.get("is_active"))

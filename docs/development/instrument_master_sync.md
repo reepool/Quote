@@ -135,7 +135,13 @@ SSE终止名单请求仅取 `STOCK_TYPE=1,8`，解析时继续排除B股类型2�
 
 `date_correction` 必须包含 `expected_delisted_date`、`expected_listed_date`、`reason`、`reference`，并传入同证券/交易所/类型/上市日相符的正式终止名单evidence和source。只允许已退市A股、非空旧日、已生效且晚于上市日的新日；writer核URL/hash/parser/观察时间及预期旧值，再以条件UPDATE防止并发覆盖。日期、受保护证据和差异表 `reason=a_share_terminal_date_corrected` 的before/after记录原子提交，失败整笔回滚；同reference及相同前后日期可幂等复跑，内容冲突则拒绝。不创建第二个writer或新表。
 
-2026-11-16固定26项清理的来源、预览与验收见 [受控清理证据](../../openspec/changes/archive/2026-11-16-correct-a-share-terminal-evidence-and-dates/verification.md)。保留000003.SZ与000004.SZ上市日待核，不为消除warning修改上市日；定向audit不能替代全市场生产freshness核验。
+2026-11-16固定26项清理的来源、预览与验收见 [受控清理证据](../../openspec/changes/archive/2026-11-16-correct-a-share-terminal-evidence-and-dates/verification.md)。000003.SZ与000004.SZ的原始未决项已由用户于2026-11-16确认本地上市日，后续人工审核记录见下文；定向audit不能替代全市场生产freshness核验。
+
+### 人工确认上市日期差异
+
+用户于2026-11-16明确确认：000003.SZ/PT金田A上市日采用1991-07-03，000004.SZ/国华退采用1991-01-14。原始SZSE终止名单分别记1991-01-14、1990-12-01；两侧退市日一致。本次保留两条本地上市日，在现有 `instrument_master_metadata.metadata_json` 的 `metadata.a_share_listing_date_review` 中保存 `status=approved`、审核人/时间/reference/理由、证券身份、采纳日、来源日和对应退市日。
+
+审核仅覆盖该身份、来源、上市日差异及退市日组成的具体记录，后续任一项变化仍按原规则报告冲突；原始官方证据保留，普通metadata刷新保留审核记录。年报成功判断保持原规则。持久记录及验证见[人工审核回执](../../openspec/changes/archive/2026-11-16-correct-a-share-terminal-evidence-and-dates/manual-listing-date-review.json)。
 
 ## BSE 退市确认
 

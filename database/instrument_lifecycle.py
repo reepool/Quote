@@ -301,6 +301,34 @@ async def _prepare_date_correction(
     }
 
 
+async def read_listing_date_reviews(
+    owner: Any, instrument_ids: Sequence[str],
+) -> dict[str, dict[str, Any]]:
+    """Read explicit human listing-date decisions from existing master metadata."""
+    wanted = sorted(set(instrument_ids))
+    reviews = {}
+    try:
+        for offset in range(0, len(wanted), 400):
+            params = {f"iid{i}": iid for i, iid in enumerate(wanted[offset:offset + 400])}
+            placeholders = ",".join(f":{key}" for key in params)
+            rows = await owner.execute_read_query(
+                "SELECT instrument_id, json_extract(metadata_json, "
+                "'$.metadata.a_share_listing_date_review') AS review_json "
+                "FROM instrument_master_metadata "
+                f"WHERE instrument_id IN ({placeholders})",
+                params,
+            )
+            for row in rows:
+                if row.get("review_json"):
+                    review = json.loads(row["review_json"])
+                    if isinstance(review, dict):
+                        reviews[row["instrument_id"]] = review
+    except Exception as exc:
+        if "no such table: instrument_master_metadata" not in str(exc):
+            raise
+    return reviews
+
+
 async def read_governance_state(owner: Any, exchanges: Sequence[str]) -> dict[str, Any]:
     """Read production plans strictly; a read/JSON failure is never an empty queue."""
     wanted = sorted(set(exchanges))

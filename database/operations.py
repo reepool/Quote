@@ -1669,6 +1669,13 @@ class DatabaseOperations:
             self.db_logger.error("Failed to save instrument master metadata batch: %s", exc)
             return 0
 
+    async def get_instrument_master_listing_date_reviews(
+        self, instrument_ids: Sequence[str],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Load human-reviewed listing-date discrepancies for exact securities."""
+        from database.instrument_lifecycle import read_listing_date_reviews
+        return await read_listing_date_reviews(self, instrument_ids)
+
     async def get_instrument_master_lineage_metadata(
         self,
         instrument_ids: Sequence[str],
@@ -1730,7 +1737,7 @@ class DatabaseOperations:
         existing_metadata_json: Optional[str],
         incoming_row: Dict[str, Any],
     ) -> Dict[str, Any]:
-        """Keep reviewed code lineage across routine master metadata refreshes."""
+        """Keep reviewed lifecycle metadata across routine master refreshes."""
         result = dict(incoming_row)
         raw_incoming_metadata = result.get("metadata")
         incoming_metadata = (
@@ -1752,7 +1759,10 @@ class DatabaseOperations:
             else None
         )
         if isinstance(existing_metadata, dict):
-            for key in ("a_share_code_lineage", "a_share_terminal_evidence"):
+            for key in (
+                "a_share_code_lineage", "a_share_terminal_evidence",
+                "a_share_listing_date_review",
+            ):
                 if key in existing_metadata and (
                     key == "a_share_terminal_evidence" or key not in incoming_metadata
                 ):
