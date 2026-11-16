@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.CX：标准化候选复核不重付抽取
+
+广州CW28条候选复用原review_seed和review_existing_draft_hash，经seed_material核原PDF/坐标/原稿绑定，不带local_format_only接续载荷。原抽取仍rejected，复核/修订/最终核验分别实际归因。既有链已支持，不新增业务循环或scope修补；只纠正已复核的标准化候选仍显示未二次审核的展示错误，旧未核JSON/Markdown不改。新有界真实授权确认前仅离线首请求和显示测试，获准后同网络环境冻结后整卡跑一次，原失败/S1/生产不改。
+
 ### 6.CW：不改业务值的显式本地消费
 
 6.CV已结束，广州原stop响应仅缺一个末尾对象闭括号，两个已知根字段错嵌elements。新local_format_only接续复用现有hash-bound载荷/checkpoint及同一章节包；不改变公共网关默认JSON严格解析，不建通用修复器。仅唯一闭括号及无冲突已知字段归位，重复键/非有限数/错版/缺基础/有歧义结构拒绝。严格合同后再沿原局部源检查，不猜业务值。generation可选标准化记录只在此模式出现，旧序列化/hash形状不变；原实际失败作者/usage归因但contract_status=rejected，原receipt不伪造成功。本地模式禁止后续模型复核，无新调用，query/export交待核候选而非可信发布。旧CV禁止本地补JSON和失败结论不追改。

@@ -1,0 +1,14 @@
+{
+  "task": "6.CX",
+  "runtime_root_bytes_removed_in_finally": 2512528,
+  "temporary_operator_bytes": 14971,
+  "temporary_operator_bytecode_bytes": 30375,
+  "total_measured_bytes": 2557874,
+  "temporary_operator": "/home/python/Quote/data/QuoteBak/workpaper-cx-600098-20261116.py",
+  "temporary_operator_bytecode": "/home/python/Quote/data/QuoteBak/__pycache__/workpaper-cx-600098-20261116.cpython-311.pyc",
+  "operator_snapshot_hash_checked_before_removal": true,
+  "entry_process_finished": true,
+  "other_direct_test_roots": "TemporaryDirectory/finally removed; bytes not measured or added",
+  "retained": ["one authoritative CX result set", "official PDF and useful parsing cache", "CT/CV/CW original results", "unique attempt marker", "unrelated shared caches and pre-existing/parallel changes"],
+  "no_production_data_removed": true
+}

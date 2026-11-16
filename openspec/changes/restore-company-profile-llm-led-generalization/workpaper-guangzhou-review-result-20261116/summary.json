@@ -1,0 +1,48 @@
+{
+  "task": "6.CX",
+  "instrument_id": "600098.SH",
+  "readable": true,
+  "exception": null,
+  "original_seed_hash": "ee07d963a9eba3a16c07c3352194f713cc7b893e908561dbfd3cc2d1055d9ccc",
+  "original_raw_candidate_count": 28,
+  "original_extraction_contract_status": "rejected",
+  "old_resources_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600098/budget.json",
+  "entry_started": true,
+  "preparation_seconds": 28.942,
+  "business_started_monotonic": 10028874.301831668,
+  "state": "completed",
+  "business_seconds": 500.396,
+  "three_reads_equal": true,
+  "facts": 30,
+  "metrics": 63,
+  "review_status": "incomplete",
+  "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F12,F13,F14,F18,F24,F32",
+  "findings": 4,
+  "core_complete": false,
+  "review_resolutions": [
+    {
+      "finding_id": "WR01",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR02",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR03",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR04",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "physical_requests": 3,
+  "charged_tokens": 109319,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "query_sha256": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+  "supervision_seconds": 533.823,
+  "cleanup_bytes": 2512528
+}

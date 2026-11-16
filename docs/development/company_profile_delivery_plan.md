@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-16 6.CX广州限定后段已结束：[30条画像及收入结构](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/result.md)。没有重付选章/抽取，真实Grok初核/DeepSeek一次修订/Grok最终再核，3物理109319实际usage/0恢复/unknown、500.396工作秒；4模型采纳项独立3支持/1限定，26原对象不变、F30/F33纠错、主要收入及利润背景2新增。多列原6隔离ID仍incomplete、收益持续性仅模型解释，不靠改状态报全准。三读/冻结/源与旧hash成立，87直接/strict/diff通过、本人2557874字节清及其余finally未量，既有并行保护。此卡1/1用尽，不再广州细项/供应链追加窗或整组重抽；下一回现有十二家公司整体交付、有限质量与发布条件，正式S1/生产另按原门槛，不因这份后段通过自动放行。
+
 2026-11-16 6.CW完成[广州28条待核候选及有限核源](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-format-consumption-result-20261116/result.md)：0新模型，以保存正文作有限格式标准化而非付费原样重发；34原对象保28/隔离6，原入口三读、原页坐标与失败保护成立。原抽取仍rejected、质量未复核、F30不作结论、主要收入构成仍限用，不计S1/生产或全稿准确。本卡结束，下一只可在此候选和原章节上有界源复核/必要合并修订，真实范围另明确授权；不重跑选章/全十二家、不为供应链/可选尾项单开窗。53直接/1入口/234兼容分别通过且不加总，strict/diff通过；本人已量2190520字节清理、其余finally未量，正式源/缓存/CT-CV/attempt及既有并行保护。
 
 2026-11-16当前6.CV真实3/3结束：[结果与两份限用画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/result.md)。新6请求/159361供应商usage/1恢复/121.601并发业务秒/unknown；上汽/海泰修订最终再核已发生，但3模型采纳项独立只有1普通支持、2限用，广州两次坏JSON仍无稿。本卡次数用尽、不追加窗或重抽十二家，S1/生产不变。下一重点不是产能/母公司标签或供应链细度100%收口，而是广州整份JSON交付：先零调用评估可审计、不会添加业务值的有限结构标准化，保旧失败与未核状态，再决定是否需要新的真实范围。本人7606657字节已清，正式源/有效缓存/CT-CU原件/attempt及既有并行保护。下列工程0/3为前轮时点，不作当前真实结果。

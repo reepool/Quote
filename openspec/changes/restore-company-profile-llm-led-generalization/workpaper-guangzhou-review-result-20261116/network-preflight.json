@@ -1,0 +1,20 @@
+{
+  "task": "6.CX",
+  "namespace": "net:[4026531840]",
+  "permission_mode": "approved_network_exec",
+  "model_requests": 0,
+  "checks": [
+    {
+      "host": "api.deepseek.com",
+      "dns_addresses": 2,
+      "tls": "TLSv1.3",
+      "seconds": 0.027
+    },
+    {
+      "host": "scorpio.reepool.com",
+      "dns_addresses": 1,
+      "tls": "TLSv1.3",
+      "seconds": 0.292
+    }
+  ]
+}

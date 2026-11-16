@@ -1,0 +1,56 @@
+{
+  "task": "6.CX",
+  "scope": "four real revised candidates and original business/revenue continuity; not all 30 facts or full-report accuracy",
+  "model_accepted_candidates": 4,
+  "independent_supported_candidates": 3,
+  "independent_qualified_candidates": 1,
+  "unchanged_original_facts": 26,
+  "modified_original_fact_ids": ["F30", "F33"],
+  "added_fact_ids": ["review-add:WR02", "review-add:WR03"],
+  "source_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+  "decisions": [
+    {
+      "finding_id": "WR01",
+      "fact_id": "F30",
+      "decision": "supported",
+      "physical_pages": [18, 22],
+      "evidence_ids": ["source-0011", "source-0015"],
+      "reason": "Both disclosure items mark not applicable. Revised wording retains the item applicability and no longer asserts that no economic change occurred."
+    },
+    {
+      "finding_id": "WR02",
+      "fact_id": "review-add:WR02",
+      "decision": "supported",
+      "physical_pages": [18, 19],
+      "evidence_ids": ["source-0011", "source-0012"],
+      "reason": "Five industry business revenues match the current-period revenue column in yuan, including the continued table header. Coal and oil revenue/growth retain their distinct product rows, -5.90% and +214.00%. Industry and product categories overlap; no cross-table summation or invented shares. Minor other-industry and regional tail rows need not be filled."
+    },
+    {
+      "finding_id": "WR03",
+      "fact_id": "review-add:WR03",
+      "decision": "qualified_source_reference",
+      "physical_pages": [17, 18],
+      "evidence_ids": ["source-0010", "source-0011"],
+      "supported_scope": "Asset-disposal income 1,826,406,356.30 yuan and +190,909.51%; non-operating expenses 454,742,024.50 yuan and +281.77%; stated change reasons include land handover income, typhoon asset damage and contract compensation.",
+      "limitation": "The cited excerpts do not directly say one-off. Treat the candidate's persistence judgment as a model/research interpretation, not a directly reported fact or the standalone amount of land-handover income. The limited overview uses source amounts and change reasons only; raw accepted model content is unchanged."
+    },
+    {
+      "finding_id": "WR04",
+      "fact_id": "F33",
+      "decision": "supported",
+      "physical_pages": [11, 12],
+      "evidence_ids": ["source-0003", "source-0004", "source-0005"],
+      "reason": "The same operating discussion's 14th-five-year achievements section continues onto page 12. The revised period no longer dates rating, 26 years of dividends and placement as events that all occurred in 2025. No exact event dates are inferred."
+    }
+  ],
+  "initial_review_coverage": {
+    "current_original_fact_ids_listed": 28,
+    "unlisted_current_ids": [],
+    "unknown_or_previously_isolated_ids_listed": ["F12", "F13", "F14", "F18", "F24", "F32"],
+    "runtime_status": "incomplete",
+    "note": "All current original IDs were listed, but six previously isolated IDs were also claimed as checked. Valid independent findings survived; no complete-review claim or extra call was created."
+  },
+  "production_authorization": "not_authorized",
+  "formal_S1_company_count": "0/12",
+  "historical_results_unchanged": true
+}

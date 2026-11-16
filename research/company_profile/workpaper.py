@@ -977,7 +977,11 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         "controlled_fixture": "受控工程输入（非真实模型结果）",
     }[workpaper.origin]
     if workpaper.generation is not None and workpaper.generation.local_format_normalization is not None:
-        origin = "真实模型原内容，经本地格式标准化的待核候选（原抽取失败，未二次审核）"
+        origin = (
+            "真实模型原内容，经本地格式标准化的待核候选（原抽取失败，未二次审核）"
+            if workpaper.quality_review is None else
+            "真实模型原内容，经本地格式标准化并接续源复核的候选（原抽取失败，仍非正式可信发布）"
+        )
     out = [
         f"# {report.instrument_id}｜{report.report_period} 公司画像底稿",
         "",
@@ -1027,7 +1031,11 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         out.extend(["", "## 模型处理记录", ""])
         if workpaper.generation.local_format_normalization is not None:
             normalization = workpaper.generation.local_format_normalization
-            out.append("本地格式标准化候选：未新增模型调用，原抽取合同仍为rejected，尚未进行二次审核。")
+            out.append(
+                "本地格式标准化候选：未新增模型调用，原抽取合同仍为rejected，尚未进行二次审核。"
+                if workpaper.quality_review is None else
+                "本地格式标准化步骤未调用模型，原抽取合同仍为rejected；后续源复核调用及结果单列如下。"
+            )
             out.append(f"- 标准化策略：`{normalization.policy}`；操作：{'、'.join(normalization.operations)}。")
             out.append(f"- 原始正文hash：`{normalization.original_content_sha256}`；标准化对象hash：`{normalization.normalized_object_sha256}`。")
         for label, call in (("选章", workpaper.generation.selection), ("正文抽取", workpaper.generation.extraction)):

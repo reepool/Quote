@@ -80,6 +80,55 @@ def test_local_formatting_does_not_bypass_numeric_source_check():
     assert '已隔离' in result.workpaper.elements.scale_and_mix.limitations[-1]
 
 
+@pytest.mark.parametrize('status', ['completed','incomplete','failed'])
+def test_reviewed_normalized_candidate_never_still_claims_unreviewed(status):
+    from research.company_profile.workpaper import WorkpaperQualityReview
+    from research.company_profile.workpaper_review import workpaper_hash
+
+    resume, identity, _ = local_input()
+    paper = run_workpaper(report=_report(),pages=PAGES,processing_identity=identity,
+        provider=NoModelCalls(),work_id='display-review',extraction_resume=resume).workpaper
+    review = WorkpaperQualityReview(status=status,original_draft_hash=workpaper_hash(paper))
+    reviewed = paper.model_copy(update={'quality_review':review})
+    rendered = render_workpaper(reviewed)
+    assert '未二次审核' not in rendered and '尚未进行二次审核' not in rendered
+    assert f'复核状态：`{status}`' in rendered and '仍非正式可信发布' in rendered
+    assert '原抽取合同仍为rejected' in rendered
+
+
+def test_saved_guangzhou_candidate_reaches_review_only_and_legacy_display_stays_identical():
+    from research.company_profile.workpaper_review import review_workpaper, seed_material, workpaper_hash
+
+    root = CHANGE/'workpaper-format-consumption-result-20261116'
+    path = root/'query.json'
+    if not path.exists(): pytest.skip('saved candidate unavailable')
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    paper = CompanyProfileWorkpaper.model_validate(json.loads(path.read_text())['profiles'][0]['workpaper'])
+    assert render_workpaper(paper) == (root/'profile.md').read_text()
+    asset = json.loads((CHANGE/'workpaper-continuation-result-20261116/600098/binding.json').read_text())['asset']
+    if not Path(asset['archive_path']).exists(): pytest.skip('official PDF unavailable')
+    rebound, packet, _ = seed_material(paper,report=paper.report,source_pdf_path=asset['archive_path'],real=True)
+    assert workpaper_hash(rebound) == workpaper_hash(paper)
+    calls = []
+
+    class StopAtReview:
+        workpaper_receipts = ()
+
+        def workpaper_request(self, **kwargs):
+            calls.append(kwargs)
+            raise ValueError('offline readiness boundary: no new review response')
+
+    identity = workpaper_processing_identity(real=True,review=True,review_profile='semantic_extraction__scorpio_grok')
+    identity['review_existing_draft_hash'] = workpaper_hash(paper)
+    result,_ = review_workpaper(rebound,packet=packet,provider=StopAtReview(),work_id='cx-readiness',identity=identity)
+    assert [c['purpose'] for c in calls] == ['review_profile_workpaper']
+    assert calls[0]['payload']['source_text'] == packet.model_text()
+    assert calls[0]['payload']['draft']['elements'] == paper.elements.model_dump(mode='json')
+    assert result.quality_review.status == 'failed' and 'offline readiness boundary' in result.quality_review.error
+    assert paper.quality_review is None and paper.generation.extraction.contract_status == 'rejected'
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == before
+
+
 @pytest.mark.parametrize('failure', ['duplicate','array','string','missing_element','root_conflict',
     'unknown','wrong_version','nan','overflow','already_valid'])
 def test_ambiguous_or_semantically_incomplete_content_is_not_repaired(failure):

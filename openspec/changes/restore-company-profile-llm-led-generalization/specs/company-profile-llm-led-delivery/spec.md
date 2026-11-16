@@ -309,6 +309,11 @@ The v9 workpaper path MUST optimize useful business content per reading and mode
 - **AND** the original raw content, rejected status, actual author and usage remain unchanged; separate normalization metadata records policy, operations and original/normalized hashes, not a fabricated accepted model receipt
 - **AND** this explicit local mode performs no model sends or automatic review, delivers an unreviewed candidate through the original writer/query/export and does not promote trust, core completeness, historical scores or production authority; old retries and continuation contracts are not retroactively relaxed
 
+#### Scenario: A separately authorized review follows local normalization
+- **WHEN** a new bounded authorization explicitly selects a saved, locally normalized LLM workpaper as a review seed
+- **THEN** the existing seed/source binding and review owner MAY review it without rerunning extraction or carrying a local-only extraction continuation into the review run
+- **AND** the original extraction remains rejected with its original content/model/usage attribution; new review/repair/final calls are separate, and rendering MUST distinguish unreviewed from actually reviewed candidates without implying trusted release
+
 #### Scenario: An already allowed retry follows a malformed workpaper JSON response
 - **WHEN** an explicitly opted-in workpaper request fails JSON or Schema validation and its existing profile/card still permits a physical retry
 - **THEN** that retry carries the concrete validation error and previous response instead of blindly repeating the original request
