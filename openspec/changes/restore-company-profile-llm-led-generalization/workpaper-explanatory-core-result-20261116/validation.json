@@ -1,0 +1,31 @@
+{
+  "task": "6.CS",
+  "new_model_calls": 0,
+  "pytest": {
+    "command": "bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --color=no --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper.py tests/unit/test_research/test_company_profile_workpaper_review.py tests/unit/test_research/test_company_profile_workpaper_local_consumption.py tests/unit/test_research/test_company_profile_workpaper_source_cells.py tests/unit/test_research/test_company_profile_workpaper_features.py -k 'not task_service_review_publishes'",
+    "passed": 183,
+    "deselected": 3,
+    "seconds": 46.50,
+    "warnings": 1,
+    "excluded_scope": "Three unchanged long TaskService entry tests; the direct runtime/writer/query/export and actual CommonGateway scripted-transport cases were run.",
+    "initial_failures": "New fixture omitted required metric subject_scope/period, expected unavailable-final status for an explicit negative final, and exposed missing disclosure-item wording in the final prompt. Corrected fixture expectations against the existing runtime branch and completed the prompt wording; no source or acceptance checks weakened."
+  },
+  "processing_identity": {
+    "prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+    "review_policy": "company_profile_workpaper_review.v8",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+    "schema_changed": false,
+    "writer_changed": false,
+    "source_binding_changed": false,
+    "new_industry_rules_or_feature_taxonomy": false
+  },
+  "actual_gateway_instructions_checked": ["extract_profile_workpaper", "review_profile_workpaper", "repair_profile_workpaper", "verify_profile_workpaper_repair"],
+  "finite_review": {
+    "blocking": "None remaining in changed behavior; applicability scope and period constraints were verified in the actual outgoing instructions. The known historical semantic defects remain limited, not declared fixed by replay.",
+    "nonblocking": "More feature grouping, display polish, exhaustive optional details and prompt-length tuning deferred.",
+    "unrelated": "Existing configuration, skeleton, mixed document blocks and parallel delisting changes protected."
+  },
+  "production_authorization": "not_authorized",
+  "formal_S1_counted": false,
+  "new_model_semantic_quality_not_evaluated": true
+}

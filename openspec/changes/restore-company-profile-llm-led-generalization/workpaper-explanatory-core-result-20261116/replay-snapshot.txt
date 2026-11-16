@@ -1,0 +1,136 @@
+"""6.CS offline compatibility proof; saved replies are not new model results."""
+import asyncio
+import hashlib
+import json
+import sys
+import time
+from decimal import Decimal
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+PRIOR=CHANGE/'workpaper-four-features-result-20261116'
+DEST=CHANGE/'workpaper-explanatory-core-result-20261116'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path,value):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2,default=str)+'\n')
+
+
+def main():
+    from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileStageRuntime
+    from research.company_profile.workpaper import CompanyProfileWorkpaper,workpaper_elements
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.company_profile.workpaper_review import workpaper_hash
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from tests.unit.test_utils.test_llm_gateway import _config, _response
+    from tests.unit.test_utils.test_llm_physical_budget import _budget, _client
+    from utils.llm.testing import ScriptedTransport
+    from utils.llm.budget import LlmPrice
+
+    assert Path(__import__('os').environ['TMPDIR'])==ROOT/'data/QuoteBak'
+    before={str(p.relative_to(ROOT)):sha(p) for p in PRIOR.rglob('*') if p.is_file()}
+    reports=[]
+    for code in ('600099','600054','600000','600100'):
+        started=time.monotonic()
+        folder=PRIOR/code
+        binding=json.loads((folder/'binding.json').read_text())
+        asset=binding['asset']
+        assert sha(Path(asset['archive_path']))==asset['content_hash']
+        parsed=ensure_archived_pdf_page_artifact(asset)
+        pages=[{'page':p.page_number,'text':p.text} for p in parsed['artifact'].pages]
+        rows=json.loads((folder/'model-receipts.json').read_text())
+        expected=json.loads((folder/'query.json').read_text())['profiles'][0]['workpaper']
+        report=ReportIdentity.model_validate(expected['report'])
+        old=CompanyProfileWorkpaper.model_validate(expected)
+        responses=[]
+        for row in rows:
+            response=_response({})
+            response['choices'][0]['message']['content']=row['raw_content']
+            # Pure fixture metering: do not retain a full unknown-usage reservation
+            # or reuse old supplier usage as new usage. This proves no resource score.
+            response['usage']={'prompt_tokens':1,'completion_tokens':1,'total_tokens':2}
+            responses.append(response)
+        transport=ScriptedTransport(responses)
+        client=_client(transport,_budget(deadline=time.monotonic()+300,max_tokens=2000000,max_requests=5,
+                       prices={('openai_compatible:TEST_LLM_KEY','test-model'):
+                               LlmPrice(Decimal(0),Decimal(0),'synthetic-offline-only',3000000)},
+                       run_authorization='company_profile_workpaper_development.2026-11-11'),
+                       _config(max_schema_repair_attempts=0,max_retries=0,timeout_seconds=300))
+        provider=CommonGatewaySemanticProvider(client=client,profile='test',max_output_tokens=12000,timeout_seconds=300,
+            execution_authorization={'status':'authorized','document_version':report.document_version,
+                                     'approval_reference':'controlled-6.CS-saved-response-replay-no-network'})
+        provider.offline_only=True
+        removed_bytes=0
+        with TemporaryDirectory(prefix='workpaper-cs-replay-') as directory:
+            root=Path(directory)
+            identity=workpaper_processing_identity(real=False,review=True)
+            identity.update(quality_review_profile='test',repair_profile='test')
+            runtime=CompanyProfileStageRuntime(writer=CompanyProfileResearchWriter(root/'output'),provider=provider)
+            item={'work_id':'cs-controlled-'+code,'report':report,'pages':pages,
+                  'source_pdf_path':asset['archive_path'],'processing_identity':identity}
+            for stage in ('acquire','parse','semantic','verify','publish'):
+                # The real adapter supplies pages at acquire; later stages retain
+                # the source owner's remapped layout, not the compact index text.
+                stage_item=item if stage=='acquire' else {k:v for k,v in item.items() if k!='pages'}
+                assert runtime.run_stage(stage,stage_item)['status']=='success'
+            reader=CompanyProfileReadService(root/'output')
+            query=reader.query((report.instrument_id,))
+            exported=reader.export((report.instrument_id,),root/'export')
+            reloaded=CompanyProfileReadService(root/'output').query((report.instrument_id,))
+            assert query['profiles']==exported['profiles']==reloaded['profiles']
+            actual=query['profiles'][0]['workpaper']
+            new=CompanyProfileWorkpaper.model_validate(actual)
+            assert new.origin=='controlled_fixture'
+            assert new.elements==old.elements, (code,new.quality_review.error,new.standardization_notes)
+            assert new.supply_chain==old.supply_chain
+            assert new.company_features==old.company_features
+            assert [(f.finding_id,f.resolution) for f in new.quality_review.findings]==[(f.finding_id,f.resolution) for f in old.quality_review.findings]
+            assert new.quality_review.policy_version=='company_profile_workpaper_review.v8'
+            assert len(transport.calls)==len(rows)==5
+            checks={'extract_profile_workpaper':('retain ALL material categories','what this detail concretely helps'),
+                    'review_profile_workpaper':('compact main income composition','not grounds for another repair'),
+                    'repair_profile_workpaper':('Applicability checkboxes',),
+                    'verify_profile_workpaper_repair':('applicability checkbox',)}
+            calls=[]
+            for row,call,receipt in zip(rows,transport.calls,provider.workpaper_receipts):
+                assert row['purpose']==receipt['purpose']
+                instructions=call['payload']['messages'][0]['content']
+                assert all(text in instructions for text in checks.get(row['purpose'],()))
+                calls.append({'purpose':row['purpose'],'instructions_sha256':hashlib.sha256(instructions.encode()).hexdigest(),
+                              'saved_raw_content_sha256':hashlib.sha256(row['raw_content'].encode()).hexdigest()})
+            asyncio.run(client.close())
+            removed_bytes=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+            result={'instrument_id':report.instrument_id,'origin':'controlled_fixture','new_model_calls':0,
+                'saved_receipt_path':str((folder/'model-receipts.json').relative_to(ROOT)),
+                'saved_receipt_sha256':sha(folder/'model-receipts.json'),'original_query_sha256':sha(folder/'query.json'),
+                'original_workpaper_hash':workpaper_hash(old),'new_processing_identity':identity,
+                'fact_count':sum(len(e.facts) for e in workpaper_elements(new).values()),
+                'metric_count':sum(len(f.metrics) for e in workpaper_elements(new).values() for f in e.facts),
+                'base_facts_and_limits_unchanged':True,'supply_chain_unchanged':True,'features_unchanged':True,
+                'review_resolutions_unchanged':True,'three_reads_equal':True,'controlled_gateway_calls':calls,
+                'source_artifact_cache_status':parsed.get('cache_status'),
+                'new_model_quality_not_evaluated':True,'same_known_limits_as_original':True,
+                'metering':'synthetic 1+1 response usage, zero test price and large fixture context; not supplier usage, cost or resource-performance proof',
+                'removed_temporary_bytes':removed_bytes,'seconds':round(time.monotonic()-started,3)}
+        reports.append(result)
+        print(json.dumps({k:result[k] for k in ('instrument_id','fact_count','three_reads_equal','seconds','removed_temporary_bytes')},ensure_ascii=False),flush=True)
+    assert all(sha(ROOT/p)==value for p,value in before.items())
+    dump(DEST/'calibration.json',{'task':'6.CS','source':'four_saved_real_6.CR_response_sets_with_official_PDF',
+        'representation':'controlled_fixture_not_new_real_LLM','new_model_calls':0,'production_authorization':'not_authorized',
+        'old_receipts_unchanged':True,'old_receipt_hashes':before,'companies':reports,
+        'temporary_bytes_deleted_in_finally':sum(c['removed_temporary_bytes'] for c in reports)})
+
+
+if __name__=='__main__':
+    main()

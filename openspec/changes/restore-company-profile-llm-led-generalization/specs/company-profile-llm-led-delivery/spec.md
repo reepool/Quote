@@ -222,6 +222,21 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **THEN** it MUST express independently usable company revenue and main business assertions separately from optional growth comparisons, subsidiary detail or unresolved event timing, using the existing fact structure rather than a new schema
 - **AND** review MUST prioritize wrong content and omissions that change the main business interpretation; missing optional margin changes, rankings, counterparties or subsidiary profits alone MUST NOT require another repair, and a failed separate fact MUST NOT withdraw valid independent core facts
 
+#### Scenario: A compact principal income composition is already supplied
+- **WHEN** selected original sections disclose a compact composition explaining the company's main revenue sources
+- **THEN** extraction and the existing source review MUST prioritize its material categories and supported amounts or shares before supplementary operating numbers, not substitute only the largest category or company total for the mix
+- **AND** this is a source-led model judgment, not a fixed industry account list, exhaustive-row requirement, arithmetic fill-in, new call or deterministic completion gate; unavailable or ambiguous items remain limited
+
+#### Scenario: Optional discoveries have differing explanatory value
+- **WHEN** the model chooses optional company-specific information from the selected source
+- **THEN** it SHOULD prefer concrete, supported explanations of the company over bare slogans, honors or subsidiary figures, while retaining freedom to choose unfamiliar characteristics without a taxonomy or count requirement
+- **AND** review MUST distinguish factual defects from writing preference: low explanatory value alone MUST NOT demand another repair or discard valid independent content; no unsupported significance or causality is invented
+
+#### Scenario: A disclosure item's applicability mark is summarized
+- **WHEN** a source marks a change/event disclosure item as not applicable without an explicit assertion that the economic change/event did not occur
+- **THEN** extraction, source review and any bounded correction MUST preserve that disclosure-item scope rather than turn it into a categorical absence assertion
+- **AND** original-source uncertainty and unrelated business facts remain available, without a keyword-based semantic veto
+
 #### Scenario: A qualitative financial absence asserts a zero without digits
 - **WHEN** a new fact categorically asserts no revenue/cost/expense without a numeral, rather than saying that the value is unknown or not disclosed in the read scope
 - **THEN** its cited source MUST explicitly support that scoped absence; a blank table cell, a zero in another column or a -100% comparison MUST NOT supply it

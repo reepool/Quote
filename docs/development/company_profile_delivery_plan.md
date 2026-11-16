@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-16当前6.CS完成[主次与特色指引校准](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-explanatory-core-result-20261116/result.md)：183直接/四份原raw经实际网关离线消费、原owner三读及原件hash通过，0新模型，未伪造语义提升；主干优先、特色自主、不适用不扩大，schema/guide/source-binding不变。先清后做、已量清本人4291271字节，旧源/缓存/结果和既有并行保护。下一唯一6.CT原十二家v18一次同版完整回归及末端内容/质量/资源核对，合并有界授权已询；批准前0模型/探针/绑定，不重开单家补句或自动计S1/启生产。范围、停止与清理见当前change章节卡；后续仍按十二家→正式S1→二十盲测→百家试运行。
+
 2026-11-16当前6.CR已交[四类同版真实画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-features-result-20261116/profiles.md)：四家原TaskService全新五阶段与三读均完成，20物理/515480实际usage/0恢复/647.714业务墙钟秒/unknown。13实际纠正或补充，1模型隔离；独立核源另禁黄山F-MC-02，原件不改。基础画像已有业务内容，自主特色仍偏明细/口号/荣誉，不以缺特色判失败；浦发主要收入明细漏项保留。先有限质量收口和通用主次校准，再按原十二家同版→正式S1→二十盲测顺序，不追单家完美/供应链细度或自动新调用。开发硬限不代替常规资源通过、S1仍0/12/生产未启；每轮先清后做，必要一套后清本人库/准备副本/日志/operator，源/有效缓存/旧结果/attempt与既有并行保护。详见当前change章节卡与本轮result.md；下列是历史轮次接续记录。
 
 当前6.CQ已交[基础＋特色同链工程](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-company-features-result/result.md)和[三条有源旧内容示意](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-company-features-result/examples.md)。框架保证下限，不锁死模型表达；company_features可自主选择、同链复核、局部容错，不设清单/数量强制，不另建平台。181直接/原owner三读与11旧hash兼容通过，零新模型，尚未证明真实特色效果。下一6.CR拟四类已有报告各一次同版新入口，合并有界授权后直接整卡观察基础/特色/复核和资源，不逐字段补卡；确认前0绑定/探针/模型，不复活旧窗口或启生产。每轮先清后做、必要一套后清本人脚本/库，源/缓存/回执/尝试及既有并行保护。

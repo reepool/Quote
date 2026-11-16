@@ -212,7 +212,69 @@ def test_gateway_fresh_features_review_repair_writer_and_three_reads():
             assert len(transport.calls) == 5
             assert 'optional ROOT company_features' in transport.calls[1]['payload']['messages'][0]['content']
             assert 'company_features' in transport.calls[2]['payload']['messages'][1]['content']
+            extraction = transport.calls[1]['payload']['messages'][0]['content']
+            initial_review = transport.calls[2]['payload']['messages'][0]['content']
+            repair_instructions = transport.calls[3]['payload']['messages'][0]['content']
+            final_instructions = transport.calls[4]['payload']['messages'][0]['content']
+            assert 'retain ALL material categories' in extraction
+            assert 'not an industry account checklist' in extraction
+            assert 'what this detail concretely helps the reader understand' in extraction
+            assert 'not an allowed-feature list' in extraction
+            assert 'next-year plan is not a current result' in extraction
+            assert 'compact main income composition' in initial_review
+            assert 'not grounds for another repair or' in initial_review
+            for instructions in (extraction, initial_review, repair_instructions, final_instructions):
+                assert 'Applicability checkboxes' in instructions or 'applicability checkbox' in instructions
+                assert 'disclosure' in instructions
             rows = list(csv.DictReader((root/'export/profiles.csv').read_text().splitlines()))
             assert rows[0]['workpaper_fact_count'] == '4'
     finally:
         asyncio.run(client.close())
+
+
+@pytest.mark.parametrize('final_ok', [True, False])
+def test_source_native_main_mix_supplement_preserves_total_and_autonomous_feature(final_ok):
+    """The provider owns semantic coverage; no account whitelist or automatic fill-in."""
+    pages, _, _, _ = material()
+    pages = tuple({**p, 'text': p['text'] + '\n主要收入构成：接口授权费70.00元；流程协同服务费20.00元；历史数据检索费10.00元。\n'}
+                  if p['page'] == 3 else p for p in pages)
+    packet = build_section_packet(_report(), pages, index_sections(pages), _selection(index_sections(pages)))
+    raw = _draft(packet).model_dump(mode='json')
+    base = raw['elements']['business_structure']['facts'][0]
+    source_ids = [e.evidence_id for e in packet.evidence]
+    raw['elements']['revenue_model'] = {'status': 'observed', 'limitations': [], 'facts': [{
+        **base, 'fact_id': 'largest-income', 'text': '接口授权费70.00元。',
+        'evidence_ids': source_ids, 'metrics': [{'name': '接口授权费', 'raw_value': '70.00',
+            'value': '70.00', 'unit': '元', 'currency': 'CNY',
+            'subject_scope': base['subject_scope'], 'period': base['period']}]}]}
+    feature = {**base, 'fact_id': 'autonomous-mechanism',
+               'text': '公司将结算系统以开放接口嵌入企业经营流程。'}
+    raw['company_features'] = {'status': 'observed', 'facts': [feature], 'limitations': []}
+    paper = bind(raw, packet)
+    candidate = {**base, 'fact_id': 'review-add:main-mix',
+                 'text': '流程协同服务费20.00元；历史数据检索费10.00元。', 'evidence_ids': source_ids,
+                 'metrics': [{'name': name, 'raw_value': number, 'value': number, 'unit': '元', 'currency': 'CNY',
+                              'subject_scope': base['subject_scope'], 'period': base['period']}
+                             for name,number in [('流程协同服务费','20.00'), ('历史数据检索费','10.00')]]}
+    review = {'reviewed_fact_ids': ['main','revenue','largest-income','autonomous-mechanism'],
+              'findings': [{'finding_id': 'main-mix', 'element': 'revenue_model', 'severity': 'material',
+                  'issue_type': 'material_omission', 'action': 'possible_omission',
+                  'affected_fact_id': 'largest-income', 'evidence_ids': source_ids,
+                  'explanation': '原最大项正确，所读主要收入构成还有两项，需保留它们解释主干。'}]}
+    final = {'checked_fact_ids': [candidate['fact_id']], 'checks': [{
+        'fact_id': candidate['fact_id'], 'accepted': final_ok,
+        'evidence_ids': source_ids, 'explanation': '受控原文核验结果。'}]}
+    provider = Provider([review, {'repaired_facts': [candidate]}, final])
+    result, _ = review_workpaper(paper, packet=packet, provider=provider, work_id='main-mix',
+        identity=workpaper_processing_identity(real=False, review=True))
+    assert result.elements.scale_and_mix == paper.elements.scale_and_mix
+    assert result.company_features == paper.company_features
+    assert result.elements.revenue_model.facts[0] == paper.elements.revenue_model.facts[0]
+    assert len(result.elements.revenue_model.facts) == (2 if final_ok else 1)
+    assert len(provider.calls) == 3
+    if final_ok:
+        assert [m.name for m in result.elements.revenue_model.facts[1].metrics] == ['流程协同服务费','历史数据检索费']
+    else:
+        # An explicit negative final is a rejection, unlike an unavailable final.
+        assert result.quality_review.findings[0].resolution == 'repair_rejected'
+    result.validate_pages(pages)

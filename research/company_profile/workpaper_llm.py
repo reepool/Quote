@@ -17,7 +17,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-15.company-features.v17"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-16.explanatory-core.v18"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-15.company-features.v4"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "公司业务/经营模式；公司经营讨论/经营综述/业务回顾的实质子节，优先于纯行业背景和泛化核心竞争力", "priority": "primary"},
@@ -100,6 +100,11 @@ Return JSON matching the schema. Write all text and limitations in Chinese.
 Deliver a compact, complete JSON object, not an exhaustive financial inventory.
 Prioritize the core profile: every main business and product/service, how it earns,
 company-period revenue and main business mix, operating role and customer/channel scope.
+For a compact main income composition already in the source, retain ALL material categories
+and their supported amounts or shares before supplementary operating figures. The largest
+category or company total alone does not explain the mix. Use the report's own categories,
+not an industry account checklist; do not calculate missing values or copy every tail row.
+Allocate the response to this main-business explanation first, then useful supplementary detail.
 Use independent facts for independently usable core assertions. Keep company revenue
 separate from net profit, optional growth-rate comparisons, event timing and unresolved
 source-basis differences. Keep each main business revenue with its own subject/basis;
@@ -143,8 +148,10 @@ Ratios and percentage-point changes have currency=null. Use percentage points fo
 rate differences, not percent growth; if a source prints a percent sign for a rate difference,
 retain source_unit='%' and raw_value but set unit='百分点' without changing its decimal value.
 issuer means the explicitly parent-only entity; plain '公司' in report-wide operating text
-uses consolidated_group unless local wording gives a narrower entity. A checked 'not applicable'
-disclosure item is not a categorical assertion that no change/event ever occurred.
+uses consolidated_group unless local wording gives a narrower entity. Applicability checkboxes
+describe only that disclosure item: 不适用 is not evidence that no economic change/event
+occurred. Retain the scoped mark or omit the optional summary; use a definite absence
+assertion only when the original source explicitly asserts it.
 Keep group/parent/segment/industry, operating revenue and total operating revenue distinct.
 For each table row keep the exact column (operating profit is not net profit) and the
 denominator of each percentage. An OR-list/conditional disclosure heading is not a fact
@@ -163,11 +170,8 @@ registered business scope or products do not establish the parent's purchased ra
 Observed requires nonempty facts. Otherwise explain unread, unfound, ambiguity or failure;
 unread/unfound is not not_disclosed. Supplementary detail can remain limited without guessing.
 No approval, full-report completeness claim, confidence score or prior-company answer is allowed.
-Prioritize EVERY main business line's disclosed revenue, share or representative operating scale before
-registration data, honors, AI systems or minor organization details. Pair product/service
-names with their source-supported uses/customer fields. Do not displace main business
-revenue with minor details. AUM/volume is supplementary when revenue composition is
-already explained; reading a section does not require copying all of its numbers.
+Pair product/service names with their source-supported uses/customer fields. AUM/volume is
+supplementary, not a replacement for disclosed income composition; reading a section does not require copying all of its numbers.
 If source supports it, add optional supply_chain with position, upstream_inputs and
 downstream_customers, using the same element/fact/evidence structure. Use unique fact IDs.
 Position explains where the company acts (production/processing/trade/operation/service);
@@ -187,6 +191,12 @@ same status/facts/limitations and fact/metric/evidence structure. Each fact shou
 the company's particular character in its own text, not repeat generic slogans or the core.
 You choose which useful characteristics to include; there is no fixed feature taxonomy,
 required count or demand to fill this container. It may be null/omitted.
+Ask what this detail concretely helps the reader understand about the company. Prefer
+source-backed mechanisms, resources or changes over bare honors, strategic slogans or
+subsidiary figures, but these are examples, not an allowed-feature list. Explain relevance
+only as supported by the source, without inventing significance or causality. Keep a useful
+discovery in its fitting baseline element rather than duplicate it just to populate features.
+Keep a feature's period consistent with its text; a next-year plan is not a current result.
 The fact/metric writing targets above are guidance, not a hard ceiling on useful features.
 Stay within the current source and response budget, keep the baseline substantive, and
 retain uncertainty. Unusual information is welcome; unsupported novelty is not a fact.

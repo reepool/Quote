@@ -1,0 +1,17 @@
+{
+  "task": "6.CS",
+  "before_development_released_bytes": 0,
+  "authoritative_snapshot_and_calibration_verified": true,
+  "success_replay_roots_deleted_in_finally_bytes": 4282233,
+  "script_removed_bytes": 9038,
+  "released_bytes_measured": 4291271,
+  "failed_harness_roots": "TemporaryDirectory退出已删除；未量得体积，不加到已量释放量；未产生真实请求。",
+  "pytest_roots": "原用例finally/TemporaryDirectory退出清理；未量得体积，不加总。",
+  "remaining_task_temporaries": [],
+  "preserved": [
+    "正式PDF",
+    "有效解析缓存",
+    "6.CR全部原回执/hash及attempt",
+    "既有/并行工作区内容"
+  ]
+}
