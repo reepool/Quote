@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping, Sequence
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_serializer, model_validator
@@ -300,7 +300,7 @@ def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
 
 def _check_fact_source(
     fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], *, check_units: bool = False,
-) -> None:
+) -> tuple[str, ...]:
     if set(fact.evidence_ids) - sources.keys():
         raise ValueError("fact cites unknown evidence")
     numbers = {
@@ -337,12 +337,38 @@ def _check_fact_source(
         if Decimal(metric.value) not in numbers | negative_rates:
             raise ValueError(f"metric number is absent from cited source: {metric.name}")
     if check_units:
-        _check_prose_quantities(fact, sources, numbers)
+        return _check_prose_quantities(fact, sources, numbers)
+    return ()
+
+
+def _monetary_display_note(
+    fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], amount: Decimal, unit: str,
+) -> str | None:
+    """Compare display magnitudes only to already source-validated same-fact metrics."""
+    scales = {"元": Decimal(1), "千元": Decimal(1000), "万元": Decimal(10000),
+              "百万元": Decimal(1000000), "亿元": Decimal(100000000), "万亿元": Decimal(1000000000000)}
+    for metric in fact.metrics:
+        original_unit = _money_unit_spelling(metric.unit)
+        if (metric.value is None or metric.qualifier != "exact" or original_unit not in scales
+            or original_unit == unit or metric.subject_scope != fact.subject_scope or metric.period != fact.period):
+            continue
+        if not _check_explicit_money_unit(metric, fact, sources):
+            continue  # A model-supplied unit without an explicit source unit cannot justify conversion.
+        try:
+            converted = Decimal(metric.value) * scales[original_unit] / scales[unit]
+            matches = converted == amount or (amount != 0 and converted.quantize(
+                Decimal(1).scaleb(amount.as_tuple().exponent), rounding=ROUND_HALF_UP) == amount)
+        except InvalidOperation:
+            continue  # Unsupported precision remains a source mismatch, not a whole-draft crash.
+        if matches:
+            kind = "等值换算" if converted == amount else "舍入展示，非精确值"
+            return f"程序显示说明：{fact.fact_id}正文{amount}{unit}为{metric.name}{metric.raw_value}{metric.unit}的{kind}；结构化原值及来源未改，不据展示值精确加总。"
+    return None
 
 
 def _check_prose_quantities(
     fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], numbers: set[Decimal],
-) -> None:
+) -> tuple[str, ...]:
     """Bind written financial numerals too, without inventing semantic metrics.
 
     This is a literal/unit check, not a claim that a number belongs to the right
@@ -350,9 +376,10 @@ def _check_prose_quantities(
     only on new binding/repairs, so historical deserialization is not rewritten.
     """
     units = {"%": "%", "％": "%", "百分点": "百分点", "个百分点": "百分点"}
-    money = {"元", "千元", "万元", "亿元"}
+    money = {"元", "千元", "万元", "百万元", "亿元", "万亿元"}
+    display_notes = []
     financial = r"收入|成本|利润|金额|费用|补贴|余额|资产|负债|资本|减值|毛利率|占比|现金流"
-    token = r"(?<![\d.,A-Za-z])(-?\d[\d,]*(?:\.\d+)?|零(?=亿元|万元|千元|元|个百分点|百分点|%|％|[，,；;。）、）()\s]|$))\s*(亿元|万元|千元|元|个百分点|百分点|%|％)?(?![\d.,A-Za-z])"
+    token = r"(?<![\d.,A-Za-z])(-?\d[\d,]*(?:\.\d+)?|零(?=万亿元|亿元|百万元|万元|千元|元|个百分点|百分点|%|％|[，,；;。）、）()\s]|$))\s*(万亿元|亿元|百万元|万元|千元|元|个百分点|百分点|%|％)?(?![\d.,A-Za-z])"
     checked = {(Decimal(m.value), units.get(m.unit, m.unit)) for m in fact.metrics if m.value is not None}
     clauses = {"".join(clause.split()) for eid in fact.evidence_ids for span in sources[eid].source_spans
                for clause in re.split(r"[，,；;。\n]", span.quote)}
@@ -383,6 +410,10 @@ def _check_prose_quantities(
         signed = -amount if unit in units and re.search(r"(?:下降|减少|降低)\s*(?:近|约|超|突破)?\s*$", prefix) else amount
         normalized_unit = units.get(unit, unit)
         literal_zero = amount == 0 and "".join((prefix + match.group(0)).split()) in clauses
+        display_note = _monetary_display_note(fact, sources, amount, unit) if unit in money else None
+        if display_note:
+            display_notes.append(display_note)
+            continue
         if amount == 0 and unit is None and not literal_zero and not any(
             value == 0 and measured_unit in money | set(units.values()) for value, measured_unit in checked
         ):
@@ -394,31 +425,31 @@ def _check_prose_quantities(
                 value=str(amount), unit=unit, source_unit=unit, currency=None,
                 subject_scope=fact.subject_scope, period=fact.period)
             _check_explicit_money_unit(metric, fact, sources)
+    return tuple(dict.fromkeys(display_notes))
 
 
 def _check_explicit_money_unit(
     metric: WorkpaperMetric, fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence],
-) -> None:
+) -> bool:
     """Reject only a clear cited table-unit conflict; never infer a missing unit.
 
     Called for new binding/repairs, not legacy deserialization. A multi-unit or
     headerless match is deliberately undecided rather than guessed by magnitude.
     """
-    money_units = {"元", "千元", "万元", "亿元"}
-    declared = {u for u in (metric.unit, metric.source_unit) if u in money_units}
+    declared = {u for value in (metric.unit, metric.source_unit) if (u := _money_unit_spelling(value))}
     if not declared:
-        return
+        return False
     reference = metric.value
     if reference is None:
-        literal = re.fullmatch(r"(?:近|约|超|突破)?\s*(-?\d[\d,，]*(?:\.\d+)?)\s*(?:亿元|万元|千元|元)?", metric.raw_value)
+        literal = re.fullmatch(r"(?:近|约|超|突破)?\s*(-?\d[\d,，]*(?:\.\d+)?)\s*(?:万亿元|亿元|百万元|万元|千元|元)?", metric.raw_value)
         if literal is None:
-            return
+            return False
         reference = literal.group(1).replace(",", "").replace("，", "")
     reference = Decimal(reference)
     units, headerless = set(), False
     for eid in fact.evidence_ids:
         for span in sources[eid].source_spans:
-            headers = list(re.finditer(r"(?:金额单位|单位)\s*[:：]\s*(?:人民币\s*)?(亿元|万元|千元|元)", span.quote))
+            headers = list(re.finditer(r"(?:金额单位|单位)\s*[:：]\s*(?:人民币\s*)?(万亿元|亿元|百万元|万元|千元|元)", span.quote))
             matches = [(m.group(), m.start(), m.end()) for m in
                        re.finditer(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)]
             matches.extend(cell for cell in _wrapped_table_cells(span.quote)
@@ -428,7 +459,7 @@ def _check_explicit_money_unit(
                     continue
                 # A paragraph may follow a table on the same source fragment.
                 # Its explicit amount suffix owns the unit, not that old header.
-                inline = re.match(r"\s*(亿元|万元|千元|元)", span.quote[end:])
+                inline = re.match(r"\s*(万亿元|亿元|百万元|万元|千元|元)", span.quote[end:])
                 if inline:
                     units.add(inline.group(1))
                     continue
@@ -439,6 +470,7 @@ def _check_explicit_money_unit(
                     headerless = True
     if not headerless and len(units) == 1 and declared != units:
         raise ValueError(f"source monetary unit conflict: {metric.name}; 原表{'/'.join(units)}，返回{'/'.join(sorted(declared))}；未猜测换算")
+    return not headerless and len(units) == 1 and declared == units
 
 
 class WorkpaperSection(_Model):
@@ -775,10 +807,13 @@ def bind_workpaper_draft(
         kept, rejected = [], []
         for fact in element.facts:
             try:
-                _check_fact_source(fact, sources, check_units=True)
+                display_notes = _check_fact_source(fact, sources, check_units=True)
             except ValueError as exc:
                 rejected.append(f"事实{fact.fact_id}已隔离，未作为结论采用：{exc}")
                 continue
+            if display_notes:
+                fact = fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (fact.uncertainty_reason, *display_notes)))})
+                binding_notes.extend(display_notes)
             kept.append(fact)
         cleaned_elements[name] = element.model_copy(update={
             "facts": tuple(kept),
@@ -799,10 +834,13 @@ def bind_workpaper_draft(
                 try:
                     if fact.fact_id in used_ids:
                         raise ValueError("duplicate fact identity")
-                    _check_fact_source(fact, sources, check_units=True)
+                    display_notes = _check_fact_source(fact, sources, check_units=True)
                 except ValueError as exc:
                     rejected.append(f"可选事实{fact.fact_id}未纳入：{exc}")
                     continue
+                if display_notes:
+                    fact = fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (fact.uncertainty_reason, *display_notes)))})
+                    binding_notes.extend(display_notes)
                 kept.append(fact)
                 used_ids.add(fact.fact_id)
             cleaned[name] = element.model_copy(update={
@@ -824,10 +862,13 @@ def bind_workpaper_draft(
             try:
                 if fact.fact_id in used_ids:
                     raise ValueError("duplicate fact identity")
-                _check_fact_source(fact, sources, check_units=True)
+                display_notes = _check_fact_source(fact, sources, check_units=True)
             except ValueError as exc:
                 rejected.append(f"特色事实{fact.fact_id}未纳入：{exc}")
                 continue
+            if display_notes:
+                fact = fact.model_copy(update={"uncertainty_reason": "；".join(filter(None, (fact.uncertainty_reason, *display_notes)))})
+                binding_notes.extend(display_notes)
             kept.append(fact)
             used_ids.add(fact.fact_id)
         company_features = company_features.model_copy(update={

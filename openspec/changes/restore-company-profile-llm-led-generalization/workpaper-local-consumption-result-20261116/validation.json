@@ -1,0 +1,72 @@
+{
+  "task": "6.CU",
+  "base_commit": "57bf0e8009d80aa4a27d9174e7269cab840052f2",
+  "new_model_calls": 0,
+  "network_requests": 0,
+  "origin": "controlled_saved_responses",
+  "source_code_sha256": {
+    "research/company_profile/workpaper.py": "b7dcf93918fc17cbe9b8d408cffdc5ff5c1234296b24dced3518ea0cb2f8b850",
+    "research/company_profile/workpaper_review.py": "ba277f6cfc719887661803674f4eefd513d687c00de4b75a67bd5240ebcb7bb3",
+    "research/company_profile/workpaper_llm.py": "e2af576c50ba536b756ba4a1694d0f2d1e1456738916aa1d8cc752d46e29e889",
+    "research/company_profile/stage5_provider.py": "3cd322d1cb87a175f250ece460cd32097c36e3d8a6fe7bc7ae5c92dfc3bb785c",
+    "utils/llm/client.py": "fbd98fe49a60614c9dae4cffd8fb89a0f0ca8bc5390f2ce992810ef016f48aed"
+  },
+  "shared_config_13_sha256": "7650f2960b036815a6c05649ca9caba7d518b73380e561e334db49d062d82233",
+  "original_taskservice_three_reads": {
+    "600104.SH": true,
+    "600082.SH": true
+  },
+  "business_results": {
+    "600104.SH": {
+      "facts": 36,
+      "findings": 3,
+      "review_status": "incomplete",
+      "business_seconds": 30.23
+    },
+    "600082.SH": {
+      "facts": 27,
+      "findings": 2,
+      "review_status": "incomplete",
+      "business_seconds": 22.584
+    }
+  },
+  "new_true_semantic_success": false,
+  "formal_S1_counted": false,
+  "production_authorization": "not_authorized",
+  "tests": {
+    "workpaper_source_review": {
+      "passed": 127,
+      "deselected": 3,
+      "seconds": 51.07
+    },
+    "workpaper_features_local": {
+      "passed": 74,
+      "seconds": 57.8
+    },
+    "saved_ct_taskservice": {
+      "passed": 2,
+      "seconds": 125.52
+    },
+    "saved_guangzhou_format": {
+      "passed": 1,
+      "seconds": 5.21
+    },
+    "gateway_budget_stream": {
+      "passed": 88,
+      "deselected": 1,
+      "seconds": 56.24
+    }
+  },
+  "extended_suite_all_passed": false,
+  "baseline_reproduced_failures": [
+    "test_initial_queue_wait_preserves_full_execution_budget",
+    "test_rate_limit_fails_over_from_grok_to_luna_with_safe_lineage"
+  ],
+  "other_extended_timing_failures_individually_attributed": false,
+  "source_binding_last_change_rechecked_saved_raw_counts": {
+    "600104.SH": 38,
+    "600082.SH": 27
+  },
+  "temporary_roots_removed_bytes_measured": 4280216,
+  "temporary_owned_roots_remaining": []
+}

@@ -926,6 +926,38 @@ async def test_json_object_schema_failure_repairs_once():
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize('kind', ['json', 'schema'])
+@pytest.mark.parametrize('feedback,retries', [(True, 1), (False, 1), (True, 0)])
+async def test_opted_in_validation_feedback_uses_only_already_allowed_retry(kind, feedback, retries):
+    from utils.llm.errors import LlmResponseParseError
+
+    bad = _response({'label':'bad'}) if kind == 'schema' else _response(None, choices=[{
+        'message': {'content': '{"label":"unfinished"'}, 'finish_reason': 'stop'}])
+    transport = ScriptedTransport([bad, _response({'label':'fixed','score':1})])
+    client = LlmClient(_config(max_schema_repair_attempts=0, max_retries=retries),
+        transport=transport, environment={'TEST_LLM_KEY':'unit-secret'})
+    try:
+        request = _request(metadata={'validation_feedback_on_retry':feedback})
+        if not retries:
+            with pytest.raises((LlmResponseParseError,LlmSchemaValidationError)):
+                await client.complete(request)
+            assert len(transport.calls)==1
+        else:
+            result=await client.complete(request)
+            assert result.attempt_count==2 and len(transport.calls)==2
+            before=transport.calls[0]['payload']; after=transport.calls[1]['payload']
+            if feedback:
+                correction=json.loads(after['messages'][-1]['content'])
+                assert correction['request_kind']=='schema_repair' and correction['prior_response']
+                assert ('line 1 column' in correction['validation_error']) if kind=='json' else ('score' in correction['validation_error'])
+                assert after['max_tokens']==before['max_tokens'] if 'max_tokens' in before else True
+            else:
+                assert after==before
+    finally:
+        await client.close()
+
+
+@pytest.mark.asyncio
 async def test_output_limit_invalid_json_is_typed_truncation_after_bounded_repair():
     truncated = {
         "choices": [

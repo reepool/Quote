@@ -1,0 +1,176 @@
+{
+  "instrument_id": "600104.SH",
+  "mode": "controlled_saved_response_task_service",
+  "new_model_calls": 0,
+  "network_allowed": false,
+  "original_receipts_sha256": "0b5ee29de3f8a2dee2a25020fe73be1fcf32e20c959bbff030c9320b3c68e842",
+  "task_seconds": 30.23,
+  "three_reads_equal": true,
+  "retained_fact_ids": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F15",
+    "F16",
+    "F17",
+    "F18",
+    "F20",
+    "F21",
+    "F22",
+    "F24",
+    "F25",
+    "F26",
+    "F27",
+    "F28",
+    "F29",
+    "F31",
+    "F32",
+    "F33",
+    "F34",
+    "F35",
+    "F36",
+    "F37",
+    "F38",
+    "F39"
+  ],
+  "review_status": "incomplete",
+  "review_findings": [
+    {
+      "finding_id": "R1",
+      "element": "scale_and_mix",
+      "severity": "material",
+      "issue_type": "material_omission",
+      "affected_fact_id": null,
+      "related_fact_id": null,
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "explanation": "草案仅保留合并营业总收入6562.4亿元及销量信息，并定性提及分产品类别，但未给出主营业务分产品的金额或占比。source-0006列示2025年分产品营业收入（人民币元）：整车业务410,196,473,001.11、零部件业务203,019,866,775.26、劳务及其他32,935,762,112.94、金融业务10,091,710,191.88，合计656,243,812,081.18。公司总额不能替代该构成；贸易收入、金融毛利率等补充数字已写入，而整车与零部件两大主业金额缺失，会改变对主要业务组合的理解。应据该表补入上述四类金额或相应占比。分行业中汽车制造业646,152,101,889.30元与金融业同额，系同一构成的另一口径，不另要求地区拆分、毛利率或尾项。",
+      "resolution": "omission_candidate",
+      "original_fact": null,
+      "revised_fact": null
+    },
+    {
+      "finding_id": "R2",
+      "element": "operations_and_inputs",
+      "severity": "minor",
+      "issue_type": "contradicts_source",
+      "affected_fact_id": "F23",
+      "related_fact_id": null,
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "explanation": "F23所称报告期内产能合计约444.6万辆与source-0011不符。表内各主要工厂报告期内产能（万辆）105.8、53.4、88.5、167.1、22.4、3.0、2.1、7.0、2.3合计为451.6万辆；444.6恰好漏计捷仕达名爵汽车印度有限公司7.0万辆。设计产能合计699.2万辆及上汽通用五菱95%、上汽集团乘用车分公司76%与来源一致，应保留，仅将报告期内产能合计更正为451.6万辆。",
+      "resolution": "quarantined",
+      "original_fact": {
+        "fact_id": "F23",
+        "text": "公司主要工厂设计产能合计约699.2万辆，报告期内产能合计约444.6万辆；其中上汽通用五菱产能利用率95%，上汽集团乘用车分公司76%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "上汽通用五菱产能利用率",
+            "raw_value": "95",
+            "value": "95",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "上汽集团乘用车分公司产能利用率",
+            "raw_value": "76",
+            "value": "76",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      },
+      "revised_fact": null
+    },
+    {
+      "finding_id": "R3",
+      "element": "operating_drivers",
+      "severity": "minor",
+      "issue_type": "unsupported_claim",
+      "affected_fact_id": "F30",
+      "related_fact_id": null,
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "explanation": "F30写“公司率先实现第二代半固态电池技术在全新MG4上搭载并批量交付”，但source-0003原文为“在国内率先实现”。去掉“在国内”会使率先范围超出来源。批量交付、全固态电池中试线贯通及国产芯片应用率超过30%均有支持，应保留，并将率先限定为国内。",
+      "resolution": "quarantined",
+      "original_fact": {
+        "fact_id": "F30",
+        "text": "公司率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "上汽国产芯片应用率",
+            "raw_value": "超30",
+            "value": "30",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "greater_than",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      },
+      "revised_fact": null
+    }
+  ],
+  "standardization_notes": [
+    "程序显示说明：F13正文4101.96亿元为整车业务营业收入410,196,473,001.11元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F13正文2030.20亿元为零部件业务营业收入203,019,866,775.26元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F13正文329.36亿元为劳务及其他营业收入32,935,762,112.94元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F13正文100.92亿元为金融业务营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F13正文6562.44亿元为主营业务分产品合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F14正文6461.52亿元为汽车制造业营业收入646,152,101,889.30元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F14正文100.92亿元为金融业营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F14正文6562.44亿元为主营业务分行业合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "事实F19已隔离，未作为结论采用：narrative number is absent from cited source: 6562.44亿元",
+    "程序显示说明：F21正文217.06亿元为研发投入合计21,706,037,747.07元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F22正文5809.44亿元为汽车制造业成本580,943,983,649.41元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F24正文754.58亿元为前五名客户销售额7,545,821.15万元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F24正文2149.67亿元为前五名供应商采购额21,496,663.81万元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F33正文2100万元为大众联合改装100%股权转让对价21,000,000.00元的等值换算；结构化原值及来源未改，不据展示值精确加总。",
+    "程序显示说明：F34正文1380万元为服务中心51%股权转让对价13,800,000.00元的等值换算；结构化原值及来源未改，不据展示值精确加总。",
+    "复核覆盖不完整：未核编号=；未知或重复编号=F19"
+  ],
+  "local_scripted_sends": 4,
+  "temporary_bytes_before_finally": 2194841
+}

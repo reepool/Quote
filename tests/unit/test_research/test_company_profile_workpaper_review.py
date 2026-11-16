@@ -241,12 +241,10 @@ def test_repair_target_identity_errors_still_reject_whole_batch_before_final(bad
     assert result.elements.business_structure == paper.elements.business_structure
 
 
-@pytest.mark.parametrize("bad_contract", ["incomplete", "unknown_fact", "unknown_evidence", "unknown_element"])
+@pytest.mark.parametrize("bad_contract", ["unknown_fact", "unknown_evidence", "unknown_element"])
 def test_invalid_initial_review_does_not_remove_independent_facts(bad_contract):
     paper, _, _, review, _ = material()
-    if bad_contract == "incomplete":
-        review["reviewed_fact_ids"] = ["main"]
-    elif bad_contract == "unknown_fact":
+    if bad_contract == "unknown_fact":
         review["findings"][0]["affected_fact_id"] = "not-a-fact"
     elif bad_contract == "unknown_evidence":
         review["findings"][0]["evidence_ids"] = ["not-a-source"]
@@ -256,6 +254,48 @@ def test_invalid_initial_review_does_not_remove_independent_facts(bad_contract):
     assert result.elements == paper.elements
     assert result.quality_review.status != "completed"
     assert len(provider.calls) == 1
+
+
+@pytest.mark.parametrize("checked", [["main"], ["main", "revenue", "unknown"], ["main", "revenue", "revenue"]])
+def test_partial_review_retains_valid_error_and_bounded_repair_without_full_pass(checked):
+    paper, _, fixed, review, verify = material()
+    review['reviewed_fact_ids'] = checked
+    _, result, provider, _ = invoke([review, {'repaired_facts': [fixed]}, verify])
+    assert len(provider.calls) == 3
+    assert result.quality_review.status == 'incomplete'
+    assert result.quality_review.checked_fact_ids == tuple(fid for fid in checked if fid in {'main', 'revenue'} and checked.count(fid) == 1)
+    assert result.quality_review.findings[0].resolution == 'corrected_pending_trust'
+    assert result.elements.scale_and_mix.facts[0].metrics[0].name == '营业收入'
+    assert result.elements.business_structure == paper.elements.business_structure
+    assert '复核覆盖不完整' in result.quality_review.error
+
+
+@pytest.mark.parametrize('invalid', ['unknown_fact', 'unknown_evidence', 'duplicate_id'])
+def test_one_invalid_finding_does_not_discard_independent_valid_findings(invalid):
+    _, _, fixed, review, verify = material()
+    bad = {**review['findings'][0], 'finding_id': 'invalid'}
+    if invalid == 'unknown_fact': bad['affected_fact_id'] = 'unknown'
+    elif invalid == 'unknown_evidence': bad['evidence_ids'] = ['unknown']
+    else: review['findings'].append(dict(bad))
+    review['findings'].append(bad)
+    _, result, provider, _ = invoke([review, {'repaired_facts': [fixed]}, verify])
+    assert len(provider.calls) == 3
+    assert result.quality_review.status == 'incomplete'
+    assert [f.finding_id for f in result.quality_review.findings] == ['wrong-profit-column']
+    assert result.quality_review.findings[0].resolution == 'corrected_pending_trust'
+    assert 'invalid' in result.quality_review.error
+
+
+def test_minor_other_omission_on_existing_fact_keeps_original_and_does_not_repair():
+    paper, _, _, review, _ = material()
+    review['findings'][0].update(action='possible_omission', issue_type='other', severity='minor')
+    _, result, provider, _ = invoke([review])
+    assert len(provider.calls) == 1
+    assert result.elements == paper.elements
+    finding = result.quality_review.findings[0]
+    assert finding.affected_fact_id is None and finding.related_fact_id == 'revenue'
+    assert finding.original_fact is None and finding.resolution == 'omission_candidate'
+    assert result.quality_review.status == 'completed_with_open_findings'
 
 
 def test_material_omission_can_be_added_but_optional_gap_does_not_trigger_repair():

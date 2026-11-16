@@ -4718,6 +4718,7 @@ class CommonGatewaySemanticProvider:
             idempotency_key=f"{semantic_request_id}:{call_type}",
             metadata={
                 "workload": "company_profile_stage5",
+                **({"validation_feedback_on_retry": True} if workpaper_reading else {}),
                 "run_id": semantic_request_id.split(":", 1)[0],
                 "stage": call_type,
                 "logical_request_id": (

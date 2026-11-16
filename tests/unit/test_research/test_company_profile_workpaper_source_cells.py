@@ -152,8 +152,40 @@ def test_new_processing_identity_versions_signed_source_rate_binding():
 
     for real in (False, True):
         identity = workpaper_processing_identity(real=real)
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.financial-absence.v4"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.monetary-display.v5"
         assert identity["semantic_reuse"] is False
+
+
+@pytest.mark.parametrize('raw,unit,display', [
+    ('410,196,473,001.11', '元', '4101.96亿元'),
+    ('21,000,000.00', '元', '2100万元'),
+    ('7,545,821.15', '万元', '754.58亿元'),
+    ('-410,196,473,001.11', '元', '-4101.96亿元'),
+])
+def test_prose_magnitude_display_keeps_exact_source_metric(raw, unit, display):
+    data = metric(raw_value=raw, value=raw.replace(',', ''), unit=unit, source_unit=unit)
+    fact, source = source_check(data, '单位：'+unit+'\n营业收入 '+raw)
+    fact = fact.model_copy(update={'text': '营业收入'+display+'。'})
+    notes = _check_fact_source(fact, {'table': source}, check_units=True)
+    assert notes and '程序显示说明' in notes[0]
+    assert fact.metrics[0].raw_value == raw and fact.metrics[0].unit == unit
+
+
+@pytest.mark.parametrize('failure', ['amount', 'sign', 'magnitude', 'subject', 'period', 'unit_missing', 'unit_conflict', 'no_metric'])
+def test_display_equivalence_never_guesses_source_unit_subject_period_or_amount(failure):
+    raw='410,196,473,001.11'
+    fact, source = source_check(metric(raw_value=raw, value=raw.replace(',', '')), '单位：元\n营业收入 '+raw)
+    fact=fact.model_copy(update={'text': '营业收入4101.96亿元。'})
+    if failure=='amount': fact=fact.model_copy(update={'text':'营业收入4101.97亿元。'})
+    elif failure=='sign': fact=fact.model_copy(update={'text':'营业收入-4101.96亿元。'})
+    elif failure=='magnitude': fact=fact.model_copy(update={'text':'营业收入4101.96万元。'})
+    elif failure=='subject': fact=fact.model_copy(update={'subject_scope':'issuer'})
+    elif failure=='period': fact=fact.model_copy(update={'period':'2024'})
+    elif failure in {'unit_missing','unit_conflict'}:
+        quote='营业收入 '+raw if failure=='unit_missing' else '单位：万元\n营业收入 '+raw
+        source=source.model_copy(update={'source_spans':(WorkpaperSpan(page=15,start=0,end=len(quote),quote=quote),)})
+    else: fact=fact.model_copy(update={'metrics':()})
+    with pytest.raises(ValueError):_check_fact_source(fact,{'table':source},check_units=True)
 
 
 @pytest.mark.parametrize("wording,unit", [

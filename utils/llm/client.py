@@ -1248,6 +1248,12 @@ class LlmClient:
                         )
                     elif attempt_count >= max_attempts or repair_used:
                         raise exc
+                    elif request.metadata.get("validation_feedback_on_retry") is True:
+                        # This consumes an already permitted retry, never an
+                        # additional schema-repair/physical allowance.
+                        current_payload = self._repair_payload(
+                            payload, exc, raw_content=raw_content
+                        )
                 except LlmError as exc:
                     last_error = exc
                     self._record_attempt_failure(
@@ -1667,7 +1673,10 @@ class LlmClient:
         try:
             data = json.loads(raw_content)
         except json.JSONDecodeError as exc:
-            raise LlmResponseParseError("LLM response is not valid JSON") from exc
+            raise LlmResponseParseError(
+                f"LLM response is not valid JSON: {exc.msg} at line {exc.lineno} "
+                f"column {exc.colno} (char {exc.pos})"
+            ) from exc
         validate_data(data, schema)
         return data
 

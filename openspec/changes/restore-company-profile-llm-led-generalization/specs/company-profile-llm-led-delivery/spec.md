@@ -54,6 +54,11 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 ### Requirement: Metric standardization preserves source meaning and audit history
 New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
 
+#### Scenario: Prose displays a source-backed amount in a different monetary magnitude
+- **WHEN** the same fact has an original-valued metric already validated against its cited source, with explicit monetary units and matching subject and period, and prose uses an equivalent magnitude or decimal-rounded display
+- **THEN** local binding MAY retain that prose with a program-generated display qualification while preserving the exact original metric, raw value, unit and evidence
+- **AND** no missing amount, sum, account ownership, currency, scope or period is inferred; wrong sign/value/magnitude, unsupported source units or absent corresponding metrics remain invalid, and rounded display is not a new exact normalized fact
+
 #### Scenario: A monetary table wraps one cell over an explicit continuation row
 - **WHEN** a cited fixed-layout monetary table has a unique aligned numeric continuation and a matching wrapped percentage-point cell identifying the same continued row
 - **THEN** source validation MAY join only those same-column cell fragments without changing the immutable quote or coordinates
@@ -88,6 +93,16 @@ New workpaper binding and repaired projections MUST clear currency on dimensionl
 An explicitly review-enabled workpaper MUST reuse the current gateway and writer to review the original selected source packet together with its draft. Extraction and review MAY use different existing profiles or requested reasoning levels; actual successful model/source/profile, requested reasoning effort and usage MUST be recorded for review, repair and final verification. A stronger name or model agreement MUST NOT establish factual truth or production approval. Legacy unreviewed workpapers MUST remain readable without implicit calls.
 
 The reviewer MUST identify checked fact IDs/elements and source-cited errors, ambiguity and material omissions within the supplied scope. Unknown references MUST NOT remove or approve facts. Validly flagged erroneous/ambiguous facts MUST leave the ordinary narrative while remaining auditable. Independent useful facts and all original sources MUST be retained. Optional omissions MUST NOT require repair. At most one combined local repair and one source-grounded verification of its proposed changes are allowed; repairs MUST preserve unrelated facts, report/source identity, exact numeric constraints and original responses. Only explicitly resolved issues with actually checked repaired objects may be applied. Failure, insufficient coverage, unresolved or newly found issues MUST remain visible and limited, never silently clear gaps. Review status MUST distinguish model-reviewed scope from trusted release and full-report completeness.
+
+#### Scenario: A partial review contains independent valid findings
+- **WHEN** a structurally valid review lists missing, duplicate or unknown checked IDs, or one finding has invalid references while other findings have unique known targets and sources
+- **THEN** the owner MUST retain the known unique checked scope and independent valid findings, isolate invalid findings with explicit reasons, and keep the review incomplete
+- **AND** legitimate errors may use the existing single bounded repair/recheck without clearing unreviewed scope; unknown or ambiguous references MUST NOT remove or approve any fact, and original responses remain unchanged
+
+#### Scenario: An omission action is attached to an existing fact
+- **WHEN** a valid possible_omission finding refers to an existing correct fact, including an issue_type other than material_omission
+- **THEN** the existing fact remains unchanged and the finding becomes an explicitly related supplement with a separate target ID
+- **AND** severity still controls whether the supplement warrants the one bounded repair, and a separate valid error finding still withdraws the erroneous original
 
 #### Scenario: A valid unique fact ID has a mismatched element hint
 - **WHEN** a finding cites an existing unique draft fact and valid source IDs but supplies a different known element hint
@@ -275,8 +290,12 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** this does not change historical model results, authorize a call or claim llm_generated completion
 
 ### Requirement: Cost-aware section work stops without fabricating completeness
-
 The v9 workpaper path MUST optimize useful business content per reading and model cost, not perfect appendix coverage. It MUST record the chosen source set and why the scope stopped, using a high-value section pack followed only by targeted material-gap recovery. Actual and unknown resource use MUST follow the current explicit execution authority; no complete-report hypothetical synthesis/verification reserve may be imposed as a prerequisite to a pending workpaper. This does not waive the real request/context/output limits or cumulative budget, recovery and permission caps. Formal evaluation thresholds remain versioned separately from basic workpaper display.
+
+#### Scenario: An already allowed retry follows a malformed workpaper JSON response
+- **WHEN** an explicitly opted-in workpaper request fails JSON or Schema validation and its existing profile/card still permits a physical retry
+- **THEN** that retry carries the concrete validation error and previous response instead of blindly repeating the original request
+- **AND** logical identity, deadline and physical/recovery/usage budgets remain cumulative, no extra retry is created, no local JSON repair fabricates a valid draft, and requests without the opt-in retain their prior behavior
 
 #### Scenario: A response budget cannot hold an exhaustive numeric inventory
 - **WHEN** selected chapters disclose more subsidiary, operating or supplementary figures than a useful core workpaper needs

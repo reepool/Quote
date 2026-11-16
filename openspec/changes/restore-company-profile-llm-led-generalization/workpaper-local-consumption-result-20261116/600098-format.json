@@ -1,0 +1,12 @@
+{
+  "task": "6.CU",
+  "new_model_calls": 0,
+  "mode": "controlled_saved_failure",
+  "original_file_sha256": "9d65d050cffbebdc113ebeee146d80002100384b57d70c9a677ee8a244634eea",
+  "raw_content_sha256": "6465c28c656dcc7c592b9f3b6b5a13971d8cf48748f7095f2d707c461f4ca8bf",
+  "local_scripted_attempts": 2,
+  "validation_error": "LLM response is not valid JSON: Expecting ',' delimiter at line 1 column 23449 (char 23448)",
+  "feedback_contains_unchanged_prior_response": true,
+  "parsed_draft": false,
+  "old_failure_unchanged": true
+}
