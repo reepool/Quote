@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-16 6.CW零新调用交[广州待核画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-format-consumption-result-20261116/result.md)：保存的真实坏JSON只做有限容器标准化，原TaskService/源检查/writer保28/34对象、隔离6，三读一致，原抽取rejected/作者/hash/usage不改。独立有限核主业/收入及F30，勾选不适用不扩大为无变动；主要收入构成仍限用，未二次审核，不称28准确或新增真实模型成功。53直接20.66秒、入口1项59.80秒、234相关兼容213.37秒通过（重叠不加总），strict/diff通过；已量清本人2190520字节，其他finally清未量，旧源/缓存/回执/attempt与并行保护。S1仍0/12、生产not_authorized；本地卡结束，不借CV余额或自动新增外呼，下一仅候选级有界复核另授权，不重抽十二家或追可选细度。
+
 2026-11-16 6.CV获新整卡批准后3/3限定真实后段已用完：[两份限用画像与广州失败](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/result.md)。上汽/海泰各修订/最终再核，模型共采纳3项/拒1项/minor未决1项；独立核采纳项仅1普通支持、2需屏蔽或仅原文参考，不因模型accepted或流程状态报全对。上汽主要收入补充与CU恢复信息重复，不造新召回；广州2次有反馈仍原样坏JSON、无稿，不追加窗。新6物理/159361供应商usage/1恢复/unknown、业务墙钟121.601秒/监督170.177秒，旧账分列、三读/源坐标/冻结源码配置不变，开发硬限内不自动计正式S1/生产。复用ea812687有效测试、本轮无新pytest；本人7606657字节清理，正式源/有效缓存/CT-CU原件/attempt及既有并行保护。下一停止可选细项和同样格式付费重发，广州先零调用评估不添删业务值的有限格式标准化，不临时放宽本卡合同。
 
 2026-11-16 6.CV工程接续就绪、真实0/3：[原初核→修订/再核、原选章/坏JSON→成稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/readiness.md)。三份CT原输入仅离线到首个新发送边界，30项接续正反/磁盘篡改/原writer三读、155源/复核接续及74其他画像分别通过（重叠不加总）；显示限定重新绑定幂等，不改旧hash/成绩。0新模型/网络探针/可发送绑定，三家新有界授权已一次询问，批准前不启动真实窗口；不算新增纠错成功或正式S1，生产未启。本人测试根finally清、体积未量不虚计，正式源/缓存/CT/CU原件/attempt及既有并行保护；只待必要真实后段，不再全组重抽或扩修时序基础设施。

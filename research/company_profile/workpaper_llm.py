@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,8 +11,9 @@ from typing import Any
 
 from .models import ReportIdentity
 from .workpaper import (
-    CompanyProfileWorkpaper, WorkpaperDraftResponse, WorkpaperGenerationMetadata,
-    WorkpaperModelCall, bind_workpaper_draft,
+    ELEMENT_LABELS, CompanyProfileWorkpaper, WorkpaperDraftResponse,
+    WorkpaperFormatNormalization, WorkpaperGenerationMetadata,
+    WorkpaperModelCall, bind_workpaper_draft, normalize_workpaper_draft,
 )
 from .workpaper_sections import (
     SectionPacket, SectionSelection, build_section_packet,
@@ -238,6 +240,55 @@ def _model_call(
     )
 
 
+def normalize_retained_workpaper_format(raw: str) -> tuple[dict, WorkpaperFormatNormalization]:
+    """One terminal object brace and unambiguous known-field relocation only.
+
+    This is an explicit retained-response operation, NOT a gateway JSON fallback.
+    No strings, arrays, missing elements or business values are completed.
+    """
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def reject_constant(value):
+        raise ValueError(f"non-finite JSON constant: {value}")
+
+    def finite_float(value):
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise ValueError("non-finite JSON number")
+        return parsed
+
+    payload = json.loads(raw + "}", object_pairs_hook=unique_object,
+                         parse_constant=reject_constant, parse_float=finite_float)
+    if not isinstance(payload, dict) or payload.get("schema_version") != "company_profile_workpaper_draft.v1":
+        raise ValueError("explicit workpaper draft version required")
+    elements = payload.get("elements")
+    if not isinstance(elements, dict):
+        raise ValueError("workpaper elements object required")
+    operations = ["append_terminal_object_brace"]
+    for name in ("limitations", "company_features", "supply_chain"):
+        if name in elements:
+            if name in payload:
+                raise ValueError(f"ambiguous root field: {name}")
+            payload[name] = elements.pop(name)
+            operations.append(f"move_elements.{name}_to_root")
+    if set(elements) != set(ELEMENT_LABELS) or set(payload) - {
+        "schema_version", "elements", "limitations", "company_features", "supply_chain",
+    }:
+        raise ValueError("all baseline elements and only known root fields required")
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+    return payload, WorkpaperFormatNormalization(
+        original_content_sha256=hashlib.sha256(raw.encode()).hexdigest(),
+        normalized_object_sha256=hashlib.sha256(canonical.encode()).hexdigest(),
+        operations=tuple(operations),
+    )
+
+
 def run_workpaper(
     *, report: ReportIdentity, pages: Sequence[Mapping],
     processing_identity: Mapping[str, Any], provider: Any, work_id: str,
@@ -246,10 +297,16 @@ def run_workpaper(
 ) -> WorkpaperRun:
     """One selection and one company extraction, never eight per-element loops."""
     real = processing_identity.get("execution_mode") == "provider"
-    if real == bool(getattr(provider, "offline_only", False)):
+    mode = extraction_resume.get("mode") if extraction_resume is not None else None
+    if mode not in (None, "local_format_only"):
+        raise ValueError("unknown extraction continuation mode")
+    local_only = mode == "local_format_only"
+    if local_only and processing_identity.get("workpaper_review_policy"):
+        raise ValueError("local-only format consumption cannot send model review requests")
+    if not local_only and real == bool(getattr(provider, "offline_only", False)):
         raise ValueError("workpaper execution mode and provider origin disagree")
     complete = getattr(provider, "workpaper_request", None)
-    if not callable(complete):
+    if not local_only and not callable(complete):
         raise ValueError("registered workpaper provider is unavailable")
     if real and not source_pdf_path:
         raise ValueError("real workpaper requires the official PDF for selected layout")
@@ -263,6 +320,7 @@ def run_workpaper(
     limit = int(processing_identity.get("max_section_characters", 160_000))
     timeout = float(processing_identity.get("logical_request_timeout_seconds", 300))
     retained_selection = None
+    normalization = None
     recovery_content = {}
     if extraction_resume is not None:
         bound_hash = hashlib.sha256(json.dumps(extraction_resume, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
@@ -348,31 +406,47 @@ def run_workpaper(
         remap_layout=remap,
         max_characters=int(processing_identity.get("max_layout_characters", 500_000)) if remap else limit,
     )
-    extracted = complete(
-        request_id=extraction_id, purpose="extract_profile_workpaper",
-        report=report,
-        payload={
-            "report": report.model_dump(mode="json"),
-            "reading_scope": packet.reading_scope.model_dump(mode="json"),
-            "source_text": packet.model_text(),
-            **recovery_content,
-        },
-        instructions=EXTRACTION_INSTRUCTIONS, response_model=WorkpaperDraftResponse,
-        max_output_tokens=int(processing_identity.get("workpaper_max_output_tokens", 12_000)),
-        timeout_seconds=timeout,
-    )
+    if local_only:
+        extracted, normalization = normalize_retained_workpaper_format(raw_failure)
+        extracted = normalize_workpaper_draft(extracted)
+        failed_call = WorkpaperModelCall.model_validate(extraction_resume.get("failed_call"))
+        if (failed_call.purpose != "extract_profile_workpaper"
+            or failed_call.contract_status != "rejected"
+            or failed_call.finish_reason != "stop"
+            or failed_call.response_hash != normalization.original_content_sha256
+            or not failed_call.model or not failed_call.source_label):
+            raise ValueError("local normalization requires the actual rejected extraction attribution")
+        extraction_id = failed_call.request_id
+    else:
+        extracted = complete(
+            request_id=extraction_id, purpose="extract_profile_workpaper",
+            report=report,
+            payload={
+                "report": report.model_dump(mode="json"),
+                "reading_scope": packet.reading_scope.model_dump(mode="json"),
+                "source_text": packet.model_text(),
+                **recovery_content,
+            },
+            instructions=EXTRACTION_INSTRUCTIONS, response_model=WorkpaperDraftResponse,
+            max_output_tokens=int(processing_identity.get("workpaper_max_output_tokens", 12_000)),
+            timeout_seconds=timeout,
+        )
     receipts = tuple(item for item in getattr(provider, "workpaper_receipts", ())
                      if item.get("request_id") in {selection_id, extraction_id})
     if retained_selection is not None:
         receipts = (dict(retained_selection, receipt_origin="retained_receipt"), *receipts)
+    author_identity = extraction_resume.get("original_processing_identity", {}) if local_only else processing_identity
+    if local_only and (not author_identity.get("prompt_version") or not author_identity.get("preprocessing_version")):
+        raise ValueError("retained extraction processing identity is required")
     generation = WorkpaperGenerationMetadata(
-        prompt_version=str(processing_identity.get("prompt_version") or WORKPAPER_PROMPT_VERSION),
-        preprocessing_version=str(processing_identity.get("preprocessing_version") or "unknown"),
-        section_guide_version=processing_identity.get("section_guide_version"),
+        prompt_version=str(author_identity.get("prompt_version") or WORKPAPER_PROMPT_VERSION),
+        preprocessing_version=str(author_identity.get("preprocessing_version") or "unknown"),
+        section_guide_version=author_identity.get("section_guide_version"),
         selection=_model_call(receipts, purpose="select_profile_sections", request_id=selection_id,
                               section_ids=tuple(item.section_id for item in index if item.level <= 3),
                               heading_count=sum(item.level <= 3 for item in index)),
-        extraction=_model_call(
+        local_format_normalization=normalization,
+        extraction=failed_call if local_only else _model_call(
             receipts, purpose="extract_profile_workpaper", request_id=extraction_id,
             section_ids=tuple(item.section_id for item in packet.reading_scope.sections),
             pages=tuple(sorted({span.page for item in packet.evidence for span in item.source_spans})),
@@ -380,7 +454,8 @@ def run_workpaper(
     )
     if real:
         for stage in (generation.selection, generation.extraction):
-            if stage.contract_status != "accepted" or not stage.model or not stage.source_label:
+            expected_status = "rejected" if local_only and stage is generation.extraction else "accepted"
+            if stage.contract_status != expected_status or not stage.model or not stage.source_label:
                 raise ValueError(f"actual model attribution is incomplete for {stage.purpose}")
     workpaper = bind_workpaper_draft(
         WorkpaperDraftResponse.model_validate(extracted),

@@ -302,6 +302,13 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 ### Requirement: Cost-aware section work stops without fabricating completeness
 The v9 workpaper path MUST optimize useful business content per reading and model cost, not perfect appendix coverage. It MUST record the chosen source set and why the scope stopped, using a high-value section pack followed only by targeted material-gap recovery. Actual and unknown resource use MUST follow the current explicit execution authority; no complete-report hypothetical synthesis/verification reserve may be imposed as a prerequisite to a pending workpaper. This does not waive the real request/context/output limits or cumulative budget, recovery and permission caps. Formal evaluation thresholds remain versioned separately from basic workpaper display.
 
+#### Scenario: Explicit local structural normalization consumes a retained failed response
+- **WHEN** a new local-only task explicitly binds an accepted original section selection, matching official source and nonempty finish=stop failed content by hash
+- **THEN** the original owner MAY append exactly one missing terminal object brace and relocate known root fields misplaced inside elements without key conflicts, provided strict unique-key finite JSON parsing and all eight baseline elements succeed
+- **AND** it MUST NOT fill business values, missing strings/arrays/elements, unknown fields or ambiguous structures; existing typed/source/number checks and local quarantine still apply
+- **AND** the original raw content, rejected status, actual author and usage remain unchanged; separate normalization metadata records policy, operations and original/normalized hashes, not a fabricated accepted model receipt
+- **AND** this explicit local mode performs no model sends or automatic review, delivers an unreviewed candidate through the original writer/query/export and does not promote trust, core completeness, historical scores or production authority; old retries and continuation contracts are not retroactively relaxed
+
 #### Scenario: An already allowed retry follows a malformed workpaper JSON response
 - **WHEN** an explicitly opted-in workpaper request fails JSON or Schema validation and its existing profile/card still permits a physical retry
 - **THEN** that retry carries the concrete validation error and previous response instead of blindly repeating the original request

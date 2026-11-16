@@ -593,6 +593,14 @@ class CompanyProfileStageRuntime:
         assert state.evidence is not None
         assert state.report is not None
         if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY:
+            resume_hash = state.processing_identity.get("workpaper_extraction_resume_hash")
+            if resume_hash and (state.workpaper_extraction_resume is None or resume_hash != hashlib.sha256(
+                json.dumps(state.workpaper_extraction_resume, ensure_ascii=False, sort_keys=True).encode()
+            ).hexdigest()):
+                raise ValueError("persisted extraction continuation does not match its bound hash")
+            if ((state.workpaper_extraction_resume or {}).get("mode") == "local_format_only"
+                and state.processing_identity.get("workpaper_review_policy")):
+                raise ValueError("local-only format consumption cannot send model review requests")
             if state.workpaper is None:
                 if state.review_seed is not None:
                     from .workpaper_review import seed_material

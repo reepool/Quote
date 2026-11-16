@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.CW：不改业务值的显式本地消费
+
+6.CV已结束，广州原stop响应仅缺一个末尾对象闭括号，两个已知根字段错嵌elements。新local_format_only接续复用现有hash-bound载荷/checkpoint及同一章节包；不改变公共网关默认JSON严格解析，不建通用修复器。仅唯一闭括号及无冲突已知字段归位，重复键/非有限数/错版/缺基础/有歧义结构拒绝。严格合同后再沿原局部源检查，不猜业务值。generation可选标准化记录只在此模式出现，旧序列化/hash形状不变；原实际失败作者/usage归因但contract_status=rejected，原receipt不伪造成功。本地模式禁止后续模型复核，无新调用，query/export交待核候选而非可信发布。旧CV禁止本地补JSON和失败结论不追改。
+
 ### 6.CV：只继承成功前段，真实完成必要纠错
 
 review_resume显式mode=repair_and_verify只允许一份accepted原初核回执，原稿hash/源版本/原raw SHA及解析payload先核，再从原一次合并修订发起最终再核；默认旧verify_only仍要求初核与修订两份，不可用新mode重复已做修订。旧初核可能在应用消费失败，当前重新解释不改原raw/contract/usage，未核范围继续incomplete，不冒充新初核。新绑定显示说明必须幂等，不能在seed_material重绑定时重复追加而使合法原稿hash失配。

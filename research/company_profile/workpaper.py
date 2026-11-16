@@ -534,12 +534,27 @@ class WorkpaperModelCall(_Model):
     physical_pages: tuple[int, ...] = ()
 
 
+class WorkpaperFormatNormalization(_Model):
+    policy: Literal["terminal_object_and_root_fields.v1"] = "terminal_object_and_root_fields.v1"
+    original_content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    normalized_object_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    operations: tuple[str, ...] = Field(min_length=1)
+
+
 class WorkpaperGenerationMetadata(_Model):
     prompt_version: str = Field(min_length=1)
     preprocessing_version: str = Field(min_length=1)
     section_guide_version: str | None = None
     selection: WorkpaperModelCall
     extraction: WorkpaperModelCall
+    local_format_normalization: WorkpaperFormatNormalization | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        if self.local_format_normalization is None:
+            payload.pop("local_format_normalization", None)
+        return payload
 
     @model_validator(mode="after")
     def stages_match(self):
@@ -547,6 +562,11 @@ class WorkpaperGenerationMetadata(_Model):
             raise ValueError("selection model attribution has wrong purpose")
         if self.extraction.purpose != "extract_profile_workpaper":
             raise ValueError("extraction model attribution has wrong purpose")
+        if self.local_format_normalization is not None and (
+            self.extraction.contract_status != "rejected"
+            or self.extraction.response_hash != self.local_format_normalization.original_content_sha256
+        ):
+            raise ValueError("local format normalization must retain the rejected original hash")
         return self
 
 
@@ -956,6 +976,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         "llm_generated": "真实模型底稿（待核，不代表正式公司可用）",
         "controlled_fixture": "受控工程输入（非真实模型结果）",
     }[workpaper.origin]
+    if workpaper.generation is not None and workpaper.generation.local_format_normalization is not None:
+        origin = "真实模型原内容，经本地格式标准化的待核候选（原抽取失败，未二次审核）"
     out = [
         f"# {report.instrument_id}｜{report.report_period} 公司画像底稿",
         "",
@@ -1003,6 +1025,11 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         out.append("- 限制：" + limitation)
     if workpaper.generation is not None:
         out.extend(["", "## 模型处理记录", ""])
+        if workpaper.generation.local_format_normalization is not None:
+            normalization = workpaper.generation.local_format_normalization
+            out.append("本地格式标准化候选：未新增模型调用，原抽取合同仍为rejected，尚未进行二次审核。")
+            out.append(f"- 标准化策略：`{normalization.policy}`；操作：{'、'.join(normalization.operations)}。")
+            out.append(f"- 原始正文hash：`{normalization.original_content_sha256}`；标准化对象hash：`{normalization.normalized_object_sha256}`。")
         for label, call in (("选章", workpaper.generation.selection), ("正文抽取", workpaper.generation.extraction)):
             model = call.model or "模型未知"
             source = call.source_label or "来源未知"
