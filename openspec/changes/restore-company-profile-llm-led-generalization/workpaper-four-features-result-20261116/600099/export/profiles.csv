@@ -1,0 +1,4 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600099.SH,2025-12-31,2026-03-27T16:00:00+00:00,False,False,False,False,0,0,model_reviewed_pending_verification,llm_generated,"公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车及上述产品配件的制造和销售，形成四大业务板块。
+公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，按单生产并适度备货；产品销售以经销模式为主。
+报告期内公司新增重要非主营业务的说明为不适用；业务类型、利润构成或利润来源发生重大变动的详细说明为不适用。",33,66,completed,0,deepseek-flash,grok-4.7

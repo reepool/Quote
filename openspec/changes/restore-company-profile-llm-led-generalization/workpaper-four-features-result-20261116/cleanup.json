@@ -1,0 +1,63 @@
+{
+  "task": "6.CR",
+  "before_development_released_bytes": 0,
+  "active_operators_before_closeout_cleanup": 0,
+  "authoritative_receipts_verified_before_delete": true,
+  "removed": [
+    {
+      "path": "data/QuoteBak/workpaper-cr-prepared-plt6w6a0",
+      "bytes": 4399837,
+      "purpose": "结束的四份准备副本与监督日志；正式源/有效缓存不在此目录"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-cr-operator.py",
+      "bytes": 28691,
+      "purpose": "本轮operator/离线汇总与只读检查脚本或其字节码；operator和closeout必要快照已持久化"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-cr-closeout.py",
+      "bytes": 9346,
+      "purpose": "本轮operator/离线汇总与只读检查脚本或其字节码；operator和closeout必要快照已持久化"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-cr-inspect.py",
+      "bytes": 2589,
+      "purpose": "本轮operator/离线汇总与只读检查脚本或其字节码；operator和closeout必要快照已持久化"
+    },
+    {
+      "path": "data/QuoteBak/__pycache__/workpaper-cr-operator.cpython-311.pyc",
+      "bytes": 59846,
+      "purpose": "本轮operator/离线汇总与只读检查脚本或其字节码；operator和closeout必要快照已持久化"
+    },
+    {
+      "path": "entry finally: workpaper-cr-600099-<unique>",
+      "bytes": 1933484,
+      "purpose": "各入口已在finally删除本人运行库/输出/checkpoint/重复传输正文，不重计历史轮次"
+    },
+    {
+      "path": "entry finally: workpaper-cr-600054-<unique>",
+      "bytes": 1753160,
+      "purpose": "各入口已在finally删除本人运行库/输出/checkpoint/重复传输正文，不重计历史轮次"
+    },
+    {
+      "path": "entry finally: workpaper-cr-600000-<unique>",
+      "bytes": 2126794,
+      "purpose": "各入口已在finally删除本人运行库/输出/checkpoint/重复传输正文，不重计历史轮次"
+    },
+    {
+      "path": "entry finally: workpaper-cr-600100-<unique>",
+      "bytes": 1812916,
+      "purpose": "各入口已在finally删除本人运行库/输出/checkpoint/重复传输正文，不重计历史轮次"
+    }
+  ],
+  "released_bytes": 12126663,
+  "recoverable": "临时库与准备副本可由正式PDF/缓存及operator快照在新的授权范围重建；必要实际回执已持久化，不需恢复重复临时物",
+  "preserved": [
+    "正式PDF",
+    "有效解析缓存",
+    "旧结果与失败",
+    "4份本次attempt标记",
+    "既有/并行工作区改动"
+  ],
+  "remaining_task_temporaries": []
+}

@@ -1,0 +1,137 @@
+"""Finite 6.CR offline derivation from immutable run receipts; no model calls."""
+import hashlib
+import json
+import statistics
+from collections import Counter
+from pathlib import Path
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-features-result-20261116'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str)+'\n')
+
+
+def main():
+    frozen = json.loads((DEST/'authorization.json').read_text())
+    group = json.loads((DEST/'group-execution.json').read_text())
+    audit = json.loads((DEST/'independent-audit.json').read_text())
+    assert group['executed'] == 4 and not group['not_started']
+    assert group['source_code_unchanged']
+    assert all(sha(ROOT/p) == h for p,h in frozen['code_sha256'].items())
+    assert sha(ROOT/'config/13_llm.json') == frozen['shared_config_sha256']
+    assert sha(DEST/'operator-snapshot.txt') == frozen['operator_sha256']
+    counts = Counter(); models = Counter(); finishes = Counter(); resolutions = Counter()
+    entries = []
+    lines = ['# 四类公司的基础画像与自主特色（6.CR）', '',
+             '本轮四家公司均为当前同版全新真实入口，不载旧答案。研究限用，不是正式S1验收或生产发布。',
+             '正文由原JSON同源呈现；来源坐标验证和模型复核均不等于全稿准确，独立核源范围见各家公司说明及independent-audit.json。', '',
+             '| 公司 | 基础事实 | 可选供应链 | 自主特色 | 请求／账本 | 业务秒 | 模型复核 |',
+             '|---|---:|---:|---:|---:|---:|---|']
+    for summary in group['results']:
+        code = summary['instrument_id'][:6]; folder = DEST/code
+        query = json.loads((folder/'query.json').read_text())
+        budget = json.loads((folder/'budget.json').read_text())
+        assert summary['three_reads_equal']
+        assert summary['physical_requests'] == len(budget['attempts']) <= 10
+        assert summary['charged_tokens'] == budget['charged_tokens'] <= 500000
+        assert summary['business_seconds'] <= 1800 and summary['recoveries'] <= 3
+        assert max(Counter(a['logical_request_id'] for a in budget['attempts']).values(), default=0) <= 2
+        for attempt in budget['attempts']:
+            assert attempt['status'] != 'reserved'
+            models[attempt['source_label']] += 1
+            finishes[attempt.get('finish_reason') or 'missing'] += 1
+        paper = query['profiles'][0].get('workpaper') if query['profiles'] else None
+        sections = dict(paper['elements']) if paper else {}
+        if paper and paper.get('supply_chain'):
+            sections.update(paper['supply_chain'])
+        if paper and paper.get('company_features'):
+            sections['company_features'] = paper['company_features']
+        all_facts = [f for e in sections.values() for f in e['facts']]
+        assert len({f['fact_id'] for f in all_facts}) == len(all_facts)
+        local_audit = audit['companies'][summary['instrument_id']]
+        blocked = set(local_audit['withhold_fact_ids'])
+        assert blocked <= {f['fact_id'] for f in all_facts}
+        if paper:
+            assert paper['origin'] == 'llm_generated'
+            assert json.loads((folder/'source-check.json').read_text())['all_retained_evidence_coordinates_equal']
+            resolutions.update(f['resolution'] for f in (paper.get('quality_review') or {}).get('findings',[]))
+        entry = {**summary, 'query':f'{code}/query.json', 'query_sha256':sha(folder/'query.json'),
+                 'all_facts':len(all_facts), 'all_metrics':sum(len(f['metrics']) for f in all_facts),
+                 'independent_withheld_fact_ids':sorted(blocked), 'independent_audit':local_audit,
+                 'formal_accuracy':None, 'formal_recall':None, 'production_authorization':'not_authorized'}
+        entries.append(entry)
+        for key in ('physical_requests','charged_tokens','recoveries','facts','metrics','feature_count','feature_metrics','supply_chain_facts'):
+            counts[key] += summary.get(key,0)
+        counts['all_facts'] += len(all_facts)
+        counts['all_metrics'] += entry['all_metrics']
+        lines.append(f"| [{summary['name']}](#{code}) | {summary.get('facts',0)} | {summary.get('supply_chain_facts',0)} | {summary.get('feature_count',0)} | {summary['physical_requests']}/{summary['charged_tokens']} | {summary['business_seconds']} | {summary.get('review_status')} |")
+    labels = {'business_structure':'业务结构','products_services':'产品、服务与用途','revenue_model':'赚钱方式',
+              'scale_and_mix':'规模与业务权重','operations_and_inputs':'经营方式与投入','customers_channels_markets':'客户、渠道与市场',
+              'operating_drivers':'经营驱动因素','material_changes':'重要变化','position':'供应链位置',
+              'inputs':'主要投入与资源','downstream':'下游领域','upstream_inputs':'主要投入与资源',
+              'downstream_customers':'下游领域','company_features':'公司特色与自主发现'}
+    for entry in entries:
+        code = entry['instrument_id'][:6]
+        paper = json.loads((DEST/code/'query.json').read_text())['profiles'][0].get('workpaper')
+        lines.extend(['',f'<a id="{code}"></a>','',f"## {entry['name']}（{entry['instrument_id']}）",'',
+                      f"[原查询](./{code}/query.json) · [完整原导出](./{code}/export/{entry['instrument_id']}_2025-12-31.md)", '',
+                      '独立核源结论：'+entry['independent_audit']['conclusion'], ''])
+        for note in entry['independent_audit']['limitations']:
+            lines.extend(['- '+note])
+        if not paper:
+            continue
+        evidence = {e['evidence_id']:e for e in paper['evidence']}
+        sections = dict(paper['elements'])
+        sections.update(paper.get('supply_chain') or {})
+        if paper.get('company_features'):
+            sections['company_features'] = paper['company_features']
+        else:
+            lines.extend(['','本轮模型没有单列框架外特色；不据此判定基础画像失败。',''])
+        for key,element in sections.items():
+            lines.extend(['',f'### {labels.get(key,key)}', '', '状态：'+element['status']+'。',''])
+            for fact in element['facts']:
+                if fact['fact_id'] in entry['independent_withheld_fact_ids']:
+                    lines.extend(['- '+fact['fact_id']+'：独立核源后不采用；原件保留以供审计。'])
+                    continue
+                cites = []
+                for eid in fact['evidence_ids']:
+                    ev = evidence[eid]
+                    cites.append('/'.join(ev['section_path'])+'，物理页'+','.join(map(str,ev['physical_pages'])))
+                lines.extend(['- '+fact['text']+'（'+fact['fact_id']+'；'+'；'.join(dict.fromkeys(cites))+'）'])
+                if fact['fact_id'] in entry['independent_audit'].get('fact_notices',{}):
+                    lines.append('  独立限用提示：'+entry['independent_audit']['fact_notices'][fact['fact_id']])
+                if fact['metrics']:
+                    lines.append('  数字：'+'；'.join(m['name']+'='+m['raw_value']+' '+str(m['unit']) for m in fact['metrics'])+'。')
+            for note in element.get('limitations',[]):
+                lines.append('- 范围限制：'+note)
+        for note in paper.get('limitations',[]):
+            lines.extend(['','底稿限制：'+note])
+    totals = dict(counts)
+    totals.update(models=dict(models),finish_reasons=dict(finishes),review_resolutions=dict(resolutions),
+                  readable=sum(e.get('readable',False) for e in entries),
+                  review_statuses=dict(Counter(e.get('review_status') for e in entries)),
+                  business_wall_seconds=round(max(e['business_ended_monotonic'] for e in entries)-min(e['business_started_monotonic'] for e in entries),3),
+                  company_business_median_seconds=statistics.median(e['business_seconds'] for e in entries),
+                  supervision_wall_seconds=group['supervision_wall_seconds'],cost='unknown')
+    assert totals['charged_tokens'] <= 2000000 and totals['physical_requests'] <= 40
+    assert totals['business_wall_seconds'] <= 2400
+    dump(DEST/'index.json',{'task':'6.CR','same_version_fresh_runs':True,'totals':totals,'companies':entries,
+                            'formal_S1_counted':False,'production_authorization':'not_authorized'})
+    (DEST/'profiles.md').write_text('\n'.join(lines)+'\n')
+    dump(DEST/'validation.json',{'four_original_taskservice_entries':True,'all_three_reads_equal':True,
+          'retained_evidence_coordinates_valid':totals['readable'], 'frozen_code_and_shared_config_unchanged':True,
+          'operator_snapshot_matches_frozen_sha256':True,'no_prior_semantics_or_reference_in_model_input':True,
+          'all_attempts_settled_and_each_and_group_bounds_checked':True,'new_pytest':False,
+          'reused_engineering_validation':frozen['reused_engineering_validation'],
+          'formal_accuracy_recall_not_evaluated':True,'totals':totals})
+    print(json.dumps(totals,ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()

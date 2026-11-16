@@ -1,0 +1,463 @@
+{
+  "task": "6.CR",
+  "same_version_fresh_runs": true,
+  "totals": {
+    "physical_requests": 20,
+    "charged_tokens": 515480,
+    "recoveries": 0,
+    "facts": 130,
+    "metrics": 224,
+    "feature_count": 4,
+    "feature_metrics": 4,
+    "supply_chain_facts": 11,
+    "all_facts": 145,
+    "all_metrics": 230,
+    "models": {
+      "deepseek:deepseek-flash": 12,
+      "scorpio:grok-4.7": 8
+    },
+    "finish_reasons": {
+      "stop": 20
+    },
+    "review_resolutions": {
+      "corrected_pending_trust": 13,
+      "quarantined": 1,
+      "unresolved": 2,
+      "omission_candidate": 1
+    },
+    "readable": 4,
+    "review_statuses": {
+      "completed": 2,
+      "completed_with_open_findings": 2
+    },
+    "business_wall_seconds": 647.714,
+    "company_business_median_seconds": 556.53,
+    "supervision_wall_seconds": 699.254,
+    "cost": "unknown"
+  },
+  "companies": [
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "run_id": "v17-features-four-600099-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "provider_constructor_binding_verified_before_entry": true,
+      "business_started_monotonic": 9994893.571072387,
+      "preparation_seconds": 45.473,
+      "state": "completed",
+      "business_ended_monotonic": 9995282.80939768,
+      "business_seconds": 389.238,
+      "contract_errors": [],
+      "failed_calls": [],
+      "feature_count": 1,
+      "feature_metrics": 4,
+      "supply_chain_facts": 3,
+      "total_facts_with_optional": 33,
+      "readable": true,
+      "facts": 29,
+      "metrics": 62,
+      "review_status": "completed",
+      "review_error": null,
+      "findings": 4,
+      "origin": "llm_generated",
+      "core_complete": false,
+      "element_counts": {
+        "business_structure": 3,
+        "products_services": 4,
+        "revenue_model": 3,
+        "scale_and_mix": 6,
+        "operations_and_inputs": 3,
+        "customers_channels_markets": 3,
+        "operating_drivers": 4,
+        "material_changes": 3
+      },
+      "query_sha256": "2de35a9a939aaa5f94fbb2e536c2c335e1625e4e65fb87d5b0f35eb820788134",
+      "core_missing_elements": [],
+      "review_limit_error": null,
+      "failure_signature": null,
+      "physical_requests": 5,
+      "charged_tokens": 120886,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "supervision_seconds": 392.507,
+      "captured_model_contents": 5,
+      "failed_contents_retained": 0,
+      "cleanup_bytes": 1933484,
+      "query": "600099/query.json",
+      "all_facts": 33,
+      "all_metrics": 66,
+      "independent_withheld_fact_ids": [],
+      "independent_audit": {
+        "conclusion": "森林消防、农业机械、ATV、摩托车四板块及经销变现、公司收入和四类主营收入均有实质内容；有限核源支持这些主干。自主特色可追到跨页子公司表，但主要是子公司经营规模补充，独特解释力一般。",
+        "checked_fact_ids": [
+          "F-BS-01",
+          "F-BS-02",
+          "F-RM-01",
+          "F-RM-02",
+          "F-SM-01",
+          "F-SM-02",
+          "F-SM-03",
+          "F-SM-04",
+          "F-SM-05",
+          "F-OD-04",
+          "F-CF-01"
+        ],
+        "source_physical_pages": [
+          8,
+          9,
+          10,
+          12,
+          15,
+          16,
+          18,
+          21,
+          30,
+          31
+        ],
+        "source_checks": [
+          "主营及产品介绍在第三节业务情况8—10页，经销/按单生产在10页；公司营业收入113124.69万元叙述与18页1131246944.93元表列一致，不以四行业主营合计替代。",
+          "21页分行业营业收入列支持467207688.51/283722402.61/248582445.60/125340298.09元，未将成本或销售量当收入。",
+          "15—16页农业机械成本管控段支持引入第二厂家11家和两项核心零部件国产化替代；修订后的板块主体及采购/制造成本分别表述合理。",
+          "特色F-CF-01的30页表头/万元单位与31页续表共同支持福马高新及联海的营收和净利润；没有把两家公司数据升为集团总量。"
+        ],
+        "feature_verdicts": [
+          {
+            "fact_id": "F-CF-01",
+            "source_supported": true,
+            "explanatory_value": "有助于了解经营主体规模，但主要是附加财务明细，不作为高质量自主发现的充分证明。"
+          }
+        ],
+        "review_effect": "4项意见均进入真实修订及final接受；其中农业机械措施被扩大到全公司、把不适用改写为未发生等问题确有纠正价值。模型completed不视为全稿真值。",
+        "withhold_fact_ids": [],
+        "limitations": [
+          "仅核列明的主干/实际特色及关联原文，未逐一核完全部33对象/全部指标。",
+          "具体产品技术参数、所有同比和全部补充事实未作独立全量核验。",
+          "公司特色未充分体现独特经营机制；不因此否定基础画像，也不为这条另开付费窗口。"
+        ]
+      },
+      "formal_accuracy": null,
+      "formal_recall": null,
+      "production_authorization": "not_authorized"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "run_id": "v17-features-four-600054-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "provider_constructor_binding_verified_before_entry": true,
+      "business_started_monotonic": 9994893.984568616,
+      "preparation_seconds": 45.45,
+      "state": "completed",
+      "business_ended_monotonic": 9995467.104691781,
+      "business_seconds": 573.12,
+      "contract_errors": [],
+      "failed_calls": [],
+      "feature_count": 2,
+      "feature_metrics": 0,
+      "supply_chain_facts": 3,
+      "total_facts_with_optional": 40,
+      "readable": true,
+      "facts": 35,
+      "metrics": 35,
+      "review_status": "completed",
+      "review_error": null,
+      "findings": 2,
+      "origin": "llm_generated",
+      "core_complete": false,
+      "element_counts": {
+        "business_structure": 2,
+        "products_services": 6,
+        "revenue_model": 2,
+        "scale_and_mix": 8,
+        "operations_and_inputs": 5,
+        "customers_channels_markets": 4,
+        "operating_drivers": 5,
+        "material_changes": 3
+      },
+      "query_sha256": "88f1e02b7b3188ee9cef57b78ebcbc1e1322a908b71a618da813a5e9458b106e",
+      "core_missing_elements": [],
+      "review_limit_error": null,
+      "failure_signature": null,
+      "physical_requests": 5,
+      "charged_tokens": 111919,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "supervision_seconds": 575.787,
+      "captured_model_contents": 5,
+      "failed_contents_retained": 0,
+      "cleanup_bytes": 1753160,
+      "query": "600054/query.json",
+      "all_facts": 40,
+      "all_metrics": 35,
+      "independent_withheld_fact_ids": [
+        "F-MC-02"
+      ],
+      "independent_audit": {
+        "conclusion": "六大旅游相关业务及收费模式清楚，公司收入/五行业规模和抵销前口径有源支持；复核补入核算方法变化及利润下降原因。两条自主特色有原文，但以协会、等级、荣誉及品牌中心为主，解释深度有限。独立核源另局部禁用F-MC-02，不影响其他基础内容。",
+        "checked_fact_ids": [
+          "F-BS-01",
+          "F-RM-01",
+          "F-RM-02",
+          "F-SM-01",
+          "F-SM-02",
+          "F-SM-03",
+          "F-SM-04",
+          "F-SM-05",
+          "F-SM-06",
+          "review-add:REV-001",
+          "review-add:REV-002",
+          "F-MC-02",
+          "F-CF-01",
+          "F-CF-02"
+        ],
+        "source_physical_pages": [
+          6,
+          9,
+          10,
+          11,
+          13,
+          14,
+          15
+        ],
+        "source_checks": [
+          "9—10页业务情况列景区、索道缆车、酒店、徽菜、旅行社、智慧旅游；11页公司讨论补经营格局和游客规模，没有套制造业供料模型。",
+          "14页营业收入210932.51万元与13页2109325107.63元一致；酒店492026389.87、索道842155363.75、景区293201670.78、旅游服务532255057.39、徽菜245296390.79元均在营业收入列。原文说明分行业为未合并抵销口径，画像明确保留。",
+          "14页支持营收9.23%增长同时受游客增加和资源使用费核算方法变化影响；11页支持归母净利润29248.09万元/下降7.15%及资源有偿使用费增加原因。",
+          "特色F-CF-01/02分别在9页和10页原业务描述，协会及5S、徽菜荣誉和品牌中心原句可追。",
+          "13及15页只有两项详细说明/有关情况勾选不适用，不能推出全部业务/利润构成均未变化；F-MC-02已在独立派生研究预览禁用，原query及模型completed不改。"
+        ],
+        "feature_verdicts": [
+          {
+            "fact_id": "F-CF-01",
+            "source_supported": true,
+            "explanatory_value": "有助于了解索道运营资质，但协会/等级罗列不是独特盈利机制。"
+          },
+          {
+            "fact_id": "F-CF-02",
+            "source_supported": true,
+            "explanatory_value": "徽菜品牌和体验中心有一定经营特色；荣誉部分解释价值低，不以数量当质量。"
+          }
+        ],
+        "review_effect": "两项遗漏经真实修订和final接受，对避免将收入增长全归于客流、遗漏利润下降有价值；但对不适用扩大成未发生的另一条仍漏审，说明二次审核不是全稿保证。",
+        "withhold_fact_ids": [
+          "F-MC-02"
+        ],
+        "limitations": [
+          "未逐一核完全部40对象及全部指标，源支持仅限列明内容。",
+          "F-MC-02不作为可靠结论，原件保留供审计；不把一条可隔离问题当成整份画像失败。",
+          "无人机物资运输等更具体的经营特点已在基础经营方式字段中保留，无需为特色栏重新分类或调用。"
+        ]
+      },
+      "formal_accuracy": null,
+      "formal_recall": null,
+      "production_authorization": "not_authorized"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "run_id": "v17-features-four-600000-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "provider_constructor_binding_verified_before_entry": true,
+      "business_started_monotonic": 9994892.97194745,
+      "preparation_seconds": 45.367,
+      "state": "completed",
+      "business_ended_monotonic": 9995540.685572244,
+      "business_seconds": 647.714,
+      "contract_errors": [],
+      "failed_calls": [],
+      "feature_count": 1,
+      "feature_metrics": 0,
+      "supply_chain_facts": 3,
+      "total_facts_with_optional": 38,
+      "readable": true,
+      "facts": 34,
+      "metrics": 103,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": 5,
+      "origin": "llm_generated",
+      "core_complete": false,
+      "element_counts": {
+        "business_structure": 3,
+        "products_services": 4,
+        "revenue_model": 6,
+        "scale_and_mix": 8,
+        "operations_and_inputs": 4,
+        "customers_channels_markets": 2,
+        "operating_drivers": 4,
+        "material_changes": 3
+      },
+      "query_sha256": "1c9a58be43cbff4ca5e5558451de6c45986105972fe067d95ac129ff52c255cf",
+      "core_missing_elements": [],
+      "review_limit_error": null,
+      "failure_signature": null,
+      "physical_requests": 5,
+      "charged_tokens": 153755,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "supervision_seconds": 651.317,
+      "captured_model_contents": 5,
+      "failed_contents_retained": 0,
+      "cleanup_bytes": 2126794,
+      "query": "600000/query.json",
+      "all_facts": 38,
+      "all_metrics": 105,
+      "independent_withheld_fact_ids": [],
+      "independent_audit": {
+        "conclusion": "四大金融业务、产品/客群、利息与非息变现有实质内容，1739.64亿元集团营收和1204.83亿元利息净收入有源支持。已读利润表的手续费及其他净收入数额仍未完整进入画像；基础可读，不冒充完整收入构成通过。唯一保留特色偏战略口号，文本明示2026计划，不能当2025实际成果。",
+        "checked_fact_ids": [
+          "F-BS-01",
+          "F-BS-02",
+          "F-BS-03",
+          "F-RM-01",
+          "F-RM-02",
+          "F-RM-03",
+          "F-CF-02",
+          "F-SC-U1"
+        ],
+        "source_physical_pages": [
+          32,
+          62,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          99
+        ],
+        "source_checks": [
+          "3.6公司主要业务情况62—71页包含公司金融、零售、金融市场与金融机构、跨境及境外机构各子节，不将五大赛道当互斥会计分部，也未套制造业原料。",
+          "71页利润表/营业收入表支持集团营收173964百万元、利息净收入120483百万元及69.26%占比；72页叙述支持1204.83亿元。没有把325269百万元业务总收入当净收入。",
+          "71页同表还明确手续费及佣金净收入22725百万元/13.06%、其他净收入30756百万元/17.68%，画像仅概括名称，未完整转录数额和占比；记录为已读后遗漏，而非未披露或选章失败。",
+          "73页平均余额表支持资金来源及计息负债8292491百万元/1.74%平均成本率，不作报告期末余额。",
+          "99页下一阶段公司管理措施明确2026年及深化战略体系，特色F-CF-02中的计划文字有据；它的period=2025年度不能用于将计划归为2025实际完成。"
+        ],
+        "feature_verdicts": [
+          {
+            "fact_id": "F-CF-02",
+            "source_supported": true,
+            "explanatory_value": "有据的战略计划，但口号多、具体经营解释价值有限；仅作为2026计划原句限用。"
+          }
+        ],
+        "review_effect": "5意见形成2修正、1隔离、2范围意见未决。特色F-CF-01所引材料没有总部所在地而被隔离，说明自主特色没有绕过来源复核；时点表述得到修正，原不明差异/未读当未披露的范围说明已暂停采用。",
+        "withhold_fact_ids": [],
+        "fact_notices": {
+          "F-CF-02": "仅引用为2026年计划；原JSON的2025年度period不能作为2025已实现事实消费。",
+          "F-SM-06": "原文分别写母公司零售贷款与公司住房贷款，主体口径未统一；保原句，不用于跨主体合计。"
+        },
+        "limitations": [
+          "未逐一核完全部38对象/全部数值，未给出正式准确率或召回率。",
+          "手续费/佣金及其他净收入的完整构成仍为真实遗漏，不为补两行重跑银行；下一通用主干信息取舍应优先整张主要构成而非大量次要数字。",
+          "原范围争议和少数混合主体/计划期间只限用原文，不作统一确定性金融数据。",
+          "特色质量不稳定，不能把有来源的口号等同有价值的公司个性。"
+        ]
+      },
+      "formal_accuracy": null,
+      "formal_recall": null,
+      "production_authorization": "not_authorized"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "run_id": "v17-features-four-600100-20261116",
+      "three_reads_equal": true,
+      "exception": null,
+      "provider_constructor_binding_verified_before_entry": true,
+      "business_started_monotonic": 9994893.849563144,
+      "preparation_seconds": 45.806,
+      "state": "completed",
+      "business_ended_monotonic": 9995433.789661258,
+      "business_seconds": 539.94,
+      "contract_errors": [],
+      "failed_calls": [],
+      "feature_count": 0,
+      "feature_metrics": 0,
+      "supply_chain_facts": 2,
+      "total_facts_with_optional": 34,
+      "readable": true,
+      "facts": 32,
+      "metrics": 24,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": 6,
+      "origin": "llm_generated",
+      "core_complete": false,
+      "element_counts": {
+        "business_structure": 4,
+        "products_services": 5,
+        "revenue_model": 3,
+        "scale_and_mix": 5,
+        "operations_and_inputs": 4,
+        "customers_channels_markets": 4,
+        "operating_drivers": 4,
+        "material_changes": 3
+      },
+      "query_sha256": "ce1a2279d6799dc89f2b91bfc699da2455b062c6a8447576974896d5278a624e",
+      "core_missing_elements": [],
+      "review_limit_error": null,
+      "failure_signature": null,
+      "physical_requests": 5,
+      "charged_tokens": 128920,
+      "cost": "unknown",
+      "stopped_reason": null,
+      "recoveries": 0,
+      "supervision_seconds": 543.485,
+      "captured_model_contents": 5,
+      "failed_contents_retained": 0,
+      "cleanup_bytes": 1812916,
+      "query": "600100/query.json",
+      "all_facts": 34,
+      "all_metrics": 24,
+      "independent_withheld_fact_ids": [],
+      "independent_audit": {
+        "conclusion": "公共安全、数智产业、智慧能源三主业及各自产品/变现均有实质回答，有限原文核对支持公司150.65亿元营收和修订后补入的三板块主营规模。没有单列自主特色，但CNKI订阅模式、核技术安检及能源综合服务等特点已留在基础框架。",
+        "checked_fact_ids": [
+          "F-BS-01",
+          "F-PS-01",
+          "F-PS-03",
+          "F-PS-04",
+          "F-PS-05",
+          "F-RM-01",
+          "F-RM-02",
+          "F-RM-03",
+          "F-SM-01",
+          "review-add:FND-002"
+        ],
+        "source_physical_pages": [
+          12,
+          13,
+          14,
+          15,
+          21,
+          22
+        ],
+        "source_checks": [
+          "12—13页业务情况支持三主业、CNKI产品、机构订阅/个人按需付费、技术授权/软件开发及能源咨询/供货/工程/运维；公共安全22页实际产品及服务与12页运维说明共同支持该变现表达。",
+          "14—15页支持150.65亿元公司营收及上年硬件出表/低毛利业务收缩的收入下降原因，没有把主营表1497009.55万元当集团营收。",
+          "21页表头为万元/2025年1—12月，三主业698057.58、275072.20、450419.69万元与带符号抵销-28111.12及抵销后合计1497009.55均匹配。它们是主要板块而非全表分项，不据三项加总复算集团收入。"
+        ],
+        "feature_verdicts": [],
+        "review_effect": "6意见中5项实际纠正/补充、1项同方数科成立与更名背景仍open。重要贡献是补回三大主业收入规模，并纠正将子公司等同整个能源产业、把目标定位写成已实现等范围扩大；旧F-SM-02仍隔离，不因新补充洗白。",
+        "withhold_fact_ids": [],
+        "limitations": [
+          "未逐一核完全部34对象/全部数值，不以模型completed_with_open_findings作全稿准确保证。",
+          "同方数科的报告期整合成立与历史法人更名背景仍有未决补充，不能据F-MC-01判定2025年新设法人。",
+          "CNKI机构及用户规模可引用原报告表述，但原文未列明确统计截止日，不作为精确2025年末用户余额。",
+          "没有单列特色不失败，已在基础字段中的公司特点不为凑特色数量迁移或重抽。"
+        ]
+      },
+      "formal_accuracy": null,
+      "formal_recall": null,
+      "production_authorization": "not_authorized"
+    }
+  ],
+  "formal_S1_counted": false,
+  "production_authorization": "not_authorized"
+}
