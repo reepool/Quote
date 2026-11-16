@@ -294,6 +294,12 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** CSV and a readable export overview MUST distinguish this draft content from trusted facts; legacy accepted counts, dimensions, core_complete, source contents and production authorization MUST remain unchanged
 - **AND** old profiles without a workpaper remain readable with no fabricated workpaper counts or model attribution, and the view performs no model calls or production writes
 
+#### Scenario: Existing research workpapers are presented together
+- **WHEN** an explicitly read-only delivery view selects saved workpapers from multiple completed development windows
+- **THEN** it MUST retain source query hashes, report versions, actual model/stage attribution and fact/evidence identities, and separate known withheld, source-only and duplicate objects from ordinary excerpts
+- **AND** the current readable entry and a reference index MUST use the same selected facts without changing business values, copying a parallel fact store or rewriting historical source results
+- **AND** cross-window content, review statuses and an intentionally pending core flag MUST NOT be represented as same-version acceptance, measured accuracy, formal company usability or production permission; the view sends no models and changes no business database
+
 #### Scenario: Human reference is rendered for review
 - **WHEN** a human_reference JSON workpaper is used to check presentation and local mapping
 - **THEN** the rendered facts, metrics and evidence remain the same as the JSON and their origin remains visible

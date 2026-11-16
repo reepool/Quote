@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-16 6.CY零调用交[十二家当前研究预览](company_profile_research_preview.md)及[发布差距](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-delivery-readiness-result-20261116/release-readiness.md)：9 CT/2 CV/1 CX，371原对象/533指标中摘录266，5坏项屏蔽/4源参考单列/1重复去重，原模型7 completed/3 open/2 incomplete不是等级。12源与审核hash/266原句引用/6反例/链接、strict/diff通过，0新模型/外传/数据库/pytest；清本人14701字节脚本，旧源/有效缓存/原件/attempt及既有并行保护。runtime workpaper仍固定未正式接受的corefalse，不据此否认有内容，也不直接改true；下一主线原owner的分级研究交付及正式接受边界，再核最终同版质量和完整资源。原CT133核心112/8/13不与后段拼分，正式S1仍0/12/生产not_authorized；本卡不新增付费或另造门槛。
+
 2026-11-16 6.CX获明确批准后广州唯一后段1/1结束：[主要收入结构补回与有限审核](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/result.md)。初核/一次修订/最终再核真实3物理109319供应商total usage/0恢复/unknown、500.396工作秒，26原对象不变、2纠错2新增成30对象63指标。4模型采纳项独立3支持/1限定，“一次性”不当直接披露，主要收入构成与F30修正有据；多列6个原隔离ID仍incomplete，不算全30准确、完整同版新处理/S1或生产。三读/源坐标/冻结hash与原件保护成立，87直接36.15秒及strict/diff通过；清本人2557874字节及其他finally未量，旧源/缓存/attempt与并行保护。当前不续广州窗口、不追可选细度，回到十二家现有内容整体交付/发布条件收口；正式S1仍0/12/生产not_authorized。
 
 2026-11-16 6.CW零新调用交[广州待核画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-format-consumption-result-20261116/result.md)：保存的真实坏JSON只做有限容器标准化，原TaskService/源检查/writer保28/34对象、隔离6，三读一致，原抽取rejected/作者/hash/usage不改。独立有限核主业/收入及F30，勾选不适用不扩大为无变动；主要收入构成仍限用，未二次审核，不称28准确或新增真实模型成功。53直接20.66秒、入口1项59.80秒、234相关兼容213.37秒通过（重叠不加总），strict/diff通过；已量清本人2190520字节，其他finally清未量，旧源/缓存/回执/attempt与并行保护。S1仍0/12、生产not_authorized；本地卡结束，不借CV余额或自动新增外呼，下一仅候选级有界复核另授权，不重抽十二家或追可选细度。

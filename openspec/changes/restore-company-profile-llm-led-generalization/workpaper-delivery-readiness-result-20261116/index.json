@@ -1,0 +1,3852 @@
+{
+  "schema_version": "research_preview_index.v2",
+  "task": "6.CY",
+  "new_model_calls": 0,
+  "research_only": true,
+  "same_version": false,
+  "production_authorization": "not_authorized",
+  "formal_s1": "0/12",
+  "selection_policy": "All non-excluded primary business/product/revenue/scale facts; core-linked or one representative supplementary fact per other element; optional features retained. Presentation selection is not a completeness or truth decision.",
+  "source_windows": {
+    "6.CT": 9,
+    "6.CV": 2,
+    "6.CX": 1
+  },
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600094/query.json",
+      "source_query_sha256": "a3585e7173dc9755fcc6909a2699f8f876d824658ea284f75a1592609d221c6b",
+      "source_report": {
+        "instrument_id": "600094.SH",
+        "report_id": "1225155390",
+        "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-30a0eff8a2e60853bd72e6ad:workpaper:extract",
+        "response_hash": "f5a803398d2089c0242d5bebf01ad8df12e82325a3999f62f053eb338a7d2a1b"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-30a0eff8a2e60853bd72e6ad:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-30a0eff8a2e60853bd72e6ad:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-30a0eff8a2e60853bd72e6ad:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 22,
+      "source_snapshot_metric_count": 22,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "F22": "投资完成比例/金额按原文截至报告日披露，不用period=2025年度推定交易精确完成日。",
+        "F17": "金额和占比按原披露保留，原文年度销售总额口径与本画像营收不强行复算统一。"
+      },
+      "note": "地产、算力与参股技术分开；公司收入原文口径冲突保留，具体住宅类目不强补。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "01a7dab6ec253610136d4300ac4a0ae073eefa4c38dae0cdbad4eae917eb6d72",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "ff5d84dde353f58703726f6a0d262865bf93395841a62e350df5b496a6969e1a",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "fact_sha256": "303e2e6b79b307befa1909f12263701532f57c7f7485dc7f07f9f63ada36d177",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "fact_sha256": "f99ecadaaeee49c3547c64814e03278afc402d2e4eeadf66d9a28aaf8d7c740e",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F06",
+              "fact_sha256": "faa552fcb103acf661b293b2685c6c73473cb1b6adf79d871fe71847cb5921fe",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "44378a99bd1341945a18df206db0fbd3539bf60d5b8be91c3d9ad9cdf7a81c4f",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F08",
+              "fact_sha256": "cc558d337bb12a28dd91ebcff55d8ca33d0fee768280c140271746b9c8b649bc",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "ca9a1dd63f5e36b0624b405ff487482a4f080077b24600c91b77a8aeec8e8f60",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F12",
+              "fact_sha256": "71fd4cc783907d40f146e8de89f670d8c74a502bad94b80659e083a277c080c9",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "fact_sha256": "8d2ea3089e4f07b3cf1418e2f62344330dc99d089bd9e8ae486d59c072875a8a",
+              "evidence_ids": [
+                "source-0001",
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F14",
+              "fact_sha256": "d2e63d39771905329ec73d021d5870d4d58c5ef67d97adcde32ac8252e239a10",
+              "evidence_ids": [
+                "source-0002",
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F17",
+              "fact_sha256": "0deaa7e34f881ff6bf61cb00f7bba6faeb484d2b720df16da69e8900e31eb758",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F19",
+              "fact_sha256": "c5b49fb6d3481ba5da193704e2bfa1f337a5dad868c1d06ddc9aeb9ffe44f7c8",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F22",
+              "fact_sha256": "284a8752b62578bf33d7422edd44db2cd24fd130442f7c63f46bd164303f6bb6",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F25",
+              "fact_sha256": "6debcf8629bc4aaad14ac8f87e316e7b0e391dd29529deb9a0934d10b9cbab65",
+              "evidence_ids": [
+                "source-0002",
+                "source-0004",
+                "source-0011"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "not_disclosed",
+          "fact_refs": [],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F26",
+              "fact_sha256": "88ba45d98acf83b144f7c1aba65583d8b2fcf6edc581a37ae888306b601fc75d",
+              "evidence_ids": [
+                "source-0002",
+                "source-0004",
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "company_features",
+          "label": "公司特色与自主发现（可选）",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F27",
+              "fact_sha256": "ffd74999dbc0bba5ce3c9dfaacf617746334b376e786f9c7d0f15b6c4be4dea1",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600094/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600103/query.json",
+      "source_query_sha256": "1c391eff20b48f5b7f39eba127966d873f1d68c3facead8131ad858c3cfb5dd4",
+      "source_report": {
+        "instrument_id": "600103.SH",
+        "report_id": "1225099218",
+        "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-3a751769bc7b40e0741b638d:workpaper:extract",
+        "response_hash": "4c2f815e8e512dac33457b564c3f509fccb6f57e34a8ef3a67f85f5a83cac175"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-3a751769bc7b40e0741b638d:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-3a751769bc7b40e0741b638d:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-3a751769bc7b40e0741b638d:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 31,
+      "source_snapshot_metric_count": 67,
+      "known_withheld_fact_ids": [
+        "F29"
+      ],
+      "source_only_fact_ids": [
+        "review-add:REV-001"
+      ],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "review-add:REV-001": "金额及公司原句有源，但原JSON的issuer是母公司专用标签，引用未支持母公司口径。仅作公司原文参考，不作为母公司标准化收入或已纠正的自动数据。"
+      },
+      "note": "公司总收入仅源参考，不能当母公司指标；医药等不能说成浆纸下游。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "83a87e2b18b828671fcf455398a29d4a7a6979e89f585e984b4f3edc7521b361",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "cf51cfa418ab9e3fa6484cf78e4f943cad6e1103685fecb043e88862585fda6d",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "fact_sha256": "4c9ea5630a039398453ccfe75eb5b1860590783813b07f1365cf61702459c016",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F04",
+              "fact_sha256": "2635930c2a550623a074d2e29a77060e63e022d35a204309b706cdd82bc7df8d",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "6b313ebaca9e32b274e9768f7392b0219525482274335cd729c1d050eddedf4a",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "fact_sha256": "f87965b754c63db0d9bff69c9c812e8d4cd89f49ed7def94c07e5411c5d0518d",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "18b36453310b6ba5b32d81d41001402e3fd71b1b89eda77e2e9964347f0da192",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "fact_sha256": "911bf75826d271bf3f195a9a61075df8283bdd54d25a46d2bc300181cf719622",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "fact_sha256": "ce88f07e30c57dba97d14e3b7ea522879c03cb0353a027f231b06d3c9513d18a",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F10",
+              "fact_sha256": "93331f9ac1b14ecbbc2c5e1a15ebc6122aab13613c759b766c5ba555cb577ebd",
+              "evidence_ids": [
+                "source-0003",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "fecf94cd1b72436b20635b8f7f082a95a99e4207f1a9fe1e11ebf5c784719bfe",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F13",
+              "fact_sha256": "398dbc333aadbd612ee2bdfa861e8d73dd7535046b67af5eb43a0032275374db",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "fact_sha256": "d46d8ab44362e3d9ed542c0e64dfcceddbe4f94dfb479d753c99734a628bc1cf",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "fact_sha256": "8a016205fb0a67f5b0c88ef82835cbadfdeeebae7fad866b5cd465197769660f",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "fact_sha256": "2d19074fb7e9de4f20fac9daba6d8a9a9d69f8370d31ed96cbb38d69d1b44fc7",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F17",
+              "fact_sha256": "fe463b9ce5fc4e31227856bd1abd4ea0629182f36564fbb437893c6cf9655c24",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F20",
+              "fact_sha256": "285d584c755bb19e60076efed31214261ce7d69b5509a6c899308a8246e81fc4",
+              "evidence_ids": [
+                "source-0001",
+                "source-0010"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F23",
+              "fact_sha256": "e7449280232849c6a1e40c761c03274be06563120b54cf68adaa85f5812abcfa",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F27",
+              "fact_sha256": "9aa4a0b7149f63756090f4ef62955f5f393d61ab80cdd1ca3b32a03cae7e2c24",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003",
+                "source-0010"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F30",
+              "fact_sha256": "454ae7af6e3cee922a4f32b20506aa9e591a47bb6b868aaa24396cd063c56ded",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F31",
+              "fact_sha256": "3b7d47be117961ac68a3ee73ddfca56f8e1c758906e8234f91cc6ecb6ec7a7af",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600103/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600100/query.json",
+      "source_query_sha256": "0fbbfda7547baf588d5b1e53946b479bbff7f6c88328c0ef939b0ba767613571",
+      "source_report": {
+        "instrument_id": "600100.SH",
+        "report_id": "1225244797",
+        "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-8e4dcbb755846da093c24eb7:workpaper:extract",
+        "response_hash": "88334528963194f780e975ffb30337526ea2df31ec6919dadb2d9ee4628af8bc"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-8e4dcbb755846da093c24eb7:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-8e4dcbb755846da093c24eb7:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-8e4dcbb755846da093c24eb7:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 27,
+      "source_snapshot_metric_count": 30,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {},
+      "note": "公共安全、数智产业、智慧能源及内部抵销分别表达；没有单列特色不失败。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "797f4e321bc2e259261e32e1d3fccad0ae5cb52bc519e7a5a26f8602cdd145b5",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "ae9072ed5a802db0b76a030019911945d9328d6d825f21f96f575abd702280f6",
+              "evidence_ids": [
+                "source-0018"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "fact_sha256": "48ba340eb9fb0d7e71bcfb20c0e35607c6bfa7216b39a2fc0c493e68d02e9a58",
+              "evidence_ids": [
+                "source-0012",
+                "source-0018"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "fact_sha256": "b681161001106e7b7a34acae98a8f8a4f3fd17857e6e374a76509c69543736c3",
+              "evidence_ids": [
+                "source-0018"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F05",
+              "fact_sha256": "5df6b7452be796f1c77ff613c5c762c8c2102c05f3e05561e9cb22d74143883f",
+              "evidence_ids": [
+                "source-0001",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "fact_sha256": "2962ae3a7707b09a6bc2be0f9ece1ce71316ce5c248731c767bbbdd0af97b5d8",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "4f0720ec87845864213a65c56161e68a63d52e5faf6e9a4236dced3b392e30ea",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "fact_sha256": "2df259c76ddca15e6abf52f7cdf02e16554380e16be588ef7aab4908cb5337d3",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F09",
+              "fact_sha256": "d481058628dafc828ac0c97e5bcd54a1228ff54adf4ca15ed3413faa394002b5",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "af53d36d964cc679e9f5944231b6342253f4adcfca81c29fde1ed1b4fce7cb73",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "9677dd22e1ea848141724fc83887a4055c192bbb8f524764b06073b3b55d7713",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "fact_sha256": "cccd6c1f5493d5967f402810e7dc4ba1de3ab7ae45165c243c5b044863aa04f8",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F13",
+              "fact_sha256": "622b63099eecf30053dff751d993c88cbe92b83ae901e3da623e4da733081741",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "fact_sha256": "e1d1620125e9f9886b9af9888222a132481395d542dc52553bf6fe97f66ef015",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "fact_sha256": "c635577bd39e339c2d45b9319b2242bd71c4013bec53c55cb1caf4f49419a190",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "fact_sha256": "d63ed6f1df61a5f5a6ccc0905ab6b0504f373664e91554220fae72d20d3c2b71",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F17",
+              "fact_sha256": "c5ce8f5bbf9e2b5bf2480df42b2631ccc23e2f518db2012f19e3c3e9c1712c13",
+              "evidence_ids": [
+                "source-0016"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F19",
+              "fact_sha256": "9a5620bab676e6b7f2975774abbd43663df2feabac16c9931bdbda464ce1130c",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F22",
+              "fact_sha256": "fdf1ee3c7c74d5827fa5b9548c5b34cdd9cccfb263700e2682332a3869676f96",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F25",
+              "fact_sha256": "71ba5de998c51ffa0aa416ceab3feda942b2a663ef2effa38cfc212c597c3c2b",
+              "evidence_ids": [
+                "source-0005",
+                "source-0018"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F29",
+              "fact_sha256": "a122125681d7d443c3f428218b70470b1607deec88ca973d3a49d9930a1b4bee",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "not_disclosed",
+          "fact_refs": [],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F30",
+              "fact_sha256": "e63d5841c52f7c9097f1f393d81789a00c5bee172d55cfb413a3129c8d469b1e",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600100/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600107/query.json",
+      "source_query_sha256": "26bfe75fee9581b195212d8f53b8458100eb98fb0186a447e93534f9c88682ff",
+      "source_report": {
+        "instrument_id": "600107.SH",
+        "report_id": "1225264726",
+        "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-0e2295de56b86b1c0309c793:workpaper:extract",
+        "response_hash": "c3e13143df64c4d1d27dc0cf3ff57e4d1616382e4785da51e442c5ccef094848"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-0e2295de56b86b1c0309c793:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-0e2295de56b86b1c0309c793:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-0e2295de56b86b1c0309c793:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 22,
+      "source_snapshot_metric_count": 38,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {},
+      "note": "医疗收入空栏不说成零；股权处置时点不强定，亏损同比仍有缺项。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "a7253ee3d382f11860be34640633aa75664f3093a6fe39b144bd4fb68eb3ded4",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "a6d92edece823a0c9b66ec3685dcfdb9359de0070820d819c8cc1aceb9f62282",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F03",
+              "fact_sha256": "97e92f0c133b0b321179e29784689c5f6b5f452cca37867b47ef9a8fdc71e24c",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "fact_sha256": "0fd7591d41f6d0517df04b4149238df38e372e228cd23df52f9da98d38e925a3",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "cd1c45727a909b5d719b77a24b1b0c0d3cc5b9a3264df574dd511acc22775f01",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F06",
+              "fact_sha256": "f9dd47fa4030cd2b40ce88c680cb247cefcbc7d78709b7769358110c60ed2df2",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "ea01408cb9cf7c08ac7fd41f6d76902c2eccf0cb075bda9c21cc59dba0ae6867",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "fact_sha256": "e9aa5b00ac42fc7c4d49373f31221640d97add201c0d7e1eb08fc335a1dbcc63",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F09",
+              "fact_sha256": "cad10a51ea271afad9fbabfafb6719dec0a30c53d534cd693d8dced4a378a174",
+              "evidence_ids": [
+                "source-0001",
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "72153a8c129d83112372b165c64087b843e7457d160b5bfc5b17b626e00119fe",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "124cd205ca89174e0b8c489504b0cb6d63bff81d2c45036eda48497b39ccd7cc",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F13",
+              "fact_sha256": "391b52cb5a8f6c509f8179d7e621757a51e293702f717afe571636dd710bea09",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F16",
+              "fact_sha256": "f9ee033bc7f11b97eebf2cb642b8166eb036226bed952d1daad873a3095d486e",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F20",
+              "fact_sha256": "a278d77b4ef3a7466dcb3a28e14e4b554a6265f45e9d0fc7328ba2a5965aa731",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F22",
+              "fact_sha256": "5a05d06adb8fa3ee9a6cb9836c45445169297a1d32007be72c90d7b2677c2349",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F25",
+              "fact_sha256": "fc3c48015f2ff71d25c166197fecb56d133f35823ccc24a1043bf44703276fe6",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "not_disclosed",
+          "fact_refs": [],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F26",
+              "fact_sha256": "eb145a675a3b7d449b9afca504798731959aa18830c22843efd493a16f1b94f1",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600107/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "source_window": "6.CX",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/query.json",
+      "source_query_sha256": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+      "source_report": {
+        "instrument_id": "600098.SH",
+        "report_id": "1225103737",
+        "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-14T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/independent-audit.json",
+      "audit_sha256": "4e5e8228a59e25348873716a6967894489b53d84dc743949fb1ec871a99d16f2",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "rejected",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-24b64f62bcbaebad8c0a42ec:workpaper:extract",
+        "response_hash": "6465c28c656dcc7c592b9f3b6b5a13971d8cf48748f7095f2d707c461f4ca8bf"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": {
+        "policy": "terminal_object_and_root_fields.v1",
+        "original_content_sha256": "6465c28c656dcc7c592b9f3b6b5a13971d8cf48748f7095f2d707c461f4ca8bf",
+        "normalized_object_sha256": "426d294ff7156c46cf3611beee4d4ba5a3b9f202e0c2a6b5403fd46eabe661bb",
+        "operations": [
+          "append_terminal_object_brace",
+          "move_elements.limitations_to_root",
+          "move_elements.company_features_to_root"
+        ]
+      },
+      "review_status_not_quality_grade": "incomplete",
+      "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F12,F13,F14,F18,F24,F32",
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-9fbf1d920a183cd928bce266:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-9fbf1d920a183cd928bce266:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-9fbf1d920a183cd928bce266:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 30,
+      "source_snapshot_metric_count": 63,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [
+        "review-add:WR03"
+      ],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "review-add:WR03": "金额/变动原因有据；一次性收益仅作模型解释，不是报告直接披露或土地交储单项金额。"
+      },
+      "note": "主要收入结构已补；初核多列旧隔离ID仍incomplete，一次性收益仅模型解释。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "a9262347d69bed88dbd795148e4969ce5cd36d063feffb62cb19145cadc3d2ba",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "4771fffe2b702ab7da77334e084287d991b3532d2a959cee0368cc778ce4d2e4",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "fact_sha256": "104f46115caa029126baedbcd026fe47d8c7e2ac0f65f6ba337fb973ecefb4e7",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "fact_sha256": "eb97aecc586bcf53af33e410fe5b8a19d7b5b838228534bca79dfde8cb19b717",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "8707492624e88c8de9c456ce7416b791b9d5b6293fa82b135ff4174e2a80086a",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F06",
+              "fact_sha256": "63acbafa4919dd89937f71d5fe17e94f82af915ede562a9dbae5d6618cec5a87",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "dd66704c7025c17a98d40dc7aae33691c2f92ba8a03d0b9a951328ad699144c7",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "fact_sha256": "2866125ba4581887ec62c086f4b10d3e5824f69a02dee65de7afee031f9f3c8d",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F09",
+              "fact_sha256": "b77e830892238bbcfecf56c4d3510d328ff4474f7e294373e1d3600a77c7bdf4",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "2071da6ba465f2dcad822086c841acc9dcc81024f3e51c7778a31f8500d2d9fe",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "a1e5a28f726a62613762d7faf214a78604f0ac7926f3b42907f3f2c6e10ba78f",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "review-add:WR02",
+              "fact_sha256": "ff5549e8a2229a4e8017ff0033550f56855edacc84b5b1dfe390983ba8cf29be",
+              "evidence_ids": [
+                "source-0011",
+                "source-0012"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F15",
+              "fact_sha256": "38e1340d0c682254417f51303529f9c0a4c2d10bde11bfed6286ee1fda5cae4b",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "fact_sha256": "92fb6fb330b05910ca7911b1506d0c74b277130c968e47f3a95e99aca31b07e9",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "fact_sha256": "1fbd5921121d771dade85ecd99c4522cd8e1339ea35811151089e998c564e58a",
+              "evidence_ids": [
+                "source-0023"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F19",
+              "fact_sha256": "816e2b7643e2498dde2244ded389231b8e8e4e9d211de8a2a3cbeb7c9475e97b",
+              "evidence_ids": [
+                "source-0021"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F21",
+              "fact_sha256": "8b6cdc62b4fcf2a35e2ec1b02f96cbf40811d153e44b27d9ecbabfb77a6fd765",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F25",
+              "fact_sha256": "b238213ad9d319c9a1b22ca278f3526ee30db2f2a009e5abbb2744b0c08ade05",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F30",
+              "fact_sha256": "fcdc744f26b23422c4648a8816c90baddb01255f2d3afab303d47194ff64f435",
+              "evidence_ids": [
+                "source-0011",
+                "source-0015"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "company_features",
+          "label": "公司特色与自主发现（可选）",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F33",
+              "fact_sha256": "9a58aad28e9530fc1e98e97b2c9490ef668fdf6c286e0f73bc4682f0876e6d10",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "fact_sha256": "00064ec9f26653e39289b76d69031209b58e2fd167f47b59db6face623a83801",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/budget.json",
+      "resource_scope": "continuation_only_not_full_company"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "source_window": "6.CV",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600104/query.json",
+      "source_query_sha256": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+      "source_report": {
+        "instrument_id": "600104.SH",
+        "report_id": "1225071780",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/independent-audit.json",
+      "audit_sha256": "0418d6afe87cb6ebbc665531d0a418fbf9e3c90cb1b5b4bd8381bc3a770eecfc",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-e953bfa4c98f963e8e2c9c0c:workpaper:extract",
+        "response_hash": "e83ee4962f459e637b3fa46408f24127548aafe96cc8609e6eddd1139a8ae01d"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "incomplete",
+      "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F19",
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-e953bfa4c98f963e8e2c9c0c:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-ddb8b8dc89cf1e05bc733df1:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-ddb8b8dc89cf1e05bc733df1:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 38,
+      "source_snapshot_metric_count": 49,
+      "known_withheld_fact_ids": [
+        "F23",
+        "F37"
+      ],
+      "source_only_fact_ids": [
+        "F38"
+      ],
+      "duplicate_preview_fact_ids": [
+        "F13"
+      ],
+      "fact_notices": {
+        "F38": "原F38的完整名单未被自身所引第18页覆盖；第19页原source-0014补足名单，仅作原文参考，不改原引证或自动升级为标准化事实。",
+        "F10": "贷款业务及金融板块收入有源；利息/服务费不作独立金额拆分。"
+      },
+      "note": "产能合计和无据客群不采用；金融公司名单仅源参考，收入重复表达去重。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "900beca9dae2009f2ef46af076ea114c96e9a4afac4bd44c0916e6484cef5662",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "f068e9c4b4e146ace95b3fd5db4577f550ca2f3ac30d7a90179156c10d29377f",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "fact_sha256": "c0dafd24c9cf4e2bbe4e39f709d97557984b2fb0fba92c73ae033365a7a454b2",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F04",
+              "fact_sha256": "ca5760e4feaf0766cee02e32df78c79d127a73c5d6948ba6fd941c8e06a65e98",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "eeab53a490cc14494d8efb69763a0f79d78b0efd84b7d2643b7605aaa954e7fe",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "fact_sha256": "b02a4e431db1d42ddb05b27705595ea088ccd98b9bbd9af167592b260da799ed",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "f390d1152f0f812dedaa4148f550b7a487c8b574aa7cef488f43612a97691c52",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "fact_sha256": "7336341e02b4395cd9cd3124070418aacc10646d065a191bac85331037c5a820",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F09",
+              "fact_sha256": "488e3d38d9392e79b524f25c67f7f974e07b54df7dbe7908f1d684eecac806e8",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "082025873bb687c2f1f1810aac3390204c6f646f05e33cd58ed57c7af5b0ca07",
+              "evidence_ids": [
+                "source-0006",
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "2c86df4043f44d2631750c4b291158da82dd41644de43ec150dd8e0e92392da1",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F12",
+              "fact_sha256": "3b67343d67cbe4b25a64566d0e4c091cce0bcd046dcd0526a9733cb50729c4ca",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "fact_sha256": "e05de8be41e72ab92f10e18b640ee6fdb7dbb7238f798bc39a1713f2e34f34f2",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "fact_sha256": "77ab63b31ee55e9ba141e6e5cd9ad51524477e00de5374311ca2f45193ba3053",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "fact_sha256": "108c2fa1ea7e57ede64ed9625efa2367aadbe20c8e0a74f3703679ce3034ce2a",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "fact_sha256": "43637319258a4192859a7124857b84603558c6081eec242735a4cadf57e1a795",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "fact_sha256": "84766873a2b40ee1e10bb4e4e4528b70944f8edd6380c08c40dff12526acc93a",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "review-add:R1",
+              "fact_sha256": "438134f7f19e8af28d090c0f8cc648799a458b088385d7496db05afde6449c6a",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F20",
+              "fact_sha256": "12679f6d7f5bea9fd9a93dc88061a20fd55e10e818c77d705d873cc5c22fbc4d",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F26",
+              "fact_sha256": "8ef9656c4d5662957f2fcd928b23ec6bd73b10517b861d8509585bb625da51db",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F28",
+              "fact_sha256": "6622ae469db9d9488ea6270e9b24d6812890c51ea8c94f1085bdff786dc9af7f",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F31",
+              "fact_sha256": "066010ccfb043afd9a262c2039b7cd17212f4ae0f9e419cdbd007d4467b476e0",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F35",
+              "fact_sha256": "ed08c2c07e594e699de50848f11e112c5570abaa1cbf3b010077f78e3ec6acd9",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F36",
+              "fact_sha256": "42eefc0357fbbe3ce107d7a4f4ca0aac10dc6a227d227c900f83d1b401150f87",
+              "evidence_ids": [
+                "source-0007",
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "company_features",
+          "label": "公司特色与自主发现（可选）",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F39",
+              "fact_sha256": "d3ecaeab763f4035d4bdbfbbf6ab92c7e7e07cecd8f3075f039f8eaf993c935b",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600104/budget.json",
+      "resource_scope": "continuation_only_not_full_company"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600088/query.json",
+      "source_query_sha256": "8d95443c7f898a5c8ca34a5c45f4ffdbfc2532ecb4854a77c412ef041540bbb5",
+      "source_report": {
+        "instrument_id": "600088.SH",
+        "report_id": "1225118832",
+        "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-9d464474dc16d245b3ab9d2e:workpaper:extract",
+        "response_hash": "b28d86a7c062bf948fa4660d2b7937925c6b324532e6930ee836d08b23303fe1"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-9d464474dc16d245b3ab9d2e:workpaper:review",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 34,
+      "source_snapshot_metric_count": 40,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {},
+      "note": "影视、旅游、广告与基金业务分开；基金营收不等于投资收益，未查全报告。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "d3034bcbe5480457cddc6ab771162a83063fc1a1c1ef53e5b5899486b1927f7b",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "d0374f988cc841bb5584b0136781a07ea038429d652f816dee526cc1ffa626e7",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "fact_sha256": "f84670f33e18901a5870679a22ca05ebc3459cebf94ad1c3a86c5f9cbe9bae77",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F04",
+              "fact_sha256": "d5ac5378c4d9655579c9a19ea5d95b4b032a42889079ec01b5f9d846be7e72f4",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "8dd62d3bd72926e913db28ec9185cec37170dfcca2d5f2f2e5f13b130e8311ee",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "fact_sha256": "73d5bfa9aae77e2992d922cff85fd469ca09b7b0570c4c1196779231568d5724",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "507408fa7ca8ea53b0f199ddb3418aafa83ee1b57c8c4f0fb45a8f64cedd03d2",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "fact_sha256": "4502048096def1783a3fb0d48339dfedf436fc4247f0e8fa5f66422de3d9a855",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F09",
+              "fact_sha256": "2fbbdd7e12e4039b69082859a7a6a28abea660628cda4c1517a78c1364faf4b9",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "00626fad196ee009e455335895eaa5d2abc272d87de5613ac601ac3fa35cedb7",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "84c0c602e999340a7bca83e09aea7ca4175b27fb8a2b3a277e3ec3a87f17bb40",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "fact_sha256": "2111add82221a1dd93d12db1a0ae3e05c0eb82c04720ad888de32f259acf3600",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "fact_sha256": "09edb11fdc91e5359cbf98446c8fad96619bd113a70323d5e3c11bdf12dc24f5",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F14",
+              "fact_sha256": "a2286b1eef044dacf371ce882c03f3c299e52f701b4a3a824305cad01ecd55fb",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "fact_sha256": "d7f0f9ff064073191932a01d3d1bf0be5e258225ab44c096760ad6630ece2aed",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F16",
+              "fact_sha256": "42530552871d06bc3b0a40d3df617dbcefaddc0d264ace5b13df5a69260f31b2",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F20",
+              "fact_sha256": "f3918b98bcff726b0f13ea303c87c1fd6d4f92e36cb1ce00475d9da8802fa941",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F24",
+              "fact_sha256": "7cacb82232cd1f96cbc7effad1794ed855da7798d00828269eb17a2743708960",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F28",
+              "fact_sha256": "2505d0a5eb7f9281444ae19e833794b3703c90a9ddc416ceac39a4e9d3d7e15d",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F33",
+              "fact_sha256": "0d6f15a8ff8f013d3eca879185e782a1af530ce3dc973d18916c9323d86e51ac",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F34",
+              "fact_sha256": "d2b235847a4c0aec3ea9cce2d4240b0b52b213e4a92e018328f37684c791b821",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F36",
+              "fact_sha256": "eddfdb16731d19fc93bcd4ea1b412a7784610368d903c30beeec3c43256e45d2",
+              "evidence_ids": [
+                "source-0001",
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600088/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600099/query.json",
+      "source_query_sha256": "e646bfcbbb84c86d707dc3282cf7580779eaa11dd0745b1a9ce8d20ab4dff05f",
+      "source_report": {
+        "instrument_id": "600099.SH",
+        "report_id": "1225042363",
+        "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-d0cf2aeff72324c12bfb1462:workpaper:extract",
+        "response_hash": "ae39fdbbf898d54544129155ee275115fcf31ca83666ab14b63fd215fc593e2b"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed_with_open_findings",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-d0cf2aeff72324c12bfb1462:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-d0cf2aeff72324c12bfb1462:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-d0cf2aeff72324c12bfb1462:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 28,
+      "source_snapshot_metric_count": 48,
+      "known_withheld_fact_ids": [
+        "F16"
+      ],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "F28": "本条原材料比例按四板块各自成本列；后半供应链优化措施仅在农业机械段落披露，不外推所有板块。"
+      },
+      "note": "农业机械降本泛化对象禁用；地区修订未通过不恢复，原料/用途只作粗粒度。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "3cf19e799f92c395d88687d23a1f08e96458f4260c1b8d7cbd6f0900269fe4f0",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "539a2eae33bafa8158fdc8ea62502004ab403f9d92cbdcc534456808f5437635",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F03",
+              "fact_sha256": "51561fa7585db0297a94863802a12847a5f2cf676590acba79c0af87f389762d",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "fact_sha256": "5f657a44f341e3b6d73d1c718db80a7cf668e012f3c32f922edd3ec32e16dd07",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "97ff2ad4bea95c657780db58c7adbd9693ada16d1c3b16fe06de7f616d32a8a5",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "fact_sha256": "b09b5765ecf4cdd73d611cb1776a11c4a0cab123a2500012e016aad5cfd77c84",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F07",
+              "fact_sha256": "1a41bf01079e1d398b88fce2a9e09a4ee7c0fe58af8a922d42e256731e87f0b4",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "fact_sha256": "1785ed7e28f883fa19dda6c8196b6d716e94a77fb34c77d1735e93f4c0f62639",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F09",
+              "fact_sha256": "dee3837a9f686184defe1f1578e87d94a976ddc0afa53e484f90eac131527a56",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "78da7549578b9d098eedda3e159407804d094b34e8601ed87854d65f9e116d45",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "1354fc485ec456fa634501d22f6f3b26af2771d2b1b1645d9258e56d8100a5bb",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "fact_sha256": "0df37f75f406e5962a5bed55e255c96e6bdbbf95a38917ed537c0eaa3c7811bf",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "fact_sha256": "b0a8ce44c524284c7e3ea68f5d684348d26d899e8ee47d86117fb501b421ff41",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "fact_sha256": "8714594aee492a87c5c91184ae2493b9047263a70593542a9c4fcab32da1e93c",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F17",
+              "fact_sha256": "63ca1df684195ca54a6ea785ce43ac3cc15d023f05f74c87765ddf4ae972fff6",
+              "evidence_ids": [
+                "source-0015",
+                "source-0016"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F19",
+              "fact_sha256": "baa4fd3e06295b7a18fe859e80b4a719422ab55f2e6039b794a645cb1cd3fc4e",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005",
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F22",
+              "fact_sha256": "7ac6d4195eef13ca36854aafcacabd540c37fc51be860d6b83f73e493d2e54e7",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F25",
+              "fact_sha256": "ccd6e583cca583c64bab7c7f9466d779e92af9abfdf5a069f3b48703c87f70b6",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F27",
+              "fact_sha256": "e2de4f0e0978b4ac61f7a7f9def62b8a104c6cb6750704689f77bd3935ca6802",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F28",
+              "fact_sha256": "fa594d127758e5c9194dc3ba8c0e110222ffab62451fa848ccbd68acac72efbf",
+              "evidence_ids": [
+                "source-0015",
+                "source-0016",
+                "source-0009",
+                "source-0010"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F29",
+              "fact_sha256": "e910de7901ba2e7093061f5830f686b27cfa28b23c488cb2fbb7dfbf64708711",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004",
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "company_features",
+          "label": "公司特色与自主发现（可选）",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F30",
+              "fact_sha256": "0b575ba788d64b11e8e902c56da640043c79e154678485fbd6c36bcea21b8a7c",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600099/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "source_window": "6.CV",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600082/query.json",
+      "source_query_sha256": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+      "source_report": {
+        "instrument_id": "600082.SH",
+        "report_id": "1225246039",
+        "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/independent-audit.json",
+      "audit_sha256": "0418d6afe87cb6ebbc665531d0a418fbf9e3c90cb1b5b4bd8381bc3a770eecfc",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-81d3d4770b538fdccef95cb9:workpaper:extract",
+        "response_hash": "656740f69746e870292308ffebdb86e48d55a899aec053622177cfacafabc6a3"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed_with_open_findings",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-81d3d4770b538fdccef95cb9:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-cf41933e7f10818573915ac8:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-cf41933e7f10818573915ac8:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 28,
+      "source_snapshot_metric_count": 25,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [
+        "review-add:RF01"
+      ],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "review-add:RF01": "金额及原因可引用公司原文；原JSON的issuer是母公司标签，原文不足以支持，两个指标均不作为母公司标准化数据。",
+        "F09": "毛利率变化的减少方向在原文和正文明确，结构化29.68是绝对百分点幅度，不作为+29.68的有符号增量。",
+        "F10": "同理2.21为减少幅度；按原句使用，不强求统一有符号数值。"
+      },
+      "note": "资产减值补充不当母公司指标；关联交易minor补充仍未决。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "2d062ae9900097b803da3448305ac74a34746b01536b90e837a702adbfc4276e",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "5a4e5cf5dba4ee3f7a280d636160cb83d3018f60a106b97cde8dd9b1dea9db19",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F03",
+              "fact_sha256": "7eb1681dfcdfddb40c55c4b610bbc688f232fb4cab6ad3bdfb834320a2ff9767",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "fact_sha256": "f803dfecda82e8836afe75544dd15396b944ad83cc954adfefa70cfadcf7d940",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "de49d1afd39a47ef01902cae0e132be8597119944173aff926fbd0b39195c066",
+              "evidence_ids": [
+                "source-0001",
+                "source-0017"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F06",
+              "fact_sha256": "b378b3df0dcbd413db1b2760f42898b2efc2f73c2be39cdf745bc495b5bf1624",
+              "evidence_ids": [
+                "source-0006",
+                "source-0022"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "2a6b4575b27a1627b846d1eb4bc7cc307854ce418fb1d03657abe4936f54b250",
+              "evidence_ids": [
+                "source-0021",
+                "source-0022"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F08",
+              "fact_sha256": "92d29f0e54a780fa8595ff815ce979c53021ff4b7519f0d467886eae1921e636",
+              "evidence_ids": [
+                "source-0004",
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "fact_sha256": "d0ea6c94122d027be6575dad838bccae199191ff3da596be22c37e185a00109e",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "f3464119c0fc9464ee2fb9c289ca40c7eb4a4ff7e3f3e3f4373e1ec5934cbe99",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "fact_sha256": "4f46555fac29ccb1ae4aed8a56be20ae9d630a62df69673c4bb883341c24626d",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "fact_sha256": "6ec160ddc1c82cce6cbf1628239ab8a6b5c6770a27aeab1d53878860381e437c",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "fact_sha256": "4bb957333464903fe961c98ec5b5241f8f1255a6e72dcbf0cdf29185fe4fa659",
+              "evidence_ids": [
+                "source-0021",
+                "source-0022"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F15",
+              "fact_sha256": "89fb8f93d1b99082703c6d28a40145b8b43494a2a582b0eb9a8fe8d4b92cb7a4",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F17",
+              "fact_sha256": "01f662524a55a6571a74a6c59f3b6c9f66d9f2bbead80466bb161bdaa5458779",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F20",
+              "fact_sha256": "fc625e8132e8086b88862d205668b5e6b585020d4a06c3f41e183fe1a3374ec4",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F24",
+              "fact_sha256": "717f832d6f2c348a31f9bd197fd606df292541212ea6b62e2ed7520841513a68",
+              "evidence_ids": [
+                "source-0008",
+                "source-0018"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F27",
+              "fact_sha256": "122f461fd3e61e1c16575e9fd49f41c34c9361026c14438c4479e4fa476d697a",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F28",
+              "fact_sha256": "8a494e30ec550a65dec8a9685449df3d0973200a825bc4c8925979f19ecd39c5",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F29",
+              "fact_sha256": "17a59d59043acf93df4a7a4d34c3285f3066f2d9ba51f2234228c11ce4e38e49",
+              "evidence_ids": [
+                "source-0006",
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600082/budget.json",
+      "resource_scope": "continuation_only_not_full_company"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600097/query.json",
+      "source_query_sha256": "3cc80fc09457cf0aab4f1f1d3810a3fd550b1398e1ee5778414cfc9aa1badc55",
+      "source_report": {
+        "instrument_id": "600097.SH",
+        "report_id": "1225039976",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-fe797a3e30d06291deb79f38:workpaper:extract",
+        "response_hash": "097a9f8304b632c680adca0dd69a2f58830f797e499b9db35f18aafc2dcf9c38"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-fe797a3e30d06291deb79f38:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-fe797a3e30d06291deb79f38:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-fe797a3e30d06291deb79f38:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 32,
+      "source_snapshot_metric_count": 34,
+      "known_withheld_fact_ids": [
+        "review-add:f-002"
+      ],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "rm-06": "零星鱼种按原表名称/金额保留；与叙事磷虾销售额的对应未由原文明确，两笔不自行相加也不强行归并。",
+        "oi-04": "为合作经营深蓝轮的原文披露，不推为公司独立自产；与零星鱼种增幅不强求统一。",
+        "sm-04": "56%/44%为原文公司全部营业收入表述，分地区表自身为主营口径，保差异不自行重算。"
+      },
+      "note": "零星鱼种不自动归并磷虾，内部转鱼不当外部销量；无据补充禁用。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "bs-01",
+              "fact_sha256": "7c78827bdb6db2aae37c8dee51c3bb294dabcc9e40d63676b57ad3a337809e37",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "bs-02",
+              "fact_sha256": "419216d54efc402400748048ac8237c6a6fce55d6b75d6c2d0011145eb4dedc8",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "ps-01",
+              "fact_sha256": "067e0cad6a64ebfa778119224cee2ff0ac811b5110d84d655b2ddae8df8ae9f0",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "ps-02",
+              "fact_sha256": "a962489a2a684d7e52d937ef20e1bd5791a98885898055dd1950323074671de5",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "ps-03",
+              "fact_sha256": "22fc0bb29aca9119d6de336329017a0bb97710f7e32a8199a2736b37aea249e7",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "rm-01",
+              "fact_sha256": "ff4d6a0e271ec60e24328471e78e1c17334b7099a358d3d30a7d8e9455d11cf0",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "rm-02",
+              "fact_sha256": "29cdffb7eab9c3899b16b446304e4c1323ae658ca501d4887917c44054be4756",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "rm-03",
+              "fact_sha256": "44decb28d9b102847ec2c6b3275ed720dfa72b92ce5fc410aee940fb8a2e68de",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "rm-04",
+              "fact_sha256": "63627bc35bb93d3875d8c855c64a9002d236955eac440ee6894f42274423dae4",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "rm-05",
+              "fact_sha256": "833c2783fa8ee9ceaad0356d03b6b07591c175e464fef2fa93ebb7a542ba2579",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "rm-06",
+              "fact_sha256": "e7cf57c84b8d84b81d42401723bfa6d2af5c2375ab5395de637ee0c58d7b7bff",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "rm-07",
+              "fact_sha256": "f78ebac98da209fe106930d60fb0bc329c90769551d6b92ee042114e7598cd13",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sm-01",
+              "fact_sha256": "c222aa62732dfbc1312b82d0db8847a5c239f7d51c10da3a06d1b60c0f00f58b",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "sm-02",
+              "fact_sha256": "0372ce9a01ff0b248d5f553b2d3348c2b0320ba34921082d06843e8aa132f833",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "sm-03",
+              "fact_sha256": "b206f7173b7c17fb7637eb505e0a006f5f9b7807fdf1758f1cc9f38fff6d6bdc",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "sm-04",
+              "fact_sha256": "6a10e2a570c01fce75c649879d354edccd5b66dbb943f25b85d244048f7cf544",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "oi-01",
+              "fact_sha256": "a223a5c7f6b520a28f3bfa8176ecf8e35c6b08d709836daeecba3e182c63fb8c",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "cc-01",
+              "fact_sha256": "dd52ca888d28b7d7dcd325ee5931c55db74ee98097189de7595aaf0b24c2d1cf",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "cc-03",
+              "fact_sha256": "7651c782aa687d81afb0caf0c93d71b3a0037e66bb3239ddf9d531df54d9a0b0",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "od-02",
+              "fact_sha256": "cb96599ae59cc6b5dbab53332dbcf942005bd37e703eaff7f1e76d57c37e2cba",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "mc-01",
+              "fact_sha256": "66ed31103caea733f575691a23e6f9559b5c5b214f1e5f743987b97fec708f9d",
+              "evidence_ids": [
+                "source-0003",
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sc-01",
+              "fact_sha256": "f3e8cf63ea7ed637d72e3198fddfa3ff3416fa43a241bb49c3c343cb82f9e5b4",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sc-02",
+              "fact_sha256": "a11302e2a3ee781b19c94be739adf0ccdd5e4d8e5bdc349c0876890c7bbf4d91",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sc-03",
+              "fact_sha256": "9591ad110a66ab7a19349ad496ce8809128fa9822f2431689300a1c32d115ce5",
+              "evidence_ids": [
+                "source-0005",
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600097/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600054/query.json",
+      "source_query_sha256": "e1df8a98a74216fa22236f0a640cfb2cb401968426a5a806450904b30fc164a4",
+      "source_report": {
+        "instrument_id": "600054.SH",
+        "report_id": "1225118314",
+        "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-274b2ea4aff8f5378152fd5c:workpaper:extract",
+        "response_hash": "a72d7169d8a7ac60a63f677c4dd2cf6a235686e622b445e5768f3a719b1f745b"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed_with_open_findings",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-274b2ea4aff8f5378152fd5c:workpaper:review",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "source_label": "deepseek:deepseek-flash",
+          "request_id": "bp-work-274b2ea4aff8f5378152fd5c:workpaper:repair",
+          "contract_status": "accepted"
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-274b2ea4aff8f5378152fd5c:workpaper:repair-verify",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 41,
+      "source_snapshot_metric_count": 44,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "F22": "附注是分部主营业务收入，集团营业收入是另一科目；差异未在本表说明，不作为来源矛盾或强行推导补齐。"
+      },
+      "note": "归母/扣非利润下降背景仍有遗漏，标准与测试保各自原文限定。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F01",
+              "fact_sha256": "f85c708a3d2ed17b28ffcf6497cf9ece7eacdc30c53382f90504d475a29f6c2e",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "fact_sha256": "9e5e9ad6b58e18d7116403c9744778e2a3013afcb4cf265bae42b111b4812ac4",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "fact_sha256": "20092a0a80daf3aa42133c599724fbd130077fd36ba2badf137d14e1c8962ed6",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "fact_sha256": "93abaf4e3aa65e5d3db78479c54862bd660503800127e2dbd312980a8cfab25f",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "fact_sha256": "6f690893de5c22bd105102aa1fbfef78f4fbfd593dbd964092a3336c71f35bc7",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "fact_sha256": "f642b2d4e58cf15d8ba24f680e5bec3aa78918b3182ac69eddf698b7e924a74a",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "fact_sha256": "92c8171d000f229b3ce5eb5e7f64b4cff18e562bd332ef73e4f505bdbfcabd43",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F08",
+              "fact_sha256": "9b25fdd9f62c582cbd41d666f70c1c36ea34ada2b9c64105a5899286b93871f2",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "fact_sha256": "7b71137d7700638d75288e2bc7aee72a815071f36a07c25264f882b6aba343d3",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "fact_sha256": "99d3b49a743e3e2b73982212a92f3f30e99d84524aea78f8f46b22e07c3b6052",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F11",
+              "fact_sha256": "15ca747f81904fe62ebeade3b98eaa5e2b8d889a1791946ae67b4901a32dcd57",
+              "evidence_ids": [
+                "source-0001",
+                "source-0007",
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "fact_sha256": "71b29d7db8fb2b18733664e99e4057c052c450f232afa239959b02964c20f542",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "fact_sha256": "5fe595e4826844a84c18044548ab243a634f66fe582183d0bada0975b09be082",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "fact_sha256": "0ef123dfc869da45816534f159fea0e3b61f08810d2f258dc39f9a82d4dc7f5d",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "fact_sha256": "4e7805681877fa2eea3757b04e7c18ced70235c97fe0fdc5bc37c097297b2443",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "fact_sha256": "9eca55001839a7e6807ba7abd6eb6ed759e9fa571a8cce0ba9378524d1e761c8",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "fact_sha256": "f73320d0d90e177c1c8ffd3e54fa5bd6c9f76f6c965ed009aa5ca1f02e4ff7ec",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "fact_sha256": "377f3cda9e088350368bda50052a80089d2d873da0f25eaab4161e2dd45dc06d",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F19",
+              "fact_sha256": "4435d07b713e8be23a0d42ed88ad6958ba4ba9d4eef5a117fcf03e41a9b99a23",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "fact_sha256": "6b8365552dc1ce9a16ca4fabfa4912bd9ca0394d0ce8a2c3fa441794290b2a2e",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "fact_sha256": "3b00b27d1fd630ec63df3ca8ce50362d5ef10f16f6c8738564d05d424074e18f",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F23",
+              "fact_sha256": "ee44478e22ba17c5fd79eb7e5ac8c2d256227b6cd24bc6c1c042fb81548768b3",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F27",
+              "fact_sha256": "0d8e2b50bbd117e07fda7852b9e75a3e369ba6dd297d5acd76f004d788912d41",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F30",
+              "fact_sha256": "8e77f0ef547cc4430ad738ff1ca31b53daf384d228699e68c84a66dec1c7a0f3",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F34",
+              "fact_sha256": "b256a25a1f095a0b06e4d19574a68de59f92c2fffe1487073b92f1cb9101d3dd",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F38",
+              "fact_sha256": "8fa2813b7dde1e3721bbcffd46c02f27c742209e266a8dfb5d302d6b66988889",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F39",
+              "fact_sha256": "ba19ca2c7bb28335472c153a25be0e8465629bcafdc14558324c3d7cad2ac6f4",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F40",
+              "fact_sha256": "5f00b81e910428a24645b410b9e1c0678d8867fc9521aad12d43a1f5d8352ae4",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "company_features",
+          "label": "公司特色与自主发现（可选）",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "F41",
+              "fact_sha256": "f15ec858cf9970c7fe1fc8c97939c1e29571e5c61461d6055fa74c36b059409d",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F42",
+              "fact_sha256": "14b64e8680e2496895db79ac1d102c5aea92b467b1f0e3cb325fbe563960d5f1",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600054/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "source_window": "6.CT",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600000/query.json",
+      "source_query_sha256": "befcb34f096a2cb7688cc95f9f508508c927c22fab641ed726e91e229e668b97",
+      "source_report": {
+        "instrument_id": "600000.SH",
+        "report_id": "1225062336",
+        "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "audit_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+      "audit_sha256": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+      "origin": "llm_generated",
+      "original_extraction_contract_status": "accepted",
+      "actual_extraction": {
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash",
+        "request_id": "bp-work-9025ee0227b76ca5c04956c4:workpaper:extract",
+        "response_hash": "734bb6ba00fe5d86d83be80e12a6a48274c1d148ff7500a8cf68c36de55bfca2"
+      },
+      "generation_prompt_version": "company_profile_workpaper.2026-11-16.explanatory-core.v18",
+      "generation_preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+      "local_format_normalization": null,
+      "review_status_not_quality_grade": "completed",
+      "review_error": null,
+      "actual_review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "request_id": "bp-work-9025ee0227b76ca5c04956c4:workpaper:review",
+          "contract_status": "accepted"
+        }
+      ],
+      "source_snapshot_fact_count": 38,
+      "source_snapshot_metric_count": 73,
+      "known_withheld_fact_ids": [],
+      "source_only_fact_ids": [],
+      "duplicate_preview_fact_ids": [],
+      "fact_notices": {
+        "mc-1": "498.37亿元叙述与49835651000元表注分别按原文保留，不强行标准化成精确同一金额。",
+        "od-3": "余额是期末，新发放是期间流量；同一fact的period字段不足以统一两者，按原句限定使用。",
+        "od-7": "托管规模是期末余额，托管收入是期间流量，不按统一期末指标消费。"
+      },
+      "note": "净收入、业务总收入及AUM分开；期末余额和期间流量按原句，不强求统一。",
+      "sections": [
+        {
+          "key": "business_structure",
+          "label": "业务结构",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "bs-1",
+              "fact_sha256": "07600c9ef2c818dbd5ac011bbc67fefbb11cb099f170e9f3dc9d352cf353e8a1",
+              "evidence_ids": [
+                "source-0007",
+                "source-0013",
+                "source-0015"
+              ]
+            },
+            {
+              "fact_id": "bs-2",
+              "fact_sha256": "ee508bf60bdf9c836ec7bf550522cca61c087b2fe3efebed7d7e2553954d748a",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "bs-3",
+              "fact_sha256": "90ea4974d9964cbe3d6e578f0947e034d46cfe5985e24cec1de6a1c568eca7ec",
+              "evidence_ids": [
+                "source-0013",
+                "source-0014"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "products_services",
+          "label": "产品、服务及用途",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "ps-1",
+              "fact_sha256": "0f164156504bcda7cf1892230aac67dd1003723a1eab922a81cd0f19c8348e8c",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008",
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "ps-2",
+              "fact_sha256": "e6b30e609b38f30f4676c6eac1b256ac31ad1c690cf64232993661beb1f6f5c5",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011",
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "ps-3",
+              "fact_sha256": "93790d6a764fe35123f1a9f901b573785e1e958f86e80d2ec2a64f05fd01540a",
+              "evidence_ids": [
+                "source-0013",
+                "source-0014",
+                "source-0015"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "revenue_model",
+          "label": "怎么赚钱",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "rm-1",
+              "fact_sha256": "6d8946d246010cc65b4939a24a17d43fdaa1394f9e12f9626c9d52a8d00da4c0",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "rm-2",
+              "fact_sha256": "fd09854be84300d3f1ade403dc61839affdf866af75e9a261cfe157b2be4637e",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "rm-3",
+              "fact_sha256": "9ad558dd200ce4d2dd717ad4bab3396d94acface6dde2ae91a81f3a82bc3d12b",
+              "evidence_ids": [
+                "source-0017",
+                "source-0018"
+              ]
+            },
+            {
+              "fact_id": "rm-4",
+              "fact_sha256": "06554ec38bc6b3e7134b607dca871cff3f04b679926a6f13cfa487d2411c7c34",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "scale_and_mix",
+          "label": "规模与业务权重",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sm-1",
+              "fact_sha256": "56b47e180e99de90b99c948f77a9b6c30c62a421cda15cae11f76d9501794d6d",
+              "evidence_ids": [
+                "source-0003",
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "sm-2",
+              "fact_sha256": "da739caf9297f61f48f399d4f7a6cd2d5476a66ea2e9385dca0507ca617175a4",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "sm-3",
+              "fact_sha256": "2f28f324f4c6fead0e71937e326d0879b9cabd9ebdc99cdb45bdfc9cbd4723e4",
+              "evidence_ids": [
+                "source-0018"
+              ]
+            },
+            {
+              "fact_id": "sm-4",
+              "fact_sha256": "bcc9ecaff2e2c54e5a829384861ec60c732746197e31602ceb8826eeacddc8e5",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "sm-5",
+              "fact_sha256": "0b7b4a71613f52c9152d92854757cb1e39ae3b39b72bb49a1c678915ffa3b636",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operations_and_inputs",
+          "label": "经营方式与关键投入",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "oi-1",
+              "fact_sha256": "1fc4b8ff2cf106ee59cba421ca217842898784c172bc72e38d04bb46b0d4f50d",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "customers_channels_markets",
+          "label": "客户、渠道与市场",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "cc-1",
+              "fact_sha256": "cde8d4cfd0f6c306ecb110c20a2b65da9e630e2e2f68d38141787914382c530b",
+              "evidence_ids": [
+                "source-0007",
+                "source-0011"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "operating_drivers",
+          "label": "关键经营影响因素",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "od-6",
+              "fact_sha256": "98a4a02172c8ba4c2154576cf5e7437949cf82f6f9cd5ae34f223b413c5d8ff0",
+              "evidence_ids": [
+                "source-0011",
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "od-7",
+              "fact_sha256": "335dc668b04b0f2491f6b0f4d5297f4275544e5aa569cd40b5253a64d62705e0",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "material_changes",
+          "label": "近期重要变化",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "mc-1",
+              "fact_sha256": "5d782383507e64a21c97d2246526e6456b48074eff7461759217f91d94caac99",
+              "evidence_ids": [
+                "source-0002",
+                "source-0004"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "position",
+          "label": "公司所处环节",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sc-1",
+              "fact_sha256": "9fb5bff82b4f13fe9cc750de8e2e91ee846216d061919b102e23ac10bd588309",
+              "evidence_ids": [
+                "source-0007",
+                "source-0013",
+                "source-0015"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "upstream_inputs",
+          "label": "上游原材料与资源",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sc-2",
+              "fact_sha256": "2e5f64dfd82122157c1932952be135cc77031c54311da5e2d96da0e05d0f8488",
+              "evidence_ids": [
+                "source-0019"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "downstream_customers",
+          "label": "下游用途与客户领域",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "sc-3",
+              "fact_sha256": "645d0376b4a2f3c3b3ce5b7f25b35d71d9aff21d6656112a1c7d3f629b34f480",
+              "evidence_ids": [
+                "source-0005",
+                "source-0007",
+                "source-0010",
+                "source-0011"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        },
+        {
+          "key": "company_features",
+          "label": "公司特色与自主发现（可选）",
+          "original_status": "observed",
+          "fact_refs": [
+            {
+              "fact_id": "cf-1",
+              "fact_sha256": "b116f1d53bac8b0025f94c90fd78acf2f21be3ca785d75e88d0c1b5ae517779d",
+              "evidence_ids": [
+                "source-0003",
+                "source-0023"
+              ]
+            },
+            {
+              "fact_id": "cf-2",
+              "fact_sha256": "ba5ebb7898ef9437e1cbc5739ad5fea53468b6a1dc7f016571963a2736f26fc4",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "scope": "摘录而非全字段交付；未展示不等于报告未披露"
+        }
+      ],
+      "formal_acceptance": "not_assessed",
+      "resource_ledger": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600000/budget.json",
+      "resource_scope": "original_CT_fresh_entry"
+    }
+  ]
+}

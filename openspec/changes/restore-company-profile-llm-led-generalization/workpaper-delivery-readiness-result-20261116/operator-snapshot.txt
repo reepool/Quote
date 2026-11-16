@@ -1,0 +1,202 @@
+"""6.CY: read-only presentation of saved original-owner workpapers, no model calls."""
+import copy
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import sys
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+CHANGE = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE/'workpaper-delivery-readiness-result-20261116'
+CURRENT = ROOT/'docs/development/company_profile_research_preview.md'
+CT = CHANGE/'workpaper-twelve-explanatory-core-result-20261116'
+CV = CHANGE/'workpaper-continuation-result-20261116'
+CX = CHANGE/'workpaper-guangzhou-review-result-20261116'
+ORDER = ['600094','600103','600100','600107','600098','600104','600088','600099','600082','600097','600054','600000']
+NOTES = {
+ '600094':'地产、算力与参股技术分开；公司收入原文口径冲突保留，具体住宅类目不强补。',
+ '600103':'公司总收入仅源参考，不能当母公司指标；医药等不能说成浆纸下游。',
+ '600100':'公共安全、数智产业、智慧能源及内部抵销分别表达；没有单列特色不失败。',
+ '600107':'医疗收入空栏不说成零；股权处置时点不强定，亏损同比仍有缺项。',
+ '600098':'主要收入结构已补；初核多列旧隔离ID仍incomplete，一次性收益仅模型解释。',
+ '600104':'产能合计和无据客群不采用；金融公司名单仅源参考，收入重复表达去重。',
+ '600088':'影视、旅游、广告与基金业务分开；基金营收不等于投资收益，未查全报告。',
+ '600099':'农业机械降本泛化对象禁用；地区修订未通过不恢复，原料/用途只作粗粒度。',
+ '600082':'资产减值补充不当母公司指标；关联交易minor补充仍未决。',
+ '600097':'零星鱼种不自动归并磷虾，内部转鱼不当外部销量；无据补充禁用。',
+ '600054':'归母/扣非利润下降背景仍有遗漏，标准与测试保各自原文限定。',
+ '600000':'净收入、业务总收入及AUM分开；期末余额和期间流量按原句，不强求统一。',
+}
+
+
+def read(path): return json.loads(Path(path).read_text())
+def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def digest(value): return hashlib.sha256(json.dumps(value,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+def dump(path,value):
+ path.parent.mkdir(parents=True,exist_ok=True)
+ path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+
+
+from research.company_profile.workpaper import CompanyProfileWorkpaper, ELEMENT_LABELS, SUPPLY_CHAIN_LABELS, workpaper_element_payloads
+
+assert not (DEST/'index.json').exists(),'do not overwrite a frozen delivery index'
+ct_audit=read(CT/'independent-audit.json')['companies']
+cv_audit=read(CV/'independent-audit.json')['companies']
+cx_audit=read(CX/'independent-audit.json')
+names={x['instrument_id'][:6]:x['name'] for x in read(CT/'index.json')['companies']}
+source_hashes={}
+rows=[]
+for code in ORDER:
+ instrument=code+'.SH'
+ folder=CV/code if code in ('600104','600082') else CX if code=='600098' else CT/code
+ source=folder/'query.json'
+ query=read(source);payload=query['profiles'][0]['workpaper']
+ paper=CompanyProfileWorkpaper.model_validate(payload)
+ assert paper.report.instrument_id==instrument and paper.origin=='llm_generated'
+ assert not query['profiles'][0]['core_complete'] and not query['profiles'][0]['accepted_facts']
+ groups=workpaper_element_payloads(payload)
+ facts={f['fact_id']:f for e in groups.values() for f in e['facts']}
+ evidence={e['evidence_id']:e for e in payload['evidence']}
+ audit_path=CX/'independent-audit.json' if code=='600098' else CV/'independent-audit.json' if code in ('600104','600082') else CT/'independent-audit.json'
+ audit=cv_audit[instrument] if code in ('600104','600082') else ct_audit[instrument] if code!='600098' else {}
+ blocked=set(audit.get('withhold_fact_ids',[]));source_only=set(audit.get('source_only_fact_ids',[]));duplicates=set(audit.get('duplicate_preview_fact_ids',[]))
+ notices=dict(audit.get('fact_notices',{}))
+ if code in ('600104','600082'):
+  old=read(CT/code/'query.json')['profiles'][0]['workpaper']
+  old_facts={f['fact_id']:f for e in workpaper_element_payloads(old).values() for f in e['facts']}
+  for fid,note in ct_audit[instrument].get('fact_notices',{}).items():
+   if fid in facts and facts[fid]==old_facts.get(fid):notices.setdefault(fid,note)
+ if code=='600098':
+  source_only={d['fact_id'] for d in cx_audit['decisions'] if d['decision']=='qualified_source_reference'}
+  notices['review-add:WR03']='金额/变动原因有据；一次性收益仅作模型解释，不是报告直接披露或土地交储单项金额。'
+ excluded=blocked|source_only|duplicates
+ assert excluded<=facts.keys(),(code,excluded-facts.keys())
+ core=set(ct_audit[instrument].get('core_fact_ids',[])) if code!='600098' else set()
+ sections=[]
+ labels={**ELEMENT_LABELS,**SUPPLY_CHAIN_LABELS,'company_features':'公司特色与自主发现（可选）'}
+ for name,element in groups.items():
+  eligible=[f['fact_id'] for f in element['facts'] if f['fact_id'] not in excluded]
+  if name in ('business_structure','products_services','revenue_model','scale_and_mix','company_features'):
+   selected=eligible
+  else:
+   selected=[fid for fid in eligible if fid in core] or eligible[:1]
+  refs=[]
+  for fid in selected:
+   fact=facts[fid]
+   assert set(fact['evidence_ids'])<=evidence.keys()
+   assert all(evidence[eid]['document_version']==payload['report']['document_version'] for eid in fact['evidence_ids'])
+   refs.append({'fact_id':fid,'fact_sha256':digest(fact),'evidence_ids':fact['evidence_ids']})
+  sections.append({'key':name,'label':labels[name],'original_status':element['status'],'fact_refs':refs,
+      'scope':'摘录而非全字段交付；未展示不等于报告未披露'})
+ generation=payload.get('generation') or {};review=payload.get('quality_review') or {}
+ source_hashes[str(source.relative_to(ROOT))]=sha(source)
+ source_hashes[str(audit_path.relative_to(ROOT))]=sha(audit_path)
+ row={'instrument_id':instrument,'name':names[code],'source_window':'6.CX' if code=='600098' else '6.CV' if code in ('600104','600082') else '6.CT',
+  'source_query':str(source.relative_to(ROOT)),'source_query_sha256':sha(source),'source_report':payload['report'],
+  'audit_reference':str(audit_path.relative_to(ROOT)),'audit_sha256':sha(audit_path),
+  'origin':payload['origin'],'original_extraction_contract_status':generation['extraction']['contract_status'],
+  'actual_extraction':{k:generation['extraction'].get(k) for k in ('model','source_label','request_id','response_hash')},
+  'generation_prompt_version':generation.get('prompt_version'),'generation_preprocessing_version':generation.get('preprocessing_version'),
+  'local_format_normalization':generation.get('local_format_normalization'),
+  'review_status_not_quality_grade':review.get('status'),'review_error':review.get('error'),
+  'actual_review_calls':[{k:c.get(k) for k in ('purpose','model','source_label','request_id','contract_status')} for c in review.get('calls',[])],
+  'source_snapshot_fact_count':len(facts),'source_snapshot_metric_count':sum(len(f['metrics']) for f in facts.values()),
+  'known_withheld_fact_ids':sorted(blocked-source_only),'source_only_fact_ids':sorted(source_only),'duplicate_preview_fact_ids':sorted(duplicates),
+  'fact_notices':notices,'note':NOTES[code],'sections':sections,'formal_acceptance':'not_assessed',
+  'resource_ledger':str((folder/'budget.json').relative_to(ROOT)),
+  'resource_scope':'continuation_only_not_full_company' if code in ('600104','600082','600098') else 'original_CT_fresh_entry'}
+ rows.append(row)
+
+index={'schema_version':'research_preview_index.v2','task':'6.CY','new_model_calls':0,'research_only':True,
+ 'same_version':False,'production_authorization':'not_authorized','formal_s1':'0/12',
+ 'selection_policy':'All non-excluded primary business/product/revenue/scale facts; core-linked or one representative supplementary fact per other element; optional features retained. Presentation selection is not a completeness or truth decision.',
+ 'source_windows':{'6.CT':9,'6.CV':2,'6.CX':1},'companies':rows}
+
+
+def validate(value):
+ seen=set()
+ for row in value['companies']:
+  assert row['instrument_id'] not in seen;seen.add(row['instrument_id'])
+  source=ROOT/row['source_query'];assert sha(source)==row['source_query_sha256']
+  p=read(source)['profiles'][0]['workpaper']
+  facts={f['fact_id']:f for e in workpaper_element_payloads(p).values() for f in e['facts']}
+  excluded=set(row['known_withheld_fact_ids'])|set(row['source_only_fact_ids'])|set(row['duplicate_preview_fact_ids'])
+  displayed=set()
+  for section in row['sections']:
+   for ref in section['fact_refs']:
+    fid=ref['fact_id'];assert fid not in excluded and fid not in displayed
+    displayed.add(fid);assert digest(facts[fid])==ref['fact_sha256']
+    assert facts[fid]['evidence_ids']==ref['evidence_ids']
+ assert len(seen)==12
+
+
+validate(index)
+negative_checks=[]
+for failure in ('query_hash','fact_hash','unknown_fact','withheld','source_only','duplicate'):
+ bad=copy.deepcopy(index)
+ target=next(r for r in bad['companies'] if r['instrument_id']=='600104.SH') if failure in ('withheld','source_only') else bad['companies'][0]
+ section=next(s for s in target['sections'] if s['fact_refs'])
+ ref=section['fact_refs'][0]
+ if failure=='query_hash':target['source_query_sha256']='wrong'
+ elif failure=='fact_hash':ref['fact_sha256']='wrong'
+ elif failure=='unknown_fact':ref['fact_id']='unknown-fact'
+ elif failure=='withheld':ref['fact_id']=target['known_withheld_fact_ids'][0]
+ elif failure=='source_only':ref['fact_id']=target['source_only_fact_ids'][0]
+ else:section['fact_refs'].append(copy.deepcopy(ref))
+ try:validate(bad)
+ except (AssertionError,KeyError):negative_checks.append(failure)
+ else:raise AssertionError('invalid preview unexpectedly accepted: '+failure)
+
+dump(DEST/'index.json',index)
+out=['# 公司画像研究预览：12家公司','',
+ '当前入口：九份6.CT真实稿、上汽/海泰6.CV后段和广州6.CX复核稿。全部有真实模型正文来源，广州原抽取合同仍rejected、经本地格式标准化后接续真实复核；没有把受控夹具冒充新抽取。','',
+ '这是跨窗口的有限研究预览，不是同版首发、正式公司可用评级、全稿准确率或生产发布。普通摘录仍待核；已知坏项屏蔽，源参考和模型解释单列。未展示不等于未披露，不强求供应链精细化。','',
+ f'[结构化源索引]({DEST}/index.json) · [发布条件与下一步]({DEST}/release-readiness.md)','',
+ '| 公司 | 来源/原对象数（非质量分） | 模型复核状态（非等级） | 主要限制 |','| --- | --- | --- | --- |']
+for row in rows:
+ out.append(f"| [{row['name']} {row['instrument_id'][:6]}](#{row['instrument_id'][:6]}) | {row['source_window']} / {row['source_snapshot_fact_count']} | {row['review_status_not_quality_grade']} | {row['note']} |")
+for row in rows:
+ code=row['instrument_id'][:6];p=read(ROOT/row['source_query'])['profiles'][0]['workpaper']
+ facts={f['fact_id']:f for e in workpaper_element_payloads(p).values() for f in e['facts']}
+ evidence={e['evidence_id']:e for e in p['evidence']}
+ out.extend(['',f'<a id="{code}"></a>','',f"## {row['name']} {code}",'',row['note'],'',
+  f"报告期：{row['source_report']['report_period']}；正文作者：{row['actual_extraction']['source_label']} / {row['actual_extraction']['model']}；来源窗口：{row['source_window']}。",'',
+  f"[原始JSON，仅供研究审查]({ROOT/row['source_query']}) · [适用独立审核]({ROOT/row['audit_reference']})；原件可能包含本页已屏蔽对象，不直接复制为可靠结论。"])
+ for section in row['sections']:
+  if not section['fact_refs']:continue
+  out.extend(['',f"### {section['label']}（原稿摘录，待核）",''])
+  for ref in section['fact_refs']:
+   f=facts[ref['fact_id']]
+   citations=[]
+   for eid in f['evidence_ids']:
+    e=evidence[eid];pages=sorted({s['page'] for s in e['source_spans']})
+    citations.append(' / '.join(e['section_path'])+'，物理页'+','.join(map(str,pages))+'，'+eid)
+   out.extend([f"- `{f['fact_id']}`：{f['text']}",'  来源：'+'；'.join(citations)])
+   if f.get('uncertainty_reason'):out.append('  原限定：'+f['uncertainty_reason'])
+   if f['fact_id'] in row['fact_notices']:out.append('  使用限制：'+row['fact_notices'][f['fact_id']])
+ if row['source_only_fact_ids']:
+  out.extend(['','### 仅源参考／解释，不进入普通结论',''])
+  for fid in row['source_only_fact_ids']:out.append(f"- `{fid}`：{row['fact_notices'].get(fid,'引用范围有局限，仅供原文审查，不作为标准化结论。')}")
+ if row['known_withheld_fact_ids']:out.extend(['','已屏蔽原对象：'+'、'.join(row['known_withheld_fact_ids'])+'。'])
+ if row['duplicate_preview_fact_ids']:out.extend(['','重复表达未再展示：'+'、'.join(row['duplicate_preview_fact_ids'])+'；不算新增经济信息。'])
+CURRENT.write_text('\n'.join(out)+'\n')
+assert all(sha(ROOT/p)==h for p,h in source_hashes.items())
+displayed=sum(len(s['fact_refs']) for row in rows for s in row['sections'])
+counts={}
+for row in rows:counts[row['review_status_not_quality_grade']]=counts.get(row['review_status_not_quality_grade'],0)+1
+validation={'task':'6.CY','new_model_calls':0,'new_network_calls':0,'new_usage':0,'new_model_cost':0,
+ 'source_snapshots_and_audits_unchanged':source_hashes,'companies':12,'all_origin_llm_generated':True,
+ 'cross_window_not_same_version_acceptance':True,'model_review_status_counts_not_quality_grades':counts,
+ 'source_fact_count':sum(r['source_snapshot_fact_count'] for r in rows),'source_metric_count':sum(r['source_snapshot_metric_count'] for r in rows),
+ 'displayed_unique_company_fact_pairs':displayed,'withheld_company_fact_pairs':sum(len(r['known_withheld_fact_ids']) for r in rows),
+ 'source_only_company_fact_pairs':sum(len(r['source_only_fact_ids']) for r in rows),'duplicate_company_fact_pairs':sum(len(r['duplicate_preview_fact_ids']) for r in rows),
+ 'all_excerpt_fact_hashes_and_citations_match_original':True,'negative_checks_rejected':negative_checks,
+ 'original_trusted_facts_empty_and_core_false':True,'preview_sha256':sha(CURRENT),'index_sha256':sha(DEST/'index.json'),
+ 'production_authorization':'not_authorized','formal_s1':'0/12','new_formal_accuracy_or_recall':None,
+ 'new_taskservice_or_database_runs':0,'historical_three_read_results_reused_not_rerun':True}
+dump(DEST/'validation.json',validation)
+shutil.copy2(__file__,DEST/'operator-snapshot.txt')
+print(json.dumps({k:v for k,v in validation.items() if k!='source_snapshots_and_audits_unchanged'},ensure_ascii=False))

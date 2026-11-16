@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.CY：同一当前预览入口，来源和等级不混
+
+复用原query/Workpaper/Evidence和审核记录，只读汇总CT九家、CV上汽/海泰、CX广州；现有docs预览页更新，历史CN等原制品/hash保留在原目录/Git，不再挂陈旧current指令。新索引只引用原query/hash/fact IDs与单列限制，摘录正文不改业务值；禁用/源参考/重复对象不进入普通结论，源参考不搬入标准化指标。有限核源结果按原适用范围复用，不产生新准确率或正式可用评级。runtime workpaper _verify固定未接受的corefalse与有源正文进展分开解释，下一不是改bool或再造框架；沿原读/写owner接分级交付和适用正式接受是后续业务切片。本卡零调用/零生产，旧成绩/授权不追改。
+
 ### 6.CX：标准化候选复核不重付抽取
 
 广州CW28条候选复用原review_seed和review_existing_draft_hash，经seed_material核原PDF/坐标/原稿绑定，不带local_format_only接续载荷。原抽取仍rejected，复核/修订/最终核验分别实际归因。既有链已支持，不新增业务循环或scope修补；只纠正已复核的标准化候选仍显示未二次审核的展示错误，旧未核JSON/Markdown不改。新有界真实授权确认前仅离线首请求和显示测试，获准后同网络环境冻结后整卡跑一次，原失败/S1/生产不改。
