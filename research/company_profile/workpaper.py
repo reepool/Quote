@@ -281,8 +281,8 @@ def workpaper_element_payloads(payload: Mapping) -> dict[str, dict]:
 def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
     """Read explicit same-column continuations, never arbitrary whitespace joins.
 
-    This narrow layout case has a monetary header, a wrapped change-in-points
-    cell marking the continued row, and uniquely aligned fractional digits.
+    Require a monetary header and either a wrapped change-in-points marker or
+    comparative columns with multiple uniquely aligned decimal continuations.
     Original quotes/coordinates are untouched; other damaged tables stay unclear.
     """
     cells = []
@@ -311,6 +311,30 @@ def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
                     cells.extend(joins)
                     cells.append((f"{change.group(1)}{change.group(2)}个百分点",
                                   offset + change.start(), offset + change.end()))
+        # Accounting tables also wrap decimal suffixes without a points cell.
+        # Two independent aligned columns establish a continuation; do not join
+        # a lone nearby digit or regroup an incomplete integer part.
+        if header and any(len(re.findall(r"\d{4}年|本期|上期|本年|上年", line)) >= 2
+                          for line in quote[header.end():offset].splitlines()):
+            fragments = list(re.finditer(r"(?<![\d.,])-?(?:\d[\d,]*(?:\.\d*)?|\.\d+)(?![\d.,])", lower))
+            prefixes = list(re.finditer(r"(?<![\d.,])-?\d{1,3}(?:,\d{3})+(?:\.(\d?))?(?![\d.,])", upper))
+            joins = []
+            for fragment in fragments:
+                aligned = []
+                for prefix in prefixes:
+                    tail = fragment.group()
+                    valid = (prefix.group(1) is not None and re.fullmatch(r"\d{1,2}", tail)
+                             and len(prefix.group(1)) + len(tail) == 2) or (
+                                 prefix.group(1) is None and re.fullmatch(r"\.\d{2}", tail))
+                    if valid and abs(prefix.end() - fragment.start()) <= 2:
+                        aligned.append(prefix)
+                if len(aligned) != 1:
+                    break
+                prefix = aligned[0]
+                joins.append((prefix.group() + fragment.group(), offset + prefix.start(), offset + prefix.end()))
+            else:
+                if len(joins) >= 2 and len({start for _, start, _ in joins}) == len(joins):
+                    cells.extend(joins)
         offset += len(upper)
     return cells
 
@@ -351,6 +375,17 @@ def _check_fact_source(
                 r"(\d[\d,]*(?:\.\d+)?)\s*(%|％|个百分点|百分点)", span.quote)
             if rate_unit.get(unit) == rate_unit.get(metric.unit) and metric.unit in rate_unit
         } if metric.unit in rate_unit and Decimal(metric.value) < 0 else set()
+        if rate_unit.get(metric.unit) == "百分点" and Decimal(metric.value) < 0:
+            negative_rates.update(-Decimal(match.group(1)) for text, _, _ in cells
+                                  if (match := re.fullmatch(r"减少(\d+(?:\.\d+)?)个百分点", text)))
+        # A table's signed percent and prose's explicit decline magnitude are
+        # two spellings of the same change, not a positive balance or growth.
+        if metric.unit in {"%", "％"} and Decimal(metric.value) > 0 and -Decimal(metric.value) in numbers:
+            if any(re.search(r"(?:同比|环比|同期增减)\s*[(（]\s*[%％]\s*[)）]", span.quote)
+                   for eid in fact.evidence_ids for span in sources[eid].source_spans):
+                negative_rates.update(Decimal(amount.replace(",", "")) for amount in re.findall(
+                    r"(?:^|[，,；;。\n])\s*(?:同比|环比)\s*(?:下降|减少|降低)\s*"
+                    r"(\d[\d,]*(?:\.\d+)?)\s*[%％]", fact.text))
         if Decimal(metric.value) not in numbers | negative_rates:
             raise ValueError(f"metric number is absent from cited source: {metric.name}")
     if check_units:
@@ -367,7 +402,7 @@ def _monetary_display_note(
     for metric in fact.metrics:
         original_unit = _money_unit_spelling(metric.unit)
         if (metric.value is None or metric.qualifier != "exact" or original_unit not in scales
-            or original_unit == unit or metric.subject_scope != fact.subject_scope or metric.period != fact.period):
+            or original_unit == unit or metric.period != fact.period):
             continue
         if not _check_explicit_money_unit(metric, fact, sources):
             continue  # A model-supplied unit without an explicit source unit cannot justify conversion.

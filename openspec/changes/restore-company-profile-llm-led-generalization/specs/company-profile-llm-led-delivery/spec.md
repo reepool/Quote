@@ -55,9 +55,25 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
 
 #### Scenario: Prose displays a source-backed amount in a different monetary magnitude
-- **WHEN** the same fact has an original-valued metric already validated against its cited source, with explicit monetary units and matching subject and period, and prose uses an equivalent magnitude or decimal-rounded display
+- **WHEN** the same fact has an original-valued metric already validated against its cited source, with explicit monetary units and matching period, and prose uses an equivalent magnitude or decimal-rounded display
 - **THEN** local binding MAY retain that prose with a program-generated display qualification while preserving the exact original metric, raw value, unit and evidence
 - **AND** no missing amount, sum, account ownership, currency, scope or period is inferred; wrong sign/value/magnitude, unsupported source units or absent corresponding metrics remain invalid, and rounded display is not a new exact normalized fact
+- **AND** each metric retains its own source-backed subject; a compound fact's enclosing group subject MUST NOT force its business-segment metrics to inherit that subject or prevent a valid display conversion, and this arithmetic check does not establish semantic ownership
+
+#### Scenario: An aligned table continuation carries an explicit negative point change
+- **WHEN** a validated same-row continuation spells 减少X个百分点 and a returned metric retains the same negative value with a percentage-point unit
+- **THEN** numeric source binding MAY recognize that signed rate without requiring a printed minus sign
+- **AND** it MUST NOT supply a negative monetary balance, a percent-growth unit, a changed amount or a rate borrowed from an ambiguous continuation
+
+#### Scenario: Comparative financial columns split only their decimal suffixes
+- **WHEN** an explicitly unit-labelled monetary table has comparative year/period columns and at least two uniquely aligned same-row decimal continuations
+- **THEN** source binding MAY restore their two-place decimal cells without changing the source quote or coordinates
+- **AND** unknown units, cross-column or ambiguous alignment, changed digits, integer-fragment regrouping and arbitrary whitespace joins remain unsupported; local success does not adopt a repair without its real final review
+
+#### Scenario: Prose expresses the magnitude of a signed comparative decline
+- **WHEN** a cited table explicitly labels its comparative rate column and reports a negative percent, while prose explicitly states 同比/环比下降 with the same positive magnitude and percent unit
+- **THEN** source binding MAY retain that positive decline-magnitude metric without changing the signed source or original returned values
+- **AND** growth wording, absent direction/header, changed magnitude and absolute monetary balances MUST NOT use this equivalence
 
 #### Scenario: A monetary table wraps one cell over an explicit continuation row
 - **WHEN** a cited fixed-layout monetary table has a unique aligned numeric continuation and a matching wrapped percentage-point cell identifying the same continued row

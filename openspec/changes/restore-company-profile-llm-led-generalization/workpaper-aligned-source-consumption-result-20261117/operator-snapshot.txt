@@ -1,0 +1,108 @@
+"""Saved real source/repair inputs, original owner, no network and no final answer."""
+import hashlib
+import json
+import shutil
+import sys
+import time
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DC=C/'workpaper-final-source-review-result-20261117'
+D=C/'workpaper-aligned-source-consumption-result-20261117'
+from research.company_profile.contracts import SemanticProviderError
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileRuntimeRecordV3
+from research.company_profile.workpaper import CompanyProfileWorkpaper,WorkpaperFact,WorkpaperRepairResponse,_check_fact_source,workpaper_elements
+from research.company_profile.workpaper_llm import workpaper_processing_identity
+from research.company_profile.workpaper_review import seed_material,review_workpaper,workpaper_hash
+
+def read(path):return json.loads(Path(path).read_text())
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def facts(p):return {f.fact_id:f for e in workpaper_elements(p).values() for f in e.facts}
+def dump(path,obj):Path(path).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+class Boundary:
+    offline_only=True
+    def __init__(self):self.workpaper_receipts=[];self.calls=[]
+    def workpaper_request(self,**kwargs):
+        assert kwargs['purpose']=='verify_profile_workpaper_repair'
+        self.calls.append(kwargs)
+        raise SemanticProviderError('offline_boundary_no_final_review_authorized')
+
+start=time.monotonic();D.mkdir(exist_ok=True)
+assert not (D/'validation.json').exists(),'already completed; do not overwrite evidence'
+plan=read(C/'workpaper-final-quality-readiness-20261117/review-plan.json')
+protected={str(p):sha(p) for p in DC.rglob('*') if p.is_file()}
+results=[];cleaned=0
+with patch('socket.socket.connect',side_effect=AssertionError('network forbidden in DD')):
+    for code,targets in [('600104',{'F13','F14'}),('600082',{'F09','F10'}),('600054',{'review-add:RF03'})]:
+        row=next(r for r in plan['profiles'] if r['instrument_id'].startswith(code))
+        raw=read(ROOT/row['source_query'])['profiles'][0]['workpaper']
+        old=CompanyProfileWorkpaper.model_validate(raw)
+        seed=old.model_copy(update={'quality_review':None,'use_review':None})
+        seed,packet,pages=seed_material(seed,report=seed.report,source_pdf_path=row['source_pdf'],real=True)
+        original=read(DC/code/'query.json')['profiles'][0]['workpaper']['quality_review']['original_draft_hash']
+        assert workpaper_hash(seed)==original,(code,workpaper_hash(seed),original)
+        all_receipts=read(DC/code/'model-receipts.json')
+        receipts=[r for r in all_receipts if r['purpose'] in {'review_profile_workpaper','repair_profile_workpaper'}]
+        review=next(r for r in receipts if r['purpose']=='review_profile_workpaper')
+        repair=next(r for r in receipts if r['purpose']=='repair_profile_workpaper')
+        for r in receipts:
+            assert hashlib.sha256(r['raw_content'].encode()).hexdigest()==r['response_hash']
+            assert json.loads(r['raw_content'])==r['response_payload']
+        response=WorkpaperRepairResponse.model_validate(repair['response_payload'])
+        candidates={f['fact_id']:WorkpaperFact.model_validate(f) for f in response.repaired_facts}
+        assert targets<=candidates.keys()
+        direct={}
+        for fid in sorted(targets):
+            f=candidates[fid];before=f.model_dump(mode='json')
+            notes=_check_fact_source(f,{e.evidence_id:e for e in packet.evidence},check_units=True)
+            assert before==f.model_dump(mode='json')
+            direct[fid]={'raw_candidate_sha256':hashlib.sha256(json.dumps(before,ensure_ascii=False,sort_keys=True).encode()).hexdigest(),
+                         'evidence_ids':list(f.evidence_ids),'source_check':'passed','display_notes':list(notes)}
+        provider=Boundary()
+        result,_=review_workpaper(seed,packet=packet,provider=provider,work_id='dd-offline-'+code,
+            identity=workpaper_processing_identity(real=False,review=True),
+            resume={'original_draft_hash':original,'document_version':seed.report.document_version,
+                    'review_response':review['response_payload'],'repair_response':repair['response_payload'],'receipts':receipts})
+        assert len(provider.calls)==1
+        payload=provider.calls[0]['payload']
+        # Only candidates the current local source consumer admitted are sent.
+        final_candidates={f['fact_id']:f for f in payload['candidates']}
+        assert targets<=final_candidates.keys(),(code,final_candidates.keys())
+        assert not targets.intersection(facts(result)),(code,'unverified candidate adopted')
+        assert len(result.quality_review.retained_request_ids)==2
+        assert result.quality_review.status=='incomplete'
+        with TemporaryDirectory(prefix='workpaper-dd-readback-') as directory:
+            root=Path(directory);writer=CompanyProfileResearchWriter(root/'output')
+            context=read(DC/code/'publication-context.json')
+            context.update(workpaper=result.model_dump(mode='json'),workpaper_receipts=receipts)
+            writer.persist(CompanyProfileRuntimeRecordV3.model_validate_json(json.dumps(context,ensure_ascii=False)))
+            query=CompanyProfileReadService(root/'output').query((row['instrument_id'],))
+            export=CompanyProfileReadService(root/'output').export((row['instrument_id'],),root/'export')
+            fresh=CompanyProfileReadService(root/'output').query((row['instrument_id'],))
+            assert query['profiles']==export['profiles']==fresh['profiles']
+            profile=query['profiles'][0]
+            assert not profile['core_complete'] and not profile['accepted_facts']
+            cleaned+=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+        assert not root.exists()
+        results.append({'instrument_id':row['instrument_id'],'seed_hash_matches_saved_review':True,
+            'official_pdf_sha256':sha(row['source_pdf']),'source_pages_verified':len(pages),'candidates':direct,
+            'final_boundary_fact_ids':sorted(final_candidates),'no_new_final_response':True,'unverified_targets_adopted':[],
+            'retained_old_receipts':2,'three_reads_equal':True,'review_status':result.quality_review.status})
+    legacy=[]
+    for row in plan['profiles']:
+        p=DC/row['instrument_id'][:6]/'query.json';raw=read(p)['profiles'][0]['workpaper']
+        restored=CompanyProfileWorkpaper.model_validate(raw).model_dump(mode='json')
+        assert restored==raw
+        legacy.append({'instrument_id':row['instrument_id'],'query_sha256':sha(p),'workpaper_json_unchanged':True})
+assert all(sha(Path(path))==digest for path,digest in protected.items())
+dump(D/'validation.json',{'task':'6.DD','new_model_requests':0,'sendable_bindings':0,'network_connect_forbidden':True,
+    'processing_identity':workpaper_processing_identity(real=False,review=True),'saved_source_results':results,
+    'legacy_queries':legacy,'old_DC_artifacts_unchanged':True,'runtime_seconds':round(time.monotonic()-start,3),
+    'readback_roots_cleaned_bytes':cleaned,'no_candidate_adopted_without_real_final_review':True})
+shutil.copy2(__file__,D/'operator-snapshot.txt')
+print(json.dumps({'passed':True,'candidate_count':sum(len(r['candidates']) for r in results),'companies':3,
+    'readback_cleaned_bytes':cleaned,'seconds':round(time.monotonic()-start,3)},ensure_ascii=False))

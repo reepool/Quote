@@ -1,0 +1,22 @@
+{
+  "task": "6.DD",
+  "source_tests": {
+    "passed": 97,
+    "seconds": 15.81
+  },
+  "workpaper_review_delivery_tests": {
+    "passed": 115,
+    "deselected": 5,
+    "seconds": 33.01
+  },
+  "new_source_behavior_identity": "company_workpaper_source_literals.aligned-cells.v6",
+  "openspec_strict": "passed",
+  "git_diff_check": "passed",
+  "review": {
+    "blocking": "三类误拒及同候选的下降幅度等价表达已修；正反/原链验证通过",
+    "nonblocking": "可选供应链/细目不扩",
+    "unrelated": "开工既有配置/骨架/混合文档及并行保护"
+  },
+  "real_final_review_still_required": true,
+  "no_new_paid_model_requests": true
+}

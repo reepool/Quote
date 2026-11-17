@@ -1,0 +1,11 @@
+{
+  "task": "6.DD",
+  "files": {
+    "checks.json": "d89fa74e65bc2b6823dec08138d0f512a9d5a46f2034cf2e31677cac824fb0eb",
+    "cleanup.json": "268c87b057fae2d28d1f137d9415064f68a8b6d92a0d32b08d8c899eab787982",
+    "final-review-plan.json": "15734bef51d40f9fd3403d8b0a4b84cc079ed584fcfdffc12eceb486f8d8eee0",
+    "operator-snapshot.txt": "8824827ccafaf22754a807e66f029a9c1533069ae7064ee93d8d8f6c21b4ab5b",
+    "result.md": "53df266b38a101deeba016ed90425b418b1a3af0ebd6f64800b237e46c6897b4",
+    "validation.json": "2db095094163df6b5145729969a9c2d39967a1806a34a48b1684006e38245b48"
+  }
+}

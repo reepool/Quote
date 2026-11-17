@@ -152,7 +152,7 @@ def test_new_processing_identity_versions_signed_source_rate_binding():
 
     for real in (False, True):
         identity = workpaper_processing_identity(real=real)
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.monetary-display.v5"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.aligned-cells.v6"
         assert identity["semantic_reuse"] is False
 
 
@@ -171,21 +171,105 @@ def test_prose_magnitude_display_keeps_exact_source_metric(raw, unit, display):
     assert fact.metrics[0].raw_value == raw and fact.metrics[0].unit == unit
 
 
-@pytest.mark.parametrize('failure', ['amount', 'sign', 'magnitude', 'subject', 'period', 'unit_missing', 'unit_conflict', 'no_metric'])
-def test_display_equivalence_never_guesses_source_unit_subject_period_or_amount(failure):
+@pytest.mark.parametrize('failure', ['amount', 'sign', 'magnitude', 'period', 'unit_missing', 'unit_conflict', 'no_metric'])
+def test_display_equivalence_never_guesses_source_unit_period_or_amount(failure):
     raw='410,196,473,001.11'
     fact, source = source_check(metric(raw_value=raw, value=raw.replace(',', '')), '单位：元\n营业收入 '+raw)
     fact=fact.model_copy(update={'text': '营业收入4101.96亿元。'})
     if failure=='amount': fact=fact.model_copy(update={'text':'营业收入4101.97亿元。'})
     elif failure=='sign': fact=fact.model_copy(update={'text':'营业收入-4101.96亿元。'})
     elif failure=='magnitude': fact=fact.model_copy(update={'text':'营业收入4101.96万元。'})
-    elif failure=='subject': fact=fact.model_copy(update={'subject_scope':'issuer'})
     elif failure=='period': fact=fact.model_copy(update={'period':'2024'})
     elif failure in {'unit_missing','unit_conflict'}:
         quote='营业收入 '+raw if failure=='unit_missing' else '单位：万元\n营业收入 '+raw
         source=source.model_copy(update={'source_spans':(WorkpaperSpan(page=15,start=0,end=len(quote),quote=quote),)})
     else: fact=fact.model_copy(update={'metrics':()})
     with pytest.raises(ValueError):_check_fact_source(fact,{'table':source},check_units=True)
+
+
+def test_compound_fact_keeps_segment_and_total_subjects_during_display_conversion():
+    fact, source = source_check(metric(raw_value='410,196,473,001.11',value='410196473001.11',
+        subject_scope='business_segment'),'单位：元\n整车业务收入410,196,473,001.11\n合计656,243,812,081.18')
+    total=WorkpaperMetric.model_validate(metric(name='合计收入',raw_value='656,243,812,081.18',value='656243812081.18'))
+    fact=fact.model_copy(update={'text':'整车业务收入4101.96亿元，合计6562.44亿元。',
+                                 'metrics':(*fact.metrics,total)})
+    before=fact.model_dump(mode='json')
+    notes=_check_fact_source(fact,{'table':source},check_units=True)
+    assert len(notes)==2 and all('舍入展示' in note for note in notes)
+    assert fact.model_dump(mode='json')==before
+    assert fact.subject_scope=='consolidated_group'
+    assert [m.subject_scope for m in fact.metrics]==['business_segment','consolidated_group']
+
+
+@pytest.mark.parametrize('amount', ['29.68','2.21'])
+def test_signed_point_value_uses_only_confirmed_wrapped_direction(amount):
+    fact,_=source_check(metric(name='毛利率同比变化',raw_value='-'+amount,value='-'+amount,
+        unit='百分点',source_unit='%',currency=None))
+    assert fact.metrics[0].value=='-'+amount
+
+
+@pytest.mark.parametrize('failure',['amount','percent','balance','opposite','unmarked'])
+def test_wrapped_point_direction_never_supplies_another_rate_or_balance(failure):
+    data=metric(name='变化',raw_value='-29.68',value='-29.68',unit='百分点',source_unit='%',currency=None)
+    quote=TABLE
+    if failure=='amount': data.update(raw_value='-29.69',value='-29.69')
+    elif failure=='percent': data.update(unit='%',source_unit='%')
+    elif failure=='balance': data.update(unit='元',source_unit='元')
+    elif failure=='opposite': quote=quote.replace('减少','增加')
+    else: quote=quote.replace('个百分点','')
+    with pytest.raises(ValueError,match='absent'):source_check(data,quote)
+
+
+FINANCIAL_TABLE=(
+    '七、近三年主要会计数据和财务指标\n'
+    '                                                                              单位：元         币种：人民币\n'
+    '          主要会计数据                          2025年             2024年          本期比上年               2023年\n'
+    '                                                                          同期增减(%)\n'
+    '归属于上市公司股东的净利润                          292,480,928.      315,009,002              -7.15     422,906,942\n'
+    '                                                   60               .14                               .83\n'
+    '归属于上市公司股东的扣除非经                         261,834,633.      316,905,979             -17.38     391,005,407\n'
+    '常性损益的净利润                                           40               .37                               .86\n'
+)
+
+
+@pytest.mark.parametrize('raw',['292,480,928.60','315,009,002.14','261,834,633.40','316,905,979.37','391,005,407.86'])
+def test_comparative_financial_cells_rejoin_decimal_tails_with_original_coordinates(raw):
+    _,source=source_check(metric(raw_value=raw,value=raw.replace(',','')),FINANCIAL_TABLE)
+    assert source.source_spans[0].quote==FINANCIAL_TABLE
+    cells=_wrapped_table_cells(FINANCIAL_TABLE)
+    assert raw in [text for text,_,_ in cells]
+    assert all(0<=start<end<=len(FINANCIAL_TABLE) for _,start,end in cells)
+
+
+@pytest.mark.parametrize('failure',['digits','column','header','unit','single','alignment','integer'])
+def test_financial_decimal_repair_rejects_changed_ambiguous_or_unmarked_fragments(failure):
+    data=metric(raw_value='261,834,633.40',value='261834633.40')
+    quote=FINANCIAL_TABLE
+    if failure=='digits': data.update(raw_value='261,834,633.41',value='261834633.41')
+    elif failure=='column': data.update(raw_value='261,834,633.37',value='261834633.37')
+    elif failure=='header': quote=quote.replace('2025年','本报告').replace('2024年','另一列').replace('2023年','其他列').replace('本期比上年','变化')
+    elif failure=='unit': quote=quote.replace('单位：元','单位未知')
+    elif failure=='single': quote=quote.replace('.37','   ').replace('.86','   ')
+    elif failure=='alignment': quote=quote.replace('常性损益的净利润                                           40','常性损益的净利润                              40')
+    else: quote=quote.replace('261,834,633.','261,834,63').replace(' 40',' 3.40')
+    with pytest.raises(ValueError,match='absent'):source_check(data,quote)
+
+
+@pytest.mark.parametrize('failure',[None,'growth','missing_direction','changed','unit','no_rate_header'])
+def test_signed_table_rate_can_support_only_explicit_same_magnitude_decline(failure):
+    fact,source=source_check(metric(),TABLE)
+    value='17.39' if failure=='changed' else '17.38'
+    rate=WorkpaperMetric.model_validate(metric(name='同比变动幅度',raw_value=value,value=value,
+        unit='元' if failure=='unit' else '%',source_unit='元' if failure=='unit' else '%',currency=None))
+    direction='增长' if failure=='growth' else '' if failure=='missing_direction' else '下降'
+    fact=fact.model_copy(update={'text':'经营情况，同比'+direction+value+'%。','metrics':(rate,)})
+    quote=FINANCIAL_TABLE.replace('同期增减(%)','其他项目') if failure=='no_rate_header' else FINANCIAL_TABLE
+    source=source.model_copy(update={'source_spans':(WorkpaperSpan(page=15,start=0,end=len(quote),quote=quote),)})
+    if failure:
+        with pytest.raises(ValueError,match='absent'):_check_fact_source(fact,{'table':source},check_units=True)
+    else:
+        _check_fact_source(fact,{'table':source},check_units=True)
+        assert rate.raw_value=='17.38' and rate.value=='17.38'
 
 
 @pytest.mark.parametrize("wording,unit", [

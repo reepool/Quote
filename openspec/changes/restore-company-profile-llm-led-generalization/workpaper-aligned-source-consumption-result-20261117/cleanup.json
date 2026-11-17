@@ -1,0 +1,18 @@
+{
+  "readback_roots_removed_bytes": 1627847,
+  "removed_tools": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dd-check.py",
+      "bytes": 7677,
+      "sha256": "8824827ccafaf22754a807e66f029a9c1533069ae7064ee93d8d8f6c21b4ab5b"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dd-finish.py",
+      "bytes": 5099,
+      "sha256": "763eb49b8acd5814df638f976c151c6606abf61b3977204ae8a638f5c64cc99f"
+    }
+  ],
+  "total_measured_bytes": 1640623,
+  "test_and_failed_short_lived_roots_cleaned_by_finally_unmeasured": true,
+  "official_sources_shared_cache_previous_receipts_and_attempts_preserved": true
+}

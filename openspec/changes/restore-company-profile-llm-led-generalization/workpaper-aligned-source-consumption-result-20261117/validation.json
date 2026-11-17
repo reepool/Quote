@@ -1,0 +1,201 @@
+{
+  "task": "6.DD",
+  "new_model_requests": 0,
+  "sendable_bindings": 0,
+  "network_connect_forbidden": true,
+  "processing_identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-17.subject-contract.v19",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+    "preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+    "source_binding_policy": "company_workpaper_source_literals.aligned-cells.v6",
+    "workpaper_format_recovery": "validation_feedback.v1",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "offline_fake",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620,
+    "workpaper_review_policy": "company_profile_workpaper_review.v10",
+    "quality_review_profile": null,
+    "repair_profile": null
+  },
+  "saved_source_results": [
+    {
+      "instrument_id": "600104.SH",
+      "seed_hash_matches_saved_review": true,
+      "official_pdf_sha256": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "source_pages_verified": 15,
+      "candidates": {
+        "F13": {
+          "raw_candidate_sha256": "5b647f44155646ca56a273ce9ab9ff7b6e3e19c9142bd04e5841c31fd33f163b",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "source_check": "passed",
+          "display_notes": [
+            "程序显示说明：F13正文4101.96亿元为整车业务营业收入410,196,473,001.11元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+            "程序显示说明：F13正文2030.20亿元为零部件业务营业收入203,019,866,775.26元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+            "程序显示说明：F13正文329.36亿元为劳务及其他营业收入32,935,762,112.94元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+            "程序显示说明：F13正文100.92亿元为金融业务营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+            "程序显示说明：F13正文6562.44亿元为主营业务分产品合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          ]
+        },
+        "F14": {
+          "raw_candidate_sha256": "c248e15a0c7388e6b4ab91c12ee0eb503b317d751aa70f16ccff7be5465e6f6c",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "source_check": "passed",
+          "display_notes": [
+            "程序显示说明：F14正文6461.52亿元为汽车制造业营业收入646,152,101,889.30元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+            "程序显示说明：F14正文100.92亿元为金融业营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+            "程序显示说明：F14正文6562.44亿元为主营业务分行业合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          ]
+        }
+      },
+      "final_boundary_fact_ids": [
+        "F10",
+        "F13",
+        "F14",
+        "F22",
+        "F37"
+      ],
+      "no_new_final_response": true,
+      "unverified_targets_adopted": [],
+      "retained_old_receipts": 2,
+      "three_reads_equal": true,
+      "review_status": "incomplete"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "seed_hash_matches_saved_review": true,
+      "official_pdf_sha256": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "source_pages_verified": 21,
+      "candidates": {
+        "F09": {
+          "raw_candidate_sha256": "3ba6bd79669edc9d2ac9990cdd32116204770ca491d0eb962b69fb72557a29f5",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "source_check": "passed",
+          "display_notes": []
+        },
+        "F10": {
+          "raw_candidate_sha256": "a1ca9b9f25a3a8b45727d1772f5973f6e3a21792b1216cf6b1f295caa49c020e",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "source_check": "passed",
+          "display_notes": []
+        }
+      },
+      "final_boundary_fact_ids": [
+        "F09",
+        "F10",
+        "F11",
+        "review-add:RF01"
+      ],
+      "no_new_final_response": true,
+      "unverified_targets_adopted": [],
+      "retained_old_receipts": 2,
+      "three_reads_equal": true,
+      "review_status": "incomplete"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "seed_hash_matches_saved_review": true,
+      "official_pdf_sha256": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "source_pages_verified": 14,
+      "candidates": {
+        "review-add:RF03": {
+          "raw_candidate_sha256": "1e4214032b8360fc4d0a124b7b334286c5a6777e34ba55e04f07114c1540c11e",
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ],
+          "source_check": "passed",
+          "display_notes": []
+        }
+      },
+      "final_boundary_fact_ids": [
+        "F19",
+        "F20",
+        "review-add:RF03"
+      ],
+      "no_new_final_response": true,
+      "unverified_targets_adopted": [],
+      "retained_old_receipts": 2,
+      "three_reads_equal": true,
+      "review_status": "incomplete"
+    }
+  ],
+  "legacy_queries": [
+    {
+      "instrument_id": "600094.SH",
+      "query_sha256": "10c875b5c74c472e0ee88d659e2bdab2988810077b71de1f1c225fda43d83af5",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600103.SH",
+      "query_sha256": "dfafb39872eadc7eaca861b78155823d3c18f13b0e4f504706effb59dba6fc72",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600100.SH",
+      "query_sha256": "5684d727854f58e467ad0912dbfc6fb222f38f5cf57d8bda6ac4fbf3532d90cb",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600107.SH",
+      "query_sha256": "952e15a2b715193cce9705423473385ba42a0ea1c32c428fc66b623a27503c42",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600098.SH",
+      "query_sha256": "de8174931b03a4ac900474f64adf91b01b53fe9bd2e6b4eec9e2b9e41bdb7b27",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600104.SH",
+      "query_sha256": "99703a87e7806f7703b8e08dfee960598c1c4aa2d127fb7dac441951a738f31e",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600088.SH",
+      "query_sha256": "d7ef75c1481d5bf71cb8fee2f30d7747d49d751484361fd858a608315722e94f",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600099.SH",
+      "query_sha256": "362e48a9ab641da2995893a9ce98415b5c243d60af449398ee0993f0448e563d",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600082.SH",
+      "query_sha256": "d0741bd9192267f6f17c8ed48dde979a92e1d8a1bedb1e62d6598656742c3d7f",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600097.SH",
+      "query_sha256": "0ad8cd82c00e73d0734d1ba6eb4474bb7636be0a03a2128ae7cd1ca744e135cf",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600054.SH",
+      "query_sha256": "c48c24b5090ac166096798d8452a7096643d42960849bb778c1fcee6493d2f72",
+      "workpaper_json_unchanged": true
+    },
+    {
+      "instrument_id": "600000.SH",
+      "query_sha256": "a119eb7eeb6a18d107d683d507a87fd91689c82bc413f499cc02c06252aea5ca",
+      "workpaper_json_unchanged": true
+    }
+  ],
+  "old_DC_artifacts_unchanged": true,
+  "runtime_seconds": 12.123,
+  "readback_roots_cleaned_bytes": 1627847,
+  "no_candidate_adopted_without_real_final_review": true
+}

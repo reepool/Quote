@@ -1,0 +1,80 @@
+{
+  "task": "6.DE",
+  "status": "proposed_not_authorized",
+  "purpose": "existing_three_repair_batches_final_source_verification_only",
+  "profiles": [
+    {
+      "instrument_id": "600104.SH",
+      "original_receipts": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600104/model-receipts.json",
+      "receipts_sha256": "7ee2d3dffe61ecd9289c7245aa3434eb5cb2504c1625691d60a8740b88896ac9",
+      "original_draft_hash": "4a44bdcd39bf3f3e00ab2d058ee1dcf1e29005f52454725f01d1b735a60bdbbf",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "candidate_ids": [
+        "F10",
+        "F13",
+        "F14",
+        "F22",
+        "F37"
+      ],
+      "newly_recovered_ids": [
+        "F13",
+        "F14"
+      ]
+    },
+    {
+      "instrument_id": "600082.SH",
+      "original_receipts": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600082/model-receipts.json",
+      "receipts_sha256": "b0305ff67a25af33ddc8b576744277c0e5e2cc727d9be4bd3eafe0d68606f964",
+      "original_draft_hash": "70d15a2f154e0f31b48ecbb197605db9b5db79bbb5740bb94944fc388b759d72",
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "candidate_ids": [
+        "F09",
+        "F10",
+        "F11",
+        "review-add:RF01"
+      ],
+      "newly_recovered_ids": [
+        "F09",
+        "F10"
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "original_receipts": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600054/model-receipts.json",
+      "receipts_sha256": "9fe86a43b51b56cb96e9db02782e06c16a9f7e933f5e2505bc87aa0ef33c80ee",
+      "original_draft_hash": "e66e4231ef0dd36cdb809e03b6dda0ebda927c0d9700c0c5bb836386ba132d1b",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "candidate_ids": [
+        "F19",
+        "F20",
+        "review-add:RF03"
+      ],
+      "newly_recovered_ids": [
+        "review-add:RF03"
+      ]
+    }
+  ],
+  "model": "existing Scorpio/Grok grok-4.7 high",
+  "data": "only the same selected public annual-report sections and public derived candidates",
+  "each_limits": {
+    "logical_requests": 1,
+    "physical_requests": 2,
+    "recoveries": 1,
+    "business_seconds": 900,
+    "ledger": 300000,
+    "priced_cost_cny": 10,
+    "unpriced_cost": "unknown"
+  },
+  "group_limits": {
+    "concurrency": 3,
+    "physical_requests": 6,
+    "business_seconds": 1200,
+    "ledger": 900000
+  },
+  "new_extraction_initial_review_or_repair": false,
+  "new_company_or_window": false,
+  "official_network_environment_only": true,
+  "production_authorization": "not_authorized",
+  "old_failure_and_usage_preserved": true,
+  "requires_new_explicit_budget_authorization": true
+}

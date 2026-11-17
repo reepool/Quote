@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-17 6.DD完成[保存候选共性消费修正](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-aligned-source-consumption-result-20261117/result.md)：上汽2/海泰2/黄山1恢复到原final边界，source-binding v6，212相关通过，三组原writer三读一致；0新模型/绑定/候选采纳，旧12稿/DC结果/hash不改。已清三个最终读回根1627847字节，过程脚本核齐后清，原源/attempt/并行保护。下一仅候选6.DE三份原修订批次12目标（含恢复5项）补最终再核，复用旧初核/修订/公开章节、不重付前段；新的有界授权未获批前不发送，不重抽十二家、追供应链尾项或扩大平台，正式S1/S2/生产不变。
+
 2026-11-17 6.DC已交[十二份同版源复核使用版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/result.md)：原十二份全部后段执行、分级后三读一致；47真实采纳修订独立45有据/1源参考/1仍错隔离。366对象中318普通已核/43保真限用，另3源参考/2隔离不作普通结论；当前133核心后继121支持/9部分/3缺失，不改旧首发或计S1。34物理/1097696供应商usage/0恢复/unknown，1865.800业务墙钟秒，源码同版未热修；本卡次数用完。下一优先复用保存候选，合并解决合法混合主体及跨行表格的消费误拒，不重抽十二家、追供应链尾项或开新平台；新真实范围须另有界授权，S2/生产未放行。工作/监督/分级读回根清35081509字节，过程物核快照后清，正式源/缓存/attempt及既有并行保护。
 
 2026-11-17 6.DB已交[四阶段统一主体合同及12稿准备](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-quality-readiness-20261117/readiness.md)：修订/最终核验与抽取/初核共用集团/母公司/分项语义，metric不继承整条fact主体；167直接通过、64兼容及4版本断言复验通过，12稿371对象旧序列化/原值/hash不变，201原页重新绑定到首个review边界。0新模型/探针/外传/生产，清准备脚本6868字节，旧源/attempt/并行保护。下一唯一候选6.DC仅复用原十二稿做同版源复核，不重付选章/抽取，具体输入与预算已冻，真实0/12待新整卡批准，不再加准备功能/单家尾项或自动扩S2。
