@@ -1,5 +1,7 @@
 # 公司画像研究预览：12家公司
 
+2026-11-17当前研究使用范围以[有限验收结论](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/acceptance.md)和原入口事实分级为准。上汽F14分行业指标的主体口径仅源参考，[当前上汽使用版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/600104-research-use.md)保留独立已核的分产品构成；原稿不改。正式S1不通过、S2/生产未放行，以下跨窗口摘录及模型状态不作正式评级。
+
 当前入口：九份6.CT真实稿、上汽/海泰6.CV后段和广州6.CX复核稿。全部有真实模型正文来源，广州原抽取合同仍rejected、经本地格式标准化后接续真实复核；没有把受控夹具冒充新抽取。
 
 这是跨窗口的有限研究预览，不是同版首发、正式公司可用评级、全稿准确率或生产发布。普通摘录仍待核；已知坏项屏蔽，源参考和模型解释单列。未展示不等于未披露，不强求供应链精细化。

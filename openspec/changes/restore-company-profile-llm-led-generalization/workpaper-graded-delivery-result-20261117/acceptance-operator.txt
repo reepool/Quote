@@ -1,0 +1,166 @@
+"""Bounded 6.DA source decision and original-owner readback; no network/model."""
+import hashlib
+import json
+import socket
+import sys
+from collections import Counter
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+C = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+D = C / 'workpaper-graded-delivery-result-20261117'
+CT = C / 'workpaper-twelve-explanatory-core-result-20261116'
+
+def read(path): return json.loads(path.read_text())
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def dump(path, value): path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+def offline(*args, **kwargs): raise AssertionError('DA must remain offline')
+socket.getaddrinfo = offline
+socket.create_connection = offline
+
+import pypdfium2 as pdfium
+from research.company_profile.workpaper import CompanyProfileWorkpaper, workpaper_elements, workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review, project_workpaper_delivery
+from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.core_assessment_projection import CompanyProfileCoreAssessment, CoreDimensionAssessment
+from research.company_profile.execution import CompanyProfileExecutionRecord, CompanyProfileTokenBudget, CompanyProfileInputIdentity
+
+def facts(paper): return {f.fact_id: f for e in workpaper_elements(paper).values() for f in e.facts}
+
+assert not (D / 'acceptance.json').exists(), 'never overwrite an issued acceptance'
+frozen = read(D / 'research-delivery.json')
+manifest = read(D / 'source-review-manifest.json')['source_files_sha256']
+assert all(sha(ROOT / path) == digest for path, digest in manifest.items())
+quality = read(CT / 'quality-summary.json')
+progress = {r['instrument_id']: r for r in read(CT / 'progress.json')['results']}
+reference = read(C / 'workpaper-core-readiness-20261114/source-first-contract.json')
+sources = {r['instrument_id']: r for r in reference['companies']}
+baseline = []
+for row in quality['companies']:
+    counts = Counter(v for _, v in row['core_conditions'])
+    n, correct = row['reviewed_output_objects'], row['correct_output_objects']
+    recall = counts['supported'] / len(row['core_conditions'])
+    accuracy = correct / n if n else None
+    baseline.append({'instrument_id': row['instrument_id'], 'core': dict(counts),
+        'core_total': len(row['core_conditions']), 'core_recall': recall,
+        'reviewed_objects': n, 'supported_objects': correct, 'reviewed_accuracy': accuracy,
+        'two_content_thresholds_met_only': recall >= .9 and accuracy is not None and accuracy >= .98,
+        'formal_negative_suite_complete': row['formal_negative_suite_complete'],
+        'physical_requests': progress[row['instrument_id']]['physical_requests'],
+        'ledger': progress[row['instrument_id']]['charged_tokens'],
+        'business_seconds': progress[row['instrument_id']]['business_seconds'],
+        'cost': progress[row['instrument_id']]['cost']})
+assert sum(r['two_content_thresholds_met_only'] for r in baseline) == 7
+
+source_checks = []
+for instrument, pages in [('600098.SH', (9, 10, 12, 17, 18, 19)), ('600104.SH', (10, 11))]:
+    source = sources[instrument]
+    assert sha(Path(source['source_pdf'])) == source['document_version']
+    with pdfium.PdfDocument(source['source_pdf']) as doc:
+        for number in pages:
+            page = doc[number - 1]
+            text_page = page.get_textpage()
+            try:
+                text = text_page.get_text_range()
+            finally:
+                text_page.close()
+                page.close()
+            source_checks.append({'instrument_id': instrument, 'document_version': source['document_version'],
+                'physical_page': number, 'native_text_sha256': hashlib.sha256(text.encode()).hexdigest()})
+
+saic = next(p for p in frozen['profiles'] if p['instrument_id'] == '600104.SH')
+entry = next(e for e in saic['workpaper_delivery']['facts'] if e['fact_id'] == 'F14')
+assert [m['subject_scope'] for m in entry['fact']['metrics'][:2]] == ['consolidated_group'] * 2
+reason = ('分行业表金额和本期列有据，但汽车制造业、金融业两个分项指标被标为consolidated_group；'
+          '不能作为集团总额或集团收入科目消费。整条只供原文参考，不改旧值/标签；R1分产品构成独立保留。')
+decision = {'fact_id': 'F14', 'fact_sha256': workpaper_fact_hash(
+    facts(CompanyProfileWorkpaper.model_validate(read(ROOT / saic['source_query'])['profiles'][0]['workpaper']))['F14']),
+    'disposition': 'source_only', 'evidence_ids': entry['evidence_ids'], 'reason': reason}
+acceptance = {'task': '6.DA', 'scope': 'saved selected-section research material; not fresh same-version S1',
+    'new_model_calls': 0, 'production_authorization': 'not_authorized', 'formal_S1_pass': False,
+    'formal_S1_company_count_unchanged': '0/12', 'S2_release': False,
+    'source_files_sha256': {**manifest, str((D/'research-delivery.json').relative_to(ROOT)): sha(D/'research-delivery.json'),
+        str((CT/'quality-summary.json').relative_to(ROOT)): sha(CT/'quality-summary.json'),
+        str((CT/'progress.json').relative_to(ROOT)): sha(CT/'progress.json')},
+    'original_CT_only': {'companies': baseline, 'core_counts': quality['core_content_counts'],
+        'reviewed_objects': 333, 'supported_objects': 326, 'two_content_thresholds_count_only': 7,
+        'formal_negative_suite_complete': False, 'not_new_quality_measurement': True},
+    'direct_source_checks': source_checks, 'new_independent_decision': decision,
+    'post_window_core_observations': {
+        '600104.SH': 'R1分产品收入构成有据；F14仅源参考，K07/K08不靠跨表借数或改scope补成通过，K03仍部分。',
+        '600082.SH': '原10核心的事实未变；新增减值RF01仍仅源参考，不作为母公司数据。',
+        '600098.SH': 'K01—K08与K10/K11可在当前事实及9/10/12/18/19页对应；K09营业收入仍缺，K12金融金额未交全，保部分。仅核核心和原已核修订，不称全30对象准确。'},
+    'research_use': '仅显式分级事实、原文近似/范围限定及对应证据可用于受限阅读；禁用raw作为已接受事实，不授权建模/交易/生产。',
+    'next_priority': '冻结一次最终质量验收范围；复用保存响应证明当前语义合同和六类实际风险。缺证或未通过即限用结案，不再整组重抽或追可选尾项。'}
+dump(D / 'acceptance.json', acceptance)
+
+results = []
+with TemporaryDirectory(prefix='workpaper-da-readback-') as name:
+    root = Path(name)
+    try:
+        writer = CompanyProfileResearchWriter(root / 'output')
+        for old in frozen['profiles']:
+            raw = CompanyProfileWorkpaper.model_validate(read(ROOT / old['source_query'])['profiles'][0]['workpaper'])
+            payload = raw.model_dump(mode='json')
+            payload['quality_review']['checked_fact_hashes'] = old['model_checked_fact_hashes']
+            payload['use_review'] = old['use_review']
+            paper = CompanyProfileWorkpaper.model_validate(payload)
+            if old['instrument_id'] == '600104.SH':
+                review = dict(old['use_review'])
+                review.update(reviewer='Codex有限源核；既有决定继承CZ，新增F14独立核源',
+                    reference=str(D/'acceptance.json'), reference_sha256=sha(D/'acceptance.json'),
+                    decisions=[*review['decisions'], decision])
+                paper = bind_workpaper_use_review(paper, review)
+            assert facts(paper) == facts(raw) and paper.evidence == raw.evidence
+            assert paper.generation == raw.generation and paper.quality_review.calls == raw.quality_review.calls
+            if old['instrument_id'] != '600104.SH':
+                assert project_workpaper_delivery(paper) == old['workpaper_delivery']
+            dims = {k: CoreDimensionAssessment(dimension_id=k, answered=False, missing_reason='no_accepted_evidence')
+                    for k in ('principal_business', 'products_services', 'revenue_model')}
+            assessment = CompanyProfileCoreAssessment(report=paper.report, core_complete=False, **dims)
+            identity = CompanyProfileInputIdentity(instrument_id=paper.report.instrument_id, report_id=paper.report.report_id,
+                document_version=paper.report.document_version, report_period=paper.report.report_period,
+                policy_version='company_profile_common_core_mapping.v1', processing_identity={'execution_mode':'saved_scope_acceptance','new_model_calls':0})
+            execution = CompanyProfileExecutionRecord(input_identity=identity, transport_retries=0,
+                token_budget=CompanyProfileTokenBudget(total_token_budget=0, extract_max_output_tokens=0,
+                    verify_max_output_tokens=0, tokens_used=0, tokens_remaining=0))
+            writer.persist(CompanyProfileRuntimeRecordV3(work_id='da-research-'+old['instrument_id'][:6], report=paper.report,
+                assessment=assessment, activated_chapters=(), evidence_gap_codes=(), provider_calls=(),
+                provider_blocked=False, execution=execution, workpaper=paper, workpaper_receipts=()))
+        ids = tuple(p['instrument_id'] for p in frozen['profiles'])
+        reader = CompanyProfileReadService(root / 'output')
+        query = reader.query(ids)
+        exported = reader.export(ids, root / 'export')
+        fresh = CompanyProfileReadService(root / 'output').query(ids)
+        assert query['profiles'] == exported['profiles'] == fresh['profiles']
+        for p in query['profiles']:
+            delivery = p['workpaper_delivery']
+            assert not p['core_complete'] and not p['accepted_facts']
+            results.append({'instrument_id':p['instrument_id'],'three_reads_equal':True,
+                'counts':delivery['counts'],'pending_review_count':delivery['pending_review_count']})
+            if p['instrument_id'] == '600104.SH':
+                entries = {e['fact_id']: e for e in delivery['facts']}
+                assert entries['F14']['fact'] is None and entries['F14']['state'] == 'source_only'
+                assert entries['review-add:R1']['state'] == 'reviewed'
+                body = p['workpaper_markdown'].split('## 阅读范围与取舍')[0]
+                assert entry['fact']['text'] not in body and entries['review-add:R1']['fact']['text'] in body
+                excerpt = p['workpaper_markdown'].split('## 原文复核')[0].split('## 来源\n')[0]
+                (D/'600104-research-use.md').write_text(excerpt + '\n原完整来源与模型审计见原CV query；F14使用审核依据见acceptance.json。\n')
+    finally:
+        temporary_bytes = sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+assert not root.exists()
+assert all(sha(ROOT/path) == digest for path, digest in acceptance['source_files_sha256'].items())
+counts = Counter()
+for row in results: counts.update(row['counts'])
+assert counts == {'reviewed':327,'pending':0,'limited':33,'source_only':5,'withheld':5,'duplicate':1}
+assert sum(r['pending_review_count'] for r in results) == 5
+dump(D/'acceptance-readback.json', {'task':'6.DA','source_acceptance_sha256':sha(D/'acceptance.json'),
+    'profiles':results,'counts':dict(counts),'pending_review_count':5,
+    'original_files_unchanged':True,'all_raw_facts_and_model_calls_unchanged':True,
+    'new_model_calls':0,'formal_accepted_facts':0,'production_authorization':'not_authorized',
+    'finally_removed_temporary_bytes':temporary_bytes,'temporary_root_removed':True})
+print(json.dumps({'companies':len(results),'counts':dict(counts),'temporary_bytes_removed':temporary_bytes,
+    'CT_two_thresholds_only':7,'formal_S1_pass':False},ensure_ascii=False))

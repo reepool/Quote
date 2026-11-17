@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-17 6.DA已交[十二家研究使用范围及正式不通过结论](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/acceptance.md)：原CT质量/完整资源与CV/CX改善分列，不拼同版；新增核源仅将上汽F14分行业metric误标集团整条source_only，已核R1及其他11家分级保留，原writer十二家三读一致。当前327已核/33限用含5待核/5源参考/5隔离/1重复，0新模型/探针/外传/TaskService语义/生产，清本人5978325字节，旧源/缓存/回执/attempt及既有并行保护。本轮有限验收完成，正式S1不通过/S2不放行；下一只推进最终同版质量与适用风险的连续验收，不再加展示层、单家尾项或自动整批付费重抽，新增真实范围须另冻有界授权。
+
 2026-11-17 6.CZ已接通[原查询/导出分级](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/profiles.md)：use_review和有效模型内容绑定沿原owner，12保存稿三读一致；327普通已核、34限用含6待核、4源参考/5隔离/1重复，原值/raw保留不进正式接受。180相关及末端兼容验证分列、strict/diff/原件hash收尾，0新模型/探针/外传/数据库/TaskService语义，清三个读回根17883216字节及核齐后的脚本/计数副本，旧源/缓存/attempt和既有并行保护。当前不再开发展示层/单家尾项；下一有限裁定研究消费范围及正式同版质量/资源，S1/生产仍未放行。
 
 2026-11-16 6.CY已更新[唯一十二家预览](company_profile_research_preview.md)：CT九家/CV两家/CX广州的266原对象摘录及轻量JSON源索引，5坏项/4源参考/1重复单列，原稿/作者/章页/复核状态不变，不拼同版或质量分。[发布条件](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-delivery-readiness-result-20261116/release-readiness.md)明确pending corefalse占位、正式质量与完整资源三差距；下一做原owner分级交付/正式接受，不再广州/供应链细项或立即重抽十二家。本轮0新模型/探针/外传/数据库/pytest，12源/266对象/6反例/链接及strict/diff通过，清本人14701字节脚本，无源副本/运行库，原件/attempt及既有并行保护。S1/生产不变，后续真实及生产仍须相应有界授权。

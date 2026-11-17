@@ -1,0 +1,178 @@
+{
+  "task": "6.DA",
+  "source_acceptance_sha256": "007426711e34f562825d6f45b38a1f6e5059c4156a83ecd235fc596bf8b7d0c3",
+  "profiles": [
+    {
+      "instrument_id": "600094.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 19,
+        "pending": 0,
+        "limited": 3,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600103.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 29,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 1,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600100.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 27,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600107.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 20,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600098.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 23,
+        "pending": 0,
+        "limited": 6,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600104.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 24,
+        "pending": 0,
+        "limited": 9,
+        "source_only": 2,
+        "withheld": 2,
+        "duplicate": 1
+      },
+      "pending_review_count": 5
+    },
+    {
+      "instrument_id": "600088.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 33,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600099.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 26,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600082.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 25,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600097.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 28,
+        "pending": 0,
+        "limited": 3,
+        "source_only": 0,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600054.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 40,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600000.SH",
+      "three_reads_equal": true,
+      "counts": {
+        "reviewed": 33,
+        "pending": 0,
+        "limited": 5,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0
+    }
+  ],
+  "counts": {
+    "reviewed": 327,
+    "pending": 0,
+    "limited": 33,
+    "source_only": 5,
+    "withheld": 5,
+    "duplicate": 1
+  },
+  "pending_review_count": 5,
+  "original_files_unchanged": true,
+  "all_raw_facts_and_model_calls_unchanged": true,
+  "new_model_calls": 0,
+  "formal_accepted_facts": 0,
+  "production_authorization": "not_authorized",
+  "finally_removed_temporary_bytes": 5966397,
+  "temporary_root_removed": true
+}

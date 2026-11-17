@@ -1,0 +1,322 @@
+{
+  "task": "6.DA",
+  "scope": "saved selected-section research material; not fresh same-version S1",
+  "new_model_calls": 0,
+  "production_authorization": "not_authorized",
+  "formal_S1_pass": false,
+  "formal_S1_company_count_unchanged": "0/12",
+  "S2_release": false,
+  "source_files_sha256": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-delivery-readiness-result-20261116/index.json": "4ecb2d618e92839755b0588fe000cc8f87b30d8ab42698d5d68da9ff3483119b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/independent-audit.json": "0418d6afe87cb6ebbc665531d0a418fbf9e3c90cb1b5b4bd8381bc3a770eecfc",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/independent-audit.json": "4e5e8228a59e25348873716a6967894489b53d84dc743949fb1ec871a99d16f2",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600094/query.json": "a3585e7173dc9755fcc6909a2699f8f876d824658ea284f75a1592609d221c6b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600103/query.json": "1c391eff20b48f5b7f39eba127966d873f1d68c3facead8131ad858c3cfb5dd4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600100/query.json": "0fbbfda7547baf588d5b1e53946b479bbff7f6c88328c0ef939b0ba767613571",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600107/query.json": "26bfe75fee9581b195212d8f53b8458100eb98fb0186a447e93534f9c88682ff",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/query.json": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600104/query.json": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600088/query.json": "8d95443c7f898a5c8ca34a5c45f4ffdbfc2532ecb4854a77c412ef041540bbb5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600099/query.json": "e646bfcbbb84c86d707dc3282cf7580779eaa11dd0745b1a9ce8d20ab4dff05f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600082/query.json": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600097/query.json": "3cc80fc09457cf0aab4f1f1d3810a3fd550b1398e1ee5778414cfc9aa1badc55",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600054/query.json": "e1df8a98a74216fa22236f0a640cfb2cb401968426a5a806450904b30fc164a4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600000/query.json": "befcb34f096a2cb7688cc95f9f508508c927c22fab641ed726e91e229e668b97",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-format-consumption-result-20261116/query.json": "a4b97839d61c9c67325fa1197d1a9dac1419582a575b387631f6d02826fa4237",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/research-delivery.json": "59fdaf12aff618b7bcadaf0984a7562b3b8cc172d44f4860fb8a864d353d5277",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/quality-summary.json": "79d986e1d235c08b4b08c15a433e049a7b3199a494d0f6a690ac432b02a3367a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/progress.json": "21700668506bdcff429e9f09e02ac8e907d47618eac3b7f95aadb4d14c54d6a2"
+  },
+  "original_CT_only": {
+    "companies": [
+      {
+        "instrument_id": "600094.SH",
+        "core": {
+          "supported": 9,
+          "partial": 1
+        },
+        "core_total": 10,
+        "core_recall": 0.9,
+        "reviewed_objects": 22,
+        "supported_objects": 22,
+        "reviewed_accuracy": 1.0,
+        "two_content_thresholds_met_only": true,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 5,
+        "ledger": 105260,
+        "business_seconds": 565.083,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600103.SH",
+        "core": {
+          "supported": 10,
+          "partial": 2
+        },
+        "core_total": 12,
+        "core_recall": 0.8333333333333334,
+        "reviewed_objects": 31,
+        "supported_objects": 29,
+        "reviewed_accuracy": 0.9354838709677419,
+        "two_content_thresholds_met_only": false,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 5,
+        "ledger": 123514,
+        "business_seconds": 393.092,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600100.SH",
+        "core": {
+          "supported": 12
+        },
+        "core_total": 12,
+        "core_recall": 1.0,
+        "reviewed_objects": 27,
+        "supported_objects": 27,
+        "reviewed_accuracy": 1.0,
+        "two_content_thresholds_met_only": true,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 5,
+        "ledger": 121005,
+        "business_seconds": 453.232,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600107.SH",
+        "core": {
+          "supported": 9,
+          "partial": 1
+        },
+        "core_total": 10,
+        "core_recall": 0.9,
+        "reviewed_objects": 22,
+        "supported_objects": 22,
+        "reviewed_accuracy": 1.0,
+        "two_content_thresholds_met_only": true,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 5,
+        "ledger": 104567,
+        "business_seconds": 427.958,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600098.SH",
+        "core": {
+          "missing": 12
+        },
+        "core_total": 12,
+        "core_recall": 0.0,
+        "reviewed_objects": 0,
+        "supported_objects": 0,
+        "reviewed_accuracy": null,
+        "two_content_thresholds_met_only": false,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 3,
+        "ledger": 94059,
+        "business_seconds": 72.217,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600104.SH",
+        "core": {
+          "supported": 7,
+          "partial": 2,
+          "missing": 1
+        },
+        "core_total": 10,
+        "core_recall": 0.7,
+        "reviewed_objects": 31,
+        "supported_objects": 28,
+        "reviewed_accuracy": 0.9032258064516129,
+        "two_content_thresholds_met_only": false,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 3,
+        "ledger": 85856,
+        "business_seconds": 361.007,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600088.SH",
+        "core": {
+          "supported": 11
+        },
+        "core_total": 11,
+        "core_recall": 1.0,
+        "reviewed_objects": 34,
+        "supported_objects": 34,
+        "reviewed_accuracy": 1.0,
+        "two_content_thresholds_met_only": true,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 3,
+        "ledger": 78572,
+        "business_seconds": 397.537,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600099.SH",
+        "core": {
+          "supported": 12
+        },
+        "core_total": 12,
+        "core_recall": 1.0,
+        "reviewed_objects": 28,
+        "supported_objects": 27,
+        "reviewed_accuracy": 0.9642857142857143,
+        "two_content_thresholds_met_only": false,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 5,
+        "ledger": 121849,
+        "business_seconds": 474.926,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600082.SH",
+        "core": {
+          "supported": 10
+        },
+        "core_total": 10,
+        "core_recall": 1.0,
+        "reviewed_objects": 27,
+        "supported_objects": 27,
+        "reviewed_accuracy": 1.0,
+        "two_content_thresholds_met_only": true,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 3,
+        "ledger": 91987,
+        "business_seconds": 529.08,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600097.SH",
+        "core": {
+          "supported": 9,
+          "partial": 1
+        },
+        "core_total": 10,
+        "core_recall": 0.9,
+        "reviewed_objects": 32,
+        "supported_objects": 31,
+        "reviewed_accuracy": 0.96875,
+        "two_content_thresholds_met_only": false,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 5,
+        "ledger": 116104,
+        "business_seconds": 506.874,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600054.SH",
+        "core": {
+          "supported": 13
+        },
+        "core_total": 13,
+        "core_recall": 1.0,
+        "reviewed_objects": 41,
+        "supported_objects": 41,
+        "reviewed_accuracy": 1.0,
+        "two_content_thresholds_met_only": true,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 5,
+        "ledger": 102870,
+        "business_seconds": 337.368,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600000.SH",
+        "core": {
+          "supported": 10,
+          "partial": 1
+        },
+        "core_total": 11,
+        "core_recall": 0.9090909090909091,
+        "reviewed_objects": 38,
+        "supported_objects": 38,
+        "reviewed_accuracy": 1.0,
+        "two_content_thresholds_met_only": true,
+        "formal_negative_suite_complete": false,
+        "physical_requests": 3,
+        "ledger": 93022,
+        "business_seconds": 262.559,
+        "cost": "unknown"
+      }
+    ],
+    "core_counts": {
+      "core_supported": 112,
+      "core_partial": 8,
+      "core_missing": 13
+    },
+    "reviewed_objects": 333,
+    "supported_objects": 326,
+    "two_content_thresholds_count_only": 7,
+    "formal_negative_suite_complete": false,
+    "not_new_quality_measurement": true
+  },
+  "direct_source_checks": [
+    {
+      "instrument_id": "600098.SH",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "physical_page": 9,
+      "native_text_sha256": "0ff2c3d2d0355644344341f8154552aabc10d33f27ddcfd32350ac0e593ee27f"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "physical_page": 10,
+      "native_text_sha256": "a01ba5f7cc04f786a8c95595e8e1167411300b83fd7bbe1870bdfd9ddb0440ff"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "physical_page": 12,
+      "native_text_sha256": "a5e30d67f15fa8a37780ce26eb31624eeab49149921dbd93bbe38907f4c1da12"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "physical_page": 17,
+      "native_text_sha256": "1df59468fb0ba781aa08307f765850a1d231be3b362a012199143648b86eae79"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "physical_page": 18,
+      "native_text_sha256": "d91638fb5697fb6b163ecf945a49c7ad98cc74a96706a8e35d9b0a1e049e2df2"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "physical_page": 19,
+      "native_text_sha256": "253652f2ddd195a6bdb2cd363415ddc0d755a4c546989ea00ee16e321af6b182"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "physical_page": 10,
+      "native_text_sha256": "a3403093e2a54de4f3e708b383d3752c427033ba95d3fcbed70fdd8e381d3525"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "physical_page": 11,
+      "native_text_sha256": "ad73346e3f3e38420135ebeb48adb2c364918174160ab1644b1cfdb62b468dc7"
+    }
+  ],
+  "new_independent_decision": {
+    "fact_id": "F14",
+    "fact_sha256": "e05de8be41e72ab92f10e18b640ee6fdb7dbb7238f798bc39a1713f2e34f34f2",
+    "disposition": "source_only",
+    "evidence_ids": [
+      "source-0006"
+    ],
+    "reason": "分行业表金额和本期列有据，但汽车制造业、金融业两个分项指标被标为consolidated_group；不能作为集团总额或集团收入科目消费。整条只供原文参考，不改旧值/标签；R1分产品构成独立保留。"
+  },
+  "post_window_core_observations": {
+    "600104.SH": "R1分产品收入构成有据；F14仅源参考，K07/K08不靠跨表借数或改scope补成通过，K03仍部分。",
+    "600082.SH": "原10核心的事实未变；新增减值RF01仍仅源参考，不作为母公司数据。",
+    "600098.SH": "K01—K08与K10/K11可在当前事实及9/10/12/18/19页对应；K09营业收入仍缺，K12金融金额未交全，保部分。仅核核心和原已核修订，不称全30对象准确。"
+  },
+  "research_use": "仅显式分级事实、原文近似/范围限定及对应证据可用于受限阅读；禁用raw作为已接受事实，不授权建模/交易/生产。",
+  "next_priority": "冻结一次最终质量验收范围；复用保存响应证明当前语义合同和六类实际风险。缺证或未通过即限用结案，不再整组重抽或追可选尾项。"
+}
