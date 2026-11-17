@@ -170,7 +170,9 @@ def test_source_checked_fact_with_explicit_use_limit_explains_it_in_markdown():
     assert '只按报告期表列收入使用，不推作收现。' in render_workpaper(paper,delivery=delivery)
 
 
-def test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions():
+@pytest.mark.parametrize('excluded', ['withheld', 'source_only', 'duplicate'])
+@pytest.mark.parametrize('uncertain', [False, True])
+def test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions(excluded, uncertain):
     with TemporaryDirectory(prefix='workpaper-cz-delivery-') as directory:
         root=Path(directory);provider=_Provider();writer=CompanyProfileResearchWriter(root/'output')
         runtime=CompanyProfileStageRuntime(writer=writer,provider=provider)
@@ -179,18 +181,45 @@ def test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions
             'processing_identity':workpaper_processing_identity(real=False)}
         for stage in ('acquire','parse','semantic','verify','publish'):assert runtime.run_stage(stage,item)['status']=='success'
         record=CompanyProfileRuntimeRecordV3.model_validate_json(writer.latest_path().read_text())
-        paper=bind_workpaper_use_review(record.workpaper,use_review(record.workpaper,{'main':'withheld','revenue':'source_checked'}))
+        payload=record.workpaper.model_dump(mode='json')
+        if uncertain:
+            payload['elements']['scale_and_mix']['facts'][0]['metrics'][0].update(
+                value=None,uncertainty_reason='只保留原值，不参与精确比较。')
+        paper=CompanyProfileWorkpaper.model_validate(payload)
+        paper=bind_workpaper_use_review(paper,use_review(paper,{'main':excluded,'revenue':'source_checked'}))
         writer.persist(record.model_copy(update={'workpaper':paper}))
         reader=CompanyProfileReadService(root/'output');query=reader.query(('600000.SH',))
         export=reader.export(('600000.SH',),root/'export')
         assert query['profiles']==export['profiles']==CompanyProfileReadService(root/'output').query(('600000.SH',))['profiles']
         profile=query['profiles'][0]
         assert profile['workpaper_summary']['business_description']==''
-        assert profile['workpaper_delivery']['counts']['withheld']==1
+        assert profile['workpaper_delivery']['counts'][excluded]==1
         assert profile['workpaper']['elements']['business_structure']['facts'][0]['text']=='公司提供存贷款和结算服务。'
         assert profile['accepted_facts']==[] and not profile['core_complete']
         row=next(csv.DictReader((root/'export/profiles.csv').open()))
-        assert row['workpaper_delivery_withheld_count']=='1' and row['workpaper_delivery_reviewed_count']=='1'
+        visible_state='limited' if uncertain else 'reviewed'
+        assert row['workpaper_delivery_'+excluded+'_count']=='1'
+        assert row['workpaper_delivery_'+visible_state+'_count']=='1'
         assert row['accepted_fact_count']=='0' and row['workpaper_business_description']==''
+        research=json.loads((root/'export/research_profiles.json').read_text())
+        assert research['research_only'] and research['formal_acceptance']=='not_assessed'
+        assert research['production_authorization']=='not_authorized'
+        assert len(research['profiles'])==1
+        exported=research['profiles'][0]
+        assert 'workpaper' not in exported and 'findings' not in exported['review']
+        assert exported['delivery']==profile['workpaper_delivery']
+        assert exported['generation']==profile['workpaper']['generation']
+        assert exported['reading_scope']==profile['workpaper']['reading_scope']
+        assert exported['report']==profile['report']
+        entries={f['fact_id']:f for f in exported['delivery']['facts']}
+        assert entries['main']['state']==excluded and entries['main']['fact'] is None
+        assert entries['revenue']['state']==visible_state
+        assert entries['revenue']['fact']['metrics'][0]['raw_value']=='100.00'
+        assert (entries['revenue']['fact']['metrics'][0]['value'] is None)==uncertain
+        assert {e['evidence_id'] for e in exported['evidence']}=={
+            eid for entry in exported['delivery']['facts'] for eid in entry['evidence_ids']}
+        manifest=json.loads((root/'export/export_manifest.json').read_text())
+        assert str(root/'export/research_profiles.json') in export['files']
+        assert str(root/'export/research_profiles.json') in manifest['files']
         assert len(provider.calls)==2
     assert not root.exists()

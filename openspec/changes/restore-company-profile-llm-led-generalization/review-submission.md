@@ -9421,6 +9421,20 @@ CU显示限定在seed_material再次绑定会重复追加并改变合法底稿ha
 
 直接核12原query及适用审核hash、266原句/证据引用、普通段落实际ID和所有本地链接通过；6内存反例（源/事实hash、未知ID、坏项/源参考外放、重复对象）全部拒绝。0新模型/探针/外传/usage/模型费用、0新数据库/TaskService/pytest，旧三读和87等有效工程证明复用，不以JSON比对冒充新入口或语义真值。strict/diff/JSON通过，Review A类只看当前错误外放和版本误标，明确限制已处理；B类章名/特色/供应链细度后置，C类既有并行不动。必要交付/验证一套，脚本快照核齐后清本人临时脚本14701字节，无运行库/PDF副本/过程日志；正式源/缓存/原件/attempt保护。活跃开发/审核未精确计时，不报零开发成本；Git只本人预览/索引及CY可隔离新增文档，普通提交推送，不纳入原混合段。CY三项完成即结束，不扩大报告或细节范围。
 
+## 320. 6.DF直接研究JSON交付与整体验收结论
+
+用户继续推进DE后的整体验收和研究交付。开工HEAD56a7c791/空暂存，reads.py及两份直接测试、章节卡/spec干净；既有配置/骨架/混合文档及并行保护，DE/DF本人无依赖残留0，原尝试保留。沿business-first-goal/openspec-apply-change、产品/验收/交付/A-B v3，发现实际缺口是当前数据以分散原稿审计JSON+外部决定联结为主；不再发三家细项卡或重复有限报告，先在原导出owner交可直接消费的合并研究JSON。
+
+最小实现仅原ReadService._write_profile_export在现有锁内多写research_profiles.json，复用已算好的workpaper_delivery、Fact/Metric/Evidence及报告/章节/实际generation/review.calls，原值/null/单位/主体/期间/来源及作者不改。被排除条目state/reasons/evidence_ids保留但fact=null，不复制workpaper原稿或审核original/revised_fact；未知历史元数据不造，八要素阅读状态、可选供应链/自主特色同一结构保留。manifest列出新文件，原逐公司审计JSON/CSV/Markdown与非workpaper导出兼容；不建新writer/库/接口/门禁/展示平台，生产代码不读OpenSpec。
+
+[机器交付与有限验收](workpaper-research-export-result-20261117/result.md)：12份当前稿/使用决定从DE索引取源，沿原writer隔离持久、query/export/新实例12/12一致。合并数据365可见事实/524指标，321普通已核/44限用（含4待核）；可见依据349独立源核/12模型源核/4未核，七个源参考/隔离/重复对象无事实载荷。上汽研发/集中度/两项交易的旧核验绑定不足仍限用待核，不因新导出自动晋升或付费补句。原数据/源/归因/全部DC-DE hash不变，不把统计标签当准确率。只留合并JSON、原CSV及链接原人读版的总览，不留12重复原稿/数据库。
+
+验收沿原133条件：当前后继123支持/9部分/1缺失，宏92.16%/微92.48%，10家只达90%召回参考，不称正式可用10家。上汽7/10、广州10/12及部分条件继续缺项；当前版本完整同版首发/适用正反/补充抽审与准确率范围、全流程资源/可核价格尚未通过。CT首发与三家超120000/unknown原证据分列引用，DC/DE后段不当全流程耗时；正式S1仍0/12，S2/生产未放行，不改阈值或手填核心bool。研究交付完成与正式差距明确，后续不再围可选尾项续窗或盲重抽，而应集中冻结正式验证合同和正常资源口径。
+
+26分级/JSON/限制/不确定性正反29.49秒、1旧非workpaper原TaskService兼容132.52秒通过；范围内只跑一次该旧长入口。十二份导出适配9.828秒，socket禁连、0真实新模型/探针/付费/TaskService语义；受控测试与保存真实稿的导出均不冒充新语义。Review A类持久总览临时逐公司JSON链接已统一到合并JSON，禁止项/null/引用/模型和兼容性成立；B类可选细化/平台不做，C类既有并行不动。strict/diff/JSON/链接/hash及本人Git隔离收尾。
+
+清完成兼容测试精确根pytest-26（仅本次test_export_writes_structured_0及其symlink、无活跃lock）4713921字节，其他pytest/并行根未动；十二份临时writer/export根9200271字节，共13914192字节，finally清。脚本与权威快照核齐后清、必要证据只一套，PDF/共享有效缓存/旧回执/attempt及既有改动保护，详情cleanup.json。活跃开发/审核时间未知，不称零开发成本；本人代码/测试及可隔离DF文档普通提交推送，原混合段不纳入。
+
 ## 319. 6.DE三份原修订批次最终再核与研究交付
 
 用户明确批准“这三份原修订批次限定最终再核”。开工HEAD9c17173c/空暂存，源码/测试未改，既有配置/骨架/混合文档/并行保护，DD/DE本人无依赖残留0。沿business-first-goal/openspec-apply-change及A/B v3，复用DD212相关/三份实际输入到final边界，不重复旧长测；仅在获准联网环境同namespace核Scorpio DNS/TLS、原回复/源hash/现有模型后冻结。原TaskService review_resume接原两回执，每家仅1逻辑/2物理含1恢复/900秒300000，并发3及组1200秒900000/6，运行中源码/共享配置不变。

@@ -1,0 +1,31 @@
+{
+  "task": "6.DF",
+  "removed_roots": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/pytest-of-python/pytest-26",
+      "bytes": 4713921,
+      "purpose": "completed non-workpaper export compatibility test"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-df-export-gvgg41dk",
+      "bytes": 9200271,
+      "purpose": "writer/query/export/fresh-reader and temporary per-company copies"
+    }
+  ],
+  "removed_tools": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-df-deliver.py",
+      "bytes": 10288,
+      "sha256": "6f961b0b0651f6455bbc615715cdb25563bd745b80ffc44da407a4372cc93340"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-df-finish.py",
+      "bytes": 5879,
+      "sha256": "3ebbd445aa043fdf2a794f9a1e79c1519b3adfba32d95429d9c23c420c2260c1"
+    }
+  ],
+  "total_measured_bytes": 13930359,
+  "other_pytest_or_parallel_roots_touched": false,
+  "unit_test_finally_cleanup_unmeasured": true,
+  "pdf_shared_cache_previous_results_and_attempts_preserved": true
+}

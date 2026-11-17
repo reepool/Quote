@@ -1,0 +1,132 @@
+"""Offline current-cohort delivery through the original writer/read/export owners."""
+import collections
+import hashlib
+import json
+import shutil
+import sys
+import time
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DE=C/'workpaper-three-final-source-review-result-20261117'
+D=C/'workpaper-research-export-result-20261117'
+from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import CompanyProfileWorkpaper,workpaper_elements
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+def read(path):return json.loads(Path(path).read_text())
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path,data):Path(path).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+def facts(p):return {f.fact_id:f for e in workpaper_elements(p).values() for f in e.facts}
+
+started=time.monotonic();D.mkdir(exist_ok=True)
+assert not (D/'validation.json').exists(),'do not overwrite completed delivery'
+manifest=read(DE/'current-delivery-index.json');assert len(manifest['profiles'])==12
+protected={str(p):sha(p) for folder in (DE,C/'workpaper-final-source-review-result-20261117') for p in folder.rglob('*') if p.is_file()}
+cleanup=[]
+# This exact completed legacy-export test created pytest-26 and only this case.
+legacy=ROOT/'data/QuoteBak/pytest-of-python/pytest-26'
+if legacy.exists():
+    assert not (legacy/'.lock').exists()
+    assert {p.name for p in legacy.iterdir()}=={'test_export_writes_structured_0','test_export_writes_structured_current'}
+    assert read(legacy/'test_export_writes_structured_0/exports/export_manifest.json')['delivered']==1
+    size=sum(p.stat().st_size for p in legacy.rglob('*') if p.is_file())
+    cleanup.append({'path':str(legacy),'bytes':size,'purpose':'completed non-workpaper export compatibility test'})
+    current=legacy.parent/'pytest-current'
+    if current.is_symlink() and current.resolve()==legacy:current.unlink()
+    shutil.rmtree(legacy)
+old_facts={};source_hashes={};expected_counts=collections.Counter();core_rows=[]
+with patch('socket.socket.connect',side_effect=AssertionError('network forbidden for offline DF')):
+    with TemporaryDirectory(prefix='workpaper-df-export-') as directory:
+        root=Path(directory);writer=CompanyProfileResearchWriter(root/'output')
+        for row in manifest['profiles']:
+            source=ROOT/row['source_query'];assert sha(source)==row['source_query_sha256']
+            source_hashes[row['source_query']]=sha(source)
+            p=read(source)['profiles'][0];paper=CompanyProfileWorkpaper.model_validate(p['workpaper'])
+            decisions=next(g for g in read(ROOT/row['decisions'])['profiles'] if g['instrument_id']==row['instrument_id'])
+            assert sha(decisions['use_review']['reference'])==decisions['use_review']['reference_sha256']
+            bound=bind_workpaper_use_review(paper,decisions['use_review'])
+            assert facts(bound)==facts(paper) and bound.evidence==paper.evidence
+            old_facts[row['instrument_id']]=facts(paper)
+            context=read(source.parent/'publication-context.json')
+            context.update(workpaper=bound.model_dump(mode='json'),workpaper_receipts=p['workpaper_receipts'])
+            writer.persist(CompanyProfileRuntimeRecordV3.model_validate_json(json.dumps(context,ensure_ascii=False)))
+            expected_counts.update(decisions['counts'])
+            v=row['core_verdicts'];n=sum(v.values());recall=v.get('supported',0)/n
+            core_rows.append({'instrument_id':row['instrument_id'],'supported':v.get('supported',0),
+                'partial':v.get('partial',0),'missing':v.get('missing',0),'total':n,
+                'selected_scope_core_recall':recall,'recall_reference_ge_90_percent':recall>=.9,
+                'formal_company_usable':'not_assessed'})
+        reader=CompanyProfileReadService(root/'output');q=reader.query(())
+        exported=reader.export((),root/'export');fresh=CompanyProfileReadService(root/'output').query(())
+        assert q['profiles']==exported['profiles']==fresh['profiles'] and len(q['profiles'])==12
+        research=read(root/'export/research_profiles.json');assert research['research_only']
+        assert research['production_authorization']=='not_authorized' and research['formal_acceptance']=='not_assessed'
+        assert len(research['profiles'])==12
+        query_by_id={p['instrument_id']:p for p in q['profiles']}
+        observed_counts=collections.Counter();basis=collections.Counter();visible_metrics=0;excluded=[]
+        for p in research['profiles']:
+            original=query_by_id[p['instrument_id']];paper=CompanyProfileWorkpaper.model_validate(original['workpaper'])
+            assert facts(paper)==old_facts[p['instrument_id']]
+            assert p['delivery']==original['workpaper_delivery']
+            assert p['generation']==original['workpaper']['generation']
+            assert p['review']['calls']==(original['workpaper'].get('quality_review') or {}).get('calls',[])
+            assert 'workpaper' not in p and 'findings' not in p['review']
+            sources={e['evidence_id']:e for e in p['evidence']}
+            observed_counts.update(p['delivery']['counts'])
+            for entry in p['delivery']['facts']:
+                assert set(entry['evidence_ids'])<=sources.keys()
+                if entry['state'] in {'source_only','withheld','duplicate'}:
+                    assert entry['fact'] is None
+                    excluded.append({'instrument_id':p['instrument_id'],'fact_id':entry['fact_id'],'state':entry['state']})
+                else:
+                    assert entry['fact']==old_facts[p['instrument_id']][entry['fact_id']].model_dump(mode='json')
+                    visible_metrics+=len(entry['fact']['metrics']);basis.update([entry['review_basis']])
+            assert not original['core_complete'] and not original['accepted_facts']
+        assert dict(observed_counts)==manifest['aggregate_delivery_counts'] and observed_counts==expected_counts
+        assert observed_counts['reviewed']==321 and observed_counts['limited']==44 and len(excluded)==7
+        # Preserve one machine payload and the existing compact CSV/overview.
+        shutil.copy2(root/'export/research_profiles.json',D/'research_profiles.json')
+        shutil.copy2(root/'export/profiles.csv',D/'profiles.csv')
+        overview=(root/'export/profiles.md').read_text()
+        export_index=read(root/'export/export_manifest.json')
+        for item in export_index['profiles']:
+            row=next(r for r in manifest['profiles'] if r['instrument_id']==item['instrument_id'])
+            relative='../'+Path(row['research_markdown']).parent.name+'/'+Path(row['research_markdown']).name
+            overview=overview.replace(item['file'].removesuffix('.json')+'.md',relative)
+            overview=overview.replace(item['file'],'research_profiles.json')
+        (D/'profiles.md').write_text(overview)
+        size=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+        cleanup.append({'path':str(root),'bytes':size,'purpose':'writer/query/export/fresh-reader and temporary per-company copies'})
+    assert not root.exists()
+assert all(sha(Path(p))==h for p,h in protected.items())
+old_CT=read(C/'workpaper-graded-delivery-result-20261117/acceptance.json')['original_CT_only']
+acceptance={'task':'6.DF','research_export_delivered':True,'new_model_calls':0,
+    'formal_S1_pass':False,'formal_S1_company_count_unchanged':'0/12','S2_release':False,
+    'production_authorization':'not_authorized','current_selected_scope_core':core_rows,
+    'current_core_micro_recall':123/133,
+    'current_core_macro_recall':sum(r['selected_scope_core_recall'] for r in core_rows)/12,
+    'companies_meeting_only_core_recall_reference':sum(r['recall_reference_ge_90_percent'] for r in core_rows),
+    'formal_accuracy':None,'accuracy_not_inferred_from_delivery_grades':True,
+    'remaining_formal_gaps':[
+        '当前为9份DC+3份DE后继，不是当前同版十二家从头首发；原CT首次广州失败保留。',
+        '上汽7/10、广州10/12仅核心召回参考未达90%；不为此改冻结分母或追加细项调用。',
+        '完整适用正反例、补充抽审及当前版本全流程资源仍未获正式通过；未触发不能计通过。',
+        'CT完整入口三家超过120000，费用/部分活跃补救成本未知；后段耗时不能替代全流程成本。'],
+    'original_CT_resource_reference':{'companies':[{'instrument_id':r['instrument_id'],'physical_requests':r['physical_requests'],
+        'ledger':r['ledger'],'business_seconds':r['business_seconds'],'cost':r['cost']} for r in old_CT['companies']],
+        'old_scores_unchanged':True},
+    'source_index':str(DE.relative_to(ROOT)/'current-delivery-index.json'),'source_index_sha256':sha(DE/'current-delivery-index.json')}
+dump(D/'acceptance.json',acceptance)
+dump(D/'validation.json',{'task':'6.DF','three_reads_equal':12,'json_profiles':12,'delivery_counts':dict(observed_counts),
+    'visible_fact_count':365,'visible_metric_count':visible_metrics,'visible_review_basis_counts':dict(basis),'excluded':excluded,
+    'all_visible_facts_metrics_evidence_and_model_attribution_unchanged':True,'historical_DC_DE_hashes_unchanged':True,
+    'source_queries_sha256':source_hashes,'new_model_calls':0,'network_connect_forbidden':True,
+    'runtime_seconds':round(time.monotonic()-started,3),'cleanup_completed_roots':cleanup,
+    'temporary_roots_removed':True,'old_audit_jsons_retained_only_in_their_authoritative_runs':True})
+shutil.copy2(__file__,D/'operator-snapshot.txt')
+print(json.dumps({'passed':True,'delivery_counts':dict(observed_counts),'visible_metric_count':visible_metrics,
+    'basis':dict(basis),'core_macro':acceptance['current_core_macro_recall'],'core_reference_companies':acceptance['companies_meeting_only_core_recall_reference'],
+    'cleanup_bytes':sum(p['bytes'] for p in cleanup),'seconds':round(time.monotonic()-started,3)},ensure_ascii=False))

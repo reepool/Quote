@@ -10,6 +10,12 @@
 
 ## Decisions
 
+### 6.DF：原导出入口提供合并研究数据
+
+原ReadService.export在同一导出锁内为workpaper额外交research_profiles.json。只复用render_profile已生成的workpaper_delivery，配报告/阅读范围、所引Evidence及实际生成/核验调用元数据；不复制原workpaper或带original/revised_fact的审核历史。被排除条目仍保state/reasons且fact=null，限定/待核仍分列，不将研究消费提升为正式接受。原逐公司审计JSON、CSV、Markdown及非workpaper导出兼容，不新建服务/写入器或OpenSpec生产依赖。
+
+以现有十二份及内容hash匹配的使用决定，在隔离根由原writer/read owner一次持久、查询/导出/新实例一致，合并JSON为唯一新增机器交付；清重复临时库/逐公司导出。有限验收复用DC/DE原源结论，正式同版首发/负例/成本未评估不称通过；不再模型调用或追单家细目。
+
 ### 6.DD：不改变业务值的共性消费修正
 
 6.DC三类真实候选误拒按原source owner合并处理。金额展示只做同事实/同期间/明确源单位的倍率与舍入，metric主体保持自身原文标注，不要求与复合fact相同；归属仍由模型源核负责，不能据换算通过提升主体。原已确认同续行的减少X个百分点可供百分点负数源匹配，不供负金额或百分比单位。财务表须有明确货币单位、比较期列及至少两个唯一同列小数续片，才还原两位小数；不泛化为去空白拼数。原表明确同比/同期增减百分比头和负值、正文明确同比/环比下降同幅度时，可保正数降幅表达；没有方向/表头、增长、错数、金额不能借用。source-binding v6区分新行为，原请求提示、原值/Evidence/旧hash与生产不改。

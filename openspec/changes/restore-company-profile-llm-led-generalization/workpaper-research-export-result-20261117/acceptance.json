@@ -1,0 +1,233 @@
+{
+  "task": "6.DF",
+  "research_export_delivered": true,
+  "new_model_calls": 0,
+  "formal_S1_pass": false,
+  "formal_S1_company_count_unchanged": "0/12",
+  "S2_release": false,
+  "production_authorization": "not_authorized",
+  "current_selected_scope_core": [
+    {
+      "instrument_id": "600094.SH",
+      "supported": 9,
+      "partial": 1,
+      "missing": 0,
+      "total": 10,
+      "selected_scope_core_recall": 0.9,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "supported": 11,
+      "partial": 1,
+      "missing": 0,
+      "total": 12,
+      "selected_scope_core_recall": 0.9166666666666666,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "supported": 12,
+      "partial": 0,
+      "missing": 0,
+      "total": 12,
+      "selected_scope_core_recall": 1.0,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "supported": 9,
+      "partial": 1,
+      "missing": 0,
+      "total": 10,
+      "selected_scope_core_recall": 0.9,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "supported": 10,
+      "partial": 1,
+      "missing": 1,
+      "total": 12,
+      "selected_scope_core_recall": 0.8333333333333334,
+      "recall_reference_ge_90_percent": false,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "supported": 7,
+      "partial": 3,
+      "missing": 0,
+      "total": 10,
+      "selected_scope_core_recall": 0.7,
+      "recall_reference_ge_90_percent": false,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "supported": 11,
+      "partial": 0,
+      "missing": 0,
+      "total": 11,
+      "selected_scope_core_recall": 1.0,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "supported": 12,
+      "partial": 0,
+      "missing": 0,
+      "total": 12,
+      "selected_scope_core_recall": 1.0,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "supported": 10,
+      "partial": 0,
+      "missing": 0,
+      "total": 10,
+      "selected_scope_core_recall": 1.0,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "supported": 9,
+      "partial": 1,
+      "missing": 0,
+      "total": 10,
+      "selected_scope_core_recall": 0.9,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "supported": 13,
+      "partial": 0,
+      "missing": 0,
+      "total": 13,
+      "selected_scope_core_recall": 1.0,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "supported": 10,
+      "partial": 1,
+      "missing": 0,
+      "total": 11,
+      "selected_scope_core_recall": 0.9090909090909091,
+      "recall_reference_ge_90_percent": true,
+      "formal_company_usable": "not_assessed"
+    }
+  ],
+  "current_core_micro_recall": 0.924812030075188,
+  "current_core_macro_recall": 0.921590909090909,
+  "companies_meeting_only_core_recall_reference": 10,
+  "formal_accuracy": null,
+  "accuracy_not_inferred_from_delivery_grades": true,
+  "remaining_formal_gaps": [
+    "当前为9份DC+3份DE后继，不是当前同版十二家从头首发；原CT首次广州失败保留。",
+    "上汽7/10、广州10/12仅核心召回参考未达90%；不为此改冻结分母或追加细项调用。",
+    "完整适用正反例、补充抽审及当前版本全流程资源仍未获正式通过；未触发不能计通过。",
+    "CT完整入口三家超过120000，费用/部分活跃补救成本未知；后段耗时不能替代全流程成本。"
+  ],
+  "original_CT_resource_reference": {
+    "companies": [
+      {
+        "instrument_id": "600094.SH",
+        "physical_requests": 5,
+        "ledger": 105260,
+        "business_seconds": 565.083,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600103.SH",
+        "physical_requests": 5,
+        "ledger": 123514,
+        "business_seconds": 393.092,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600100.SH",
+        "physical_requests": 5,
+        "ledger": 121005,
+        "business_seconds": 453.232,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600107.SH",
+        "physical_requests": 5,
+        "ledger": 104567,
+        "business_seconds": 427.958,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600098.SH",
+        "physical_requests": 3,
+        "ledger": 94059,
+        "business_seconds": 72.217,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600104.SH",
+        "physical_requests": 3,
+        "ledger": 85856,
+        "business_seconds": 361.007,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600088.SH",
+        "physical_requests": 3,
+        "ledger": 78572,
+        "business_seconds": 397.537,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600099.SH",
+        "physical_requests": 5,
+        "ledger": 121849,
+        "business_seconds": 474.926,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600082.SH",
+        "physical_requests": 3,
+        "ledger": 91987,
+        "business_seconds": 529.08,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600097.SH",
+        "physical_requests": 5,
+        "ledger": 116104,
+        "business_seconds": 506.874,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600054.SH",
+        "physical_requests": 5,
+        "ledger": 102870,
+        "business_seconds": 337.368,
+        "cost": "unknown"
+      },
+      {
+        "instrument_id": "600000.SH",
+        "physical_requests": 3,
+        "ledger": 93022,
+        "business_seconds": 262.559,
+        "cost": "unknown"
+      }
+    ],
+    "old_scores_unchanged": true
+  },
+  "source_index": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/current-delivery-index.json",
+  "source_index_sha256": "d26ad650c8d8d5ff912153342f5b3bd9eae0d66e4a76e1c6d9830e85812cd81e"
+}

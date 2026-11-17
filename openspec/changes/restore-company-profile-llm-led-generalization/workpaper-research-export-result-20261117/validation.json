@@ -1,0 +1,93 @@
+{
+  "task": "6.DF",
+  "three_reads_equal": 12,
+  "json_profiles": 12,
+  "delivery_counts": {
+    "reviewed": 321,
+    "pending": 0,
+    "limited": 44,
+    "source_only": 4,
+    "withheld": 2,
+    "duplicate": 1
+  },
+  "visible_fact_count": 365,
+  "visible_metric_count": 524,
+  "visible_review_basis_counts": {
+    "independent_source_check": 349,
+    "model_source_check": 12,
+    "not_reviewed": 4
+  },
+  "excluded": [
+    {
+      "instrument_id": "600094.SH",
+      "fact_id": "review-add:R03",
+      "state": "source_only"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "fact_id": "F16",
+      "state": "withheld"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "fact_id": "F10",
+      "state": "source_only"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "fact_id": "F11",
+      "state": "source_only"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "fact_id": "F13",
+      "state": "duplicate"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "fact_id": "F23",
+      "state": "withheld"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "fact_id": "F38",
+      "state": "source_only"
+    }
+  ],
+  "all_visible_facts_metrics_evidence_and_model_attribution_unchanged": true,
+  "historical_DC_DE_hashes_unchanged": true,
+  "source_queries_sha256": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600094/query.json": "10c875b5c74c472e0ee88d659e2bdab2988810077b71de1f1c225fda43d83af5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600103/query.json": "dfafb39872eadc7eaca861b78155823d3c18f13b0e4f504706effb59dba6fc72",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600100/query.json": "5684d727854f58e467ad0912dbfc6fb222f38f5cf57d8bda6ac4fbf3532d90cb",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600107/query.json": "952e15a2b715193cce9705423473385ba42a0ea1c32c428fc66b623a27503c42",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600098/query.json": "de8174931b03a4ac900474f64adf91b01b53fe9bd2e6b4eec9e2b9e41bdb7b27",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600104/query.json": "1069bf54411035d357ecfd26ecfeca583e94ebc56a4c40b18561f299a980c538",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600088/query.json": "d7ef75c1481d5bf71cb8fee2f30d7747d49d751484361fd858a608315722e94f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600099/query.json": "362e48a9ab641da2995893a9ce98415b5c243d60af449398ee0993f0448e563d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600082/query.json": "660710208cf43bdd23135cf1ee3095c1b7e89b6cbfface9bdb24e77acd73dde4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600097/query.json": "0ad8cd82c00e73d0734d1ba6eb4474bb7636be0a03a2128ae7cd1ca744e135cf",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600054/query.json": "4708986160607fe7a5421a7d33390c398a0b9732bc889b076914e202d3dbd744",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600000/query.json": "a119eb7eeb6a18d107d683d507a87fd91689c82bc413f499cc02c06252aea5ca"
+  },
+  "new_model_calls": 0,
+  "network_connect_forbidden": true,
+  "runtime_seconds": 9.822,
+  "cleanup_completed_roots": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/pytest-of-python/pytest-26",
+      "bytes": 4713921,
+      "purpose": "completed non-workpaper export compatibility test"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-df-export-gvgg41dk",
+      "bytes": 9200271,
+      "purpose": "writer/query/export/fresh-reader and temporary per-company copies"
+    }
+  ],
+  "temporary_roots_removed": true,
+  "old_audit_jsons_retained_only_in_their_authoritative_runs": true,
+  "overview_json_links_target_merged_research_export": true,
+  "csv_cells_preserved_record_terminator": "LF",
+  "artifact_formatting_note": "持久CSV记录行尾由原导出的CRLF转为LF；csv.reader逐单元格一致，业务导出逻辑及操作快照不改。"
+}

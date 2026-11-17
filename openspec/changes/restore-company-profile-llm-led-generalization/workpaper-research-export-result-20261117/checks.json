@@ -1,0 +1,24 @@
+{
+  "task": "6.DF",
+  "openspec_strict": "passed",
+  "git_diff_check": "passed",
+  "delivery_tests": {
+    "passed": 26,
+    "seconds": 29.49
+  },
+  "legacy_task_service_compatibility": {
+    "passed": 1,
+    "seconds": 132.52
+  },
+  "real_model_calls": 0,
+  "twelve_saved_workpapers_exported": 12,
+  "sources_values_and_attribution_preserved": true,
+  "persistent_overview_links": "canonical prior Markdown and merged research JSON",
+  "review": {
+    "blocking": "原审计JSON与分级机器消费入口分开；七条禁止/去重项无事实载荷；临时链接已修",
+    "nonblocking": "可选供应链/单家尾项和展示美化不扩",
+    "unrelated": "开工配置/骨架/混合段/并行保护"
+  },
+  "formal_S1": "0/12",
+  "production_authorization": "not_authorized"
+}

@@ -693,7 +693,29 @@ def _write_profile_export(
     written: list[str] = []
     if not profiles:
         return written
+    research_profiles: list[dict[str, Any]] = []
     for profile in profiles:
+        paper, delivery = profile.get("workpaper"), profile.get("workpaper_delivery")
+        if paper and delivery:
+            from .workpaper import workpaper_element_payloads
+
+            review = paper.get("quality_review") or {}
+            use_review = paper.get("use_review") or {}
+            cited = {eid for entry in delivery["facts"] for eid in entry["evidence_ids"]}
+            research_profiles.append({
+                "instrument_id": profile["instrument_id"], "report": profile["report"],
+                "origin": paper["origin"], "reading_scope": paper["reading_scope"],
+                "source_element_statuses": {name: {"status": element["status"],
+                    "limitations": element.get("limitations", [])}
+                    for name, element in workpaper_element_payloads(paper).items()},
+                "generation": paper.get("generation"),
+                "review": {"status": review.get("status"), "error": review.get("error"),
+                    "calls": review.get("calls", []),
+                    "independent_reference": {key: use_review[key] for key in
+                        ("reviewer", "reference", "reference_sha256") if key in use_review}},
+                "delivery": delivery,
+                "evidence": [e for e in paper["evidence"] if e["evidence_id"] in cited],
+            })
         path = target / _profile_filename(profile)
         path.write_text(
             json.dumps(profile, ensure_ascii=False, indent=2),
@@ -704,6 +726,15 @@ def _write_profile_export(
             markdown_path = path.with_suffix(".md")
             markdown_path.write_text(str(profile["workpaper_markdown"]), encoding="utf-8")
             written.append(str(markdown_path))
+    if research_profiles:
+        research_path = target / "research_profiles.json"
+        research_path.write_text(json.dumps({
+            "schema_version": "company_profile_workpaper_research_export.v1",
+            "research_only": True, "formal_acceptance": "not_assessed",
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+            "profiles": research_profiles,
+        }, ensure_ascii=False, indent=2), encoding="utf-8")
+        written.append(str(research_path))
     csv_path = target / "profiles.csv"
     _write_profile_csv(csv_path, profiles)
     written.append(str(csv_path))

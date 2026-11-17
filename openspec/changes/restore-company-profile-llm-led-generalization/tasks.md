@@ -764,6 +764,12 @@ R6 / A0-R、R7 / B1-R（原§10）已撤销，不再作为当前待办，也不�
 - [x] 6.CJ2 唯一1/1真实入口完成35事实/64指标及初核/一次修订/再核，5物理/0恢复/128669实际usage/unknown、642.618业务秒。抽取6022输出/stop，5候选采纳、2隔离、30独立对象不变，非完整核心或正式S1。
 - [x] 6.CJ3 10窄核心4支持/6部分、独立mc-02禁用与原稿/checked不改；三读/源坐标/原件/冻结hash核对、Review/strict/Git本人隔离完成。无业务代码变更、不冒称重跑pytest，清本人3051730字节，S1/生产不变。见workpaper-saic-compact-core-result-20261115/及审核§297。
 
+### 6.DF 整体验收与直接研究导出（零新调用）
+
+- [x] 6.DF1 原ReadService.export已随workpaper交research_profiles.json，复用原分级Fact/Metric/Evidence及模型元数据；七个禁止/去重项无事实载荷，旧审计JSON/CSV/Markdown及非workpaper导出兼容，0新模型。
+- [x] 6.DF2 十二份保存真实稿原writer/query/export/新实例12/12一致，365可见事实/524指标，其中349独立源核/12模型源核/4限用待核；旧值/源/归因/hash不改。有限验收给123/9/1后继对照及正式不通过/未评估差距，不重算首发或放行S2，见workpaper-research-export-result-20261117/。
+- [x] 6.DF3 26直接/1旧入口兼容通过，有限Review修正持久总览JSON链接，strict/diff/hash/链接及本人隔离Git收尾；清临时writer/export根9200271与本次已完成pytest-26根4713921字节，脚本核快照后清，不留12重复原稿。旧源/缓存/attempt及既有并行保护，详审核§320。
+
 ### 6.DE 三份原修订批次只补最终再核（用户批准）
 
 - [x] 6.DE1 用户明确批准三份原批次后，获准联网环境DNS/TLS/原源及回复hash核齐，冻结当前源码/仅Grok high/预算，复用DD212及实际输入证明；开工本人无依赖残留0，原件/并行保护。

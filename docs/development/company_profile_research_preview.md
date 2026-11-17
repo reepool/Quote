@@ -1,5 +1,7 @@
 # 公司画像研究预览：12家公司
 
+2026-11-17已提供[单文件研究JSON](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-export-result-20261117/research_profiles.json)、[读取示例与验收范围](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-export-result-20261117/result.md)和[导出总览](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-export-result-20261117/profiles.md)。程序按同一分级读取365可见事实/524指标，来源/原名/限定/模型归因齐备；4限用项仍待核，7源参考/隔离/重复条目fact=null。人读逐家公司继续使用DE/DC权威版本，下面旧状态不作当前评级；本轮没有新增模型或正式S1/生产成绩。
+
 2026-11-17当前入口更新为[十二份研究使用版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/profiles.md)：上汽、海泰、黄山已完成原批次最终再核，其余九份沿6.DC。实际补回分行业收入、园区开发/运营构成及黄山利润下降背景；重复收入去重，金融范围缺证仍仅源参考，坏项及旧限制继续生效。当前321普通已核/44保真限用，不是正式S1或生产评级。下方旧入口、模型状态和摘录为历史，以新链接内使用范围为准。
 
 2026-11-17最新入口为[6.DC十二份源复核后的使用版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/result.md)。本轮47项真实采纳修订独立45有据、1源参考、1仍错误隔离，正文318已核/43保真限用；源参考及已知错误不进入普通交付。青山收入/下游、林海经营变化、浦发减值损失已有实际纠正或补充，上汽/海泰/黄山仍有明确缺项。下列旧摘录、旧表和原模型状态保留为历史，当前使用范围以新链接内逐家公司使用版为准；新源复核不重算旧首发，不自动计正式S1或启生产。

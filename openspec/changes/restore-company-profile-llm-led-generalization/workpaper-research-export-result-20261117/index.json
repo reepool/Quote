@@ -1,0 +1,16 @@
+{
+  "task": "6.DF",
+  "result": "result.md",
+  "machine_delivery": "research_profiles.json",
+  "files": {
+    "acceptance.json": "5ed2a472bbb38959ae0ec6d4fb0f0ce9c6acb059c52b8790f39752287fe58d60",
+    "checks.json": "6f87a6b803cb50529865d6eb3136db576234e586ceac534291a9d0e0d79146b8",
+    "cleanup.json": "a1a6a4d93b1f7874f056c874144b8543f39ad7ff7d74965eb703e07c29c9a76f",
+    "operator-snapshot.txt": "6f961b0b0651f6455bbc615715cdb25563bd745b80ffc44da407a4372cc93340",
+    "profiles.csv": "50e56f6fb57b1c36fcc35b611b07409a320af84c8f1e25fa315095e47c830674",
+    "profiles.md": "2f221d3cb005a0d3f504ea0f0df5a8e9f17c4bdadfe5b4c84e8459ba6bf090bc",
+    "research_profiles.json": "b7048d43cb654db14d405cd31dfb743ced48388d3e6d1f615bb7f159ff35f968",
+    "result.md": "b1cfb36950a6f553d25b06475182fc8b236e1db800cc95abda8116ba404f9c2b",
+    "validation.json": "6a113b2696edbc04f5bb98cf2171e612ee250c04c260c92e4fc1bfcc9c99873c"
+  }
+}

@@ -246,6 +246,12 @@ Each element MUST carry status, facts and limitations. Status MUST map explicitl
 
 Evidence MUST bind evidence_id, document version, section_path, physical pages and exact source spans or existing Evidence references, with printed-page labels when available. Table evidence MUST preserve its owning header, row/column, unit, period and necessary footnotes through linked source spans; it need not force all context into one giant quotation. No fact may rely on an unsupported citation or an invented section title. Readable output MUST be rendered from the same structured facts, with evidence and uncertainty retained, not authored as an unrelated second answer.
 
+#### Scenario: Researchers export the currently graded workpapers as machine-readable data
+- **WHEN** the existing read owner exports profiles containing workpaper_delivery
+- **THEN** it MUST also write one research_profiles.json with the same graded facts, report/source/reading scope and actual generation/review metadata, using the existing Fact/Metric/Evidence representation
+- **AND** source_only, withheld and duplicate entries retain their status/reasons with null fact payloads; raw workpapers and original/revised audit candidates MUST NOT be copied into that research payload
+- **AND** pending/limited facts retain their labels, qualifications and null values as applicable; research delivery is not formal acceptance or production authorization, legacy audit JSON/CSV/Markdown remain available, and no model call or parallel writer is introduced
+
 #### Scenario: A model discovers distinctive information outside the baseline
 - **WHEN** the selected original sections contain company-specific information the model judges useful beyond the baseline eight elements
 - **THEN** the model MAY populate optional company_features using the existing element/fact/metric/evidence contract, without a fixed feature taxonomy, mandatory number of extras or a parallel writer
