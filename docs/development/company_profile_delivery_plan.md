@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-17当前6.DG：落实用户“重要要素缺项可交付”。沿原workpaper抽取/复核及read owner，以现有status/limitations和遗漏意见显示未获取范围、建议补充；不新增必填字段或公司规则，不因未获取补充项拒绝整稿，不为上述五项另开模型窗口。先核清本人无依赖临时物，保护并行和正式源；规范先同步，再做原入口的离线查询/导出验证，交接清本人产物。基础内容成立、剩余缺项、事实可靠性、正式批次验收分开说明；旧133/首发/S1及生产权限不追改。详当前change 6.DG任务。
+
 2026-11-17 6.DF交付[可直接读取的十二份研究JSON](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-export-result-20261117/research_profiles.json)及[有限验收](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-export-result-20261117/result.md)：原ReadService.export同链新增合并数据，不复制审计原稿/撤回候选；365可见事实/524指标，349独立源核/12模型源核/4限用待核、七项无事实载荷，原值/源/归因及DC/DE hash不改，12三读一致。26直接和1旧入口兼容通过，0新真实模型/付费；清临时读回/兼容根13914192字节，脚本核齐后清。正式S1/S2/生产不放行，剩余集中在当前同版完整验证、适用正反/准确率范围及正常资源/价格；不再逐句补三家、默认整批重抽或扩平台。
 
 2026-11-17 6.DE完成[三份原批次真实最终再核](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/result.md)，[当前十二份入口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/profiles.md)已更新：海泰两项主业构成、上汽分行业收入、黄山利润下降背景进入使用版，重复分产品收入去重，金融范围缺证仅源参考。新3物理/68237供应商usage/0恢复/unknown、160.669业务秒，原入口/分级三读3/3一致；当前321普通已核/44限用/4源参考/2隔离/1重复，123支持/9部分/1缺失只作后继对照，S1/S2/生产不变。此卡3/3全部用完，下一回整体画像验收与研究交付，不围三家再补句或重付前段；运行/监督/读回根清8918168字节、脚本核齐后清，源/缓存/attempt及既有并行保护。

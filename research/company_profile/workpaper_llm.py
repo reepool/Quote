@@ -21,7 +21,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-17.subject-contract.v19"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-17.missing-information.v20"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-15.company-features.v4"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "公司业务/经营模式；公司经营讨论/经营综述/业务回顾的实质子节，优先于纯行业背景和泛化核心竞争力", "priority": "primary"},
@@ -110,6 +110,15 @@ and their supported amounts or shares before supplementary operating figures. Th
 category or company total alone does not explain the mix. Use the report's own categories,
 not an industry account checklist; do not calculate missing values or copy every tail row.
 Allocate the response to this main-business explanation first, then useful supplementary detail.
+Important does not mean mandatory. If an important item was not acquired, retain the
+supported profile and state 未获取成功 and the scope/reason in that element's limitations;
+suggest what to acquire only when useful. Do not fill an unknown with a guessed fact.
+Specific product subclasses, subsidiary service details and small revenue tails may be
+absent. A clearly labelled company scale does not require BOTH total operating income
+and operating revenue; never conflate those accounts. Missing supplementary detail does
+not make an otherwise substantive basic profile incomplete or require more reading.
+If a basic business question itself remains unanswered, say so without rejecting the
+independent sourced content. All eight element keys remain, with honest status/reasons.
 Use independent facts for independently usable core assertions. Keep company revenue
 separate from net profit, optional growth-rate comparisons, event timing and unresolved
 source-basis differences. Keep each main business revenue with its own subject/basis;

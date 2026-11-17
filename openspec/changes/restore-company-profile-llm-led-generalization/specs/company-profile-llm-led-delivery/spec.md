@@ -316,6 +316,14 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **THEN** the workpaper publishes the supported facts with explicit missing scope/reason and no fabricated value
 - **AND** eight populated keys or successful JSON parsing alone establishes neither content completeness nor a passing company score
 
+#### Scenario: An important information item was not acquired
+- **WHEN** a sourced profile explains the main business, principal products/services and earning mechanisms but an important supplementary item was not acquired or remains unverified
+- **THEN** the profile MUST remain deliverable with explicit missing scope/reasons and suggested acquisition where useful, without treating importance, an open omission or an unfilled checklist item as a whole-profile rejection
+- **AND** source-grounded company scale need not include both total operating income and operating revenue; their distinct names/scopes MUST remain intact, and specific product subclasses, subsidiary service details and small revenue tails are not mandatory completion items
+- **AND** the existing query/export MUST carry element status/limitations and unresolved omission suggestions without promoting those suggestions to facts, withdrawing independent valid facts or automatically issuing more reading/paid requests
+- **AND** a genuinely unanswered basic business question remains explicitly incomplete but its reliable partial content is still delivered; known false assertions remain locally withheld, while historical frozen scores, formal batch validation and production authorization stay separate
+- **AND** future acceptance contracts MUST separate basic business questions from important supplementary targets; supplementary targets MUST NOT enter the mandatory denominator for basic profile completion, and prior frozen contracts/results MUST NOT be rewritten
+
 #### Scenario: A useful workpaper has no trusted core facts yet
 - **WHEN** query/export reads a sourced workpaper whose trusted-core accepted_fact_count is still zero
 - **THEN** it MUST also expose a separate workpaper summary with its original business description, fact/metric counts, origin, review status, unresolved-finding count and known actual extraction/review models

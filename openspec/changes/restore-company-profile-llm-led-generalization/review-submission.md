@@ -1,5 +1,13 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 321. 6.DG重要缺项提示、不拒绝独立画像
+
+2026-11-17用户明确重要要素未获取可以标未获取/建议获取，不因此拒绝画像。本轮沿原workpaper/ReadService落实，prompt v20/review v11区分基础问题与重要补充；原delivery附information_gaps/suggested_acquisitions，人读版同源显示补充建议，research_profiles.json补顶层limitations。没有新必填字段、公司规则、writer、模型调用或付费窗口；已知错项继续局部隔离，旧值/原稿/hash、133清单/首次分数及正式core/S1/生产不追改。基础内容、建议补充、事实可靠性及正式批次评测分开。
+
+验证：`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --tb=short --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper_delivery.py tests/unit/test_research/test_company_profile_workpaper_review.py -k 'not test_task_service_review_publishes_original_before_review_and_corrected_afterward' tests/unit/test_research/test_company_profile_workpaper.py::test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced`，85通过/3未选，32.40秒。随后原TaskService三种接续、补充建议及实际网关提示验证共8通过/132.09秒（重叠5项不加总）；原writer/query/export/新实例带缺项一致，未决补充只一次复核不修订，修好后建议消失，错项仍无普通事实载荷。strict/diff通过。首轮新投影误读持久finding不存在的action字段导致7失败，已改按现有resolution/original_fact读取并完成上述复验；不以初轮失败声称通过。Review A类此误读已修、无剩余阻塞，B类写作/细目不扩，C类既有并行不动。
+
+开工master/HEAD7c4bd718/空暂存，配置/骨架/规划/并行脏文件保留，仅本人新增段落隔离提交。先盘点未见本人DF/分级导出无依赖残留，释放0；本轮测试运行根由TemporaryDirectory/finally删除，无新脚本、工作库或重复源，清理字节未单计不虚报；旧pytest19/20/22/24/25未知归属不删。本人源码/测试/规范隔离普通提交推送；活跃开发/审核时间未精确计，不新增正式质量或资源达标声明。
+
 最新状态（2026-11-17，[6.DB统一合同§316](#316-6db四阶段主体合同统一与最终质量观察就绪)）：修订/最终再核与抽取/初核、实际字段Schema统一主体语义，prompt v19/review v10；167直接通过，另64兼容及4版本断言更新后复验通过。12旧稿371对象序列化/原值/hash不变，201原页重新源绑定到首个review请求主动停止，0新模型/回执/TaskService整链成绩，语义风险仍待真实观察。准备脚本6868字节核快照后清、测试finally未量，旧源/attempt/并行保护；下一6.DC仅拟十二份现有稿统一源复核/必要一次修订再核，真实0/12未批准，不重抽/扩S2/启生产。
 
 最新状态（2026-11-17，[6.DA有限验收§315](#315-6da十二家有限验收与阶段裁决)）：受限研究阅读保留，正式S1不通过、S2/生产不放行。原CT仅7家达到90%/98%两项内容数值参考，不称正式可用7家；后段不拼首发。直接核8原页发现上汽F14分行业metric误标集团，沿原use_review整条仅源参考，原R1及其他11家分级保留，12家原writer三读一致；当前327已核/33限用含5待核/5源参考/5隔离/1重复。0新模型/探针/外传/数据库/TaskService语义，清本人5978325字节，原值/模型/旧hash/attempt及既有并行保护，详acceptance.md。本轮有限验收已结论，不再展示层/单家尾项，正式同版质量和适用风险仍为主线。

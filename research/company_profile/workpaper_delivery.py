@@ -127,6 +127,20 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                 "fact": None if excluded else fact.model_dump(mode="json"),
             })
     pending_review_count = sum(e["fact"] is not None and e["review_basis"] == "not_reviewed" for e in facts)
+    information_gaps = [
+        {"element": name, "status": element.status, "reasons": list(element.limitations)}
+        for name, element in workpaper_elements(paper).items()
+        if element.status != "observed" or element.limitations
+    ]
+    suggested_acquisitions = [
+        {"finding_id": finding.finding_id, "element": finding.element,
+         "severity": finding.severity, "reason": finding.explanation,
+         "evidence_ids": list(finding.evidence_ids)}
+        for finding in (review.findings if review else ())
+        if finding.original_fact is None and finding.resolution in {
+            "omission_candidate", "repair_rejected", "verification_failed"}
+    ]
     return {"policy_version": "company_profile_research_delivery.v1", "research_only": True,
             "formal_acceptance": "not_assessed", "production_authorization": "not_authorized",
+            "information_gaps": information_gaps, "suggested_acquisitions": suggested_acquisitions,
             "counts": counts, "labels": dict(DELIVERY_LABELS), "pending_review_count": pending_review_count, "facts": facts}

@@ -705,6 +705,7 @@ def _write_profile_export(
             research_profiles.append({
                 "instrument_id": profile["instrument_id"], "report": profile["report"],
                 "origin": paper["origin"], "reading_scope": paper["reading_scope"],
+                "limitations": paper.get("limitations", []),
                 "source_element_statuses": {name: {"status": element["status"],
                     "limitations": element.get("limitations", [])}
                     for name, element in workpaper_element_payloads(paper).items()},

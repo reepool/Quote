@@ -182,6 +182,9 @@ def test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions
         for stage in ('acquire','parse','semantic','verify','publish'):assert runtime.run_stage(stage,item)['status']=='success'
         record=CompanyProfileRuntimeRecordV3.model_validate_json(writer.latest_path().read_text())
         payload=record.workpaper.model_dump(mode='json')
+        gap_reason='未获取成功：具体产品子类；建议有需要时从业务介绍补充。'
+        payload['elements']['products_services'].update(status='extraction_failed',facts=[],limitations=[gap_reason])
+        payload['limitations']=[gap_reason]
         if uncertain:
             payload['elements']['scale_and_mix']['facts'][0]['metrics'][0].update(
                 value=None,uncertainty_reason='只保留原值，不参与精确比较。')
@@ -210,6 +213,11 @@ def test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions
         assert exported['delivery']==profile['workpaper_delivery']
         assert exported['generation']==profile['workpaper']['generation']
         assert exported['reading_scope']==profile['workpaper']['reading_scope']
+        assert exported['limitations']==[gap_reason]
+        assert exported['source_element_statuses']['products_services']=={
+            'status':'extraction_failed','limitations':[gap_reason]}
+        assert {'element':'products_services','status':'extraction_failed','reasons':[gap_reason]} in exported['delivery']['information_gaps']
+        assert gap_reason in profile['workpaper_markdown']
         assert exported['report']==profile['report']
         entries={f['fact_id']:f for f in exported['delivery']['facts']}
         assert entries['main']['state']==excluded and entries['main']['fact'] is None

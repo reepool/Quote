@@ -309,10 +309,21 @@ def test_material_omission_can_be_added_but_optional_gap_does_not_trigger_repair
               "accepted": True, "evidence_ids": list(added["evidence_ids"]), "explanation": "上年同期列有90.00元。"}]}
     _, result, _, _ = invoke([initial, {"repaired_facts": [added]}, verify])
     assert added["fact_id"] in {f.fact_id for f in result.elements.scale_and_mix.facts}
+    from research.company_profile.workpaper_delivery import project_workpaper_delivery
+
+    assert project_workpaper_delivery(result)['suggested_acquisitions']==[]
     finding["severity"] = "minor"
     _, limited, provider, _ = invoke([initial])
     assert len(provider.calls) == 1
     assert limited.quality_review.status == "completed_with_open_findings"
+    delivery = project_workpaper_delivery(limited)
+    assert {row['fact_id'] for row in delivery['facts'] if row['fact'] is not None} == {'main','revenue'}
+    assert delivery['suggested_acquisitions']==[{
+        'finding_id':'missing-prior','element':'scale_and_mix','severity':'minor',
+        'reason':finding['explanation'],'evidence_ids':finding['evidence_ids']}]
+    assert any(gap['element']=='products_services' for gap in delivery['information_gaps'])
+    rendered=render_workpaper(limited,delivery=delivery)
+    assert '建议获取（不阻塞画像交付）' in rendered and finding['explanation'] in rendered
 
 
 def test_scope_and_nonfact_findings_stay_open_without_discarding_fact_repairs():

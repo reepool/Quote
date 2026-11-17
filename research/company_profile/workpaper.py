@@ -1139,6 +1139,12 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper, *, delivery: Mapping | 
                     out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
             out.extend(f"- 限制：{limit}" for limit in element.limitations)
             out.append("")
+    if delivery is not None and delivery.get("suggested_acquisitions"):
+        out.extend(["## 建议获取（不阻塞画像交付）", ""])
+        for suggestion in delivery["suggested_acquisitions"]:
+            element_label = ELEMENT_LABELS.get(suggestion["element"], suggestion["element"])
+            out.append(f"- {element_label}：{suggestion['reason']}")
+        out.append("")
     out.extend(["## 阅读范围与取舍", "", workpaper.reading_scope.selection_rationale, ""])
     for section in workpaper.reading_scope.sections:
         out.append(f"- {' / '.join(section.section_path)}，物理页{section.start_page}—{section.end_page}：{section.rationale}")

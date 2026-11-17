@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.DG：重要缺项是采集建议，不是整稿拒绝条件
+
+复用八要素status/limitations、原阅读范围和未解决possible_omission意见，不建新评分器或必填清单。抽取与初核说明“重要不等于必填”，区别改变基础业务理解的缺口与建议补充；重要补充未获取只留原因，不自动触发额外付费或清空独立内容。原delivery投影提供information_gaps和suggested_acquisitions，仅投影现有元数据，不把建议当事实；Markdown同源显示，研究JSON保顶层limitations。旧可信core标志仍表达原正式接受状态，不能用它否定研究内容；新合同基础与补充分列，旧分母/分数不改。仅离线原owner正反与持久读回验证，先清后做、收尾清本人临时物。
+
 ### 6.DF：原导出入口提供合并研究数据
 
 原ReadService.export在同一导出锁内为workpaper额外交research_profiles.json。只复用render_profile已生成的workpaper_delivery，配报告/阅读范围、所引Evidence及实际生成/核验调用元数据；不复制原workpaper或带original/revised_fact的审核历史。被排除条目仍保state/reasons且fact=null，限定/待核仍分列，不将研究消费提升为正式接受。原逐公司审计JSON、CSV、Markdown及非workpaper导出兼容，不新建服务/写入器或OpenSpec生产依赖。

@@ -525,13 +525,15 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert "compact, complete JSON object" in instructions
         assert "12-24 distinct facts" in instructions and "40 metrics overall" in instructions
         assert "not a completeness gate" in instructions
+        assert "Important does not mean mandatory" in instructions
+        assert "未获取成功" in instructions and "BOTH total operating income" in instructions
         assert "reading a section does not require copying all of its numbers" in instructions
         assert "Never infer zero from blank cells" in instructions
         assert "independently usable core assertions" in instructions
         assert "Keep company revenue" in instructions
         assert "No revenue/cost/expense is also a definite zero-like assertion" in instructions
         identity = workpaper_processing_identity(real=False)
-        assert identity["prompt_version"].endswith("subject-contract.v19")
+        assert identity["prompt_version"].endswith("missing-information.v20")
         assert identity["section_guide_version"].endswith("company-features.v4")
         assert "optional ROOT company_features" in instructions
         assert identity["workpaper_max_output_tokens"] == 12000
