@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-17 6.CZ已交[原查询/导出的事实级研究分级](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/result.md)：原writer/ReadService对12保存真实稿持久三读一致，371对象中327普通已核、34保真限用（含6待核）、4仅源参考/5隔离/1重复单列；模型源核、独立源核与待核依据可见，原值/raw/实际模型/旧hash不改。180相关55.72秒及末端兼容复验分列，原scope/hash、坏项不外放、近似限用及限用待核计数已证；0新模型/探针/外传/数据库/TaskService语义，不能作新模型质量分或S1。三读回根清17883216字节，脚本/计数副本核齐后清，旧源/缓存/回执/attempt及既有并行保护。研究分级接通不等于正式接受，accepted/core/S1 0/12/生产not_authorized仍保持，下一仅有限正式验收，不再展示层或供应链尾项循环。
+
 2026-11-16 6.CY零调用交[十二家当前研究预览](company_profile_research_preview.md)及[发布差距](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-delivery-readiness-result-20261116/release-readiness.md)：9 CT/2 CV/1 CX，371原对象/533指标中摘录266，5坏项屏蔽/4源参考单列/1重复去重，原模型7 completed/3 open/2 incomplete不是等级。12源与审核hash/266原句引用/6反例/链接、strict/diff通过，0新模型/外传/数据库/pytest；清本人14701字节脚本，旧源/有效缓存/原件/attempt及既有并行保护。runtime workpaper仍固定未正式接受的corefalse，不据此否认有内容，也不直接改true；下一主线原owner的分级研究交付及正式接受边界，再核最终同版质量和完整资源。原CT133核心112/8/13不与后段拼分，正式S1仍0/12/生产not_authorized；本卡不新增付费或另造门槛。
 
 2026-11-16 6.CX获明确批准后广州唯一后段1/1结束：[主要收入结构补回与有限审核](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/result.md)。初核/一次修订/最终再核真实3物理109319供应商total usage/0恢复/unknown、500.396工作秒，26原对象不变、2纠错2新增成30对象63指标。4模型采纳项独立3支持/1限定，“一次性”不当直接披露，主要收入构成与F30修正有据；多列6个原隔离ID仍incomplete，不算全30准确、完整同版新处理/S1或生产。三读/源坐标/冻结hash与原件保护成立，87直接36.15秒及strict/diff通过；清本人2557874字节及其他finally未量，旧源/缓存/attempt与并行保护。当前不续广州窗口、不追可选细度，回到十二家现有内容整体交付/发布条件收口；正式S1仍0/12/生产not_authorized。

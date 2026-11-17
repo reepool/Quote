@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-17 6.CZ已接通[原查询/导出分级](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/profiles.md)：use_review和有效模型内容绑定沿原owner，12保存稿三读一致；327普通已核、34限用含6待核、4源参考/5隔离/1重复，原值/raw保留不进正式接受。180相关及末端兼容验证分列、strict/diff/原件hash收尾，0新模型/探针/外传/数据库/TaskService语义，清三个读回根17883216字节及核齐后的脚本/计数副本，旧源/缓存/attempt和既有并行保护。当前不再开发展示层/单家尾项；下一有限裁定研究消费范围及正式同版质量/资源，S1/生产仍未放行。
+
 2026-11-16 6.CY已更新[唯一十二家预览](company_profile_research_preview.md)：CT九家/CV两家/CX广州的266原对象摘录及轻量JSON源索引，5坏项/4源参考/1重复单列，原稿/作者/章页/复核状态不变，不拼同版或质量分。[发布条件](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-delivery-readiness-result-20261116/release-readiness.md)明确pending corefalse占位、正式质量与完整资源三差距；下一做原owner分级交付/正式接受，不再广州/供应链细项或立即重抽十二家。本轮0新模型/探针/外传/数据库/pytest，12源/266对象/6反例/链接及strict/diff通过，清本人14701字节脚本，无源副本/运行库，原件/attempt及既有并行保护。S1/生产不变，后续真实及生产仍须相应有界授权。
 
 2026-11-16 6.CX广州限定后段已结束：[30条画像及收入结构](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/result.md)。没有重付选章/抽取，真实Grok初核/DeepSeek一次修订/Grok最终再核，3物理109319实际usage/0恢复/unknown、500.396工作秒；4模型采纳项独立3支持/1限定，26原对象不变、F30/F33纠错、主要收入及利润背景2新增。多列原6隔离ID仍incomplete、收益持续性仅模型解释，不靠改状态报全准。三读/冻结/源与旧hash成立，87直接/strict/diff通过、本人2557874字节清及其余finally未量，既有并行保护。此卡1/1用尽，不再广州细项/供应链追加窗或整组重抽；下一回现有十二家公司整体交付、有限质量与发布条件，正式S1/生产另按原门槛，不因这份后段通过自动放行。

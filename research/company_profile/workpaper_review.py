@@ -20,7 +20,7 @@ from .workpaper import (
     WorkpaperReviewResponse, _check_fact_source,
     standardize_workpaper_metrics, WorkpaperDraftResponse, bind_workpaper_draft,
     workpaper_elements, workpaper_element_payloads,
-    qualify_workpaper_display,
+    qualify_workpaper_display, workpaper_fact_hash,
 )
 from .workpaper_sections import SectionPacket, extract_selected_layout
 
@@ -467,6 +467,9 @@ def review_workpaper(
         checked_fact_ids=checked, findings=tuple(findings), calls=tuple(calls), error=error,
         retained_request_ids=tuple(item["request_id"] for item in prior_receipts),
         locally_revalidated_request_ids=tuple(locally_revalidated),
+        # A retained initial reply did not necessarily read this rebound seed.
+        # Only a new initial call may bind current input hashes automatically.
+        checked_fact_hashes={fid: workpaper_fact_hash(facts[fid][1]) for fid in checked} if resume is None else None,
     )
     safe = standardize_workpaper_metrics(_project(paper, review=quality, findings=findings, replacements=replacements))
     if target_notes:

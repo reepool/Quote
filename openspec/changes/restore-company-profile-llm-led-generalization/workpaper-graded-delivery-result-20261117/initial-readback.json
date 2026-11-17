@@ -1,0 +1,263 @@
+{
+  "task": "6.CZ",
+  "companies": 12,
+  "new_model_calls": 0,
+  "network_denied": true,
+  "new_taskservice_semantic_runs": 0,
+  "new_database_runs": 0,
+  "new_billing_usage": 0,
+  "original_writer_and_reader_used": true,
+  "query_export_fresh_read_equal": true,
+  "raw_facts_and_source_model_review_unchanged": true,
+  "original_source_files_sha256": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-delivery-readiness-result-20261116/index.json": "4ecb2d618e92839755b0588fe000cc8f87b30d8ab42698d5d68da9ff3483119b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/independent-audit.json": "bc9bed01b59b6725d1195fec68775b3aa3ac66a6b25486bc2c7ebbc55e0ba006",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/independent-audit.json": "0418d6afe87cb6ebbc665531d0a418fbf9e3c90cb1b5b4bd8381bc3a770eecfc",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/independent-audit.json": "4e5e8228a59e25348873716a6967894489b53d84dc743949fb1ec871a99d16f2",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600094/query.json": "a3585e7173dc9755fcc6909a2699f8f876d824658ea284f75a1592609d221c6b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600103/query.json": "1c391eff20b48f5b7f39eba127966d873f1d68c3facead8131ad858c3cfb5dd4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600100/query.json": "0fbbfda7547baf588d5b1e53946b479bbff7f6c88328c0ef939b0ba767613571",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600107/query.json": "26bfe75fee9581b195212d8f53b8458100eb98fb0186a447e93534f9c88682ff",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/query.json": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600104/query.json": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600088/query.json": "8d95443c7f898a5c8ca34a5c45f4ffdbfc2532ecb4854a77c412ef041540bbb5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600099/query.json": "e646bfcbbb84c86d707dc3282cf7580779eaa11dd0745b1a9ce8d20ab4dff05f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600082/query.json": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600097/query.json": "3cc80fc09457cf0aab4f1f1d3810a3fd550b1398e1ee5778414cfc9aa1badc55",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600054/query.json": "e1df8a98a74216fa22236f0a640cfb2cb401968426a5a806450904b30fc164a4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600000/query.json": "befcb34f096a2cb7688cc95f9f508508c927c22fab641ed726e91e229e668b97",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-format-consumption-result-20261116/query.json": "a4b97839d61c9c67325fa1197d1a9dac1419582a575b387631f6d02826fa4237"
+  },
+  "counts": {
+    "reviewed": 327,
+    "pending": 0,
+    "limited": 34,
+    "source_only": 4,
+    "withheld": 5,
+    "duplicate": 1
+  },
+  "company_results": [
+    {
+      "instrument_id": "600094.SH",
+      "counts": {
+        "reviewed": 19,
+        "pending": 0,
+        "limited": 3,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 22,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600094/query.json",
+      "original_query_sha256": "a3585e7173dc9755fcc6909a2699f8f876d824658ea284f75a1592609d221c6b",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "counts": {
+        "reviewed": 29,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 1,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 31,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600103/query.json",
+      "original_query_sha256": "1c391eff20b48f5b7f39eba127966d873f1d68c3facead8131ad858c3cfb5dd4",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "counts": {
+        "reviewed": 27,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 27,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600100/query.json",
+      "original_query_sha256": "0fbbfda7547baf588d5b1e53946b479bbff7f6c88328c0ef939b0ba767613571",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "counts": {
+        "reviewed": 20,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 22,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600107/query.json",
+      "original_query_sha256": "26bfe75fee9581b195212d8f53b8458100eb98fb0186a447e93534f9c88682ff",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "counts": {
+        "reviewed": 23,
+        "pending": 0,
+        "limited": 6,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 30,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/query.json",
+      "original_query_sha256": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "incomplete"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "counts": {
+        "reviewed": 24,
+        "pending": 0,
+        "limited": 10,
+        "source_only": 1,
+        "withheld": 2,
+        "duplicate": 1
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 38,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600104/query.json",
+      "original_query_sha256": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "incomplete"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "counts": {
+        "reviewed": 33,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 34,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600088/query.json",
+      "original_query_sha256": "8d95443c7f898a5c8ca34a5c45f4ffdbfc2532ecb4854a77c412ef041540bbb5",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "counts": {
+        "reviewed": 26,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 28,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600099/query.json",
+      "original_query_sha256": "e646bfcbbb84c86d707dc3282cf7580779eaa11dd0745b1a9ce8d20ab4dff05f",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "counts": {
+        "reviewed": 25,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 28,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600082/query.json",
+      "original_query_sha256": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "counts": {
+        "reviewed": 28,
+        "pending": 0,
+        "limited": 3,
+        "source_only": 0,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 32,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600097/query.json",
+      "original_query_sha256": "3cc80fc09457cf0aab4f1f1d3810a3fd550b1398e1ee5778414cfc9aa1badc55",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "counts": {
+        "reviewed": 40,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 41,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600054/query.json",
+      "original_query_sha256": "e1df8a98a74216fa22236f0a640cfb2cb401968426a5a806450904b30fc164a4",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "counts": {
+        "reviewed": 33,
+        "pending": 0,
+        "limited": 5,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "three_reads_equal": true,
+      "raw_fact_count": 38,
+      "original_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600000/query.json",
+      "original_query_sha256": "befcb34f096a2cb7688cc95f9f508508c927c22fab641ed726e91e229e668b97",
+      "core_complete": false,
+      "accepted_fact_count": 0,
+      "model_review_status": "completed"
+    }
+  ],
+  "all_known_exclusions_applied": true,
+  "formal_accepted_facts_still_zero": true,
+  "core_flags_still_false": true,
+  "temporary_root_bytes_removed": 5953630,
+  "production_authorization": "not_authorized",
+  "formal_s1": "0/12"
+}

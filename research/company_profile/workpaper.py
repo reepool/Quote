@@ -6,6 +6,8 @@ Human references and model drafts use the same content contract and stay distinc
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
@@ -649,6 +651,37 @@ class WorkpaperQualityReview(_Model):
     retained_request_ids: tuple[str, ...] = ()
     locally_revalidated_request_ids: tuple[str, ...] = ()
     error: str | None = None
+    checked_fact_hashes: dict[str, str] | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        if self.checked_fact_hashes is None:
+            payload.pop("checked_fact_hashes", None)
+        return payload
+
+
+def workpaper_fact_hash(fact: WorkpaperFact) -> str:
+    """Bind a use/review decision to exact current text, metrics and references."""
+    return hashlib.sha256(json.dumps(fact.model_dump(mode="json"), ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+
+
+class WorkpaperUseDecision(_Model):
+    fact_id: str = Field(min_length=1)
+    fact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    disposition: Literal["source_checked", "source_only", "withheld", "duplicate"]
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    reason: str = Field(min_length=1)
+    limitation: str | None = None
+
+
+class WorkpaperUseReview(_Model):
+    """Locally bound independent source review, never authored by extraction."""
+    report: ReportIdentity
+    reviewer: str = Field(min_length=1)
+    reference: str = Field(min_length=1)
+    reference_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    decisions: tuple[WorkpaperUseDecision, ...]
 
 
 class CompanyProfileWorkpaper(_Model):
@@ -664,12 +697,15 @@ class CompanyProfileWorkpaper(_Model):
     quality_review: WorkpaperQualityReview | None = None
     standardization_notes: tuple[str, ...] = ()
     company_features: WorkpaperElement | None = None
+    use_review: WorkpaperUseReview | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
         payload = handler(self)
         if self.company_features is None:
             payload.pop(FEATURE_ELEMENT, None)
+        if self.use_review is None:
+            payload.pop("use_review", None)
         return payload
 
     @model_validator(mode="after")
@@ -692,12 +728,26 @@ class CompanyProfileWorkpaper(_Model):
                 if set(finding.evidence_ids) - sources_set:
                     raise ValueError("review finding cites unknown source evidence")
         ids: set[str] = set()
+        facts = {}
         for section in workpaper_elements(self).values():
             for fact in section.facts:
                 if fact.fact_id in ids:
                     raise ValueError("duplicate fact identity")
                 ids.add(fact.fact_id)
+                facts[fact.fact_id] = fact
                 _check_fact_source(fact, sources)
+        if self.use_review is not None:
+            if self.use_review.report != self.report:
+                raise ValueError("independent use review belongs to another report")
+            seen = set()
+            for decision in self.use_review.decisions:
+                if decision.fact_id in seen or decision.fact_id not in facts:
+                    raise ValueError("unknown or duplicate independent use-review fact")
+                seen.add(decision.fact_id)
+                if workpaper_fact_hash(facts[decision.fact_id]) != decision.fact_sha256:
+                    raise ValueError("independent use-review fact content is stale")
+                if set(decision.evidence_ids) - sources.keys():
+                    raise ValueError("independent use review cites unknown evidence")
         return self
 
     def validate_pages(self, pages: Sequence[Mapping]) -> None:
@@ -968,7 +1018,7 @@ def _metric_display(metric: WorkpaperMetric) -> str:
     return (raw_value if raw_value.endswith(unit) else f"{raw_value} {unit}") + qualification
 
 
-def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
+def render_workpaper(workpaper: CompanyProfileWorkpaper, *, delivery: Mapping | None = None) -> str:
     """Render only the structured workpaper; never synthesize a second answer."""
     report = workpaper.report
     origin = {
@@ -990,6 +1040,14 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         f"来源版本：`{report.document_version}`。发布时点：{report.published_at}。",
         "",
     ]
+    delivery_by_id = {entry["fact_id"]: entry for entry in delivery["facts"]} if delivery is not None else None
+    if delivery is not None:
+        out.extend(["研究分级不等于正式可信发布；以下普通正文不含隔离、仅源参考或重复对象。原底稿及后文复核记录保留审计。", ""])
+        out.append("；".join(f"{delivery['labels'][state]} {count}" for state, count in delivery["counts"].items()))
+        out.append(f"待核合计（含限用中的待核）：{delivery['pending_review_count']}。")
+        out.append("")
+        if workpaper.use_review is not None:
+            out.extend([f"独立使用审核：{workpaper.use_review.reviewer}；依据：{workpaper.use_review.reference}；hash `{workpaper.use_review.reference_sha256}`。", ""])
     labels = dict(ELEMENT_LABELS)
     if workpaper.company_features is not None:
         labels[FEATURE_ELEMENT] = "公司特色与自主发现（可选）"
@@ -998,9 +1056,15 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         element = elements[name]
         out.extend([f"## {label}", ""])
         for fact in element.facts:
+            entry = delivery_by_id[fact.fact_id] if delivery_by_id is not None else None
+            if entry is not None and entry["fact"] is None:
+                continue
             refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
             uncertain = f"【不确定：{fact.uncertainty_reason or '主体范围未明确'}】" if fact.uncertainty_reason or fact.subject_scope == "unclear" else ""
-            out.append(f"- {uncertain}{fact.text}（{refs}）")
+            label = f"【{entry['label']}】" if entry is not None else ""
+            out.append(f"- {label}{uncertain}{fact.text}（{refs}）")
+            if entry is not None and entry["state"] in {"pending", "limited"}:
+                out.append("  - 使用限制：" + "；".join(entry["reasons"]))
             for metric in fact.metrics:
                 out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
         for limitation in element.limitations:
@@ -1012,9 +1076,15 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
             element = getattr(workpaper.supply_chain, name)
             out.extend([f"### {label}", ""])
             for fact in element.facts:
+                entry = delivery_by_id[fact.fact_id] if delivery_by_id is not None else None
+                if entry is not None and entry["fact"] is None:
+                    continue
                 refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
                 uncertain = f"【不确定：{fact.uncertainty_reason or '主体范围未明确'}】" if fact.uncertainty_reason or fact.subject_scope == "unclear" else ""
-                out.append(f"- {uncertain}{fact.text}（{refs}）")
+                label = f"【{entry['label']}】" if entry is not None else ""
+                out.append(f"- {label}{uncertain}{fact.text}（{refs}）")
+                if entry is not None and entry["state"] in {"pending", "limited"}:
+                    out.append("  - 使用限制：" + "；".join(entry["reasons"]))
                 for metric in fact.metrics:
                     out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
             out.extend(f"- 限制：{limit}" for limit in element.limitations)
@@ -1027,6 +1097,12 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         out.append("- 未读/后置：" + scope)
     for limitation in workpaper.limitations:
         out.append("- 限制：" + limitation)
+    if delivery is not None:
+        restricted = [e for e in delivery["facts"] if e["fact"] is None]
+        if restricted:
+            out.extend(["", "## 限用与隔离（不作普通结论）", ""])
+            for entry in restricted:
+                out.append(f"- {entry['fact_id']} / {entry['label']}：{'；'.join(entry['reasons'])}")
     if workpaper.generation is not None:
         out.extend(["", "## 模型处理记录", ""])
         if workpaper.generation.local_format_normalization is not None:

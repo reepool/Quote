@@ -300,6 +300,13 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** the current readable entry and a reference index MUST use the same selected facts without changing business values, copying a parallel fact store or rewriting historical source results
 - **AND** cross-window content, review statuses and an intentionally pending core flag MUST NOT be represented as same-version acceptance, measured accuracy, formal company usability or production permission; the view sends no models and changes no business database
 
+#### Scenario: Original query and export deliver research facts by reviewed scope
+- **WHEN** the original read owner reads a workpaper with source-bound facts, actual model-review records and optional independently authored use-review decisions
+- **THEN** query, Markdown and CSV MUST distinguish model-checked, independently source-checked, pending, limited/source-only and withheld scope without changing formal accepted facts, core completeness or production authority
+- **AND** independent decisions MUST bind the report version and current fact-content hash with reviewer, evidence and reason; unknown/duplicate identities, stale facts or wrong versions are rejected, the extraction response cannot author this metadata, and old absent metadata preserves legacy serialization/hash inputs
+- **AND** known withheld, source-only and duplicate facts MUST NOT enter ordinary business text or standardized delivery metrics, while their unchanged originals and audit metadata remain available; one company's incomplete review does not discard unrelated checked facts, and completed status alone never overrides a source restriction
+- **AND** truthful source uncertainty MAY remain limited and readable; the existing writer/read owner serves persistence and all export formats without a new store, production dependency on development evidence or implicit model calls
+
 #### Scenario: Human reference is rendered for review
 - **WHEN** a human_reference JSON workpaper is used to check presentation and local mapping
 - **THEN** the rendered facts, metrics and evidence remain the same as the JSON and their origin remains visible

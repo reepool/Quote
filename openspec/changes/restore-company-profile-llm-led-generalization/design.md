@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.CZ：事实级研究消费接原owner，不伪造正式接受
+
+workpaper可选use_review保存独立审核人/来源引用及逐fact内容hash、报告版本、source_checked/source_only/withheld/duplicate决定，LLM DraftResponse无该权限字段；旧None不序列化，历史hash不改。原事实不被人工改数/改scope。纯workpaper_delivery投影由原query和可读导出共用：有效实际模型核对、独立源核、待核、保真限用及隔离分开，已知限制优先；复核ID不能代替正式准确率或核心完整性。原raw保审计，普通Markdown/业务摘要不含已知坏项/源参考，CSV给分级计数，accepted/core/生产仍原值。不建新事实库、writer或评分框架；操作适配器把已存在独立审核绑定到新开发副本，生产代码不import OpenSpec。保存12稿的原writer/query/export/新实例验证与直接正反闭环是本卡交付，非新模型/S1。
+
 ### 6.CY：同一当前预览入口，来源和等级不混
 
 复用原query/Workpaper/Evidence和审核记录，只读汇总CT九家、CV上汽/海泰、CX广州；现有docs预览页更新，历史CN等原制品/hash保留在原目录/Git，不再挂陈旧current指令。新索引只引用原query/hash/fact IDs与单列限制，摘录正文不改业务值；禁用/源参考/重复对象不进入普通结论，源参考不搬入标准化指标。有限核源结果按原适用范围复用，不产生新准确率或正式可用评级。runtime workpaper _verify固定未接受的corefalse与有源正文进展分开解释，下一不是改bool或再造框架；沿原读/写owner接分级交付和适用正式接受是后续业务切片。本卡零调用/零生产，旧成绩/授权不追改。

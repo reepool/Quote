@@ -1,5 +1,17 @@
 # A/B任务卡：人工有源底稿→集中章节文本→同结构抽取
 
+## 已完成6.CZ：原查询/导出接通事实级研究分级（零新调用）
+
+已交[原入口分级读回](workpaper-graded-delivery-result-20261117/result.md)：新use_review及模型输入hash绑定沿原writer/ReadService，12/12三读一致；当前371对象中普通已核327、保真限用34（含6待核）、4源参考/5隔离/1重复不进普通正文/交付指标，原值/raw/作者和旧结果不改。180相关55.72秒通过，末端旧格式复验分列；A类限用待核交叉计数及保留初核套新seed已修，不改正式计数/核心/生产。0新模型/探针/外传/数据库/TaskService语义，不算正式S1。先核CY/CZ本人残留0，三读回根清17883216字节，脚本/计数副本核齐后清，源/缓存/旧回执/attempt与既有并行保护。完成后不再加展示层或单家尾项，正式接受/同版质量资源仍独立验收。
+
+用户“继续”，沿business-first-goal/OpenSpec及A/B v3实施，不再只交文档总览。唯一目标：原CompanyProfileResearchWriter/ReadService的query/export/Markdown/CSV显示已做模型核对、独立源核、待核、限用及隔离内容；有用正文可见，已知坏项/源参考不进入普通正文或标准化展示。正式accepted_facts/core_complete/S1/生产授权不变，不能把checked ID或非空字段当正式语义完成。
+
+现有workpaper增加可选独立使用审核元数据，绑定报告版本及当前fact内容hash，明确审核人、引用及依据；LLM抽取合同不得写该字段。错误/未知/重复/错版/陈旧决定拒绝，原值、主体、指标、Evidence及实际模型/原复核记录不改；无新元数据的旧文件保持序列化/hash兼容。原读owner统一生成分级投影和可读导出，区分source核与模型核；公司级incomplete不抹掉有依据的独立核对，反之completed不豁免已知坏项。保真近似/歧义可限用，供应链加分和特色自由保留。
+
+复用CY的12份真实来源和CT/CV/CX独立审核，用原writer持久到新的隔离开发根、原ReadService查询/导出/新实例一致，不写旧源结果或生产库；先代表性链再补直接正反。只在操作适配器读取OpenSpec审核，生产模块不依赖OpenSpec/公司名单，不新增writer/旁路库/通用质量框架。该读回是保存结果的工程接线，不是新TaskService语义运行、同版首发或正式S1通过。
+
+先核CY/CZ本人无依赖临时物，保护正式PDF/有效缓存/旧query/raw/attempt与既有配置/骨架/混合段/并行。允许同窗P0—P3局部实现、直接验证及必要回归、有限Review/strict后本人隔离Git交付，0新模型/探针/外传/付费或生产。必要新回执只一套，临时库/导出/脚本finally清，简记实数；本卡完成后再处理正式接受的适用验收，不扩成完美质量平台或整组重抽。
+
 ## 已完成6.CY：十二家现有内容统一交付与发布差距（零新调用）
 
 已更新[现有十二家预览](/home/python/Quote/docs/development/company_profile_research_preview.md)及[发布差距](workpaper-delivery-readiness-result-20261116/release-readiness.md)。9份CT/2份CV/1份CX，原371对象/533指标中摘录266个；5坏项屏蔽、4源参考/解释单列、1重复去重，7 completed/3 open/2 incomplete保原状态，不作可用率。原对象/引用/hash、6内存反例及链接直接验证通过，0新模型/外传/数据库/pytest，旧有效工程证明复用。确认pending workpaper固定corefalse非无内容，下一主线是原owner分级交付/正式接受边界，不直接改bool或重抽全组。strict/diff通过、清本人14701字节脚本，无运行库/源副本，正式源/旧证据/attempt与既有并行保护。CY三项完成，S1仍0/12/生产未启，整体change未完成。

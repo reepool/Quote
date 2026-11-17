@@ -283,10 +283,14 @@ class CompanyProfileReadService:
         }
         if isinstance(record, CompanyProfileRuntimeRecordV3):
             from .workpaper import workpaper_elements, render_workpaper
+            from .workpaper_delivery import project_workpaper_delivery
 
             profile["schema_version"] = "company_profile_common_core_profile.v3"
             profile["workpaper"] = record.workpaper.model_dump(mode="json")
-            profile["workpaper_markdown"] = render_workpaper(record.workpaper)
+            delivery = project_workpaper_delivery(record.workpaper)
+            profile["workpaper_raw_for_audit"] = True
+            profile["workpaper_delivery"] = delivery
+            profile["workpaper_markdown"] = render_workpaper(record.workpaper, delivery=delivery)
             review = record.workpaper.quality_review
             profile["workpaper_status"] = (
                 "model_reviewed_pending_verification"
@@ -300,7 +304,8 @@ class CompanyProfileReadService:
             generation = record.workpaper.generation
             profile["workpaper_summary"] = {
                 "origin": record.workpaper.origin,
-                "business_description": "\n".join(f.text for f in record.workpaper.elements.business_structure.facts),
+                "business_description": "\n".join(e["fact"]["text"] for e in delivery["facts"]
+                                                  if e["element"] == "business_structure" and e["fact"] is not None),
                 "fact_count": len(facts),
                 "metric_count": sum(len(f.metrics) for f in facts),
                 "element_fact_counts": {name: len(element.facts) for name, element in elements.items()},
@@ -309,6 +314,9 @@ class CompanyProfileReadService:
                 "extraction_model": generation.extraction.model if generation else None,
                 "review_model": next((call.model for call in review.calls
                                       if call.purpose == "review_profile_workpaper" and call.contract_status == "accepted"), None) if review else None,
+                "delivery_counts": delivery["counts"],
+                "delivery_pending_review_count": delivery["pending_review_count"],
+                **{f"delivery_{key}_count": value for key, value in delivery["counts"].items()},
             }
         elif isinstance(record, CompanyProfileRuntimeRecordV2):
             from .report_interpretation import research_views
@@ -559,6 +567,9 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
     workpaper_fields = (
         "origin", "business_description", "fact_count", "metric_count",
         "review_status", "open_finding_count", "extraction_model", "review_model",
+        "delivery_reviewed_count", "delivery_pending_count", "delivery_limited_count",
+        "delivery_source_only_count", "delivery_withheld_count", "delivery_duplicate_count",
+        "delivery_pending_review_count",
     )
     fieldnames = [
         "instrument_id",
@@ -723,6 +734,9 @@ def _write_profile_overview(path: Path, profiles: Sequence[Mapping[str, Any]]) -
         else:
             markdown = Path(filename).with_suffix(".md").name
             state = f"{paper['origin']} / {profile['workpaper_status']} / {paper['review_status'] or '未复核'}；未决={cell(paper['open_finding_count'])}"
+            if paper.get("delivery_counts") is not None:
+                state += "；研究分级=" + cell(paper["delivery_counts"])
+                state += "；待核合计（含限用）=" + cell(paper.get("delivery_pending_review_count"))
             values = (f"{profile.get('instrument_id')} / {period}", paper["business_description"] or "本次无主营描述，查看缺项",
                       f"{paper['fact_count']} / {paper['metric_count']}", state,
                       f"{paper['extraction_model'] or '未知'} / {paper['review_model'] or '未知'}",
