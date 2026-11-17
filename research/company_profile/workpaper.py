@@ -37,6 +37,21 @@ FEATURE_ELEMENT = "company_features"
 Subject = Literal[
     "consolidated_group", "issuer", "named_subsidiary", "business_segment", "unclear"
 ]
+SUBJECT_SCOPE_DESCRIPTION = (
+    "consolidated_group means group-wide scope; plain 公司 in report-wide operating text "
+    "defaults to it unless local evidence gives a narrower object. issuer means an "
+    "explicitly parent-only company, not merely the reporting company. named_subsidiary "
+    "means a specified subsidiary; business_segment means the specified business, product "
+    "or industry row. unclear preserves scope that cannot be established."
+)
+WORKPAPER_SUBJECT_INSTRUCTIONS = SUBJECT_SCOPE_DESCRIPTION + (
+    "\nJudge each metric's own source object independently of its enclosing fact. A business "
+    "or industry row does not inherit consolidated_group from a company-wide fact or a "
+    "consolidated table. Keep the source category in the metric name. Apply these meanings "
+    "to original and repaired facts alike; never change a label just to pass review. "
+    "A locatable amount, similar amounts or an arithmetic sum alone cannot establish "
+    "subject scope or equivalence between source categories."
+)
 Status = Literal[
     "observed", "not_disclosed", "not_applicable", "extraction_failed", "unclear"
 ]
@@ -102,7 +117,7 @@ class WorkpaperMetric(_Model):
     unit: str | None = Field(default=None, min_length=1)
     source_unit: str | None = None
     currency: str | None = None
-    subject_scope: Subject
+    subject_scope: Subject = Field(description=SUBJECT_SCOPE_DESCRIPTION)
     period: str = Field(min_length=1)
     comparison_basis: str | None = None
     qualifier: Literal["exact", "approximate", "greater_than"] = "exact"
@@ -197,7 +212,7 @@ class WorkpaperMetric(_Model):
 class WorkpaperFact(_Model):
     fact_id: str = Field(min_length=1)
     text: str = Field(min_length=1)
-    subject_scope: Subject
+    subject_scope: Subject = Field(description=SUBJECT_SCOPE_DESCRIPTION)
     period: str = Field(min_length=1)
     evidence_ids: tuple[str, ...] = Field(min_length=1)
     metrics: tuple[WorkpaperMetric, ...] = ()

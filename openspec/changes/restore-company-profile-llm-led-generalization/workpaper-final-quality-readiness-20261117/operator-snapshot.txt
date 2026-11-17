@@ -1,0 +1,101 @@
+"""Prepare saved real drafts at the original source-review boundary, offline."""
+import hashlib
+import json
+import socket
+import sys
+from pathlib import Path
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+C = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = C/'workpaper-final-quality-readiness-20261117'
+
+def read(path): return json.loads(path.read_text())
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def blocked(*args, **kwargs): raise AssertionError('offline readiness forbids network')
+socket.getaddrinfo = blocked
+socket.create_connection = blocked
+
+from research.company_profile.workpaper import CompanyProfileWorkpaper, workpaper_elements, workpaper_fact_hash
+from research.company_profile.workpaper_llm import workpaper_processing_identity, WORKPAPER_PROMPT_VERSION
+from research.company_profile.workpaper_review import seed_material, review_workpaper, workpaper_hash, REVIEW_POLICY
+
+class Capture:
+    workpaper_receipts = ()
+    def __init__(self): self.calls = []
+    def workpaper_request(self, **request):
+        self.calls.append(request)
+        raise ValueError('offline stop at first new review request; no response supplied')
+
+def fact_map(paper):
+    return {f.fact_id:f for element in workpaper_elements(paper).values() for f in element.facts}
+
+assert not (DEST/'review-plan.json').exists(), 'do not overwrite a frozen plan'
+index = read(C/'workpaper-graded-delivery-result-20261117/research-delivery.json')
+reference_path = C/'workpaper-core-readiness-20261114/source-first-contract.json'
+reference = read(reference_path)
+source_reports = {r['instrument_id']:r for r in reference['companies']}
+identity = workpaper_processing_identity(real=True, review=True, review_profile='semantic_extraction__scorpio_grok')
+results = []
+for row in index['profiles']:
+    query_path = ROOT/row['source_query']
+    assert sha(query_path) == row['source_query_sha256']
+    raw = read(query_path)['profiles'][0]['workpaper']
+    paper = CompanyProfileWorkpaper.model_validate(raw)
+    assert paper.model_dump(mode='json') == raw, 'old JSON shape changed'
+    assert paper.model_dump_json().encode() == json.dumps(raw, ensure_ascii=False, separators=(',',':')).encode(), 'old serialization changed'
+    # New explicit existing_draft review; old review records stay in the untouched query.
+    seed = paper.model_copy(update={'quality_review':None, 'use_review':None})
+    source = source_reports[row['instrument_id']]
+    prepared, packet, pages = seed_material(seed, report=paper.report, source_pdf_path=source['source_pdf'], real=True)
+    before, after = fact_map(seed), fact_map(prepared)
+    for fid, fact in after.items():
+        assert fid in before and fact.text == before[fid].text and fact.metrics == before[fid].metrics
+    capture = Capture()
+    outcome, _ = review_workpaper(prepared, packet=packet, provider=capture,
+        work_id='dc-existing-'+row['instrument_id'][:6], identity=identity)
+    assert len(capture.calls)==1 and capture.calls[0]['purpose']=='review_profile_workpaper'
+    request = capture.calls[0]
+    content = json.dumps(request['payload'], ensure_ascii=False, sort_keys=True)
+    assert 'offline stop at first new review' in outcome.quality_review.error
+    assert outcome.quality_review.status=='failed' and not capture.workpaper_receipts
+    assert sha(query_path) == row['source_query_sha256']
+    results.append({'instrument_id':row['instrument_id'], 'source_query':row['source_query'],
+        'source_query_sha256':row['source_query_sha256'], 'report':paper.report.model_dump(mode='json'),
+        'source_pdf':source['source_pdf'], 'official_pdf_sha256':sha(Path(source['source_pdf'])),
+        'old_workpaper_sha256':workpaper_hash(paper), 'review_seed_sha256':workpaper_hash(seed),
+        'source_bound_seed_sha256':workpaper_hash(prepared),
+        'original_fact_count':len(before), 'source_bound_fact_count':len(after),
+        'locally_withheld_ids':sorted(before.keys()-after.keys()),
+        'facts_sha256':{fid:workpaper_fact_hash(fact) for fid,fact in after.items()},
+        'selected_section_ids':[s.section_id for s in packet.reading_scope.sections],
+        'original_pages':[p['page'] for p in pages], 'source_characters':len(packet.model_text()),
+        'first_review_payload_bytes_not_full_wire':len(content.encode()),
+        'first_review_payload_sha256':hashlib.sha256(content.encode()).hexdigest(),
+        'first_review_instructions_sha256':hashlib.sha256(request['instructions'].encode()).hexdigest(),
+        'first_boundary_verified':True, 'new_model_calls':0})
+    print(row['instrument_id'],len(before),'->',len(after),'first review prepared',flush=True)
+
+code_files=['research/company_profile/workpaper.py','research/company_profile/workpaper_llm.py',
+            'research/company_profile/workpaper_review.py','research/company_profile/workpaper_delivery.py',
+            'research/company_profile/stage5_provider.py','research/company_profile/runtime.py',
+            'research/company_profile/reads.py','research/company_profile/workpaper_sections.py']
+plan={'task':'6.DC proposed source-review successor', 'status':'not_authorized_for_new_calls',
+    'prepared_by':'6.DB offline boundary checks', 'prompt_version':WORKPAPER_PROMPT_VERSION,
+    'review_policy':REVIEW_POLICY, 'processing_identity':identity,
+    'code_sha256':{p:sha(ROOT/p) for p in code_files},
+    'reference_sha256':sha(reference_path), 'reference_not_model_input':True,
+    'source_risk_challenges':reference['risk_challenges'],
+    'method':'Reuse existing final real drafts; strip only prior quality/use metadata, bind official selected sources, then new initial review/at most one consolidated repair/final recheck. No extraction, no old review replies, no human reference answers.',
+    'not_new_full_processing_or_blind_first':True, 'no_automatic_S1_or_production_acceptance':True,
+    'production_authorization':'not_authorized', 'new_model_calls':0,
+    'profiles':results,
+    'proposed_each_limits':{'seconds':1800,'conservative_ledger':500000,'physical_requests':6,
+        'recoveries':3,'recoveries_per_logical':1,'logical_requests':3,'known_cost_cny':10,'unpriced_cost':'unknown'},
+    'proposed_group_limits':{'concurrency':4,'seconds':7200,'conservative_ledger':6000000,'physical_requests':72},
+    'stop':'no added window/company; same core failure in two consecutive companies stops new dispatch; in-flight remains within original limits; unisolatable core contamination stops affected sends'}
+DEST.mkdir(parents=True,exist_ok=True)
+(DEST/'review-plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+assert len(results)==12
+print(json.dumps({'prepared':len(results),'facts':sum(r['source_bound_fact_count'] for r in results),
+    'new_model_calls':0,'full_wire_budget_measured':False},ensure_ascii=False))

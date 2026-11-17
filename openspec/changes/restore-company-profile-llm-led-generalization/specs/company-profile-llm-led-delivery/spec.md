@@ -283,6 +283,12 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **THEN** linked Evidence retains the row/column, subject, period and unit as one traceable support context
 - **AND** the program does not guess the column, require one unnecessarily long quotation or accept an amount merely because an ID exists
 
+#### Scenario: Correction preserves the meaning of subject labels
+- **WHEN** extraction, initial source review, local correction or final source verification handles a company-wide fact containing narrower business metrics
+- **THEN** all four requests and their metric/fact field descriptions MUST use the same subject-label meanings: issuer requires explicit parent-only evidence, and a business or industry row remains business_segment rather than inheriting consolidated_group from the enclosing fact or table
+- **AND** each metric is judged on its own source object, uncertainty remains explicit, and a locatable amount or similar sum alone does not establish scope or category equivalence
+- **AND** this is an aligned model contract, not a keyword-based semantic validator or automatic rewrite of old labels, values, hashes or acceptance results
+
 #### Scenario: Some elements are missing
 - **WHEN** a selected section packet supports the main business and products but does not support a key input or customer detail
 - **THEN** the workpaper publishes the supported facts with explicit missing scope/reason and no fabricated value

@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-17 6.DB完成[同一主体契约与十二份源复核准备](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-quality-readiness-20261117/readiness.md)：四阶段/字段Schema统一，prompt v19/review v10；167相关通过，另64兼容通过及4旧版本断言更新后单独通过。12旧稿/371对象序列化字节与原值/hash不改，201原页源绑定后到首个新review请求主动停止，无新模型/回执/TaskService整链成绩；六风险程序已证与语义待证分开。临时准备脚本6868字节核快照后清、测试finally未量不虚加，旧源/缓存/attempt和既有并行保护。6.DC只拟现有十二稿同版源复核/必要一次修订再核，真实0/12且尚未批准，不重跑选章抽取、不自动计S1/扩S2/生产。
+
 2026-11-17 6.DA完成[十二家有限验收裁决](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/acceptance.md)：现有显式分级研究阅读可保留，正式S1不通过、S2不放行、生产not_authorized；原CT133核心112/8/13及333对象326支持不改，7家仅达到90%/98%两项数值参考，不称正式可用7家。后段改善不拼同版；直接核8原页新增F14分行业metric误标集团的独立source_only决定，原值/模型/raw不改，其他11家投影未变、12家原writer三读一致。当前327已核/33限用含5待核/5源参考/5隔离/1重复；本轮0新模型/探针/外传/数据库/TaskService语义，清本人5978325字节，旧源/缓存/attempt和既有并行保护。有限验收已结论，不再把供应链尾项或展示开发作前置；最终同版正式质量/适用风险及资源仍须按原门槛，不自动新付费或扩S2。
 
 2026-11-17 6.CZ已交[原查询/导出的事实级研究分级](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/result.md)：原writer/ReadService对12保存真实稿持久三读一致，371对象中327普通已核、34保真限用（含6待核）、4仅源参考/5隔离/1重复单列；模型源核、独立源核与待核依据可见，原值/raw/实际模型/旧hash不改。180相关55.72秒及末端兼容复验分列，原scope/hash、坏项不外放、近似限用及限用待核计数已证；0新模型/探针/外传/数据库/TaskService语义，不能作新模型质量分或S1。三读回根清17883216字节，脚本/计数副本核齐后清，旧源/缓存/回执/attempt及既有并行保护。研究分级接通不等于正式接受，accepted/core/S1 0/12/生产not_authorized仍保持，下一仅有限正式验收，不再展示层或供应链尾项循环。

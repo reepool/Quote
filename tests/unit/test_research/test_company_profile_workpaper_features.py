@@ -226,6 +226,18 @@ def test_gateway_fresh_features_review_repair_writer_and_three_reads():
             for instructions in (extraction, initial_review, repair_instructions, final_instructions):
                 assert 'Applicability checkboxes' in instructions or 'applicability checkbox' in instructions
                 assert 'disclosure' in instructions
+                assert 'issuer means an explicitly parent-only company' in instructions
+                assert 'business_segment means the specified business, product or industry row' in instructions
+                assert "Judge each metric's own source object independently" in instructions
+                assert 'does not inherit consolidated_group' in instructions
+                assert 'arithmetic sum alone cannot establish' in instructions
+            # Only extraction and repair RETURN facts; review/final return findings/checks.
+            for call in (transport.calls[1], transport.calls[3]):
+                schema = call['payload']['response_format']['json_schema']['schema']
+                for name in ('WorkpaperFact', 'WorkpaperMetric'):
+                    description = schema['$defs'][name]['properties']['subject_scope']['description']
+                    assert 'explicitly parent-only' in description
+                    assert 'specified business, product or industry row' in description
             rows = list(csv.DictReader((root/'export/profiles.csv').read_text().splitlines()))
             assert rows[0]['workpaper_fact_count'] == '4'
     finally:

@@ -1,0 +1,16 @@
+{
+  "task": "6.DB",
+  "new_model_calls": 0,
+  "new_sendable_bindings": 0,
+  "production_authorization": "not_authorized",
+  "main_checks": {"passed": 167, "deselected": 3, "seconds": 35.96},
+  "compatibility_first": {"passed": 64, "failed_old_version_assertions": 4, "deselected": 1, "seconds": 29.67},
+  "version_assertion_recheck": {"passed": 4, "seconds": 5.37},
+  "wire_checks": "Four actual system messages; actual fact/metric response field descriptions in extraction and repair; original writer/query/export/fresh-reader nonempty controlled path.",
+  "saved_inputs": {"companies": 12, "facts": 371, "original_selected_pages": 201, "old_serialization_bytes_equal": true, "old_values_unchanged": true, "source_rebinding_fact_loss": 0, "stopped_before_first_new_response": true},
+  "semantic_risk_suite_complete": false,
+  "formal_S1_pass": false,
+  "script_cleanup_bytes": 6868,
+  "test_temporary_roots": "finally cleaned; sizes not measured",
+  "prior_results_and_attempt_markers": "preserved"
+}

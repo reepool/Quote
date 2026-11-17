@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.DB：四阶段与字段Schema使用同一主体契约
+
+在原workpaper模型定义主体标签说明，抽取/初核/修订/最终再核共用；metric按自身业务/产品/行业对象判定，不能继承fact或合并表的集团标签。只改请求说明和字段description，保原JSON字段、序列化/hash、数值/来源检查及局部隔离；不新增语义正则或自动改标签。prompt v19/review v10区分新请求，旧结果/生产不改。已有十二稿按原源复核owner离线到首个新请求核齐，下一仅建议同版后段源复核而非重新选章抽取，新增真实调用必须另有界批准，详workpaper-final-quality-readiness-20261117/。
+
 ### 6.CZ：事实级研究消费接原owner，不伪造正式接受
 
 workpaper可选use_review保存独立审核人/来源引用及逐fact内容hash、报告版本、source_checked/source_only/withheld/duplicate决定，LLM DraftResponse无该权限字段；旧None不序列化，历史hash不改。原事实不被人工改数/改scope。纯workpaper_delivery投影由原query和可读导出共用：有效实际模型核对、独立源核、待核、保真限用及隔离分开，已知限制优先；复核ID不能代替正式准确率或核心完整性。原raw保审计，普通Markdown/业务摘要不含已知坏项/源参考，CSV给分级计数，accepted/core/生产仍原值。不建新事实库、writer或评分框架；操作适配器把已存在独立审核绑定到新开发副本，生产代码不import OpenSpec。保存12稿的原writer/query/export/新实例验证与直接正反闭环是本卡交付，非新模型/S1。
