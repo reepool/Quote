@@ -1,0 +1,110 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-8d0d94e5189e97cae31466fa",
+  "report": {
+    "instrument_id": "600082.SH",
+    "report_id": "1225246039",
+    "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "600082.SH",
+      "report_id": "1225246039",
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-28T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "600082.SH",
+      "report_id": "1225246039",
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 900,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-17.subject-contract.v19",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_existing_draft_hash": "70d15a2f154e0f31b48ecbb197605db9b5db79bbb5740bb94944fc388b759d72",
+        "review_max_output_tokens": 12000,
+        "review_resume_hash": "440927686818f9041c9c6df48bffbd961a3859e0e70f59c06c07ecb536eb6360",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.aligned-cells.v6",
+        "workpaper_format_recovery": "validation_feedback.v1",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_review_policy": "company_profile_workpaper_review.v10"
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 300000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 24720,
+      "tokens_remaining": 275280
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": []
+}

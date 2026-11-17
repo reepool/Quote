@@ -1,0 +1,57 @@
+{
+  "task": "6.DE",
+  "instrument_id": "600054.SH",
+  "name": "黄山旅游",
+  "entry_started": true,
+  "readable": true,
+  "three_reads_equal": true,
+  "exception": null,
+  "candidate_ids": [
+    "F19",
+    "F20",
+    "review-add:RF03"
+  ],
+  "preparation_seconds": 43.974,
+  "business_started_monotonic": 10094534.610432208,
+  "state": "completed",
+  "business_ended_monotonic": 10094641.74126356,
+  "business_seconds": 107.131,
+  "query_sha256": "4708986160607fe7a5421a7d33390c398a0b9732bc889b076914e202d3dbd744",
+  "fact_count": 42,
+  "metric_count": 49,
+  "core_complete": false,
+  "review_status": "completed",
+  "review_error": null,
+  "retained_request_ids": [
+    "bp-work-2df6966344c726fe8d1d1b11:workpaper:review",
+    "bp-work-2df6966344c726fe8d1d1b11:workpaper:repair"
+  ],
+  "new_or_changed_fact_ids": [
+    "review-add:RF03"
+  ],
+  "removed_fact_ids": [],
+  "findings": [
+    {
+      "finding_id": "RF01",
+      "fact_id": "F19",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "RF02",
+      "fact_id": "F20",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "RF03",
+      "fact_id": null,
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "physical_requests": 1,
+  "ledger": 18194,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "supervision_seconds": 153.726,
+  "cleanup_bytes": 2224718
+}

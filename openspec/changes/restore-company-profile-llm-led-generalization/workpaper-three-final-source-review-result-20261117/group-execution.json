@@ -1,0 +1,224 @@
+{
+  "results": [
+    {
+      "task": "6.DE",
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "entry_started": true,
+      "readable": true,
+      "three_reads_equal": true,
+      "exception": null,
+      "candidate_ids": [
+        "F10",
+        "F13",
+        "F14",
+        "F22",
+        "F37"
+      ],
+      "preparation_seconds": 42.382,
+      "business_started_monotonic": 10094533.079932436,
+      "state": "completed",
+      "business_ended_monotonic": 10094693.748754794,
+      "business_seconds": 160.669,
+      "query_sha256": "1069bf54411035d357ecfd26ecfeca583e94ebc56a4c40b18561f299a980c538",
+      "fact_count": 38,
+      "metric_count": 49,
+      "core_complete": false,
+      "review_status": "completed",
+      "review_error": null,
+      "retained_request_ids": [
+        "bp-work-4f15fcea42eb3fb1e9b428cc:workpaper:review",
+        "bp-work-4f15fcea42eb3fb1e9b428cc:workpaper:repair"
+      ],
+      "new_or_changed_fact_ids": [
+        "F10",
+        "F13",
+        "F14"
+      ],
+      "removed_fact_ids": [],
+      "findings": [
+        {
+          "finding_id": "WR-F10-SCOPE",
+          "fact_id": "F10",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR-F10-INCOME",
+          "fact_id": "F10",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR-F13-SCOPE",
+          "fact_id": "F13",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR-F14-SCOPE",
+          "fact_id": "F14",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR-F22-SCOPE",
+          "fact_id": "F22",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR-F37-CUSTOMER",
+          "fact_id": "F37",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "physical_requests": 1,
+      "ledger": 25323,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "supervision_seconds": 205.069,
+      "cleanup_bytes": 2430833
+    },
+    {
+      "task": "6.DE",
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "entry_started": true,
+      "readable": true,
+      "three_reads_equal": true,
+      "exception": null,
+      "candidate_ids": [
+        "F09",
+        "F10",
+        "F11",
+        "review-add:RF01"
+      ],
+      "preparation_seconds": 44.601,
+      "business_started_monotonic": 10094534.803752635,
+      "state": "completed",
+      "business_ended_monotonic": 10094655.405770147,
+      "business_seconds": 120.602,
+      "query_sha256": "660710208cf43bdd23135cf1ee3095c1b7e89b6cbfface9bdb24e77acd73dde4",
+      "fact_count": 28,
+      "metric_count": 25,
+      "core_complete": false,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "retained_request_ids": [
+        "bp-work-45f1bc56f152a681d1a0633e:workpaper:review",
+        "bp-work-45f1bc56f152a681d1a0633e:workpaper:repair"
+      ],
+      "new_or_changed_fact_ids": [
+        "F09",
+        "F10"
+      ],
+      "removed_fact_ids": [],
+      "findings": [
+        {
+          "finding_id": "REV-F09-SCOPE",
+          "fact_id": "F09",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-F09-SIGN",
+          "fact_id": "F09",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-F10-SCOPE",
+          "fact_id": "F10",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-F10-SIGN",
+          "fact_id": "F10",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-F11-SCOPE",
+          "fact_id": "F11",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-RF01-SCOPE",
+          "fact_id": "review-add:RF01",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-F01-ONLY",
+          "fact_id": null,
+          "resolution": "omission_candidate"
+        },
+        {
+          "finding_id": "REV-F24-RPT",
+          "fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "physical_requests": 1,
+      "ledger": 24720,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "supervision_seconds": 167.107,
+      "cleanup_bytes": 2353536
+    },
+    {
+      "task": "6.DE",
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "entry_started": true,
+      "readable": true,
+      "three_reads_equal": true,
+      "exception": null,
+      "candidate_ids": [
+        "F19",
+        "F20",
+        "review-add:RF03"
+      ],
+      "preparation_seconds": 43.974,
+      "business_started_monotonic": 10094534.610432208,
+      "state": "completed",
+      "business_ended_monotonic": 10094641.74126356,
+      "business_seconds": 107.131,
+      "query_sha256": "4708986160607fe7a5421a7d33390c398a0b9732bc889b076914e202d3dbd744",
+      "fact_count": 42,
+      "metric_count": 49,
+      "core_complete": false,
+      "review_status": "completed",
+      "review_error": null,
+      "retained_request_ids": [
+        "bp-work-2df6966344c726fe8d1d1b11:workpaper:review",
+        "bp-work-2df6966344c726fe8d1d1b11:workpaper:repair"
+      ],
+      "new_or_changed_fact_ids": [
+        "review-add:RF03"
+      ],
+      "removed_fact_ids": [],
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "fact_id": "F19",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF02",
+          "fact_id": "F20",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF03",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "physical_requests": 1,
+      "ledger": 18194,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "supervision_seconds": 153.726,
+      "cleanup_bytes": 2224718
+    }
+  ],
+  "supervision_seconds": 209.424,
+  "source_code_unchanged": true,
+  "shared_config_unchanged": true
+}

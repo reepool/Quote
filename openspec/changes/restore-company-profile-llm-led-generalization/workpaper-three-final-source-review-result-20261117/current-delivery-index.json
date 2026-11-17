@@ -1,0 +1,257 @@
+{
+  "task": "6.DE",
+  "profiles": [
+    {
+      "instrument_id": "600094.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600094/query.json",
+      "source_query_sha256": "10c875b5c74c472e0ee88d659e2bdab2988810077b71de1f1c225fda43d83af5",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600094-research.md",
+      "counts": {
+        "reviewed": 17,
+        "pending": 0,
+        "limited": 5,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 9,
+        "partial": 1
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600103.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600103/query.json",
+      "source_query_sha256": "dfafb39872eadc7eaca861b78155823d3c18f13b0e4f504706effb59dba6fc72",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600103-research.md",
+      "counts": {
+        "reviewed": 27,
+        "pending": 0,
+        "limited": 4,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 11,
+        "partial": 1
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600100.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600100/query.json",
+      "source_query_sha256": "5684d727854f58e467ad0912dbfc6fb222f38f5cf57d8bda6ac4fbf3532d90cb",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600100-research.md",
+      "counts": {
+        "reviewed": 27,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 12
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600107.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600107/query.json",
+      "source_query_sha256": "952e15a2b715193cce9705423473385ba42a0ea1c32c428fc66b623a27503c42",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600107-research.md",
+      "counts": {
+        "reviewed": 17,
+        "pending": 0,
+        "limited": 5,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 9,
+        "partial": 1
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600098.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600098/query.json",
+      "source_query_sha256": "de8174931b03a4ac900474f64adf91b01b53fe9bd2e6b4eec9e2b9e41bdb7b27",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600098-research.md",
+      "counts": {
+        "reviewed": 24,
+        "pending": 0,
+        "limited": 6,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 10,
+        "missing": 1,
+        "partial": 1
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600104.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600104/query.json",
+      "source_query_sha256": "1069bf54411035d357ecfd26ecfeca583e94ebc56a4c40b18561f299a980c538",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600104-research.md",
+      "counts": {
+        "reviewed": 24,
+        "pending": 0,
+        "limited": 9,
+        "source_only": 3,
+        "withheld": 1,
+        "duplicate": 1
+      },
+      "core_verdicts": {
+        "supported": 7,
+        "partial": 3
+      },
+      "new_final_this_card": true
+    },
+    {
+      "instrument_id": "600088.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600088/query.json",
+      "source_query_sha256": "d7ef75c1481d5bf71cb8fee2f30d7747d49d751484361fd858a608315722e94f",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600088-research.md",
+      "counts": {
+        "reviewed": 33,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 11
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600099.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600099/query.json",
+      "source_query_sha256": "362e48a9ab641da2995893a9ce98415b5c243d60af449398ee0993f0448e563d",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600099-research.md",
+      "counts": {
+        "reviewed": 26,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 0,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 12
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600082.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600082/query.json",
+      "source_query_sha256": "660710208cf43bdd23135cf1ee3095c1b7e89b6cbfface9bdb24e77acd73dde4",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600082-research.md",
+      "counts": {
+        "reviewed": 28,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 10
+      },
+      "new_final_this_card": true
+    },
+    {
+      "instrument_id": "600097.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600097/query.json",
+      "source_query_sha256": "0ad8cd82c00e73d0734d1ba6eb4474bb7636be0a03a2128ae7cd1ca744e135cf",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600097-research.md",
+      "counts": {
+        "reviewed": 26,
+        "pending": 0,
+        "limited": 3,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 9,
+        "partial": 1
+      },
+      "new_final_this_card": false
+    },
+    {
+      "instrument_id": "600054.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600054/query.json",
+      "source_query_sha256": "4708986160607fe7a5421a7d33390c398a0b9732bc889b076914e202d3dbd744",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600054-research.md",
+      "counts": {
+        "reviewed": 40,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 13
+      },
+      "new_final_this_card": true
+    },
+    {
+      "instrument_id": "600000.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600000/query.json",
+      "source_query_sha256": "a119eb7eeb6a18d107d683d507a87fd91689c82bc413f499cc02c06252aea5ca",
+      "decisions": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/delivery-decisions.json",
+      "research_markdown": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600000-research.md",
+      "counts": {
+        "reviewed": 32,
+        "pending": 0,
+        "limited": 7,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "core_verdicts": {
+        "supported": 10,
+        "partial": 1
+      },
+      "new_final_this_card": false
+    }
+  ],
+  "aggregate_delivery_counts": {
+    "reviewed": 321,
+    "pending": 0,
+    "limited": 44,
+    "source_only": 4,
+    "withheld": 2,
+    "duplicate": 1
+  },
+  "aggregate_core_verdicts": {
+    "supported": 123,
+    "partial": 9,
+    "missing": 1
+  },
+  "same_version_first_run_claimed": false,
+  "formal_S1": "0/12",
+  "production_authorization": "not_authorized"
+}

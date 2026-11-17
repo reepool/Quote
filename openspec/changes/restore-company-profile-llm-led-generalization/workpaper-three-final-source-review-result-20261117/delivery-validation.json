@@ -1,0 +1,30 @@
+{
+  "task": "6.DE",
+  "checks": [
+    {
+      "instrument_id": "600104.SH",
+      "three_reads_equal": true,
+      "facts_values_evidence_model_calls_and_receipts_unchanged": true,
+      "profile_sha256": "e7d961e03779280ab4c806edc356da8a7e9d32857dfa9a129e9c83c27dda3112",
+      "core_complete": false
+    },
+    {
+      "instrument_id": "600082.SH",
+      "three_reads_equal": true,
+      "facts_values_evidence_model_calls_and_receipts_unchanged": true,
+      "profile_sha256": "e9e0f974c30f2e25ef3067ae0698ac45c272688549b768cd079a0967f5955f43",
+      "core_complete": false
+    },
+    {
+      "instrument_id": "600054.SH",
+      "three_reads_equal": true,
+      "facts_values_evidence_model_calls_and_receipts_unchanged": true,
+      "profile_sha256": "37b720851b18c57ec2e49bdd244c41670cc486fcfc80ec7991595913bfd94c7c",
+      "core_complete": false
+    }
+  ],
+  "temporary_root_removed": true,
+  "removed_bytes": 1866319,
+  "new_model_calls": 0,
+  "raw_run_and_prior_DC_unchanged": true
+}

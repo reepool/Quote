@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-17 6.DE后继结束：[当前十二份研究使用版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/profiles.md)。原三份修订批次12候选真实最终接受，其中5个程序误拒目标均独立有据，1重复不多计、4项新增独立信息；金融范围组合另仅源参考。当前133核心后继123支持/9部分/1缺失，旧首发及DC原分不改，不据此自动计S1或放行S2/生产；资源新3物理/68237供应商usage/0恢复/unknown，原初核/修订/旧用量另保。当前仍是显式分级研究交付，正式同版首发、适用负例及资源门槛按本文，不为尾项继续加窗。
+
 2026-11-17 6.DC后继源复核已结束：[十二份当前使用版及有限核源](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/result.md)。12/12有稿、47真实采纳修订独立45支持/1源参考/1隔离；当前133核心121支持/9部分/3缺失只作后继内容对照，不重算6.CT首发或改变本计划门槛。34新增物理/1097696供应商usage/0恢复/费用unknown，原选章抽取及旧费用另保，未评估负例/未核范围不默认通过；正式S1仍0/12，S2/生产未放行。下一优先复用保存候选解决直接消费误拒，再连续推进正式验收，不追单家公司可选尾项或重抽十二家。
 
 > 类型：requirements；版本：2（LLM主导纠偏）；制定：2026-10-16。

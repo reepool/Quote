@@ -1,0 +1,279 @@
+{
+  "task": "6.DE",
+  "method": "直接读原引用/完整表头及续行核本次五个恢复对象和F10争议；未改候选及事实仅以完整fact hash/同源复用DC独立判定。不把模型一致、数值命中或三读当语义真值。",
+  "formal_stage_pass": false,
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "production_authorization": "not_authorized",
+  "companies": {
+    "600104.SH": {
+      "source_pages_read": [
+        11,
+        12,
+        13,
+        17,
+        18
+      ],
+      "supported_candidate_ids": [
+        "F13",
+        "F14",
+        "F22",
+        "F37"
+      ],
+      "source_only_fact_ids": [
+        "F10"
+      ],
+      "duplicate_fact_ids": [
+        "F13"
+      ],
+      "core_override": {
+        "600104-K08": "supported"
+      },
+      "conclusion": "分行业收入构成恢复；分产品F13与已核R1同一披露，保R1精确元值而不重复展示。F10新模型改判接受，但行业毛利率88.47%与具名汽车金融子公司发放贷款各自有源，未证明两组披露为同一收入范围，整条仅源参考。原F11/F38源参考及F23产能错误隔离不变。公司营业收入科目区别、零部件具体子类及金融服务边界仍部分，不用同金额/模型accepted消缺。",
+      "core_verdicts": [
+        "supported",
+        "supported",
+        "partial",
+        "partial",
+        "supported",
+        "supported",
+        "partial",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "query_sha256": "1069bf54411035d357ecfd26ecfeca583e94ebc56a4c40b18561f299a980c538",
+      "changed_facts": {
+        "F10": {
+          "fact_sha256": "99cd1dab9b1b8426ed8845d1274d812b9151234c9d5df40a595060f274593460",
+          "evidence_ids": [
+            "source-0006",
+            "source-0013"
+          ]
+        },
+        "F13": {
+          "fact_sha256": "5b647f44155646ca56a273ce9ab9ff7b6e3e19c9142bd04e5841c31fd33f163b",
+          "evidence_ids": [
+            "source-0006"
+          ]
+        },
+        "F14": {
+          "fact_sha256": "c248e15a0c7388e6b4ab91c12ee0eb503b317d751aa70f16ccff7be5465e6f6c",
+          "evidence_ids": [
+            "source-0006"
+          ]
+        }
+      },
+      "actual_final_accepted_fact_ids": [
+        "F10",
+        "F13",
+        "F14",
+        "F22",
+        "F37"
+      ],
+      "unchanged_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F11",
+        "F12",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39",
+        "review-add:R1"
+      ]
+    },
+    "600082.SH": {
+      "source_pages_read": [
+        15
+      ],
+      "supported_candidate_ids": [
+        "F09",
+        "F10",
+        "F11",
+        "review-add:RF01"
+      ],
+      "source_only_fact_ids": [],
+      "duplicate_fact_ids": [],
+      "core_override": {
+        "600082-K09": "supported"
+      },
+      "conclusion": "原15页收入/成本/毛利率及增减列支持园区开发和运营两条恢复，续行小数和减少百分点均正确；商品销售与减值原稿不变，空成本仍未列示而非零。关联交易等minor未补，不追加调用。",
+      "core_verdicts": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "query_sha256": "660710208cf43bdd23135cf1ee3095c1b7e89b6cbfface9bdb24e77acd73dde4",
+      "changed_facts": {
+        "F09": {
+          "fact_sha256": "3ba6bd79669edc9d2ac9990cdd32116204770ca491d0eb962b69fb72557a29f5",
+          "evidence_ids": [
+            "source-0006"
+          ]
+        },
+        "F10": {
+          "fact_sha256": "a1ca9b9f25a3a8b45727d1772f5973f6e3a21792b1216cf6b1f295caa49c020e",
+          "evidence_ids": [
+            "source-0006"
+          ]
+        }
+      },
+      "actual_final_accepted_fact_ids": [
+        "F09",
+        "F10",
+        "F11",
+        "review-add:RF01"
+      ],
+      "unchanged_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F11",
+        "F12",
+        "F13",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F27",
+        "F28",
+        "F29",
+        "review-add:RF01"
+      ]
+    },
+    "600054.SH": {
+      "source_pages_read": [
+        6,
+        11
+      ],
+      "supported_candidate_ids": [
+        "F19",
+        "F20",
+        "review-add:RF03"
+      ],
+      "source_only_fact_ids": [],
+      "duplicate_fact_ids": [],
+      "core_override": {},
+      "conclusion": "11页支持归母净利29248.09万元、减少2252.81万元/7.15%及景区资源有偿使用费增加原因；6页财务表支持扣非净利261834633.40元/同比-17.38%。叙事万元和财务表元值各按来源保留，不强行配平舍入差额；客流原限定未改，原13核心继续成立。",
+      "core_verdicts": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "query_sha256": "4708986160607fe7a5421a7d33390c398a0b9732bc889b076914e202d3dbd744",
+      "changed_facts": {
+        "review-add:RF03": {
+          "fact_sha256": "1e4214032b8360fc4d0a124b7b334286c5a6777e34ba55e04f07114c1540c11e",
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ]
+        }
+      },
+      "actual_final_accepted_fact_ids": [
+        "F19",
+        "F20",
+        "review-add:RF03"
+      ],
+      "unchanged_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39",
+        "F40",
+        "F41",
+        "F42"
+      ]
+    }
+  }
+}

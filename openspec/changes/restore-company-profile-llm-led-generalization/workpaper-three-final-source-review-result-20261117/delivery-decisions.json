@@ -1,0 +1,1811 @@
+{
+  "task": "6.DE",
+  "raw_queries_preserved": true,
+  "profiles": [
+    {
+      "instrument_id": "600104.SH",
+      "use_review": {
+        "report": {
+          "instrument_id": "600104.SH",
+          "report_id": "1225071780",
+          "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-01T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "Codex本次有限独立核源及DC精确hash继承",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/independent-audit.json",
+        "reference_sha256": "bd330190aedcad84dec65b3ca59fd86d5ba098467d2b474ad236fe1006856a25",
+        "decisions": [
+          {
+            "fact_id": "F01",
+            "fact_sha256": "900beca9dae2009f2ef46af076ea114c96e9a4afac4bd44c0916e6484cef5662",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F02",
+            "fact_sha256": "f068e9c4b4e146ace95b3fd5db4577f550ca2f3ac30d7a90179156c10d29377f",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F03",
+            "fact_sha256": "c0dafd24c9cf4e2bbe4e39f709d97557984b2fb0fba92c73ae033365a7a454b2",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F04",
+            "fact_sha256": "ca5760e4feaf0766cee02e32df78c79d127a73c5d6948ba6fd941c8e06a65e98",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F05",
+            "fact_sha256": "eeab53a490cc14494d8efb69763a0f79d78b0efd84b7d2643b7605aaa954e7fe",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F06",
+            "fact_sha256": "b02a4e431db1d42ddb05b27705595ea088ccd98b9bbd9af167592b260da799ed",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F07",
+            "fact_sha256": "f390d1152f0f812dedaa4148f550b7a487c8b574aa7cef488f43612a97691c52",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F08",
+            "fact_sha256": "7336341e02b4395cd9cd3124070418aacc10646d065a191bac85331037c5a820",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F09",
+            "fact_sha256": "488e3d38d9392e79b524f25c67f7f974e07b54df7dbe7908f1d684eecac806e8",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F11",
+            "fact_sha256": "2c86df4043f44d2631750c4b291158da82dd41644de43ec150dd8e0e92392da1",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "F22按12页分行业成本表保本期580,943,983,649.41元、99.80%分母及成本类别，业务主体改窄、亿元正文只舍入限用。F37按13页集中度和17页境内外乘用/商用车销量，删除个人/企业客群无据断言。F10候选被真实final拒绝，未恢复金融行业合计与子公司贷款业务的等同，不采纳。F13/F14候选原元表数与分项主体有源，但复合fact为集团、各metric为分项时，旧金额展示检查拒绝其亿元正文，未送final，不能称新真实通过；原R1按元及分项/合计主体区分的收入构成原样保留。F23产能定义老错误新初核未发现，旧隔离继续；F38仍仅源参考。另F11的206,508,725.66元明确为贸易业务行而非公司全部收入，其metric仍集团标签，按与青山同类口径仅源参考，不当集团总额指标。公司营业收入科目与分行业金额、具体零部件类别仍不完整；F10退出后贷款细项只作部分，不沿用原支持。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F12",
+            "fact_sha256": "3b67343d67cbe4b25a64566d0e4c091cce0bcd046dcd0526a9733cb50729c4ca",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F15",
+            "fact_sha256": "77ab63b31ee55e9ba141e6e5cd9ad51524477e00de5374311ca2f45193ba3053",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F16",
+            "fact_sha256": "108c2fa1ea7e57ede64ed9625efa2367aadbe20c8e0a74f3703679ce3034ce2a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F17",
+            "fact_sha256": "43637319258a4192859a7124857b84603558c6081eec242735a4cadf57e1a795",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F18",
+            "fact_sha256": "84766873a2b40ee1e10bb4e4e4528b70944f8edd6380c08c40dff12526acc93a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "review-add:R1",
+            "fact_sha256": "438134f7f19e8af28d090c0f8cc648799a458b088385d7496db05afde6449c6a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F20",
+            "fact_sha256": "12679f6d7f5bea9fd9a93dc88061a20fd55e10e818c77d705d873cc5c22fbc4d",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F23",
+            "fact_sha256": "91a73a8f1d4e1f6ee7065b88bced388da21a8298ca2857a60616b9b20e6c8c56",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "reason": "F22按12页分行业成本表保本期580,943,983,649.41元、99.80%分母及成本类别，业务主体改窄、亿元正文只舍入限用。F37按13页集中度和17页境内外乘用/商用车销量，删除个人/企业客群无据断言。F10候选被真实final拒绝，未恢复金融行业合计与子公司贷款业务的等同，不采纳。F13/F14候选原元表数与分项主体有源，但复合fact为集团、各metric为分项时，旧金额展示检查拒绝其亿元正文，未送final，不能称新真实通过；原R1按元及分项/合计主体区分的收入构成原样保留。F23产能定义老错误新初核未发现，旧隔离继续；F38仍仅源参考。另F11的206,508,725.66元明确为贸易业务行而非公司全部收入，其metric仍集团标签，按与青山同类口径仅源参考，不当集团总额指标。公司营业收入科目与分行业金额、具体零部件类别仍不完整；F10退出后贷款细项只作部分，不沿用原支持。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F25",
+            "fact_sha256": "ac666c52265bf9ac66b4d091fd66ab48e0519499c7602caa07f09b7de7d7cfd2",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F26",
+            "fact_sha256": "8ef9656c4d5662957f2fcd928b23ec6bd73b10517b861d8509585bb625da51db",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F27",
+            "fact_sha256": "6da007bc02b8f057f170be9a2a7e9bfc225a9169b607e841472c91bb236480f6",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F28",
+            "fact_sha256": "6622ae469db9d9488ea6270e9b24d6812890c51ea8c94f1085bdff786dc9af7f",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F29",
+            "fact_sha256": "2d8bc8b9ba108ad4ab6af9dfc8b7bd01b8ef2bd6bd458910fd2238b5bad7c04b",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F31",
+            "fact_sha256": "066010ccfb043afd9a262c2039b7cd17212f4ae0f9e419cdbd007d4467b476e0",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F32",
+            "fact_sha256": "535ab0d8f1b55d2047657935593e7e47188605a246b559ac298fd7ba501c359a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001",
+              "source-0016"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F35",
+            "fact_sha256": "ed08c2c07e594e699de50848f11e112c5570abaa1cbf3b010077f78e3ec6acd9",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F36",
+            "fact_sha256": "42eefc0357fbbe3ce107d7a4f4ca0aac10dc6a227d227c900f83d1b401150f87",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007",
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F37",
+            "fact_sha256": "ed5159ad0c2bd366d45f440a9facd19bfb206efb781e15f73f724f8846bc9659",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008",
+              "source-0012"
+            ],
+            "reason": "F22按12页分行业成本表保本期580,943,983,649.41元、99.80%分母及成本类别，业务主体改窄、亿元正文只舍入限用。F37按13页集中度和17页境内外乘用/商用车销量，删除个人/企业客群无据断言。F10候选被真实final拒绝，未恢复金融行业合计与子公司贷款业务的等同，不采纳。F13/F14候选原元表数与分项主体有源，但复合fact为集团、各metric为分项时，旧金额展示检查拒绝其亿元正文，未送final，不能称新真实通过；原R1按元及分项/合计主体区分的收入构成原样保留。F23产能定义老错误新初核未发现，旧隔离继续；F38仍仅源参考。另F11的206,508,725.66元明确为贸易业务行而非公司全部收入，其metric仍集团标签，按与青山同类口径仅源参考，不当集团总额指标。公司营业收入科目与分行业金额、具体零部件类别仍不完整；F10退出后贷款细项只作部分，不沿用原支持。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F38",
+            "fact_sha256": "505fa770e69d7e129226c1a27f6677060d4f9d1f5adabe2f0682791fe0ea5796",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "reason": "F22按12页分行业成本表保本期580,943,983,649.41元、99.80%分母及成本类别，业务主体改窄、亿元正文只舍入限用。F37按13页集中度和17页境内外乘用/商用车销量，删除个人/企业客群无据断言。F10候选被真实final拒绝，未恢复金融行业合计与子公司贷款业务的等同，不采纳。F13/F14候选原元表数与分项主体有源，但复合fact为集团、各metric为分项时，旧金额展示检查拒绝其亿元正文，未送final，不能称新真实通过；原R1按元及分项/合计主体区分的收入构成原样保留。F23产能定义老错误新初核未发现，旧隔离继续；F38仍仅源参考。另F11的206,508,725.66元明确为贸易业务行而非公司全部收入，其metric仍集团标签，按与青山同类口径仅源参考，不当集团总额指标。公司营业收入科目与分行业金额、具体零部件类别仍不完整；F10退出后贷款细项只作部分，不沿用原支持。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F39",
+            "fact_sha256": "d3ecaeab763f4035d4bdbfbbf6ab92c7e7e07cecd8f3075f039f8eaf993c935b",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001",
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F22",
+            "fact_sha256": "a1b29e42e81bbc0037753a25c8a64857192f63160d6d5f5b80717836e2f57525",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "reason": "F22按12页分行业成本表保本期580,943,983,649.41元、99.80%分母及成本类别，业务主体改窄、亿元正文只舍入限用。F37按13页集中度和17页境内外乘用/商用车销量，删除个人/企业客群无据断言。F10候选被真实final拒绝，未恢复金融行业合计与子公司贷款业务的等同，不采纳。F13/F14候选原元表数与分项主体有源，但复合fact为集团、各metric为分项时，旧金额展示检查拒绝其亿元正文，未送final，不能称新真实通过；原R1按元及分项/合计主体区分的收入构成原样保留。F23产能定义老错误新初核未发现，旧隔离继续；F38仍仅源参考。另F11的206,508,725.66元明确为贸易业务行而非公司全部收入，其metric仍集团标签，按与青山同类口径仅源参考，不当集团总额指标。公司营业收入科目与分行业金额、具体零部件类别仍不完整；F10退出后贷款细项只作部分，不沿用原支持。",
+            "limitation": "保留原文限定、主体/时点或披露差异，见独立核源说明。"
+          },
+          {
+            "fact_id": "F13",
+            "fact_sha256": "5b647f44155646ca56a273ce9ab9ff7b6e3e19c9142bd04e5841c31fd33f163b",
+            "disposition": "duplicate",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "与review-add:R1为同一分产品收入披露，保留原精确元值条；本次亿元显示未增加另一份经济事实。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F14",
+            "fact_sha256": "c248e15a0c7388e6b4ab91c12ee0eb503b317d751aa70f16ccff7be5465e6f6c",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "11页主营业务分行业情况营业收入列支持汽车制造业646152101889.30元、金融业10091710191.88元及合计656243812081.18元；各分项与合计保自身主体，亿元仅显示。",
+            "limitation": "正文亿元为舍入展示，按结构化原元值使用；不将汽车制造业自动改称另一公司科目。"
+          },
+          {
+            "fact_id": "F10",
+            "fact_sha256": "99cd1dab9b1b8426ed8845d1274d812b9151234c9d5df40a595060f274593460",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0006",
+              "source-0013"
+            ],
+            "reason": "11页金融业务行毛利率与18页汽车金融子公司贷款指标分别有源，但来源未证明表中金融业务行与该子公司集合的收入范围等同；新最终accepted不消除此已知归属缺口。",
+            "limitation": null
+          }
+        ]
+      },
+      "counts": {
+        "reviewed": 24,
+        "pending": 0,
+        "limited": 9,
+        "source_only": 3,
+        "withheld": 1,
+        "duplicate": 1
+      },
+      "facts": [
+        {
+          "fact_id": "F01",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F02",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F03",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F04",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F05",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F06",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F07",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F08",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F09",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F10",
+          "state": "source_only",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F11",
+          "state": "source_only",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F12",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F13",
+          "state": "duplicate",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F14",
+          "state": "limited",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F15",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F16",
+          "state": "limited",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F17",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F18",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "review-add:R1",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F20",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F21",
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F22",
+          "state": "limited",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F23",
+          "state": "withheld",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F24",
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F25",
+          "state": "limited",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F26",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F27",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F28",
+          "state": "limited",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F29",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F31",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F32",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F33",
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F34",
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F35",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F36",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F37",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F38",
+          "state": "source_only",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F39",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        }
+      ],
+      "pending_review_count": 4
+    },
+    {
+      "instrument_id": "600082.SH",
+      "use_review": {
+        "report": {
+          "instrument_id": "600082.SH",
+          "report_id": "1225246039",
+          "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-28T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "Codex本次有限独立核源及DC精确hash继承",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/independent-audit.json",
+        "reference_sha256": "bd330190aedcad84dec65b3ca59fd86d5ba098467d2b474ad236fe1006856a25",
+        "decisions": [
+          {
+            "fact_id": "F01",
+            "fact_sha256": "2d062ae9900097b803da3448305ac74a34746b01536b90e837a702adbfc4276e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F02",
+            "fact_sha256": "5a4e5cf5dba4ee3f7a280d636160cb83d3018f60a106b97cde8dd9b1dea9db19",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F03",
+            "fact_sha256": "7eb1681dfcdfddb40c55c4b610bbc688f232fb4cab6ad3bdfb834320a2ff9767",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F04",
+            "fact_sha256": "f803dfecda82e8836afe75544dd15396b944ad83cc954adfefa70cfadcf7d940",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F05",
+            "fact_sha256": "de49d1afd39a47ef01902cae0e132be8597119944173aff926fbd0b39195c066",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001",
+              "source-0017"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F06",
+            "fact_sha256": "b378b3df0dcbd413db1b2760f42898b2efc2f73c2be39cdf745bc495b5bf1624",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006",
+              "source-0022"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F07",
+            "fact_sha256": "2a6b4575b27a1627b846d1eb4bc7cc307854ce418fb1d03657abe4936f54b250",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0021",
+              "source-0022"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F08",
+            "fact_sha256": "92d29f0e54a780fa8595ff815ce979c53021ff4b7519f0d467886eae1921e636",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004",
+              "source-0006"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F12",
+            "fact_sha256": "6ec160ddc1c82cce6cbf1628239ab8a6b5c6770a27aeab1d53878860381e437c",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F13",
+            "fact_sha256": "4bb957333464903fe961c98ec5b5241f8f1255a6e72dcbf0cdf29185fe4fa659",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0021",
+              "source-0022"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F15",
+            "fact_sha256": "89fb8f93d1b99082703c6d28a40145b8b43494a2a582b0eb9a8fe8d4b92cb7a4",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001",
+              "source-0002"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F16",
+            "fact_sha256": "1feab9c694c53aba9109d430cfb874e8fa42805d35eb0cb3a3e335eae722d6b7",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0016"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F17",
+            "fact_sha256": "01f662524a55a6571a74a6c59f3b6c9f66d9f2bbead80466bb161bdaa5458779",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F18",
+            "fact_sha256": "6e899c2641c8e1df4b2a9b268fd95d76efbb46b03ec508c28b6583b77e60a942",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008",
+              "source-0009"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F19",
+            "fact_sha256": "f00d4e773b62354b4b48859e8a4288196e01aa1da29021e5f92bdfec964275aa",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008",
+              "source-0009"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F20",
+            "fact_sha256": "fc625e8132e8086b88862d205668b5e6b585020d4a06c3f41e183fe1a3374ec4",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F21",
+            "fact_sha256": "060771a1c83ef89798c1b5ce7e43d45407b2b229b549ebdc03bb12f93d847e16",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F22",
+            "fact_sha256": "2e480c26556a9d3cb82b300c259150dd703e1fac9dd66bc88de4c0c486850f9f",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F23",
+            "fact_sha256": "299697435884a0c3f64dbb0b954b5ecc538c636628a284700f174821190dd49e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003",
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "review-add:RF01",
+            "fact_sha256": "a5bf93ed78129f4c6db5bbd89fb47ec6fb18be60e8dfd61b4d49996e4d2fcfb0",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005",
+              "source-0021"
+            ],
+            "reason": "商品贸易424,569.35元/-49.75%为特定业务，分项scope有据，空成本不造零。RF01资产减值损失-45,477,408.86元、比较年-11,336,444.84元及增加计提原因保持，经营分析表无母公司限定，改集团默认口径有据；损失以负数列示、不另算百分比。原F09/F10主板块金额和正文下降方向有据，但修订把原表“减少29.68/2.21个百分点”写成裸负数raw，未通过本地源检查、未进入final，不能按真实采纳恢复；两条主要构成退出后K09记缺失，不用合同收入/租赁收入替代园区开发/运营口径。原已独立支持的其他主干保留；唯一上市公司、关联交易标签为minor补充，不追齐。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F24",
+            "fact_sha256": "717f832d6f2c348a31f9bd197fd606df292541212ea6b62e2ed7520841513a68",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008",
+              "source-0018"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F25",
+            "fact_sha256": "faf20ce33a3327f04a85b77393aff84a19d6087e7b9941c32d60aa5e894f41d5",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F27",
+            "fact_sha256": "122f461fd3e61e1c16575e9fd49f41c34c9361026c14438c4479e4fa476d697a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F28",
+            "fact_sha256": "8a494e30ec550a65dec8a9685449df3d0973200a825bc4c8925979f19ecd39c5",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F29",
+            "fact_sha256": "17a59d59043acf93df4a7a4d34c3285f3066f2d9ba51f2234228c11ce4e38e49",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006",
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F11",
+            "fact_sha256": "328c398e7a282bfd711c07e38951d9b6872764257633ff156ffdd5026f78a771",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "商品贸易424,569.35元/-49.75%为特定业务，分项scope有据，空成本不造零。RF01资产减值损失-45,477,408.86元、比较年-11,336,444.84元及增加计提原因保持，经营分析表无母公司限定，改集团默认口径有据；损失以负数列示、不另算百分比。原F09/F10主板块金额和正文下降方向有据，但修订把原表“减少29.68/2.21个百分点”写成裸负数raw，未通过本地源检查、未进入final，不能按真实采纳恢复；两条主要构成退出后K09记缺失，不用合同收入/租赁收入替代园区开发/运营口径。原已独立支持的其他主干保留；唯一上市公司、关联交易标签为minor补充，不追齐。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F09",
+            "fact_sha256": "3ba6bd79669edc9d2ac9990cdd32116204770ca491d0eb962b69fb72557a29f5",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "15页科技园区开发业务行及同列续行：收入418710800.51元、成本341118587.17元、毛利率18.53%、收入35.15%/成本112.60%及毛利率减少29.68个百分点有据；不当集团合计。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F10",
+            "fact_sha256": "a1ca9b9f25a3a8b45727d1772f5973f6e3a21792b1216cf6b1f295caa49c020e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "15页科技园区运营业务行及同列续行：收入30105192.48元、成本14372966.79元、毛利率52.26%、收入11.60%/成本17.02%及毛利率减少2.21个百分点有据；不当集团合计。",
+            "limitation": null
+          }
+        ]
+      },
+      "counts": {
+        "reviewed": 28,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "facts": [
+        {
+          "fact_id": "F01",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F02",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F03",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F04",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F05",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F06",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F07",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F08",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F09",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F10",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F11",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F12",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F13",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F15",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F16",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F17",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F18",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F19",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F20",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F21",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F22",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F23",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "review-add:RF01",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F24",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F25",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F27",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F28",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F29",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        }
+      ],
+      "pending_review_count": 0
+    },
+    {
+      "instrument_id": "600054.SH",
+      "use_review": {
+        "report": {
+          "instrument_id": "600054.SH",
+          "report_id": "1225118314",
+          "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-17T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "Codex本次有限独立核源及DC精确hash继承",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/independent-audit.json",
+        "reference_sha256": "bd330190aedcad84dec65b3ca59fd86d5ba098467d2b474ad236fe1006856a25",
+        "decisions": [
+          {
+            "fact_id": "F01",
+            "fact_sha256": "f85c708a3d2ed17b28ffcf6497cf9ece7eacdc30c53382f90504d475a29f6c2e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F02",
+            "fact_sha256": "9e5e9ad6b58e18d7116403c9744778e2a3013afcb4cf265bae42b111b4812ac4",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F03",
+            "fact_sha256": "20092a0a80daf3aa42133c599724fbd130077fd36ba2badf137d14e1c8962ed6",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F04",
+            "fact_sha256": "93abaf4e3aa65e5d3db78479c54862bd660503800127e2dbd312980a8cfab25f",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F05",
+            "fact_sha256": "6f690893de5c22bd105102aa1fbfef78f4fbfd593dbd964092a3336c71f35bc7",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F06",
+            "fact_sha256": "f642b2d4e58cf15d8ba24f680e5bec3aa78918b3182ac69eddf698b7e924a74a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F07",
+            "fact_sha256": "92c8171d000f229b3ce5eb5e7f64b4cff18e562bd332ef73e4f505bdbfcabd43",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F08",
+            "fact_sha256": "9b25fdd9f62c582cbd41d666f70c1c36ea34ada2b9c64105a5899286b93871f2",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F09",
+            "fact_sha256": "7b71137d7700638d75288e2bc7aee72a815071f36a07c25264f882b6aba343d3",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F10",
+            "fact_sha256": "99d3b49a743e3e2b73982212a92f3f30e99d84524aea78f8f46b22e07c3b6052",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F11",
+            "fact_sha256": "15ca747f81904fe62ebeade3b98eaa5e2b8d889a1791946ae67b4901a32dcd57",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001",
+              "source-0007",
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F12",
+            "fact_sha256": "71b29d7db8fb2b18733664e99e4057c052c450f232afa239959b02964c20f542",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F13",
+            "fact_sha256": "5fe595e4826844a84c18044548ab243a634f66fe582183d0bada0975b09be082",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F14",
+            "fact_sha256": "0ef123dfc869da45816534f159fea0e3b61f08810d2f258dc39f9a82d4dc7f5d",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F15",
+            "fact_sha256": "4e7805681877fa2eea3757b04e7c18ced70235c97fe0fdc5bc37c097297b2443",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F16",
+            "fact_sha256": "9eca55001839a7e6807ba7abd6eb6ed759e9fa571a8cce0ba9378524d1e761c8",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F17",
+            "fact_sha256": "f73320d0d90e177c1c8ffd3e54fa5bd6c9f76f6c965ed009aa5ca1f02e4ff7ec",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F18",
+            "fact_sha256": "377f3cda9e088350368bda50052a80089d2d873da0f25eaab4161e2dd45dc06d",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F22",
+            "fact_sha256": "3b00b27d1fd630ec63df3ca8ce50362d5ef10f16f6c8738564d05d424074e18f",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0014"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": "附注是分部主营业务收入，集团营业收入是另一科目；差异未在本表说明，不作为来源矛盾或强行推导补齐。"
+          },
+          {
+            "fact_id": "F23",
+            "fact_sha256": "ee44478e22ba17c5fd79eb7e5ac8c2d256227b6cd24bc6c1c042fb81548768b3",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F24",
+            "fact_sha256": "18f09b0284e0495228d4988c8261840b003a790d8f1b862a4bd08d10f723256e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F25",
+            "fact_sha256": "3d9005fc38bb20209c24bfb2d446b085b6040d91c3ed7a75fff40c01310934c5",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F26",
+            "fact_sha256": "aa100e877cd3abc23c8e5c9324c47bafd30ec466124af7b2056ec9d036f69bb4",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F27",
+            "fact_sha256": "0d8e2b50bbd117e07fda7852b9e75a3e369ba6dd297d5acd76f004d788912d41",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F28",
+            "fact_sha256": "6976ac03a04a5c43863bee7427bbecb01045d93d12773a86c6326824850a3aad",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F29",
+            "fact_sha256": "6cbc07ceed27f3bdfd1f7ec8ece4bb81d1f594f8db69ea9f90c96c02d4febd09",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F30",
+            "fact_sha256": "8e77f0ef547cc4430ad738ff1ca31b53daf384d228699e68c84a66dec1c7a0f3",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F31",
+            "fact_sha256": "6f9e7cf66f5550ac65f2b0a29e7ae6f98445f036a8b4f412d805a5490823fbca",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F32",
+            "fact_sha256": "73fda45481572f3afda1ee76a57c3b73de9ea2e6f0707255c657372a6201b091",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008",
+              "source-0009"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F33",
+            "fact_sha256": "071c8d5723421a346e5ca705ec57eb60d57b4e59112059cae1a9fc25cc2e023c",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0007",
+              "source-0010"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F34",
+            "fact_sha256": "b256a25a1f095a0b06e4d19574a68de59f92c2fffe1487073b92f1cb9101d3dd",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F35",
+            "fact_sha256": "064715391f7f3f8a72dc74d70e2b0f5193a4be98083f92cb14335d4f2a9f1797",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F36",
+            "fact_sha256": "6a109acd6be964d4d9d220a739d1c8dbb7eeee3506696c1911240d83a5db66b2",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F37",
+            "fact_sha256": "437066d81c5b932b5ac174d00fcd7d782dfe2e6780622eec6b89bb493b5eedbb",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F38",
+            "fact_sha256": "8fa2813b7dde1e3721bbcffd46c02f27c742209e266a8dfb5d302d6b66988889",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F39",
+            "fact_sha256": "ba19ca2c7bb28335472c153a25be0e8465629bcafdc14558324c3d7cad2ac6f4",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F40",
+            "fact_sha256": "5f00b81e910428a24645b410b9e1c0678d8867fc9521aad12d43a1f5d8352ae4",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F41",
+            "fact_sha256": "f15ec858cf9970c7fe1fc8c97939c1e29571e5c61461d6055fa74c36b059409d",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F42",
+            "fact_sha256": "14b64e8680e2496895db79ac1d102c5aea92b467b1f0e3cb325fbe563960d5f1",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "复用原独立核源中对相同对象的支持；不是新模型核验或正式接受。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F19",
+            "fact_sha256": "a0ad9cd5dc6a5c88b3a3fb717a01bf6fb5a16120ac47b8536865ddf7b36f6d5a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "11页支持黄山景区进山游客516.80万人、492.24万人、增加24.56万人及4.99%；景区不冒集团全部客流，unclear限用保留。索道及缆车1043.38万人次、981.49万人次、增加61.88万人次及6.31%照原文保留，不强行用舍入数配平。新增RF03净利下降候选没有进入最终再核：standardization_notes明确扣非净利润数字未定位，6页原表将261,834,633.40在小数点后换行，11页净利润减少叙事有据；未采纳不等于源无此信息。原13核心仍有据，盈利下降与资源有偿使用费背景是重要未补充信息，公开缺项，不人工写成模型已交付。",
+            "limitation": "保留原文限定、主体/时点或披露差异，见独立核源说明。"
+          },
+          {
+            "fact_id": "F20",
+            "fact_sha256": "9fd0d8d2628704f1bb2296907fa90f9fbeaf6c256de796759d2d32b4f8df5827",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "reason": "11页支持黄山景区进山游客516.80万人、492.24万人、增加24.56万人及4.99%；景区不冒集团全部客流，unclear限用保留。索道及缆车1043.38万人次、981.49万人次、增加61.88万人次及6.31%照原文保留，不强行用舍入数配平。新增RF03净利下降候选没有进入最终再核：standardization_notes明确扣非净利润数字未定位，6页原表将261,834,633.40在小数点后换行，11页净利润减少叙事有据；未采纳不等于源无此信息。原13核心仍有据，盈利下降与资源有偿使用费背景是重要未补充信息，公开缺项，不人工写成模型已交付。",
+            "limitation": null
+          },
+          {
+            "fact_id": "review-add:RF03",
+            "fact_sha256": "1e4214032b8360fc4d0a124b7b334286c5a6777e34ba55e04f07114c1540c11e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001",
+              "source-0005"
+            ],
+            "reason": "按11页经营情况补入归母利润下降与原文费用原因，按6页比较财务表补入扣非利润261834633.40元及下降17.38%；期间/科目/合并默认主体有据，保持各来源原精度。",
+            "limitation": null
+          }
+        ]
+      },
+      "counts": {
+        "reviewed": 40,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "facts": [
+        {
+          "fact_id": "F01",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F02",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F03",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F04",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F05",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F06",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F07",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F08",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F09",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F10",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F11",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F12",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F13",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F14",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F15",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F16",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F17",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F18",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F19",
+          "state": "limited",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F20",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F22",
+          "state": "limited",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F23",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F24",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F25",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F26",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F27",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F28",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F29",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F30",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F31",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F32",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F33",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "review-add:RF03",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F34",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F35",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F36",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F37",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F38",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F39",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F40",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F41",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        },
+        {
+          "fact_id": "F42",
+          "state": "reviewed",
+          "review_basis": "independent_source_check",
+          "model_review_stage": null
+        }
+      ],
+      "pending_review_count": 0
+    }
+  ]
+}

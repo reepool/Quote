@@ -1,0 +1,147 @@
+"""Independent source/use decisions for the spent DE final-only entries."""
+import collections
+import hashlib
+import json
+import shutil
+import sys
+import time
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DC=C/'workpaper-final-source-review-result-20261117'
+D=C/'workpaper-three-final-source-review-result-20261117'
+from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import CompanyProfileWorkpaper,workpaper_elements,workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+def read(path):return json.loads(Path(path).read_text())
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def facts(p):return {f.fact_id:f for e in workpaper_elements(p).values() for f in e.facts}
+
+notes={
+ '600104.SH':{'source_pages_read':[11,12,13,17,18],
+   'supported_candidate_ids':['F13','F14','F22','F37'],
+   'source_only_fact_ids':['F10'],'duplicate_fact_ids':['F13'],
+   'core_override':{'600104-K08':'supported'},
+   'conclusion':'分行业收入构成恢复；分产品F13与已核R1同一披露，保R1精确元值而不重复展示。F10新模型改判接受，但行业毛利率88.47%与具名汽车金融子公司发放贷款各自有源，未证明两组披露为同一收入范围，整条仅源参考。原F11/F38源参考及F23产能错误隔离不变。公司营业收入科目区别、零部件具体子类及金融服务边界仍部分，不用同金额/模型accepted消缺。',
+   'decisions':{
+      'F13':('duplicate','与review-add:R1为同一分产品收入披露，保留原精确元值条；本次亿元显示未增加另一份经济事实。',None),
+      'F14':('source_checked','11页主营业务分行业情况营业收入列支持汽车制造业646152101889.30元、金融业10091710191.88元及合计656243812081.18元；各分项与合计保自身主体，亿元仅显示。','正文亿元为舍入展示，按结构化原元值使用；不将汽车制造业自动改称另一公司科目。'),
+      'F10':('source_only','11页金融业务行毛利率与18页汽车金融子公司贷款指标分别有源，但来源未证明表中金融业务行与该子公司集合的收入范围等同；新最终accepted不消除此已知归属缺口。',None)}},
+ '600082.SH':{'source_pages_read':[15],
+   'supported_candidate_ids':['F09','F10','F11','review-add:RF01'],
+   'source_only_fact_ids':[],'duplicate_fact_ids':[],'core_override':{'600082-K09':'supported'},
+   'conclusion':'原15页收入/成本/毛利率及增减列支持园区开发和运营两条恢复，续行小数和减少百分点均正确；商品销售与减值原稿不变，空成本仍未列示而非零。关联交易等minor未补，不追加调用。',
+   'decisions':{
+      'F09':('source_checked','15页科技园区开发业务行及同列续行：收入418710800.51元、成本341118587.17元、毛利率18.53%、收入35.15%/成本112.60%及毛利率减少29.68个百分点有据；不当集团合计。',None),
+      'F10':('source_checked','15页科技园区运营业务行及同列续行：收入30105192.48元、成本14372966.79元、毛利率52.26%、收入11.60%/成本17.02%及毛利率减少2.21个百分点有据；不当集团合计。',None)}},
+ '600054.SH':{'source_pages_read':[6,11],
+   'supported_candidate_ids':['F19','F20','review-add:RF03'],
+   'source_only_fact_ids':[],'duplicate_fact_ids':[],'core_override':{},
+   'conclusion':'11页支持归母净利29248.09万元、减少2252.81万元/7.15%及景区资源有偿使用费增加原因；6页财务表支持扣非净利261834633.40元/同比-17.38%。叙事万元和财务表元值各按来源保留，不强行配平舍入差额；客流原限定未改，原13核心继续成立。',
+   'decisions':{'review-add:RF03':('source_checked','按11页经营情况补入归母利润下降与原文费用原因，按6页比较财务表补入扣非利润261834633.40元及下降17.38%；期间/科目/合并默认主体有据，保持各来源原精度。',None)}}}
+assert not (D/'independent-audit.json').exists(),'do not overwrite completed audit'
+protected={str(p):sha(p) for p in DC.rglob('*') if p.is_file()}
+execution=read(D/'group-execution.json');assert len(execution['results'])==3
+plan=read(C/'workpaper-aligned-source-consumption-result-20261117/final-review-plan.json')
+old_audit=read(DC/'independent-audit.json');old_grades=read(DC/'delivery-decisions.json')
+reference=read(C/'workpaper-core-readiness-20261114/source-first-contract.json')
+audit={'task':'6.DE','method':'直接读原引用/完整表头及续行核本次五个恢复对象和F10争议；未改候选及事实仅以完整fact hash/同源复用DC独立判定。不把模型一致、数值命中或三读当语义真值。',
+       'formal_stage_pass':False,'formal_accuracy':None,'formal_recall':None,'production_authorization':'not_authorized','companies':{}}
+for row in plan['profiles']:
+    instrument=row['instrument_id'];code=instrument[:6];n=notes[instrument]
+    new=CompanyProfileWorkpaper.model_validate(read(D/code/'query.json')['profiles'][0]['workpaper'])
+    old=CompanyProfileWorkpaper.model_validate(read(DC/code/'query.json')['profiles'][0]['workpaper'])
+    a,b=facts(new),facts(old)
+    accepted={f.revised_fact.fact_id for f in new.quality_review.findings if f.resolution=='corrected_pending_trust'}
+    assert accepted==set(row['candidate_ids'])
+    changed={fid for fid,f in a.items() if f!=b.get(fid)}
+    assert changed==set(row['newly_recovered_ids'])|({'F10'} if code=='600104' else set())
+    original=read(ROOT/row['original_receipts'])
+    for r in original:
+        if r['purpose'] in {'review_profile_workpaper','repair_profile_workpaper'}:
+            assert hashlib.sha256(r['raw_content'].encode()).hexdigest()==r['response_hash']
+    actual=read(D/code/'model-receipts.json');assert len(actual)==1 and actual[0]['purpose']=='verify_profile_workpaper_repair'
+    assert actual[0]['source_label']=='scorpio:grok-4.7' and actual[0]['finish_reason']=='stop'
+    assert set(actual[0]['response_payload']['checked_fact_ids'])==accepted
+    assert all(c['accepted'] for c in actual[0]['response_payload']['checks'])
+    core=list(old_audit['companies'][instrument]['core_verdicts'])
+    conditions=next(c for c in reference['companies'] if c['instrument_id']==instrument)['core_conditions']
+    for i,c in enumerate(conditions):
+        if c['condition_id'] in n['core_override']:core[i]=n['core_override'][c['condition_id']]
+    audit['companies'][instrument]={k:v for k,v in n.items() if k!='decisions'}
+    audit['companies'][instrument].update(core_verdicts=core,query_sha256=sha(D/code/'query.json'),
+        changed_facts={fid:{'fact_sha256':workpaper_fact_hash(a[fid]),'evidence_ids':list(a[fid].evidence_ids)} for fid in sorted(changed)},
+        actual_final_accepted_fact_ids=sorted(accepted),unchanged_fact_ids=sorted(fid for fid in a if a[fid]==b.get(fid)))
+dump(D/'independent-audit.json',audit)
+grades=[];readback=[];cleaned=0
+with TemporaryDirectory(prefix='workpaper-de-graded-') as directory:
+    root=Path(directory);writer=CompanyProfileResearchWriter(root/'output')
+    for row in plan['profiles']:
+        instrument=row['instrument_id'];code=instrument[:6]
+        raw=read(D/code/'query.json')['profiles'][0];paper=CompanyProfileWorkpaper.model_validate(raw['workpaper']);current=facts(paper)
+        controls={d.fact_id:d.model_dump(mode='json') for d in paper.use_review.decisions}
+        for fid,(state,reason,limitation) in notes[instrument]['decisions'].items():
+            f=current[fid];controls[fid]={'fact_id':fid,'fact_sha256':workpaper_fact_hash(f),'disposition':state,
+                'evidence_ids':list(f.evidence_ids),'reason':reason,'limitation':limitation}
+        bound=bind_workpaper_use_review(paper,{'report':paper.report.model_dump(mode='json'),
+            'reviewer':'Codex本次有限独立核源及DC精确hash继承','reference':str(D/'independent-audit.json'),
+            'reference_sha256':sha(D/'independent-audit.json'),'decisions':list(controls.values())})
+        assert facts(bound)==current and bound.quality_review==paper.quality_review and bound.evidence==paper.evidence
+        context=read(D/code/'publication-context.json');context.update(workpaper=bound.model_dump(mode='json'),workpaper_receipts=raw['workpaper_receipts'])
+        writer.persist(CompanyProfileRuntimeRecordV3.model_validate_json(json.dumps(context,ensure_ascii=False)))
+    for row in plan['profiles']:
+        instrument=row['instrument_id'];code=instrument[:6];reader=CompanyProfileReadService(root/'output')
+        query=reader.query((instrument,));export=reader.export((instrument,),root/'export'/code);fresh=CompanyProfileReadService(root/'output').query((instrument,))
+        assert query['profiles']==export['profiles']==fresh['profiles']
+        p=query['profiles'][0];raw=read(D/code/'query.json')['profiles'][0]
+        a=CompanyProfileWorkpaper.model_validate(p['workpaper']);b=CompanyProfileWorkpaper.model_validate(raw['workpaper'])
+        assert facts(a)==facts(b) and a.evidence==b.evidence and a.quality_review==b.quality_review
+        assert p['workpaper_receipts']==raw['workpaper_receipts'] and not p['core_complete'] and not p['accepted_facts']
+        states={f['fact_id']:f for f in p['workpaper_delivery']['facts']}
+        if code=='600104':
+            assert states['F10']['state']=='source_only' and states['F10']['fact'] is None
+            assert states['F13']['state']=='duplicate' and states['F13']['fact'] is None
+            assert states['F23']['state']=='withheld' and states['F11']['state']==states['F38']['state']=='source_only'
+            assert states['review-add:R1']['fact'] is not None
+        (D/(code+'-research.md')).write_text(p['workpaper_markdown'])
+        grades.append({'instrument_id':instrument,'use_review':p['workpaper']['use_review'],'counts':p['workpaper_delivery']['counts'],
+            'facts':[{k:f[k] for k in ('fact_id','state','review_basis','model_review_stage')} for f in p['workpaper_delivery']['facts']],
+            'pending_review_count':p['workpaper_delivery']['pending_review_count']})
+        readback.append({'instrument_id':instrument,'three_reads_equal':True,'facts_values_evidence_model_calls_and_receipts_unchanged':True,
+            'profile_sha256':hashlib.sha256(json.dumps(p,ensure_ascii=False,sort_keys=True).encode()).hexdigest(),'core_complete':False})
+    cleaned=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+assert not root.exists()
+newgrades={g['instrument_id']:g for g in grades};totals=collections.Counter();core=collections.Counter();index=[]
+for g in old_grades['profiles']:
+    instrument=g['instrument_id'];code=instrument[:6];new=instrument in newgrades
+    grade=newgrades.get(instrument,g);totals.update(grade['counts'])
+    verdicts=(audit if new else old_audit)['companies'][instrument]['core_verdicts'];core.update(verdicts)
+    source=(D if new else DC)/code/'query.json'
+    index.append({'instrument_id':instrument,'source_query':str(source.relative_to(ROOT)),'source_query_sha256':sha(source),
+        'decisions':str(((D if new else DC)/'delivery-decisions.json').relative_to(ROOT)),
+        'research_markdown':str(((D if new else DC)/(code+'-research.md')).relative_to(ROOT)),
+        'counts':grade['counts'],'core_verdicts':dict(collections.Counter(verdicts)),'new_final_this_card':new})
+dump(D/'delivery-decisions.json',{'task':'6.DE','raw_queries_preserved':True,'profiles':grades})
+dump(D/'current-delivery-index.json',{'task':'6.DE','profiles':index,'aggregate_delivery_counts':dict(totals),
+    'aggregate_core_verdicts':dict(core),'same_version_first_run_claimed':False,'formal_S1':'0/12','production_authorization':'not_authorized'})
+dump(D/'delivery-validation.json',{'task':'6.DE','checks':readback,'temporary_root_removed':True,'removed_bytes':cleaned,
+    'new_model_calls':0,'raw_run_and_prior_DC_unchanged':True})
+resource={'task':'6.DE','logical_requests':3,'physical_requests':sum(r['physical_requests'] for r in execution['results']),
+    'ledger':sum(r['ledger'] for r in execution['results']),'ledger_basis':'provider_reported_total_usage',
+    'recoveries':sum(r['recoveries'] for r in execution['results']),'cost':'unknown',
+    'business_wall_seconds':round(max(r['business_ended_monotonic'] for r in execution['results'])-min(r['business_started_monotonic'] for r in execution['results']),3),
+    'supervision_seconds':execution['supervision_seconds'],'actual_final_accepted':12,'new_or_restored_fact_ids':6,
+    'newly_recovered_targets_accepted':5,'newly_recovered_targets_independently_supported':5,
+    'recovered_targets_duplicate':1,'new_unique_research_facts_delivered':4,
+    'new_known_scope_combination_source_only':1,'aggregate_current_delivery_counts':dict(totals),'aggregate_current_core_verdicts':dict(core),
+    'worker_cleanup_bytes':sum(r['cleanup_bytes'] for r in execution['results']),
+    'supervisor_cleanup_bytes':read(D/'supervision-cleanup.json')['removed_bytes'],'graded_readback_cleanup_bytes':cleaned,
+    'old_usage_not_overwritten':True,'formal_S1':'0/12','production_authorization':'not_authorized'}
+dump(D/'resource-summary.json',resource)
+assert all(sha(Path(p))==digest for p,digest in protected.items())
+shutil.copy2(__file__,D/'delivery-operator-snapshot.txt')
+print(json.dumps(resource,ensure_ascii=False,indent=2))

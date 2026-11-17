@@ -1,0 +1,67 @@
+{
+  "task": "6.DE",
+  "authorization_sha256": "e9a4800a774fab8cb0e6b4bab763fbc30072944587e13d31aa44f0603d094a0e",
+  "asset": {
+    "instrument_id": "600054.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_6c1c10fda0c84960cd9f5ed70c235be8",
+    "filing_id": "1225118314",
+    "source": "cninfo",
+    "published_at": "2026-04-17T16:00:00+00:00",
+    "content_hash": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/f8/f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f.pdf",
+    "report_type": "annual_report"
+  },
+  "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600054/query.json",
+  "source_query_sha256": "e1df8a98a74216fa22236f0a640cfb2cb401968426a5a806450904b30fc164a4",
+  "original_receipts_sha256": "9fe86a43b51b56cb96e9db02782e06c16a9f7e933f5e2505bc87aa0ef33c80ee",
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-17.subject-contract.v19",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+    "preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+    "source_binding_policy": "company_workpaper_source_literals.aligned-cells.v6",
+    "workpaper_format_recovery": "validation_feedback.v1",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 900,
+    "workpaper_review_policy": "company_profile_workpaper_review.v10",
+    "quality_review_profile": "semantic_extraction__scorpio_grok",
+    "repair_profile": "semantic_extraction__deepseek",
+    "review_max_output_tokens": 12000,
+    "review_existing_draft_hash": "e66e4231ef0dd36cdb809e03b6dda0ebda927c0d9700c0c5bb836386ba132d1b",
+    "review_resume_hash": "a25c551c0abb600c2063a1f717b5d73a710218df32fe5992945f6e2bcfb2373f"
+  },
+  "candidate_ids": [
+    "F19",
+    "F20",
+    "review-add:RF03"
+  ],
+  "old_stage_usage": [
+    {
+      "purpose": "review_profile_workpaper",
+      "usage": {
+        "input_tokens": 19471,
+        "output_tokens": 722,
+        "total_tokens": 49921
+      },
+      "request_id": "bp-work-2df6966344c726fe8d1d1b11:workpaper:review",
+      "contract_status": "accepted"
+    },
+    {
+      "purpose": "repair_profile_workpaper",
+      "usage": {
+        "input_tokens": 10120,
+        "output_tokens": 1028,
+        "total_tokens": 11148
+      },
+      "request_id": "bp-work-2df6966344c726fe8d1d1b11:workpaper:repair",
+      "contract_status": "accepted"
+    }
+  ]
+}

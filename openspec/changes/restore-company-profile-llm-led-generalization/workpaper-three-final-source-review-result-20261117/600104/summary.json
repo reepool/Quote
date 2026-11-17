@@ -1,0 +1,76 @@
+{
+  "task": "6.DE",
+  "instrument_id": "600104.SH",
+  "name": "上汽集团",
+  "entry_started": true,
+  "readable": true,
+  "three_reads_equal": true,
+  "exception": null,
+  "candidate_ids": [
+    "F10",
+    "F13",
+    "F14",
+    "F22",
+    "F37"
+  ],
+  "preparation_seconds": 42.382,
+  "business_started_monotonic": 10094533.079932436,
+  "state": "completed",
+  "business_ended_monotonic": 10094693.748754794,
+  "business_seconds": 160.669,
+  "query_sha256": "1069bf54411035d357ecfd26ecfeca583e94ebc56a4c40b18561f299a980c538",
+  "fact_count": 38,
+  "metric_count": 49,
+  "core_complete": false,
+  "review_status": "completed",
+  "review_error": null,
+  "retained_request_ids": [
+    "bp-work-4f15fcea42eb3fb1e9b428cc:workpaper:review",
+    "bp-work-4f15fcea42eb3fb1e9b428cc:workpaper:repair"
+  ],
+  "new_or_changed_fact_ids": [
+    "F10",
+    "F13",
+    "F14"
+  ],
+  "removed_fact_ids": [],
+  "findings": [
+    {
+      "finding_id": "WR-F10-SCOPE",
+      "fact_id": "F10",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR-F10-INCOME",
+      "fact_id": "F10",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR-F13-SCOPE",
+      "fact_id": "F13",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR-F14-SCOPE",
+      "fact_id": "F14",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR-F22-SCOPE",
+      "fact_id": "F22",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR-F37-CUSTOMER",
+      "fact_id": "F37",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "physical_requests": 1,
+  "ledger": 25323,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "supervision_seconds": 205.069,
+  "cleanup_bytes": 2430833
+}

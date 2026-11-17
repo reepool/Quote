@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-17 6.DE完成[三份原批次真实最终再核](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/result.md)，[当前十二份入口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/profiles.md)已更新：海泰两项主业构成、上汽分行业收入、黄山利润下降背景进入使用版，重复分产品收入去重，金融范围缺证仅源参考。新3物理/68237供应商usage/0恢复/unknown、160.669业务秒，原入口/分级三读3/3一致；当前321普通已核/44限用/4源参考/2隔离/1重复，123支持/9部分/1缺失只作后继对照，S1/S2/生产不变。此卡3/3全部用完，下一回整体画像验收与研究交付，不围三家再补句或重付前段；运行/监督/读回根清8918168字节、脚本核齐后清，源/缓存/attempt及既有并行保护。
+
 2026-11-17 6.DD完成[保存候选共性消费修正](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-aligned-source-consumption-result-20261117/result.md)：上汽2/海泰2/黄山1恢复到原final边界，source-binding v6，212相关通过，三组原writer三读一致；0新模型/绑定/候选采纳，旧12稿/DC结果/hash不改。已清三个最终读回根1627847字节，过程脚本核齐后清，原源/attempt/并行保护。下一仅候选6.DE三份原修订批次12目标（含恢复5项）补最终再核，复用旧初核/修订/公开章节、不重付前段；新的有界授权未获批前不发送，不重抽十二家、追供应链尾项或扩大平台，正式S1/S2/生产不变。
 
 2026-11-17 6.DC已交[十二份同版源复核使用版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/result.md)：原十二份全部后段执行、分级后三读一致；47真实采纳修订独立45有据/1源参考/1仍错隔离。366对象中318普通已核/43保真限用，另3源参考/2隔离不作普通结论；当前133核心后继121支持/9部分/3缺失，不改旧首发或计S1。34物理/1097696供应商usage/0恢复/unknown，1865.800业务墙钟秒，源码同版未热修；本卡次数用完。下一优先复用保存候选，合并解决合法混合主体及跨行表格的消费误拒，不重抽十二家、追供应链尾项或开新平台；新真实范围须另有界授权，S2/生产未放行。工作/监督/分级读回根清35081509字节，过程物核快照后清，正式源/缓存/attempt及既有并行保护。

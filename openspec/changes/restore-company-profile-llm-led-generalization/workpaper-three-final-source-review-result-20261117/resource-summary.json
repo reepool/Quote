@@ -1,0 +1,37 @@
+{
+  "task": "6.DE",
+  "logical_requests": 3,
+  "physical_requests": 3,
+  "ledger": 68237,
+  "ledger_basis": "provider_reported_total_usage",
+  "recoveries": 0,
+  "cost": "unknown",
+  "business_wall_seconds": 160.669,
+  "supervision_seconds": 209.424,
+  "actual_final_accepted": 12,
+  "new_or_restored_fact_ids": 6,
+  "newly_recovered_targets_accepted": 5,
+  "newly_recovered_targets_independently_supported": 5,
+  "recovered_targets_duplicate": 1,
+  "new_unique_research_facts_delivered": 4,
+  "new_known_scope_combination_source_only": 1,
+  "aggregate_current_delivery_counts": {
+    "reviewed": 321,
+    "pending": 0,
+    "limited": 44,
+    "source_only": 4,
+    "withheld": 2,
+    "duplicate": 1
+  },
+  "aggregate_current_core_verdicts": {
+    "supported": 123,
+    "partial": 9,
+    "missing": 1
+  },
+  "worker_cleanup_bytes": 7009087,
+  "supervisor_cleanup_bytes": 42762,
+  "graded_readback_cleanup_bytes": 1866319,
+  "old_usage_not_overwritten": true,
+  "formal_S1": "0/12",
+  "production_authorization": "not_authorized"
+}

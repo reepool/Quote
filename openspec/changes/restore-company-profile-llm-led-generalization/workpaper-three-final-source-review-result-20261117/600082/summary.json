@@ -1,0 +1,84 @@
+{
+  "task": "6.DE",
+  "instrument_id": "600082.SH",
+  "name": "海泰发展",
+  "entry_started": true,
+  "readable": true,
+  "three_reads_equal": true,
+  "exception": null,
+  "candidate_ids": [
+    "F09",
+    "F10",
+    "F11",
+    "review-add:RF01"
+  ],
+  "preparation_seconds": 44.601,
+  "business_started_monotonic": 10094534.803752635,
+  "state": "completed",
+  "business_ended_monotonic": 10094655.405770147,
+  "business_seconds": 120.602,
+  "query_sha256": "660710208cf43bdd23135cf1ee3095c1b7e89b6cbfface9bdb24e77acd73dde4",
+  "fact_count": 28,
+  "metric_count": 25,
+  "core_complete": false,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "retained_request_ids": [
+    "bp-work-45f1bc56f152a681d1a0633e:workpaper:review",
+    "bp-work-45f1bc56f152a681d1a0633e:workpaper:repair"
+  ],
+  "new_or_changed_fact_ids": [
+    "F09",
+    "F10"
+  ],
+  "removed_fact_ids": [],
+  "findings": [
+    {
+      "finding_id": "REV-F09-SCOPE",
+      "fact_id": "F09",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-F09-SIGN",
+      "fact_id": "F09",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-F10-SCOPE",
+      "fact_id": "F10",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-F10-SIGN",
+      "fact_id": "F10",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-F11-SCOPE",
+      "fact_id": "F11",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-RF01-SCOPE",
+      "fact_id": "review-add:RF01",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-F01-ONLY",
+      "fact_id": null,
+      "resolution": "omission_candidate"
+    },
+    {
+      "finding_id": "REV-F24-RPT",
+      "fact_id": null,
+      "resolution": "omission_candidate"
+    }
+  ],
+  "physical_requests": 1,
+  "ledger": 24720,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "supervision_seconds": 167.107,
+  "cleanup_bytes": 2353536
+}

@@ -1,0 +1,39 @@
+[
+  {
+    "call_type": "verify",
+    "semantic_request_id": "bp-work-8d0d94e5189e97cae31466fa:workpaper:repair-verify",
+    "gateway_request_id": "ef81e40ad7164a238708f1c8df5e8653",
+    "status": "success",
+    "profile": "semantic_extraction__scorpio_grok",
+    "provider": "openai_compatible",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "source_label": "scorpio:grok-4.7",
+    "failover_count": 0,
+    "attempts": [
+      {
+        "source_label": "scorpio:grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.7",
+        "attempt_sequence": 1,
+        "request_id": "ef81e40ad7164a238708f1c8df5e8653",
+        "provider_request_id": "f2859ab5-b4d3-4bdd-bdee-847c1e0c9818, c32b4107-420f-45cf-b15c-99f0e7a62b02",
+        "status": "success",
+        "attempt_count": 1,
+        "latency_ms": 97302
+      }
+    ],
+    "response_hash": "d48c9bc70201aa71ca85b48342f08dde46029b384714ac6f35886c3d88499df5",
+    "latency_ms": 97302,
+    "input_tokens": 18077,
+    "output_tokens": 494,
+    "total_tokens": 24720,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": null,
+    "error_detail": null,
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  }
+]

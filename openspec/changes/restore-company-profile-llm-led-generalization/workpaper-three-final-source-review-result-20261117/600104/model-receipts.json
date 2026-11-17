@@ -1,0 +1,75 @@
+[
+  {
+    "request_id": "bp-work-dc4ab5559a9258d1a6cf3d44:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "004d4667868647ac60446b6fcfaf6b26a21c5c77c885524365739a040ae3d3b4",
+    "response_hash": "73ed1b5d76f74cd2a189ebd361f06b23582c153e69bb1942ade7f1140bdfb364",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F10\",\"F13\",\"F14\",\"F22\",\"F37\"],\"checks\":[{\"fact_id\":\"F10\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0013\"],\"explanation\":\"分产品表金融业务行毛利率为88.47%，合计行才是11.30%，指标口径已改为business_segment，未再沿用合并整体。原文未称该收入为利息及服务收入；修复删除该性质断言，仅保留来源支持的汽车金融子公司发放贷款等业务及毛利率，并用“等”避免把贷款说成唯一收入来源。\"},{\"fact_id\":\"F13\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"整车、零部件、劳务及其他、金融业务四项均取自分产品营业收入列，结构化金额与410,196,473,001.11元、203,019,866,775.26元、32,935,762,112.94元、10,091,710,191.88元一致，且各自为business_segment；合计656,243,812,081.18元维持consolidated_group。正文亿元数为已披露的舍入展示，未把展示值当作精确值。\"},{\"fact_id\":\"F14\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"汽车制造业646,152,101,889.30元与金融业10,091,710,191.88元均属分行业营业收入行，指标已改为business_segment，未继承合并口径；分行业合计656,243,812,081.18元可维持consolidated_group。正文6461.52亿元、100.92亿元、6562.44亿元均为对应原值的舍入，金额无需改数。\"},{\"fact_id\":\"F22\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"580,943,983,649.41元及占总成本99.80%属于分行业成本表汽车制造业行，不是合并总成本582,107,305,751.33元；两项指标均为business_segment。成本构成“原材料、人工工资、折旧、能源等”与来源一致，5809.44亿元仅为舍入展示。\"},{\"fact_id\":\"F37\",\"accepted\":true,\"evidence_ids\":[\"source-0008\",\"source-0012\"],\"explanation\":\"已删除来源未支持的个人消费者及企业客户类型断言。境内、境外乘用车与商用车销量见产销分地区表，前五名客户销售额占年度销售总额11.68%见客户集中度披露；公司层面表述维持consolidated_group，未把空白或变动率误作财务为零。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F10",
+        "F13",
+        "F14",
+        "F22",
+        "F37"
+      ],
+      "checks": [
+        {
+          "fact_id": "F10",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0013"
+          ],
+          "explanation": "分产品表金融业务行毛利率为88.47%，合计行才是11.30%，指标口径已改为business_segment，未再沿用合并整体。原文未称该收入为利息及服务收入；修复删除该性质断言，仅保留来源支持的汽车金融子公司发放贷款等业务及毛利率，并用“等”避免把贷款说成唯一收入来源。"
+        },
+        {
+          "fact_id": "F13",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "整车、零部件、劳务及其他、金融业务四项均取自分产品营业收入列，结构化金额与410,196,473,001.11元、203,019,866,775.26元、32,935,762,112.94元、10,091,710,191.88元一致，且各自为business_segment；合计656,243,812,081.18元维持consolidated_group。正文亿元数为已披露的舍入展示，未把展示值当作精确值。"
+        },
+        {
+          "fact_id": "F14",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "汽车制造业646,152,101,889.30元与金融业10,091,710,191.88元均属分行业营业收入行，指标已改为business_segment，未继承合并口径；分行业合计656,243,812,081.18元可维持consolidated_group。正文6461.52亿元、100.92亿元、6562.44亿元均为对应原值的舍入，金额无需改数。"
+        },
+        {
+          "fact_id": "F22",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "580,943,983,649.41元及占总成本99.80%属于分行业成本表汽车制造业行，不是合并总成本582,107,305,751.33元；两项指标均为business_segment。成本构成“原材料、人工工资、折旧、能源等”与来源一致，5809.44亿元仅为舍入展示。"
+        },
+        {
+          "fact_id": "F37",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008",
+            "source-0012"
+          ],
+          "explanation": "已删除来源未支持的个人消费者及企业客户类型断言。境内、境外乘用车与商用车销量见产销分地区表，前五名客户销售额占年度销售总额11.68%见客户集中度披露；公司层面表述维持consolidated_group，未把空白或变动率误作财务为零。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 16565,
+      "output_tokens": 611,
+      "total_tokens": 25323
+    }
+  }
+]

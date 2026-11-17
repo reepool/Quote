@@ -1,0 +1,22 @@
+{
+  "task": "6.DE",
+  "openspec_strict": "passed",
+  "git_diff_check": "passed",
+  "source_code_and_shared_config_unchanged": true,
+  "new_physical_receipts_verified": 3,
+  "original_receipts_retained": 6,
+  "source_pdf_hashes_verified": 3,
+  "real_entry_three_reads_equal": 3,
+  "independent_delivery_three_reads_equal": 3,
+  "current_index_profiles": 12,
+  "original_values_sources_model_attribution_and_receipts_unchanged": true,
+  "old_DC_artifacts_unchanged": true,
+  "reused_tests": "DD97源正反及115画像/修订/交付，源码未改不重复运行",
+  "review": {
+    "blocking": "F10范围组合仅源参考、F13重复退出普通正文，原F23隔离及F11/F38限制保留",
+    "nonblocking": "供应链细度、minor补充不扩",
+    "unrelated": "开工既有配置/骨架/混合段/并行保护"
+  },
+  "formal_S1": "0/12",
+  "production_authorization": "not_authorized"
+}

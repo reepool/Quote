@@ -1,0 +1,24 @@
+{
+  "task": "6.DE",
+  "removed_roots_bytes": 8918168,
+  "removed_tools": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-de-run.py",
+      "bytes": 21982,
+      "sha256": "a0ccac95209087000d3425a3cc547bc8259a0f2c3c1cba8062a842b9118670c9"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-de-deliver.py",
+      "bytes": 13774,
+      "sha256": "b32c461f0c8831fae86405adb8b2e8c8fe17e73beaa076bd54e58ebe77fcca60"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-de-finish.py",
+      "bytes": 6698,
+      "sha256": "9fc17dad929e3de8f0a2bb93c639034b862928fe19132f734822d07cd8db4ad5"
+    }
+  ],
+  "total_measured_bytes": 8960622,
+  "three_attempt_markers_retained": true,
+  "official_sources_shared_caches_previous_results_and_parallel_edits_preserved": true
+}
