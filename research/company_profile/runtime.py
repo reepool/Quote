@@ -212,6 +212,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "review_existing_draft_hash",
             "review_resume_hash",
             "workpaper_extraction_resume_hash",
+            "workpaper_enrichment",
             "quality_review_profile",
             "repair_profile",
             "discovery_scope",
@@ -463,6 +464,13 @@ class CompanyProfileStageRuntime:
         if item.get("accepted_records"):
             state.accepted_records = tuple(item["accepted_records"])
         state.processing_identity = processing_identity_from_item(item)
+        enrichment = state.processing_identity.get("workpaper_enrichment")
+        if enrichment and state.report is not None:
+            from .workpaper_enrichment import WorkpaperEnrichmentPlan
+
+            plan = WorkpaperEnrichmentPlan.model_validate(enrichment)
+            if state.report != plan.report:
+                raise ValueError("enrichment source differs from the bound report")
         if not state.processing_identity.get("review_resume_hash"):
             state.review_resume = None
         if not state.processing_identity.get("workpaper_extraction_resume_hash"):

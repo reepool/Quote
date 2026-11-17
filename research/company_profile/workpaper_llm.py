@@ -331,6 +331,8 @@ def run_workpaper(
     retained_selection = None
     normalization = None
     recovery_content = {}
+    enrichment = processing_identity.get("workpaper_enrichment")
+    reading_targets = {"targeted_reading": {"targets": enrichment["targets"]}} if enrichment else {}
     if extraction_resume is not None:
         bound_hash = hashlib.sha256(json.dumps(extraction_resume, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
         if (processing_identity.get("workpaper_extraction_resume_hash") != bound_hash
@@ -387,8 +389,9 @@ def run_workpaper(
                 "max_selected_characters": limit,
                 "section_guide_version": SECTION_GUIDE_VERSION,
                 "reading_questions": SECTION_GUIDE,
+                **reading_targets,
             },
-            instructions=SELECTION_INSTRUCTIONS, response_model=SectionSelection,
+            instructions=SELECTION_INSTRUCTIONS + ("\nFor this supplemental reading, select complete report-local subsections answering targeted_reading only; do not repeat a whole-company first read." if enrichment else ""), response_model=SectionSelection,
             max_output_tokens=2500, timeout_seconds=timeout,
         )
     selection = SectionSelection.model_validate(selected)
@@ -435,8 +438,9 @@ def run_workpaper(
                 "reading_scope": packet.reading_scope.model_dump(mode="json"),
                 "source_text": packet.model_text(),
                 **recovery_content,
+                **reading_targets,
             },
-            instructions=EXTRACTION_INSTRUCTIONS, response_model=WorkpaperDraftResponse,
+            instructions=EXTRACTION_INSTRUCTIONS + ("\nThis is a supplemental reading: answer only targeted_reading questions from these original sections. Do not regenerate unrelated profile content. Keep required element keys; non-target elements have no facts and an explicit not-read-for-this-task limitation. Retain any remaining uncertainty; an answer does not establish exhaustive coverage." if enrichment else ""), response_model=WorkpaperDraftResponse,
             max_output_tokens=int(processing_identity.get("workpaper_max_output_tokens", 12_000)),
             timeout_seconds=timeout,
         )

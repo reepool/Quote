@@ -20,6 +20,7 @@ from utils.llm import load_project_environment
 
 from .routes import router
 from .announcement_asset_routes import router as announcement_asset_router
+from .company_profile_routes import router as company_profile_router
 from .middleware import setup_middleware
 
 
@@ -132,6 +133,7 @@ setup_middleware(app)
 # 添加路由
 app.include_router(router, prefix="/api/v1")
 app.include_router(announcement_asset_router, prefix="/api/v1")
+app.include_router(company_profile_router, prefix="/api/v1")
 
 
 @app.get("/")

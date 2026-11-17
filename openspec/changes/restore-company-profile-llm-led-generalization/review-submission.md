@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 322. 6.DH API缺项与指定股票有界多轮补读
+
+用户要求API知道可能缺项，并可按股票后续多次精读，不让批量首读等待补满。沿原owner新增GET `/api/v1/research/company/{instrument_id}/annual-profile` 和POST同路径`/enrichment-plan`：GET交分级事实/缺项原因/建议、各轮来源/实际模型/未读范围；POST只给原工作ID/hash/报告与问题绑定的计划，明确未执行、不隐式付费。原TaskService/execute_published_task新增enrich，要求一个股票、具体问题、复核provider和有限预算，原队列只drain本轮工作，原章节选择/抽取带目标但不送旧答案，复核与writer不另建。每轮独立保存，API按同报告/hash祖先链汇总，`reading_work_id+fact_id`定位；坏项仍fact=null，旧稿不覆盖，新增同要素内容仅提示已补充、不自动报全部消缺或跨轮消歧。当前仍研究用途，HTTP端不直接执行付费补读，未部署或启生产。
+
+离线直接验证：新四项覆盖实际ASGI请求/只读计划/404与422、原TaskService两轮精读与重复请求无新发送、另一股票未处理/原文件字节不变、报告漂移拒绝和补读失败保原稿。原入口两轮加幂等在扩展运行中通过（61.50秒）；26原分级读取也通过。最终API/漂移/动作目录3项8.93秒，失败保稿1项5.48秒（重叠不加总）。直接命令为 `bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --tb=short --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_enrichment.py`；原读取兼容范围为`test_company_profile_workpaper_delivery.py`。HTTP/异步验证在正常获准环境只用离线provider，无新模型/探针/外传；strict/diff通过。不能将这四项工程证明计为真实语义/正式S1。
+
+验证限制与Review：受限沙箱TestClient portal及asyncio唤醒挂起，原进程已精准停止，改正常环境ASGI验证后API通过；没有为此修改事件循环/网络基础设施。首轮原入口断言均通过但测试误用storage.close收尾报错，已按实际scoped连接修正并完成后继原入口验证。过宽扩展到完整operations旧链路，1013.95秒后主动中断，35通过/5失败；两处动作目录预期随新增enrich同步，其中纯目录已定向通过；另外3项旧run/pause/unbound路径失败未归因/不声称原来已通过或本轮全绿，没有为其扩大当前开发。有限Review未发现新精读路径剩余阻塞；B类跨轮自动消歧/完整性自动裁决后置，C类既有并行不改。本轮也暴露验证范围选得过宽的效率问题，后续只复验直接变化。
+
+开工master/HEAD12c5984b/空暂存，既有配置/骨架/规划/未跟踪内容保留。开工未见本人DG残留、释放0；直接测试TemporaryDirectory/finally收尾。三个被中断API测试根共129456目录表观字节、本人pytest-26旧任务回归根37601806字节确认归属和无活跃占用后清理，共37731262；旧pytest19/20/22/24/25未知归属不删，正式PDF/源/缓存/历史回执与尝试不动。无新独立脚本/重复正文归档，必要命令与失败只留本节。本人代码/测试/规范段落隔离普通提交推送；正式S1/旧133及生产权限不改。
+
 ## 321. 6.DG重要缺项提示、不拒绝独立画像
 
 2026-11-17用户明确重要要素未获取可以标未获取/建议获取，不因此拒绝画像。本轮沿原workpaper/ReadService落实，prompt v20/review v11区分基础问题与重要补充；原delivery附information_gaps/suggested_acquisitions，人读版同源显示补充建议，research_profiles.json补顶层limitations。没有新必填字段、公司规则、writer、模型调用或付费窗口；已知错项继续局部隔离，旧值/原稿/hash、133清单/首次分数及正式core/S1/生产不追改。基础内容、建议补充、事实可靠性及正式批次评测分开。

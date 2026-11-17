@@ -335,6 +335,34 @@ curl -X POST "http://localhost:8000/api/v1/gaps/fill" \
 
 研究域接口统一使用 `/api/v1/research` 前缀。已落到本地 `research.db` 的标准化快照或物化结果原则上都应提供 API 读路径；未开放模块会返回明确的 gated/disabled 原因。
 
+### GET /api/v1/research/company/{instrument_id}/annual-profile
+
+读取原公司画像read owner的年报研究内容，不同于`/profile`公司档案快照。只读本地，不触发LLM、下载或生产写入；尚无年报画像返回404。默认读取根为既有`data/research/company_profile_common_core`，开发目录不会自动发布到这里；服务是否已部署以实际OpenAPI为准。
+
+- `facts`：分级事实，以`reading_work_id + fact_id`共同定位。隔离、仅源参考和重复对象保状态/原因但`fact=null`，待核/保真限用不冒充正式接受。
+- `information_gaps`：要素、原状态、缺项或不确定原因及所属读取批次；`suggested_acquisitions`是复核提出的补充建议，不是已经取得的事实。
+- `readings`：各轮实际章节/原页、未读或后置范围、来源Evidence、模型及审核状态。事实的Evidence编号在其所属读取批次内解析。
+- `supplemental_reading_work_ids`提示同一要素已有补读内容，`follow_up_state=supplemented_not_fully_reassessed`不等于所有缺项已解决。没有发现缺项也不等于全文完整；`full_report_completeness`和跨轮自动消歧均为`not_assessed`。
+
+同报告补读追加展示，不覆盖首读、不自动将跨轮冲突结论合并成确定答案；新报告不会承接旧报告的补读链。当前仍为研究用途，生产权限不因GET或有内容而改变。
+
+### POST /api/v1/research/company/{instrument_id}/annual-profile/enrichment-plan
+
+为指定股票和具体缺项生成精读计划，**只规划，不启动模型**。`base_work_id`可省略，默认绑定当前同报告读取链的末端；明确请求ID和问题，重复ID/相同问题复用已保存的计划，不允许同ID改问另一件事。
+
+```json
+{
+  "request_id": "600104-products-read-2",
+  "targets": [
+    {"element": "products_services", "question": "补读零部件板块的具体产品子类及用途，未找到则说明范围。"}
+  ]
+}
+```
+
+返回`state=planned, execution_started=false, action=enrich, enrichment_plan=...`，计划含报告身份、原工作ID及内容hash。基础要素名沿既有八要素（如`business_structure`、`products_services`、`scale_and_mix`），也可指定既有供应链或`company_features`，不创建公司专属字段。
+
+受授权的内部调用方将原样计划交给已配置provider、复核profile及有限执行预算的原`CompanyProfileTaskService.execute("enrich", instrument_ids=("600104.SH",), enrichment_plan=plan, ...)`。入口只排入/处理这一家公司，按目录选章、取原文和复核，保存独立后继记录；原画像失败不清空、批量首读不自动等待补读。第三次及以后用新的request_id和问题，仍各有界，不自动循环或续旧额度。计划不是外传/付费或生产授权，HTTP端当前不直接执行付费精读。
+
 ### GET /api/v1/research/company/{instrument_id}/financial-indicators
 
 读取本地财务摘要/关键指标快照。当前接口对应 `financial_summaries`，只读本地库，不在请求时访问外部财务源。

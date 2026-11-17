@@ -129,6 +129,7 @@ PUBLISHED_ACTIONS = (
     "resume",
     "query",
     "export",
+    "enrich",
 )
 CONTROL_SCHEMA_VERSION = "company_profile_task_control.v1"
 DEFAULT_OUTPUT_ROOT = "data/research/company_profile_common_core"
@@ -159,6 +160,7 @@ def published_task_catalog() -> dict[str, Any]:
             "max_elapsed_seconds": DEFAULT_MAX_ELAPSED_SECONDS,
             "reason": "operator_request",
             "output_directory": None,
+            "enrichment_plan": None,
         },
         "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
         "writer": COMMON_CORE_WRITER_NAME,
@@ -688,8 +690,9 @@ class CompanyProfileTaskService:
         processing_identity: Mapping[str, Any] | None = None,
         work_id: str | None = None,
         plan_directory: str | Path | None = None,
+        enrichment_plan: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
-        if self.execution_budget is not None and str(action or "").strip().lower() in {"run", "resume"}:
+        if self.execution_budget is not None and str(action or "").strip().lower() in {"run", "resume", "enrich"}:
             max_elapsed_seconds = min(
                 max_elapsed_seconds, self.execution_budget.remaining_time()
             )
@@ -727,6 +730,42 @@ class CompanyProfileTaskService:
                 processing_identity=processing_identity,
                 work_id=work_id,
             )
+        if normalized == "enrich":
+            from .workpaper_enrichment import WorkpaperEnrichmentPlan
+            from .workpaper_review import workpaper_hash
+
+            plan = WorkpaperEnrichmentPlan.model_validate(enrichment_plan)
+            if instruments != (plan.report.instrument_id,):
+                raise ValueError("enrichment requires exactly its one bound stock")
+            if (self.processing_identity.get("reading_strategy") != "chapter_workpaper_v1"
+                or not self.processing_identity.get("workpaper_review_policy") or self.provider is None
+                or self.token_budget <= 0 or not 0 < max_elapsed_seconds < float("inf")):
+                raise ValueError("enrichment requires an explicit workpaper review provider and finite budget")
+            if self.processing_identity.get("execution_mode") == "provider" and self.execution_budget is None:
+                raise ValueError("real enrichment requires an explicit execution budget")
+            current = self.reads.research_profile(plan.report.instrument_id)
+            prior = next((r["enrichment"] for r in current["readings"]
+                          if r["enrichment"] and r["enrichment"]["request_id"] == plan.request_id), None)
+            if prior is not None and prior != plan.model_dump(mode="json"):
+                raise ValueError("enrichment request_id already names a different reading")
+            if plan.base_work_id not in {r["work_id"] for r in current["readings"]}:
+                raise ValueError("enrichment base is outside the current same-report lineage")
+            base = self.reads._latest_by_instrument(work_id=plan.base_work_id)[plan.report.instrument_id]
+            if base.report != plan.report or workpaper_hash(base.workpaper) != plan.base_workpaper_sha256:
+                raise ValueError("enrichment base report or content hash changed")
+            self._ensure_publication_allows_writes()
+            previous = self.processing_identity
+            previous_hash = self.processing_identity_hash
+            self.processing_identity = {**previous, "workpaper_enrichment": plan.model_dump(mode="json")}
+            self.processing_identity_hash = _stable_hash(self.processing_identity)
+            try:
+                result = await self._run(knowledge_cutoff=cutoff, instrument_ids=instruments,
+                    max_items=1, max_elapsed_seconds=float(max_elapsed_seconds), enqueue=True,
+                    limit_drain_to_enqueued=True)
+                return {**result, "action": "enrich", "enrichment_plan": plan.model_dump(mode="json")}
+            finally:
+                self.processing_identity = previous
+                self.processing_identity_hash = previous_hash
         registry = candidate_registry or self.candidate_registry
         plan = live_plan or self.live_plan
         if normalized in {"run", "resume"}:
@@ -1747,6 +1786,7 @@ async def execute_published_task(
     work_id: str | None = None,
     plan_directory: str | Path | None = None,
     execution_budget: LlmRunBudget | None = None,
+    enrichment_plan: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
@@ -1754,7 +1794,7 @@ async def execute_published_task(
     if execution_budget is not None:
         execution_budget.remaining_time()
     normalized = str(action or "").strip().lower()
-    if normalized in {"run", "resume"}:
+    if normalized in {"run", "resume", "enrich"}:
         publication = load_publication_control(checkpoint_root)
         if not publication_allows_new_writes(publication):
             state = publication.state if publication is not None else "unknown"
@@ -1787,7 +1827,7 @@ async def execute_published_task(
         execution_budget=execution_budget,
     )
     logger.info("Company-profile entry: task service ready")
-    if normalized in {"run", "resume"}:
+    if normalized in {"run", "resume", "enrich"}:
         max_elapsed_seconds -= time.monotonic() - entry_started
         if max_elapsed_seconds <= 0:
             raise TimeoutError("company-profile entry budget exhausted before enqueue")
@@ -1805,6 +1845,7 @@ async def execute_published_task(
         processing_identity=processing_identity,
         work_id=work_id,
         plan_directory=plan_directory,
+        enrichment_plan=enrichment_plan,
     )
 
 

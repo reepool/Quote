@@ -177,6 +177,104 @@ class CompanyProfileReadService:
             chapters=self.stage4_chapters,
         )
 
+    def research_profile(self, instrument_id: str) -> dict[str, Any]:
+        """API-safe content with exact same-report supplemental ancestry.
+
+        Facts keep (reading_work_id, fact_id) identity. Later readings do not
+        silently replace, reconcile or approve earlier facts or gap statements.
+        """
+        root = self._latest_by_instrument().get(instrument_id)
+        if not isinstance(root, CompanyProfileRuntimeRecordV3):
+            raise FileNotFoundError("annual-report company profile not found")
+        from .workpaper import workpaper_elements
+        from .workpaper_delivery import project_workpaper_delivery
+        from .workpaper_enrichment import WorkpaperEnrichmentPlan
+        from .workpaper_review import workpaper_hash
+
+        records = {root.work_id: root}
+        candidates = []
+        for path in self.namespace_root.glob("*.json"):
+            try:
+                record = _RUNTIME_ADAPTER.validate_json(path.read_text(encoding="utf-8"))
+                raw = _record_processing_identity(record).get("workpaper_enrichment")
+                if raw and isinstance(record, CompanyProfileRuntimeRecordV3) and record.report == root.report:
+                    candidates.append((WorkpaperEnrichmentPlan.model_validate(raw), record))
+            except (OSError, ValueError):
+                continue
+        while candidates:
+            remaining = []
+            for plan, record in sorted(candidates, key=lambda item: (item[0].request_id, item[1].work_id)):
+                base = records.get(plan.base_work_id)
+                if base is None:
+                    remaining.append((plan, record))
+                elif plan.report == root.report and plan.base_workpaper_sha256 == workpaper_hash(base.workpaper):
+                    records.setdefault(record.work_id, record)
+            if len(remaining) == len(candidates):
+                break
+            candidates = remaining
+        readings, facts, gaps, suggestions = [], [], [], []
+        for record in records.values():
+            paper = record.workpaper
+            delivery = project_workpaper_delivery(paper)
+            plan = _record_processing_identity(record).get("workpaper_enrichment")
+            targeted = {t["element"] for t in plan["targets"]} if plan else set(workpaper_elements(paper))
+            entries = [entry for entry in delivery["facts"] if entry["element"] in targeted]
+            facts.extend({"reading_work_id": record.work_id, **entry} for entry in entries)
+            gaps.extend({"reading_work_id": record.work_id, **gap} for gap in delivery["information_gaps"]
+                        if gap["element"] in targeted)
+            suggestions.extend({"reading_work_id": record.work_id, **item}
+                               for item in delivery["suggested_acquisitions"] if item["element"] in targeted)
+            cited = {eid for entry in entries for eid in entry["evidence_ids"]}
+            readings.append({"work_id": record.work_id, "workpaper_sha256": workpaper_hash(paper),
+                "enrichment": plan, "origin": paper.origin,
+                "reading_scope": paper.reading_scope.model_dump(mode="json"),
+                "limitations": list(paper.limitations),
+                "generation": paper.generation.model_dump(mode="json") if paper.generation else None,
+                "review_status": paper.quality_review.status if paper.quality_review else "not_reviewed",
+                "review_calls": [c.model_dump(mode="json") for c in paper.quality_review.calls] if paper.quality_review else [],
+                "evidence": [e.model_dump(mode="json") for e in paper.evidence if e.evidence_id in cited]})
+        for gap in gaps:
+            gap["supplemental_reading_work_ids"] = list(dict.fromkeys(
+                fact["reading_work_id"] for fact in facts
+                if fact["reading_work_id"] not in {root.work_id, gap["reading_work_id"]} and fact["element"] == gap["element"]
+                and fact["fact"] is not None))
+            gap["follow_up_state"] = ("supplemented_not_fully_reassessed"
+                                      if gap["supplemental_reading_work_ids"] else "no_supplement_yet")
+        return {"schema_version": "company_profile_research_api.v1", "instrument_id": instrument_id,
+            "report": root.report.model_dump(mode="json"), "base_work_id": root.work_id,
+            "latest_reading_work_id": readings[-1]["work_id"], "readings": readings, "facts": facts,
+            "information_gaps": gaps, "suggested_acquisitions": suggestions,
+            "coverage_assessment": "selected_scope_only", "full_report_completeness": "not_assessed",
+            "cross_reading_reconciliation": "not_assessed", "research_only": True,
+            "production_authorization": PRODUCTION_AUTHORIZATION}
+
+    def plan_enrichment(self, instrument_id: str, *, request_id: str, targets,
+                        base_work_id: str | None = None) -> dict[str, Any]:
+        """Bind questions to a readable version, without queuing or calling."""
+        from .workpaper_enrichment import enrichment_plan_from_record
+
+        current = self.research_profile(instrument_id)
+        from .workpaper_enrichment import EnrichmentTarget
+
+        normalized_targets = [EnrichmentTarget.model_validate(t).model_dump(mode="json") for t in targets]
+        prior = next((r["enrichment"] for r in current["readings"]
+                      if r["enrichment"] and r["enrichment"]["request_id"] == request_id), None)
+        if prior is not None:
+            if prior["targets"] != normalized_targets or (base_work_id and prior["base_work_id"] != base_work_id):
+                raise ValueError("enrichment request_id already names different questions or base")
+            return {"state": "planned", "execution_started": False, "action": "enrich",
+                "enrichment_plan": prior, "requires": ["explicit_model_and_finite_budget", "publication_write_permission"],
+                "production_authorization": PRODUCTION_AUTHORIZATION}
+        chosen = base_work_id or current["latest_reading_work_id"]
+        if chosen not in {r["work_id"] for r in current["readings"]}:
+            raise ValueError("base reading is outside the current same-report lineage")
+        record = self._latest_by_instrument(work_id=chosen, include_enrichments=True)[instrument_id]
+        plan = enrichment_plan_from_record(record, request_id=request_id, targets=normalized_targets)
+        return {"state": "planned", "execution_started": False,
+            "action": "enrich", "enrichment_plan": plan.model_dump(mode="json"),
+            "requires": ["explicit_model_and_finite_budget", "publication_write_permission"],
+            "production_authorization": PRODUCTION_AUTHORIZATION}
+
     def _select_profiles(
         self,
         instrument_ids: Sequence[str],
@@ -209,6 +307,7 @@ class CompanyProfileReadService:
         *,
         processing_identity: Mapping[str, Any] | None = None,
         work_id: str | None = None,
+        include_enrichments: bool = False,
     ) -> dict[str, CompanyProfileRuntimeRecord]:
         latest: dict[str, CompanyProfileRuntimeRecord] = {}
         if not self.namespace_root.is_dir():
@@ -224,6 +323,8 @@ class CompanyProfileReadService:
                     path.read_text(encoding="utf-8")
                 )
             except (OSError, ValueError):
+                continue
+            if not include_enrichments and not work_id and _record_processing_identity(record).get("workpaper_enrichment"):
                 continue
             if work_id and record.work_id != work_id:
                 continue

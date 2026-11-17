@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-17当前6.DH：新增年报画像只读API和指定股票补读计划，原TaskService enrich动作按同报告hash/具体问题/独立请求执行，只drain本轮单股，原writer逐轮追加。API汇总首读及同报告补读，缺项/未读范围/建议和每轮模型可见，不自动消缺或覆盖原稿；批量首读不等待补读。HTTP计划不直接调用模型，真实发送/生产仍须既有授权。离线两轮精读、幂等、坏绑定和API直接验证后交接；先核清本人旧临时物、收尾清本人产物，其他脏文件/正式源不动。正式S1及旧分数不改，使用合同见REST API文档与产品§3.2.5。
+
 2026-11-17当前6.DG：落实用户“重要要素缺项可交付”。沿原workpaper抽取/复核及read owner，以现有status/limitations和遗漏意见显示未获取范围、建议补充；不新增必填字段或公司规则，不因未获取补充项拒绝整稿，不为上述五项另开模型窗口。先核清本人无依赖临时物，保护并行和正式源；规范先同步，再做原入口的离线查询/导出验证，交接清本人产物。基础内容成立、剩余缺项、事实可靠性、正式批次验收分开说明；旧133/首发/S1及生产权限不追改。详当前change 6.DG任务。
 
 2026-11-17 6.DF交付[可直接读取的十二份研究JSON](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-export-result-20261117/research_profiles.json)及[有限验收](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-export-result-20261117/result.md)：原ReadService.export同链新增合并数据，不复制审计原稿/撤回候选；365可见事实/524指标，349独立源核/12模型源核/4限用待核、七项无事实载荷，原值/源/归因及DC/DE hash不改，12三读一致。26直接和1旧入口兼容通过，0新真实模型/付费；清临时读回/兼容根13914192字节，脚本核齐后清。正式S1/S2/生产不放行，剩余集中在当前同版完整验证、适用正反/准确率范围及正常资源/价格；不再逐句补三家、默认整批重抽或扩平台。

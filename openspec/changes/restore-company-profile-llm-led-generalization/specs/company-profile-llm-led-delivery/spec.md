@@ -324,6 +324,15 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** a genuinely unanswered basic business question remains explicitly incomplete but its reliable partial content is still delivered; known false assertions remain locally withheld, while historical frozen scores, formal batch validation and production authorization stay separate
 - **AND** future acceptance contracts MUST separate basic business questions from important supplementary targets; supplementary targets MUST NOT enter the mandatory denominator for basic profile completion, and prior frozen contracts/results MUST NOT be rewritten
 
+#### Scenario: API clients inspect gaps and request targeted subsequent readings
+- **WHEN** a client reads an annual-report company profile through the HTTP API
+- **THEN** the original read owner MUST expose graded facts, explicit missing/uncertain items, suggested acquisition and selected/unread scope without raw rejected candidate payloads or implicit model calls
+- **AND** the API MUST allow a stock-specific, report/hash-bound enrichment plan naming concrete questions; planning is not execution
+- **WHEN** an explicitly authorized enrichment is executed
+- **THEN** the original TaskService MUST enqueue/drain only the requested stock using report-local chapter selection, extraction and existing source review under the supplied finite budget
+- **AND** every subsequent reading retains its base work identity/hash, actual model/source/review metadata and original writer record; API reads compose only the exact same-report lineage, keep prior valid facts on failure, and permit further explicitly requested readings
+- **AND** newly acquired content MUST NOT automatically close every gap sharing an element; absence of discovered gaps is not proof of full-report completeness, batch first reads remain independent, and historical results/production authority stay unchanged
+
 #### Scenario: A useful workpaper has no trusted core facts yet
 - **WHEN** query/export reads a sourced workpaper whose trusted-core accepted_fact_count is still zero
 - **THEN** it MUST also expose a separate workpaper summary with its original business description, fact/metric counts, origin, review status, unresolved-finding count and known actual extraction/review models
