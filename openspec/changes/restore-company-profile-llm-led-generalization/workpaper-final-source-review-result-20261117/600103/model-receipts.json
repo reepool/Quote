@@ -1,0 +1,566 @@
+[
+  {
+    "request_id": "bp-work-5d88bbcf3252b4b833c64f62:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "449255f3aa69f7814157fd5aec63ab3ca75fb9b6fc5af5d01cabf3284610444d",
+    "response_hash": "18c4d9b5ea7d1ac12018fc4b0bfd273f95cfc3cb184832d768385f846d54fe36",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"WF01\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"review-add:REV-001\",\"evidence_ids\":[\"source-0004\",\"source-0005\"],\"explanation\":\"营业收入2,418,990,221.17元、正文24.19亿元、同比减少1.81亿元及下降6.98%均能对应原文，但事实及三项指标的subject_scope标为issuer错误。source-0004以“公司”叙述并同段使用“归属于上市公司股东的净利润”，source-0005利润表科目变动表未标明母公司单体；报告口径中的“公司”默认合并范围，issuer仅指明确的母公司单体。应改为consolidated_group，保留金额、期间及1.81亿元约数的不确定性说明。\"},{\"finding_id\":\"WF02\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F06\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"纸箱、纸板、纸袋的产品及用途与原文一致，但subject_scope标为named_subsidiary错误。source-0002仅在母子公司栏写“子公司”，并未点名具体子公司。named_subsidiary只适用于已指明的子公司，此处不能确立具体主体，应改为unclear，正文可保留。\"},{\"finding_id\":\"WF03\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F07\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"风油精、无极膏、软脉灵的用途与原文一致，但subject_scope标为named_subsidiary错误。source-0002医药行业对应的是未点名的“子公司”，不是漳州水仙等已列名主体。应改为unclear，不得仅凭产品名称推定具体子公司。\"},{\"finding_id\":\"WF04\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F08\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"光电子器件用途及林业培育、木材竹材产销与原文一致，但subject_scope标为named_subsidiary错误。source-0002电子通讯行业、林业对应栏均为“子公司”，未指定法律主体。应改为unclear，正文产品说明可保留。\"},{\"finding_id\":\"WF05\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F16\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"纸、浆粕、浆板、纸箱板箱、光电子模块、风油精系列的产销量及单位与产销表一致，但各产品行指标的subject_scope均标为consolidated_group。产品行不得从公司汇总事实或合并表格继承合并主体，应改为business_segment，并保留指标名称中的产品类别；库存量未列不构成缺漏。\"},{\"finding_id\":\"WF06\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F22\",\"evidence_ids\":[\"source-0011\"],\"explanation\":\"木竹片及木浆产品贸易业务本期60.15万元、上期3,061.94万元、同比-98.04%与原文一致，且未与商贸业收入混同。但该金额属于指定贸易业务行，事实及指标subject_scope不应标为consolidated_group，应改为business_segment。\"},{\"finding_id\":\"WF07\",\"element\":\"position\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F29\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"explanation\":\"制浆造纸企业、浆纸主业自主生产及配套碱回收、热电、污水处理系统有原文支持，一体布局亦包括纸制品、医药、光电子和林业。但“向下游延伸”至医药、光电子、林业开发没有依据；原文“下游”仅指包装用浆纸、纺织用溶解浆等产品。应保留自主生产及配套系统，删除或限定不支持的下游延伸表述。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F13\",\"F14\",\"F15\",\"F16\",\"review-add:REV-001\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "WF01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "review-add:REV-001",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005"
+          ],
+          "explanation": "营业收入2,418,990,221.17元、正文24.19亿元、同比减少1.81亿元及下降6.98%均能对应原文，但事实及三项指标的subject_scope标为issuer错误。source-0004以“公司”叙述并同段使用“归属于上市公司股东的净利润”，source-0005利润表科目变动表未标明母公司单体；报告口径中的“公司”默认合并范围，issuer仅指明确的母公司单体。应改为consolidated_group，保留金额、期间及1.81亿元约数的不确定性说明。"
+        },
+        {
+          "finding_id": "WF02",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F06",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "纸箱、纸板、纸袋的产品及用途与原文一致，但subject_scope标为named_subsidiary错误。source-0002仅在母子公司栏写“子公司”，并未点名具体子公司。named_subsidiary只适用于已指明的子公司，此处不能确立具体主体，应改为unclear，正文可保留。"
+        },
+        {
+          "finding_id": "WF03",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F07",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "风油精、无极膏、软脉灵的用途与原文一致，但subject_scope标为named_subsidiary错误。source-0002医药行业对应的是未点名的“子公司”，不是漳州水仙等已列名主体。应改为unclear，不得仅凭产品名称推定具体子公司。"
+        },
+        {
+          "finding_id": "WF04",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F08",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "光电子器件用途及林业培育、木材竹材产销与原文一致，但subject_scope标为named_subsidiary错误。source-0002电子通讯行业、林业对应栏均为“子公司”，未指定法律主体。应改为unclear，正文产品说明可保留。"
+        },
+        {
+          "finding_id": "WF05",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F16",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "纸、浆粕、浆板、纸箱板箱、光电子模块、风油精系列的产销量及单位与产销表一致，但各产品行指标的subject_scope均标为consolidated_group。产品行不得从公司汇总事实或合并表格继承合并主体，应改为business_segment，并保留指标名称中的产品类别；库存量未列不构成缺漏。"
+        },
+        {
+          "finding_id": "WF06",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F22",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "木竹片及木浆产品贸易业务本期60.15万元、上期3,061.94万元、同比-98.04%与原文一致，且未与商贸业收入混同。但该金额属于指定贸易业务行，事实及指标subject_scope不应标为consolidated_group，应改为business_segment。"
+        },
+        {
+          "finding_id": "WF07",
+          "element": "position",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F29",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "explanation": "制浆造纸企业、浆纸主业自主生产及配套碱回收、热电、污水处理系统有原文支持，一体布局亦包括纸制品、医药、光电子和林业。但“向下游延伸”至医药、光电子、林业开发没有依据；原文“下游”仅指包装用浆纸、纺织用溶解浆等产品。应保留自主生产及配套系统，删除或限定不支持的下游延伸表述。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "review-add:REV-001",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31"
+      ]
+    },
+    "usage": {
+      "input_tokens": 25688,
+      "output_tokens": 1133,
+      "total_tokens": 50367
+    }
+  },
+  {
+    "request_id": "bp-work-5d88bbcf3252b4b833c64f62:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "74d424b288357957e2658f9eb5f477df8f6884cc4a55bcd30a09917dc8b33b29",
+    "response_hash": "a1b6e19109111c57fa213c6a78faa9d416d21bde6f621cc3d509a97cdff116e5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:REV-001\",\"text\":\"2025年公司实现营业收入2,418,990,221.17元（约24.19亿元），比上年同期减少1.81亿元，下降6.98%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,418,990,221.17\",\"value\":\"2418990221.17\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业收入同比变动额\",\"raw_value\":\"减少1.81亿元\",\"value\":null,\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文以约数亿元表述同比减少额，未给出精确金额。\"},{\"name\":\"营业收入同比变动率\",\"raw_value\":\"-6.98\",\"value\":\"-6.98\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"正文24.19亿元为营业收入2,418,990,221.17元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\"},{\"fact_id\":\"F06\",\"text\":\"子公司纸制品加工产品包括纸箱、纸板、纸袋，纸箱用于产品包装，纸板用于制作纸箱或建材，纸袋用于水泥、化工、建材、食品、工业、饲料等包装。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":\"原文母子公司栏仅列“子公司”，未指明具体子公司主体。\"},{\"fact_id\":\"F07\",\"text\":\"子公司医药产品包括风油精（清凉、止痛、驱风、止痒）、无极膏（消炎、镇痛、止痒、抗菌、局部麻醉）、软脉灵（滋补肝肾、益气活血、软化血管）。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":\"原文母子公司栏仅列“子公司”，未指明具体子公司主体。\"},{\"fact_id\":\"F08\",\"text\":\"子公司电子通讯产品为光电子器件，为数据中心、数据通信等光纤传输、接入系统提供高速光模块产品；子公司林业业务为森林培育、营造、管护及木材、竹材生产销售。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":\"原文母子公司栏仅列“子公司”，未指明具体子公司主体。\"},{\"fact_id\":\"F16\",\"text\":\"主要产品产销量：纸生产量24.98万吨、销售量24.09万吨；浆粕生产量2.49万吨、销售量2.58万吨；浆板生产量7.19万吨、销售量4.94万吨；纸箱、板箱生产量7.61万吨、销售量7.27万吨；光电子模块生产量197.37万只、销售量194.44万只；风油精系列生产量5,555.50万瓶、销售量5,413.83万瓶。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"生产量-纸\",\"raw_value\":\"24.98\",\"value\":\"24.98\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"销售量-纸\",\"raw_value\":\"24.09\",\"value\":\"24.09\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"生产量-浆粕\",\"raw_value\":\"2.49\",\"value\":\"2.49\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"销售量-浆粕\",\"raw_value\":\"2.58\",\"value\":\"2.58\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"生产量-浆板\",\"raw_value\":\"7.19\",\"value\":\"7.19\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"销售量-浆板\",\"raw_value\":\"4.94\",\"value\":\"4.94\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"生产量-纸箱、板箱\",\"raw_value\":\"7.61\",\"value\":\"7.61\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"销售量-纸箱、板箱\",\"raw_value\":\"7.27\",\"value\":\"7.27\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"生产量-光电子模块\",\"raw_value\":\"197.37\",\"value\":\"197.37\",\"unit\":\"万只\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"销售量-光电子模块\",\"raw_value\":\"194.44\",\"value\":\"194.44\",\"unit\":\"万只\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"生产量-风油精系列\",\"raw_value\":\"5,555.50\",\"value\":\"5555.50\",\"unit\":\"万瓶\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"销售量-风油精系列\",\"raw_value\":\"5,413.83\",\"value\":\"5413.83\",\"unit\":\"万瓶\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F22\",\"text\":\"报告期木竹片及木浆产品贸易业务本期营业收入60.15万元，上期3,061.94万元，同比下降98.04%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"木竹片及木浆产品贸易业务营业收入\",\"raw_value\":\"60.15\",\"value\":\"60.15\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"木竹片及木浆产品贸易业务营业收入同比增减\",\"raw_value\":\"-98.04\",\"value\":\"-98.04\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F29\",\"text\":\"公司为制浆造纸企业，浆纸主业秉承自主生产模式，具备制浆造纸生产线及配套的碱回收、热电、污水处理系统；公司业务还包括纸制品加工、医药、光电子及林业开发。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:REV-001",
+          "text": "2025年公司实现营业收入2,418,990,221.17元（约24.19亿元），比上年同期减少1.81亿元，下降6.98%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "2,418,990,221.17",
+              "value": "2418990221.17",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入同比变动额",
+              "raw_value": "减少1.81亿元",
+              "value": null,
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文以约数亿元表述同比减少额，未给出精确金额。"
+            },
+            {
+              "name": "营业收入同比变动率",
+              "raw_value": "-6.98",
+              "value": "-6.98",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "正文24.19亿元为营业收入2,418,990,221.17元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        },
+        {
+          "fact_id": "F06",
+          "text": "子公司纸制品加工产品包括纸箱、纸板、纸袋，纸箱用于产品包装，纸板用于制作纸箱或建材，纸袋用于水泥、化工、建材、食品、工业、饲料等包装。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "原文母子公司栏仅列“子公司”，未指明具体子公司主体。"
+        },
+        {
+          "fact_id": "F07",
+          "text": "子公司医药产品包括风油精（清凉、止痛、驱风、止痒）、无极膏（消炎、镇痛、止痒、抗菌、局部麻醉）、软脉灵（滋补肝肾、益气活血、软化血管）。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "原文母子公司栏仅列“子公司”，未指明具体子公司主体。"
+        },
+        {
+          "fact_id": "F08",
+          "text": "子公司电子通讯产品为光电子器件，为数据中心、数据通信等光纤传输、接入系统提供高速光模块产品；子公司林业业务为森林培育、营造、管护及木材、竹材生产销售。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "原文母子公司栏仅列“子公司”，未指明具体子公司主体。"
+        },
+        {
+          "fact_id": "F16",
+          "text": "主要产品产销量：纸生产量24.98万吨、销售量24.09万吨；浆粕生产量2.49万吨、销售量2.58万吨；浆板生产量7.19万吨、销售量4.94万吨；纸箱、板箱生产量7.61万吨、销售量7.27万吨；光电子模块生产量197.37万只、销售量194.44万只；风油精系列生产量5,555.50万瓶、销售量5,413.83万瓶。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "生产量-纸",
+              "raw_value": "24.98",
+              "value": "24.98",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "销售量-纸",
+              "raw_value": "24.09",
+              "value": "24.09",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "生产量-浆粕",
+              "raw_value": "2.49",
+              "value": "2.49",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "销售量-浆粕",
+              "raw_value": "2.58",
+              "value": "2.58",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "生产量-浆板",
+              "raw_value": "7.19",
+              "value": "7.19",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "销售量-浆板",
+              "raw_value": "4.94",
+              "value": "4.94",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "生产量-纸箱、板箱",
+              "raw_value": "7.61",
+              "value": "7.61",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "销售量-纸箱、板箱",
+              "raw_value": "7.27",
+              "value": "7.27",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "生产量-光电子模块",
+              "raw_value": "197.37",
+              "value": "197.37",
+              "unit": "万只",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "销售量-光电子模块",
+              "raw_value": "194.44",
+              "value": "194.44",
+              "unit": "万只",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "生产量-风油精系列",
+              "raw_value": "5,555.50",
+              "value": "5555.50",
+              "unit": "万瓶",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "销售量-风油精系列",
+              "raw_value": "5,413.83",
+              "value": "5413.83",
+              "unit": "万瓶",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F22",
+          "text": "报告期木竹片及木浆产品贸易业务本期营业收入60.15万元，上期3,061.94万元，同比下降98.04%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "木竹片及木浆产品贸易业务营业收入",
+              "raw_value": "60.15",
+              "value": "60.15",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "木竹片及木浆产品贸易业务营业收入同比增减",
+              "raw_value": "-98.04",
+              "value": "-98.04",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F29",
+          "text": "公司为制浆造纸企业，浆纸主业秉承自主生产模式，具备制浆造纸生产线及配套的碱回收、热电、污水处理系统；公司业务还包括纸制品加工、医药、光电子及林业开发。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15918,
+      "output_tokens": 2008,
+      "total_tokens": 17926
+    }
+  },
+  {
+    "request_id": "bp-work-5d88bbcf3252b4b833c64f62:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "7d6536338fcd862f5b94e56325350ffa6c9ae681c1a832fb14a39d62dd8132f2",
+    "response_hash": "e8cd866d15b953b4847a57eef96ed8bf88a417bfd42a45a4b11f140428d1295e",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:REV-001\",\"F06\",\"F07\",\"F08\",\"F16\",\"F22\",\"F29\"],\"checks\":[{\"fact_id\":\"review-add:REV-001\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0005\"],\"explanation\":\"已将主体由issuer改为consolidated_group。正文“公司”与“归属于上市公司股东的净利润”同段，利润表科目变动表亦未标明母公司单体，按报告口径应为合并范围。2,418,990,221.17元、约24.19亿元、减少1.81亿元及下降6.98%分别对应原文，期间为2025年度，并保留亿元约数及舍入展示的不确定性。\"},{\"fact_id\":\"F06\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"纸箱、纸板、纸袋的用途与原文一致，主体已改为unclear。原文母子公司栏仅写“子公司”，未点名具体法律主体，不能标为named_subsidiary；不确定性说明已保留。\"},{\"fact_id\":\"F07\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"风油精、无极膏、软脉灵的用途与原文一致，主体已改为unclear。医药行业对应栏仅为未点名的“子公司”，未推定漳州水仙等已列名主体，不确定性说明已保留。\"},{\"fact_id\":\"F08\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"光电子器件用途及林业培育、木材竹材产销与原文一致，主体已改为unclear。电子通讯行业和林业栏均只写“子公司”，未指定法律主体，不确定性说明已保留。\"},{\"fact_id\":\"F16\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"各产品行产销量、单位与产销表一致，事实及各项指标主体均改为business_segment，指标名称保留纸、浆粕、浆板、纸箱板箱、光电子模块、风油精系列类别。产品行未继承合并主体，未列库存量不构成缺漏。\"},{\"fact_id\":\"F22\",\"accepted\":true,\"evidence_ids\":[\"source-0011\"],\"explanation\":\"木竹片及木浆产品贸易业务本期60.15万元、上期3,061.94万元、同比-98.04%与贸易业务表一致，单位为万元，未与商贸业收入混同。该指定业务行主体已改为business_segment。\"},{\"fact_id\":\"F29\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"explanation\":\"已删除无依据的“向下游延伸”表述，保留制浆造纸企业、浆纸主业自主生产及配套碱回收、热电、污水处理系统。纸制品、医药、光电子和林业开发属于原文一体布局，报告正文“公司”按合并范围处理。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:REV-001",
+        "F06",
+        "F07",
+        "F08",
+        "F16",
+        "F22",
+        "F29"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:REV-001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0005"
+          ],
+          "explanation": "已将主体由issuer改为consolidated_group。正文“公司”与“归属于上市公司股东的净利润”同段，利润表科目变动表亦未标明母公司单体，按报告口径应为合并范围。2,418,990,221.17元、约24.19亿元、减少1.81亿元及下降6.98%分别对应原文，期间为2025年度，并保留亿元约数及舍入展示的不确定性。"
+        },
+        {
+          "fact_id": "F06",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "纸箱、纸板、纸袋的用途与原文一致，主体已改为unclear。原文母子公司栏仅写“子公司”，未点名具体法律主体，不能标为named_subsidiary；不确定性说明已保留。"
+        },
+        {
+          "fact_id": "F07",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "风油精、无极膏、软脉灵的用途与原文一致，主体已改为unclear。医药行业对应栏仅为未点名的“子公司”，未推定漳州水仙等已列名主体，不确定性说明已保留。"
+        },
+        {
+          "fact_id": "F08",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "光电子器件用途及林业培育、木材竹材产销与原文一致，主体已改为unclear。电子通讯行业和林业栏均只写“子公司”，未指定法律主体，不确定性说明已保留。"
+        },
+        {
+          "fact_id": "F16",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "各产品行产销量、单位与产销表一致，事实及各项指标主体均改为business_segment，指标名称保留纸、浆粕、浆板、纸箱板箱、光电子模块、风油精系列类别。产品行未继承合并主体，未列库存量不构成缺漏。"
+        },
+        {
+          "fact_id": "F22",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "木竹片及木浆产品贸易业务本期60.15万元、上期3,061.94万元、同比-98.04%与贸易业务表一致，单位为万元，未与商贸业收入混同。该指定业务行主体已改为business_segment。"
+        },
+        {
+          "fact_id": "F29",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "explanation": "已删除无依据的“向下游延伸”表述，保留制浆造纸企业、浆纸主业自主生产及配套碱回收、热电、污水处理系统。纸制品、医药、光电子和林业开发属于原文一体布局，报告正文“公司”按合并范围处理。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 18801,
+      "output_tokens": 680,
+      "total_tokens": 22951
+    }
+  }
+]

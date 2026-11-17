@@ -1,0 +1,112 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600097.SH",
+  "name": "开创国际",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "3cc80fc09457cf0aab4f1f1d3810a3fd550b1398e1ee5778414cfc9aa1badc55",
+  "original_fact_count": 32,
+  "preparation_seconds": 27.806,
+  "business_started_monotonic": 10088948.018119141,
+  "state": "completed",
+  "business_ended_monotonic": 10089578.453012647,
+  "business_seconds": 630.435,
+  "core_complete": false,
+  "fact_count": 29,
+  "metric_count": 30,
+  "new_or_changed_fact_ids": [
+    "rm-02",
+    "rm-03",
+    "rm-04",
+    "rm-05",
+    "rm-06",
+    "rm-07",
+    "sm-03",
+    "oi-03"
+  ],
+  "removed_original_fact_ids": [
+    "od-04",
+    "oi-04",
+    "review-add:f-002"
+  ],
+  "unchanged_fact_count": 21,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": [
+    {
+      "finding_id": "f-001",
+      "fact_id": "review-add:f-002",
+      "resolution": "quarantined"
+    },
+    {
+      "finding_id": "f-002",
+      "fact_id": "rm-02",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-003",
+      "fact_id": "rm-03",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-004",
+      "fact_id": "rm-04",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-005",
+      "fact_id": "rm-05",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-006",
+      "fact_id": "rm-06",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-007",
+      "fact_id": "rm-07",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-008",
+      "fact_id": "sm-03",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-009",
+      "fact_id": "oi-03",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "f-010",
+      "fact_id": "oi-04",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "f-011",
+      "fact_id": "od-04",
+      "resolution": "repair_rejected"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 27,
+    "pending": 0,
+    "limited": 2,
+    "source_only": 0,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "0ad8cd82c00e73d0734d1ba6eb4474bb7636be0a03a2128ae7cd1ca744e135cf",
+  "physical_requests": 3,
+  "charged_tokens": 94706,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 659.848,
+  "cleanup_bytes": 2257244
+}

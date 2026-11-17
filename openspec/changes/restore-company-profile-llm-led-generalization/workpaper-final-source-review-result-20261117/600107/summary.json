@@ -1,0 +1,104 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600107.SH",
+  "name": "美尔雅",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "26bfe75fee9581b195212d8f53b8458100eb98fb0186a447e93534f9c88682ff",
+  "original_fact_count": 22,
+  "preparation_seconds": 43.291,
+  "business_started_monotonic": 10088013.527462207,
+  "state": "completed",
+  "business_ended_monotonic": 10088670.162091728,
+  "business_seconds": 656.635,
+  "core_complete": false,
+  "fact_count": 22,
+  "metric_count": 38,
+  "new_or_changed_fact_ids": [
+    "F05",
+    "F08",
+    "F10",
+    "F11",
+    "F13",
+    "F15",
+    "F20",
+    "F21",
+    "F22"
+  ],
+  "removed_original_fact_ids": [],
+  "unchanged_fact_count": 13,
+  "review_status": "incomplete",
+  "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F12,F17,F18",
+  "findings": [
+    {
+      "finding_id": "WR01",
+      "fact_id": "F05",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR02",
+      "fact_id": "F08",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR03",
+      "fact_id": "F10",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR04",
+      "fact_id": "F11",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR05",
+      "fact_id": "F13",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR06",
+      "fact_id": "F15",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR07",
+      "fact_id": "F20",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR08",
+      "fact_id": "F22",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR09",
+      "fact_id": "F21",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR10",
+      "fact_id": null,
+      "resolution": "unresolved"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 17,
+    "pending": 0,
+    "limited": 5,
+    "source_only": 0,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "952e15a2b715193cce9705423473385ba42a0ea1c32c428fc66b623a27503c42",
+  "physical_requests": 3,
+  "charged_tokens": 104446,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 702.188,
+  "cleanup_bytes": 2334093
+}

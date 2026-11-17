@@ -1,0 +1,51 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600100.SH",
+  "name": "同方股份",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "0fbbfda7547baf588d5b1e53946b479bbff7f6c88328c0ef939b0ba767613571",
+  "original_fact_count": 27,
+  "preparation_seconds": 43.725,
+  "business_started_monotonic": 10088014.00279935,
+  "state": "completed",
+  "business_ended_monotonic": 10088382.02114764,
+  "business_seconds": 368.018,
+  "core_complete": false,
+  "fact_count": 27,
+  "metric_count": 30,
+  "new_or_changed_fact_ids": [
+    "F02"
+  ],
+  "removed_original_fact_ids": [],
+  "unchanged_fact_count": 26,
+  "review_status": "completed",
+  "review_error": null,
+  "findings": [
+    {
+      "finding_id": "RF01",
+      "fact_id": "F02",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 27,
+    "pending": 0,
+    "limited": 0,
+    "source_only": 0,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "5684d727854f58e467ad0912dbfc6fb222f38f5cf57d8bda6ac4fbf3532d90cb",
+  "physical_requests": 3,
+  "charged_tokens": 78445,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 413.38,
+  "cleanup_bytes": 2109566
+}

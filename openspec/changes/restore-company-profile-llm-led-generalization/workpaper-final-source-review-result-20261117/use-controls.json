@@ -1,0 +1,8 @@
+{
+  "task": "6.DC",
+  "original_grades": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/research-delivery.json",
+  "original_grades_sha256": "59fdaf12aff618b7bcadaf0984a7562b3b8cc172d44f4860fb8a864d353d5277",
+  "additional_independent_decision": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/acceptance.json",
+  "additional_independent_decision_sha256": "007426711e34f562825d6f45b38a1f6e5059c4156a83ecd235fc596bf8b7d0c3",
+  "policy": "Unchanged decisions retain their source-bound hashes; a changed formerly restricted fact is source_only pending independent source check. Model acceptance cannot clear an independent restriction."
+}

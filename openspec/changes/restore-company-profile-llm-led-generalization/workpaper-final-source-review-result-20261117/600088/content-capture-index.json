@@ -1,0 +1,17 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "sequence": 1,
+      "sha256": "cceccdce817e80f4f1f2de448b6a451f5c29ff0dd3cdf8693f9e04d0182c2ed0",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 17557,
+        "completion_tokens": 115,
+        "total_tokens": 35083
+      },
+      "retained": false,
+      "path": null
+    }
+  ]
+}

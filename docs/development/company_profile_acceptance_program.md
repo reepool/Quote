@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-17 6.DC后继源复核已结束：[十二份当前使用版及有限核源](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/result.md)。12/12有稿、47真实采纳修订独立45支持/1源参考/1隔离；当前133核心121支持/9部分/3缺失只作后继内容对照，不重算6.CT首发或改变本计划门槛。34新增物理/1097696供应商usage/0恢复/费用unknown，原选章抽取及旧费用另保，未评估负例/未核范围不默认通过；正式S1仍0/12，S2/生产未放行。下一优先复用保存候选解决直接消费误拒，再连续推进正式验收，不追单家公司可选尾项或重抽十二家。
+
 > 类型：requirements；版本：2（LLM主导纠偏）；制定：2026-10-16。
 > 本文是后续公司画像验证的数量、质量、补救和进度唯一计划入口，细化产品总需求第27节；职责与交接仍遵循`ab_role_development_workflow.md`。
 > 当前[实施交接§258](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#258-直接实施v9章节底稿与两家公司真实交付)：用户已授权本会话直接实施和现有池并发开发；上汽人工参考1/1、上汽及浦发真实结构化底稿2/2已交，原TaskService/writer/query/export三读一致，均pending而非正式可用评分。旧三家窗口、S1/S32原成绩不改；每轮先清后做、交付后清本人过程物。§257及以下旧日期化零调用限制只属其原轮次。

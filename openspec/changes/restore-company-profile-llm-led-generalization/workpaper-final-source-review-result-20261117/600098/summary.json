@@ -1,0 +1,68 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600098.SH",
+  "name": "广州发展",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+  "original_fact_count": 30,
+  "preparation_seconds": 38.549,
+  "business_started_monotonic": 10088421.992036415,
+  "state": "completed",
+  "business_ended_monotonic": 10089224.226058353,
+  "business_seconds": 802.234,
+  "core_complete": false,
+  "fact_count": 30,
+  "metric_count": 63,
+  "new_or_changed_fact_ids": [
+    "F16",
+    "F27",
+    "review-add:WR03"
+  ],
+  "removed_original_fact_ids": [],
+  "unchanged_fact_count": 27,
+  "review_status": "incomplete",
+  "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F12,F13,F14,F18,F24,F32",
+  "findings": [
+    {
+      "finding_id": "RF01",
+      "fact_id": null,
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "RF02",
+      "fact_id": "F16",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "RF03",
+      "fact_id": "F27",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "RF04",
+      "fact_id": "review-add:WR03",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 23,
+    "pending": 0,
+    "limited": 6,
+    "source_only": 1,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "de8174931b03a4ac900474f64adf91b01b53fe9bd2e6b4eec9e2b9e41bdb7b27",
+  "physical_requests": 3,
+  "charged_tokens": 137560,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 842.38,
+  "cleanup_bytes": 2660959
+}

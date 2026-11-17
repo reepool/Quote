@@ -1,0 +1,142 @@
+[
+  {
+    "request_id": "bp-work-495cd447d05207d84da133ac:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "b2d04d4f221ac17725cfc8029e866f102c9c1195ee6f5ac6d2a7ab9846a42846",
+    "response_hash": "b776f45280f503d021f3f777453478ed55204393ae9cbbf25d9024806ef7a406",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"RF01\",\"element\":\"business_structure\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F02\",\"evidence_ids\":[\"source-0010\",\"source-0018\",\"source-0008\",\"source-0019\"],\"explanation\":\"F02将公共安全产业表述为“主要由同方威视承载”，但选定章节并未作此等同。公共安全章节以公司业务为主体，仅在产品与市场表述中提及同方威视；子公司章节只支持公司持股71.25%，以及同方威视生产销售货物/车辆成像检查系统、放射性物质监测系统、行李及包裹成像检查系统和人体安全检查系统。公共安全板块与同方威视主营业务收入同为698,057.58万元，不能据此认定板块主体等同；且板块毛利率29.81%与子公司毛利率29.85%并不一致，公司亦非全资持股。应删除不受支持的“主要由同方威视承载”表述，保留已有来源支持的持股比例和产品范围。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F29\",\"F30\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "element": "business_structure",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F02",
+          "evidence_ids": [
+            "source-0010",
+            "source-0018",
+            "source-0008",
+            "source-0019"
+          ],
+          "explanation": "F02将公共安全产业表述为“主要由同方威视承载”，但选定章节并未作此等同。公共安全章节以公司业务为主体，仅在产品与市场表述中提及同方威视；子公司章节只支持公司持股71.25%，以及同方威视生产销售货物/车辆成像检查系统、放射性物质监测系统、行李及包裹成像检查系统和人体安全检查系统。公共安全板块与同方威视主营业务收入同为698,057.58万元，不能据此认定板块主体等同；且板块毛利率29.81%与子公司毛利率29.85%并不一致，公司亦非全资持股。应删除不受支持的“主要由同方威视承载”表述，保留已有来源支持的持股比例和产品范围。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F29",
+        "F30"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20935,
+      "output_tokens": 334,
+      "total_tokens": 47962
+    }
+  },
+  {
+    "request_id": "bp-work-495cd447d05207d84da133ac:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "8fa522a721dc955afef5035b3dddbbf5b143579acffd9fb7c529ab35feb39d59",
+    "response_hash": "25cd24d395984592062fd0fa5230ecf265502bf16659149e0d4eede0a52d8fe0",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F02\",\"text\":\"同方威视技术股份有限公司成立于2000年12月19日，注册资本18,500万元，公司持股71.25%，主要生产和销售货物/车辆成像检查系统、放射性物质监测系统、行李及包裹成像检查系统、人体安全检查系统等系列产品。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F02",
+          "text": "同方威视技术股份有限公司成立于2000年12月19日，注册资本18,500万元，公司持股71.25%，主要生产和销售货物/车辆成像检查系统、放射性物质监测系统、行李及包裹成像检查系统、人体安全检查系统等系列产品。",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0018"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12887,
+      "output_tokens": 111,
+      "total_tokens": 12998
+    }
+  },
+  {
+    "request_id": "bp-work-495cd447d05207d84da133ac:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "14ed582f165a7316cc4c732d0d42c477c82bed2da19eded4f99eea1ca22a7320",
+    "response_hash": "b305cdaaf822b7dc9fec40f84f391d395ded3b37b59fe46a7c8327a6383ce66b",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F02\"],\"checks\":[{\"fact_id\":\"F02\",\"accepted\":true,\"evidence_ids\":[\"source-0018\",\"source-0010\",\"source-0019\"],\"explanation\":\"候选已删除不受支持的“公共安全产业主要由同方威视承载”等同表述，仅保留source-0018直接支持的子公司成立日期、注册资本、公司持股71.25%及货物/车辆成像检查、放射性物质监测、行李包裹成像检查和人体安全检查等产品范围。主体正确限定为具名子公司，未把公共安全板块收入或毛利率归入该子公司，也未因收入同额推断板块与子公司等同。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0018",
+            "source-0010",
+            "source-0019"
+          ],
+          "explanation": "候选已删除不受支持的“公共安全产业主要由同方威视承载”等同表述，仅保留source-0018直接支持的子公司成立日期、注册资本、公司持股71.25%及货物/车辆成像检查、放射性物质监测、行李包裹成像检查和人体安全检查等产品范围。主体正确限定为具名子公司，未把公共安全板块收入或毛利率归入该子公司，也未因收入同额推断板块与子公司等同。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15244,
+      "output_tokens": 151,
+      "total_tokens": 17485
+    }
+  }
+]

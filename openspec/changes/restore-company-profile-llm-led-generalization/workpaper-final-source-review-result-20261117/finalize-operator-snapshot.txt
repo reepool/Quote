@@ -1,0 +1,91 @@
+"""Bounded offline artifact checks and cleanup; no provider or model entry."""
+import hashlib
+import json
+import re
+import shutil
+from pathlib import Path
+
+ROOT=Path('/home/python/Quote')
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+D=C/'workpaper-final-source-review-result-20261117'
+def read(path):return json.loads(Path(path).read_text())
+def digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path,obj):Path(path).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+def facts(paper):
+    groups={**paper['elements'],**(paper.get('supply_chain') or {})}
+    if paper.get('company_features'):groups['company_features']=paper['company_features']
+    return {f['fact_id']:f for e in groups.values() for f in e['facts']}
+plan=read(C/'workpaper-final-quality-readiness-20261117/review-plan.json')
+audit=read(D/'independent-audit.json'); delivery=read(D/'delivery-decisions.json')
+resources=read(D/'resource-summary.json'); validation=read(D/'delivery-validation.json')
+assert len(validation['checks'])==12 and all(r['three_reads_equal'] for r in validation['checks'])
+calls=0; old_hashes={}; queries={}; referenced_facts=0
+for row in plan['profiles']:
+    code=row['instrument_id'][:6]; query=read(D/code/'query.json'); p=query['profiles'][0]
+    assert digest(ROOT/row['source_query'])==row['source_query_sha256']
+    assert digest(row['source_pdf'])==row['official_pdf_sha256']
+    summary=read(D/code/'summary.json'); assert digest(D/code/'query.json')==summary['query_sha256']
+    old_hashes[row['source_query']]=row['source_query_sha256'];queries[code]=summary['query_sha256']
+    raw_calls=read(D/code/'model-receipts.json')
+    assert p['workpaper_receipts']==raw_calls
+    assert all(c['finish_reason']=='stop' and c['source_label'] in {'scorpio:grok-4.7','deepseek:deepseek-flash'} for c in raw_calls)
+    calls+=len(raw_calls)
+    f=facts(p['workpaper']); graded=next(r for r in delivery['profiles'] if r['instrument_id']==row['instrument_id'])
+    assert sum(graded['counts'].values())==len(f)
+    assert graded['use_review']['reference_sha256']==digest(D/'independent-audit.json')
+    for choice in graded['use_review']['decisions']:
+        expected=hashlib.sha256(json.dumps(f[choice['fact_id']],ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+        assert expected==choice['fact_sha256']
+        referenced_facts+=1
+assert calls==resources['physical_requests']==34
+assert resources['ledger']==1097696 and resources['recoveries']==0
+assert sum(audit['aggregate_core_verdicts'].values())==133
+assert audit['actual_accepted_repairs']==47
+assert audit['independent_decisions_on_accepted_repairs']=={'supported':45,'source_only':1,'withheld':1}
+assert sum(resources['delivery_counts'].values())==resources['fact_count']==366
+assert read(D/'group-execution.json')['source_code_unchanged']
+# Preserve exactly the executed/inspected deliver operator after its local path fallback correction.
+shutil.copy2(ROOT/'data/QuoteBak/workpaper-dc-deliver.py',D/'delivery-operator-snapshot.txt')
+assert digest(ROOT/'data/QuoteBak/workpaper-dc-run.py')==digest(D/'operator-snapshot.txt')
+assert digest(ROOT/'data/QuoteBak/workpaper-dc-deliver.py')==digest(D/'delivery-operator-snapshot.txt')
+manual=read(ROOT/'data/QuoteBak/workpaper-dc-audit-input.json')
+assert all(all(audit['companies'][code][key]==value for key,value in j.items()) for code,j in manual.items())
+snapshot=D/'finalize-operator-snapshot.txt';shutil.copy2(__file__,snapshot)
+cleanup_targets=[ROOT/'data/QuoteBak/workpaper-dc-run.py',ROOT/'data/QuoteBak/workpaper-dc-inspect.py',
+    ROOT/'data/QuoteBak/workpaper-dc-audit-input.json',ROOT/'data/QuoteBak/workpaper-dc-deliver.py',
+    ROOT/'data/QuoteBak/__pycache__/workpaper-dc-run.cpython-311.pyc',Path(__file__)]
+removed=[]
+for path in cleanup_targets:
+    assert path.parent in {ROOT/'data/QuoteBak',ROOT/'data/QuoteBak/__pycache__'}
+    if path.exists():
+        removed.append({'path':str(path),'bytes':path.stat().st_size,'sha256':digest(path)})
+        path.unlink()
+cleaned=sum(r['bytes'] for r in removed)
+roots=resources['cleanup_worker_bytes']+resources['cleanup_supervisor_bytes']+resources['cleanup_projection_bytes']
+dump(D/'cleanup.json',{'task':'6.DC','cleaned_roots_bytes':roots,'removed_files':removed,'removed_files_bytes':cleaned,
+    'total_measured_bytes':roots+cleaned,'attempt_markers_retained':12,'official_sources_and_shared_cache_preserved':True,
+    'unmeasured_failed_projection_roots_cleaned_by_finally':True,'parallel_or_preexisting_artifacts_removed':False})
+dump(D/'validation.json',{'task':'6.DC','json_parsing_passed':True,'physical_receipts_verified':calls,
+    'source_query_sha256':queries,'old_queries_preserved':old_hashes,'official_pdf_hashes_verified':12,
+    'current_independent_fact_bindings_verified':referenced_facts,'writer_readback':'delivery-validation.json',
+    'openspec_strict':{'command':'OPENSPEC_TELEMETRY=0 openspec validate restore-company-profile-llm-led-generalization --strict --no-interactive','result':'passed'},
+    'git_diff_check':'passed','production_code_changed':False,'new_model_calls_after_group':0,
+    'reused_tests':'6.DB167直接/64兼容/4版本断言；未改源码，不重复长测试',
+    'review':{'blocking':'已知坏项/缺证对象按现有use_review退出普通交付；旧失败/正文不改',
+        'followup_P1':'合法fact/metric不同主体、负百分点及跨行小数的源消费误拒；保本轮原拒绝，不补调用',
+        'nonblocking':'可选供应链细节/特色尾项不扩','unrelated':'开工既有配置/骨架/混合文档/并行保护'}})
+broken=[]
+for path in [D/'result.md',*(D.glob('*-research.md'))]:
+    for target in re.findall(r'\]\(([^)]+)\)',path.read_text()):
+        if target.startswith(('#','http:','https:','mailto:')):continue
+        base=target.split('#')[0].strip('<>')
+        destination=Path(base) if base.startswith('/') else path.parent/base
+        if not destination.exists():broken.append((str(path),target))
+assert not broken,broken
+all_json=list(D.rglob('*.json'))
+for path in all_json:read(path)
+dump(D/'index.json',{'task':'6.DC','authoritative_result':'result.md','research_only':True,
+    'actual_results_immutable':True,'files':{str(p.relative_to(D)):digest(p) for p in sorted(D.rglob('*'))
+        if p.is_file() and p.name!='index.json'}})
+print(json.dumps({'passed':True,'physical_requests':calls,'json_files':len(all_json),'source_bindings':referenced_facts,
+    'cleanup_total_bytes':roots+cleaned,'cleanup_files_bytes':cleaned,'cleanup_files':len(removed)},ensure_ascii=False))

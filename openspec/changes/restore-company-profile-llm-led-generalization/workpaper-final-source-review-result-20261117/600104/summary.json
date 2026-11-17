@@ -1,0 +1,81 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600104.SH",
+  "name": "上汽集团",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+  "original_fact_count": 38,
+  "preparation_seconds": 38.743,
+  "business_started_monotonic": 10088425.81972072,
+  "state": "completed",
+  "business_ended_monotonic": 10088913.342163404,
+  "business_seconds": 487.522,
+  "core_complete": false,
+  "fact_count": 35,
+  "metric_count": 40,
+  "new_or_changed_fact_ids": [
+    "F22",
+    "F37"
+  ],
+  "removed_original_fact_ids": [
+    "F10",
+    "F13",
+    "F14"
+  ],
+  "unchanged_fact_count": 33,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": [
+    {
+      "finding_id": "WR-F10-SCOPE",
+      "fact_id": "F10",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "WR-F10-INCOME",
+      "fact_id": "F10",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "WR-F13-SCOPE",
+      "fact_id": "F13",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "WR-F14-SCOPE",
+      "fact_id": "F14",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "WR-F22-SCOPE",
+      "fact_id": "F22",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "WR-F37-CUSTOMER",
+      "fact_id": "F37",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 24,
+    "pending": 0,
+    "limited": 8,
+    "source_only": 2,
+    "withheld": 1,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "99703a87e7806f7703b8e08dfee960598c1c4aa2d127fb7dac441951a738f31e",
+  "physical_requests": 3,
+  "charged_tokens": 91250,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 528.085,
+  "cleanup_bytes": 2330068
+}

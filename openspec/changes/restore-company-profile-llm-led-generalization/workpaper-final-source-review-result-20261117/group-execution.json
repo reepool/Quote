@@ -1,0 +1,928 @@
+{
+  "results": [
+    {
+      "task": "6.DC",
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "a3585e7173dc9755fcc6909a2699f8f876d824658ea284f75a1592609d221c6b",
+      "original_fact_count": 22,
+      "preparation_seconds": 43.152,
+      "business_started_monotonic": 10088012.876926748,
+      "state": "completed",
+      "business_ended_monotonic": 10088489.664270556,
+      "business_seconds": 476.787,
+      "core_complete": false,
+      "fact_count": 23,
+      "metric_count": 26,
+      "new_or_changed_fact_ids": [
+        "F06",
+        "F08",
+        "review-add:R03",
+        "F13",
+        "F20",
+        "F22",
+        "F25"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 16,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "R01",
+          "fact_id": "F22",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R02",
+          "fact_id": "F06",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R03",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R04",
+          "fact_id": "F25",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R05",
+          "fact_id": "F20",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R06",
+          "fact_id": null,
+          "resolution": "unresolved"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 19,
+        "pending": 0,
+        "limited": 4,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "10c875b5c74c472e0ee88d659e2bdab2988810077b71de1f1c225fda43d83af5",
+      "physical_requests": 3,
+      "charged_tokens": 74706,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 521.531,
+      "cleanup_bytes": 2027713
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "1c391eff20b48f5b7f39eba127966d873f1d68c3facead8131ad858c3cfb5dd4",
+      "original_fact_count": 31,
+      "preparation_seconds": 43.984,
+      "business_started_monotonic": 10088014.129431875,
+      "state": "completed",
+      "business_ended_monotonic": 10088376.043291938,
+      "business_seconds": 361.914,
+      "core_complete": false,
+      "fact_count": 31,
+      "metric_count": 67,
+      "new_or_changed_fact_ids": [
+        "F06",
+        "F07",
+        "F08",
+        "F16",
+        "review-add:REV-001",
+        "F22",
+        "F29"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 24,
+      "review_status": "completed",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "WF01",
+          "fact_id": "review-add:REV-001",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WF02",
+          "fact_id": "F06",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WF03",
+          "fact_id": "F07",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WF04",
+          "fact_id": "F08",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WF05",
+          "fact_id": "F16",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WF06",
+          "fact_id": "F22",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WF07",
+          "fact_id": "F29",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 26,
+        "pending": 0,
+        "limited": 3,
+        "source_only": 2,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "dfafb39872eadc7eaca861b78155823d3c18f13b0e4f504706effb59dba6fc72",
+      "physical_requests": 3,
+      "charged_tokens": 91244,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 408.673,
+      "cleanup_bytes": 2452816
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "0fbbfda7547baf588d5b1e53946b479bbff7f6c88328c0ef939b0ba767613571",
+      "original_fact_count": 27,
+      "preparation_seconds": 43.725,
+      "business_started_monotonic": 10088014.00279935,
+      "state": "completed",
+      "business_ended_monotonic": 10088382.02114764,
+      "business_seconds": 368.018,
+      "core_complete": false,
+      "fact_count": 27,
+      "metric_count": 30,
+      "new_or_changed_fact_ids": [
+        "F02"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 26,
+      "review_status": "completed",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "fact_id": "F02",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 27,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "5684d727854f58e467ad0912dbfc6fb222f38f5cf57d8bda6ac4fbf3532d90cb",
+      "physical_requests": 3,
+      "charged_tokens": 78445,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 413.38,
+      "cleanup_bytes": 2109566
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "26bfe75fee9581b195212d8f53b8458100eb98fb0186a447e93534f9c88682ff",
+      "original_fact_count": 22,
+      "preparation_seconds": 43.291,
+      "business_started_monotonic": 10088013.527462207,
+      "state": "completed",
+      "business_ended_monotonic": 10088670.162091728,
+      "business_seconds": 656.635,
+      "core_complete": false,
+      "fact_count": 22,
+      "metric_count": 38,
+      "new_or_changed_fact_ids": [
+        "F05",
+        "F08",
+        "F10",
+        "F11",
+        "F13",
+        "F15",
+        "F20",
+        "F21",
+        "F22"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 13,
+      "review_status": "incomplete",
+      "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F12,F17,F18",
+      "findings": [
+        {
+          "finding_id": "WR01",
+          "fact_id": "F05",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR02",
+          "fact_id": "F08",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR03",
+          "fact_id": "F10",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR04",
+          "fact_id": "F11",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR05",
+          "fact_id": "F13",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR06",
+          "fact_id": "F15",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR07",
+          "fact_id": "F20",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR08",
+          "fact_id": "F22",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR09",
+          "fact_id": "F21",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR10",
+          "fact_id": null,
+          "resolution": "unresolved"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 17,
+        "pending": 0,
+        "limited": 5,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "952e15a2b715193cce9705423473385ba42a0ea1c32c428fc66b623a27503c42",
+      "physical_requests": 3,
+      "charged_tokens": 104446,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 702.188,
+      "cleanup_bytes": 2334093
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+      "original_fact_count": 30,
+      "preparation_seconds": 38.549,
+      "business_started_monotonic": 10088421.992036415,
+      "state": "completed",
+      "business_ended_monotonic": 10089224.226058353,
+      "business_seconds": 802.234,
+      "core_complete": false,
+      "fact_count": 30,
+      "metric_count": 63,
+      "new_or_changed_fact_ids": [
+        "F16",
+        "F27",
+        "review-add:WR03"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 27,
+      "review_status": "incomplete",
+      "review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F12,F13,F14,F18,F24,F32",
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "RF02",
+          "fact_id": "F16",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF03",
+          "fact_id": "F27",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF04",
+          "fact_id": "review-add:WR03",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 23,
+        "pending": 0,
+        "limited": 6,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "de8174931b03a4ac900474f64adf91b01b53fe9bd2e6b4eec9e2b9e41bdb7b27",
+      "physical_requests": 3,
+      "charged_tokens": 137560,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 842.38,
+      "cleanup_bytes": 2660959
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+      "original_fact_count": 38,
+      "preparation_seconds": 38.743,
+      "business_started_monotonic": 10088425.81972072,
+      "state": "completed",
+      "business_ended_monotonic": 10088913.342163404,
+      "business_seconds": 487.522,
+      "core_complete": false,
+      "fact_count": 35,
+      "metric_count": 40,
+      "new_or_changed_fact_ids": [
+        "F22",
+        "F37"
+      ],
+      "removed_original_fact_ids": [
+        "F10",
+        "F13",
+        "F14"
+      ],
+      "unchanged_fact_count": 33,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "WR-F10-SCOPE",
+          "fact_id": "F10",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "WR-F10-INCOME",
+          "fact_id": "F10",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "WR-F13-SCOPE",
+          "fact_id": "F13",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "WR-F14-SCOPE",
+          "fact_id": "F14",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "WR-F22-SCOPE",
+          "fact_id": "F22",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR-F37-CUSTOMER",
+          "fact_id": "F37",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 24,
+        "pending": 0,
+        "limited": 8,
+        "source_only": 2,
+        "withheld": 1,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "99703a87e7806f7703b8e08dfee960598c1c4aa2d127fb7dac441951a738f31e",
+      "physical_requests": 3,
+      "charged_tokens": 91250,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 528.085,
+      "cleanup_bytes": 2330068
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "8d95443c7f898a5c8ca34a5c45f4ffdbfc2532ecb4854a77c412ef041540bbb5",
+      "original_fact_count": 34,
+      "preparation_seconds": 28.641,
+      "business_started_monotonic": 10088524.618773304,
+      "state": "completed",
+      "business_ended_monotonic": 10088749.720301665,
+      "business_seconds": 225.102,
+      "core_complete": false,
+      "fact_count": 34,
+      "metric_count": 40,
+      "new_or_changed_fact_ids": [],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 34,
+      "review_status": "completed",
+      "review_error": null,
+      "findings": [],
+      "delivery_counts": {
+        "reviewed": 33,
+        "pending": 0,
+        "limited": 1,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "d7ef75c1481d5bf71cb8fee2f30d7747d49d751484361fd858a608315722e94f",
+      "physical_requests": 1,
+      "charged_tokens": 35083,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 255.466,
+      "cleanup_bytes": 1907148
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "e646bfcbbb84c86d707dc3282cf7580779eaa11dd0745b1a9ce8d20ab4dff05f",
+      "original_fact_count": 28,
+      "preparation_seconds": 28.374,
+      "business_started_monotonic": 10088704.727371162,
+      "state": "completed",
+      "business_ended_monotonic": 10089409.277714929,
+      "business_seconds": 704.55,
+      "core_complete": false,
+      "fact_count": 29,
+      "metric_count": 48,
+      "new_or_changed_fact_ids": [
+        "F16",
+        "review-add:FND-001",
+        "F19",
+        "F28"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 25,
+      "review_status": "completed",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "FND-001",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "FND-002",
+          "fact_id": "F16",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "FND-003",
+          "fact_id": "F28",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "FND-004",
+          "fact_id": "F19",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 28,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "362e48a9ab641da2995893a9ce98415b5c243d60af449398ee0993f0448e563d",
+      "physical_requests": 3,
+      "charged_tokens": 102223,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 734.597,
+      "cleanup_bytes": 2236889
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+      "original_fact_count": 28,
+      "preparation_seconds": 28.565,
+      "business_started_monotonic": 10088784.586999703,
+      "state": "completed",
+      "business_ended_monotonic": 10089246.505477732,
+      "business_seconds": 461.918,
+      "core_complete": false,
+      "fact_count": 26,
+      "metric_count": 17,
+      "new_or_changed_fact_ids": [
+        "F11",
+        "review-add:RF01"
+      ],
+      "removed_original_fact_ids": [
+        "F09",
+        "F10"
+      ],
+      "unchanged_fact_count": 24,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "REV-F09-SCOPE",
+          "fact_id": "F09",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "REV-F09-SIGN",
+          "fact_id": "F09",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "REV-F10-SCOPE",
+          "fact_id": "F10",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "REV-F10-SIGN",
+          "fact_id": "F10",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "REV-F11-SCOPE",
+          "fact_id": "F11",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-RF01-SCOPE",
+          "fact_id": "review-add:RF01",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "REV-F01-ONLY",
+          "fact_id": null,
+          "resolution": "omission_candidate"
+        },
+        {
+          "finding_id": "REV-F24-RPT",
+          "fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 25,
+        "pending": 0,
+        "limited": 0,
+        "source_only": 1,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "d0741bd9192267f6f17c8ed48dde979a92e1d8a1bedb1e62d6598656742c3d7f",
+      "physical_requests": 3,
+      "charged_tokens": 87027,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 493.418,
+      "cleanup_bytes": 2292178
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "3cc80fc09457cf0aab4f1f1d3810a3fd550b1398e1ee5778414cfc9aa1badc55",
+      "original_fact_count": 32,
+      "preparation_seconds": 27.806,
+      "business_started_monotonic": 10088948.018119141,
+      "state": "completed",
+      "business_ended_monotonic": 10089578.453012647,
+      "business_seconds": 630.435,
+      "core_complete": false,
+      "fact_count": 29,
+      "metric_count": 30,
+      "new_or_changed_fact_ids": [
+        "rm-02",
+        "rm-03",
+        "rm-04",
+        "rm-05",
+        "rm-06",
+        "rm-07",
+        "sm-03",
+        "oi-03"
+      ],
+      "removed_original_fact_ids": [
+        "od-04",
+        "oi-04",
+        "review-add:f-002"
+      ],
+      "unchanged_fact_count": 21,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "f-001",
+          "fact_id": "review-add:f-002",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "f-002",
+          "fact_id": "rm-02",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-003",
+          "fact_id": "rm-03",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-004",
+          "fact_id": "rm-04",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-005",
+          "fact_id": "rm-05",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-006",
+          "fact_id": "rm-06",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-007",
+          "fact_id": "rm-07",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-008",
+          "fact_id": "sm-03",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-009",
+          "fact_id": "oi-03",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-010",
+          "fact_id": "oi-04",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "f-011",
+          "fact_id": "od-04",
+          "resolution": "repair_rejected"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 27,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "0ad8cd82c00e73d0734d1ba6eb4474bb7636be0a03a2128ae7cd1ca744e135cf",
+      "physical_requests": 3,
+      "charged_tokens": 94706,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 659.848,
+      "cleanup_bytes": 2257244
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "e1df8a98a74216fa22236f0a640cfb2cb401968426a5a806450904b30fc164a4",
+      "original_fact_count": 41,
+      "preparation_seconds": 32.877,
+      "business_started_monotonic": 10089262.645131936,
+      "state": "completed",
+      "business_ended_monotonic": 10089695.937323997,
+      "business_seconds": 433.292,
+      "core_complete": false,
+      "fact_count": 41,
+      "metric_count": 44,
+      "new_or_changed_fact_ids": [
+        "F19",
+        "F20"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 39,
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "fact_id": "F19",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF02",
+          "fact_id": "F20",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "RF03",
+          "fact_id": null,
+          "resolution": "repair_rejected"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 39,
+        "pending": 0,
+        "limited": 2,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "c48c24b5090ac166096798d8452a7096643d42960849bb778c1fcee6493d2f72",
+      "physical_requests": 3,
+      "charged_tokens": 77296,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 467.897,
+      "cleanup_bytes": 2185169
+    },
+    {
+      "task": "6.DC",
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "entry_started": true,
+      "readable": true,
+      "exception": null,
+      "three_reads_equal": true,
+      "original_query_sha256": "befcb34f096a2cb7688cc95f9f508508c927c22fab641ed726e91e229e668b97",
+      "original_fact_count": 38,
+      "preparation_seconds": 32.989,
+      "business_started_monotonic": 10089287.202692533,
+      "state": "completed",
+      "business_ended_monotonic": 10089878.677396376,
+      "business_seconds": 591.475,
+      "core_complete": false,
+      "fact_count": 39,
+      "metric_count": 74,
+      "new_or_changed_fact_ids": [
+        "sm-1",
+        "sm-2",
+        "review-add:F4",
+        "cc-3",
+        "mc-1",
+        "mc-3"
+      ],
+      "removed_original_fact_ids": [],
+      "unchanged_fact_count": 33,
+      "review_status": "completed",
+      "review_error": null,
+      "findings": [
+        {
+          "finding_id": "F1",
+          "fact_id": "mc-1",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "F2",
+          "fact_id": "mc-3",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "F3",
+          "fact_id": "cc-3",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "F4",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "delivery_counts": {
+        "reviewed": 33,
+        "pending": 0,
+        "limited": 6,
+        "source_only": 0,
+        "withheld": 0,
+        "duplicate": 0
+      },
+      "pending_review_count": 0,
+      "query_sha256": "a119eb7eeb6a18d107d683d507a87fd91689c82bc413f499cc02c06252aea5ca",
+      "physical_requests": 3,
+      "charged_tokens": 123710,
+      "cost": "unknown",
+      "recoveries": 0,
+      "stopped_reason": null,
+      "failure_signature": null,
+      "supervision_seconds": 626.172,
+      "cleanup_bytes": 2567513
+    }
+  ],
+  "not_started": [],
+  "stop_reason": null,
+  "source_code_unchanged": true,
+  "supervision_seconds": 1914.731
+}

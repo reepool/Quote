@@ -1,0 +1,161 @@
+"""Offline final source decisions and original-owner readback for the spent DC card."""
+import collections
+import hashlib
+import json
+import shutil
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import CompanyProfileWorkpaper, workpaper_elements, workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+ROOT = Path('/home/python/Quote')
+C = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+D = C/'workpaper-final-source-review-result-20261117'
+def read(path): return json.loads(Path(path).read_text())
+def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path, value):
+    Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def write_text(path, text):
+    Path(path).write_text(text)
+def facts(paper): return {f.fact_id:f for e in workpaper_elements(paper).values() for f in e.facts}
+
+input_path=ROOT/'data/QuoteBak/workpaper-dc-audit-input.json'
+judgments=read(input_path) if input_path.exists() else read(D/'independent-audit.json')['companies']
+plan=read(C/'workpaper-final-quality-readiness-20261117/review-plan.json')
+execution=read(D/'group-execution.json')
+reference=read(C/'workpaper-core-readiness-20261114/source-first-contract.json')
+assert len(judgments)==len(plan['profiles'])==len(execution['results'])==12
+raw_paths=[p for p in D.rglob('*') if p.is_file()]
+protected={str(p):sha(p) for p in raw_paths}
+core_counts=collections.Counter()
+audit={'task':'6.DC','method':'本轮改变与已知疑点直接读原文/表头/续页；未改内容只按完整fact hash及同一源复用既有独立判定。广州其余模型核对对象不冒充全稿独立核源。源坐标/hash只保证身份，不作语义真值。',
+       'formal_stage_pass':False,'formal_accuracy':None,'formal_recall':None,
+       'core_reference':'../workpaper-core-readiness-20261114/source-first-contract.json',
+       'reference_not_sent_to_models':True,'production_authorization':'not_authorized','companies':{}}
+accepted_count=0
+accepted_independent=collections.Counter()
+for row in plan['profiles']:
+    instrument=row['instrument_id']; code=instrument[:6]; j=judgments[instrument]
+    summary=read(D/code/'summary.json')
+    paper=CompanyProfileWorkpaper.model_validate(read(D/code/'query.json')['profiles'][0]['workpaper'])
+    current=facts(paper)
+    old=CompanyProfileWorkpaper.model_validate(read(ROOT/row['source_query'])['profiles'][0]['workpaper'])
+    before=facts(old)
+    changed=set(summary['new_or_changed_fact_ids'])
+    assert changed=={fid for fid,f in current.items() if f!=before.get(fid)}
+    classified=set(j['supported_changed_fact_ids'])|set(j.get('source_only_fact_ids',[]))|set(j['withhold_fact_ids'])
+    assert changed<=classified,(instrument,changed-classified)
+    assert set(j['limited_changed_fact_ids'])<=set(j['supported_changed_fact_ids'])
+    core=next(r for r in reference['companies'] if r['instrument_id']==instrument)
+    assert len(j['core_verdicts'])==len(core['core_conditions']),(instrument,core.keys())
+    core_counts.update(j['core_verdicts'])
+    accepted=[f.revised_fact.fact_id for f in paper.quality_review.findings
+              if f.resolution=='corrected_pending_trust']
+    assert len(accepted)==len(set(accepted))
+    accepted_count+=len(accepted)
+    for fid in accepted:
+        assert fid in current
+        accepted_independent['supported' if fid in j['supported_changed_fact_ids'] else
+                             'withheld' if fid in j['withhold_fact_ids'] else 'source_only']+=1
+    audit['companies'][instrument]={**j,
+        'query_sha256':sha(D/code/'query.json'),'source_query':row['source_query'],
+        'report':paper.report.model_dump(mode='json'),
+        'changed_facts':{fid:{'fact_sha256':workpaper_fact_hash(current[fid]),'evidence_ids':list(current[fid].evidence_ids)} for fid in sorted(changed)},
+        'inherited_exact_fact_ids':[fid for fid,f in current.items() if f==before.get(fid)],
+        'actually_accepted_repair_fact_ids':accepted,
+        'core_conditions':[{'condition_id':condition['condition_id'],'verdict':v}
+                           for condition,v in zip(core['core_conditions'],j['core_verdicts'])]}
+audit['aggregate_core_verdicts']=dict(core_counts)
+audit['actual_accepted_repairs']=accepted_count
+audit['independent_decisions_on_accepted_repairs']=dict(accepted_independent)
+audit['risk_scope']=[
+    {'risk':'business_products','actual':'青山并列业务/同方具名子公司/上汽业务边界重核；主要缺项按133条件保部分或缺失。'},
+    {'risk':'income_columns_units','actual':'青山公司收入/分项口径、海泰分项退出、浦发减值负数重新核源；未输出的错误不当负例通过。'},
+    {'risk':'subject_period','actual':'集团/分项/景区/客群/具名子公司及截至报告日按原句判断；上汽F11另限源参考。'},
+    {'risk':'purchase_sale_direction','actual':'青山不当下游关系纠正；林海F16采购成本与制造成本因果仍错并隔离。粗粒度供应链可留，不追细网。'},
+    {'risk':'related_party_and_leasing','actual':'中视出租/基金与海泰租赁沿未变事实hash复用原核源；海泰关联交易次要补充未决，未触发负例未评估。'},
+    {'risk':'financial_disclosure','actual':'浦发净收入/贷款余额/转股原文差异分开；上汽金融子公司与行业总额混淆的候选实际final拒绝。'}]
+dump(D/'independent-audit.json',audit)
+reference_hash=sha(D/'independent-audit.json')
+delivery_rows=[]; validations=[]; total_counts=collections.Counter(); basis=collections.Counter()
+projection_cleaned=0
+with TemporaryDirectory(prefix='workpaper-dc-delivery-') as directory:
+    root=Path(directory); writer=CompanyProfileResearchWriter(root/'output')
+    for row in plan['profiles']:
+        instrument=row['instrument_id']; code=instrument[:6]; j=judgments[instrument]
+        raw=read(D/code/'query.json')['profiles'][0]
+        paper=CompanyProfileWorkpaper.model_validate(raw['workpaper']); current=facts(paper)
+        decisions={d.fact_id:d.model_dump(mode='json') for d in paper.use_review.decisions}
+        for fid in j['supported_changed_fact_ids']+j.get('additional_supported_fact_ids',[]):
+            f=current[fid]
+            decisions[fid]={'fact_id':fid,'fact_sha256':workpaper_fact_hash(f),'disposition':'source_checked',
+                'evidence_ids':list(f.evidence_ids),'reason':j['notes'],
+                'limitation':'保留原文限定、主体/时点或披露差异，见独立核源说明。' if fid in j['limited_changed_fact_ids'] else None}
+        for state,key in [('source_only','source_only_fact_ids'),('withheld','withhold_fact_ids')]:
+            for fid in j.get(key,[]):
+                f=current[fid]
+                decisions[fid]={'fact_id':fid,'fact_sha256':workpaper_fact_hash(f),'disposition':state,
+                    'evidence_ids':list(f.evidence_ids),'reason':j['notes'],'limitation':None}
+        bound=bind_workpaper_use_review(paper,{'report':paper.report.model_dump(mode='json'),
+            'reviewer':'Codex本轮有限独立核源；未改事实继承原精确hash判定',
+            'reference':str(D/'independent-audit.json'),'reference_sha256':reference_hash,
+            'decisions':list(decisions.values())})
+        assert facts(bound)==current and bound.quality_review==paper.quality_review
+        context=read(D/code/'publication-context.json')
+        context.update(workpaper=bound.model_dump(mode='json'),workpaper_receipts=read(D/code/'model-receipts.json'))
+        record=CompanyProfileRuntimeRecordV3.model_validate_json(json.dumps(context,ensure_ascii=False))
+        writer.persist(record)
+    for row in plan['profiles']:
+        instrument=row['instrument_id']; code=instrument[:6]
+        reader=CompanyProfileReadService(root/'output')
+        query=reader.query((instrument,)); export=reader.export((instrument,),root/'export'/code)
+        fresh=CompanyProfileReadService(root/'output').query((instrument,))
+        assert query['profiles']==export['profiles']==fresh['profiles']
+        p=query['profiles'][0]; raw=read(D/code/'query.json')['profiles'][0]
+        b=CompanyProfileWorkpaper.model_validate(p['workpaper']); a=CompanyProfileWorkpaper.model_validate(raw['workpaper'])
+        assert facts(a)==facts(b) and a.evidence==b.evidence and a.quality_review==b.quality_review
+        assert not p['core_complete'] and not p['accepted_facts']
+        decisions={d['fact_id']:d for d in p['workpaper_delivery']['facts']}
+        for fid in judgments[instrument].get('withhold_fact_ids',[]):
+            assert decisions[fid]['state']=='withheld' and decisions[fid]['fact'] is None
+        for fid in judgments[instrument].get('source_only_fact_ids',[]):
+            assert decisions[fid]['state']=='source_only' and decisions[fid]['fact'] is None
+        total_counts.update(p['workpaper_delivery']['counts'])
+        basis.update(f['review_basis'] for f in p['workpaper_delivery']['facts'])
+        # Compact reproducible delta and grade index, not a second full query store.
+        delivery_rows.append({'instrument_id':instrument,'use_review':p['workpaper']['use_review'],
+            'counts':p['workpaper_delivery']['counts'],
+            'facts':[{k:f[k] for k in ('fact_id','state','review_basis','model_review_stage')} for f in p['workpaper_delivery']['facts']],
+            'pending_review_count':p['workpaper_delivery']['pending_review_count']})
+        write_text(D/(code+'-research.md'),p['workpaper_markdown'])
+        validations.append({'instrument_id':instrument,'three_reads_equal':True,'raw_fact_metrics_evidence_review_receipts_unchanged':True,
+            'read_profile_sha256':hashlib.sha256(json.dumps(p,ensure_ascii=False,sort_keys=True).encode()).hexdigest(),
+            'source_query_sha256':sha(D/code/'query.json'),'core_complete':False,'accepted_fact_count':0})
+    projection_cleaned=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+assert not root.exists()
+assert all(sha(Path(path))==digest for path,digest in protected.items())
+business_wall=round(max(r['business_ended_monotonic'] for r in execution['results'])-
+                    min(r['business_started_monotonic'] for r in execution['results']),3)
+resource={'task':'6.DC','companies':12,'readable':12,'physical_requests':sum(r['physical_requests'] for r in execution['results']),
+    'ledger':sum(r['charged_tokens'] for r in execution['results']),'ledger_basis':'provider_reported_total_usage',
+    'recoveries':sum(r['recoveries'] for r in execution['results']),'cost':'unknown',
+    'business_wall_seconds':business_wall,'supervision_seconds':execution['supervision_seconds'],
+    'company_business_seconds':{r['instrument_id']:r['business_seconds'] for r in execution['results']},
+    'review_status_counts':dict(collections.Counter(r['review_status'] for r in execution['results'])),
+    'fact_count':sum(r['fact_count'] for r in execution['results']),
+    'metric_count':sum(r['metric_count'] for r in execution['results']),
+    'changed_fact_count':sum(len(r['new_or_changed_fact_ids']) for r in execution['results']),
+    'accepted_repair_fact_count':accepted_count,'delivery_counts':dict(total_counts),'review_basis_counts':dict(basis),
+    'core_verdicts':dict(core_counts),'new_model_requests_after_group':0,
+    'cleanup_worker_bytes':sum(r['cleanup_bytes'] for r in execution['results']),
+    'cleanup_supervisor_bytes':read(D/'supervision-cleanup.json')['removed_bytes'],
+    'cleanup_projection_bytes':projection_cleaned,'formal_S1':'0/12','production_authorization':'not_authorized'}
+dump(D/'delivery-decisions.json',{'task':'6.DC','raw_queries_preserved':True,'profiles':delivery_rows})
+dump(D/'delivery-validation.json',{'task':'6.DC','checks':validations,'protected_original_artifacts_unchanged':True,
+    'temporary_root_removed':True,'removed_bytes':projection_cleaned,'no_model_calls':True})
+dump(D/'resource-summary.json',resource)
+shutil.copy2(__file__,D/'delivery-operator-snapshot.txt')
+print(json.dumps(resource,ensure_ascii=False,indent=2))

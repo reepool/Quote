@@ -1,0 +1,512 @@
+[
+  {
+    "request_id": "bp-work-2f39f21066ff4a3203e66cac:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "da4299457d02b5a339e28a9aa0457900cd52d70d000105ec56716c3adefefc07",
+    "response_hash": "626e03d7026f0a199ef62e80ea6faddd834ebbc446605fd1ff8f3d934c66e4f9",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"review-add:WR02\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"review-add:WR03\",\"F33\",\"F34\"],\"findings\":[{\"finding_id\":\"RF01\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0005\",\"source-0019\"],\"explanation\":\"底稿已列公司电力总产量243.76亿千瓦时和新能源发电量增长，但未收录来源明确披露的合并口径火力发电企业发电量157.10亿千瓦时、上网电量149.21亿千瓦时，以及同比下降7.87%和7.77%。source-0019火电行亦列示发电量1,570,966.12万千瓦时、同比-7.87%，并披露火电可控装机483.65万千瓦、同比减少11.7%。火电仍是发电量的主要部分，其收缩及来源所述省内供需偏宽松、珠江电厂煤电环保替代关停机组等原因，会改变对电力业务结构的理解。应按来源类别补充上述产量、上网电量和装机变动及原因；不得用总产量减新能源发电量自行推算，也不得与分行业收入行混为同一口径。F15的叙事装机1,097万千瓦、484万千瓦可保留，只需补充变动，不必改写成无来源的精确值。\"},{\"finding_id\":\"RF02\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F16\",\"evidence_ids\":[\"source-0012\"],\"explanation\":\"产销量情况分析表按主要产品列示电力、热力、市场煤、成品油、天然气的产销量。这些是分产品行，指标主体应为business_segment，不能因该表位于公司合并口径主营业务分析而继承consolidated_group。各数量与来源一致，应保留原值及产品类别名称，仅将相应指标subject_scope改为business_segment。不得据此把市场煤销售量与叙事中的煤炭销售量、或天然气销售量与供气量视为同一口径。\"},{\"finding_id\":\"RF03\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F27\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"F27各指标均来自新能源业务小节，名称亦为新能源装机、发电、售电及绿电交易，主体应为business_segment，不应标为consolidated_group。数量、同比及“超”“约”等限定与source-0007一致，应保留正文和数值，只修正指标口径。修正时不得把86.66亿千瓦时、84.68亿千瓦时与公司电力总产量或火电发电量写成同一主体。\"},{\"finding_id\":\"RF04\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"review-add:WR03\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"explanation\":\"资产处置收益1,826,406,356.30元、同比增加190,909.51%，以及营业外支出454,742,024.50元、同比增加281.77%，均与利润表一致；来源仅说明资产处置收益变动原因为确认土地交储收益，营业外支出原因为光伏项目台风灾害资产毁损报废损失及支付合同履约补偿。来源没有将该收益定性为一次性收益，也没有表述“不应视为可持续主业增量”。该句会实质改变对约18.26亿元收益与利润关系的理解，属于无来源断言。应删除该判断，保留金额、同比和来源已载明的原因；不要把营业外支出写成营业利润变动原因。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "review-add:WR02",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "review-add:WR03",
+        "F33",
+        "F34"
+      ],
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0005",
+            "source-0019"
+          ],
+          "explanation": "底稿已列公司电力总产量243.76亿千瓦时和新能源发电量增长，但未收录来源明确披露的合并口径火力发电企业发电量157.10亿千瓦时、上网电量149.21亿千瓦时，以及同比下降7.87%和7.77%。source-0019火电行亦列示发电量1,570,966.12万千瓦时、同比-7.87%，并披露火电可控装机483.65万千瓦、同比减少11.7%。火电仍是发电量的主要部分，其收缩及来源所述省内供需偏宽松、珠江电厂煤电环保替代关停机组等原因，会改变对电力业务结构的理解。应按来源类别补充上述产量、上网电量和装机变动及原因；不得用总产量减新能源发电量自行推算，也不得与分行业收入行混为同一口径。F15的叙事装机1,097万千瓦、484万千瓦可保留，只需补充变动，不必改写成无来源的精确值。"
+        },
+        {
+          "finding_id": "RF02",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F16",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "explanation": "产销量情况分析表按主要产品列示电力、热力、市场煤、成品油、天然气的产销量。这些是分产品行，指标主体应为business_segment，不能因该表位于公司合并口径主营业务分析而继承consolidated_group。各数量与来源一致，应保留原值及产品类别名称，仅将相应指标subject_scope改为business_segment。不得据此把市场煤销售量与叙事中的煤炭销售量、或天然气销售量与供气量视为同一口径。"
+        },
+        {
+          "finding_id": "RF03",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F27",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "F27各指标均来自新能源业务小节，名称亦为新能源装机、发电、售电及绿电交易，主体应为business_segment，不应标为consolidated_group。数量、同比及“超”“约”等限定与source-0007一致，应保留正文和数值，只修正指标口径。修正时不得把86.66亿千瓦时、84.68亿千瓦时与公司电力总产量或火电发电量写成同一主体。"
+        },
+        {
+          "finding_id": "RF04",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "review-add:WR03",
+          "evidence_ids": [
+            "source-0010",
+            "source-0011"
+          ],
+          "explanation": "资产处置收益1,826,406,356.30元、同比增加190,909.51%，以及营业外支出454,742,024.50元、同比增加281.77%，均与利润表一致；来源仅说明资产处置收益变动原因为确认土地交储收益，营业外支出原因为光伏项目台风灾害资产毁损报废损失及支付合同履约补偿。来源没有将该收益定性为一次性收益，也没有表述“不应视为可持续主业增量”。该句会实质改变对约18.26亿元收益与利润关系的理解，属于无来源断言。应删除该判断，保留金额、同比和来源已载明的原因；不要把营业外支出写成营业利润变动原因。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 30896,
+      "output_tokens": 988,
+      "total_tokens": 73537
+    }
+  },
+  {
+    "request_id": "bp-work-2f39f21066ff4a3203e66cac:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "4e9b1aac5910d109cfc7bbbffa144d51ee5b2f858604c4a5ecccdd3a99957b09",
+    "response_hash": "229d4c24e493869a642e90d4bf94811d50457ea36d1cea9109e26e7980d38338",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:RF01\",\"text\":\"报告期内，合并口径火力发电企业完成发电量157.10亿千瓦时、上网电量149.21亿千瓦时，受省内电力供需形势偏宽松、珠江电厂煤电环保替代关停机组等因素影响，同比下降7.87%和7.77%。截至2025年12月31日，火电可控装机容量为483.65万千瓦，同比减少11.7%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0019\"],\"metrics\":[{\"name\":\"合并口径火力发电企业发电量\",\"raw_value\":\"157.10\",\"value\":\"157.10\",\"unit\":\"亿千瓦时\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比下降7.87%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"合并口径火力发电企业上网电量\",\"raw_value\":\"149.21\",\"value\":\"149.21\",\"unit\":\"亿千瓦时\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比下降7.77%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"火电可控装机容量\",\"raw_value\":\"483.65\",\"value\":\"483.65\",\"unit\":\"万千瓦\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比减少11.7%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F16\",\"text\":\"2025年公司电力生产量243.76亿千瓦时、销售量233.89亿千瓦时；热力生产量682.58万吉焦、销售量684.66万吉焦；市场煤销售量4,801.25万吨；成品油销售量100.37万吨；天然气销售量359,796.93万立方米。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"电力生产量\",\"raw_value\":\"243.76\",\"value\":\"243.76\",\"unit\":\"亿千瓦时\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电力销售量\",\"raw_value\":\"233.89\",\"value\":\"233.89\",\"unit\":\"亿千瓦时\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"热力生产量\",\"raw_value\":\"682.58\",\"value\":\"682.58\",\"unit\":\"万吉焦\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"热力销售量\",\"raw_value\":\"684.66\",\"value\":\"684.66\",\"unit\":\"万吉焦\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"市场煤销售量\",\"raw_value\":\"4,801.25\",\"value\":\"4801.25\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"成品油销售量\",\"raw_value\":\"100.37\",\"value\":\"100.37\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"天然气销售量\",\"raw_value\":\"359,796.93\",\"value\":\"359796.93\",\"unit\":\"万立方米\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F27\",\"text\":\"2025年公司年度新增新能源装机超130万千瓦，其中自建项目规模超120万千瓦；报告期内新能源完成发电量86.66亿千瓦时、售电量84.68亿千瓦时，同比增长26.55%和26.48%；全年完成绿电交易约11亿千瓦时，同比增长86%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"年度新增新能源装机\",\"raw_value\":\"超130\",\"value\":\"130\",\"unit\":\"万千瓦\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null},{\"name\":\"自建新能源项目规模\",\"raw_value\":\"超120\",\"value\":\"120\",\"unit\":\"万千瓦\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null},{\"name\":\"新能源发电量\",\"raw_value\":\"86.66\",\"value\":\"86.66\",\"unit\":\"亿千瓦时\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"新能源售电量\",\"raw_value\":\"84.68\",\"value\":\"84.68\",\"unit\":\"亿千瓦时\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"新能源发电量同比\",\"raw_value\":\"26.55\",\"value\":\"26.55\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"新能源售电量同比\",\"raw_value\":\"26.48\",\"value\":\"26.48\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"绿电交易电量\",\"raw_value\":\"约11\",\"value\":\"11\",\"unit\":\"亿千瓦时\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":null},{\"name\":\"绿电交易电量同比\",\"raw_value\":\"86\",\"value\":\"86\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:WR03\",\"text\":\"营业收入、营业成本变动主要因煤炭和油品销量增加、风电及光伏发电装机规模增加；营业利润、归母净利润变动主要因天然气业务、风电及光伏发电业务规模增加及确认土地交储收益。其中，资产处置收益本期1,826,406,356.30元，同比增加190,909.51%，原因为确认土地交储收益；营业外支出454,742,024.50元，同比增加281.77%，原因包括光伏项目受台风灾害导致的资产毁损报废损失以及支付合同履约补偿。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"资产处置收益\",\"raw_value\":\"1,826,406,356.30\",\"value\":\"1826406356.30\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增加190,909.51%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业外支出\",\"raw_value\":\"454,742,024.50\",\"value\":\"454742024.50\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增加281.77%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:RF01",
+          "text": "报告期内，合并口径火力发电企业完成发电量157.10亿千瓦时、上网电量149.21亿千瓦时，受省内电力供需形势偏宽松、珠江电厂煤电环保替代关停机组等因素影响，同比下降7.87%和7.77%。截至2025年12月31日，火电可控装机容量为483.65万千瓦，同比减少11.7%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0019"
+          ],
+          "metrics": [
+            {
+              "name": "合并口径火力发电企业发电量",
+              "raw_value": "157.10",
+              "value": "157.10",
+              "unit": "亿千瓦时",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比下降7.87%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "合并口径火力发电企业上网电量",
+              "raw_value": "149.21",
+              "value": "149.21",
+              "unit": "亿千瓦时",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比下降7.77%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "火电可控装机容量",
+              "raw_value": "483.65",
+              "value": "483.65",
+              "unit": "万千瓦",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比减少11.7%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F16",
+          "text": "2025年公司电力生产量243.76亿千瓦时、销售量233.89亿千瓦时；热力生产量682.58万吉焦、销售量684.66万吉焦；市场煤销售量4,801.25万吨；成品油销售量100.37万吨；天然气销售量359,796.93万立方米。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "metrics": [
+            {
+              "name": "电力生产量",
+              "raw_value": "243.76",
+              "value": "243.76",
+              "unit": "亿千瓦时",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电力销售量",
+              "raw_value": "233.89",
+              "value": "233.89",
+              "unit": "亿千瓦时",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "热力生产量",
+              "raw_value": "682.58",
+              "value": "682.58",
+              "unit": "万吉焦",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "热力销售量",
+              "raw_value": "684.66",
+              "value": "684.66",
+              "unit": "万吉焦",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "市场煤销售量",
+              "raw_value": "4,801.25",
+              "value": "4801.25",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "成品油销售量",
+              "raw_value": "100.37",
+              "value": "100.37",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "天然气销售量",
+              "raw_value": "359,796.93",
+              "value": "359796.93",
+              "unit": "万立方米",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F27",
+          "text": "2025年公司年度新增新能源装机超130万千瓦，其中自建项目规模超120万千瓦；报告期内新能源完成发电量86.66亿千瓦时、售电量84.68亿千瓦时，同比增长26.55%和26.48%；全年完成绿电交易约11亿千瓦时，同比增长86%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "年度新增新能源装机",
+              "raw_value": "超130",
+              "value": "130",
+              "unit": "万千瓦",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "自建新能源项目规模",
+              "raw_value": "超120",
+              "value": "120",
+              "unit": "万千瓦",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "新能源发电量",
+              "raw_value": "86.66",
+              "value": "86.66",
+              "unit": "亿千瓦时",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "新能源售电量",
+              "raw_value": "84.68",
+              "value": "84.68",
+              "unit": "亿千瓦时",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "新能源发电量同比",
+              "raw_value": "26.55",
+              "value": "26.55",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "新能源售电量同比",
+              "raw_value": "26.48",
+              "value": "26.48",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "绿电交易电量",
+              "raw_value": "约11",
+              "value": "11",
+              "unit": "亿千瓦时",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "绿电交易电量同比",
+              "raw_value": "86",
+              "value": "86",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:WR03",
+          "text": "营业收入、营业成本变动主要因煤炭和油品销量增加、风电及光伏发电装机规模增加；营业利润、归母净利润变动主要因天然气业务、风电及光伏发电业务规模增加及确认土地交储收益。其中，资产处置收益本期1,826,406,356.30元，同比增加190,909.51%，原因为确认土地交储收益；营业外支出454,742,024.50元，同比增加281.77%，原因包括光伏项目受台风灾害导致的资产毁损报废损失以及支付合同履约补偿。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010",
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "资产处置收益",
+              "raw_value": "1,826,406,356.30",
+              "value": "1826406356.30",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增加190,909.51%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业外支出",
+              "raw_value": "454,742,024.50",
+              "value": "454742024.50",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增加281.77%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 20380,
+      "output_tokens": 1966,
+      "total_tokens": 22346
+    }
+  },
+  {
+    "request_id": "bp-work-2f39f21066ff4a3203e66cac:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "801e9f6301a2c11897c66b13470bb619a489c12b052421e151142dd1e9748e0e",
+    "response_hash": "984b263f7877328ea0cc553d31c986b43fcad9e1453ece8a4afe4aaad41a74c7",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:RF01\",\"F16\",\"F27\",\"review-add:WR03\"],\"checks\":[{\"fact_id\":\"review-add:RF01\",\"accepted\":false,\"evidence_ids\":[\"source-0005\",\"source-0019\"],\"explanation\":\"发电量157.10亿千瓦时、上网电量149.21亿千瓦时及同比下降7.87%、7.77%和所述原因可在source-0005定位，火电可控装机483.65万千瓦、同比减少11.7%可在source-0019定位，但主体不正确。火力发电企业、火电是指定业务或电源类型，不是集团整体；“合并口径”只说明核算范围，火电装机行也不能从公司装机披露继承consolidated_group。\"},{\"fact_id\":\"F16\",\"accepted\":true,\"evidence_ids\":[\"source-0012\"],\"explanation\":\"source-0012产销量分产品行的电力、热力、市场煤、成品油、天然气数量及单位与候选一致。候选保留市场煤、天然气销售量等来源类别，未与叙事煤炭销售量或供气量混同，且各指标主体已改为business_segment，符合仅修正指标口径的要求。\"},{\"fact_id\":\"F27\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007新能源业务小节载明新增装机超130万千瓦、自建超120万千瓦，发电量86.66亿千瓦时、售电量84.68亿千瓦时及同比26.55%、26.48%，绿电交易约11亿千瓦时、同比86%。候选保留超、约限定，事实和指标主体均为business_segment，且未与公司电力总产量或火电发电量写成同一主体。\"},{\"fact_id\":\"review-add:WR03\",\"accepted\":true,\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"explanation\":\"资产处置收益1,826,406,356.30元、同比190,909.51%和营业外支出454,742,024.50元、同比281.77%与source-0010本期栏目一致；变动原因分别限于确认土地交储收益，以及光伏台风灾害资产毁损报废损失和支付合同履约补偿。候选已删除无来源的一次性或不可持续判断，也未把营业外支出写成营业利润变动原因。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:RF01",
+        "F16",
+        "F27",
+        "review-add:WR03"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:RF01",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0005",
+            "source-0019"
+          ],
+          "explanation": "发电量157.10亿千瓦时、上网电量149.21亿千瓦时及同比下降7.87%、7.77%和所述原因可在source-0005定位，火电可控装机483.65万千瓦、同比减少11.7%可在source-0019定位，但主体不正确。火力发电企业、火电是指定业务或电源类型，不是集团整体；“合并口径”只说明核算范围，火电装机行也不能从公司装机披露继承consolidated_group。"
+        },
+        {
+          "fact_id": "F16",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "explanation": "source-0012产销量分产品行的电力、热力、市场煤、成品油、天然气数量及单位与候选一致。候选保留市场煤、天然气销售量等来源类别，未与叙事煤炭销售量或供气量混同，且各指标主体已改为business_segment，符合仅修正指标口径的要求。"
+        },
+        {
+          "fact_id": "F27",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007新能源业务小节载明新增装机超130万千瓦、自建超120万千瓦，发电量86.66亿千瓦时、售电量84.68亿千瓦时及同比26.55%、26.48%，绿电交易约11亿千瓦时、同比86%。候选保留超、约限定，事实和指标主体均为business_segment，且未与公司电力总产量或火电发电量写成同一主体。"
+        },
+        {
+          "fact_id": "review-add:WR03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010",
+            "source-0011"
+          ],
+          "explanation": "资产处置收益1,826,406,356.30元、同比190,909.51%和营业外支出454,742,024.50元、同比281.77%与source-0010本期栏目一致；变动原因分别限于确认土地交储收益，以及光伏台风灾害资产毁损报废损失和支付合同履约补偿。候选已删除无来源的一次性或不可持续判断，也未把营业外支出写成营业利润变动原因。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 24471,
+      "output_tokens": 542,
+      "total_tokens": 41677
+    }
+  }
+]

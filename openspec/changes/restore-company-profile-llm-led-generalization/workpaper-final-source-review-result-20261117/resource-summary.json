@@ -1,0 +1,58 @@
+{
+  "task": "6.DC",
+  "companies": 12,
+  "readable": 12,
+  "physical_requests": 34,
+  "ledger": 1097696,
+  "ledger_basis": "provider_reported_total_usage",
+  "recoveries": 0,
+  "cost": "unknown",
+  "business_wall_seconds": 1865.8,
+  "supervision_seconds": 1914.731,
+  "company_business_seconds": {
+    "600094.SH": 476.787,
+    "600103.SH": 361.914,
+    "600100.SH": 368.018,
+    "600107.SH": 656.635,
+    "600098.SH": 802.234,
+    "600104.SH": 487.522,
+    "600088.SH": 225.102,
+    "600099.SH": 704.55,
+    "600082.SH": 461.918,
+    "600097.SH": 630.435,
+    "600054.SH": 433.292,
+    "600000.SH": 591.475
+  },
+  "review_status_counts": {
+    "completed_with_open_findings": 5,
+    "completed": 5,
+    "incomplete": 2
+  },
+  "fact_count": 366,
+  "metric_count": 517,
+  "changed_fact_count": 51,
+  "accepted_repair_fact_count": 47,
+  "delivery_counts": {
+    "reviewed": 318,
+    "pending": 0,
+    "limited": 43,
+    "source_only": 3,
+    "withheld": 2,
+    "duplicate": 0
+  },
+  "review_basis_counts": {
+    "independent_source_check": 350,
+    "model_source_check": 16
+  },
+  "core_verdicts": {
+    "supported": 121,
+    "partial": 9,
+    "missing": 3
+  },
+  "new_model_requests_after_group": 0,
+  "cleanup_worker_bytes": 27361356,
+  "cleanup_supervisor_bytes": 318196,
+  "cleanup_projection_bytes": 7401957,
+  "formal_S1": "0/12",
+  "production_authorization": "not_authorized"
+}

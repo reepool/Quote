@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-17 6.DC已交[十二份同版源复核使用版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/result.md)：原十二份全部后段执行、分级后三读一致；47真实采纳修订独立45有据/1源参考/1仍错隔离。366对象中318普通已核/43保真限用，另3源参考/2隔离不作普通结论；当前133核心后继121支持/9部分/3缺失，不改旧首发或计S1。34物理/1097696供应商usage/0恢复/unknown，1865.800业务墙钟秒，源码同版未热修；本卡次数用完。下一优先复用保存候选，合并解决合法混合主体及跨行表格的消费误拒，不重抽十二家、追供应链尾项或开新平台；新真实范围须另有界授权，S2/生产未放行。工作/监督/分级读回根清35081509字节，过程物核快照后清，正式源/缓存/attempt及既有并行保护。
+
 2026-11-17 6.DB已交[四阶段统一主体合同及12稿准备](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-quality-readiness-20261117/readiness.md)：修订/最终核验与抽取/初核共用集团/母公司/分项语义，metric不继承整条fact主体；167直接通过、64兼容及4版本断言复验通过，12稿371对象旧序列化/原值/hash不变，201原页重新绑定到首个review边界。0新模型/探针/外传/生产，清准备脚本6868字节，旧源/attempt/并行保护。下一唯一候选6.DC仅复用原十二稿做同版源复核，不重付选章/抽取，具体输入与预算已冻，真实0/12待新整卡批准，不再加准备功能/单家尾项或自动扩S2。
 
 2026-11-17 6.DA已交[十二家研究使用范围及正式不通过结论](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/acceptance.md)：原CT质量/完整资源与CV/CX改善分列，不拼同版；新增核源仅将上汽F14分行业metric误标集团整条source_only，已核R1及其他11家分级保留，原writer十二家三读一致。当前327已核/33限用含5待核/5源参考/5隔离/1重复，0新模型/探针/外传/TaskService语义/生产，清本人5978325字节，旧源/缓存/回执/attempt及既有并行保护。本轮有限验收完成，正式S1不通过/S2不放行；下一只推进最终同版质量与适用风险的连续验收，不再加展示层、单家尾项或自动整批付费重抽，新增真实范围须另冻有界授权。

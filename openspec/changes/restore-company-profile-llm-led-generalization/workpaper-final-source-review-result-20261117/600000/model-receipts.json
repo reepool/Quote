@@ -1,0 +1,329 @@
+[
+  {
+    "request_id": "bp-work-adab8ac791bb78855e9bacfc:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "1f26b23958c77c9cc8ab959b9726dd972b531b13cefa6b2a31c4f8e1a893dd39",
+    "response_hash": "5820ef6f42ae7b16a85d8a1a62a120b1a813982da161b56f23f06060778cd019",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"F1\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"mc-1\",\"evidence_ids\":[\"source-0004\",\"source-0002\"],\"explanation\":\"mc-1及“可转债转股金额”指标将主体标为issuer，但source-0004以本集团为主语记载完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；source-0002仅称公司可转债转股3,953,659,998股、转股金额49,835,651,000元、期末普通股股本33,305,838,300股，并未明示母公司。issuer只适用于明示母公司口径。金额、股数和2025年度事件可保留，事实及指标主体应改为consolidated_group。\"},{\"finding_id\":\"F2\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"mc-3\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"mc-3及“赎回永续债金额”指标将主体标为issuer。source-0002只写公司于2025年11月支付20浦发银行永续债利息23.75亿元，并于11月23日全额赎回永续债500亿元，没有母公司或本公司等母公司限定。未明示母公司的公司不能标成issuer，应按口径改为consolidated_group。赎回金额、利息金额和2025年11月时点均有原文支持，应保留。\"},{\"finding_id\":\"F3\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"cc-3\",\"evidence_ids\":[\"source-0015\"],\"explanation\":\"cc-3中“总分行战略客户海外贷款余额”指标主体标为consolidated_group。原文为报告期末总分行战略客户海外贷款余额1,884亿元人民币、增长48%，总分行已是比合并集团更窄的对象；选定章节既未证明该余额等于本集团，也未写明母公司。不能仅凭可定位金额推断合并口径，也不应改标为issuer。该指标金额和增长表述可保留，主体应改为unclear。同条跨境客户数、跨境数字化渠道活跃客户数没有总分行限定，不在此项纠正范围。\"},{\"finding_id\":\"F4\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0017\"],\"explanation\":\"source-0017利润表列示本集团报告期信用减值损失及其他减值损失-65,901百万元，上年同期-69,480百万元，为营业支出最大项目，且大于利润总额53,374百万元。底稿已记录营业收入构成和利润总额，但缺少这一主要损益调整，会改变对盈利形成机制的理解。应补记该合并口径费用金额及2025年度期间，不必因此补齐其余费用明细。\"}],\"reviewed_fact_ids\":[\"bs-1\",\"bs-2\",\"bs-3\",\"ps-1\",\"ps-2\",\"ps-3\",\"rm-1\",\"rm-2\",\"rm-3\",\"rm-4\",\"sm-1\",\"sm-2\",\"sm-3\",\"sm-4\",\"sm-5\",\"oi-1\",\"oi-2\",\"oi-3\",\"oi-4\",\"cc-1\",\"cc-2\",\"cc-3\",\"cc-4\",\"od-1\",\"od-3\",\"od-4\",\"od-5\",\"od-6\",\"od-7\",\"od-8\",\"mc-1\",\"mc-2\",\"mc-3\",\"sc-1\",\"sc-2\",\"sc-3\",\"cf-1\",\"cf-2\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "F1",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "mc-1",
+          "evidence_ids": [
+            "source-0004",
+            "source-0002"
+          ],
+          "explanation": "mc-1及“可转债转股金额”指标将主体标为issuer，但source-0004以本集团为主语记载完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；source-0002仅称公司可转债转股3,953,659,998股、转股金额49,835,651,000元、期末普通股股本33,305,838,300股，并未明示母公司。issuer只适用于明示母公司口径。金额、股数和2025年度事件可保留，事实及指标主体应改为consolidated_group。"
+        },
+        {
+          "finding_id": "F2",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "mc-3",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "mc-3及“赎回永续债金额”指标将主体标为issuer。source-0002只写公司于2025年11月支付20浦发银行永续债利息23.75亿元，并于11月23日全额赎回永续债500亿元，没有母公司或本公司等母公司限定。未明示母公司的公司不能标成issuer，应按口径改为consolidated_group。赎回金额、利息金额和2025年11月时点均有原文支持，应保留。"
+        },
+        {
+          "finding_id": "F3",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "cc-3",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "cc-3中“总分行战略客户海外贷款余额”指标主体标为consolidated_group。原文为报告期末总分行战略客户海外贷款余额1,884亿元人民币、增长48%，总分行已是比合并集团更窄的对象；选定章节既未证明该余额等于本集团，也未写明母公司。不能仅凭可定位金额推断合并口径，也不应改标为issuer。该指标金额和增长表述可保留，主体应改为unclear。同条跨境客户数、跨境数字化渠道活跃客户数没有总分行限定，不在此项纠正范围。"
+        },
+        {
+          "finding_id": "F4",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "explanation": "source-0017利润表列示本集团报告期信用减值损失及其他减值损失-65,901百万元，上年同期-69,480百万元，为营业支出最大项目，且大于利润总额53,374百万元。底稿已记录营业收入构成和利润总额，但缺少这一主要损益调整，会改变对盈利形成机制的理解。应补记该合并口径费用金额及2025年度期间，不必因此补齐其余费用明细。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "bs-1",
+        "bs-2",
+        "bs-3",
+        "ps-1",
+        "ps-2",
+        "ps-3",
+        "rm-1",
+        "rm-2",
+        "rm-3",
+        "rm-4",
+        "sm-1",
+        "sm-2",
+        "sm-3",
+        "sm-4",
+        "sm-5",
+        "oi-1",
+        "oi-2",
+        "oi-3",
+        "oi-4",
+        "cc-1",
+        "cc-2",
+        "cc-3",
+        "cc-4",
+        "od-1",
+        "od-3",
+        "od-4",
+        "od-5",
+        "od-6",
+        "od-7",
+        "od-8",
+        "mc-1",
+        "mc-2",
+        "mc-3",
+        "sc-1",
+        "sc-2",
+        "sc-3",
+        "cf-1",
+        "cf-2"
+      ]
+    },
+    "usage": {
+      "input_tokens": 32241,
+      "output_tokens": 891,
+      "total_tokens": 74495
+    }
+  },
+  {
+    "request_id": "bp-work-adab8ac791bb78855e9bacfc:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "8f9d51f06bd27ee7e92513460a2bf72bd120392c34447794aa6326de021520dd",
+    "response_hash": "76bc0e47028cc13fa9bec73b78e2b434766b2a10c66eddc80c9baad2f0ef06d9",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"mc-1\",\"text\":\"公司完成498.37亿元可转债转股，报告期末普通股总股本增至33,305,838,300股；并发行500亿元无固定期限资本债券和200亿元二级资本债券。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0004\"],\"metrics\":[{\"name\":\"可转债转股金额\",\"raw_value\":\"49,835,651,000\",\"value\":\"49835651000\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"mc-3\",\"text\":\"2025年11月公司全额赎回永续债500亿元，并于当月支付20浦发银行永续债利息23.75亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年11月\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"赎回永续债金额\",\"raw_value\":\"500\",\"value\":\"500\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年11月\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"cc-3\",\"text\":\"跨境客户数近4.9万户，增长24%；跨境数字化渠道活跃客户达2.8万户；总分行战略客户海外贷款余额1,884亿元人民币，增长48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"跨境客户数\",\"raw_value\":\"近4.9\",\"value\":\"4.9\",\"unit\":\"万户\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":null},{\"name\":\"跨境数字化渠道活跃客户数\",\"raw_value\":\"2.8\",\"value\":\"2.8\",\"unit\":\"万户\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"总分行战略客户海外贷款余额\",\"raw_value\":\"1,884\",\"value\":\"1884\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文仅限定为总分行战略客户海外贷款余额，未明示为合并集团或母公司口径。\"}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:F4\",\"text\":\"报告期内，本集团信用减值损失及其他减值损失为-65,901百万元，上年同期为-69,480百万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"信用减值损失及其他减值损失\",\"raw_value\":\"-65,901\",\"value\":\"-65901\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "mc-1",
+          "text": "公司完成498.37亿元可转债转股，报告期末普通股总股本增至33,305,838,300股；并发行500亿元无固定期限资本债券和200亿元二级资本债券。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002",
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "可转债转股金额",
+              "raw_value": "49,835,651,000",
+              "value": "49835651000",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "mc-3",
+          "text": "2025年11月公司全额赎回永续债500亿元，并于当月支付20浦发银行永续债利息23.75亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年11月",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "赎回永续债金额",
+              "raw_value": "500",
+              "value": "500",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年11月",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "cc-3",
+          "text": "跨境客户数近4.9万户，增长24%；跨境数字化渠道活跃客户达2.8万户；总分行战略客户海外贷款余额1,884亿元人民币，增长48%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "跨境客户数",
+              "raw_value": "近4.9",
+              "value": "4.9",
+              "unit": "万户",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "跨境数字化渠道活跃客户数",
+              "raw_value": "2.8",
+              "value": "2.8",
+              "unit": "万户",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "总分行战略客户海外贷款余额",
+              "raw_value": "1,884",
+              "value": "1884",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文仅限定为总分行战略客户海外贷款余额，未明示为合并集团或母公司口径。"
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:F4",
+          "text": "报告期内，本集团信用减值损失及其他减值损失为-65,901百万元，上年同期为-69,480百万元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "metrics": [
+            {
+              "name": "信用减值损失及其他减值损失",
+              "raw_value": "-65,901",
+              "value": "-65901",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 19434,
+      "output_tokens": 793,
+      "total_tokens": 20227
+    }
+  },
+  {
+    "request_id": "bp-work-adab8ac791bb78855e9bacfc:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "8ada4bbd7287a1bf87195eb0ce2c730bfd48e104923160c35a679420f39d4acf",
+    "response_hash": "6c2ae3c61fa49fb403e7501d1cea4c9393792236ab0ea68a27ca244c660a0060",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"mc-1\",\"mc-3\",\"cc-3\",\"review-add:F4\"],\"checks\":[{\"fact_id\":\"mc-1\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0002\"],\"explanation\":\"source-0004以本集团记载完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；source-0002仅称公司于报告期转股、转股金额49,835,651,000元、期末普通股增至33,305,838,300股，未明示母公司。候选将事实及可转债转股金额指标改为consolidated_group，期间、金额、股数和证据均与原文及F1要求一致。\"},{\"fact_id\":\"mc-3\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"source-0002仅记载公司于2025年11月支付20浦发银行永续债利息23.75亿元，并于11月23日全额赎回永续债500亿元，没有母公司限定。候选主体改为consolidated_group，赎回金额、利息金额和2025年11月时点均予保留，实质纠正了issuer误标。\"},{\"fact_id\":\"cc-3\",\"accepted\":true,\"evidence_ids\":[\"source-0015\"],\"explanation\":\"source-0015将1,884亿元人民币、增长48%限定为报告期末总分行战略客户海外贷款余额，既未证明等于本集团，也未写明母公司。候选仅将该指标改为unclear并保留金额、增长和限定表述；跨境客户数近4.9万户、跨境数字化渠道活跃客户2.8万户无总分行限定，不在F3纠正范围，期间亦为2025年末。\"},{\"fact_id\":\"review-add:F4\",\"accepted\":true,\"evidence_ids\":[\"source-0017\"],\"explanation\":\"source-0017本集团利润表以人民币百万元列示报告期信用减值损失及其他减值损失-65,901、上年同期-69,480。候选按合并口径、2025年度和负号列示补记该主要损益项目，单位与比较基础正确，未把空白或变动率推断为零。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "mc-1",
+        "mc-3",
+        "cc-3",
+        "review-add:F4"
+      ],
+      "checks": [
+        {
+          "fact_id": "mc-1",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0002"
+          ],
+          "explanation": "source-0004以本集团记载完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；source-0002仅称公司于报告期转股、转股金额49,835,651,000元、期末普通股增至33,305,838,300股，未明示母公司。候选将事实及可转债转股金额指标改为consolidated_group，期间、金额、股数和证据均与原文及F1要求一致。"
+        },
+        {
+          "fact_id": "mc-3",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "source-0002仅记载公司于2025年11月支付20浦发银行永续债利息23.75亿元，并于11月23日全额赎回永续债500亿元，没有母公司限定。候选主体改为consolidated_group，赎回金额、利息金额和2025年11月时点均予保留，实质纠正了issuer误标。"
+        },
+        {
+          "fact_id": "cc-3",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "source-0015将1,884亿元人民币、增长48%限定为报告期末总分行战略客户海外贷款余额，既未证明等于本集团，也未写明母公司。候选仅将该指标改为unclear并保留金额、增长和限定表述；跨境客户数近4.9万户、跨境数字化渠道活跃客户2.8万户无总分行限定，不在F3纠正范围，期间亦为2025年末。"
+        },
+        {
+          "fact_id": "review-add:F4",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "explanation": "source-0017本集团利润表以人民币百万元列示报告期信用减值损失及其他减值损失-65,901、上年同期-69,480。候选按合并口径、2025年度和负号列示补记该主要损益项目，单位与比较基础正确，未把空白或变动率推断为零。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 22865,
+      "output_tokens": 509,
+      "total_tokens": 28988
+    }
+  }
+]

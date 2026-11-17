@@ -1,0 +1,71 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600000.SH",
+  "name": "浦发银行",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "befcb34f096a2cb7688cc95f9f508508c927c22fab641ed726e91e229e668b97",
+  "original_fact_count": 38,
+  "preparation_seconds": 32.989,
+  "business_started_monotonic": 10089287.202692533,
+  "state": "completed",
+  "business_ended_monotonic": 10089878.677396376,
+  "business_seconds": 591.475,
+  "core_complete": false,
+  "fact_count": 39,
+  "metric_count": 74,
+  "new_or_changed_fact_ids": [
+    "sm-1",
+    "sm-2",
+    "review-add:F4",
+    "cc-3",
+    "mc-1",
+    "mc-3"
+  ],
+  "removed_original_fact_ids": [],
+  "unchanged_fact_count": 33,
+  "review_status": "completed",
+  "review_error": null,
+  "findings": [
+    {
+      "finding_id": "F1",
+      "fact_id": "mc-1",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "F2",
+      "fact_id": "mc-3",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "F3",
+      "fact_id": "cc-3",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "F4",
+      "fact_id": null,
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 33,
+    "pending": 0,
+    "limited": 6,
+    "source_only": 0,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "a119eb7eeb6a18d107d683d507a87fd91689c82bc413f499cc02c06252aea5ca",
+  "physical_requests": 3,
+  "charged_tokens": 123710,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 626.172,
+  "cleanup_bytes": 2567513
+}

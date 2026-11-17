@@ -1,0 +1,330 @@
+[
+  {
+    "request_id": "bp-work-2df6966344c726fe8d1d1b11:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "210d25313890b76a78d1da0dac6127d244e93c0967c7f1013e850b7753784ef6",
+    "response_hash": "3d01416b86cd3cc3e2ee8ed578c1354bfbc3ab3c5c3ede4546f2aef539b6c467",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"RF01\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F19\",\"evidence_ids\":[\"source-0005\"],\"explanation\":\"516.80万人、上年492.24万人、增加24.56万人、增幅4.99%与原文一致，但事实及“黄山景区累计接待进山游客”“黄山景区进山游客同比增幅”的主体被标为consolidated_group。原文对象是黄山景区进山游客，不是合并集团整体接待量；公司还经营花山谜窟、太平湖，不能上收到集团口径，也不能仅凭金额改标为景区业务分部。应保留上述数量与增幅，把主体改为黄山景区这一更窄来源对象；枚举无法精确表达时标unclear。\"},{\"finding_id\":\"RF02\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F20\",\"evidence_ids\":[\"source-0005\"],\"explanation\":\"索道及缆车累计运送1,043.38万人次、上年981.49万人次、增加61.88万人次、增幅6.31%与原文一致，但事实及两项运送量指标的主体被标为consolidated_group。原文对象是索道及缆车业务，不是集团全部业务客流。应保留数量与增幅，将subject_scope改为business_segment。\"},{\"finding_id\":\"RF03\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0005\"],\"explanation\":\"已采纳事实有合并营业收入增长9.23%和营业成本增长20.35%，但未收录同期盈利结果。原文列示归属于上市公司股东的净利润292,480,928.60元（29,248.09万元），同比减少2,252.81万元、降幅7.15%，并明确主要系本期景区资源有偿使用费增加所致；扣非净利润261,834,633.40元、同比下降17.38%。底稿隔离说明称该净利润数字不在引用来源中，与上述原文不符。只保留收入增长、不说明利润下降且扣非降幅更大，会改变对盈利方向和资源有偿使用费影响的理解。应补入上述有来源结果及归因，不必配平所选章节未解释的其他差异。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\",\"F34\",\"F35\",\"F36\",\"F37\",\"F38\",\"F39\",\"F40\",\"F41\",\"F42\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F19",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "516.80万人、上年492.24万人、增加24.56万人、增幅4.99%与原文一致，但事实及“黄山景区累计接待进山游客”“黄山景区进山游客同比增幅”的主体被标为consolidated_group。原文对象是黄山景区进山游客，不是合并集团整体接待量；公司还经营花山谜窟、太平湖，不能上收到集团口径，也不能仅凭金额改标为景区业务分部。应保留上述数量与增幅，把主体改为黄山景区这一更窄来源对象；枚举无法精确表达时标unclear。"
+        },
+        {
+          "finding_id": "RF02",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F20",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "索道及缆车累计运送1,043.38万人次、上年981.49万人次、增加61.88万人次、增幅6.31%与原文一致，但事实及两项运送量指标的主体被标为consolidated_group。原文对象是索道及缆车业务，不是集团全部业务客流。应保留数量与增幅，将subject_scope改为business_segment。"
+        },
+        {
+          "finding_id": "RF03",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ],
+          "explanation": "已采纳事实有合并营业收入增长9.23%和营业成本增长20.35%，但未收录同期盈利结果。原文列示归属于上市公司股东的净利润292,480,928.60元（29,248.09万元），同比减少2,252.81万元、降幅7.15%，并明确主要系本期景区资源有偿使用费增加所致；扣非净利润261,834,633.40元、同比下降17.38%。底稿隔离说明称该净利润数字不在引用来源中，与上述原文不符。只保留收入增长、不说明利润下降且扣非降幅更大，会改变对盈利方向和资源有偿使用费影响的理解。应补入上述有来源结果及归因，不必配平所选章节未解释的其他差异。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39",
+        "F40",
+        "F41",
+        "F42"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19471,
+      "output_tokens": 722,
+      "total_tokens": 49921
+    }
+  },
+  {
+    "request_id": "bp-work-2df6966344c726fe8d1d1b11:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "64f69894b22e1af7c1894fcd00c8b8b041b15a44947323c03acf3702a0281289",
+    "response_hash": "ac979b615802beec6d8554e6494388990d9c06e0b461edac3d146e45b810afaa",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F19\",\"text\":\"2025年黄山景区累计接待进山游客516.80万人，较上年同期492.24万人增加24.56万人，增幅4.99%。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"黄山景区累计接待进山游客\",\"raw_value\":\"516.80\",\"value\":\"516.80\",\"unit\":\"万人\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文对象为黄山景区进山游客，非合并集团整体接待量，枚举无法精确表达该更窄来源对象。\"},{\"name\":\"黄山景区进山游客同比增幅\",\"raw_value\":\"4.99\",\"value\":\"4.99\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文对象为黄山景区进山游客，非合并集团整体接待量，枚举无法精确表达该更窄来源对象。\"}],\"uncertainty_reason\":\"原文对象为黄山景区进山游客，非合并集团整体接待量，枚举无法精确表达该更窄来源对象。\"},{\"fact_id\":\"F20\",\"text\":\"2025年索道及缆车累计运送游客1,043.38万人次，较上年同期981.49万人次增加61.88万人次，增幅6.31%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"索道及缆车累计运送游客\",\"raw_value\":\"1,043.38\",\"value\":\"1043.38\",\"unit\":\"万人次\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"索道及缆车运送游客同比增幅\",\"raw_value\":\"6.31\",\"value\":\"6.31\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:RF03\",\"text\":\"2025年实现归属于上市公司股东的净利润29,248.09万元，较上年同期减少2,252.81万元，减幅7.15%，主要系本期景区资源有偿使用费增加所致；归属于上市公司股东的扣除非经常性损益的净利润261,834,633.40元，同比下降17.38%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"29,248.09\",\"value\":\"29248.09\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于上市公司股东的净利润同比减少额\",\"raw_value\":\"2,252.81\",\"value\":\"2252.81\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于上市公司股东的净利润同比减幅\",\"raw_value\":\"7.15\",\"value\":\"7.15\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"261,834,633.40\",\"value\":\"261834633.40\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润同比降幅\",\"raw_value\":\"17.38\",\"value\":\"17.38\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F19",
+          "text": "2025年黄山景区累计接待进山游客516.80万人，较上年同期492.24万人增加24.56万人，增幅4.99%。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "黄山景区累计接待进山游客",
+              "raw_value": "516.80",
+              "value": "516.80",
+              "unit": "万人",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文对象为黄山景区进山游客，非合并集团整体接待量，枚举无法精确表达该更窄来源对象。"
+            },
+            {
+              "name": "黄山景区进山游客同比增幅",
+              "raw_value": "4.99",
+              "value": "4.99",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文对象为黄山景区进山游客，非合并集团整体接待量，枚举无法精确表达该更窄来源对象。"
+            }
+          ],
+          "uncertainty_reason": "原文对象为黄山景区进山游客，非合并集团整体接待量，枚举无法精确表达该更窄来源对象。"
+        },
+        {
+          "fact_id": "F20",
+          "text": "2025年索道及缆车累计运送游客1,043.38万人次，较上年同期981.49万人次增加61.88万人次，增幅6.31%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "索道及缆车累计运送游客",
+              "raw_value": "1,043.38",
+              "value": "1043.38",
+              "unit": "万人次",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "索道及缆车运送游客同比增幅",
+              "raw_value": "6.31",
+              "value": "6.31",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:RF03",
+          "text": "2025年实现归属于上市公司股东的净利润29,248.09万元，较上年同期减少2,252.81万元，减幅7.15%，主要系本期景区资源有偿使用费增加所致；归属于上市公司股东的扣除非经常性损益的净利润261,834,633.40元，同比下降17.38%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "归属于上市公司股东的净利润",
+              "raw_value": "29,248.09",
+              "value": "29248.09",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的净利润同比减少额",
+              "raw_value": "2,252.81",
+              "value": "2252.81",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的净利润同比减幅",
+              "raw_value": "7.15",
+              "value": "7.15",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+              "raw_value": "261,834,633.40",
+              "value": "261834633.40",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的扣除非经常性损益的净利润同比降幅",
+              "raw_value": "17.38",
+              "value": "17.38",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10120,
+      "output_tokens": 1028,
+      "total_tokens": 11148
+    }
+  },
+  {
+    "request_id": "bp-work-2df6966344c726fe8d1d1b11:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "ee59d85d54e31d0a466d46fc863ed719397af0dce44f9c2578c75d2a7076dde6",
+    "response_hash": "b0a29793829e0e15ebb6cbb5344a3d854ded6f1151f019a12b73b20035b5b41a",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F19\",\"F20\"],\"checks\":[{\"fact_id\":\"F19\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0003\"],\"explanation\":\"source-0005载明报告期内黄山景区累计接待进山游客516.80万人、上年同期492.24万人、增加24.56万人、增幅4.99%，数量、单位、比较基准与2025年度期间均相符。该对象是黄山景区进山游客；source-0003显示公司还经营花山谜窟、太平湖，故不能上收为合并集团，也不能仅凭金额改标为景区业务分部。候选保留精确数量与增幅，主体及两项指标均标unclear并说明枚举无法表达该更窄来源，实质纠正了主体错误且未制造不当确定性。\"},{\"fact_id\":\"F20\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0003\"],\"explanation\":\"source-0005载明索道及缆车累计运送游客1,043.38万人次、上年同期981.49万人次、增加61.88万人次、增幅6.31%，候选的数量、单位、增幅、2025年度期间及证据均一致。结合source-0003，该口径属于索道及缆车业务而非集团全部客流。候选将事实及两项指标主体改为business_segment，并在指标名称中保留索道及缆车来源类别，实质解决了wrong_subject。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F19",
+        "F20"
+      ],
+      "checks": [
+        {
+          "fact_id": "F19",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0003"
+          ],
+          "explanation": "source-0005载明报告期内黄山景区累计接待进山游客516.80万人、上年同期492.24万人、增加24.56万人、增幅4.99%，数量、单位、比较基准与2025年度期间均相符。该对象是黄山景区进山游客；source-0003显示公司还经营花山谜窟、太平湖，故不能上收为合并集团，也不能仅凭金额改标为景区业务分部。候选保留精确数量与增幅，主体及两项指标均标unclear并说明枚举无法表达该更窄来源，实质纠正了主体错误且未制造不当确定性。"
+        },
+        {
+          "fact_id": "F20",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0003"
+          ],
+          "explanation": "source-0005载明索道及缆车累计运送游客1,043.38万人次、上年同期981.49万人次、增加61.88万人次、增幅6.31%，候选的数量、单位、增幅、2025年度期间及证据均一致。结合source-0003，该口径属于索道及缆车业务而非集团全部客流。候选将事实及两项指标主体改为business_segment，并在指标名称中保留索道及缆车来源类别，实质解决了wrong_subject。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11791,
+      "output_tokens": 337,
+      "total_tokens": 16227
+    }
+  }
+]

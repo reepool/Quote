@@ -1,0 +1,428 @@
+[
+  {
+    "request_id": "bp-work-45f1bc56f152a681d1a0633e:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "c003c40901c6d64568e0527ffb07017ed6154b0c9026fb717b3dff4ccaef7c6a",
+    "response_hash": "4b0685075bce52ce4714915ba93443f3c7f5e78fce53b48b4ca3ee7d9bed9d21",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"REV-F09-SCOPE\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F09\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"科技园区开发的收入、成本、毛利率及变动均来自分行业/分产品行，不是公司合并总额。该行金额为418,710,800.51元，同表合计营业收入为449,240,562.34元，二者不能等同。事实及各项指标的subject_scope不应标为consolidated_group，应改为business_segment，并保留指标名称中的“科技园区开发”。金额、18.53%毛利率、收入增35.15%、成本增112.60%本身与该行一致，可保留。\"},{\"finding_id\":\"REV-F09-SIGN\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F09\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"分行业表写明科技园区开发毛利率“减少29.68个百分点”。事实正文方向正确，但指标“科技园区开发毛利率比上年增减”的值为29.68且未体现减少，按增减口径会被读成上升。应将该指标改为-29.68个百分点；这是百分点变动，不是相对增长率。本期毛利率18.53%及其他已核对金额应保留。\"},{\"finding_id\":\"REV-F10-SCOPE\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F10\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"科技园区运营的30,105,192.48元收入、14,372,966.79元成本及52.26%毛利率属于分行业/分产品中的业务行，不能继承公司合并口径。事实及指标subject_scope应改为business_segment，指标名称继续保留“科技园区运营”。收入增11.60%、成本增17.02%与该行一致，可保留。\"},{\"finding_id\":\"REV-F10-SIGN\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F10\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"来源写明科技园区运营毛利率减少2.21个百分点。指标“科技园区运营毛利率比上年增减”仅记录2.21，丢失减少方向。应改为-2.21个百分点，不得当成上升；正文中的收入、成本及52.26%毛利率可保留。\"},{\"finding_id\":\"REV-F11-SCOPE\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F11\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"商品销售业务424,569.35元及收入同比-49.75%是分行业表中的业务行，不是合并总额。subject_scope应改为business_segment。营业成本单元格为“-”，事实称未列示是恰当的，不应改写成零成本。\"},{\"finding_id\":\"REV-RF01-SCOPE\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"review-add:RF01\",\"evidence_ids\":[\"source-0005\",\"source-0021\"],\"explanation\":\"资产减值损失-45,477,408.86元及上年同期-11,336,444.84元出自公司利润表科目变动表，与同一报告主体的营业收入一致，且该营业收入与附注合并口径449,240,562.34元相符。来源没有标明母公司单体，不能标为issuer。应改为consolidated_group。负数表示损失、以及计提存货跌价准备和投资性房地产减值准备增加的原因可保留；表中变动比例为“不适用”，不应另行计算百分比。\"},{\"finding_id\":\"REV-F01-ONLY\",\"element\":\"business_structure\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F01\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"来源开篇写明公司是天津滨海高新区唯一的国有控股上市公司。F01保留了国有控股上市公司及双轮主业表述，但删去“唯一”。该限定应补回，其余已有依据的主业描述不必改写。\"},{\"finding_id\":\"REV-F24-RPT\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F24\",\"evidence_ids\":[\"source-0008\",\"source-0018\"],\"explanation\":\"转让天津海发方信置地有限公司100%股权、价格9,065.95万元、受让方及报告期内完成付款和交割均有依据。但议案明确为“转让全资子公司股权暨关联交易”，现有事实未说明关联交易属性。应补充该限定，不要改动已支持的价格、比例和交割事实。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"review-add:RF01\",\"F24\",\"F25\",\"F27\",\"F28\",\"F29\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "REV-F09-SCOPE",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F09",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "科技园区开发的收入、成本、毛利率及变动均来自分行业/分产品行，不是公司合并总额。该行金额为418,710,800.51元，同表合计营业收入为449,240,562.34元，二者不能等同。事实及各项指标的subject_scope不应标为consolidated_group，应改为business_segment，并保留指标名称中的“科技园区开发”。金额、18.53%毛利率、收入增35.15%、成本增112.60%本身与该行一致，可保留。"
+        },
+        {
+          "finding_id": "REV-F09-SIGN",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F09",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "分行业表写明科技园区开发毛利率“减少29.68个百分点”。事实正文方向正确，但指标“科技园区开发毛利率比上年增减”的值为29.68且未体现减少，按增减口径会被读成上升。应将该指标改为-29.68个百分点；这是百分点变动，不是相对增长率。本期毛利率18.53%及其他已核对金额应保留。"
+        },
+        {
+          "finding_id": "REV-F10-SCOPE",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F10",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "科技园区运营的30,105,192.48元收入、14,372,966.79元成本及52.26%毛利率属于分行业/分产品中的业务行，不能继承公司合并口径。事实及指标subject_scope应改为business_segment，指标名称继续保留“科技园区运营”。收入增11.60%、成本增17.02%与该行一致，可保留。"
+        },
+        {
+          "finding_id": "REV-F10-SIGN",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F10",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "来源写明科技园区运营毛利率减少2.21个百分点。指标“科技园区运营毛利率比上年增减”仅记录2.21，丢失减少方向。应改为-2.21个百分点，不得当成上升；正文中的收入、成本及52.26%毛利率可保留。"
+        },
+        {
+          "finding_id": "REV-F11-SCOPE",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F11",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "商品销售业务424,569.35元及收入同比-49.75%是分行业表中的业务行，不是合并总额。subject_scope应改为business_segment。营业成本单元格为“-”，事实称未列示是恰当的，不应改写成零成本。"
+        },
+        {
+          "finding_id": "REV-RF01-SCOPE",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "review-add:RF01",
+          "evidence_ids": [
+            "source-0005",
+            "source-0021"
+          ],
+          "explanation": "资产减值损失-45,477,408.86元及上年同期-11,336,444.84元出自公司利润表科目变动表，与同一报告主体的营业收入一致，且该营业收入与附注合并口径449,240,562.34元相符。来源没有标明母公司单体，不能标为issuer。应改为consolidated_group。负数表示损失、以及计提存货跌价准备和投资性房地产减值准备增加的原因可保留；表中变动比例为“不适用”，不应另行计算百分比。"
+        },
+        {
+          "finding_id": "REV-F01-ONLY",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F01",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "来源开篇写明公司是天津滨海高新区唯一的国有控股上市公司。F01保留了国有控股上市公司及双轮主业表述，但删去“唯一”。该限定应补回，其余已有依据的主业描述不必改写。"
+        },
+        {
+          "finding_id": "REV-F24-RPT",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F24",
+          "evidence_ids": [
+            "source-0008",
+            "source-0018"
+          ],
+          "explanation": "转让天津海发方信置地有限公司100%股权、价格9,065.95万元、受让方及报告期内完成付款和交割均有依据。但议案明确为“转让全资子公司股权暨关联交易”，现有事实未说明关联交易属性。应补充该限定，不要改动已支持的价格、比例和交割事实。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "review-add:RF01",
+        "F24",
+        "F25",
+        "F27",
+        "F28",
+        "F29"
+      ]
+    },
+    "usage": {
+      "input_tokens": 21511,
+      "output_tokens": 1320,
+      "total_tokens": 47526
+    }
+  },
+  {
+    "request_id": "bp-work-45f1bc56f152a681d1a0633e:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "0537e99e0c7804f65cf0eb5b05629678e596e9dccb8c9d28bc2195a4d606c82a",
+    "response_hash": "fa53f2f21514905fd0bf58c1e81afef428bdc5ecc51b3345a3ea2ef9a1989b4e",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F09\",\"text\":\"科技园区开发业务营业收入418,710,800.51元，营业成本341,118,587.17元，毛利率18.53%，收入比上年增35.15%、成本增112.60%，毛利率减少29.68个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"科技园区开发营业收入\",\"raw_value\":\"418,710,800.51\",\"value\":\"418710800.51\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"科技园区开发营业成本\",\"raw_value\":\"341,118,587.17\",\"value\":\"341118587.17\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"科技园区开发毛利率\",\"raw_value\":\"18.53\",\"value\":\"18.53\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"科技园区开发毛利率比上年增减\",\"raw_value\":\"-29.68\",\"value\":\"-29.68\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F10\",\"text\":\"科技园区运营业务营业收入30,105,192.48元，营业成本14,372,966.79元，毛利率52.26%，收入比上年增11.60%、成本增17.02%，毛利率减少2.21个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"科技园区运营营业收入\",\"raw_value\":\"30,105,192.48\",\"value\":\"30105192.48\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"科技园区运营营业成本\",\"raw_value\":\"14,372,966.79\",\"value\":\"14372966.79\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"科技园区运营毛利率\",\"raw_value\":\"52.26\",\"value\":\"52.26\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"科技园区运营毛利率比上年增减\",\"raw_value\":\"-2.21\",\"value\":\"-2.21\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F11\",\"text\":\"商品销售业务营业收入424,569.35元，营业成本未列示，收入比上年减少49.75%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"商品销售业务营业收入\",\"raw_value\":\"424,569.35\",\"value\":\"424569.35\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"商品销售业务营业收入比上年增减\",\"raw_value\":\"-49.75\",\"value\":\"-49.75\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:RF01\",\"text\":\"报告期内，公司资产减值损失为-45,477,408.86元（损失以负数表示），较上年同期-11,336,444.84元增加，主要系本期公司计提存货跌价准备及投资性房地产减值准备增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0021\"],\"metrics\":[{\"name\":\"资产减值损失\",\"raw_value\":\"-45,477,408.86\",\"value\":\"-45477408.86\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"本期数\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"资产减值损失\",\"raw_value\":\"-11,336,444.84\",\"value\":\"-11336444.84\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":\"上年同期数\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F09",
+          "text": "科技园区开发业务营业收入418,710,800.51元，营业成本341,118,587.17元，毛利率18.53%，收入比上年增35.15%、成本增112.60%，毛利率减少29.68个百分点。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "科技园区开发营业收入",
+              "raw_value": "418,710,800.51",
+              "value": "418710800.51",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "科技园区开发营业成本",
+              "raw_value": "341,118,587.17",
+              "value": "341118587.17",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "科技园区开发毛利率",
+              "raw_value": "18.53",
+              "value": "18.53",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "科技园区开发毛利率比上年增减",
+              "raw_value": "-29.68",
+              "value": "-29.68",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F10",
+          "text": "科技园区运营业务营业收入30,105,192.48元，营业成本14,372,966.79元，毛利率52.26%，收入比上年增11.60%、成本增17.02%，毛利率减少2.21个百分点。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "科技园区运营营业收入",
+              "raw_value": "30,105,192.48",
+              "value": "30105192.48",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "科技园区运营营业成本",
+              "raw_value": "14,372,966.79",
+              "value": "14372966.79",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "科技园区运营毛利率",
+              "raw_value": "52.26",
+              "value": "52.26",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "科技园区运营毛利率比上年增减",
+              "raw_value": "-2.21",
+              "value": "-2.21",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F11",
+          "text": "商品销售业务营业收入424,569.35元，营业成本未列示，收入比上年减少49.75%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "商品销售业务营业收入",
+              "raw_value": "424,569.35",
+              "value": "424569.35",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "商品销售业务营业收入比上年增减",
+              "raw_value": "-49.75",
+              "value": "-49.75",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:RF01",
+          "text": "报告期内，公司资产减值损失为-45,477,408.86元（损失以负数表示），较上年同期-11,336,444.84元增加，主要系本期公司计提存货跌价准备及投资性房地产减值准备增加所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0021"
+          ],
+          "metrics": [
+            {
+              "name": "资产减值损失",
+              "raw_value": "-45,477,408.86",
+              "value": "-45477408.86",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "本期数",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产减值损失",
+              "raw_value": "-11,336,444.84",
+              "value": "-11336444.84",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": "上年同期数",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15160,
+      "output_tokens": 1252,
+      "total_tokens": 16412
+    }
+  },
+  {
+    "request_id": "bp-work-45f1bc56f152a681d1a0633e:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "84083cba311f541628338ae2692c440d92dd0fef82918eb2e6f967b1f05cdeeb",
+    "response_hash": "473c08cfead6fc3116fa6997fce63107238ac854cda86f50e6f8c5cd5bf41aa4",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F11\",\"review-add:RF01\"],\"checks\":[{\"fact_id\":\"F11\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"分行业情况表中商品销售业务行营业收入为424,569.35元、营业收入比上年增减为-49.75%，营业成本单元格为破折号。候选将主体改为business_segment，期间、金额、单位和收入变动列均与该业务行相符，并将营业成本表述为未列示，未改写为零成本，已解决原主体错置问题。\"},{\"fact_id\":\"review-add:RF01\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0021\"],\"explanation\":\"科目变动表列示资产减值损失本期数-45,477,408.86元、上年同期数-11,336,444.84元，变动比例为不适用；备注明确损失以负数表示，原因系计提存货跌价准备及投资性房地产减值准备增加。该表述属于报告期公司经营口径且未标明母公司单体，同表营业收入又与合并附注449,240,562.34元一致，改为consolidated_group正确；候选保留负数和原因、未另行计算百分比，已解决原问题。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F11",
+        "review-add:RF01"
+      ],
+      "checks": [
+        {
+          "fact_id": "F11",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "分行业情况表中商品销售业务行营业收入为424,569.35元、营业收入比上年增减为-49.75%，营业成本单元格为破折号。候选将主体改为business_segment，期间、金额、单位和收入变动列均与该业务行相符，并将营业成本表述为未列示，未改写为零成本，已解决原主体错置问题。"
+        },
+        {
+          "fact_id": "review-add:RF01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0021"
+          ],
+          "explanation": "科目变动表列示资产减值损失本期数-45,477,408.86元、上年同期数-11,336,444.84元，变动比例为不适用；备注明确损失以负数表示，原因系计提存货跌价准备及投资性房地产减值准备增加。该表述属于报告期公司经营口径且未标明母公司单体，同表营业收入又与合并附注449,240,562.34元一致，改为consolidated_group正确；候选保留负数和原因、未另行计算百分比，已解决原问题。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 16626,
+      "output_tokens": 285,
+      "total_tokens": 23089
+    }
+  }
+]

@@ -1,0 +1,128 @@
+{
+  "task": "6.DC",
+  "cleaned_roots_bytes": 35081509,
+  "removed_files": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dc-run.py",
+      "bytes": 27077,
+      "sha256": "8eeef0ef2e0f7259bc791b5b5f93ba85c2a3e07dafc97a045a9c73e9475ea868"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dc-inspect.py",
+      "bytes": 3167,
+      "sha256": "6cb1742df1310eda7f6e3e2522539d7cf14f32646f4a014e46b5412b97e93538"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dc-audit-input.json",
+      "bytes": 16780,
+      "sha256": "c12e902d795042564c4fa04e3ae2f30432a6195e91d65eb0c1f636e115a1b9ac"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dc-deliver.py",
+      "bytes": 12344,
+      "sha256": "e1e4184f51e30385ca61a76f6243a34d1364b7097a8c15b67b21be289a5e8ad8"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/__pycache__/workpaper-dc-run.cpython-311.pyc",
+      "bytes": 56514,
+      "sha256": "987c4be0ccc4cfed8c0e91ee159e1206af73dccfe216097144a75359f3dc887a"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dc-finalize.py",
+      "bytes": 6624,
+      "sha256": "e481a54f5b891ed59c1a550006d0a29f8813587d2cb9d9eafada230924e23040"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dc-stage.py",
+      "bytes": 2039,
+      "sha256": "b4ada213cb8853df2d78b6271bc64ff095149cb07ffd4463ba16df8d0b5a8174"
+    }
+  ],
+  "removed_files_bytes": 124545,
+  "total_measured_bytes": 36024448,
+  "attempt_markers_retained": 12,
+  "official_sources_and_shared_cache_preserved": true,
+  "unmeasured_failed_projection_roots_cleaned_by_finally": true,
+  "parallel_or_preexisting_artifacts_removed": false,
+  "redundant_delivery_files_removed": [
+    {
+      "path": "600094/profile.md",
+      "bytes": 50444,
+      "sha256": "dd810799aa318565db48ce68bbbc876480da1f9fe203e9f9e740f8be1da89847",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600103/profile.md",
+      "bytes": 65594,
+      "sha256": "0121ecca87b978444c0f1dd277d5ae7b3fc5c563227de63cc90f07f6e88f3d2f",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600100/profile.md",
+      "bytes": 67738,
+      "sha256": "982021eb54e96844db1ec58daaf93fd6c3f9e4e243e2cfdf0dbf2171c9293ca9",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600107/profile.md",
+      "bytes": 57488,
+      "sha256": "7221599bd314158d536223328273ee741151e76e5ebc9a090d90584af715efdb",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600098/profile.md",
+      "bytes": 87118,
+      "sha256": "a266de24722339819bef7685652c33c8b98d7f561cc48512493378324ecc794e",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600104/profile.md",
+      "bytes": 67197,
+      "sha256": "2243585faf914c51793861060ca0d777a7dbe56845057ec3c39f1a7701238dd5",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600088/profile.md",
+      "bytes": 45109,
+      "sha256": "a41d000ae4763fc551a78c8abaa0123441d156772295c941b66a4f387417ea7f",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600099/profile.md",
+      "bytes": 65829,
+      "sha256": "fe89a8d29b46b6759d89d4defeaba2ca69af9bb044d882fff61073c82c5ccfbe",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600082/profile.md",
+      "bytes": 66041,
+      "sha256": "a8790ba913dd9fbe5709fc8993d9d4951fbdac4a74a78c53f62640bdd78ab648",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600097/profile.md",
+      "bytes": 57087,
+      "sha256": "9cf8c352b60295051a2598c0b43e18fefb85ebd57f2b26e1a05a6e367b0d2256",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600054/profile.md",
+      "bytes": 59931,
+      "sha256": "af757690aba3aecd4d5b4e8671ed9f88af48fe71dbc39ab71c02fd11bf9dd4ed",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "600000/profile.md",
+      "bytes": 102335,
+      "sha256": "c4f85c0d18899ade91ad89eb3f150e6e5b688c7a3e260a34808ed9d83bb49a63",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    },
+    {
+      "path": "progress.json",
+      "bytes": 26483,
+      "sha256": "0bfeaed8e6662e48c22d2115a58574a97b68652bbd041be51f948c99ccbb31ce",
+      "retained_authority": "same company query.json workpaper_markdown or group-execution.json"
+    }
+  ],
+  "redundant_delivery_files_removed_bytes": 818394
+}

@@ -1,0 +1,50 @@
+{
+  "task": "6.DC",
+  "json_parsing_passed": true,
+  "physical_receipts_verified": 34,
+  "source_query_sha256": {
+    "600094": "10c875b5c74c472e0ee88d659e2bdab2988810077b71de1f1c225fda43d83af5",
+    "600103": "dfafb39872eadc7eaca861b78155823d3c18f13b0e4f504706effb59dba6fc72",
+    "600100": "5684d727854f58e467ad0912dbfc6fb222f38f5cf57d8bda6ac4fbf3532d90cb",
+    "600107": "952e15a2b715193cce9705423473385ba42a0ea1c32c428fc66b623a27503c42",
+    "600098": "de8174931b03a4ac900474f64adf91b01b53fe9bd2e6b4eec9e2b9e41bdb7b27",
+    "600104": "99703a87e7806f7703b8e08dfee960598c1c4aa2d127fb7dac441951a738f31e",
+    "600088": "d7ef75c1481d5bf71cb8fee2f30d7747d49d751484361fd858a608315722e94f",
+    "600099": "362e48a9ab641da2995893a9ce98415b5c243d60af449398ee0993f0448e563d",
+    "600082": "d0741bd9192267f6f17c8ed48dde979a92e1d8a1bedb1e62d6598656742c3d7f",
+    "600097": "0ad8cd82c00e73d0734d1ba6eb4474bb7636be0a03a2128ae7cd1ca744e135cf",
+    "600054": "c48c24b5090ac166096798d8452a7096643d42960849bb778c1fcee6493d2f72",
+    "600000": "a119eb7eeb6a18d107d683d507a87fd91689c82bc413f499cc02c06252aea5ca"
+  },
+  "old_queries_preserved": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600094/query.json": "a3585e7173dc9755fcc6909a2699f8f876d824658ea284f75a1592609d221c6b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600103/query.json": "1c391eff20b48f5b7f39eba127966d873f1d68c3facead8131ad858c3cfb5dd4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600100/query.json": "0fbbfda7547baf588d5b1e53946b479bbff7f6c88328c0ef939b0ba767613571",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600107/query.json": "26bfe75fee9581b195212d8f53b8458100eb98fb0186a447e93534f9c88682ff",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-guangzhou-review-result-20261116/query.json": "e6accaf5c5af7845b067d44566076bd3d41b2fc830b0f409d271d4418b84ec73",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600104/query.json": "503324867900989cd7186050ee9bc85355ccae73a8ac8cc3eef76e4a35448ab6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600088/query.json": "8d95443c7f898a5c8ca34a5c45f4ffdbfc2532ecb4854a77c412ef041540bbb5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600099/query.json": "e646bfcbbb84c86d707dc3282cf7580779eaa11dd0745b1a9ce8d20ab4dff05f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuation-result-20261116/600082/query.json": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600097/query.json": "3cc80fc09457cf0aab4f1f1d3810a3fd550b1398e1ee5778414cfc9aa1badc55",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600054/query.json": "e1df8a98a74216fa22236f0a640cfb2cb401968426a5a806450904b30fc164a4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-explanatory-core-result-20261116/600000/query.json": "befcb34f096a2cb7688cc95f9f508508c927c22fab641ed726e91e229e668b97"
+  },
+  "official_pdf_hashes_verified": 12,
+  "current_independent_fact_bindings_verified": 350,
+  "writer_readback": "delivery-validation.json",
+  "openspec_strict": {
+    "command": "OPENSPEC_TELEMETRY=0 openspec validate restore-company-profile-llm-led-generalization --strict --no-interactive",
+    "result": "passed"
+  },
+  "git_diff_check": "passed",
+  "production_code_changed": false,
+  "new_model_calls_after_group": 0,
+  "reused_tests": "6.DB167直接/64兼容/4版本断言；未改源码，不重复长测试",
+  "review": {
+    "blocking": "已知坏项/缺证对象按现有use_review退出普通交付；旧失败/正文不改",
+    "followup_P1": "合法fact/metric不同主体、负百分点及跨行小数的源消费误拒；保本轮原拒绝，不补调用",
+    "nonblocking": "可选供应链细节/特色尾项不扩",
+    "unrelated": "开工既有配置/骨架/混合文档/并行保护"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "sequence": 1,
+      "sha256": "c5293b00e3efba238af10cb61401828385fcca38e9cea3abe0fcdb7d524cc004",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 23007,
+        "completion_tokens": 906,
+        "total_tokens": 51342
+      },
+      "retained": false,
+      "path": null
+    },
+    {
+      "sequence": 2,
+      "sha256": "96d0517d33bf910b7f18a6cb09469cd7e18f9ae350fc3b20affd7d0570e907f2",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 14018,
+        "completion_tokens": 1691,
+        "total_tokens": 15709
+      },
+      "retained": false,
+      "path": null
+    },
+    {
+      "sequence": 3,
+      "sha256": "10cbb5b087e08aadfab93dd52fae7419540ce1259e59b666c1f1bd16c0eb615e",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 15040,
+        "completion_tokens": 381,
+        "total_tokens": 24199
+      },
+      "retained": false,
+      "path": null
+    }
+  ]
+}

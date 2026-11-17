@@ -1,0 +1,25 @@
+{
+  "task": "6.DC",
+  "mode": "existing_real_draft_source_review_successor_not_new_extraction",
+  "reference": "../workpaper-core-readiness-20261114/source-first-contract.json",
+  "core_condition_count": 133,
+  "reference_not_sent_to_models": true,
+  "method": "Compare current facts to the frozen source conditions by independent source reading. Reuse prior independent support only when the entire current fact hash and source version match. Read new/changed candidates and their full owning headers/continuations; include model-rejected or quarantined items when assessing review effect. Metadata agreement or a locatable number is not a semantic verdict.",
+  "primary_prior_support": [
+    "../workpaper-twelve-explanatory-core-result-20261116/independent-audit.json",
+    "../workpaper-continuation-result-20261116/independent-audit.json",
+    "../workpaper-guangzhou-review-result-20261116/independent-audit.json",
+    "../workpaper-graded-delivery-result-20261117/acceptance.json"
+  ],
+  "known_independent_restrictions": "../workpaper-graded-delivery-result-20261117/research-delivery.json plus DA F14 decision; unchanged restrictions remain, changed restricted facts await independent source check",
+  "review_scope": [
+    "all 133 source core conditions across 12 companies, preserving partial/missing where not substantively answered",
+    "all new or changed retained facts and actual repair candidates",
+    "all known doubts and actual six risk families, separating untriggered negatives",
+    "unchanged facts with existing independent checks reused by exact content/source identity; model-only checked remainder stays explicitly model-checked"
+  ],
+  "counting": "Unique instrument_id/fact_id objects; do not count the same query/export twice or call separate IDs economically unique without checking. Keep original CT first results, this successor and independent use restrictions separate.",
+  "uncertainty": "Faithful source approximation, units and scope uncertainty may remain limited without another reading or repair. Known wrong subjects, values, columns, events or unsupported links must be corrected or locally withheld.",
+  "non_targets": "No exhaustive supply-chain or optional-detail completion; no new full-report recall, unseen generalization, market-wide accuracy, S1-first or production claim.",
+  "production_authorization": "not_authorized"
+}

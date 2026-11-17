@@ -1,0 +1,61 @@
+[
+  {
+    "request_id": "bp-work-6f932ea0fd112fc97a36a9cc:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "c98871c61e3543b62e0384b8befdeb96aa94cbe881a2e5541cbf242cc31dc76c",
+    "response_hash": "cceccdce817e80f4f1f2de448b6a451f5c29ff0dd3cdf8693f9e04d0182c2ed0",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F33\",\"F34\",\"F35\",\"F36\"]}",
+    "response_payload": {
+      "findings": [],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F33",
+        "F34",
+        "F35",
+        "F36"
+      ]
+    },
+    "usage": {
+      "input_tokens": 17557,
+      "output_tokens": 115,
+      "total_tokens": 35083
+    }
+  }
+]

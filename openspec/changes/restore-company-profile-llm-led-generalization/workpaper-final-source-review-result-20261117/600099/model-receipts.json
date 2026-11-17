@@ -1,0 +1,259 @@
+[
+  {
+    "request_id": "bp-work-c54e4f3a694d9c45a55755d3:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "57a2973ca809ca5ab17a8c872817bba9c9012f9f2c0e6b57fc3a839e667e5e43",
+    "response_hash": "f489723f584c03661e7264292740f89bdfee8910efb9f694590df9013c864004",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F27\",\"F28\",\"F29\",\"F30\"],\"findings\":[{\"finding_id\":\"FND-001\",\"element\":\"operations_and_inputs\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0015\",\"source-0014\",\"source-0007\",\"source-0008\"],\"explanation\":\"四大板块收入金额及增减已有依据，但产销量表显示销量变动与收入变动方向相反，会改变对主要业务经营结果的理解：特种车辆销量同比下降9.27%，行业营业收入却同比增长20.60%；农业机械销量同比下降8.40%，营业收入却同比增长26.77%；森林消防机械销量同比增长86.11%、生产量同比增长104.99%，营业收入却同比下降27.38%。原文另说明森林消防机械产销量增加主要来自风力灭火机、油锯等，收入下降则因全地形消防车等销售减少。仅保留收入增减和需求收窄、市场拓展等表述，不能覆盖这一产销与收入背离。无需补全库存或全部产销明细，也不把库存“不适用”解释为零变动。\"},{\"finding_id\":\"FND-002\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F16\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"引入第二厂家11家和两项核心零部件国产化替代，位于“农业机械板块成本管控成效尤为显著”的说明中，不是未加限定的公司整体事实。以销定产、按单生产、适度备货和经销为主有原文支持，应保留；供应商与国产化表述应限定为农业机械板块，或删除该未限定主体的公司整体归因。\"},{\"finding_id\":\"FND-003\",\"element\":\"upstream_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F28\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"各板块原材料占本板块成本的比例与成本表一致，可保留；但引入第二厂家和核心零部件国产化替代同样只见于农业机械板块成本管控，不能因并列多个板块成本占比而写成未指明板块或公司整体的供应链优化。应将该举措限定为农业机械板块。\"},{\"finding_id\":\"FND-004\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F19\",\"evidence_ids\":[\"source-0008\"],\"explanation\":\"2025年拓展欧洲、东南亚等市场并降低单一市场依赖，出自特种车辆与摩托车板块段落，不是全部业务的统一市场动作。经销为主以及特种车辆覆盖美国、欧盟、南非、东南亚等表述有对应原文，可保留；市场拓展句应改记为特种车辆与摩托车板块，避免写成公司整体行为。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F27",
+        "F28",
+        "F29",
+        "F30"
+      ],
+      "findings": [
+        {
+          "finding_id": "FND-001",
+          "element": "operations_and_inputs",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0015",
+            "source-0014",
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "四大板块收入金额及增减已有依据，但产销量表显示销量变动与收入变动方向相反，会改变对主要业务经营结果的理解：特种车辆销量同比下降9.27%，行业营业收入却同比增长20.60%；农业机械销量同比下降8.40%，营业收入却同比增长26.77%；森林消防机械销量同比增长86.11%、生产量同比增长104.99%，营业收入却同比下降27.38%。原文另说明森林消防机械产销量增加主要来自风力灭火机、油锯等，收入下降则因全地形消防车等销售减少。仅保留收入增减和需求收窄、市场拓展等表述，不能覆盖这一产销与收入背离。无需补全库存或全部产销明细，也不把库存“不适用”解释为零变动。"
+        },
+        {
+          "finding_id": "FND-002",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F16",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "引入第二厂家11家和两项核心零部件国产化替代，位于“农业机械板块成本管控成效尤为显著”的说明中，不是未加限定的公司整体事实。以销定产、按单生产、适度备货和经销为主有原文支持，应保留；供应商与国产化表述应限定为农业机械板块，或删除该未限定主体的公司整体归因。"
+        },
+        {
+          "finding_id": "FND-003",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F28",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "各板块原材料占本板块成本的比例与成本表一致，可保留；但引入第二厂家和核心零部件国产化替代同样只见于农业机械板块成本管控，不能因并列多个板块成本占比而写成未指明板块或公司整体的供应链优化。应将该举措限定为农业机械板块。"
+        },
+        {
+          "finding_id": "FND-004",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F19",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "2025年拓展欧洲、东南亚等市场并降低单一市场依赖，出自特种车辆与摩托车板块段落，不是全部业务的统一市场动作。经销为主以及特种车辆覆盖美国、欧盟、南非、东南亚等表述有对应原文，可保留；市场拓展句应改记为特种车辆与摩托车板块，避免写成公司整体行为。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 22669,
+      "output_tokens": 762,
+      "total_tokens": 58542
+    }
+  },
+  {
+    "request_id": "bp-work-c54e4f3a694d9c45a55755d3:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "c68c36a73cbb658ad0419d1fa0269f9f917aac08ef517c0a131ee53290aa3b35",
+    "response_hash": "8fea86ae9570a302f95549b976fa459ca7b299cf2b44a05c1c7b837fdeac193f",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:FND-001\",\"text\":\"产销量与收入变动方向背离：特种车辆销量同比下降9.27%，特种车辆行业营业收入同比增长20.60%；农业机械销量同比下降8.40%，农业机械行业营业收入同比增长26.77%；森林消防机械销量同比增长86.11%、生产量同比增长104.99%，森林消防机械行业营业收入同比下降27.38%。森林消防机械产销量增加主要来自风力灭火机、油锯等产品，收入下降则因全地形消防车等产品销售减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0014\",\"source-0007\",\"source-0008\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F16\",\"text\":\"公司以销定产、按单生产并适度备货，销售以经销模式为主；2025年农业机械板块通过优化供应商体系引入第二厂家11家，并实现两项核心零部件国产化替代，以降低采购成本并增强供应链自主可控能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0009\",\"source-0010\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F28\",\"text\":\"成本构成显示各业务板块以原材料投入为主，原材料占本期总成本比例分别为特种车辆93.11%、农业机械96.72%、森林消防机械98.25%、摩托车94.92%；农业机械板块通过引入第二厂家和核心零部件国产化替代优化供应链。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0016\",\"source-0009\",\"source-0010\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F19\",\"text\":\"公司产品销售以经销模式为主；特种车辆销售覆盖美国、欧盟、南非、东南亚等海外市场，2025年特种车辆与摩托车板块积极拓展欧洲、东南亚等多元化市场以降低单一市场依赖。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\",\"source-0008\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:FND-001",
+          "text": "产销量与收入变动方向背离：特种车辆销量同比下降9.27%，特种车辆行业营业收入同比增长20.60%；农业机械销量同比下降8.40%，农业机械行业营业收入同比增长26.77%；森林消防机械销量同比增长86.11%、生产量同比增长104.99%，森林消防机械行业营业收入同比下降27.38%。森林消防机械产销量增加主要来自风力灭火机、油锯等产品，收入下降则因全地形消防车等产品销售减少。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015",
+            "source-0014",
+            "source-0007",
+            "source-0008"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F16",
+          "text": "公司以销定产、按单生产并适度备货，销售以经销模式为主；2025年农业机械板块通过优化供应商体系引入第二厂家11家，并实现两项核心零部件国产化替代，以降低采购成本并增强供应链自主可控能力。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0009",
+            "source-0010"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F28",
+          "text": "成本构成显示各业务板块以原材料投入为主，原材料占本期总成本比例分别为特种车辆93.11%、农业机械96.72%、森林消防机械98.25%、摩托车94.92%；农业机械板块通过引入第二厂家和核心零部件国产化替代优化供应链。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015",
+            "source-0016",
+            "source-0009",
+            "source-0010"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F19",
+          "text": "公司产品销售以经销模式为主；特种车辆销售覆盖美国、欧盟、南非、东南亚等海外市场，2025年特种车辆与摩托车板块积极拓展欧洲、东南亚等多元化市场以降低单一市场依赖。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005",
+            "source-0008"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 13372,
+      "output_tokens": 499,
+      "total_tokens": 13871
+    }
+  },
+  {
+    "request_id": "bp-work-c54e4f3a694d9c45a55755d3:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "94938a3c6e8d2891b8327d3f3388fe770db3de4cf6987ef9ee2ef61309822958",
+    "response_hash": "23b47a1e171113c13dc23ec8e89104887e61ccca8a7fafb0608e4a922f964478",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:FND-001\",\"F16\",\"F28\",\"F19\"],\"checks\":[{\"fact_id\":\"review-add:FND-001\",\"accepted\":true,\"evidence_ids\":[\"source-0015\",\"source-0014\",\"source-0007\",\"source-0008\"],\"explanation\":\"该候选补上产销量与收入变动方向相反的遗漏，数值、口径和期间均与原文一致。产销量表列明特种车辆销量同比下降9.27%、农业机械销量同比下降8.40%、森林消防机械销量同比增长86.11%且生产量同比增长104.99%；分行业表对应营业收入同比分别为增长20.60%、增长26.77%和下降27.38%。森林消防机械产销量增加主要来自风力灭火机、油锯，收入下降因全地形消防车等销售减少，与产销量说明及分行业说明一致。候选未把库存“不适用”写成零变动，也未越权补入库存明细；主体为各指定业务板块，期间为2025年度，足以解决FND-001。\"},{\"fact_id\":\"F16\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0009\",\"source-0010\"],\"explanation\":\"经营模式原文支持公司主要以销定产、按单生产、根据市场需求适度备货，且产品销售以经销为主；报告整体经营表述下该部分可归为合并集团范围。引入第二厂家11家和两项核心零部件国产化替代位于“农业机械板块成本管控成效尤为显著”的说明中，候选已将该举措限定为农业机械板块，不再写成未限定主体的公司整体事实，从而纠正FND-002。期间与原文2025年一致，成本下降和增强供应链自主可控的表述未超出原文效果说明。\"},{\"fact_id\":\"F28\",\"accepted\":true,\"evidence_ids\":[\"source-0015\",\"source-0016\",\"source-0009\",\"source-0010\"],\"explanation\":\"成本分析表分行业、分产品均显示原材料占本板块本期总成本的比例为特种车辆93.11%、农业机械96.72%、森林消防机械98.25%、摩托车94.92%；候选用“分别为”列示，属于各板块内部占比，而非公司总成本占比。引入第二厂家和核心零部件国产化替代已明确限定为农业机械板块，未因并列多个板块成本占比而上升为未指明板块或公司整体的供应链优化，解决了FND-003。省略具体家数不影响这一核心更正。\"},{\"fact_id\":\"F19\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0005\",\"source-0008\"],\"explanation\":\"公司产品销售以经销模式为主有经营模式原文支持，可按报告整体经营表述保留。特种车辆（ATV全地形车）销售覆盖美国、欧盟、南非、东南亚等海外市场，与产品介绍一致。拓展欧洲、东南亚等多元化市场并降低单一市场依赖出自特种车辆与摩托车板块段落，候选已改记为该板块，不再写成全部业务的统一市场动作，纠正了FND-004的主体错误。2025年度与该段经营讨论及报告期一致。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:FND-001",
+        "F16",
+        "F28",
+        "F19"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:FND-001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015",
+            "source-0014",
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "该候选补上产销量与收入变动方向相反的遗漏，数值、口径和期间均与原文一致。产销量表列明特种车辆销量同比下降9.27%、农业机械销量同比下降8.40%、森林消防机械销量同比增长86.11%且生产量同比增长104.99%；分行业表对应营业收入同比分别为增长20.60%、增长26.77%和下降27.38%。森林消防机械产销量增加主要来自风力灭火机、油锯，收入下降因全地形消防车等销售减少，与产销量说明及分行业说明一致。候选未把库存“不适用”写成零变动，也未越权补入库存明细；主体为各指定业务板块，期间为2025年度，足以解决FND-001。"
+        },
+        {
+          "fact_id": "F16",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "经营模式原文支持公司主要以销定产、按单生产、根据市场需求适度备货，且产品销售以经销为主；报告整体经营表述下该部分可归为合并集团范围。引入第二厂家11家和两项核心零部件国产化替代位于“农业机械板块成本管控成效尤为显著”的说明中，候选已将该举措限定为农业机械板块，不再写成未限定主体的公司整体事实，从而纠正FND-002。期间与原文2025年一致，成本下降和增强供应链自主可控的表述未超出原文效果说明。"
+        },
+        {
+          "fact_id": "F28",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015",
+            "source-0016",
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "成本分析表分行业、分产品均显示原材料占本板块本期总成本的比例为特种车辆93.11%、农业机械96.72%、森林消防机械98.25%、摩托车94.92%；候选用“分别为”列示，属于各板块内部占比，而非公司总成本占比。引入第二厂家和核心零部件国产化替代已明确限定为农业机械板块，未因并列多个板块成本占比而上升为未指明板块或公司整体的供应链优化，解决了FND-003。省略具体家数不影响这一核心更正。"
+        },
+        {
+          "fact_id": "F19",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0005",
+            "source-0008"
+          ],
+          "explanation": "公司产品销售以经销模式为主有经营模式原文支持，可按报告整体经营表述保留。特种车辆（ATV全地形车）销售覆盖美国、欧盟、南非、东南亚等海外市场，与产品介绍一致。拓展欧洲、东南亚等多元化市场并降低单一市场依赖出自特种车辆与摩托车板块段落，候选已改记为该板块，不再写成全部业务的统一市场动作，纠正了FND-004的主体错误。2025年度与该段经营讨论及报告期一致。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 16284,
+      "output_tokens": 705,
+      "total_tokens": 29810
+    }
+  }
+]

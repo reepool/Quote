@@ -1,0 +1,82 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600094.SH",
+  "name": "大名城",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "a3585e7173dc9755fcc6909a2699f8f876d824658ea284f75a1592609d221c6b",
+  "original_fact_count": 22,
+  "preparation_seconds": 43.152,
+  "business_started_monotonic": 10088012.876926748,
+  "state": "completed",
+  "business_ended_monotonic": 10088489.664270556,
+  "business_seconds": 476.787,
+  "core_complete": false,
+  "fact_count": 23,
+  "metric_count": 26,
+  "new_or_changed_fact_ids": [
+    "F06",
+    "F08",
+    "review-add:R03",
+    "F13",
+    "F20",
+    "F22",
+    "F25"
+  ],
+  "removed_original_fact_ids": [],
+  "unchanged_fact_count": 16,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": [
+    {
+      "finding_id": "R01",
+      "fact_id": "F22",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R02",
+      "fact_id": "F06",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R03",
+      "fact_id": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R04",
+      "fact_id": "F25",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R05",
+      "fact_id": "F20",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R06",
+      "fact_id": null,
+      "resolution": "unresolved"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 19,
+    "pending": 0,
+    "limited": 4,
+    "source_only": 0,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "10c875b5c74c472e0ee88d659e2bdab2988810077b71de1f1c225fda43d83af5",
+  "physical_requests": 3,
+  "charged_tokens": 74706,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 521.531,
+  "cleanup_bytes": 2027713
+}

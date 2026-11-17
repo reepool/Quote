@@ -1,0 +1,69 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600099.SH",
+  "name": "林海股份",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "e646bfcbbb84c86d707dc3282cf7580779eaa11dd0745b1a9ce8d20ab4dff05f",
+  "original_fact_count": 28,
+  "preparation_seconds": 28.374,
+  "business_started_monotonic": 10088704.727371162,
+  "state": "completed",
+  "business_ended_monotonic": 10089409.277714929,
+  "business_seconds": 704.55,
+  "core_complete": false,
+  "fact_count": 29,
+  "metric_count": 48,
+  "new_or_changed_fact_ids": [
+    "F16",
+    "review-add:FND-001",
+    "F19",
+    "F28"
+  ],
+  "removed_original_fact_ids": [],
+  "unchanged_fact_count": 25,
+  "review_status": "completed",
+  "review_error": null,
+  "findings": [
+    {
+      "finding_id": "FND-001",
+      "fact_id": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "FND-002",
+      "fact_id": "F16",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "FND-003",
+      "fact_id": "F28",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "FND-004",
+      "fact_id": "F19",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 28,
+    "pending": 0,
+    "limited": 0,
+    "source_only": 1,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "362e48a9ab641da2995893a9ce98415b5c243d60af449398ee0993f0448e563d",
+  "physical_requests": 3,
+  "charged_tokens": 102223,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 734.597,
+  "cleanup_bytes": 2236889
+}

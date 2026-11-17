@@ -1,0 +1,90 @@
+{
+  "task": "6.DC",
+  "instrument_id": "600082.SH",
+  "name": "海泰发展",
+  "entry_started": true,
+  "readable": true,
+  "exception": null,
+  "three_reads_equal": true,
+  "original_query_sha256": "9968b8c98f66db7e85c4b3d14a350a872a448ec403c9dbfffd5657cf3d83486c",
+  "original_fact_count": 28,
+  "preparation_seconds": 28.565,
+  "business_started_monotonic": 10088784.586999703,
+  "state": "completed",
+  "business_ended_monotonic": 10089246.505477732,
+  "business_seconds": 461.918,
+  "core_complete": false,
+  "fact_count": 26,
+  "metric_count": 17,
+  "new_or_changed_fact_ids": [
+    "F11",
+    "review-add:RF01"
+  ],
+  "removed_original_fact_ids": [
+    "F09",
+    "F10"
+  ],
+  "unchanged_fact_count": 24,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": [
+    {
+      "finding_id": "REV-F09-SCOPE",
+      "fact_id": "F09",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "REV-F09-SIGN",
+      "fact_id": "F09",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "REV-F10-SCOPE",
+      "fact_id": "F10",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "REV-F10-SIGN",
+      "fact_id": "F10",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "REV-F11-SCOPE",
+      "fact_id": "F11",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-RF01-SCOPE",
+      "fact_id": "review-add:RF01",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "REV-F01-ONLY",
+      "fact_id": null,
+      "resolution": "omission_candidate"
+    },
+    {
+      "finding_id": "REV-F24-RPT",
+      "fact_id": null,
+      "resolution": "omission_candidate"
+    }
+  ],
+  "delivery_counts": {
+    "reviewed": 25,
+    "pending": 0,
+    "limited": 0,
+    "source_only": 1,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "pending_review_count": 0,
+  "query_sha256": "d0741bd9192267f6f17c8ed48dde979a92e1d8a1bedb1e62d6598656742c3d7f",
+  "physical_requests": 3,
+  "charged_tokens": 87027,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "failure_signature": null,
+  "supervision_seconds": 493.418,
+  "cleanup_bytes": 2292178
+}

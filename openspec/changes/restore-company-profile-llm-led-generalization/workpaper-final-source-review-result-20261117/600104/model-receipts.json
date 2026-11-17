@@ -1,0 +1,423 @@
+[
+  {
+    "request_id": "bp-work-4f15fcea42eb3fb1e9b428cc:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "6893f4ab27ae54fb8aef8a80127b36308b89258413c348bfd1344e5081f97386",
+    "response_hash": "c5293b00e3efba238af10cb61401828385fcca38e9cea3abe0fcdb7d524cc004",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"review-add:R1\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F31\",\"F32\",\"F33\",\"F34\",\"F35\",\"F36\",\"F37\",\"F38\",\"F39\"],\"findings\":[{\"finding_id\":\"WR-F10-SCOPE\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F10\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"金融业务毛利率88.47%属于主营业务分产品表中的金融业务行，不是合并集团整体毛利率；同表合计行毛利率为11.30%。该指标的subject_scope不得沿用consolidated_group，应改为business_segment。正文中的88.47%与来源一致，可保留。\"},{\"finding_id\":\"WR-F10-INCOME\",\"element\":\"revenue_model\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F10\",\"evidence_ids\":[\"source-0006\",\"source-0013\"],\"explanation\":\"来源仅列示金融业务收入、成本、毛利率，并披露汽车金融子公司发放贷款等经营指标，并未表述该收入为利息及服务收入。应删除或限定该收入性质表述，保留来源支持的金融业务毛利率及贷款业务事实。\"},{\"finding_id\":\"WR-F13-SCOPE\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F13\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"整车业务、零部件业务、劳务及其他、金融业务均为分产品行，其营业收入指标不能继承合并集团口径。四项指标的subject_scope应改为business_segment；合计656,243,812,081.18元可维持consolidated_group。正文金额与来源营业收入列一致，舍入说明可保留。\"},{\"finding_id\":\"WR-F14-SCOPE\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F14\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"汽车制造业与金融业是分行业行，不是合并集团整体。相应营业收入指标的subject_scope应改为business_segment；分行业合计可维持consolidated_group。金额与来源营业收入列一致，无需改数。\"},{\"finding_id\":\"WR-F22-SCOPE\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F22\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"汽车制造业成本580,943,983,649.41元及占总成本99.80%属于分行业成本行，合并总成本为582,107,305,751.33元。两项指标的subject_scope应改为business_segment。金额和比例本身与来源一致。\"},{\"finding_id\":\"WR-F37-CUSTOMER\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F37\",\"evidence_ids\":[\"source-0008\",\"source-0012\"],\"explanation\":\"来源支持境内及境外乘用车、商用车销售，以及前五名客户销售额占年度销售总额11.68%，但未说明客户包括个人消费者及企业客户。应删除该客户类型断言，保留有来源的市场范围和集中度表述。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "review-add:R1",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39"
+      ],
+      "findings": [
+        {
+          "finding_id": "WR-F10-SCOPE",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F10",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "金融业务毛利率88.47%属于主营业务分产品表中的金融业务行，不是合并集团整体毛利率；同表合计行毛利率为11.30%。该指标的subject_scope不得沿用consolidated_group，应改为business_segment。正文中的88.47%与来源一致，可保留。"
+        },
+        {
+          "finding_id": "WR-F10-INCOME",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F10",
+          "evidence_ids": [
+            "source-0006",
+            "source-0013"
+          ],
+          "explanation": "来源仅列示金融业务收入、成本、毛利率，并披露汽车金融子公司发放贷款等经营指标，并未表述该收入为利息及服务收入。应删除或限定该收入性质表述，保留来源支持的金融业务毛利率及贷款业务事实。"
+        },
+        {
+          "finding_id": "WR-F13-SCOPE",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F13",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "整车业务、零部件业务、劳务及其他、金融业务均为分产品行，其营业收入指标不能继承合并集团口径。四项指标的subject_scope应改为business_segment；合计656,243,812,081.18元可维持consolidated_group。正文金额与来源营业收入列一致，舍入说明可保留。"
+        },
+        {
+          "finding_id": "WR-F14-SCOPE",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F14",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "汽车制造业与金融业是分行业行，不是合并集团整体。相应营业收入指标的subject_scope应改为business_segment；分行业合计可维持consolidated_group。金额与来源营业收入列一致，无需改数。"
+        },
+        {
+          "finding_id": "WR-F22-SCOPE",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F22",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "汽车制造业成本580,943,983,649.41元及占总成本99.80%属于分行业成本行，合并总成本为582,107,305,751.33元。两项指标的subject_scope应改为business_segment。金额和比例本身与来源一致。"
+        },
+        {
+          "finding_id": "WR-F37-CUSTOMER",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F37",
+          "evidence_ids": [
+            "source-0008",
+            "source-0012"
+          ],
+          "explanation": "来源支持境内及境外乘用车、商用车销售，以及前五名客户销售额占年度销售总额11.68%，但未说明客户包括个人消费者及企业客户。应删除该客户类型断言，保留有来源的市场范围和集中度表述。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 23007,
+      "output_tokens": 906,
+      "total_tokens": 51342
+    }
+  },
+  {
+    "request_id": "bp-work-4f15fcea42eb3fb1e9b428cc:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "3424f39bb296d24566e4d9a2f4797ea302b098cbe98fc1ecd349c3f12fd1ef6b",
+    "response_hash": "96d0517d33bf910b7f18a6cb09469cd7e18f9ae350fc3b20affd7d0570e907f2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F10\",\"text\":\"金融业务由汽车金融子公司开展，通过发放汽车贷款等开展业务，报告期金融业务毛利率为88.47%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0013\"],\"metrics\":[{\"name\":\"金融业务毛利率\",\"raw_value\":\"88.47\",\"value\":\"88.47\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F13\",\"text\":\"主营业务分产品收入构成：整车业务收入4101.96亿元，零部件业务收入2030.20亿元，劳务及其他收入329.36亿元，金融业务收入100.92亿元，合计6562.44亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"整车业务营业收入\",\"raw_value\":\"410,196,473,001.11\",\"value\":\"410196473001.11\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"零部件业务营业收入\",\"raw_value\":\"203,019,866,775.26\",\"value\":\"203019866775.26\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"劳务及其他营业收入\",\"raw_value\":\"32,935,762,112.94\",\"value\":\"32935762112.94\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"金融业务营业收入\",\"raw_value\":\"10,091,710,191.88\",\"value\":\"10091710191.88\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品合计营业收入\",\"raw_value\":\"656,243,812,081.18\",\"value\":\"656243812081.18\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"程序显示说明：F13正文4101.96亿元为整车业务营业收入410,196,473,001.11元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文2030.20亿元为零部件业务营业收入203,019,866,775.26元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文329.36亿元为劳务及其他营业收入32,935,762,112.94元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文100.92亿元为金融业务营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文6562.44亿元为主营业务分产品合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\"},{\"fact_id\":\"F14\",\"text\":\"主营业务分行业收入构成：汽车制造业收入6461.52亿元，金融业收入100.92亿元，合计6562.44亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"汽车制造业营业收入\",\"raw_value\":\"646,152,101,889.30\",\"value\":\"646152101889.30\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"金融业营业收入\",\"raw_value\":\"10,091,710,191.88\",\"value\":\"10091710191.88\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分行业合计营业收入\",\"raw_value\":\"656,243,812,081.18\",\"value\":\"656243812081.18\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"程序显示说明：F14正文6461.52亿元为汽车制造业营业收入646,152,101,889.30元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文100.92亿元为金融业营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文6562.44亿元为主营业务分行业合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\"},{\"fact_id\":\"F22\",\"text\":\"成本构成中，汽车制造业成本主要为原材料、人工工资、折旧、能源等，本期金额5809.44亿元，占总成本比例99.80%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"汽车制造业成本\",\"raw_value\":\"580,943,983,649.41\",\"value\":\"580943983649.41\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"汽车制造业成本占总成本比例\",\"raw_value\":\"99.80\",\"value\":\"99.80\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"程序显示说明：F22正文5809.44亿元为汽车制造业成本580,943,983,649.41元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\"},{\"fact_id\":\"F37\",\"text\":\"公司产品面向国内及海外乘用车和商用车市场；前五名客户销售额占年度销售总额11.68%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0012\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F10",
+          "text": "金融业务由汽车金融子公司开展，通过发放汽车贷款等开展业务，报告期金融业务毛利率为88.47%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0013"
+          ],
+          "metrics": [
+            {
+              "name": "金融业务毛利率",
+              "raw_value": "88.47",
+              "value": "88.47",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F13",
+          "text": "主营业务分产品收入构成：整车业务收入4101.96亿元，零部件业务收入2030.20亿元，劳务及其他收入329.36亿元，金融业务收入100.92亿元，合计6562.44亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "整车业务营业收入",
+              "raw_value": "410,196,473,001.11",
+              "value": "410196473001.11",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "零部件业务营业收入",
+              "raw_value": "203,019,866,775.26",
+              "value": "203019866775.26",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "劳务及其他营业收入",
+              "raw_value": "32,935,762,112.94",
+              "value": "32935762112.94",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "金融业务营业收入",
+              "raw_value": "10,091,710,191.88",
+              "value": "10091710191.88",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品合计营业收入",
+              "raw_value": "656,243,812,081.18",
+              "value": "656243812081.18",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F13正文4101.96亿元为整车业务营业收入410,196,473,001.11元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文2030.20亿元为零部件业务营业收入203,019,866,775.26元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文329.36亿元为劳务及其他营业收入32,935,762,112.94元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文100.92亿元为金融业务营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F13正文6562.44亿元为主营业务分产品合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        },
+        {
+          "fact_id": "F14",
+          "text": "主营业务分行业收入构成：汽车制造业收入6461.52亿元，金融业收入100.92亿元，合计6562.44亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "汽车制造业营业收入",
+              "raw_value": "646,152,101,889.30",
+              "value": "646152101889.30",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "金融业营业收入",
+              "raw_value": "10,091,710,191.88",
+              "value": "10091710191.88",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分行业合计营业收入",
+              "raw_value": "656,243,812,081.18",
+              "value": "656243812081.18",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F14正文6461.52亿元为汽车制造业营业收入646,152,101,889.30元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文100.92亿元为金融业营业收入10,091,710,191.88元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文6562.44亿元为主营业务分行业合计营业收入656,243,812,081.18元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        },
+        {
+          "fact_id": "F22",
+          "text": "成本构成中，汽车制造业成本主要为原材料、人工工资、折旧、能源等，本期金额5809.44亿元，占总成本比例99.80%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "汽车制造业成本",
+              "raw_value": "580,943,983,649.41",
+              "value": "580943983649.41",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "汽车制造业成本占总成本比例",
+              "raw_value": "99.80",
+              "value": "99.80",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F22正文5809.44亿元为汽车制造业成本580,943,983,649.41元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        },
+        {
+          "fact_id": "F37",
+          "text": "公司产品面向国内及海外乘用车和商用车市场；前五名客户销售额占年度销售总额11.68%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008",
+            "source-0012"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 14018,
+      "output_tokens": 1691,
+      "total_tokens": 15709
+    }
+  },
+  {
+    "request_id": "bp-work-4f15fcea42eb3fb1e9b428cc:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "c03830bfd87cd613fa35540e12c6e51c6a76c81d273d874e52ff39706b520085",
+    "response_hash": "10cbb5b087e08aadfab93dd52fae7419540ce1259e59b666c1f1bd16c0eb615e",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F10\",\"F22\",\"F37\"],\"checks\":[{\"fact_id\":\"F10\",\"accepted\":false,\"evidence_ids\":[\"source-0006\",\"source-0013\"],\"explanation\":\"88.47%确属分产品表金融业务行毛利率，改为business_segment方向正确，来源也未称该收入为利息及服务收入。但候选断言金融业务由汽车金融子公司通过发放汽车贷款开展，source-0006只列收入、成本及毛利率，并未指明经营主体或收入性质；source-0013另行披露三家汽车金融子公司贷款指标，其营业收入与金融业务收入并不相同，不能据此认定主体或业务等同。\"},{\"fact_id\":\"F22\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007分行业成本表列明汽车制造业成本构成项目为原材料、人工工资、折旧、能源等，本期金额580,943,983,649.41元，占总成本99.80%，合计成本另为582,107,305,751.33元。候选正确使用business_segment、本期金额列和总成本分母，结构化原值精确，正文亿元数亦已标明为舍入展示。\"},{\"fact_id\":\"F37\",\"accepted\":true,\"evidence_ids\":[\"source-0008\",\"source-0012\"],\"explanation\":\"source-0012支持境内及境外乘用车、客车和载货汽车销售，source-0008支持前五名客户销售额占年度销售总额11.68%。候选删除了来源未支持的个人及企业客户类型断言，市场范围、集中度、合并口径和2025年度期间均与来源一致。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F10",
+        "F22",
+        "F37"
+      ],
+      "checks": [
+        {
+          "fact_id": "F10",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0006",
+            "source-0013"
+          ],
+          "explanation": "88.47%确属分产品表金融业务行毛利率，改为business_segment方向正确，来源也未称该收入为利息及服务收入。但候选断言金融业务由汽车金融子公司通过发放汽车贷款开展，source-0006只列收入、成本及毛利率，并未指明经营主体或收入性质；source-0013另行披露三家汽车金融子公司贷款指标，其营业收入与金融业务收入并不相同，不能据此认定主体或业务等同。"
+        },
+        {
+          "fact_id": "F22",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007分行业成本表列明汽车制造业成本构成项目为原材料、人工工资、折旧、能源等，本期金额580,943,983,649.41元，占总成本99.80%，合计成本另为582,107,305,751.33元。候选正确使用business_segment、本期金额列和总成本分母，结构化原值精确，正文亿元数亦已标明为舍入展示。"
+        },
+        {
+          "fact_id": "F37",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008",
+            "source-0012"
+          ],
+          "explanation": "source-0012支持境内及境外乘用车、客车和载货汽车销售，source-0008支持前五名客户销售额占年度销售总额11.68%。候选删除了来源未支持的个人及企业客户类型断言，市场范围、集中度、合并口径和2025年度期间均与来源一致。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15040,
+      "output_tokens": 381,
+      "total_tokens": 24199
+    }
+  }
+]

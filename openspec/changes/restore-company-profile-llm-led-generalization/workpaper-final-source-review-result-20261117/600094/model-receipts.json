@@ -1,0 +1,402 @@
+[
+  {
+    "request_id": "bp-work-bf979a385ba617f21a839898:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "7ac4a137f963d9eee1e61ab4fe16d66218bdaf7dd64615c779ad22d4a35aace1",
+    "response_hash": "fac24b2aaff24d3e8fd03a18b578bcf9c28dd5d415287fddb6f1b629dad8f4b1",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"R01\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F22\",\"evidence_ids\":[\"source-0004\",\"source-0002\"],\"explanation\":\"20.45%和7.24亿元只在source-0004中表述为截至报告日完成，并说明该项目为参股、未纳入合并报表、对2025年度财务状况及经营业绩暂无重大影响。source-0002仅支持报告期内已通过全资子公司战略受让佰才邦股权，并未给出该比例和投资总额。F22删去“截至报告日”，并将指标期间写成2025年度，把报告日时点数据收窄成年度内已完成的期末事实。应保留比例、金额、参股、未并表及对2025年度暂无重大影响等限定，恢复截至报告日时点，不得把指标期间无条件标为2025年度。\"},{\"finding_id\":\"R02\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F06\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"结转收入1,534.83万元对应算力服务板块营业收入15,348,294.98元；实际收入11,243.16万元、实际成本9,708.33万元是该板块净额法核算下的总额法备查数，不是公司合并营业收入或营业成本。事实及三项指标的subject_scope均标为consolidated_group，主体过宽。应改为business_segment，保留金额、净额法和已正常运营的表述；实际收入、实际成本不得并入或替代合并报表营业收入、营业成本。\"},{\"finding_id\":\"R03\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"explanation\":\"底稿已有公司营业收入和房地产板块收入，但缺少对应的主营成本金额。source-0006列示营业成本1,784,045,409.69元、同比-49.09%，原因是本期交付结转面积减少；source-0007房地产板块营业成本及开发成本为同一金额。隔离说明称约17.84亿元不在引用来源中，与上述来源不符。缺少该成本会改变对主业结转规模和盈利机制的理解。应补回该来源金额，并可说明其与房地产板块开发成本一致；金控、金融投资成本栏为空，不能补为零。\"},{\"finding_id\":\"R04\",\"element\":\"position\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F25\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"F25将佰才邦20.45%参股及未纳入合并报表范围写成2025年度的当前经营结构。该比例和未并表结论在source-0004中的时点是截至报告日，不是无条件的2025年末。应保留参股、未并表，以及AutoFlightX持股比例和合并范围未披露的限定，并把20.45%恢复为截至报告日；低空领域的战略投资表述本身不必删除。\"},{\"finding_id\":\"R05\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_causality\",\"action\":\"correct\",\"affected_fact_id\":\"F20\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007说明华东区域毛利额较上年增长，一方面因映辰二期当期交付结转，另一方面因已交付项目结算金额低于暂估、单方成本下降，并由此导致毛利率上升。F20把交付结转直接写成毛利率上升的主要原因，混淆了毛利额与毛利率。西北区域由负转正、东南区域受存量房售价下降影响的方向有来源，可保留。修正时只把毛利率上升主要归因于单方成本下降，交付结转限定为收入及毛利额因素。\"},{\"finding_id\":\"R06\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"explanation\":\"底稿将具体客户名称、分渠道结构、主要原材料或能源采购构成写成“报告未披露”，并把上游标为not_disclosed。所供材料只是选定章节，选定文本未出现不等于全报告未披露，也不能据此断言经济事项不存在。应改为选定章节未列示或未知。分行业、分产品表中金融投资和金控金额为空可以作为表内观察保留，但空栏不是零。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F06\",\"F07\",\"F08\",\"F10\",\"F12\",\"F13\",\"F14\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "R01",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F22",
+          "evidence_ids": [
+            "source-0004",
+            "source-0002"
+          ],
+          "explanation": "20.45%和7.24亿元只在source-0004中表述为截至报告日完成，并说明该项目为参股、未纳入合并报表、对2025年度财务状况及经营业绩暂无重大影响。source-0002仅支持报告期内已通过全资子公司战略受让佰才邦股权，并未给出该比例和投资总额。F22删去“截至报告日”，并将指标期间写成2025年度，把报告日时点数据收窄成年度内已完成的期末事实。应保留比例、金额、参股、未并表及对2025年度暂无重大影响等限定，恢复截至报告日时点，不得把指标期间无条件标为2025年度。"
+        },
+        {
+          "finding_id": "R02",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F06",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "结转收入1,534.83万元对应算力服务板块营业收入15,348,294.98元；实际收入11,243.16万元、实际成本9,708.33万元是该板块净额法核算下的总额法备查数，不是公司合并营业收入或营业成本。事实及三项指标的subject_scope均标为consolidated_group，主体过宽。应改为business_segment，保留金额、净额法和已正常运营的表述；实际收入、实际成本不得并入或替代合并报表营业收入、营业成本。"
+        },
+        {
+          "finding_id": "R03",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "explanation": "底稿已有公司营业收入和房地产板块收入，但缺少对应的主营成本金额。source-0006列示营业成本1,784,045,409.69元、同比-49.09%，原因是本期交付结转面积减少；source-0007房地产板块营业成本及开发成本为同一金额。隔离说明称约17.84亿元不在引用来源中，与上述来源不符。缺少该成本会改变对主业结转规模和盈利机制的理解。应补回该来源金额，并可说明其与房地产板块开发成本一致；金控、金融投资成本栏为空，不能补为零。"
+        },
+        {
+          "finding_id": "R04",
+          "element": "position",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F25",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "F25将佰才邦20.45%参股及未纳入合并报表范围写成2025年度的当前经营结构。该比例和未并表结论在source-0004中的时点是截至报告日，不是无条件的2025年末。应保留参股、未并表，以及AutoFlightX持股比例和合并范围未披露的限定，并把20.45%恢复为截至报告日；低空领域的战略投资表述本身不必删除。"
+        },
+        {
+          "finding_id": "R05",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "unsupported_causality",
+          "action": "correct",
+          "affected_fact_id": "F20",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007说明华东区域毛利额较上年增长，一方面因映辰二期当期交付结转，另一方面因已交付项目结算金额低于暂估、单方成本下降，并由此导致毛利率上升。F20把交付结转直接写成毛利率上升的主要原因，混淆了毛利额与毛利率。西北区域由负转正、东南区域受存量房售价下降影响的方向有来源，可保留。修正时只把毛利率上升主要归因于单方成本下降，交付结转限定为收入及毛利额因素。"
+        },
+        {
+          "finding_id": "R06",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0008",
+            "source-0009"
+          ],
+          "explanation": "底稿将具体客户名称、分渠道结构、主要原材料或能源采购构成写成“报告未披露”，并把上游标为not_disclosed。所供材料只是选定章节，选定文本未出现不等于全报告未披露，也不能据此断言经济事项不存在。应改为选定章节未列示或未知。分行业、分产品表中金融投资和金控金额为空可以作为表内观察保留，但空栏不是零。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F06",
+        "F07",
+        "F08",
+        "F10",
+        "F12",
+        "F13",
+        "F14",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14355,
+      "output_tokens": 1185,
+      "total_tokens": 42492
+    }
+  },
+  {
+    "request_id": "bp-work-bf979a385ba617f21a839898:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "edd00292ad47de833516f12a0bd1a5eecc749308c92edbaca52e4c828caab8da",
+    "response_hash": "f2aee98ff5f6ce63e970282b6dab0dd33b6e103b02ab75bcc1d1061590accbb5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F22\",\"text\":\"截至报告日，公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告日\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"佰才邦股份战略投资比例\",\"raw_value\":\"20.45\",\"value\":\"20.45\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告日\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"佰才邦股份战略投资总额\",\"raw_value\":\"7.24\",\"value\":\"7.24\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告日\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F06\",\"text\":\"算力服务本报告期已正常运营，采用净额法核算，结转收入1,534.83万元，其中实际收入11,243.16万元、实际成本9,708.33万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"算力服务结转收入\",\"raw_value\":\"1,534.83\",\"value\":\"1534.83\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"算力服务实际收入\",\"raw_value\":\"11,243.16\",\"value\":\"11243.16\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"算力服务实际成本\",\"raw_value\":\"9,708.33\",\"value\":\"9708.33\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:R03\",\"text\":\"报告期内公司营业成本1,784,045,409.69元，同比减少49.09%，主要系本期交付结转面积减少；房地产板块营业成本及开发成本为同一金额1,784,045,409.69元。金控板块、金融投资成本栏为空，未披露金额。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期数3,504,161,581.72元\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业成本同比变动比例\",\"raw_value\":\"-49.09\",\"value\":\"-49.09\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房地产板块营业成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房地产板块开发成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F25\",\"text\":\"公司当前经营以房地产开发销售及运营为主业，同时开展算力基础设施运营与产业服务；截至报告日，通过参股方式布局6G通信（佰才邦20.45%股份，未纳入合并报表范围），低空经济领域为战略投资AutoFlightX Inc.，持股比例及是否纳入合并范围未披露。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0004\",\"source-0011\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F20\",\"text\":\"华东区域毛利额较上年增长，一方面因前期预售的映辰二期项目当期交付结转收入，另一方面因前期已交付项目完成工程结算，实际结算金额小于账面暂估金额导致单方成本下降，毛利率上升主要系单方成本下降所致；西北区域毛利率由负转正，主要因上年同期已计提减值准备的因素不再持续恶化；东南区域毛利率略降，主要受存量房销售价格下降影响。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F22",
+          "text": "截至报告日，公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。",
+          "subject_scope": "consolidated_group",
+          "period": "截至报告日",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "佰才邦股份战略投资比例",
+              "raw_value": "20.45",
+              "value": "20.45",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "截至报告日",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "佰才邦股份战略投资总额",
+              "raw_value": "7.24",
+              "value": "7.24",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "截至报告日",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F06",
+          "text": "算力服务本报告期已正常运营，采用净额法核算，结转收入1,534.83万元，其中实际收入11,243.16万元、实际成本9,708.33万元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "算力服务结转收入",
+              "raw_value": "1,534.83",
+              "value": "1534.83",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "算力服务实际收入",
+              "raw_value": "11,243.16",
+              "value": "11243.16",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "算力服务实际成本",
+              "raw_value": "9,708.33",
+              "value": "9708.33",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:R03",
+          "text": "报告期内公司营业成本1,784,045,409.69元，同比减少49.09%，主要系本期交付结转面积减少；房地产板块营业成本及开发成本为同一金额1,784,045,409.69元。金控板块、金融投资成本栏为空，未披露金额。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "营业成本",
+              "raw_value": "1,784,045,409.69",
+              "value": "1784045409.69",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期数3,504,161,581.72元",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业成本同比变动比例",
+              "raw_value": "-49.09",
+              "value": "-49.09",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房地产板块营业成本",
+              "raw_value": "1,784,045,409.69",
+              "value": "1784045409.69",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房地产板块开发成本",
+              "raw_value": "1,784,045,409.69",
+              "value": "1784045409.69",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F25",
+          "text": "公司当前经营以房地产开发销售及运营为主业，同时开展算力基础设施运营与产业服务；截至报告日，通过参股方式布局6G通信（佰才邦20.45%股份，未纳入合并报表范围），低空经济领域为战略投资AutoFlightX Inc.，持股比例及是否纳入合并范围未披露。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002",
+            "source-0004",
+            "source-0011"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F20",
+          "text": "华东区域毛利额较上年增长，一方面因前期预售的映辰二期项目当期交付结转收入，另一方面因前期已交付项目完成工程结算，实际结算金额小于账面暂估金额导致单方成本下降，毛利率上升主要系单方成本下降所致；西北区域毛利率由负转正，主要因上年同期已计提减值准备的因素不再持续恶化；东南区域毛利率略降，主要受存量房销售价格下降影响。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 9105,
+      "output_tokens": 1261,
+      "total_tokens": 10366
+    }
+  },
+  {
+    "request_id": "bp-work-bf979a385ba617f21a839898:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "a28cd4a9be678301d0e3ec1a7fcdcd06c10b8e99adf8ed81b3f52d316f638008",
+    "response_hash": "e473569076fcc2c9717295933d1501c9893ada02e2c61724f645f2100975988d",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F22\",\"F06\",\"review-add:R03\",\"F25\",\"F20\"],\"checks\":[{\"fact_id\":\"F22\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"source-0004原文即为截至报告日完成佰才邦20.45%股份战略投资、投资总额7.24亿元，并明确该项目为参股、未纳入合并报表、对2025年度财务状况及经营业绩暂无重大影响。候选恢复截至报告日时点，比例、金额、参股、未并表及暂无重大影响均与来源一致，未再把该时点数据无条件写成2025年度已完成事实。\"},{\"fact_id\":\"F06\",\"accepted\":true,\"evidence_ids\":[\"source-0008\",\"source-0007\"],\"explanation\":\"source-0008载明算力服务本报告期已正常运营、仍按净额法核算，结转收入1,534.83万元，其中实际收入11,243.16万元、实际成本9,708.33万元；该结转收入对应source-0007算力服务板块营业收入。候选主体及三项指标均改为business_segment，保留净额法与金额，未把实际收入、实际成本并入或替代合并营业收入、营业成本。\"},{\"fact_id\":\"review-add:R03\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"explanation\":\"source-0006列示公司营业成本1,784,045,409.69元、同比-49.09%，原因是本期交付结转面积减少；source-0007房地产板块营业成本与开发成本同为该金额。候选补回该成本并按合并与板块分别标注主体，金控板块、金融投资成本仅表述为空、未披露金额，没有从空白单元格推断为零。\"},{\"fact_id\":\"F25\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0002\"],\"explanation\":\"佰才邦20.45%参股及未纳入合并报表已在文本中恢复为截至报告日，不再无条件表述为2025年末结构；低空经济对AutoFlightX Inc.的战略投资保留，并明确持股比例及是否纳入合并范围未披露。房地产开发销售及运营、算力运营与产业服务的经营表述有报告期来源支持。\"},{\"fact_id\":\"F20\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007将华东区域毛利额增长同时联系映辰二期交付结转和结算后单方成本下降，并将毛利率上升连接于单方成本下降。候选把交付结转限定为毛利额及收入因素，毛利率上升主要归因于单方成本下降；西北区域由负转正、东南区域受存量房售价下降的方向与来源一致。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F22",
+        "F06",
+        "review-add:R03",
+        "F25",
+        "F20"
+      ],
+      "checks": [
+        {
+          "fact_id": "F22",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "source-0004原文即为截至报告日完成佰才邦20.45%股份战略投资、投资总额7.24亿元，并明确该项目为参股、未纳入合并报表、对2025年度财务状况及经营业绩暂无重大影响。候选恢复截至报告日时点，比例、金额、参股、未并表及暂无重大影响均与来源一致，未再把该时点数据无条件写成2025年度已完成事实。"
+        },
+        {
+          "fact_id": "F06",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008",
+            "source-0007"
+          ],
+          "explanation": "source-0008载明算力服务本报告期已正常运营、仍按净额法核算，结转收入1,534.83万元，其中实际收入11,243.16万元、实际成本9,708.33万元；该结转收入对应source-0007算力服务板块营业收入。候选主体及三项指标均改为business_segment，保留净额法与金额，未把实际收入、实际成本并入或替代合并营业收入、营业成本。"
+        },
+        {
+          "fact_id": "review-add:R03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "explanation": "source-0006列示公司营业成本1,784,045,409.69元、同比-49.09%，原因是本期交付结转面积减少；source-0007房地产板块营业成本与开发成本同为该金额。候选补回该成本并按合并与板块分别标注主体，金控板块、金融投资成本仅表述为空、未披露金额，没有从空白单元格推断为零。"
+        },
+        {
+          "fact_id": "F25",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0002"
+          ],
+          "explanation": "佰才邦20.45%参股及未纳入合并报表已在文本中恢复为截至报告日，不再无条件表述为2025年末结构；低空经济对AutoFlightX Inc.的战略投资保留，并明确持股比例及是否纳入合并范围未披露。房地产开发销售及运营、算力运营与产业服务的经营表述有报告期来源支持。"
+        },
+        {
+          "fact_id": "F20",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007将华东区域毛利额增长同时联系映辰二期交付结转和结算后单方成本下降，并将毛利率上升连接于单方成本下降。候选把交付结转限定为毛利额及收入因素，毛利率上升主要归因于单方成本下降；西北区域由负转正、东南区域受存量房售价下降的方向与来源一致。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11151,
+      "output_tokens": 646,
+      "total_tokens": 21848
+    }
+  }
+]
