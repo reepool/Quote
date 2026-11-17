@@ -1,0 +1,37 @@
+{
+  "task": "6.DJ",
+  "instrument_id": "600104.SH",
+  "entry_started": true,
+  "state": "completed",
+  "exception": null,
+  "before_readings": 1,
+  "before_visible_facts": 33,
+  "preparation_seconds": 27.642,
+  "business_seconds": 330.07,
+  "after_readings": 2,
+  "new_reading_work_ids": [
+    "bp-work-2ae4196b91569edcee5d22a4"
+  ],
+  "new_visible_facts": 6,
+  "new_visible_metrics": 0,
+  "new_delivery_counts": {
+    "reviewed": 6,
+    "limited": 0,
+    "pending": 0,
+    "source_only": 0,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "before_facts_preserved": true,
+  "original_runtime_files_unchanged": true,
+  "supplement_three_reads_equal": true,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "physical_requests": 5,
+  "charged_tokens": 91608,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "supervision_seconds": 362.494,
+  "production_authorization": "not_authorized"
+}

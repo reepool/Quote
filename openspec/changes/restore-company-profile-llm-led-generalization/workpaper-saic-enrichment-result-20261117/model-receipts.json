@@ -1,0 +1,669 @@
+[
+  {
+    "request_id": "bp-work-2ae4196b91569edcee5d22a4:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "adcbf597f39f601028bfb4ef95f9b920c4858ef8cf3911a2d69296ceffafc0d1",
+    "response_hash": "ba130e7aba8b2c3b5c6ee972708551eded5f834f0fcf3b5c8fe86aae39568568",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0039\",\"section-0055\",\"section-0081\",\"section-0082\",\"section-0083\",\"section-0106\"],\"rationale\":\"本次为定向补充阅读，目标是汽车零部件业务的具体产品子类、用途及对应业务主体。section-0039（报告期内公司从事的业务情况）给出整车、零部件、移动出行和服务、金融、创新等板块的业务结构，是零部件业务定位的原文来源；section-0055（收入和成本分析）提供分业务/分产品的收入构成，可确认零部件板块的收入口径与规模；section-0081（零部件产销量）直接披露零部件产品的产销明细，是产品子类最直接的原文；section-0082（新能源汽车业务）与section-0083（汽车金融业务）用于区分零部件与新能源、金融板块的边界，避免把其他板块产品误归入零部件；section-0106（主要控股参股公司分析）披露主要子公司业务，可对应零部件业务主体。以上均为报告正文实质子节，未选TOC重复项，也未选不可选条目。\",\"deferred\":[\"section-0053（主营业务分析）为父级汇总，其收入成本明细已由section-0055覆盖，避免父子重复选择\",\"section-0078（行业经营性信息分析）为父级，其下产能、产销量、新能源、金融子节已按需选取，其余行业背景非本次定向目标\",\"第八节财务报告中的分部信息（section-1093）与收入附注（section-0880）仅在正文披露不足时补充，本次正文已覆盖零部件产品与主体，暂不扩读\",\"零部件板块的关联购销明细（section-1048）属可选供应链信息，非本次产品子类目标，暂不展开\"],\"stop_reason\":\"已选取能直接回答零部件产品子类、用途与业务主体的正文子节，覆盖业务结构、收入构成、产销量明细及主要子公司；剩余为行业背景、财务附注与关联交易细节，对本次定向问题边际贡献低，故在此停止，不声称覆盖全报告。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0039",
+        "section-0055",
+        "section-0081",
+        "section-0082",
+        "section-0083",
+        "section-0106"
+      ],
+      "rationale": "本次为定向补充阅读，目标是汽车零部件业务的具体产品子类、用途及对应业务主体。section-0039（报告期内公司从事的业务情况）给出整车、零部件、移动出行和服务、金融、创新等板块的业务结构，是零部件业务定位的原文来源；section-0055（收入和成本分析）提供分业务/分产品的收入构成，可确认零部件板块的收入口径与规模；section-0081（零部件产销量）直接披露零部件产品的产销明细，是产品子类最直接的原文；section-0082（新能源汽车业务）与section-0083（汽车金融业务）用于区分零部件与新能源、金融板块的边界，避免把其他板块产品误归入零部件；section-0106（主要控股参股公司分析）披露主要子公司业务，可对应零部件业务主体。以上均为报告正文实质子节，未选TOC重复项，也未选不可选条目。",
+      "deferred": [
+        "section-0053（主营业务分析）为父级汇总，其收入成本明细已由section-0055覆盖，避免父子重复选择",
+        "section-0078（行业经营性信息分析）为父级，其下产能、产销量、新能源、金融子节已按需选取，其余行业背景非本次定向目标",
+        "第八节财务报告中的分部信息（section-1093）与收入附注（section-0880）仅在正文披露不足时补充，本次正文已覆盖零部件产品与主体，暂不扩读",
+        "零部件板块的关联购销明细（section-1048）属可选供应链信息，非本次产品子类目标，暂不展开"
+      ],
+      "stop_reason": "已选取能直接回答零部件产品子类、用途与业务主体的正文子节，覆盖业务结构、收入构成、产销量明细及主要子公司；剩余为行业背景、财务附注与关联交易细节，对本次定向问题边际贡献低，故在此停止，不声称覆盖全报告。"
+    },
+    "usage": {
+      "input_tokens": 23974,
+      "output_tokens": 448,
+      "total_tokens": 24422
+    }
+  },
+  {
+    "request_id": "bp-work-2ae4196b91569edcee5d22a4:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "c20a1b7d84776321d2ba8696d17c17869b194e5ab3cd40277f7923e2eb2019fd",
+    "response_hash": "e758cc01c78cccf806131e07b42075b4bcd12459bb036655b012bd14d7387835",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对业务结构进行重新提取。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"公司零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741）开展，其2025年业务情况详见华域汽车在上交所发布的2025年年报。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"零部件业务按零部件类别、按市场类别的产销量明细披露均标注为不适用，本报告正文未列出具体零部件产品子类及其用途。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"主要子公司华域汽车的主要业务为汽车零部件生产、销售。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"主要子公司中联汽车电子的主要业务为汽车用电子产品的生产、经营和研发。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"主要子公司动力新科的主要业务为柴油机及配件的生产销售。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F-PS-06\",\"text\":\"公司整合智电零部件业务资源，加快推进全固态电池、一体化智能底盘等技术的产业化落地。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"本报告正文未按零部件产品子类（如具体总成、系统名称）逐项披露产品清单及对应用途，仅披露业务主体与部分技术方向；具体产品子类与用途需参见华域汽车2025年年报，本次未获取成功。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"主营业务分产品中，零部件业务营业收入203,019,866,775.26元，营业成本164,149,718,120.28元，毛利率19.15%，营业收入比上年增减6.47%，营业成本比上年增减4.87%，毛利率比上年增加1.24个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"零部件业务营业收入\",\"raw_value\":\"203,019,866,775.26\",\"value\":\"203019866775.26\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"零部件业务营业成本\",\"raw_value\":\"164,149,718,120.28\",\"value\":\"164149718120.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"零部件业务毛利率\",\"raw_value\":\"19.15\",\"value\":\"19.15\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"零部件业务营业收入比上年增减\",\"raw_value\":\"6.47\",\"value\":\"6.47\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"零部件业务营业成本比上年增减\",\"raw_value\":\"4.87\",\"value\":\"4.87\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"零部件业务毛利率比上年增减\",\"raw_value\":\"1.24\",\"value\":\"1.24\",\"unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"零部件业务成本构成项目为原材料、人工工资、折旧、能源等，本期金额164,149,718,120.28元，占总成本比例28.20%，上年同期金额156,532,375,412.29元，本期金额较上年同期变动比例4.87%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"零部件业务成本构成项目本期金额\",\"raw_value\":\"164,149,718,120.28\",\"value\":\"164149718120.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"零部件业务本期占总成本比例\",\"raw_value\":\"28.20\",\"value\":\"28.20\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"零部件业务上年同期金额\",\"raw_value\":\"156,532,375,412.29\",\"value\":\"156532375412.29\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"零部件业务本期金额较上年同期变动比例\",\"raw_value\":\"4.87\",\"value\":\"4.87\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}],\"limitations\":[\"零部件业务收入按分产品口径披露，未进一步拆分至具体产品子类收入。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"主营业务分产品合计营业收入656,243,812,081.18元，其中整车业务410,196,473,001.11元、零部件业务203,019,866,775.26元、劳务及其他32,935,762,112.94元、金融业务10,091,710,191.88元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"主营业务分产品合计营业收入\",\"raw_value\":\"656,243,812,081.18\",\"value\":\"656243812081.18\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"整车业务营业收入\",\"raw_value\":\"410,196,473,001.11\",\"value\":\"410196473001.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"零部件业务营业收入\",\"raw_value\":\"203,019,866,775.26\",\"value\":\"203019866775.26\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"劳务及其他营业收入\",\"raw_value\":\"32,935,762,112.94\",\"value\":\"32935762112.94\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"金融业务营业收入\",\"raw_value\":\"10,091,710,191.88\",\"value\":\"10091710191.88\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"主要子公司华域汽车注册资本315,272万元，总资产19,918,645.09万元，归属于母公司净资产6,714,457.33万元，营业总收入18,399,890.05万元，营业利润943,418.20万元，归属于母公司净利润720,726.81万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"华域汽车注册资本\",\"raw_value\":\"315,272\",\"value\":\"315272\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"华域汽车总资产\",\"raw_value\":\"19,918,645.09\",\"value\":\"19918645.09\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"华域汽车归属于母公司净资产\",\"raw_value\":\"6,714,457.33\",\"value\":\"6714457.33\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"华域汽车营业总收入\",\"raw_value\":\"18,399,890.05\",\"value\":\"18399890.05\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"华域汽车营业利润\",\"raw_value\":\"943,418.20\",\"value\":\"943418.20\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"华域汽车归属于母公司净利润\",\"raw_value\":\"720,726.81\",\"value\":\"720726.81\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]}],\"limitations\":[\"零部件业务未按具体产品子类披露收入构成，无法给出子类层面的规模与结构。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"零部件业务成本构成项目为原材料、人工工资、折旧、能源等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"公司整合智电零部件业务资源，加快推进全固态电池、一体化智能底盘等技术的产业化落地。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"本报告正文未披露零部件业务的具体原材料品种、供应商或产能数据；零部件产销量按类别披露标注为不适用。\"]},\"customers_channels_markets\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对客户、渠道与市场进行重新提取；零部件按市场类别的产销量披露标注为不适用。\"]},\"operating_drivers\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对经营驱动因素进行重新提取。\"]},\"material_changes\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对重大变化进行重新提取。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展，其主要业务为汽车零部件生产、销售。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0011\"]}],\"limitations\":[\"未披露零部件业务在产业链中的具体环节细分。\"]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"零部件业务成本构成项目为原材料、人工工资、折旧、能源等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"未披露具体原材料品种及供应商名称。\"]},\"downstream_customers\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本报告正文未披露零部件产品的具体下游客户类型或用途；按市场类别的产销量披露标注为不适用。\"]}},\"company_features\":null,\"limitations\":[\"本次为定向补充阅读，仅回答汽车零部件业务的产品子类、用途及业务主体问题，未重新生成其他画像内容。\",\"本报告正文未按零部件产品子类逐项披露产品清单及用途，相关明细需参见华域汽车2025年年报，本次未获取成功。\",\"不声称覆盖全报告或已穷尽零部件业务信息。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次为定向补充阅读，未针对业务结构进行重新提取。"
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "公司零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741）开展，其2025年业务情况详见华域汽车在上交所发布的2025年年报。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "零部件业务按零部件类别、按市场类别的产销量明细披露均标注为不适用，本报告正文未列出具体零部件产品子类及其用途。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "主要子公司华域汽车的主要业务为汽车零部件生产、销售。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "主要子公司中联汽车电子的主要业务为汽车用电子产品的生产、经营和研发。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "主要子公司动力新科的主要业务为柴油机及配件的生产销售。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F-PS-06",
+              "text": "公司整合智电零部件业务资源，加快推进全固态电池、一体化智能底盘等技术的产业化落地。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "本报告正文未按零部件产品子类（如具体总成、系统名称）逐项披露产品清单及对应用途，仅披露业务主体与部分技术方向；具体产品子类与用途需参见华域汽车2025年年报，本次未获取成功。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "主营业务分产品中，零部件业务营业收入203,019,866,775.26元，营业成本164,149,718,120.28元，毛利率19.15%，营业收入比上年增减6.47%，营业成本比上年增减4.87%，毛利率比上年增加1.24个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "零部件业务营业收入",
+                  "raw_value": "203,019,866,775.26",
+                  "value": "203019866775.26",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "零部件业务营业成本",
+                  "raw_value": "164,149,718,120.28",
+                  "value": "164149718120.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "零部件业务毛利率",
+                  "raw_value": "19.15",
+                  "value": "19.15",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "零部件业务营业收入比上年增减",
+                  "raw_value": "6.47",
+                  "value": "6.47",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "零部件业务营业成本比上年增减",
+                  "raw_value": "4.87",
+                  "value": "4.87",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "零部件业务毛利率比上年增减",
+                  "raw_value": "1.24",
+                  "value": "1.24",
+                  "unit": "百分点",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "零部件业务成本构成项目为原材料、人工工资、折旧、能源等，本期金额164,149,718,120.28元，占总成本比例28.20%，上年同期金额156,532,375,412.29元，本期金额较上年同期变动比例4.87%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "零部件业务成本构成项目本期金额",
+                  "raw_value": "164,149,718,120.28",
+                  "value": "164149718120.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "零部件业务本期占总成本比例",
+                  "raw_value": "28.20",
+                  "value": "28.20",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "零部件业务上年同期金额",
+                  "raw_value": "156,532,375,412.29",
+                  "value": "156532375412.29",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2024年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "零部件业务本期金额较上年同期变动比例",
+                  "raw_value": "4.87",
+                  "value": "4.87",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "零部件业务收入按分产品口径披露，未进一步拆分至具体产品子类收入。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "主营业务分产品合计营业收入656,243,812,081.18元，其中整车业务410,196,473,001.11元、零部件业务203,019,866,775.26元、劳务及其他32,935,762,112.94元、金融业务10,091,710,191.88元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分产品合计营业收入",
+                  "raw_value": "656,243,812,081.18",
+                  "value": "656243812081.18",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "整车业务营业收入",
+                  "raw_value": "410,196,473,001.11",
+                  "value": "410196473001.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "零部件业务营业收入",
+                  "raw_value": "203,019,866,775.26",
+                  "value": "203019866775.26",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "劳务及其他营业收入",
+                  "raw_value": "32,935,762,112.94",
+                  "value": "32935762112.94",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "金融业务营业收入",
+                  "raw_value": "10,091,710,191.88",
+                  "value": "10091710191.88",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "主要子公司华域汽车注册资本315,272万元，总资产19,918,645.09万元，归属于母公司净资产6,714,457.33万元，营业总收入18,399,890.05万元，营业利润943,418.20万元，归属于母公司净利润720,726.81万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "华域汽车注册资本",
+                  "raw_value": "315,272",
+                  "value": "315272",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "华域汽车总资产",
+                  "raw_value": "19,918,645.09",
+                  "value": "19918645.09",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "华域汽车归属于母公司净资产",
+                  "raw_value": "6,714,457.33",
+                  "value": "6714457.33",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "华域汽车营业总收入",
+                  "raw_value": "18,399,890.05",
+                  "value": "18399890.05",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "华域汽车营业利润",
+                  "raw_value": "943,418.20",
+                  "value": "943418.20",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "华域汽车归属于母公司净利润",
+                  "raw_value": "720,726.81",
+                  "value": "720726.81",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "零部件业务未按具体产品子类披露收入构成，无法给出子类层面的规模与结构。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "零部件业务成本构成项目为原材料、人工工资、折旧、能源等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "公司整合智电零部件业务资源，加快推进全固态电池、一体化智能底盘等技术的产业化落地。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "本报告正文未披露零部件业务的具体原材料品种、供应商或产能数据；零部件产销量按类别披露标注为不适用。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次为定向补充阅读，未针对客户、渠道与市场进行重新提取；零部件按市场类别的产销量披露标注为不适用。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次为定向补充阅读，未针对经营驱动因素进行重新提取。"
+          ]
+        },
+        "material_changes": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次为定向补充阅读，未针对重大变化进行重新提取。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展，其主要业务为汽车零部件生产、销售。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0011"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露零部件业务在产业链中的具体环节细分。"
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "零部件业务成本构成项目为原材料、人工工资、折旧、能源等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体原材料品种及供应商名称。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本报告正文未披露零部件产品的具体下游客户类型或用途；按市场类别的产销量披露标注为不适用。"
+          ]
+        }
+      },
+      "company_features": null,
+      "limitations": [
+        "本次为定向补充阅读，仅回答汽车零部件业务的产品子类、用途及业务主体问题，未重新生成其他画像内容。",
+        "本报告正文未按零部件产品子类逐项披露产品清单及用途，相关明细需参见华域汽车2025年年报，本次未获取成功。",
+        "不声称覆盖全报告或已穷尽零部件业务信息。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 11757,
+      "output_tokens": 2870,
+      "total_tokens": 14627
+    }
+  },
+  {
+    "request_id": "bp-work-2ae4196b91569edcee5d22a4:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "dc1e57e5205739d8547e1bf16613df6aa3babe3ab21ae888c5837eb91fd51843",
+    "response_hash": "38f10903af12952ee6939fc4b4a037442118c1116b45bd26e49fa3ea54ed1157",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"REV-001\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-PS-02\",\"evidence_ids\":[\"source-0006\",\"source-0001\"],\"explanation\":\"前半句有依据：零部件产销量项下“按零部件类别”“按市场类别”均勾选不适用。后半句把该勾选和选定章节未见清单，写成“本报告正文未列出具体零部件产品子类及其用途”，范围过宽。不适用只描述该产销量披露项，不能证明全报告没有子类或用途；所供文本亦已写明整合智电零部件并推进全固态电池、一体化智能底盘产业化。应保留不适用这一核心，把后半句限定为所供选定章节未列子类清单及用途对照，且不等于全文未披露。\"},{\"finding_id\":\"REV-002\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"产品服务、经营投入、下游客户及总括限制多处将“本报告正文未披露/未列出”写成已证实的全文缺失。本次仅有选定章节；未见未选文本应标为未知，不能当作未披露。source-0006的不适用只覆盖零部件产销量的分类与市场类别，不能外推为没有产品子类、用途、具体原材料或下游客户。应改为所供选定章节未列示，并保持不适用的原披露项范围；不因此否定已核实的业务主体与金额。\"},{\"finding_id\":\"REV-003\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0005\"],\"explanation\":\"定向问题要求找出已披露的零部件相关产品子类。所供章节在贸易业务中写明本期主要系汽车芯片及相关汽车零部件的出口贸易，但草稿未收录该产品描述。其收入相对零部件业务分产品收入属于小额尾部，且口径是贸易业务而非零部件业务分产品行，不得并入口径或当作主业构成缺失。建议仅作补充提示，不要求补全金额，也不否定已有华域汽车等主体事实。\"}],\"reviewed_fact_ids\":[\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-PS-06\",\"F-RM-01\",\"F-RM-02\",\"F-SM-01\",\"F-OI-01\",\"F-OI-02\",\"F-SC-01\",\"F-SC-02\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "REV-001",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-PS-02",
+          "evidence_ids": [
+            "source-0006",
+            "source-0001"
+          ],
+          "explanation": "前半句有依据：零部件产销量项下“按零部件类别”“按市场类别”均勾选不适用。后半句把该勾选和选定章节未见清单，写成“本报告正文未列出具体零部件产品子类及其用途”，范围过宽。不适用只描述该产销量披露项，不能证明全报告没有子类或用途；所供文本亦已写明整合智电零部件并推进全固态电池、一体化智能底盘产业化。应保留不适用这一核心，把后半句限定为所供选定章节未列子类清单及用途对照，且不等于全文未披露。"
+        },
+        {
+          "finding_id": "REV-002",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "产品服务、经营投入、下游客户及总括限制多处将“本报告正文未披露/未列出”写成已证实的全文缺失。本次仅有选定章节；未见未选文本应标为未知，不能当作未披露。source-0006的不适用只覆盖零部件产销量的分类与市场类别，不能外推为没有产品子类、用途、具体原材料或下游客户。应改为所供选定章节未列示，并保持不适用的原披露项范围；不因此否定已核实的业务主体与金额。"
+        },
+        {
+          "finding_id": "REV-003",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "定向问题要求找出已披露的零部件相关产品子类。所供章节在贸易业务中写明本期主要系汽车芯片及相关汽车零部件的出口贸易，但草稿未收录该产品描述。其收入相对零部件业务分产品收入属于小额尾部，且口径是贸易业务而非零部件业务分产品行，不得并入口径或当作主业构成缺失。建议仅作补充提示，不要求补全金额，也不否定已有华域汽车等主体事实。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-PS-06",
+        "F-RM-01",
+        "F-RM-02",
+        "F-SM-01",
+        "F-OI-01",
+        "F-OI-02",
+        "F-SC-01",
+        "F-SC-02"
+      ]
+    },
+    "usage": {
+      "input_tokens": 13512,
+      "output_tokens": 628,
+      "total_tokens": 30678
+    }
+  },
+  {
+    "request_id": "bp-work-2ae4196b91569edcee5d22a4:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "2f1054b3a1b94ac48c6159ef34f4a4bc00c2e1a2789450593c9b6a4073a18d1f",
+    "response_hash": "35c77c079f89de4df4d6b18e84cd43b0af74d09792cc3266d60e0874de0c6a10",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-PS-02\",\"text\":\"零部件产销量项下“按零部件类别”“按市场类别的产销量明细披露均标注为不适用；所供选定章节未列出具体零部件产品子类清单及用途对照，这不等于全报告未披露相关子类或用途。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-PS-02",
+          "text": "零部件产销量项下“按零部件类别”“按市场类别的产销量明细披露均标注为不适用；所供选定章节未列出具体零部件产品子类清单及用途对照，这不等于全报告未披露相关子类或用途。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 8110,
+      "output_tokens": 109,
+      "total_tokens": 8219
+    }
+  },
+  {
+    "request_id": "bp-work-2ae4196b91569edcee5d22a4:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "69d69273a21a2e0ab5f4654ce8714abc91a1f41c01f633ba7037ea05a9d597cb",
+    "response_hash": "945f9936dc738b8fee17a5aecea9f03c6cee5df148cfa19ac40103162fd6d0f3",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-PS-02\"],\"checks\":[{\"fact_id\":\"F-PS-02\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0001\"],\"explanation\":\"候选事实保留了零部件产销量项下“按零部件类别”“按市场类别”均勾选不适用这一核心，并把后半句正确限定为所供选定章节未列具体零部件产品子类清单及用途对照，且明确不等于全报告未披露，从而纠正了原事实将披露项勾选和选定章节未见清单扩大为全文未披露的过宽断言。source-0006支持上述不适用勾选；source-0001关于全固态电池、一体化智能底盘产业化的叙述并非子类清单及用途对照，与收窄后的表述不冲突。主体、期间与不确定性处理均符合原文。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-PS-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-PS-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0001"
+          ],
+          "explanation": "候选事实保留了零部件产销量项下“按零部件类别”“按市场类别”均勾选不适用这一核心，并把后半句正确限定为所供选定章节未列具体零部件产品子类清单及用途对照，且明确不等于全报告未披露，从而纠正了原事实将披露项勾选和选定章节未见清单扩大为全文未披露的过宽断言。source-0006支持上述不适用勾选；source-0001关于全固态电池、一体化智能底盘产业化的叙述并非子类清单及用途对照，与收窄后的表述不冲突。主体、期间与不确定性处理均符合原文。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 9915,
+      "output_tokens": 187,
+      "total_tokens": 13662
+    }
+  }
+]

@@ -326,6 +326,20 @@ def test_material_omission_can_be_added_but_optional_gap_does_not_trigger_repair
     assert '建议获取（不阻塞画像交付）' in rendered and finding['explanation'] in rendered
 
 
+def test_supplemental_review_receives_the_same_targeted_reading_scope():
+    paper, packet, fixed, review, verify = material()
+    provider = Provider([review, {"repaired_facts": [fixed]}, verify])
+    identity = workpaper_processing_identity(real=False, review=True)
+    targets = [{"element": "scale_and_mix", "question": "公司本期营业收入是多少？"}]
+    identity["workpaper_enrichment"] = {"targets": targets}
+    result, _ = review_workpaper(paper, packet=packet, provider=provider, work_id="supplement", identity=identity)
+    assert result.quality_review.status == "completed"
+    assert len(provider.calls) == 3
+    for call in provider.calls:
+        assert call["payload"]["targeted_reading"] == {"targets": targets}
+        assert "Deliberately unread non-target elements are not omissions to repair" in call["instructions"]
+
+
 def test_scope_and_nonfact_findings_stay_open_without_discarding_fact_repairs():
     _, _, fixed, review, verify = material()
     for element, action in (("limitations", "correct"), ("revenue_model", "human_review")):

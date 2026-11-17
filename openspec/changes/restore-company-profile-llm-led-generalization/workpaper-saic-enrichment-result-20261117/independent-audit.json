@@ -1,0 +1,91 @@
+{
+  "task": "6.DJ",
+  "reviewer": "Codex direct original-PDF comparison after real model review",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "physical_pages_bound": [
+    8,
+    9,
+    11,
+    12,
+    13,
+    17,
+    18,
+    19,
+    26,
+    27
+  ],
+  "source_span_coordinates_checked": true,
+  "target_fact_verdicts": [
+    {
+      "fact_id": "F-PS-01",
+      "fact_sha256": "6063888c65c9cecc96c53de667a144acaad82bdce72d2acec96d3c24a406f58d",
+      "verdict": "supported_in_stated_scope",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "p17明确华域汽车主体和外部年报指引；与原画像F03的主体定位重叠，不当成全新业务发现。"
+    },
+    {
+      "fact_id": "F-PS-02",
+      "fact_sha256": "c1f999465777288daab9b370a359a6ac414f0bc815240a2edc00a8ee4aba547a",
+      "verdict": "supported_in_stated_scope",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "p17只支持产销量分类披露不适用；最终修订已收窄到所供章节并保全报告未知，不作零部件不存在的断言。"
+    },
+    {
+      "fact_id": "F-PS-03",
+      "fact_sha256": "7a3b15877f0f2d4e1cba2b17f2af6a56845b222daef4afa88ac41819fb68ca0c",
+      "verdict": "supported_in_stated_scope",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "p26子公司行明确华域汽车的零部件生产/销售角色，比既有仅主体定位更具体。"
+    },
+    {
+      "fact_id": "F-PS-04",
+      "fact_sha256": "9727b0a8089b450acd79042b5249638e722811ac2f97f6a7c75092a3fcf95e4c",
+      "verdict": "supported_in_stated_scope",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "p26公司类型为子公司，中联汽车电子有限公司对应汽车用电子产品的生产、经营和研发；不推定客户或采购。"
+    },
+    {
+      "fact_id": "F-PS-05",
+      "fact_sha256": "cf43c2d3d9b113e5ce017a331f63934b7f0c557ebeb4951f7ab4eebaef705568",
+      "verdict": "supported_in_stated_scope",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "p26动力新科子公司行明确柴油机及配件生产销售，不把其他公司的产品移给华域。"
+    },
+    {
+      "fact_id": "F-PS-06",
+      "fact_sha256": "38ba874ce4c4ef3b97187617b4354434f04fd6ff71eb0a9a71494e48a3a54399",
+      "verdict": "supported_in_stated_scope",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p8为智电零部件整合及全固态电池/智能底盘技术产业化方向；与旧画像F06重叠，不表述成已量产产品清单。"
+    }
+  ],
+  "material_new_information": [
+    "中联汽车电子：汽车用电子产品生产、经营和研发",
+    "动力新科：柴油机及配件生产销售"
+  ],
+  "overlap_with_existing_profile": [
+    "F-PS-01",
+    "F-PS-06"
+  ],
+  "remaining_limitations": [
+    "完整零部件子类清单、总成/系统细目和用途对照未取得；华域年报为可能后续来源，本次未读取另一家公司报告。",
+    "旧产品缺项仍保原身份；补读同维度新增不是所有细项均已解决。",
+    "仅独立核六个目标事实，不把其他七个非目标原始事实或原画像全部对象计为本轮准确。",
+    "原解析标题树在主要控股参股公司分析上方含数值伪父标题；本轮以真实子节标题、p26原文和精确坐标核源，不把该父标题作为业务事实。",
+    "审查模型另建议汽车芯片贸易描述；原画像F11已含该信息，不作为新发现或新增付费补写。"
+  ],
+  "formal_S1_unchanged": "0/12",
+  "production_authorization": "not_authorized"
+}

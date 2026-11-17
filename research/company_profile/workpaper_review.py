@@ -294,6 +294,13 @@ def review_workpaper(
     def request(request_id, purpose, response_model, instructions, content):
         profile = identity.get("repair_profile" if purpose == "repair_profile_workpaper" else "quality_review_profile")
         options = {"profile_override": profile} if profile else {}
+        enrichment = identity.get("workpaper_enrichment")
+        if enrichment:
+            content = {**content, "targeted_reading": {"targets": enrichment["targets"]}}
+            instructions += ("\nThis is a supplemental reading, not a new whole-company profile. "
+                "Assess omissions only against targeted_reading questions. Deliberately unread "
+                "non-target elements are not omissions to repair. Check every asserted fact for "
+                "source correctness; preserve honest uncertainty and remaining target gaps.")
         result = provider.workpaper_request(
             request_id=request_id, purpose=purpose, report=paper.report,
             payload={"report": paper.report.model_dump(mode="json"),

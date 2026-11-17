@@ -1,0 +1,92 @@
+"""Independent source checks of six delivered target facts, no model calls."""
+import asyncio
+import hashlib
+import json
+import os
+from pathlib import Path
+from unittest.mock import patch
+import httpx
+from fastapi import FastAPI
+ROOT=Path('/home/python/Quote')
+import sys
+sys.path.insert(0,str(ROOT))
+from api.company_profile_routes import router
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.runtime import CompanyProfileResearchWriter
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+from research.company_profile.workpaper_sections import extract_selected_layout
+from research.company_profile.workpaper import workpaper_fact_hash
+
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+D=C/'workpaper-saic-enrichment-result-20261117'
+OUTPUT=ROOT/'data/research/company_profile_api_preview_20261117'
+reader=CompanyProfileReadService(OUTPUT)
+api=reader.research_profile('600104.SH')
+new=api['readings'][-1];wid=new['work_id']
+record=reader._latest_by_instrument(work_id=wid)['600104.SH']
+paper=record.workpaper
+asset=json.loads((C/'workpaper-api-delivery-result-20261117/enrichment-readiness.json').read_text())['source_pdf']
+assert hashlib.sha256(Path(asset).read_bytes()).hexdigest()==paper.report.document_version
+pages=sorted({p for e in paper.evidence for p in e.physical_pages})
+original=extract_selected_layout(Path(asset).read_bytes(),pages)
+paper.validate_pages(original)
+facts={f.fact_id:f for f in paper.elements.products_services.facts}
+sources={e.evidence_id:e for e in paper.evidence}
+quotes={fid:'\n'.join(s.quote for eid in f.evidence_ids for s in sources[eid].source_spans) for fid,f in facts.items()}
+assert '华域汽车系统股份有限公司' in quotes['F-PS-01'] and '600741' in quotes['F-PS-01']
+assert '按零部件类别' in quotes['F-PS-02'] and '按市场类别' in quotes['F-PS-02']
+assert '不等于全报告未披露' in facts['F-PS-02'].text
+assert '汽车零部件生产、销售' in quotes['F-PS-03']
+assert '中联汽车电子' in quotes['F-PS-04'] and '经营和研发' in quotes['F-PS-04']
+assert '动力新科' in quotes['F-PS-05'] and '柴油机及配件的生产销售' in quotes['F-PS-05']
+assert '全固态电池' in quotes['F-PS-06'] and '产业化落地' in quotes['F-PS-06']
+for fid in ('F-PS-01','F-PS-03','F-PS-04','F-PS-05'):assert facts[fid].subject_scope=='named_subsidiary'
+reason={
+ 'F-PS-01':'p17明确华域汽车主体和外部年报指引；与原画像F03的主体定位重叠，不当成全新业务发现。',
+ 'F-PS-02':'p17只支持产销量分类披露不适用；最终修订已收窄到所供章节并保全报告未知，不作零部件不存在的断言。',
+ 'F-PS-03':'p26子公司行明确华域汽车的零部件生产/销售角色，比既有仅主体定位更具体。',
+ 'F-PS-04':'p26公司类型为子公司，中联汽车电子有限公司对应汽车用电子产品的生产、经营和研发；不推定客户或采购。',
+ 'F-PS-05':'p26动力新科子公司行明确柴油机及配件生产销售，不把其他公司的产品移给华域。',
+ 'F-PS-06':'p8为智电零部件整合及全固态电池/智能底盘技术产业化方向；与旧画像F06重叠，不表述成已量产产品清单。'}
+verdicts=[{'fact_id':fid,'fact_sha256':workpaper_fact_hash(f),'verdict':'supported_in_stated_scope',
+    'evidence_ids':list(f.evidence_ids),'reason':reason[fid]} for fid,f in facts.items()]
+audit={'task':'6.DJ','reviewer':'Codex direct original-PDF comparison after real model review',
+ 'document_version':paper.report.document_version,'physical_pages_bound':pages,
+ 'source_span_coordinates_checked':True,'target_fact_verdicts':verdicts,
+ 'material_new_information':['中联汽车电子：汽车用电子产品生产、经营和研发','动力新科：柴油机及配件生产销售'],
+ 'overlap_with_existing_profile':['F-PS-01','F-PS-06'],'remaining_limitations':[
+    '完整零部件子类清单、总成/系统细目和用途对照未取得；华域年报为可能后续来源，本次未读取另一家公司报告。',
+    '旧产品缺项仍保原身份；补读同维度新增不是所有细项均已解决。',
+    '仅独立核六个目标事实，不把其他七个非目标原始事实或原画像全部对象计为本轮准确。',
+    '原解析标题树在主要控股参股公司分析上方含数值伪父标题；本轮以真实子节标题、p26原文和精确坐标核源，不把该父标题作为业务事实。',
+    '审查模型另建议汽车芯片贸易描述；原画像F11已含该信息，不作为新发现或新增付费补写。'],
+ 'formal_S1_unchanged':'0/12','production_authorization':'not_authorized'}
+(D/'independent-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
+bound=bind_workpaper_use_review(paper,{
+    'report':paper.report.model_dump(mode='json'),'reviewer':audit['reviewer'],
+    'reference':str(D/'independent-audit.json'),
+    'reference_sha256':hashlib.sha256((D/'independent-audit.json').read_bytes()).hexdigest(),
+    'decisions':[{'fact_id':fid,'fact_sha256':workpaper_fact_hash(f),'disposition':'source_checked',
+        'evidence_ids':list(f.evidence_ids),'reason':reason[fid]} for fid,f in facts.items()]})
+assert bound.elements==paper.elements and bound.generation==paper.generation and bound.quality_review==paper.quality_review
+CompanyProfileResearchWriter(OUTPUT,checkpoint_root=Path(__file__).parent/'checkpoints').persist(record.model_copy(update={'workpaper':bound}))
+api=reader.research_profile('600104.SH')
+assert all(row['review_basis']=='independent_source_check' for row in api['facts'] if row['reading_work_id']==wid)
+os.environ['QUOTE_COMPANY_PROFILE_RESEARCH_ROOT']=str(OUTPUT)
+async def check():
+ app=FastAPI();app.include_router(router,prefix='/api/v1')
+ async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://local-research') as client:
+  response=await client.get('/api/v1/research/company/600104.SH/annual-profile')
+  assert response.status_code==200 and response.json()==api
+  body=response.json()
+  assert len(body['readings'])==2 and sum(f['fact'] is not None for f in body['facts'])==39
+  assert body['readings'][0]['work_id']=='bp-work-dc4ab5559a9258d1a6cf3d44'
+  assert any(g['follow_up_state']=='supplemented_not_fully_reassessed' for g in body['information_gaps'])
+  assert body['full_report_completeness']=='not_assessed'
+  (D/'api.json').write_text(json.dumps(body,ensure_ascii=False,indent=2)+'\n')
+  return {'http_status':response.status_code,'readings':2,'visible_facts':39,'six_target_source_checks':True,
+          'api_equals_original_read_owner':True,'all_gap_closure_not_claimed':True,'new_model_calls':0}
+with patch('socket.socket.connect',side_effect=AssertionError('post-run audit is offline')):
+ checks=asyncio.run(check())
+(D/'checks.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(checks,ensure_ascii=False))

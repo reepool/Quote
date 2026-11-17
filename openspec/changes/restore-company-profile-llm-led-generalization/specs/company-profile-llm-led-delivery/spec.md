@@ -330,6 +330,7 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** the API MUST allow a stock-specific, report/hash-bound enrichment plan naming concrete questions; planning is not execution
 - **WHEN** an explicitly authorized enrichment is executed
 - **THEN** the original TaskService MUST enqueue/drain only the requested stock using report-local chapter selection, extraction and existing source review under the supplied finite budget
+- **AND** initial source review, any local repair and final recheck MUST receive the same targeted reading questions; deliberately unread non-target elements MUST NOT require whole-profile completion, while every asserted fact remains subject to source correctness checks
 - **AND** every subsequent reading retains its base work identity/hash, actual model/source/review metadata and original writer record; API reads compose only the exact same-report lineage, keep prior valid facts on failure, and permit further explicitly requested readings
 - **AND** newly acquired content MUST NOT automatically close every gap sharing an element; absence of discovered gaps is not proof of full-report completeness, batch first reads remain independent, and historical results/production authority stay unchanged
 

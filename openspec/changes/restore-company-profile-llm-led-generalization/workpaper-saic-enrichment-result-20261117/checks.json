@@ -1,0 +1,15 @@
+{
+  "http_status": 200,
+  "readings": 2,
+  "visible_facts": 39,
+  "six_target_source_checks": true,
+  "api_equals_original_read_owner": true,
+  "all_gap_closure_not_claimed": true,
+  "new_model_calls": 0,
+  "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-2ae4196b91569edcee5d22a4.json",
+  "runtime_sha256": "fa1005cd696647a4b5294c7634bd5086097140c8e4770405c0ce3a5474e55991",
+  "independent_checked_target_facts": 6,
+  "old_fact_values_unchanged": true,
+  "ordinary_API_does_not_publish_seven_non_target_raw_facts": true,
+  "three_reads_after_independent_binding": true
+}
