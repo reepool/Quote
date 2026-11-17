@@ -1,0 +1,24 @@
+{
+  "task": "6.DI",
+  "direct_tests": 30,
+  "direct_test_seconds": 20.03,
+  "real_saved_profiles_API_equal": 12,
+  "model_calls": 0,
+  "production_enabled": false,
+  "temporary_scripts_removed": true,
+  "removed_file_bytes": 16044,
+  "retained_research_runtime_root": "/home/python/Quote/data/research/company_profile_api_preview_20261117",
+  "retained_runtime_bytes": 2561632,
+  "unrelated_existing_changes_preserved": true,
+  "evidence_sha256": {
+    "operator-snapshot.txt": "5714321bbcf57da30b71af40a5d14f61cfac44807e5c5aa86db7734b99c1f874",
+    "enrichment-plan.json": "9c12ffa7f76f4e16253dde451abc6364c8006f1d4ee990a07065cb25fe9d422d",
+    "preparation-snapshot.txt": "fd5c49e8003702c202ac42a953d5a99e66cc4f2ebbdf380652ebd4ade111f41b",
+    "api-summary.json": "91434c7983c2353c5e58b0f29dec94dc46341846c0b539f483a2c66bd964eb84",
+    "baseline-snapshot.txt": "d5194c68d584ea2e9bbbfb49214d0a32f3fbbdd9706a1ff425fb409678431f8f",
+    "enrichment-readiness.json": "cfd1861238521acb3cc6ab789ff7445f72e0df3a808f519179d571222c296ab9",
+    "result.md": "fb939ebf6c9773a6c44fe264d7474b3520765f3d527337f8ee35b9cf3a2805f1",
+    "index.json": "c706c290ff216df150b711cd7c0f8f951e7f9c4755a00e808b1038cb7a684ed2",
+    "baseline-check.json": "2eed0edf699c6a735cd60acc00e4b3f787074c37ac72bfa7e4acfc7a3a0b6980"
+  }
+}

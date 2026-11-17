@@ -1,0 +1,66 @@
+"""Read-only source/profile checks, stopping before the first model request."""
+import hashlib
+import json
+import runpy
+import sys
+from pathlib import Path
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+D=C/'workpaper-api-delivery-result-20261117'
+from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.runtime import CompanyProfileRuntimeRecordV3
+from research.company_profile.workpaper_llm import run_workpaper,workpaper_processing_identity
+from research.company_profile.workpaper_review import workpaper_hash
+
+def read(p):return json.loads(Path(p).read_text())
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+helper=runpy.run_path(str(C/'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'))
+cfg=helper['config_for_run']()
+plan=read(D/'enrichment-plan.json')
+asset=read(C/'workpaper-three-final-source-review-result-20261117/600104/binding.json')['asset']
+assert sha(asset['archive_path'])==plan['report']['document_version']
+reader=CompanyProfileReadService(ROOT/'data/research/company_profile_api_preview_20261117')
+base=reader._latest_by_instrument(work_id=plan['base_work_id'])['600104.SH']
+assert base.report.model_dump(mode='json')==plan['report']
+assert workpaper_hash(base.workpaper)==plan['base_workpaper_sha256']
+parsed=ensure_archived_pdf_page_artifact(asset)
+pages=[{'page':p.page_number,'text':p.text} for p in parsed['artifact'].pages]
+identity=workpaper_processing_identity(real=True,review=True,review_profile=helper['REVIEW'])
+identity.update(repair_profile=helper['EXTRACT'],review_max_output_tokens=12000,workpaper_enrichment=plan)
+
+class StopBeforeSend(Exception):pass
+class NoSend:
+    offline_only=False
+    def workpaper_request(self,**kwargs):
+        assert kwargs['purpose']=='select_profile_sections'
+        assert kwargs['payload']['targeted_reading']['targets']==plan['targets']
+        self.request=kwargs
+        raise StopBeforeSend()
+provider=NoSend()
+try:
+    run_workpaper(report=base.report,pages=pages,processing_identity=identity,provider=provider,
+        work_id='6-DJ-preflight-only',source_pdf_path=asset['archive_path'])
+except StopBeforeSend:pass
+else:raise AssertionError('preparation must stop before any model reply')
+payload=json.dumps(provider.request['payload'],ensure_ascii=False,sort_keys=True).encode()
+profiles=[]
+for name in (helper['EXTRACT'],helper['REVIEW']):
+    p=cfg.profiles[name]
+    from urllib.parse import urlsplit
+    profiles.append({'profile':name,'model':p.model,'host':urlsplit(p.base_url).hostname,
+        'source_label':p.source_label,'reasoning_effort':p.reasoning_effort,'disable_thinking':p.disable_thinking})
+result={'task':'6.DI/next 6.DJ','real_execution_started':False,'new_model_calls':0,
+    'source_pdf':asset['archive_path'],'source_sha256':sha(asset['archive_path']),
+    'report':plan['report'],'source_pages':len(pages),'source_cache_status':parsed.get('cache_status'),
+    'base_work_id':plan['base_work_id'],'base_workpaper_sha256':workpaper_hash(base.workpaper),
+    'plan_sha256':sha(D/'enrichment-plan.json'),'identity':identity,'profiles':profiles,
+    'first_selection_payload_sha256':hashlib.sha256(payload).hexdigest(),'first_selection_payload_bytes':len(payload),
+    'payload_does_not_include_old_answers_or_independent_reference':True,
+    'later_reading_and_review_success':'not_assessed',
+    'proposed_limits':{'entry_count':1,'max_elapsed_seconds':1800,'conservative_ledger':500000,
+        'physical_requests':10,'max_recoveries':3,'recoveries_per_logical':1,'cost':'unknown',
+        'priced_cost_cny_cap':10,'no_recharge':True,'no_additional_window_or_company':True},
+    'production_authorization':'not_authorized','authorization':'new specific bounded approval required'}
+(D/'enrichment-readiness.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:result[k] for k in ('new_model_calls','source_pages','source_cache_status','first_selection_payload_bytes','profiles','authorization')},ensure_ascii=False))

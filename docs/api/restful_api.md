@@ -339,6 +339,8 @@ curl -X POST "http://localhost:8000/api/v1/gaps/fill" \
 
 读取原公司画像read owner的年报研究内容，不同于`/profile`公司档案快照。只读本地，不触发LLM、下载或生产写入；尚无年报画像返回404。默认读取根为既有`data/research/company_profile_common_core`，开发目录不会自动发布到这里；服务是否已部署以实际OpenAPI为准。
 
+需要使用独立研究数据时，在API进程环境显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`。当前十二份已保存真实稿的研究读取根是`/home/python/Quote/data/research/company_profile_api_preview_20261117`，已逐家验证API与原read owner一致；该目录是实际读取数据，不是可清理测试库。配置路径不存在或为空时返回503，不静默改读其他数据。未设置变量仍沿原默认根，不改共享配置或自动重启服务；本次仅完成ASGI接口实物验证，不代表现网已部署。
+
 - `facts`：分级事实，以`reading_work_id + fact_id`共同定位。隔离、仅源参考和重复对象保状态/原因但`fact=null`，待核/保真限用不冒充正式接受。
 - `information_gaps`：要素、原状态、缺项或不确定原因及所属读取批次；`suggested_acquisitions`是复核提出的补充建议，不是已经取得的事实。
 - `readings`：各轮实际章节/原页、未读或后置范围、来源Evidence、模型及审核状态。事实的Evidence编号在其所属读取批次内解析。

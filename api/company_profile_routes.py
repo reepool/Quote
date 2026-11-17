@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import asyncio
+import os
+from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -15,6 +17,12 @@ router = APIRouter(tags=["Research"])
 def annual_profile_reader() -> CompanyProfileReadService:
     from research.company_profile.operations import DEFAULT_OUTPUT_ROOT
 
+    configured = os.environ.get("QUOTE_COMPANY_PROFILE_RESEARCH_ROOT")
+    if configured is not None:
+        root = Path(configured).expanduser()
+        if not configured.strip() or not root.is_dir():
+            raise HTTPException(status_code=503, detail="configured company-profile research root is unavailable")
+        return CompanyProfileReadService(root)
     return CompanyProfileReadService(DEFAULT_OUTPUT_ROOT)
 
 

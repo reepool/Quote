@@ -333,6 +333,12 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** every subsequent reading retains its base work identity/hash, actual model/source/review metadata and original writer record; API reads compose only the exact same-report lineage, keep prior valid facts on failure, and permit further explicitly requested readings
 - **AND** newly acquired content MUST NOT automatically close every gap sharing an element; absence of discovered gaps is not proof of full-report completeness, batch first reads remain independent, and historical results/production authority stay unchanged
 
+#### Scenario: A research API reads an explicitly selected persisted cohort
+- **WHEN** a deployment explicitly selects a research output root for saved real workpapers
+- **THEN** the API MUST use the same original read owner on that root and reject a missing configured root without silently falling back to another dataset
+- **AND** original writer records, actual attribution and use decisions remain traceable; independently established acquisition gaps MAY be appended as local usage limitations on a successor research copy without changing source facts or historical artifacts
+- **AND** selecting a research dataset MUST NOT enable production tasks, model calls, automatic replay or a production quality claim
+
 #### Scenario: A useful workpaper has no trusted core facts yet
 - **WHEN** query/export reads a sourced workpaper whose trusted-core accepted_fact_count is still zero
 - **THEN** it MUST also expose a separate workpaper summary with its original business description, fact/metric counts, origin, review status, unresolved-finding count and known actual extraction/review models

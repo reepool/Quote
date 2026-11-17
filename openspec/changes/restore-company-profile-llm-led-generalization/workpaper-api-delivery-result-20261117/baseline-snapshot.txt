@@ -1,0 +1,53 @@
+"""Reproduce old test preconditions at the actual runtime boundary, no DB."""
+import ast
+import hashlib
+import json
+import subprocess
+import sys
+import types
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+from research.company_profile.runtime import CompanyProfileStageRuntime,CompanyProfileResearchWriter
+from tests.unit.test_research.test_company_profile_runtime import _RequestBoundOverviewProvider,_report,_overview_page,SERVICE_OVERVIEW
+
+ref='7c4bd718'
+def old(path):return subprocess.check_output(['git','show',ref+':'+path],cwd=ROOT,text=True)
+name='research.company_profile._di_baseline_runtime'
+module=types.ModuleType(name);module.__package__='research.company_profile';sys.modules[name]=module
+exec(compile(old('research/company_profile/runtime.py'),name,'exec'),module.__dict__)
+
+results={}
+for label,kind in [('pre_API_enrichment',module.CompanyProfileStageRuntime),('current',CompanyProfileStageRuntime)]:
+    with TemporaryDirectory(prefix='workpaper-di-baseline-') as directory:
+        provider=_RequestBoundOverviewProvider()
+        runtime=kind(writer=CompanyProfileResearchWriter(Path(directory)/'output'),provider=provider)
+        item={'work_id':'old-test-runtime','report':_report(instrument_id='600000.SH',report_id='asset-ops-run'),
+              'pages':(_overview_page(SERVICE_OVERVIEW),)}
+        for stage in ('acquire','parse','semantic','verify','publish'):
+            runtime.run_stage(stage,item)
+        unbound=runtime.run_stage('acquire',{'work_id':'unbound'})
+        results[label]={'extract_calls':provider.extract_calls,'verify_calls':provider.verify_calls,
+            'unbound_status':unbound['status'],'unbound_quality':unbound.get('quality'),
+            'unbound_reason':unbound.get('reason')}
+assert results['pre_API_enrichment']==results['current']
+assert results['current']['extract_calls']==0
+
+def method(source,clazz,name):
+    tree=ast.parse(source)
+    cls=next(node for node in tree.body if isinstance(node,ast.ClassDef) and node.name==clazz)
+    return ast.dump(next(node for node in cls.body if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)) and node.name==name),include_attributes=False)
+operations='research/company_profile/operations.py'
+unchanged={name:method(old(operations),'CompanyProfileTaskService',name)==method((ROOT/operations).read_text(),'CompanyProfileTaskService',name)
+           for name in ('_run','pause','_should_stop_run','_publication_allows_writes')}
+assert all(unchanged.values())
+output={'baseline_ref':ref,'runtime_preconditions':results,'unchanged_application_methods':unchanged,
+    'conclusion':{'run_extract_count':'旧规则默认策略在基线与当前都不调用该测试provider；旧断言1不适用于这份默认输入。',
+        'pause_callback':'旧测试在extract回调触发pause，但同一输入在基线与当前均无extract，不能期待此回调暂停。',
+        'unbound':'acquire机器返工返回在基线与当前相同；旧整队列计数断言未在本轮重跑，不声称整套通过。'},
+    'new_model_calls':0,'full_slow_legacy_suite_repeated':False}
+path=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-api-delivery-result-20261117/baseline-check.json'
+path.parent.mkdir(exist_ok=True)
+path.write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(output,ensure_ascii=False))

@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.DI：已有真实稿接API研究读取根
+
+annual_profile_reader支持显式QUOTE_COMPANY_PROFILE_RESEARCH_ROOT，未设置沿原根；研究读取目录不存在时明确503，不静默回退。原writer将DE索引指定的十二稿和独立使用审核写独立持久研究目录，旧raw/hash/业务值不改；复制版本只加独立审核已经确定的未获取说明，避免API虽有内容却漏报已知缺项。用真实ASGI对十二家读内容/缺项/来源/作者、POST补读计划，无模型调用；证据只保一份紧凑索引、核对与示例。旧run/pause/unbound失败通过基线最短触发路径判断，不再完整跑慢旧套件。下一单家有界真实补读先绑定正式源/问题/模型/预算，工程成立后按现有权限边界一次确认，不启生产或扩样。
+
 ### 6.DH：API读取与有界补读沿原owner
 
 新增薄年报画像router，不往routes.py堆领域逻辑，原公司档案快照接口不变。read owner提供研究投影（facts以reading_work_id+fact_id定位、Evidence/实际模型按轮保留）及缺项/未读/建议，GET零调用；POST只生成hash-bound精读计划，明确未执行。TaskService enrich动作要求一个股票、具体问题、唯一请求ID和原画像hash，使用原队列和runtime，只drain本轮工作；选章/抽取带问题，不输入旧答案，源审核仍走现有链。补读以同一writer的独立runtime记录保存，原稿不覆盖；read owner按原工作ID/hash/同报告引用链汇总，失败与未核补充不抹原内容，不按同element有事实自动报补齐。无需新事实库、合并语义规则或补读调度平台；真实调用/生产未授权，离线验证可重复补读及跨报告/过期绑定拒绝。

@@ -1,0 +1,20 @@
+{
+  "schema_version": "company_profile_enrichment.v1",
+  "request_id": "6-DJ-saic-products-20261117",
+  "base_work_id": "bp-work-dc4ab5559a9258d1a6cf3d44",
+  "base_workpaper_sha256": "cf01aa6cfaf485eb4d84fcfe128a3e1068ca37bb55563249357fa610bc12f978",
+  "report": {
+    "instrument_id": "600104.SH",
+    "report_id": "1225071780",
+    "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-01T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "targets": [
+    {
+      "element": "products_services",
+      "question": "精读本报告的汽车零部件业务，找出其披露的具体产品子类、用途及对应业务主体。只根据实际原文回答；未获取到则说明原因，不重写整份画像，不强求附带金额。"
+    }
+  ]
+}

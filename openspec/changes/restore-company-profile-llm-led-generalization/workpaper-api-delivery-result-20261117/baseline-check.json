@@ -1,0 +1,44 @@
+{
+  "baseline_ref": "7c4bd718",
+  "runtime_preconditions": {
+    "pre_API_enrichment": {
+      "extract_calls": 0,
+      "verify_calls": 0,
+      "unbound_status": "blocked",
+      "unbound_quality": {
+        "stage_ready": false,
+        "blocking_machine_rework": 1,
+        "machine_rework_reasons": {
+          "pages_not_bound": 1
+        }
+      },
+      "unbound_reason": "pages_not_bound"
+    },
+    "current": {
+      "extract_calls": 0,
+      "verify_calls": 0,
+      "unbound_status": "blocked",
+      "unbound_quality": {
+        "stage_ready": false,
+        "blocking_machine_rework": 1,
+        "machine_rework_reasons": {
+          "pages_not_bound": 1
+        }
+      },
+      "unbound_reason": "pages_not_bound"
+    }
+  },
+  "unchanged_application_methods": {
+    "_run": true,
+    "pause": true,
+    "_should_stop_run": true,
+    "_publication_allows_writes": true
+  },
+  "conclusion": {
+    "run_extract_count": "旧规则默认策略在基线与当前都不调用该测试provider；旧断言1不适用于这份默认输入。",
+    "pause_callback": "旧测试在extract回调触发pause，但同一输入在基线与当前均无extract，不能期待此回调暂停。",
+    "unbound": "acquire机器返工返回在基线与当前相同；旧整队列计数断言未在本轮重跑，不声称整套通过。"
+  },
+  "new_model_calls": 0,
+  "full_slow_legacy_suite_repeated": false
+}

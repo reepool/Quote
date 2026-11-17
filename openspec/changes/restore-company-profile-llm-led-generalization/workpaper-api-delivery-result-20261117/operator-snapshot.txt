@@ -1,0 +1,123 @@
+"""Prepare saved real workpapers for API research use; never call a model."""
+import asyncio
+import collections
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import types
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+import httpx
+from fastapi import FastAPI
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+OUT=ROOT/'data/research/company_profile_api_preview_20261117'
+EVIDENCE=CHANGE/'workpaper-api-delivery-result-20261117'
+from api.company_profile_routes import router
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+from research.company_profile.workpaper import CompanyProfileWorkpaper, workpaper_elements
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+from research.company_profile.workpaper_review import workpaper_hash
+
+def read(path):return json.loads(Path(path).read_text())
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def facts(paper):return {f.fact_id:f.model_dump(mode='json') for e in workpaper_elements(paper).values() for f in e.facts}
+
+assert not OUT.exists(),'persistent delivery already exists; verify rather than overwrite'
+assert not EVIDENCE.exists(),'completed evidence must not be overwritten'
+manifest=read(CHANGE/'workpaper-three-final-source-review-result-20261117/current-delivery-index.json')
+notes={
+ '600104.SH':{
+  'products_services':[
+   '独立使用审核建议获取（600104-K03）：零部件的柴油机、汽车电子等具体子类及板块归属尚未完整取得；不是基础画像必填项。',
+   '独立使用审核建议获取（600104-K04）：汽车金融贷款等具体服务及其披露范围尚未完整取得；不采用行业毛利率与子公司贷款范围的无据组合。'],
+  'scale_and_mix':['独立使用审核建议获取（600104-K07）：公司营业收入科目及与营业总收入的区别尚未单独完整交付；现有营业总收入和主要收入构成继续可用，不以同金额分行业行代替该科目。']},
+ '600098.SH':{'scale_and_mix':[
+  '独立使用审核建议获取（600098-K09）：公司利润表营业收入科目尚未单独取得；已有营业总收入及主要构成，不能把营业总收入改名代替。',
+  '独立使用审核建议获取（600098-K12）：收入构成中的金融业务小项尚未完整取得；不影响已有主要能源业务画像。']}}
+source_hashes={}
+rows=[]
+writer=CompanyProfileResearchWriter(OUT)
+for row in manifest['profiles']:
+    source=ROOT/row['source_query']
+    assert sha(source)==row['source_query_sha256']
+    source_hashes[str(source)]=sha(source)
+    p=read(source)['profiles'][0]
+    paper=CompanyProfileWorkpaper.model_validate(p['workpaper'])
+    choices=next(r for r in read(ROOT/row['decisions'])['profiles'] if r['instrument_id']==row['instrument_id'])
+    bound=bind_workpaper_use_review(paper,choices['use_review'])
+    payload=bound.model_dump(mode='json')
+    for element,limits in notes.get(row['instrument_id'],{}).items():
+        payload['elements'][element]['limitations'].extend(limits)
+    if row['instrument_id'] in notes:
+        payload['standardization_notes'].append('本研究读取版本由程序附加既有独立审核的缺项使用说明；事实/数字/来源/实际模型与旧原稿不变，非新模型核验。')
+    bound=CompanyProfileWorkpaper.model_validate(payload)
+    assert facts(bound)==facts(paper) and bound.evidence==paper.evidence and bound.generation==paper.generation
+    context=read(source.parent/'publication-context.json')
+    context.update(workpaper=bound.model_dump(mode='json'),workpaper_receipts=p['workpaper_receipts'])
+    record=CompanyProfileRuntimeRecordV3.model_validate_json(json.dumps(context,ensure_ascii=False))
+    path=writer.persist(record)
+    rows.append({'instrument_id':row['instrument_id'],'work_id':record.work_id,
+        'source_query':row['source_query'],'source_sha256':sha(source),
+        'runtime_record':str(path),'runtime_sha256':sha(path),
+        'workpaper_sha256':workpaper_hash(bound),'known_gap_notes_added':sum(len(x) for x in notes.get(row['instrument_id'],{}).values())})
+os.environ['QUOTE_COMPANY_PROFILE_RESEARCH_ROOT']=str(OUT)
+
+async def verify():
+    app=FastAPI();app.include_router(router,prefix='/api/v1')
+    reader=CompanyProfileReadService(OUT)
+    summaries=[]
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://research-local') as client:
+        for row in rows:
+            endpoint='/api/v1/research/company/'+row['instrument_id']+'/annual-profile'
+            response=await client.get(endpoint)
+            assert response.status_code==200,(row['instrument_id'],response.text)
+            body=response.json()
+            assert body==reader.research_profile(row['instrument_id'])
+            assert len(body['readings'])==1 and body['production_authorization']=='not_authorized'
+            counts=collections.Counter(e['state'] for e in body['facts'])
+            assert all(e['fact'] is None for e in body['facts'] if e['state'] in {'withheld','source_only','duplicate'})
+            assert body['readings'][0]['generation']['extraction']['model']
+            assert body['full_report_completeness']=='not_assessed'
+            content=[e for e in body['facts'] if e['fact'] is not None]
+            original=reader.query((row['instrument_id'],))['profiles'][0]
+            assert counts==collections.Counter(original['workpaper_delivery']['counts'])
+            summaries.append({'instrument_id':row['instrument_id'],'status_code':response.status_code,
+                'response_sha256':hashlib.sha256(response.content).hexdigest(),
+                'visible_facts':len(content),'visible_metrics':sum(len(e['fact']['metrics']) for e in content),
+                'delivery_counts':dict(counts),'information_gaps':body['information_gaps'],
+                'suggested_acquisitions':body['suggested_acquisitions'],
+                'business_description':[e['fact']['text'] for e in content if e['element']=='business_structure'],
+                'extraction_model':body['readings'][0]['generation']['extraction']['model'],
+                'review_status':body['readings'][0]['review_status'],
+                'unread_or_deferred':body['readings'][0]['reading_scope']['unread_or_deferred']})
+        response=await client.post('/api/v1/research/company/600104.SH/annual-profile/enrichment-plan',json={
+            'request_id':'6-DJ-saic-products-20261117','targets':[{
+                'element':'products_services','question':'精读本报告的汽车零部件业务，找出其披露的具体产品子类、用途及对应业务主体。只根据实际原文回答；未获取到则说明原因，不重写整份画像，不强求附带金额。'}]})
+        assert response.status_code==200,response.text
+        assert not response.json()['execution_started']
+        plan=response.json()['enrichment_plan']
+        EVIDENCE.mkdir()
+        dump(EVIDENCE/'enrichment-plan.json',plan)
+    return summaries
+
+with patch('socket.socket.connect',side_effect=AssertionError('offline DI: network forbidden')):
+    summaries=asyncio.run(verify())
+assert all(sha(path)==value for path,value in source_hashes.items())
+assert sum(r['visible_facts'] for r in summaries)==365
+assert sum(r['visible_metrics'] for r in summaries)==524
+dump(EVIDENCE/'api-summary.json',{'task':'6.DI','new_model_calls':0,'profiles':summaries,
+    'visible_facts':365,'visible_metrics':524,'api_read_owner_equal':12,'known_gap_notes_added':5,
+    'historical_sources_unchanged':True,'production_authorization':'not_authorized'})
+dump(EVIDENCE/'index.json',{'task':'6.DI','research_output_root':str(OUT),'profiles':rows,
+    'source_index':'workpaper-three-final-source-review-result-20261117/current-delivery-index.json',
+    'environment_key':'QUOTE_COMPANY_PROFILE_RESEARCH_ROOT','not_production_deployment':True})
+print(json.dumps({'profiles':len(rows),'visible_facts':365,'visible_metrics':524,'known_gap_notes':5,'output_root':str(OUT)},ensure_ascii=False))

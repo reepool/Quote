@@ -1,5 +1,17 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 323. 6.DI十二份真实画像API实物与单家补读准备
+
+用户同意继续后沿openspec-apply-change/business-first-goal，实际业务交付为[十二家API研究读取版](workpaper-api-delivery-result-20261117/result.md)。原writer将DE索引十二稿/独立使用审核持久到data/research/company_profile_api_preview_20261117，显式QUOTE_COMPANY_PROFILE_RESEARCH_ROOT让原API read owner使用；未设置沿原根，配置不可用503不回退。实际ASGI十二GET全部200并与原reader一致，365可见事实/524指标，七项隔离/仅源参考/重复仍fact=null。上汽三项/广州两项独立已知缺项加入复制版本对应要素的本地使用限制，不改事实/来源/实际模型或历史hash；原稿不覆写，未部署现网/启生产。
+
+30直接验证20.03秒通过，命令为`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --tb=short --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_enrichment.py::test_explicit_research_root_never_falls_back_to_another_dataset tests/unit/test_research/test_company_profile_enrichment.py::test_api_reads_gap_scope_and_plans_without_models_or_raw_withheld_values tests/unit/test_research/test_company_profile_enrichment.py::test_enrichment_source_drift_is_rejected_before_any_model_call tests/unit/test_research/test_company_profile_enrichment.py::test_failed_supplement_keeps_the_previously_readable_profile tests/unit/test_research/test_company_profile_workpaper_delivery.py`，正常执行环境、离线ASGI/替传输，无新模型。独立十二稿实物验证禁止socket.connect。strict/diff通过，Review A类已知缺项漏出API的交付问题以本地说明修复，B类全量消缺/跨轮自动消歧不做，C类既有并行保护。
+
+旧失败最短基线：7c4bd718与当前相同SERVICE_OVERVIEW的实际runtime均extract=0/verify=0，旧run期望一次extract及在其回调pause的前置均不成立；无页输入均pages_not_bound机器返工，原_run/pause/停止/写入许可AST相同。第三项整队列计数未重跑，不声称旧套件全过。只用于排除本轮变化的已发现直接路径，不把新画像质量交给旧规则测试，也不为它复制慢研究库。
+
+上汽API已生成6.DJ单次产品子类/用途/主体精读计划，正式PDF205页hash与复制画像绑定，原解析缓存命中；当前官方DeepSeek flash关闭thinking、Scorpio/Grok4.7 high配置和密钥可用性只读核齐，选章载荷74745字节仅到发送前停止，不含旧答案，后续生成/复核成功尚未验证。拟1800秒/500000账本/10物理含3恢复每逻辑1、有价10元/无价unknown，不承诺人民币总额；只有该公开报告的所选章节及公开派生稿，不追加窗/公司、充值、改共享配置或生产。当前0新调用/探针/真实入口，具体预算待用户确认，不能以旧额度续跑。
+
+开工HEADab992b84/空暂存，配置/骨架/规划混合段及未跟踪既有改动保留。本人DH无依赖残留0；三份临时操作脚本与持久快照逐字节一致后清，释放文件字节见validation.json，直接测试finally未量不虚报。2,561,632目录表观字节的十二份原writer记录是API实际读取数据，按用途保留，不当临时库清掉；正式源/有效缓存/旧回执及attempt不动。只提交本人可隔离代码/测试/规范/紧凑实物并普通推送，S1仍0/12、旧133和生产未改。活跃开发/审核时间未精确计；本轮工程和已有真实内容消费完成，真实精读另按6.DJ。
+
 ## 322. 6.DH API缺项与指定股票有界多轮补读
 
 用户要求API知道可能缺项，并可按股票后续多次精读，不让批量首读等待补满。沿原owner新增GET `/api/v1/research/company/{instrument_id}/annual-profile` 和POST同路径`/enrichment-plan`：GET交分级事实/缺项原因/建议、各轮来源/实际模型/未读范围；POST只给原工作ID/hash/报告与问题绑定的计划，明确未执行、不隐式付费。原TaskService/execute_published_task新增enrich，要求一个股票、具体问题、复核provider和有限预算，原队列只drain本轮工作，原章节选择/抽取带目标但不送旧答案，复核与writer不另建。每轮独立保存，API按同报告/hash祖先链汇总，`reading_work_id+fact_id`定位；坏项仍fact=null，旧稿不覆盖，新增同要素内容仅提示已补充、不自动报全部消缺或跨轮消歧。当前仍研究用途，HTTP端不直接执行付费补读，未部署或启生产。

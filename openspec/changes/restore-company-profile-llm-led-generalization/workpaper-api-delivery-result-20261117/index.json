@@ -1,0 +1,129 @@
+{
+  "task": "6.DI",
+  "research_output_root": "/home/python/Quote/data/research/company_profile_api_preview_20261117",
+  "profiles": [
+    {
+      "instrument_id": "600094.SH",
+      "work_id": "bp-work-bf979a385ba617f21a839898",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600094/query.json",
+      "source_sha256": "10c875b5c74c472e0ee88d659e2bdab2988810077b71de1f1c225fda43d83af5",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-bf979a385ba617f21a839898.json",
+      "runtime_sha256": "39312b24274e789f7ba75852f5ff7a99243b7d2fefd5e6a52b4519a072608164",
+      "workpaper_sha256": "55729c44100f816372d147a100f4bca44307edcb589492c927dc48d96fc35db1",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600103.SH",
+      "work_id": "bp-work-5d88bbcf3252b4b833c64f62",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600103/query.json",
+      "source_sha256": "dfafb39872eadc7eaca861b78155823d3c18f13b0e4f504706effb59dba6fc72",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-5d88bbcf3252b4b833c64f62.json",
+      "runtime_sha256": "32e2226086de06b127b496629599894d8371372c120b802a7b89e2b707c37312",
+      "workpaper_sha256": "8cab145f3a15d8e7da2474744f157746323aa5c0b4ad35671c3fe0fb9d9d6954",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600100.SH",
+      "work_id": "bp-work-495cd447d05207d84da133ac",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600100/query.json",
+      "source_sha256": "5684d727854f58e467ad0912dbfc6fb222f38f5cf57d8bda6ac4fbf3532d90cb",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-495cd447d05207d84da133ac.json",
+      "runtime_sha256": "8d91f61cf4cebf57dda6cb62dcbb646dc8a64130b5fb3705b4e6b58feec34c9e",
+      "workpaper_sha256": "af13d895a5f77f53d6fad1459b37aaf56c0303f2849b34de0a3d4062508f9110",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600107.SH",
+      "work_id": "bp-work-b94e5bae3f3267bd35912a70",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600107/query.json",
+      "source_sha256": "952e15a2b715193cce9705423473385ba42a0ea1c32c428fc66b623a27503c42",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-b94e5bae3f3267bd35912a70.json",
+      "runtime_sha256": "d87a241233924df1a2054f00747065dbd1c44e92c1ac6f1900ede1c8cda0e850",
+      "workpaper_sha256": "3fde8bcbb7cf4ca2c0ea70cdf9f537195a0fec7ff0c99c290da9f209d91218eb",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600098.SH",
+      "work_id": "bp-work-2f39f21066ff4a3203e66cac",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600098/query.json",
+      "source_sha256": "de8174931b03a4ac900474f64adf91b01b53fe9bd2e6b4eec9e2b9e41bdb7b27",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-2f39f21066ff4a3203e66cac.json",
+      "runtime_sha256": "def0805fd5e33bef6997f006e9e939aba8043664c9c224930bff38fe5120bea1",
+      "workpaper_sha256": "d3bc85bfebf41f3e8d2e56931d6a3d2e8d4b87703cc35d94b126f037b9687eeb",
+      "known_gap_notes_added": 2
+    },
+    {
+      "instrument_id": "600104.SH",
+      "work_id": "bp-work-dc4ab5559a9258d1a6cf3d44",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600104/query.json",
+      "source_sha256": "1069bf54411035d357ecfd26ecfeca583e94ebc56a4c40b18561f299a980c538",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-dc4ab5559a9258d1a6cf3d44.json",
+      "runtime_sha256": "2f1fb89e4af34ff271deda7c21c309831c63ef80c1dbb240047e031bd267becb",
+      "workpaper_sha256": "cf01aa6cfaf485eb4d84fcfe128a3e1068ca37bb55563249357fa610bc12f978",
+      "known_gap_notes_added": 3
+    },
+    {
+      "instrument_id": "600088.SH",
+      "work_id": "bp-work-6f932ea0fd112fc97a36a9cc",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600088/query.json",
+      "source_sha256": "d7ef75c1481d5bf71cb8fee2f30d7747d49d751484361fd858a608315722e94f",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-6f932ea0fd112fc97a36a9cc.json",
+      "runtime_sha256": "03edc5c0a7afe1a2d568ee0e1aeb9c877ee5c74fb4239975424387bba7ec6e55",
+      "workpaper_sha256": "65b59c282c6a6308f84e8322f1761cf95cc852dfb97a3a942ead69e729c48db5",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600099.SH",
+      "work_id": "bp-work-c54e4f3a694d9c45a55755d3",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600099/query.json",
+      "source_sha256": "362e48a9ab641da2995893a9ce98415b5c243d60af449398ee0993f0448e563d",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-c54e4f3a694d9c45a55755d3.json",
+      "runtime_sha256": "042e91f7629785ab0dd9da8823b3e609f23a40d2980c04dead0ea209713fd900",
+      "workpaper_sha256": "b8463f96cf302af0ea3f7f1e075a6cc4dc373a3b0fe36ebddd1853c96ed607f2",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600082.SH",
+      "work_id": "bp-work-8d0d94e5189e97cae31466fa",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600082/query.json",
+      "source_sha256": "660710208cf43bdd23135cf1ee3095c1b7e89b6cbfface9bdb24e77acd73dde4",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-8d0d94e5189e97cae31466fa.json",
+      "runtime_sha256": "30ae0c29fd33af2b46b94301b51637ea1007db4349ed8fe111d2b3c1b06ae892",
+      "workpaper_sha256": "04a54ee196651f78185a5e420b3a6c0db8032c036156e3c1a353df57bb14eb5b",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600097.SH",
+      "work_id": "bp-work-3525cda24575d90a4cc66978",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600097/query.json",
+      "source_sha256": "0ad8cd82c00e73d0734d1ba6eb4474bb7636be0a03a2128ae7cd1ca744e135cf",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-3525cda24575d90a4cc66978.json",
+      "runtime_sha256": "a5f33616c7f4db8a2bbfb8cb4607f3b55b98460100c81be40912f814c12f76c4",
+      "workpaper_sha256": "b9cf3e4caa5d3e4039e003a284b4eef74efbabcfad2d9695ade6b26a2fdf0b36",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600054.SH",
+      "work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-final-source-review-result-20261117/600054/query.json",
+      "source_sha256": "4708986160607fe7a5421a7d33390c398a0b9732bc889b076914e202d3dbd744",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-5e0abe90ca0571db02fcf3cb.json",
+      "runtime_sha256": "bdb1a5fa8ff4eaa11dfe686b963e2c52b2872831075f0246ed4997a282e09396",
+      "workpaper_sha256": "7f21b259b08bcc97c037a0360ad267874465329ed362e1dacd1ac4c86a9298b6",
+      "known_gap_notes_added": 0
+    },
+    {
+      "instrument_id": "600000.SH",
+      "work_id": "bp-work-adab8ac791bb78855e9bacfc",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-final-source-review-result-20261117/600000/query.json",
+      "source_sha256": "a119eb7eeb6a18d107d683d507a87fd91689c82bc413f499cc02c06252aea5ca",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-adab8ac791bb78855e9bacfc.json",
+      "runtime_sha256": "9c705d6b6d5f46c65a1dcb28c317e0aad9f4a7bdd064dc506f173fe35f79b162",
+      "workpaper_sha256": "59a7d1b148cf1eaa51316cd0f0c8d0d13a74c8d09f81cfcff5043c82f55e375c",
+      "known_gap_notes_added": 0
+    }
+  ],
+  "source_index": "workpaper-three-final-source-review-result-20261117/current-delivery-index.json",
+  "environment_key": "QUOTE_COMPANY_PROFILE_RESEARCH_ROOT",
+  "not_production_deployment": true
+}

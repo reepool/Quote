@@ -23,6 +23,19 @@ from tests.unit.test_research.test_company_profile_workpaper import PAGES, _repo
 from tests.unit.test_research.test_company_profile_workpaper_delivery import use_review
 
 
+def test_explicit_research_root_never_falls_back_to_another_dataset(monkeypatch):
+    from fastapi import HTTPException
+
+    with TemporaryDirectory(prefix='workpaper-di-root-') as directory:
+        monkeypatch.setenv('QUOTE_COMPANY_PROFILE_RESEARCH_ROOT', directory)
+        assert annual_profile_reader().output_root == Path(directory)
+        for missing in ('', str(Path(directory)/'missing')):
+            monkeypatch.setenv('QUOTE_COMPANY_PROFILE_RESEARCH_ROOT', missing)
+            with pytest.raises(HTTPException) as failed:
+                annual_profile_reader()
+            assert failed.value.status_code == 503
+
+
 def bootstrap(root):
     writer = CompanyProfileResearchWriter(root / 'output')
     runtime = CompanyProfileStageRuntime(writer=writer, provider=_Provider())
