@@ -1695,6 +1695,27 @@ class LlmClient:
                 "do not invent, infer, or silently delete values."
             ),
         }
+        if isinstance(error, LlmResponseParseError) and isinstance(raw_content, str):
+            try:
+                json.loads(raw_content)
+            except json.JSONDecodeError as parse_error:
+                correction["json_error"] = {
+                    "message": parse_error.msg, "offset": parse_error.pos,
+                    "line": parse_error.lineno, "column": parse_error.colno,
+                    "at_end_of_response": parse_error.pos == len(raw_content.rstrip()),
+                }
+                try:
+                    candidate = json.loads(raw_content + "}")
+                except json.JSONDecodeError:
+                    pass
+                else:
+                    if isinstance(candidate, dict):
+                        correction["syntax_hint"] = (
+                            "Appending one terminal object brace makes the prior response valid JSON. "
+                            "Return the ENTIRE corrected object, including that brace, not the unchanged "
+                            "prior response or a patch. This only diagnoses syntax: all schema fields "
+                            "and source constraints still apply. Do not add or guess business values."
+                        )
         messages.append(
             {
                 "role": "user",

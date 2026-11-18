@@ -109,6 +109,16 @@ The v9 system MUST distinguish basic workpaper delivery, selected-section inform
 ### Requirement: Selected section packets retain PDF table meaning
 The company-profile consumer MUST reuse the existing shared PDF/layout/recovery owners to assemble selected-section text, not build another parser or bypass shared OCR policy. A packet MUST contain the source version, report-local section IDs/title paths and source spans, and ordered paragraph/table blocks. Tables MUST preserve title, subject, period, unit/currency, column and row headers, blank/merged-cell relationships, signs, footnotes and original per-page provenance. Continuations may be linked or merged only when owning-table/header relationships are supported; unresolved layout MUST remain explicit. Native structure SHOULD be reused, bounded layout/image recovery MAY target a genuinely affected table, and full-report OCR or plain-text nonemptiness MUST NOT be treated as table correctness.
 
+#### Scenario: A readable native page cannot be rendered as fixed-width layout
+- **WHEN** one selected page fails fixed-width extraction but the shared native owner supplies readable text
+- **THEN** the packet retains the readable source with an explicit per-page layout limitation and original coordinates, without representing its table columns as recovered
+- **AND** other valid selected business sections remain available; missing or undecodable pages remain explicit rather than being called not disclosed
+
+#### Scenario: Business headings do not have section numbers
+- **WHEN** a report uses short standalone business headings instead of numbered headings
+- **THEN** the report-local index exposes those source headings and boundaries for model selection, without stock/page whitelists or inferred business answers
+- **AND** decimal amount continuations and recurring page footers do not become business section boundaries
+
 #### Scenario: A table crosses a PDF page boundary
 - **WHEN** an income table continues onto the next physical page without repeating all headers
 - **THEN** the selected packet includes the governing header and continuation rows with their original source coordinates and correct relationships

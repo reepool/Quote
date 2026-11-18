@@ -1,0 +1,202 @@
+{
+  "task": "6.DT",
+  "new_model_requests": 0,
+  "new_business_entries": 0,
+  "old_S2_result_changed": false,
+  "formal_acceptance": "not_assessed",
+  "production_authorization": "not_authorized",
+  "official_full_title": {
+    "title": "浙江东日股份有限公司2025年年度报告（全文）",
+    "document_type": "annual_report",
+    "selected": true
+  },
+  "citic_business_packet": {
+    "section_titles": [
+      [
+        "报告期内公司从事的业务情况"
+      ]
+    ],
+    "physical_pages": [
+      26
+    ],
+    "source_characters": 349,
+    "transcription_version": "shared-pdf-pypdf-layout.v1",
+    "limitations": [],
+    "model_text_sha256": "cf1eef1103203e6368e4ef587bb7e820d6c179e99a29c95b129f499da4942a0e",
+    "old_index_missing_that_heading": true
+  },
+  "shenwan_original_selected_packet": {
+    "section_titles": [
+      [
+        "第三节  管理层讨论与分析（续）",
+        "（一） 报告期内公司从事的主要业务"
+      ],
+      [
+        "第三节  管理层讨论与分析（续）",
+        "（二） 主营业务情况"
+      ],
+      [
+        "第三节  管理层讨论与分析（续）",
+        "2. 个人金融业务"
+      ],
+      [
+        "第三节  管理层讨论与分析（续）",
+        "3. 机构服务及交易业务"
+      ],
+      [
+        "第三节  管理层讨论与分析（续）",
+        "4. 投资管理业务"
+      ],
+      [
+        "第三节  管理层讨论与分析（续）",
+        "（四） 收入与成本"
+      ],
+      [
+        "第三节  管理层讨论与分析（续）",
+        "（一） 主营业务分业务情况"
+      ]
+    ],
+    "physical_pages": [
+      28,
+      29,
+      38,
+      39,
+      46,
+      47,
+      52,
+      53,
+      59,
+      60,
+      61,
+      64,
+      65,
+      67
+    ],
+    "source_characters": 7592,
+    "transcription_version": "shared-pdf-layout-with-native-fallback.v2",
+    "limitations": [
+      "物理页28布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页29布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页38布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页39布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页46布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页47布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页52布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页53布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页59布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页60布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页61布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页64布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页65布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+      "物理页67布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+    ],
+    "model_text_sha256": "48708d5372f60f1011ab5b11d4d43cfad0d2b0bcf9d3171c9b51b334fd033d46"
+  },
+  "json_recovery_feedback": [
+    {
+      "instrument": "000025",
+      "original_content_sha256": "a47708d750161e898b1ee93ecc5119f1af037fa8a632bfb55d8afd21d2a3f710",
+      "diagnosis": {
+        "at_end_of_response": true,
+        "column": 17350,
+        "line": 1,
+        "message": "Expecting ',' delimiter",
+        "offset": 17349
+      },
+      "syntax_hint": "Appending one terminal object brace makes the prior response valid JSON. Return the ENTIRE corrected object, including that brace, not the unchanged prior response or a patch. This only diagnoses syntax: all schema fields and source constraints still apply. Do not add or guess business values.",
+      "raw_response_auto_accepted": false
+    },
+    {
+      "instrument": "000001",
+      "original_content_sha256": "2ad115b2ac7aaa4979798a2501fc86d43182e5d80d6818776e77ffd5a6b5a8c8",
+      "diagnosis": {
+        "at_end_of_response": true,
+        "column": 23015,
+        "line": 1,
+        "message": "Expecting ',' delimiter",
+        "offset": 23014
+      },
+      "syntax_hint": "Appending one terminal object brace makes the prior response valid JSON. Return the ENTIRE corrected object, including that brace, not the unchanged prior response or a patch. This only diagnoses syntax: all schema fields and source constraints still apply. Do not add or guess business values.",
+      "raw_response_auto_accepted": false
+    }
+  ],
+  "old_raw_runtime_and_api_unchanged": true,
+  "old_api_profiles": 16,
+  "tests": {
+    "source-tests.xml": {
+      "tests": "116",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "77.892",
+      "failure_details": [
+        {
+          "test": "test_guangzhou_saved_content_original_task_service_candidate",
+          "message": "AssertionError: assert 'incomplete' == 'completed'\n  \n  - completed\n  ?         -\n  + incomplete\n  ? ++"
+        }
+      ]
+    },
+    "target-tests.xml": {
+      "tests": "16",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "55.788"
+    },
+    "final-tests.xml": {
+      "tests": "200",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "62.219",
+      "failure_details": [
+        {
+          "test": "test_initial_queue_wait_preserves_full_execution_budget",
+          "message": "utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded"
+        }
+      ]
+    },
+    "timing-recheck.xml": {
+      "tests": "1",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.407",
+      "failure_details": [
+        {
+          "test": "test_initial_queue_wait_preserves_full_execution_budget",
+          "message": "utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded"
+        }
+      ]
+    },
+    "timing-baseline.xml": {
+      "tests": "1",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.218",
+      "failure_details": [
+        {
+          "test": "test_initial_queue_wait_preserves_full_execution_budget",
+          "message": "utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded"
+        }
+      ]
+    },
+    "closed-tests.xml": {
+      "tests": "146",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "47.194"
+    },
+    "native-gap-tests.xml": {
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.168"
+    }
+  },
+  "baseline_timing_failure": "40ms queue test also fails after rebinding the only changed client method to its exact HEAD implementation; no deadline relaxation or unrelated queue fix.",
+  "baseline_commit": "ec855b46"
+}

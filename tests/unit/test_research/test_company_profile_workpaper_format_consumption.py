@@ -228,7 +228,7 @@ def test_guangzhou_saved_content_original_task_service_candidate(monkeypatch):
         document_version=asset['content_hash'],report_period=asset['report_period'],published_at=asset['published_at'])
     selection_receipt = next(r for r in json.loads(paths['original-selection.json'].read_text()) if r['purpose']=='select_profile_sections')
     selection = SectionSelection.model_validate(selection_receipt['response_payload'])
-    index = index_sections(pages)
+    index = index_sections(pages, legacy_numbered_only=True)
     packet_pages = extract_selected_layout(Path(asset['archive_path']).read_bytes(),selected_pages(index,selection))
     packet = build_section_packet(report,packet_pages,index,selection,remap_layout=True,max_characters=500000)
     failed = json.loads(paths['failed-model-content/content-001.json'].read_text())

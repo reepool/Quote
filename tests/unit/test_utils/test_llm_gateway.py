@@ -957,6 +957,26 @@ async def test_opted_in_validation_feedback_uses_only_already_allowed_retry(kind
         await client.close()
 
 
+def test_json_repair_explains_terminal_brace_but_never_accepts_it_locally():
+    from utils.llm.errors import LlmResponseParseError
+
+    raw = '{"label":"same source value","score":1'
+    payload = {"messages": [{"role": "user", "content": "source"}], "max_tokens": 200}
+    error = LlmResponseParseError("invalid JSON")
+    repaired = LlmClient._repair_payload(payload, error, raw_content=raw)
+    correction = json.loads(repaired["messages"][-1]["content"])
+    assert correction["json_error"]["at_end_of_response"] is True
+    assert "terminal object brace" in correction["syntax_hint"]
+    assert "ENTIRE corrected object" in correction["syntax_hint"]
+    assert correction["prior_response"] == raw
+    assert payload["messages"] == [{"role": "user", "content": "source"}]
+    assert repaired["max_tokens"] == payload["max_tokens"]
+    with pytest.raises(LlmResponseParseError):
+        LlmClient._parse_and_validate(raw, SCHEMA)
+    different = LlmClient._repair_payload(payload, error, raw_content='{"label": "unfinished')
+    assert "syntax_hint" not in json.loads(different["messages"][-1]["content"])
+
+
 @pytest.mark.asyncio
 async def test_output_limit_invalid_json_is_typed_truncation_after_bounded_repair():
     truncated = {

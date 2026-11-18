@@ -617,6 +617,7 @@ class CompanyProfileStageRuntime:
                         state.review_seed, report=state.report,
                         source_pdf_path=state.source_pdf_path,
                         real=state.processing_identity.get("execution_mode") == "provider",
+                        native_pages=state.pages,
                     )
                     state.pages = checked_pages or state.pages
                     state.workpaper.validate_pages(state.pages)

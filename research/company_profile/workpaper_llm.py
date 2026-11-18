@@ -42,9 +42,9 @@ def workpaper_processing_identity(
         "reading_strategy": WORKPAPER_READING_STRATEGY,
         "prompt_version": WORKPAPER_PROMPT_VERSION,
         "section_guide_version": SECTION_GUIDE_VERSION,
-        "preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+        "preprocessing_version": "toc_sections_native_layout.v5.plain-headings-local-layout",
         "source_binding_policy": "company_workpaper_source_literals.aligned-cells.v6",
-        "workpaper_format_recovery": "validation_feedback.v1",
+        "workpaper_format_recovery": "validation_feedback.v2.syntax-diagnosis",
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
         "execution_mode": "provider" if real else "offline_fake",
         "semantic_reuse": False,
@@ -322,7 +322,9 @@ def run_workpaper(
     content = Path(source_pdf_path).read_bytes() if source_pdf_path else None
     if content is not None and hashlib.sha256(content).hexdigest() != report.document_version:
         raise ValueError("source PDF hash differs from the bound report")
-    index = index_sections(pages)
+    source_identity = (extraction_resume or {}).get("original_processing_identity") or processing_identity
+    new_preprocessing = source_identity.get("preprocessing_version") == "toc_sections_native_layout.v5.plain-headings-local-layout"
+    index = index_sections(pages, legacy_numbered_only=not new_preprocessing)
     selection_id = f"{work_id}:workpaper:sections"
     extraction_id = f"{work_id}:workpaper:extract"
     path_ids = {section.section_path: section.section_id for section in index}
@@ -402,7 +404,7 @@ def run_workpaper(
     remap = source_pdf_path is not None
     if remap:
         assert content is not None
-        packet_pages = extract_selected_layout(content, chosen_pages)
+        packet_pages = extract_selected_layout(content, chosen_pages, native_pages=pages if new_preprocessing else None)
     elif real:
         raise ValueError("real workpaper requires the official PDF for selected layout")
     else:

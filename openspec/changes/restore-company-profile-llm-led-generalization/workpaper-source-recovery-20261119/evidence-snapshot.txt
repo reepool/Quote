@@ -1,0 +1,146 @@
+"""Offline verification of repaired source preparation; never a new S2 run."""
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import xml.etree.ElementTree as ET
+
+from research.business_profile_documents import classify_business_profile_document
+from research.company_profile.models import ReportIdentity
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper_sections import (
+    SectionSelection, build_section_packet, extract_selected_layout, index_sections, selected_pages,
+)
+from utils.llm import LlmClient
+from utils.llm.errors import LlmResponseParseError
+
+ROOT = Path('/home/python/Quote')
+OLD = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118'
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-source-recovery-20261119'
+TEMP = ROOT / 'data/QuoteBak/workpaper-dt-xHtgK0'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def source(code):
+    item = next(row for row in json.loads((OLD / 'source-manifest.json').read_text())['companies'] if row['instrument_id'].startswith(code))
+    asset = item['asset']
+    pdf = Path(asset['archive_path'])
+    assert sha(pdf) == asset['content_hash']
+    cache = pdf.parent / 'derived/business_profile_pdfium_recovery.v4' / (pdf.stem + '_57e1dd4f16ef40ff.json.gz')
+    pages = json.loads(gzip.decompress(cache.read_bytes()))['pages']
+    report = ReportIdentity(instrument_id=asset['instrument_id'], report_id=asset['filing_id'], document_version=pdf.stem,
+                            report_period=asset['report_period'], published_at=asset['published_at'])
+    return pdf, pages, report
+
+
+def packet_summary(packet):
+    return {'section_titles': [s.section_path for s in packet.reading_scope.sections],
+            'physical_pages': sorted({s.page for e in packet.evidence for s in e.source_spans}),
+            'source_characters': sum(len(s.quote) for e in packet.evidence for s in e.source_spans),
+            'transcription_version': packet.transcription_version, 'limitations': packet.limitations,
+            'model_text_sha256': hashlib.sha256(packet.model_text().encode()).hexdigest()}
+
+
+results = {'task': '6.DT', 'new_model_requests': 0, 'new_business_entries': 0,
+           'old_S2_result_changed': False, 'formal_acceptance': 'not_assessed', 'production_authorization': 'not_authorized'}
+title = '浙江东日股份有限公司2025年年度报告（全文）'
+classified = classify_business_profile_document(title, adjunct_type='PDF')
+assert classified.selected and classified.is_full_report
+results['official_full_title'] = {'title': title, 'document_type': classified.document_type, 'selected': classified.selected}
+
+pdf, native, report = source('600030')
+sections = index_sections(native)
+business = next(s for s in sections if s.section_path[-1] == '报告期内公司从事的业务情况')
+selection = SectionSelection(selected_section_ids=(business.section_id,), rationale='主营介绍原文离线定位', stop_reason='只验证供源不生成答案')
+layout = extract_selected_layout(pdf.read_bytes(), selected_pages(sections, selection), native_pages=native)
+packet = build_section_packet(report, layout, sections, selection, remap_layout=True)
+assert all(s in packet.model_text() for s in ('投资银行', '财富管理', '资产管理', '托管'))
+results['citic_business_packet'] = packet_summary(packet)
+results['citic_business_packet']['old_index_missing_that_heading'] = not any(
+    s.section_path[-1] == business.section_path[-1] for s in index_sections(native, legacy_numbered_only=True))
+
+pdf, native, report = source('000166')
+receipts = json.loads((OLD / '000166/model-receipts.json').read_text())
+selection = SectionSelection.model_validate(receipts[0]['response_payload'])
+legacy = index_sections(native, legacy_numbered_only=True)
+layout = extract_selected_layout(pdf.read_bytes(), selected_pages(legacy, selection), native_pages=native)
+packet = build_section_packet(report, layout, legacy, selection, remap_layout=True, max_characters=500000)
+assert any(e.physical_pages == (29,) for e in packet.evidence)
+assert packet.limitations and '布局未恢复' in packet.model_text()
+results['shenwan_original_selected_packet'] = packet_summary(packet)
+
+results['json_recovery_feedback'] = []
+for code in ['000025', '000001']:
+    path = OLD / code / 'failed-model-content/content-002.json'
+    payload = json.loads(path.read_text())
+    repaired = LlmClient._repair_payload({'messages': []}, LlmResponseParseError('invalid JSON'), raw_content=payload['content'])
+    feedback = json.loads(repaired['messages'][-1]['content'])
+    assert feedback['json_error']['at_end_of_response'] and 'syntax_hint' in feedback
+    results['json_recovery_feedback'].append({'instrument': code, 'original_content_sha256': payload['content_sha256'],
+        'diagnosis': feedback['json_error'], 'syntax_hint': feedback['syntax_hint'], 'raw_response_auto_accepted': False})
+
+old_read = json.loads((OLD / 'readback-check.json').read_text())
+for name, expected in old_read['raw_runtime_sha256_unchanged'].items():
+    assert sha(ROOT / name) == expected
+for name, expected in json.loads((OLD / 'cleanup.json').read_text())['final_canonical_outputs_sha256'].items():
+    assert sha(OLD / name) == expected
+saved = json.loads((OLD / 'delivery/annual-api.json').read_text())
+reader = CompanyProfileReadService(ROOT / 'data/research/company_profile_s2_first_20261118')
+assert reader.research_profile_catalog() == saved['catalog']
+results['old_raw_runtime_and_api_unchanged'] = True
+results['old_api_profiles'] = len(saved['profiles'])
+results['tests'] = {}
+for name in ['source-tests.xml', 'target-tests.xml', 'final-tests.xml', 'timing-recheck.xml', 'timing-baseline.xml', 'closed-tests.xml', 'native-gap-tests.xml']:
+    path = TEMP / name
+    if path.exists():
+        suite = ET.parse(path).getroot().find('testsuite')
+        results['tests'][name] = {key: suite.get(key) for key in ['tests', 'failures', 'errors', 'skipped', 'time']}
+results['baseline_timing_failure'] = '40ms queue test also fails after rebinding the only changed client method to its exact HEAD implementation; no deadline relaxation or unrelated queue fix.'
+DEST.mkdir(exist_ok=True)
+(DEST / 'verification.json').write_text(json.dumps(results, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({k:v for k,v in results.items() if k not in {'json_recovery_feedback', 'tests'}}, ensure_ascii=False))
+
+
+# Closing operation
+"""Keep one compact verification, remove only this finished task's derivatives."""
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import subprocess
+import xml.etree.ElementTree as ET
+
+ROOT = Path('/home/python/Quote')
+TEMP = ROOT / 'data/QuoteBak/workpaper-dt-xHtgK0'
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-source-recovery-20261119'
+OLD = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118'
+assert TEMP.is_dir() and TEMP.parent == ROOT / 'data/QuoteBak'
+assert not any(str(TEMP / name) in line for line in subprocess.check_output(['ps', '-eo', 'args='], text=True).splitlines()
+               for name in ['evidence.py', 'pytest-final', 'pytest-closed', 'pytest-native-gap'])
+verification = json.loads((DEST / 'verification.json').read_text())
+for path in TEMP.glob('*.xml'):
+    suite = ET.parse(path).getroot().find('testsuite')
+    verification['tests'][path.name] = {key: suite.get(key) for key in ['tests', 'failures', 'errors', 'skipped', 'time']}
+    failures = [{'test': case.get('name'), 'message': case.find('failure').get('message')}
+                for case in suite.findall('testcase') if case.find('failure') is not None]
+    if failures:
+        verification['tests'][path.name]['failure_details'] = failures
+assert verification['tests']['closed-tests.xml']['failures'] == '0'
+assert verification['tests']['native-gap-tests.xml']['failures'] == '0'
+verification['baseline_commit'] = 'ec855b46'
+(DEST / 'verification.json').write_text(json.dumps(verification, ensure_ascii=False, indent=2) + '\n')
+(DEST / 'evidence-snapshot.txt').write_text((TEMP / 'evidence.py').read_text() + '\n\n# Closing operation\n' + Path(__file__).read_text())
+for name, expected in json.loads((OLD / 'readback-check.json').read_text())['raw_runtime_sha256_unchanged'].items():
+    assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected
+files = [p for p in TEMP.rglob('*') if p.is_file()]
+record = {'removed_root': str(TEMP), 'files': len(files), 'file_bytes': sum(p.stat().st_size for p in files),
+          'previous_finally_cleanup_bytes': 'not_aggregated_do_not_double_count',
+          'retained': ['official PDF/shared valid cache', 'original S2 runtime/query/failures/API/attempts',
+                       'current verification/result and exact evidence script snapshot', 'baseline and parallel changes'],
+          'reproducible_derivatives_only': True}
+shutil.rmtree(TEMP)
+(DEST / 'cleanup.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(record, ensure_ascii=False))

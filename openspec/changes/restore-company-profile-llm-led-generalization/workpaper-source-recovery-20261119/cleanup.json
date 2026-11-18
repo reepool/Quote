@@ -1,0 +1,13 @@
+{
+  "removed_root": "/home/python/Quote/data/QuoteBak/workpaper-dt-xHtgK0",
+  "files": 31,
+  "file_bytes": 226203,
+  "previous_finally_cleanup_bytes": "not_aggregated_do_not_double_count",
+  "retained": [
+    "official PDF/shared valid cache",
+    "original S2 runtime/query/failures/API/attempts",
+    "current verification/result and exact evidence script snapshot",
+    "baseline and parallel changes"
+  ],
+  "reproducible_derivatives_only": true
+}

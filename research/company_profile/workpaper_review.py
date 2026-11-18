@@ -140,7 +140,7 @@ def workpaper_hash(workpaper: CompanyProfileWorkpaper) -> str:
     return hashlib.sha256(workpaper.model_dump_json().encode()).hexdigest()
 
 
-def seed_material(seed, *, report, source_pdf_path, real: bool):
+def seed_material(seed, *, report, source_pdf_path, real: bool, native_pages=None):
     """Re-review explicit prior workpaper sources without reselecting or regenerating."""
     paper = seed if isinstance(seed, CompanyProfileWorkpaper) else CompanyProfileWorkpaper.model_validate(seed)
     if paper.report != report or paper.quality_review is not None:
@@ -153,7 +153,10 @@ def seed_material(seed, *, report, source_pdf_path, real: bool):
         if hashlib.sha256(content).hexdigest() != report.document_version:
             raise ValueError("review seed PDF hash differs from report")
         numbers = sorted({span.page for item in paper.evidence for span in item.source_spans})
-        pages = extract_selected_layout(content, numbers)
+        pages = extract_selected_layout(
+            content, numbers,
+            native_pages=native_pages if paper.reading_scope.transcription_version == "shared-pdf-layout-with-native-fallback.v2" else None,
+        )
         paper.validate_pages(pages)
     # A new review entry is a new source binding, not a legacy read. Do not let
     # persisted text bypass the same checks used for extraction and repairs.

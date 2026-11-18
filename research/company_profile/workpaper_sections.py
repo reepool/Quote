@@ -29,15 +29,23 @@ _HEADING = re.compile(
     r"[（(][0-9]{1,3}[）)][.．]?\s*.+)$"
 )
 _INLINE_HEADING = re.compile(rf"[。；]\s+([{_CN}]+[、．.]\s*[^。；\r\n]{{2,80}})\s*$")
+_PLAIN_HEADING = re.compile(
+    r"^[^\d\W][^。；;：:，,!?！？\d]{1,37}"
+    r"(?:情况|分析|概览|综述|回顾|业务|经营模式|业务模式|财务报告|公司治理|重要事项|未来展望)$"
+)
 
 
-def _numeric_table_row(title: str) -> bool:
+def _numeric_table_row(title: str, *, legacy: bool = False) -> bool:
     """Do not let decimal amounts/ratios terminate a real section.
 
     Multi-level headings such as 3.7 / 3.6.2 remain valid. Financial
     continuations can start with 000.00 or 1.47 -69.51; retain that text
     as source, not as a new heading/boundary.
     """
+    if not legacy and re.match(
+        r"^\d+(?:\.\d+)+\s*(?:[万亿千百]?(?:元|台|吨|只|辆|人|户)|[%％])(?:[，,。；;\s]|$)", title
+    ):
+        return True
     match = re.match(r"^(\d+(?:\.\d+)+)\s+(.+)$", title)
     if not match:
         return False
@@ -85,7 +93,7 @@ class SectionPacket(_Model):
     def model_text(self) -> str:
         out = [
             "以下仅为本报告选定章节原文，不是候选答案。",
-            "表格以等宽文本保留布局；相邻原页片段可能属于同一续表，金额须同时引用表头/单位所在片段。",
+            "正常页以等宽文本保留表格布局；若页内标明布局降级或未读，不能据此猜列。相邻片段的金额须共同引用表头/单位。",
         ]
         for evidence in self.evidence:
             out.extend([
@@ -93,6 +101,8 @@ class SectionPacket(_Model):
                 f"[[{evidence.evidence_id}]] {' / '.join(evidence.section_path)}",
             ])
             for span in evidence.source_spans:
+                if evidence.table_context and "布局未恢复" in evidence.table_context:
+                    out.append(evidence.table_context)
                 out.extend([f"物理页 {span.page}", "```text", span.quote, "```"])
         return "\n".join(out)
 
@@ -122,9 +132,14 @@ def _source_pages(pages: Sequence[Mapping]) -> dict[int, str]:
     return dict(sorted(result.items()))
 
 
-def index_sections(pages: Sequence[Mapping]) -> tuple[IndexedSection, ...]:
+def index_sections(pages: Sequence[Mapping], *, legacy_numbered_only: bool = False) -> tuple[IndexedSection, ...]:
     """Index real headings; directory entries locate structure, not answers."""
     by_page = _source_pages(pages)
+    footer_counts: dict[str, int] = {}
+    for text in by_page.values():
+        for line in text.splitlines()[-2:]:
+            title = line.strip()
+            footer_counts[title] = footer_counts.get(title, 0) + 1
     headings: list[dict[str, Any]] = []
     stack: list[dict[str, Any]] = []
     for page, text in by_page.items():
@@ -132,7 +147,8 @@ def index_sections(pages: Sequence[Mapping]) -> tuple[IndexedSection, ...]:
         if ("目录" in text or "目 录" in text) and len(re.findall(r"\.{3,}|…{2,}", text)) >= 2:
             continue
         offset = 0
-        for line in text.splitlines(keepends=True):
+        lines = text.splitlines(keepends=True)
+        for line_number, line in enumerate(lines):
             stripped = line.strip()
             inline = _INLINE_HEADING.search(stripped)
             leading = len(line) - len(line.lstrip())
@@ -142,9 +158,12 @@ def index_sections(pages: Sequence[Mapping]) -> tuple[IndexedSection, ...]:
                 leading += inline.start(1)
                 stripped = inline.group(1).strip()
             match = _HEADING.match(stripped)
-            if match and not _numeric_table_row(stripped) and len(stripped) <= 150 and not re.search(r"\.{3,}|…{2,}", stripped):
+            plain = not legacy_numbered_only and bool(_PLAIN_HEADING.fullmatch(stripped))
+            if plain and line_number >= len(lines) - 2 and footer_counts.get(stripped, 0) >= 3:
+                plain = False  # Repeated report/page footer, not a new boundary.
+            if (match or plain) and not _numeric_table_row(stripped, legacy=legacy_numbered_only) and len(stripped) <= 150 and not re.search(r"\.{3,}|…{2,}", stripped):
                 title = re.split(r"[。；]", stripped, maxsplit=1)[0].strip()
-                level = _level(title)
+                level = _level(title) if match else 1
                 start = offset + leading
                 while stack and stack[-1]["level"] >= level:
                     closed = stack.pop()
@@ -213,6 +232,7 @@ def build_section_packet(
     max_characters: int = 160_000,
 ) -> SectionPacket:
     by_page = _source_pages(pages)
+    page_metadata = {int(p.get("page", p.get("page_number"))): p for p in pages}
     by_id = {item.section_id: item for item in sections}
     selected_pages(sections, selection)
     chosen = sorted((by_id[sid] for sid in set(selection.selected_section_ids)), key=lambda e: (e.start_page, e.start_offset, -e.characters))
@@ -228,6 +248,14 @@ def build_section_packet(
             text = by_page.get(page)
             if text is None:
                 raise ValueError(f"selected section page was not supplied: {page}")
+            metadata = page_metadata[page]
+            if metadata.get("readable") is False:
+                limitation = str(metadata.get("layout_limitation") or f"物理页{page}原文不可读，本页未读，不等于未披露。")
+                if limitation not in limitations:
+                    limitations.append(limitation)
+                continue
+            if metadata.get("layout_limitation") and metadata["layout_limitation"] not in limitations:
+                limitations.append(metadata["layout_limitation"])
             start = section.start_offset if page == section.start_page else 0
             end = section.end_offset if page == section.end_page else len(text)
             if remap_layout:
@@ -244,12 +272,16 @@ def build_section_packet(
                 section_path=section.section_path,
                 physical_pages=(page,),
                 source_spans=(WorkpaperSpan(page=page, start=start, end=end, quote=quote),),
-                table_context="相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。",
+                table_context=metadata.get("layout_limitation") or "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。",
             ))
     if not evidence:
         raise ValueError("selected sections contain no readable source text")
     if sum(len(span.quote) for item in evidence for span in item.source_spans) > max_characters:
         raise ValueError("selected sections are too broad; select smaller complete subsections")
+    transcription = (
+        "shared-pdf-layout-with-native-fallback.v2" if remap_layout and limitations
+        else "shared-pdf-pypdf-layout.v1" if remap_layout else "source_page_text.v1"
+    )
     return SectionPacket(
         report=report,
         reading_scope=WorkpaperReadingScope(
@@ -258,37 +290,67 @@ def build_section_packet(
                 start_page=item.start_page, end_page=item.end_page,
                 rationale=selection.rationale,
             ) for item in chosen),
-            unread_or_deferred=selection.deferred,
+            unread_or_deferred=(*selection.deferred, *limitations),
             selection_rationale=selection.rationale,
             stop_reason=selection.stop_reason,
-            transcription_version="shared-pdf-pypdf-layout.v1" if remap_layout else "source_page_text.v1",
+            transcription_version=transcription,
         ),
         evidence=tuple(evidence),
-        transcription_version="shared-pdf-pypdf-layout.v1" if remap_layout else "source_page_text.v1",
+        transcription_version=transcription,
         limitations=tuple(limitations),
     )
 
 
-def extract_selected_layout(content: bytes, page_numbers: Sequence[int]) -> tuple[dict, ...]:
+def extract_selected_layout(
+    content: bytes, page_numbers: Sequence[int], *, native_pages: Sequence[Mapping] | None = None,
+) -> tuple[dict, ...]:
     """Use the shared native PDF owner in opt-in fixed-width layout mode."""
     from research.document_processing.pdf import PypdfNativeAdapter, detect_text_quality
 
     result = PypdfNativeAdapter(extraction_mode="layout").extract(content, target_pages=page_numbers)
     requested = set(page_numbers)
-    if set(page.page_number for page in result.pages) != requested:
+    if native_pages is None and set(page.page_number for page in result.pages) != requested:
         raise ValueError("native layout extraction did not return every selected page")
+    fallback = _source_pages(native_pages) if native_pages is not None else {}
+    by_number = {page.page_number: page for page in result.pages}
     pages = []
-    for page in result.pages:
-        quality, _diagnostics = detect_text_quality(page.text)
+    for number in sorted(requested):
+        page = by_number.get(number)
+        text = page.text if page else ""
+        quality, _diagnostics = detect_text_quality(text)
+        # A page may contain plenty of readable text while layout extraction
+        # loses a heading needed to remap the native index. Keep this local:
+        # use the already supplied shared native text, never guessed offsets.
+        native_titles = (
+            line.strip() for line in fallback.get(number, "").splitlines()[:-2]
+            if (_HEADING.fullmatch(line.strip()) or _PLAIN_HEADING.fullmatch(line.strip()))
+            and not _numeric_table_row(line.strip())
+        )
+        lost_heading = any(_position(text, title) is None for title in native_titles)
         # A native chapter divider can legitimately contain only its heading.
         # Keep that text and its coordinates: low character count is not a
         # decoding failure, and must not discard the following business pages.
-        if quality not in {"usable", "low_text"} or page.diagnostics:
-            raise ValueError(f"selected page has unreadable native layout: {page.page_number}")
+        metadata = {}
+        if quality not in {"usable", "low_text"} or page is None or page.diagnostics or lost_heading:
+            if native_pages is None:
+                raise ValueError(f"selected page has unreadable native layout: {number}")
+            text = fallback.get(number, "")
+            quality, _diagnostics = detect_text_quality(text)
+            readable = quality in {"usable", "low_text"}
+            metadata = {
+                "layout_limitation": f"物理页{number}布局未恢复；" + (
+                    "仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。" if readable
+                    else "原生文本也不可读，本页未读，不等于未披露。"
+                ),
+                "extraction_method": "shared-native-text-fallback.v1" if readable else "unreadable",
+            }
+            if not readable:
+                text = ""
         pages.append({
-            "page": page.page_number, "text": page.text, "readable": True,
-            "text_hash": hashlib.sha256(page.text.encode()).hexdigest(),
+            "page": number, "text": text, "readable": quality in {"usable", "low_text"},
+            "text_hash": hashlib.sha256(text.encode()).hexdigest(),
             "extraction_method": "shared-pdf-pypdf-layout.v1",
             "layout_quality": quality,
+            **metadata,
         })
     return tuple(pages)

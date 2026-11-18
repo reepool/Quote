@@ -6,6 +6,16 @@ from research.business_profile_documents import (
 )
 
 
+def test_parenthesized_full_report_suffix_does_not_admit_related_notices():
+    for suffix in ("（全文）", "(全文)", "全文"):
+        for kind in ("年度报告", "半年度报告"):
+            result = classify_business_profile_document(f"示例公司2025年{kind}{suffix}", adjunct_type="PDF")
+            assert result.selected and result.is_full_report and not result.is_correction
+    for suffix in ("（全文）摘要", "（全文）披露公告", "（全文）说明", "（全文及摘要）"):
+        result = classify_business_profile_document("示例公司2025年年度报告" + suffix)
+        assert not result.selected and not result.is_full_report
+
+
 def test_classifies_full_periodic_reports_and_excludes_summaries():
     annual = classify_business_profile_document("万华化学2025年年度报告")
     summary = classify_business_profile_document("万华化学2025年年度报告摘要")
