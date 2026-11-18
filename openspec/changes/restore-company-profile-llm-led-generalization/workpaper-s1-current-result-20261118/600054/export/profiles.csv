@@ -1,0 +1,7 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model,workpaper_delivery_reviewed_count,workpaper_delivery_pending_count,workpaper_delivery_limited_count,workpaper_delivery_source_only_count,workpaper_delivery_withheld_count,workpaper_delivery_duplicate_count,workpaper_delivery_pending_review_count
+600054.SH,2025-12-31,2026-04-17T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司经营黄山景区、花山谜窟景区及太平湖景区，主要提供旅游观光和休闲度假等服务。
+公司拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提供客运观光服务。
+公司拥有各类酒店十余家，主要提供住宿餐饮等旅宿服务；黄山景区内主要分布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆等，景区外主要分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠假日酒店、黄山国际大酒店等。
+公司以“徽商的厨房、家乡的味道”为发展定位，打造徽文化主题餐饮品牌，在全国多地开设连锁主题餐饮门店，主要提供徽菜餐饮等服务。
+公司旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等方面，下属黄山市中国旅行社有限公司为安徽省首批5A级旅行社。
+公司智慧旅游业务依托黄山景区旅游资源，开展旅游目的地智慧旅游建设和运营，涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。",32,43,completed_with_open_findings,1,deepseek-flash,grok-4.7,32,0,0,0,0,0,0

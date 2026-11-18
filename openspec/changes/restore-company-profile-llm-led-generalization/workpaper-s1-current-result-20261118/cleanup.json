@@ -1,0 +1,19 @@
+{
+  "task": "6.DL",
+  "business_roots_cleaned_in_finally_bytes": 7828514,
+  "final_scratch_roots": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dl-4sFi1x",
+      "bytes": 40005,
+      "purpose": "owned no-longer-needed preparation, operator, or process-log duplicate; snapshots verified"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dl-prepared-i7kei9uv",
+      "bytes": 12488717,
+      "purpose": "owned no-longer-needed preparation, operator, or process-log duplicate; snapshots verified"
+    }
+  ],
+  "total_measured_file_bytes": 20357236,
+  "formal_PDF_effective_parse_cache_old_results_attempts_and_both_API_roots": "retained",
+  "unrelated_or_preexisting_directories": "not_deleted"
+}

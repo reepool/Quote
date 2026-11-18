@@ -1,0 +1,20 @@
+{
+  "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/source-first-contract.json",
+  "sha256": "a3c7007cc778417ace8d3f9f413a44446e11ea0bc2777b7cf306c1d5f0241f0d",
+  "full_pool_conditions": 70,
+  "selected_instruments": [
+    "600099.SH",
+    "600054.SH",
+    "600000.SH",
+    "600100.SH",
+    "600094.SH",
+    "600103.SH",
+    "600107.SH",
+    "600098.SH",
+    "600104.SH",
+    "600088.SH",
+    "600082.SH",
+    "600097.SH"
+  ],
+  "not_model_input": true
+}

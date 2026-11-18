@@ -1,0 +1,9 @@
+{
+  "task": "6.DL",
+  "passed": false,
+  "instruments": ["600099.SH", "600054.SH", "600000.SH", "600100.SH"],
+  "reason": "600000.SH produced a real draft but its source review failed with deadline_exceeded after its permitted recovery; the first-four complete review chain is not established. Stop the remaining eight under the approved barrier, not because of optional missing detail.",
+  "not_started_must_remain": ["600094.SH", "600103.SH", "600107.SH", "600098.SH", "600104.SH", "600088.SH", "600082.SH", "600097.SH"],
+  "no_new_window_or_rerun": true,
+  "existing_valid_research_content_retained": true
+}

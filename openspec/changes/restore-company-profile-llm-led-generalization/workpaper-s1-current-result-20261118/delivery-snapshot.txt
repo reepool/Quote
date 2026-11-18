@@ -1,0 +1,168 @@
+"""6.DL read-only audit binding and original-writer research delivery; no models."""
+import asyncio
+import hashlib
+import json
+import os
+import sys
+from collections import Counter
+from pathlib import Path
+from unittest.mock import patch
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+CHANGE = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE/'workpaper-s1-current-result-20261118'
+OUT = ROOT/'data/research/company_profile_s1_current_20261118'
+from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import CompanyProfileWorkpaper, workpaper_elements, workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+CHECKED = {
+ '600099.SH':['F01','F02','F04','F05','F06','F07','F08','F09','F11','F12','F13','F14','F15','F26','F29','F31'],
+ '600054.SH':['F'+str(n).zfill(2) for n in range(1,34) if n!=22],
+ '600000.SH':['bs-01','bs-02','bs-03','bs-04','ps-01','ps-02','ps-03','ps-04','ps-05','rm-01','rm-02','rm-03','rm-04','rm-05'],
+ '600100.SH':['F01','F02','F04','F05','F06','F07','F08','F09','F10','F11','F26','F27','F29','review-add:RF01','review-add:RF05'],
+}
+CORE = {
+ '600099.SH':[['F01'],['F04'],['F05'],['F06'],['F07'],['F01','F02']],
+ '600054.SH':[['F01','F02','F03','F04','F05','F06'],['F01'],['F02'],['F03','F04'],['F05'],['F06'],['F09']],
+ '600000.SH':[['bs-01'],['bs-02','ps-01'],['ps-02'],['bs-03','ps-04'],['bs-04','ps-05'],['rm-02','rm-03']],
+ '600100.SH':[['F01'],['F05'],['F06','F07'],['F08'],['F09'],['F10'],['F11']],
+}
+REASONS = {
+ '600099.SH':'独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。',
+ '600054.SH':'独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。',
+ '600000.SH':'独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。',
+ '600100.SH':'独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。',
+}
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def read(path):
+    return json.loads(Path(path).read_text())
+
+
+def dump(path,value):
+    Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2,default=str)+'\n')
+
+
+assert not OUT.exists() and not (DEST/'independent-audit.json').exists()
+group = read(DEST/'group-execution.json')
+assert group['executed']==4 and len(group['not_started'])==8 and group['source_code_unchanged']
+assert group['stop_reason']=='first_four_core_blocked'
+contract = read(DEST/'source-first-contract.json')
+references = {c['instrument_id']:c for c in contract['companies']}
+inputs = {}
+papers, contexts = {}, {}
+audit_companies = []
+for instrument in CHECKED:
+    folder = DEST/instrument[:6]
+    for name in ('query.json','runtime.json','summary.json','model-receipts.json','budget.json'):
+        inputs[str((folder/name).relative_to(ROOT))]=sha(folder/name)
+    record = CompanyProfileRuntimeRecordV3.model_validate_json((folder/'runtime.json').read_text())
+    paper = record.workpaper
+    assert paper is not None and paper.origin=='llm_generated'
+    facts = {f.fact_id:f for e in workpaper_elements(paper).values() for f in e.facts}
+    assert set(CHECKED[instrument]) <= facts.keys()
+    assert all(set(ids)<=set(CHECKED[instrument]) for ids in CORE[instrument])
+    core = references[instrument]['core_conditions']
+    assert len(core)==len(CORE[instrument])
+    decisions = []
+    for fid in CHECKED[instrument]:
+        fact = facts[fid]
+        decisions.append({'fact_id':fid,'fact_sha256':workpaper_fact_hash(fact),
+            'disposition':'source_checked','evidence_ids':list(fact.evidence_ids),'reason':REASONS[instrument]})
+    if instrument=='600000.SH':
+        for fid, raw in [('rm-06','原文为报告期内对公业务营业净收入685.79亿元'),('rm-07','原文为报告期内资产托管业务收入24.81亿元')]:
+            fact=facts[fid]
+            decisions.append({'fact_id':fid,'fact_sha256':workpaper_fact_hash(fact),
+                'disposition':'source_only','evidence_ids':list(fact.evidence_ids),
+                'reason':raw+'；金额与业务名称有原文，但结构化consolidated_group标签范围偏宽/尚未核清。按原披露参考，不作为集团整体收入或与集团营收相加；不强求本轮确定性归类。',
+                'limitation':'银行高阶复核未完成；这两条仅源参考，不作为规范化集团指标。'})
+    accepted=[f for f in (paper.quality_review.findings if paper.quality_review else ()) if f.resolution=='corrected_pending_trust']
+    assert all(f.revised_fact and f.revised_fact.fact_id in CHECKED[instrument] for f in accepted)
+    audit_companies.append({'instrument_id':instrument,'query_sha256':sha(folder/'query.json'),
+        'core_conditions':[{'condition_id':c['condition_id'],'verdict':'supported','fact_ids':ids}
+            for c,ids in zip(core,CORE[instrument])],
+        'source_checked_fact_ids':CHECKED[instrument],
+        'scope_reference_only_fact_ids':['rm-06','rm-07'] if instrument=='600000.SH' else [],
+        'accepted_model_repairs_independently_supported':[f.finding_id for f in accepted],
+        'remaining_objects':'not_independently_assessed_in_this_round',
+        'source_reason':REASONS[instrument],'decisions':decisions})
+    papers[instrument]=paper
+    contexts[instrument]=record.model_dump(mode='json')
+audit = {'task':'6.DL','method':'Independent comparison with original PDF text/headers and current source spans, not model agreement or ID presence',
+    'core_reference_sha256':sha(DEST/'source-first-contract.json'),
+    'core_conditions_assessed':sum(len(c['core_conditions']) for c in audit_companies),
+    'supported_current_objects':sum(len(c['source_checked_fact_ids']) for c in audit_companies),
+    'unclosed_scope_reference_only_objects':2,
+    'accepted_model_repairs_independently_supported':sum(len(c['accepted_model_repairs_independently_supported']) for c in audit_companies),
+    'formal_accuracy':None,'formal_S1_pass':False,
+    'not_whole_report_or_all_output_accuracy':True,
+    'risk_scope':'Actual subject/period corrections and rejection observed; other frozen company-risk pairs not executed; 22 offline source-binding tests are engineering evidence, not real-model negative passes.',
+    'companies':audit_companies,'input_sha256_unchanged':inputs,'production_authorization':'not_authorized'}
+assert (audit['core_conditions_assessed'],audit['supported_current_objects'],audit['accepted_model_repairs_independently_supported'])==(26,77,12)
+dump(DEST/'independent-audit.json',audit)
+audit_hash=sha(DEST/'independent-audit.json')
+writer=CompanyProfileResearchWriter(OUT)
+rows=[]
+for company in audit_companies:
+    instrument=company['instrument_id']
+    paper=papers[instrument]
+    use_review={'report':paper.report.model_dump(mode='json'),'reviewer':'Codex independent source comparison, selected scope',
+        'reference':str((DEST/'independent-audit.json').relative_to(ROOT)), 'reference_sha256':audit_hash,
+        'decisions':company['decisions']}
+    bound=bind_workpaper_use_review(paper,use_review)
+    assert bound.elements==paper.elements and bound.evidence==paper.evidence and bound.generation==paper.generation and bound.quality_review==paper.quality_review
+    context={**contexts[instrument],'workpaper':bound.model_dump(mode='json')}
+    record=CompanyProfileRuntimeRecordV3.model_validate_json(json.dumps(context,ensure_ascii=False))
+    path=writer.persist(record)
+    rows.append({'instrument_id':instrument,'work_id':record.work_id,'runtime_record':str(path),'runtime_sha256':sha(path)})
+
+
+async def verify_delivery():
+    import httpx
+    from fastapi import FastAPI
+    from api.company_profile_routes import router
+    os.environ['QUOTE_COMPANY_PROFILE_RESEARCH_ROOT']=str(OUT)
+    app=FastAPI(); app.include_router(router,prefix='/api/v1')
+    reader=CompanyProfileReadService(OUT)
+    exported=reader.export(tuple(CHECKED),export_directory=DEST/'delivery')
+    queried=reader.query(tuple(CHECKED))
+    reloaded=CompanyProfileReadService(OUT).query(tuple(CHECKED))
+    assert queried['profiles']==exported['profiles']==reloaded['profiles']
+    summaries=[]
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://research-local') as client:
+        for row in rows:
+            instrument=row['instrument_id']
+            response=await client.get('/api/v1/research/company/'+instrument+'/annual-profile')
+            assert response.status_code==200 and response.json()==reader.research_profile(instrument)
+            value=response.json()
+            visible=[f for f in value['facts'] if f['fact'] is not None]
+            assert all(f['fact'] is None for f in value['facts'] if f['state'] in ('source_only','withheld','duplicate'))
+            if instrument=='600000.SH':
+                assert value['readings'][0]['review_status']=='failed'
+                assert any(f['state']=='pending' for f in value['facts'])
+                assert all(next(f for f in value['facts'] if f['fact_id']==fid)['state']=='source_only' for fid in ('rm-06','rm-07'))
+            summaries.append({'instrument_id':instrument,'api_status':response.status_code,
+                'visible_records':len(visible),'metrics':sum(len(f['fact']['metrics']) for f in visible),
+                'delivery_counts':dict(Counter(f['state'] for f in value['facts'])),
+                'information_gaps':value['information_gaps'],'suggested_acquisitions':value['suggested_acquisitions'],
+                'model_review_status':value['readings'][0]['review_status']})
+    return summaries
+
+
+with patch('socket.socket.connect',side_effect=AssertionError('6.DL delivery: no network/model')):
+    summaries=asyncio.run(verify_delivery())
+assert all(sha(ROOT/path)==value for path,value in inputs.items())
+dump(DEST/'delivery-index.json',{'task':'6.DL','research_output_root':str(OUT),'not_deployed':True,
+    'profiles':rows,'three_reads_equal':4,'API_read_owner_equal':4,
+    'independent_audit_sha256':audit_hash,'profiles_summary':summaries,'old_API_root_unchanged':True,
+    'production_authorization':'not_authorized'})
+print(json.dumps({'delivered':4,'independently_supported':77,'source_only':2,
+    'visible_records':sum(c['visible_records'] for c in summaries),'metrics':sum(c['metrics'] for c in summaries),
+    'new_calls_in_postprocessing':0,'output_root':str(OUT)},ensure_ascii=False))

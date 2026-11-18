@@ -1,0 +1,108 @@
+"""Close the bounded 6.DL observation and clean only its owned scratch roots."""
+import hashlib
+import json
+import os
+import shutil
+from pathlib import Path
+
+ROOT=Path('/home/python/Quote')
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=CHANGE/'workpaper-s1-current-result-20261118'
+WORK=ROOT/'data/QuoteBak/workpaper-dl-4sFi1x'
+PREPARED=ROOT/'data/QuoteBak/workpaper-dl-prepared-i7kei9uv'
+
+
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path):return json.loads(Path(path).read_text())
+def dump(path,data):Path(path).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+
+
+group=read(DEST/'group-execution.json')
+auth=read(DEST/'authorization.json')
+audit=read(DEST/'independent-audit.json')
+index=read(DEST/'delivery-index.json')
+assert group['executed']==4 and len(group['not_started'])==8 and group['stop_reason']=='first_four_core_blocked'
+assert {p:sha(ROOT/p) for p in auth['code_sha256']}==auth['code_sha256']
+assert sha(ROOT/'config/13_llm.json')==auth['shared_config_sha256']
+assert sha(WORK/'dl_runner.py')==auth['operator_sha256']
+assert sha(ROOT/auth['source_first_reference'])==auth['source_first_reference_sha256']
+assert all(sha(ROOT/path)==value for path,value in audit['input_sha256_unchanged'].items())
+old=read(CHANGE/'workpaper-batch-acceptance-20261118/acceptance.json')
+assert all(sha(ROOT/path)==value for path,value in old['runtime_sha256_unchanged'].items())
+rows=[]
+for instrument in auth['order']:
+    marker=ROOT/'data/QuoteBak/s1-attempts'/('workpaper-dl-'+instrument[:6]+'-20261118.json')
+    if instrument in group['not_started']:
+        assert not marker.exists() and not (DEST/instrument[:6]).exists()
+        continue
+    assert marker.exists()
+    directory=DEST/instrument[:6]
+    summary=read(directory/'summary.json')
+    budget=read(directory/'budget.json')
+    assert summary['three_reads_equal'] and summary['exception'] is None
+    known=sum(a['usage']['total_tokens'] for a in budget['attempts'] if a.get('usage'))
+    unknown=[a for a in budget['attempts'] if not a.get('usage')]
+    row={'instrument_id':instrument,'physical_requests':budget['physical_requests'],
+        'conservative_charged_ledger':budget['charged_tokens'],'supplier_usage_known':known,
+        'usage_unknown_attempts':len(unknown),'unknown_reserved':sum(a['charged_tokens'] for a in unknown),
+        'recoveries':summary['recoveries'],'preparation_seconds':summary['preparation_seconds'],
+        'business_seconds':summary['business_seconds'],'supervision_seconds':summary['supervision_seconds'],
+        'fee':'unknown','model_review_status':summary['review_status'],
+        'query_sha256':sha(directory/'query.json'),'model_receipts_sha256':sha(directory/'model-receipts.json'),
+        'business_runtime_root_file_bytes_cleaned':summary['cleanup_bytes']}
+    assert row['physical_requests']<=10 and row['conservative_charged_ledger']<=500000 and row['business_seconds']<=1800
+    assert row['conservative_charged_ledger']==known+row['unknown_reserved']
+    rows.append(row)
+totals={key:sum(r[key] for r in rows) for key in (
+    'physical_requests','conservative_charged_ledger','supplier_usage_known','usage_unknown_attempts',
+    'unknown_reserved','recoveries','business_runtime_root_file_bytes_cleaned')}
+assert (totals['physical_requests'],totals['conservative_charged_ledger'],totals['supplier_usage_known'],totals['unknown_reserved'])==(19,818382,440550,377832)
+dump(DEST/'resource-summary.json',{'task':'6.DL','companies':rows,'totals':totals,
+    'concurrency_max':4,'group_supervision_seconds':group['supervision_wall_seconds'],
+    'all_within_approved_dual_model_limits':True,'old_ordinary_resource_pass_not_claimed':True,
+    'known_usage_is_not_complete_supplier_usage':True,'fee':'unknown','production_authorization':'not_authorized'})
+# Preserve the minimal request-timing evidence, not whole temporary process logs.
+bank_log=(PREPARED/'600000-run.log').read_text()
+lines=[line for line in bank_log.splitlines() if (
+    ('profile=semantic_extraction__scorpio_grok' in line and 'event=llm.' in line)
+    or ('HTTP Request: POST https://scorpio.reepool.com' in line))]
+(DEST/'bank-review-timeout-log.txt').write_text('\n'.join(lines)+'\n')
+for local,retained in [('dl_runner.py','operator-snapshot.txt'),('freeze_quality.py','quality-contract-snapshot.txt'),
+    ('publish_results.py','delivery-snapshot.txt'),('finalize_evidence.py','closeout-snapshot.txt')]:
+    shutil.copy2(WORK/local,DEST/retained)
+    assert sha(WORK/local)==sha(DEST/retained)
+validation={'task':'6.DL','formal_S1_pass':False,'S2_released':False,
+    'executed':4,'not_started':group['not_started'],'original_entry_three_reads_equal':4,
+    'graded_delivery_three_reads_equal':index['three_reads_equal'],'actual_ASGI_GET_and_read_owner_equal':index['API_read_owner_equal'],
+    'current_basic_source_conditions_supported':26,'all_pool_basic_conditions':70,
+    'not_all_pool_recall':True,'independently_supported_objects':77,
+    'accepted_repairs_independently_checked':12,'source_reference_only_scope_objects':2,
+    'whole_output_accuracy':None,'full_formal_negative_suite_pass':False,
+    'offline_engineering_tests':{'command':'bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper_source_cells.py -k "changed_or_cross_column or joined_cell_still or qualitative_financial_absence or financial_decimal_repair or rate_wording"',
+        'passed':22,'deselected':75,'seconds':6.27,'not_model_semantic_pass':True},
+    'runtime_inputs_and_model_results_unchanged':True,'frozen_source_code_and_config_unchanged_during_run':True,
+    'old_API_runtime_hashes_preserved':13,'historical_133_and_scores_unchanged':True,
+    'new_research_root':index['research_output_root'],'visible_records':sum(p['visible_records'] for p in index['profiles_summary']),
+    'visible_metrics':sum(p['metrics'] for p in index['profiles_summary']),
+    'no_new_model_calls_after_first_four':True,'production_authorization':'not_authorized'}
+assert (validation['visible_records'],validation['visible_metrics'])==(142,222)
+dump(DEST/'validation.json',validation)
+for proc in Path('/proc').iterdir():
+    if not proc.name.isdigit():continue
+    try:parts=(proc/'cmdline').read_bytes().split(b'\0')
+    except (OSError,PermissionError):continue
+    assert str(WORK/'dl_runner.py').encode() not in parts
+    assert b'data/QuoteBak/workpaper-dl-4sFi1x/dl_runner.py' not in parts
+scratch=[]
+for directory in (WORK,PREPARED):
+    assert directory.parent==ROOT/'data/QuoteBak' and directory.is_dir() and not directory.is_symlink()
+    scratch.append({'path':str(directory),'bytes':sum(p.stat().st_size for p in directory.rglob('*') if p.is_file()),
+        'purpose':'owned no-longer-needed preparation, operator, or process-log duplicate; snapshots verified'})
+dump(DEST/'cleanup.json',{'task':'6.DL','business_roots_cleaned_in_finally_bytes':totals['business_runtime_root_file_bytes_cleaned'],
+    'final_scratch_roots':scratch,'total_measured_file_bytes':totals['business_runtime_root_file_bytes_cleaned']+sum(p['bytes'] for p in scratch),
+    'formal_PDF_effective_parse_cache_old_results_attempts_and_both_API_roots':'retained',
+    'unrelated_or_preexisting_directories':'not_deleted'})
+print(json.dumps({'finalized':True,'visible_records':142,'metrics':222,'source_checked':77,
+    'cleaned_file_bytes':totals['business_runtime_root_file_bytes_cleaned']+sum(p['bytes'] for p in scratch)},ensure_ascii=False),flush=True)
+for directory in (PREPARED,WORK):
+    shutil.rmtree(directory)

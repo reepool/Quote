@@ -1,0 +1,317 @@
+{
+  "task": "6.DL",
+  "research_output_root": "/home/python/Quote/data/research/company_profile_s1_current_20261118",
+  "not_deployed": true,
+  "profiles": [
+    {
+      "instrument_id": "600099.SH",
+      "work_id": "bp-work-afdfaa98807b8a4c4e1b0dfa",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_s1_current_20261118/company_profile_common_core.v1/bp-work-afdfaa98807b8a4c4e1b0dfa.json",
+      "runtime_sha256": "a7d9201d7754a78eb2578939961a9aeff88cfe6aa97db54631d5511ed8e5c6fe"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "work_id": "bp-work-e90e59273c54550629b5724d",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_s1_current_20261118/company_profile_common_core.v1/bp-work-e90e59273c54550629b5724d.json",
+      "runtime_sha256": "2a005b979fab564170f5373f1b506242ad79a81248c99e7865118047b4355219"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_s1_current_20261118/company_profile_common_core.v1/bp-work-fe6e6f93e0146e00e83900a0.json",
+      "runtime_sha256": "b9ee8afaf9726971668cbfb755aee80d32cb234f7cf6f1814ec56c2f7dda0a82"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "work_id": "bp-work-f6aff834b339105257473b0c",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_s1_current_20261118/company_profile_common_core.v1/bp-work-f6aff834b339105257473b0c.json",
+      "runtime_sha256": "93f6bf059edd6d9da0d2c72ea43918e4f09f9e40b0bf24b5ecede7769feabae6"
+    }
+  ],
+  "three_reads_equal": 4,
+  "API_read_owner_equal": 4,
+  "independent_audit_sha256": "5212e6614ba7ace7f0be117fb1b788e8ff62459c5748dbd4e4ba2bf10ba293bd",
+  "profiles_summary": [
+    {
+      "instrument_id": "600099.SH",
+      "api_status": 200,
+      "visible_records": 32,
+      "metrics": 58,
+      "delivery_counts": {
+        "reviewed": 32
+      },
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-afdfaa98807b8a4c4e1b0dfa",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-afdfaa98807b8a4c4e1b0dfa",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-afdfaa98807b8a4c4e1b0dfa",
+          "element": "upstream_inputs",
+          "status": "unclear",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-afdfaa98807b8a4c4e1b0dfa",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "model_review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "api_status": 200,
+      "visible_records": 32,
+      "metrics": 43,
+      "delivery_counts": {
+        "reviewed": 32
+      },
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-e90e59273c54550629b5724d",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "主营业务分行业收入为未合并抵消口径，各行业收入合计大于合并营业收入，不宜直接相加作为公司总收入。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-e90e59273c54550629b5724d",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取公司具体原材料、能源采购明细及供应商名称，成本分析仅披露成本构成项目。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-e90e59273c54550629b5724d",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "未披露具体客户名称、区域收入分地区明细及销售渠道占比。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-e90e59273c54550629b5724d",
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "未披露具体原材料、能源品类及主要供应商名称。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-e90e59273c54550629b5724d",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "未披露具体客户名称及客户类型结构。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "model_review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "api_status": 200,
+      "visible_records": 51,
+      "metrics": 89,
+      "delivery_counts": {
+        "reviewed": 13,
+        "limited": 7,
+        "source_only": 2,
+        "pending": 31
+      },
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "未获取按公司金融、零售金融、金融市场、跨境业务四大板块划分的完整营业收入及占比明细；对公业务营业净收入与集团营业收入口径不同，不可直接相加或等同。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "未获取按四大业务板块划分的资产、收入完整规模及占比数据。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取按业务板块划分的完整成本、费用及资本占用明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "未获取按客户类型划分的完整收入贡献及渠道销售占比数据。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "未获取各经营驱动因素对营业收入或利润的量化贡献拆分。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "未获取报告期内重大资产重组、重大收购或出售等结构性变化的完整说明。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取按资金来源类型划分的完整余额及成本明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fe6e6f93e0146e00e83900a0",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "未获取按客户类型划分的完整收入贡献数据。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "model_review_status": "failed"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "api_status": 200,
+      "visible_records": 27,
+      "metrics": 32,
+      "delivery_counts": {
+        "reviewed": 25,
+        "limited": 2
+      },
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-f6aff834b339105257473b0c",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "事实F13已隔离，未作为结论采用：narrative number is absent from cited source: 28,111.12万元"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-f6aff834b339105257473b0c",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "报告未在选定章节披露主要原材料、能源等具体采购品类的构成明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-f6aff834b339105257473b0c",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "指标格式隔离：事实F18未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+            "指标格式隔离：事实F19未作为结论采用；metrics.0: Value error, metric values must be decimal strings; metrics.1: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-f6aff834b339105257473b0c",
+          "element": "upstream_inputs",
+          "status": "not_disclosed",
+          "reasons": [
+            "选定章节未披露公司主要原材料、能源等具体采购品类及来源，仅披露前五名供应商采购额占比。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [
+        {
+          "reading_work_id": "bp-work-f6aff834b339105257473b0c",
+          "finding_id": "RF09",
+          "element": "material_changes",
+          "severity": "minor",
+          "reason": "F24并列报告期内整合成立同方数科与2025年3月更名，但未保留source-0018的1999年7月8日设立、原名同方知网数字出版技术股份有限公司。现稿容易把管理层讨论中的“成立”理解成报告期内新设法人。应补充设立时间与更名关系，不必删除来源中的整合表述。",
+          "evidence_ids": [
+            "source-0005",
+            "source-0018"
+          ]
+        }
+      ],
+      "model_review_status": "completed_with_open_findings"
+    }
+  ],
+  "old_API_root_unchanged": true,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,1207 @@
+[
+  {
+    "request_id": "bp-work-e90e59273c54550629b5724d:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "1de64146ed8173c0fd2c3213546b46e9a3067fc7637547c1103e579c06851d56",
+    "response_hash": "7b29924379b0b908accc2a746467619a42dc1f0395bbb409fa2f009ae771e4f2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0036\",\"section-0044\",\"section-0059\",\"section-0061\",\"section-0023\",\"section-0120\",\"section-1174\"],\"rationale\":\"选择公司业务介绍（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是货币化与主要业务权重的核心；主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营规模；分部信息（section-1174）用于核对分业务收入口径。行业背景、核心竞争力、治理与财务报告附注非本次经营解读重点，予以排除。\",\"deferred\":[\"section-0043 行业情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0052 核心竞争力：偏泛化竞争优势，非收入与经营实质，暂不选\",\"section-0141 公司治理、环境和社会：与经营解读无关，暂不选\",\"section-0349 财务报告全文：仅按需使用分部与收入附注，不整体扩读\"],\"stop_reason\":\"已覆盖业务结构、产品服务、经营模式、收入总额与分业务构成、经营变化及子公司规模，可支撑公司经营与货币化解读；剩余为行业背景、治理及财务附注细节，不影响核心判断，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0036",
+        "section-0044",
+        "section-0059",
+        "section-0061",
+        "section-0023",
+        "section-0120",
+        "section-1174"
+      ],
+      "rationale": "选择公司业务介绍（section-0036）说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及收入和成本分析（section-0061）给出营业收入总额、分业务收入构成与成本，是货币化与主要业务权重的核心；主要会计数据（section-0023）提供公司层面营收、利润等总量指标；主要控股参股公司分析（section-0120）补充子公司经营规模；分部信息（section-1174）用于核对分业务收入口径。行业背景、核心竞争力、治理与财务报告附注非本次经营解读重点，予以排除。",
+      "deferred": [
+        "section-0043 行业情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0052 核心竞争力：偏泛化竞争优势，非收入与经营实质，暂不选",
+        "section-0141 公司治理、环境和社会：与经营解读无关，暂不选",
+        "section-0349 财务报告全文：仅按需使用分部与收入附注，不整体扩读"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、经营模式、收入总额与分业务构成、经营变化及子公司规模，可支撑公司经营与货币化解读；剩余为行业背景、治理及财务附注细节，不影响核心判断，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 21275,
+      "output_tokens": 356,
+      "total_tokens": 21631
+    }
+  },
+  {
+    "request_id": "bp-work-e90e59273c54550629b5724d:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "24deaa1115e10b8932c2a38f3504d93ba25ed29ad6e3b35cc10283556605ea46",
+    "response_hash": "92a0898efac7516a3411d6dacc9de3907dd6cf2a8dab73275ac28fe77e729b3d",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司经营黄山景区、花山谜窟景区及太平湖景区，主要提供旅游观光和休闲度假等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F02\",\"text\":\"公司拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提供客运观光服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F03\",\"text\":\"公司拥有各类酒店十余家，主要提供住宿餐饮等旅宿服务；黄山景区内主要分布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆等，景区外主要分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠假日酒店、黄山国际大酒店等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]},{\"fact_id\":\"F04\",\"text\":\"公司以“徽商的厨房、家乡的味道”为发展定位，打造徽文化主题餐饮品牌，在全国多地开设连锁主题餐饮门店，主要提供徽菜餐饮等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F05\",\"text\":\"公司旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等方面，下属黄山市中国旅行社有限公司为安徽省首批5A级旅行社。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F06\",\"text\":\"公司智慧旅游业务依托黄山景区旅游资源，开展旅游目的地智慧旅游建设和运营，涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F07\",\"text\":\"公司业务分为景区、索道及缆车、酒店、徽菜、旅行社、智慧旅游六大板块，分别提供观光度假、客运观光、住宿餐饮、徽菜餐饮、旅行服务及智慧旅游平台运营等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]},{\"fact_id\":\"F08\",\"text\":\"公司已形成“雲麓”酒管品牌，并形成高端山奢美宿品牌“雲亼”、目的地豪华休旅品牌“雲麓”、超中端主题生活方式酒店品牌“雲野”以及高端休闲疗愈特色酒店品牌“雲颐”在内的多元化品牌矩阵。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F09\",\"text\":\"公司营业收入主要来自酒店、索道及缆车、景区、旅游服务、徽菜等业务板块；主营业务分行业收入按未合并抵消口径列报，合计金额大于合并抵消后列报的营业收入，差额主要是各行业之间的内部交易抵消。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F10\",\"text\":\"报告期内公司实现营业收入210,932.51万元，同比增长9.23%，主要系黄山景区接待进山游客增加及景区资源有偿使用费核算方法变化所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"210,932.51\",\"value\":\"210932.51\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"9.23\",\"value\":\"9.23\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"报告期内公司营业成本112,079.51万元，同比增长20.35%，主要系本期景区资源有偿使用费增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"112,079.51\",\"value\":\"112079.51\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比增长率\",\"raw_value\":\"20.35\",\"value\":\"20.35\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F12\",\"text\":\"主营业务分行业情况：酒店业务营业收入492,026,389.87元，毛利率32.57%，收入同比增长7.99%；索道及缆车业务营业收入842,155,363.75元，毛利率75.20%，收入同比增长17.37%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"酒店业务营业收入\",\"raw_value\":\"492,026,389.87\",\"value\":\"492026389.87\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"酒店业务毛利率\",\"raw_value\":\"32.57\",\"value\":\"32.57\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"酒店业务营业收入同比增长率\",\"raw_value\":\"7.99\",\"value\":\"7.99\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"索道及缆车业务营业收入\",\"raw_value\":\"842,155,363.75\",\"value\":\"842155363.75\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"索道及缆车业务毛利率\",\"raw_value\":\"75.20\",\"value\":\"75.20\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"索道及缆车业务营业收入同比增长率\",\"raw_value\":\"17.37\",\"value\":\"17.37\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"主营业务分行业情况：景区业务营业收入293,201,670.78元，毛利率46.46%，收入同比增长21.92%；旅游服务业务营业收入532,255,057.39元，毛利率7.98%，收入同比增长12.13%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"景区业务营业收入\",\"raw_value\":\"293,201,670.78\",\"value\":\"293201670.78\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"景区业务毛利率\",\"raw_value\":\"46.46\",\"value\":\"46.46\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"景区业务营业收入同比增长率\",\"raw_value\":\"21.92\",\"value\":\"21.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业务营业收入\",\"raw_value\":\"532,255,057.39\",\"value\":\"532255057.39\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业务毛利率\",\"raw_value\":\"7.98\",\"value\":\"7.98\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业务营业收入同比增长率\",\"raw_value\":\"12.13\",\"value\":\"12.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"主营业务分行业情况：徽菜业务营业收入245,296,390.79元，毛利率0.30%，收入同比增长1.09%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"徽菜业务营业收入\",\"raw_value\":\"245,296,390.79\",\"value\":\"245296390.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"徽菜业务毛利率\",\"raw_value\":\"0.30\",\"value\":\"0.30\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"徽菜业务营业收入同比增长率\",\"raw_value\":\"1.09\",\"value\":\"1.09\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"公司2025年营业收入2,109,325,107.63元，2024年为1,931,131,905.50元，本期比上年同期增减9.23%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,109,325,107.63\",\"value\":\"2109325107.63\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入\",\"raw_value\":\"1,931,131,905.50\",\"value\":\"1931131905.50\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"9.23\",\"value\":\"9.23\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"主营业务分行业收入为未合并抵消口径，各行业收入合计大于合并营业收入，不宜直接相加作为公司总收入。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F16\",\"text\":\"成本构成：酒店业务成本主要为住宿、餐饮，本期金额331,764,429.18元，占本期总成本23.17%；索道及缆车业务成本主要为索道、缆车运输等，本期金额208,848,588.38元，占14.59%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"酒店业务成本\",\"raw_value\":\"331,764,429.18\",\"value\":\"331764429.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"酒店业务成本占总成本比例\",\"raw_value\":\"23.17\",\"value\":\"23.17\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"索道及缆车业务成本\",\"raw_value\":\"208,848,588.38\",\"value\":\"208848588.38\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"索道及缆车业务成本占总成本比例\",\"raw_value\":\"14.59\",\"value\":\"14.59\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"成本构成：景区业务成本主要为景点开发、维护等，本期金额156,979,901.66元，占10.96%；旅游服务业务成本主要人员、场地、交通等，本期金额489,760,970.14元，占34.20%；徽菜业务成本主要为餐饮，本期金额244,568,871.09元，占17.08%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"景区业务成本\",\"raw_value\":\"156,979,901.66\",\"value\":\"156979901.66\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"景区业务成本占总成本比例\",\"raw_value\":\"10.96\",\"value\":\"10.96\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业务成本\",\"raw_value\":\"489,760,970.14\",\"value\":\"489760970.14\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业务成本占总成本比例\",\"raw_value\":\"34.20\",\"value\":\"34.20\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"徽菜业务成本\",\"raw_value\":\"244,568,871.09\",\"value\":\"244568871.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"徽菜业务成本占总成本比例\",\"raw_value\":\"17.08\",\"value\":\"17.08\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F18\",\"text\":\"酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司黄山风景区内山上酒店征收风景名胜资源有偿使用费所致；索道及缆车业务营业成本增加主要系该有偿使用费征收模式改变且征收比例增长所致。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"]}],\"limitations\":[\"未获取公司具体原材料、能源采购明细及供应商名称，成本分析仅披露成本构成项目。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F19\",\"text\":\"前五名客户销售额18,250.88万元，占年度销售总额7.61%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"18,250.88\",\"value\":\"18250.88\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"7.61\",\"value\":\"7.61\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F20\",\"text\":\"前五名供应商采购额13,750.74万元，占年度采购总额9.47%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"13,750.74\",\"value\":\"13750.74\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"9.47\",\"value\":\"9.47\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F21\",\"text\":\"公司徽菜业务在全国多地开设连锁主题餐饮门店；旅行社业务涵盖国内旅游、入境旅游、出境旅游等，市场覆盖境内外游客。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"未披露具体客户名称、区域收入分地区明细及销售渠道占比。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F22\",\"text\":\"报告期内，黄山景区累计接待进山游客516.80万人，较去年同期492.24万人增加24.56万人，增幅4.99%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"黄山景区累计接待进山游客\",\"raw_value\":\"516.80\",\"value\":\"516.80\",\"unit\":\"万人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"黄山景区累计接待进山游客\",\"raw_value\":\"492.24\",\"value\":\"492.24\",\"unit\":\"万人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"黄山景区进山游客同比增幅\",\"raw_value\":\"4.99\",\"value\":\"4.99\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F23\",\"text\":\"报告期内，索道及缆车累计运送游客1,043.38万人次，较去年同期981.49万人次增加61.88万人次，增幅6.31%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"索道及缆车累计运送游客\",\"raw_value\":\"1,043.38\",\"value\":\"1043.38\",\"unit\":\"万人次\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"索道及缆车累计运送游客\",\"raw_value\":\"981.49\",\"value\":\"981.49\",\"unit\":\"万人次\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"索道及缆车运送游客同比增幅\",\"raw_value\":\"6.31\",\"value\":\"6.31\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F24\",\"text\":\"景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F25\",\"text\":\"报告期内，北海宾馆环境整治改造项目、汤泉大酒店改造项目投入运营；完成半山寺环境整治项目；徽商故里淮南店投入运营，并加快推进仙人洞店改造项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F26\",\"text\":\"黄山文旅大模型成功通过中央网信办备案审核，系全省首个通过备案的文旅垂类大模型；自主研发黄山AI旅行助手并完成2个大版本、43个小版本功能迭代开发，AI旅行助手SaaS平台已成功对外拓展外部部分景区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F27\",\"text\":\"报告期内新设子公司黄山云趣、黄山云起，对公司生产经营和业绩无重大影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F28\",\"text\":\"归属于上市公司股东的净利润29,248.09万元，较去年同期减少2,252.81万元，减幅7.15%，主要系本期景区资源有偿使用费增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"29,248.09\",\"value\":\"29248.09\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比减幅\",\"raw_value\":\"7.15\",\"value\":\"7.15\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"公司以旅游服务运营为主，经营景区、索道及缆车、酒店、徽菜餐饮、旅行社及智慧旅游平台等业务，处于旅游服务提供环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F30\",\"text\":\"公司成本构成包括酒店住宿餐饮、索道缆车运输、景点开发维护、旅游服务人员场地交通及徽菜餐饮等投入；前五名供应商采购额占年度采购总额9.47%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"9.47\",\"value\":\"9.47\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未披露具体原材料、能源品类及主要供应商名称。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"公司下游客户为旅游观光、休闲度假游客及徽菜餐饮、旅行社、智慧旅游等服务的消费者；前五名客户销售额占年度销售总额7.61%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\",\"source-0009\"],\"metrics\":[{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"7.61\",\"value\":\"7.61\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未披露具体客户名称及客户类型结构。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F32\",\"text\":\"公司主编了国家标准《山岳型旅游景区清洁服务规范》，主编或参编《风景名胜区游步道技术标准》《景区玻璃栈道建设标准》《景区垃圾分类设施设置标准》等团体标准；旗下索道均为5S等级索道和安全生产标准化一级单位，并曾对江西灵山索道、浙江龙游六春湖索道和北京冬奥会滑雪索道等实施品牌、技术及管理输出。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F33\",\"text\":\"公司成功开辟5条无人机物资运输航线，运行以来运输各类物资585万斤，助力缓解景区物资运输难题；智能登山杖、髌骨带、膝关节外骨骼三款产品以及智能“机器狗”在景区公开测试，部分产品已投入租赁或出售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[]},\"limitations\":[\"主营业务分行业收入为未合并抵消口径，与合并营业收入存在内部交易抵消差额。\",\"未获取分地区收入明细、具体客户与供应商名称及采购物资品类明细。\",\"主要子公司分析仅列示部分子公司，未覆盖全部子公司经营数据。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司经营黄山景区、花山谜窟景区及太平湖景区，主要提供旅游观光和休闲度假等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提供客运观光服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "公司拥有各类酒店十余家，主要提供住宿餐饮等旅宿服务；黄山景区内主要分布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆等，景区外主要分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠假日酒店、黄山国际大酒店等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "公司以“徽商的厨房、家乡的味道”为发展定位，打造徽文化主题餐饮品牌，在全国多地开设连锁主题餐饮门店，主要提供徽菜餐饮等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "公司旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等方面，下属黄山市中国旅行社有限公司为安徽省首批5A级旅行社。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "公司智慧旅游业务依托黄山景区旅游资源，开展旅游目的地智慧旅游建设和运营，涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F07",
+              "text": "公司业务分为景区、索道及缆车、酒店、徽菜、旅行社、智慧旅游六大板块，分别提供观光度假、客运观光、住宿餐饮、徽菜餐饮、旅行服务及智慧旅游平台运营等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "公司已形成“雲麓”酒管品牌，并形成高端山奢美宿品牌“雲亼”、目的地豪华休旅品牌“雲麓”、超中端主题生活方式酒店品牌“雲野”以及高端休闲疗愈特色酒店品牌“雲颐”在内的多元化品牌矩阵。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F09",
+              "text": "公司营业收入主要来自酒店、索道及缆车、景区、旅游服务、徽菜等业务板块；主营业务分行业收入按未合并抵消口径列报，合计金额大于合并抵消后列报的营业收入，差额主要是各行业之间的内部交易抵消。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "报告期内公司实现营业收入210,932.51万元，同比增长9.23%，主要系黄山景区接待进山游客增加及景区资源有偿使用费核算方法变化所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "210,932.51",
+                  "value": "210932.51",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增长率",
+                  "raw_value": "9.23",
+                  "value": "9.23",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "报告期内公司营业成本112,079.51万元，同比增长20.35%，主要系本期景区资源有偿使用费增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "112,079.51",
+                  "value": "112079.51",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本同比增长率",
+                  "raw_value": "20.35",
+                  "value": "20.35",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F12",
+              "text": "主营业务分行业情况：酒店业务营业收入492,026,389.87元，毛利率32.57%，收入同比增长7.99%；索道及缆车业务营业收入842,155,363.75元，毛利率75.20%，收入同比增长17.37%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "酒店业务营业收入",
+                  "raw_value": "492,026,389.87",
+                  "value": "492026389.87",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "酒店业务毛利率",
+                  "raw_value": "32.57",
+                  "value": "32.57",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "酒店业务营业收入同比增长率",
+                  "raw_value": "7.99",
+                  "value": "7.99",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "索道及缆车业务营业收入",
+                  "raw_value": "842,155,363.75",
+                  "value": "842155363.75",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "索道及缆车业务毛利率",
+                  "raw_value": "75.20",
+                  "value": "75.20",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "索道及缆车业务营业收入同比增长率",
+                  "raw_value": "17.37",
+                  "value": "17.37",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "主营业务分行业情况：景区业务营业收入293,201,670.78元，毛利率46.46%，收入同比增长21.92%；旅游服务业务营业收入532,255,057.39元，毛利率7.98%，收入同比增长12.13%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "景区业务营业收入",
+                  "raw_value": "293,201,670.78",
+                  "value": "293201670.78",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "景区业务毛利率",
+                  "raw_value": "46.46",
+                  "value": "46.46",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "景区业务营业收入同比增长率",
+                  "raw_value": "21.92",
+                  "value": "21.92",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业务营业收入",
+                  "raw_value": "532,255,057.39",
+                  "value": "532255057.39",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业务毛利率",
+                  "raw_value": "7.98",
+                  "value": "7.98",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业务营业收入同比增长率",
+                  "raw_value": "12.13",
+                  "value": "12.13",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "主营业务分行业情况：徽菜业务营业收入245,296,390.79元，毛利率0.30%，收入同比增长1.09%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "徽菜业务营业收入",
+                  "raw_value": "245,296,390.79",
+                  "value": "245296390.79",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "徽菜业务毛利率",
+                  "raw_value": "0.30",
+                  "value": "0.30",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "徽菜业务营业收入同比增长率",
+                  "raw_value": "1.09",
+                  "value": "1.09",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "公司2025年营业收入2,109,325,107.63元，2024年为1,931,131,905.50元，本期比上年同期增减9.23%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "2,109,325,107.63",
+                  "value": "2109325107.63",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入",
+                  "raw_value": "1,931,131,905.50",
+                  "value": "1931131905.50",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "9.23",
+                  "value": "9.23",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "主营业务分行业收入为未合并抵消口径，各行业收入合计大于合并营业收入，不宜直接相加作为公司总收入。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F16",
+              "text": "成本构成：酒店业务成本主要为住宿、餐饮，本期金额331,764,429.18元，占本期总成本23.17%；索道及缆车业务成本主要为索道、缆车运输等，本期金额208,848,588.38元，占14.59%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "酒店业务成本",
+                  "raw_value": "331,764,429.18",
+                  "value": "331764429.18",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "酒店业务成本占总成本比例",
+                  "raw_value": "23.17",
+                  "value": "23.17",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "索道及缆车业务成本",
+                  "raw_value": "208,848,588.38",
+                  "value": "208848588.38",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "索道及缆车业务成本占总成本比例",
+                  "raw_value": "14.59",
+                  "value": "14.59",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "成本构成：景区业务成本主要为景点开发、维护等，本期金额156,979,901.66元，占10.96%；旅游服务业务成本主要人员、场地、交通等，本期金额489,760,970.14元，占34.20%；徽菜业务成本主要为餐饮，本期金额244,568,871.09元，占17.08%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "景区业务成本",
+                  "raw_value": "156,979,901.66",
+                  "value": "156979901.66",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "景区业务成本占总成本比例",
+                  "raw_value": "10.96",
+                  "value": "10.96",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业务成本",
+                  "raw_value": "489,760,970.14",
+                  "value": "489760970.14",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业务成本占总成本比例",
+                  "raw_value": "34.20",
+                  "value": "34.20",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "徽菜业务成本",
+                  "raw_value": "244,568,871.09",
+                  "value": "244568871.09",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "徽菜业务成本占总成本比例",
+                  "raw_value": "17.08",
+                  "value": "17.08",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司黄山风景区内山上酒店征收风景名胜资源有偿使用费所致；索道及缆车业务营业成本增加主要系该有偿使用费征收模式改变且征收比例增长所致。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取公司具体原材料、能源采购明细及供应商名称，成本分析仅披露成本构成项目。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F19",
+              "text": "前五名客户销售额18,250.88万元，占年度销售总额7.61%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "18,250.88",
+                  "value": "18250.88",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "7.61",
+                  "value": "7.61",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "前五名供应商采购额13,750.74万元，占年度采购总额9.47%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "13,750.74",
+                  "value": "13750.74",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "9.47",
+                  "value": "9.47",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "公司徽菜业务在全国多地开设连锁主题餐饮门店；旅行社业务涵盖国内旅游、入境旅游、出境旅游等，市场覆盖境内外游客。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称、区域收入分地区明细及销售渠道占比。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F22",
+              "text": "报告期内，黄山景区累计接待进山游客516.80万人，较去年同期492.24万人增加24.56万人，增幅4.99%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "黄山景区累计接待进山游客",
+                  "raw_value": "516.80",
+                  "value": "516.80",
+                  "unit": "万人",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "黄山景区累计接待进山游客",
+                  "raw_value": "492.24",
+                  "value": "492.24",
+                  "unit": "万人",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "黄山景区进山游客同比增幅",
+                  "raw_value": "4.99",
+                  "value": "4.99",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "报告期内，索道及缆车累计运送游客1,043.38万人次，较去年同期981.49万人次增加61.88万人次，增幅6.31%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "索道及缆车累计运送游客",
+                  "raw_value": "1,043.38",
+                  "value": "1043.38",
+                  "unit": "万人次",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "索道及缆车累计运送游客",
+                  "raw_value": "981.49",
+                  "value": "981.49",
+                  "unit": "万人次",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "索道及缆车运送游客同比增幅",
+                  "raw_value": "6.31",
+                  "value": "6.31",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F25",
+              "text": "报告期内，北海宾馆环境整治改造项目、汤泉大酒店改造项目投入运营；完成半山寺环境整治项目；徽商故里淮南店投入运营，并加快推进仙人洞店改造项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "黄山文旅大模型成功通过中央网信办备案审核，系全省首个通过备案的文旅垂类大模型；自主研发黄山AI旅行助手并完成2个大版本、43个小版本功能迭代开发，AI旅行助手SaaS平台已成功对外拓展外部部分景区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "报告期内新设子公司黄山云趣、黄山云起，对公司生产经营和业绩无重大影响。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "归属于上市公司股东的净利润29,248.09万元，较去年同期减少2,252.81万元，减幅7.15%，主要系本期景区资源有偿使用费增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "29,248.09",
+                  "value": "29248.09",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比减幅",
+                  "raw_value": "7.15",
+                  "value": "7.15",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F29",
+              "text": "公司以旅游服务运营为主，经营景区、索道及缆车、酒店、徽菜餐饮、旅行社及智慧旅游平台等业务，处于旅游服务提供环节。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F30",
+              "text": "公司成本构成包括酒店住宿餐饮、索道缆车运输、景点开发维护、旅游服务人员场地交通及徽菜餐饮等投入；前五名供应商采购额占年度采购总额9.47%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "9.47",
+                  "value": "9.47",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体原材料、能源品类及主要供应商名称。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F31",
+              "text": "公司下游客户为旅游观光、休闲度假游客及徽菜餐饮、旅行社、智慧旅游等服务的消费者；前五名客户销售额占年度销售总额7.61%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "7.61",
+                  "value": "7.61",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称及客户类型结构。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F32",
+            "text": "公司主编了国家标准《山岳型旅游景区清洁服务规范》，主编或参编《风景名胜区游步道技术标准》《景区玻璃栈道建设标准》《景区垃圾分类设施设置标准》等团体标准；旗下索道均为5S等级索道和安全生产标准化一级单位，并曾对江西灵山索道、浙江龙游六春湖索道和北京冬奥会滑雪索道等实施品牌、技术及管理输出。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ]
+          },
+          {
+            "fact_id": "F33",
+            "text": "公司成功开辟5条无人机物资运输航线，运行以来运输各类物资585万斤，助力缓解景区物资运输难题；智能登山杖、髌骨带、膝关节外骨骼三款产品以及智能“机器狗”在景区公开测试，部分产品已投入租赁或出售。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "主营业务分行业收入为未合并抵消口径，与合并营业收入存在内部交易抵消差额。",
+        "未获取分地区收入明细、具体客户与供应商名称及采购物资品类明细。",
+        "主要子公司分析仅列示部分子公司，未覆盖全部子公司经营数据。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 12659,
+      "output_tokens": 5514,
+      "total_tokens": 18173
+    }
+  },
+  {
+    "request_id": "bp-work-e90e59273c54550629b5724d:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "70f731dfb0240123fa58eda7375a17e79f064ebc4f41b408def23092cc7257dd",
+    "response_hash": "4fa84061c450c4d62c25ab7ae9c27df3287c0616cd14df9973ea88186f6ef808",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"RF01\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F22\",\"evidence_ids\":[\"source-0005\",\"source-0003\"],\"explanation\":\"516.80万人、492.24万人及增幅4.99%的统计对象是黄山景区进山游客，不是合并集团。公司同时经营花山谜窟景区和太平湖景区，不能把黄山景区游客量标为consolidated_group，也不得改记为整个景区业务。应保留原文数字和黄山景区主体，将事实及指标subject_scope改为business_segment；若不能对应报表行业行，则标unclear。\"},{\"finding_id\":\"RF02\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F23\",\"evidence_ids\":[\"source-0005\",\"source-0008\"],\"explanation\":\"1,043.38万人次、981.49万人次及增幅6.31%对应索道及缆车运送量，与分行业表中的索道及缆车业务为同一业务对象，不是合并集团口径。应保留人次和增幅，将subject_scope由consolidated_group改为business_segment。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F22",
+          "evidence_ids": [
+            "source-0005",
+            "source-0003"
+          ],
+          "explanation": "516.80万人、492.24万人及增幅4.99%的统计对象是黄山景区进山游客，不是合并集团。公司同时经营花山谜窟景区和太平湖景区，不能把黄山景区游客量标为consolidated_group，也不得改记为整个景区业务。应保留原文数字和黄山景区主体，将事实及指标subject_scope改为business_segment；若不能对应报表行业行，则标unclear。"
+        },
+        {
+          "finding_id": "RF02",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F23",
+          "evidence_ids": [
+            "source-0005",
+            "source-0008"
+          ],
+          "explanation": "1,043.38万人次、981.49万人次及增幅6.31%对应索道及缆车运送量，与分行业表中的索道及缆车业务为同一业务对象，不是合并集团口径。应保留人次和增幅，将subject_scope由consolidated_group改为business_segment。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19021,
+      "output_tokens": 414,
+      "total_tokens": 44894
+    }
+  },
+  {
+    "request_id": "bp-work-e90e59273c54550629b5724d:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "8c53963ceef96b40019b949e6ccfe1adcbd0e0eaa6310f94d0afbda76901fc15",
+    "response_hash": "507b6a9371d0a07caf78ceefed3c34f56bd4654ac3b3dfa5a8696cb6393231f9",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F22\",\"text\":\"报告期内，黄山景区累计接待进山游客516.80万人，较去年同期492.24万人增加24.56万人，增幅4.99%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"黄山景区累计接待进山游客\",\"raw_value\":\"516.80\",\"value\":\"516.80\",\"unit\":\"万人\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"黄山景区累计接待进山游客\",\"raw_value\":\"492.24\",\"value\":\"492.24\",\"unit\":\"万人\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"黄山景区进山游客同比增幅\",\"raw_value\":\"4.99\",\"value\":\"4.99\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F23\",\"text\":\"报告期内，索道及缆车累计运送游客1,043.38万人次，较去年同期981.49万人次增加61.88万人次，增幅6.31%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"索道及缆车累计运送游客\",\"raw_value\":\"1,043.38\",\"value\":\"1043.38\",\"unit\":\"万人次\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"索道及缆车累计运送游客\",\"raw_value\":\"981.49\",\"value\":\"981.49\",\"unit\":\"万人次\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"索道及缆车运送游客同比增幅\",\"raw_value\":\"6.31\",\"value\":\"6.31\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F22",
+          "text": "报告期内，黄山景区累计接待进山游客516.80万人，较去年同期492.24万人增加24.56万人，增幅4.99%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "黄山景区累计接待进山游客",
+              "raw_value": "516.80",
+              "value": "516.80",
+              "unit": "万人",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "黄山景区累计接待进山游客",
+              "raw_value": "492.24",
+              "value": "492.24",
+              "unit": "万人",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "黄山景区进山游客同比增幅",
+              "raw_value": "4.99",
+              "value": "4.99",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F23",
+          "text": "报告期内，索道及缆车累计运送游客1,043.38万人次，较去年同期981.49万人次增加61.88万人次，增幅6.31%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "索道及缆车累计运送游客",
+              "raw_value": "1,043.38",
+              "value": "1043.38",
+              "unit": "万人次",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "索道及缆车累计运送游客",
+              "raw_value": "981.49",
+              "value": "981.49",
+              "unit": "万人次",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "索道及缆车运送游客同比增幅",
+              "raw_value": "6.31",
+              "value": "6.31",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 9987,
+      "output_tokens": 598,
+      "total_tokens": 10585
+    }
+  },
+  {
+    "request_id": "bp-work-e90e59273c54550629b5724d:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "353bcffc4a3e7196ebbfa4114263535c0aaf1db17a17e295f0b688f5e0ce6246",
+    "response_hash": "327e749b95043b2b84521389c2b9b19dea56bc95218957e14922638e7ede2e52",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F22\",\"F23\"],\"checks\":[{\"fact_id\":\"F22\",\"accepted\":false,\"evidence_ids\":[\"source-0005\",\"source-0003\",\"source-0008\"],\"explanation\":\"不接受。source-0005的516.80万人、492.24万人及4.99%仅指黄山景区进山游客，候选保留了该主体和数字，但黄山景区不能对应报表行业行。source-0003表明景区业务同时涵盖黄山景区、花山谜窟景区和太平湖景区，source-0008的行业行也是更宽的景区业务。按初始问题，不得改记为整个景区业务，不能对应行业行时应标unclear；候选仍将事实及指标标为business_segment，主体范围不正确。\"},{\"fact_id\":\"F23\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0008\"],\"explanation\":\"接受。source-0005载明索道及缆车累计运送游客1,043.38万人次，上年同期981.49万人次，增加61.88万人次、增幅6.31%。该对象与source-0008分行业表中的索道及缆车业务一致，不是合并集团口径。候选保留人次、增幅和期间，并将主体范围改为business_segment，已实质纠正错误。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F22",
+        "F23"
+      ],
+      "checks": [
+        {
+          "fact_id": "F22",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0005",
+            "source-0003",
+            "source-0008"
+          ],
+          "explanation": "不接受。source-0005的516.80万人、492.24万人及4.99%仅指黄山景区进山游客，候选保留了该主体和数字，但黄山景区不能对应报表行业行。source-0003表明景区业务同时涵盖黄山景区、花山谜窟景区和太平湖景区，source-0008的行业行也是更宽的景区业务。按初始问题，不得改记为整个景区业务，不能对应行业行时应标unclear；候选仍将事实及指标标为business_segment，主体范围不正确。"
+        },
+        {
+          "fact_id": "F23",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0008"
+          ],
+          "explanation": "接受。source-0005载明索道及缆车累计运送游客1,043.38万人次，上年同期981.49万人次，增加61.88万人次、增幅6.31%。该对象与source-0008分行业表中的索道及缆车业务一致，不是合并集团口径。候选保留人次、增幅和期间，并将主体范围改为business_segment，已实质纠正错误。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11816,
+      "output_tokens": 304,
+      "total_tokens": 18346
+    }
+  }
+]

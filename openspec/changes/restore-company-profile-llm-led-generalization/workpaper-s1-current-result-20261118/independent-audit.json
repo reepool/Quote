@@ -1,0 +1,1134 @@
+{
+  "task": "6.DL",
+  "method": "Independent comparison with original PDF text/headers and current source spans, not model agreement or ID presence",
+  "core_reference_sha256": "a3c7007cc778417ace8d3f9f413a44446e11ea0bc2777b7cf306c1d5f0241f0d",
+  "core_conditions_assessed": 26,
+  "supported_current_objects": 77,
+  "unclosed_scope_reference_only_objects": 2,
+  "accepted_model_repairs_independently_supported": 12,
+  "formal_accuracy": null,
+  "formal_S1_pass": false,
+  "not_whole_report_or_all_output_accuracy": true,
+  "risk_scope": "Actual subject/period corrections and rejection observed; other frozen company-risk pairs not executed; 22 offline source-binding tests are engineering evidence, not real-model negative passes.",
+  "companies": [
+    {
+      "instrument_id": "600099.SH",
+      "query_sha256": "fe05f3676c9d5d0d94ae8d73cbbfaff1b21acad5f137329537226ab80103f445",
+      "core_conditions": [
+        {
+          "condition_id": "600099-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ]
+        },
+        {
+          "condition_id": "600099-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04"
+          ]
+        },
+        {
+          "condition_id": "600099-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ]
+        },
+        {
+          "condition_id": "600099-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06"
+          ]
+        },
+        {
+          "condition_id": "600099-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F07"
+          ]
+        },
+        {
+          "condition_id": "600099-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F02",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F26",
+        "F29",
+        "F31"
+      ],
+      "scope_reference_only_fact_ids": [],
+      "accepted_model_repairs_independently_supported": [
+        "R01",
+        "R02",
+        "R03",
+        "R04"
+      ],
+      "remaining_objects": "not_independently_assessed_in_this_round",
+      "source_reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。",
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "0820637952c2de961f5b54d950c5884577bb73c559c01477cc0656f8f6246b8d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F02",
+          "fact_sha256": "3aee146d5d19baa5bf7bf3f2c43cbd23100a23797270e3c4ba90c0e2f694d005",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "ddc2c7c439b0c9705925ac414df084056e71b634854b111cbf319a9dcfc97416",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "110cc2b931b980767fef7201e9985971c1a3e46d20dc39ad98ac0e5ea3cd967f",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F06",
+          "fact_sha256": "77e4986b9c5955668a7912996984f27c8387be4cceaa57b53ac7c814a602801d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F07",
+          "fact_sha256": "c25103f7464d3a6708393df29e6e552a983aef3a62e24d26b417b8fb8d5988e7",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F08",
+          "fact_sha256": "93e1efb4a7e1e764a3521c4a2101632932fb5c4fe44ac16784ea72a7e7a45826",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F09",
+          "fact_sha256": "4b08cbf11128d9b0da93d0c0012086b8d84d41d62d22f176761bfb295413fede",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F11",
+          "fact_sha256": "115c46e4c41ce3f6506f4e1850c38ccc03a957220029d12189fa166b3bba0be2",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F12",
+          "fact_sha256": "bf504e846574f4d937ac0e07720ce6a035be50a4f6d3c7d3d36d4a6aa821888d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F13",
+          "fact_sha256": "578bf926de41734358d191298151b04719e83de8254d8ef432b9c8fc96226aff",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F14",
+          "fact_sha256": "8b2cc187d82fa414b28feb3dc951854bc5d14a7edbf0725de264c76940ef8788",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F15",
+          "fact_sha256": "96099f10602e943f72d01a2c640c9528bc578bf71c144443c8d60d00ae37ed06",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F26",
+          "fact_sha256": "959c64142b3febff1d9d86b36b80224f873a79596db068e400429e25ace24324",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0014",
+            "source-0017"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F29",
+          "fact_sha256": "1de890d205ba30ae8c3f1fb88d3d5268f08fff236b73dcc80d984b281b07bd83",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0005"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        },
+        {
+          "fact_id": "F31",
+          "fact_sha256": "1ff6991861b32d48cc54a1edc5ff5e94a645d3f5eb237c87d2550f19d48d8eb0",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004",
+            "source-0005",
+            "source-0008"
+          ],
+          "reason": "独立核原文p8—10主营/产品/经营模式、p12规模与占比、p21分行业/地区表及不适用、p24披露状态；主营和直销/经销角色有据。四个真实修订保原值，分项不混集团、不适用不推出未变动。未列对象不是本轮独立全核。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "query_sha256": "60567378e961281ab6182ef28c5569e4c4ee954195bff16e52e5d2fec520d36a",
+      "core_conditions": [
+        {
+          "condition_id": "600054-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02",
+            "F03",
+            "F04",
+            "F05",
+            "F06"
+          ]
+        },
+        {
+          "condition_id": "600054-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ]
+        },
+        {
+          "condition_id": "600054-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02"
+          ]
+        },
+        {
+          "condition_id": "600054-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F03",
+            "F04"
+          ]
+        },
+        {
+          "condition_id": "600054-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ]
+        },
+        {
+          "condition_id": "600054-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06"
+          ]
+        },
+        {
+          "condition_id": "600054-DL07",
+          "verdict": "supported",
+          "fact_ids": [
+            "F09"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33"
+      ],
+      "scope_reference_only_fact_ids": [],
+      "accepted_model_repairs_independently_supported": [
+        "RF02"
+      ],
+      "remaining_objects": "not_independently_assessed_in_this_round",
+      "source_reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。",
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "f85c708a3d2ed17b28ffcf6497cf9ece7eacdc30c53382f90504d475a29f6c2e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F02",
+          "fact_sha256": "9e5e9ad6b58e18d7116403c9744778e2a3013afcb4cf265bae42b111b4812ac4",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F03",
+          "fact_sha256": "20092a0a80daf3aa42133c599724fbd130077fd36ba2badf137d14e1c8962ed6",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "93abaf4e3aa65e5d3db78479c54862bd660503800127e2dbd312980a8cfab25f",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "6f690893de5c22bd105102aa1fbfef78f4fbfd593dbd964092a3336c71f35bc7",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F06",
+          "fact_sha256": "f642b2d4e58cf15d8ba24f680e5bec3aa78918b3182ac69eddf698b7e924a74a",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F07",
+          "fact_sha256": "25b3d262253997b322143b86ec2138303e11f55aa1505cf93456a9792b0cca22",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F08",
+          "fact_sha256": "85d93b2b18e47cfb557581decc6a4022791c36a9b88ab66c618b33550950a367",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F09",
+          "fact_sha256": "a37d7e5814a23f262f2923de945e07d59a25f4578c278fbf763ba313850d965e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F10",
+          "fact_sha256": "b0d3b867ff8ea326a4ed2824501b04df91752bf2687f6f347342863b6f0a309a",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F11",
+          "fact_sha256": "00b07367137fe6bd176685fd12890defc9d9c24c0b7abaa63b615827c1cad71b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F12",
+          "fact_sha256": "0371ae7e4969956ef8813650953936f2fdba2d8762241dfa06eceb5f0187d497",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F13",
+          "fact_sha256": "156e7ff3889f7a54ca304b1ba480e39a26a3c73b9d6850b6728c1552f0b81358",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F14",
+          "fact_sha256": "d9ab6f0685efc84b4ee3ba2be3585904f7bad98132bb54b8dfa896632f6cfa56",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F15",
+          "fact_sha256": "efe2247d7c5105e2815be45a483a87da6b7f17811ac0a117fbac42adbfeaf329",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0007"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F16",
+          "fact_sha256": "abf815435a8b543c92c018169220395a5d62adf3bcc2cf6e8207a3843167d653",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F17",
+          "fact_sha256": "0c47da30b90a4e5638c786912272ec34cb54719cd2924e0b4903d5b088ce7899",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F18",
+          "fact_sha256": "c8deeb4655fc4946d93f00838c7edfc65bb15f09b9b1ee0c42fe07579690952d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008",
+            "source-0009"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F19",
+          "fact_sha256": "ae074ed654d4732718a95f056203626b249a80469cc592fb47902c72cbb08d9c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F20",
+          "fact_sha256": "a775738dd29014a3562dfcaa1c6f9d5db8c9eaed39951e4631a302753d4f0725",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F21",
+          "fact_sha256": "b7d4e5f91637472fc0e387f7df2b51cbc41754c71ee9cebfd98e28aae386bb51",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F23",
+          "fact_sha256": "dbb9e205f388cf7b300f4724e21e00b1636a2ad65b0508552b96f16900fe6f99",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F24",
+          "fact_sha256": "40d11a61910fdd1a43c48df01fc81d2c1aba455e336f0c416c9f7b40835ce6cc",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F25",
+          "fact_sha256": "138f343da1410cc48c8b45479c9651299337f1235a715f861bb4431819300f37",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F26",
+          "fact_sha256": "27cefbc3589675df8321864a718b57486a2edd00b48a1cae0139d7c2393a275c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F27",
+          "fact_sha256": "c19cea6dd37af152ef9b7e9076951d26fcaf2ec1b952e31e375f44d19915061b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F28",
+          "fact_sha256": "c32ec33f7ebb92bb32d5e38c92195456c8d7205575e37afc9e591f531adb8f4f",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F29",
+          "fact_sha256": "63876154b45bad6fa2fa43db32dac59e189abdc68e0bf86c961d327725b12d4f",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F30",
+          "fact_sha256": "9ff56192a42d833adce15b1f2b09a5ac9eea98c73fe80a262ff53b181f82840e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F31",
+          "fact_sha256": "86acc4d091c5711720f69cbe7589a327e9cc5a7a6e9809b7b3befff42b40e39d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004",
+            "source-0009"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F32",
+          "fact_sha256": "e27d13e8c61df0763a7423334f3b2f8a17b0620c27b1325abf029412e92ade43",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        },
+        {
+          "fact_id": "F33",
+          "fact_sha256": "c935e825fc507664533cc9eba9f7f51868ebe4b9b21c8b15ea489bf113be11bc",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "独立核原文p9—11的六业务/经营量/项目与变化，p6/p13—15公司/未抵销行业收入成本及客户供应商、p22新设子公司；表内成本/销售比例按披露口径保留，不改成集团营收或合并成本分母。F23为索道业务运量；F22未被最终接受，未复活。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600000.SH",
+      "query_sha256": "7d988cb9d69fc4287c683f7a6a96a15191e4d19b8092d10b438e4e841527a17b",
+      "core_conditions": [
+        {
+          "condition_id": "600000-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-01"
+          ]
+        },
+        {
+          "condition_id": "600000-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-02",
+            "ps-01"
+          ]
+        },
+        {
+          "condition_id": "600000-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "ps-02"
+          ]
+        },
+        {
+          "condition_id": "600000-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-03",
+            "ps-04"
+          ]
+        },
+        {
+          "condition_id": "600000-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-04",
+            "ps-05"
+          ]
+        },
+        {
+          "condition_id": "600000-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "rm-02",
+            "rm-03"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "bs-04",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "ps-04",
+        "ps-05",
+        "rm-01",
+        "rm-02",
+        "rm-03",
+        "rm-04",
+        "rm-05"
+      ],
+      "scope_reference_only_fact_ids": [
+        "rm-06",
+        "rm-07"
+      ],
+      "accepted_model_repairs_independently_supported": [],
+      "remaining_objects": "not_independently_assessed_in_this_round",
+      "source_reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+      "decisions": [
+        {
+          "fact_id": "bs-01",
+          "fact_sha256": "e8603afc9561d6efb019c23971358d612c34d419d440701cdc8ad3c38f1b02b8",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0007",
+            "source-0010",
+            "source-0013",
+            "source-0014"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "bs-02",
+          "fact_sha256": "45a296c069bc94372d12de03e4282d2853f671d48b97e234628b3a173d7fc9ff",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "bs-03",
+          "fact_sha256": "bc125250288619efa6c06fe9da6fb4820bd18dfb5a8c7e734298dd7d055a20a6",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0013",
+            "source-0014"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "bs-04",
+          "fact_sha256": "cd50f011e84f905e7f467a9ffd8403a3cf86c61b4bef93f8aa2bf89b1980c3b6",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "ps-01",
+          "fact_sha256": "beb1efaa1cbfa464ecd288bab1b6fa76cfd5cb78bfce28cca8e07c3718940845",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008",
+            "source-0009",
+            "source-0010"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "ps-02",
+          "fact_sha256": "b649deafff66723c81f31b79ec542adba9d5b0c138e36399232e0a19f81ee390",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0010",
+            "source-0011",
+            "source-0012",
+            "source-0013"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "ps-03",
+          "fact_sha256": "246ffadc81743c64b006615ab0614f155262c46e013da27f51045b0862e464b5",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "ps-04",
+          "fact_sha256": "0b439527ca41c04c5c923677b358f6e8c67f9184f7086971acb50750047aae86",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0013",
+            "source-0014"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "ps-05",
+          "fact_sha256": "4187b6405351d670d9ebdc6ca1db20543dea78b034221f84adee3be91300082e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "rm-01",
+          "fact_sha256": "d133a92034c901a91a898ae924c9c3ae6bc4b8724528e0576b0ba27dfdcaad8c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0017"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "rm-02",
+          "fact_sha256": "7e3c08566d51154ae0aa175f1c61218fb2e661c0710f42482d1f395f7304cf03",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "rm-03",
+          "fact_sha256": "18a25174e1154adc76debe8d6c33fe15d0f864b5981c7dc9a92dddd2e09db201",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0017"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "rm-04",
+          "fact_sha256": "7e44fc5b061e446c54be00e0ccf1f344f4c9973c491a6c02a4544d310f159257",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0017",
+            "source-0018"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "rm-05",
+          "fact_sha256": "749a3f38f5459981b02128fc5b21911e835f8eaab89e4eb4186c69678dd420dd",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0018"
+          ],
+          "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。"
+        },
+        {
+          "fact_id": "rm-06",
+          "fact_sha256": "3b13dc3a81a7edff8ded1a0830bb967b7aa57ebb5f462d725a7b8eccc1c0f242",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "原文为报告期内对公业务营业净收入685.79亿元；金额与业务名称有原文，但结构化consolidated_group标签范围偏宽/尚未核清。按原披露参考，不作为集团整体收入或与集团营收相加；不强求本轮确定性归类。",
+          "limitation": "银行高阶复核未完成；这两条仅源参考，不作为规范化集团指标。"
+        },
+        {
+          "fact_id": "rm-07",
+          "fact_sha256": "c26cd3ee87ab069ef0b98969d98a3271d82b0db08929cffc316f80bbba17ecc5",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "reason": "原文为报告期内资产托管业务收入24.81亿元；金额与业务名称有原文，但结构化consolidated_group标签范围偏宽/尚未核清。按原披露参考，不作为集团整体收入或与集团营收相加；不强求本轮确定性归类。",
+          "limitation": "银行高阶复核未完成；这两条仅源参考，不作为规范化集团指标。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600100.SH",
+      "query_sha256": "92f7eb4045b1e176ae5d754a8c2e0ed19d82c2a07884cc0b4d5a479b1ad2fa2a",
+      "core_conditions": [
+        {
+          "condition_id": "600100-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ]
+        },
+        {
+          "condition_id": "600100-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ]
+        },
+        {
+          "condition_id": "600100-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06",
+            "F07"
+          ]
+        },
+        {
+          "condition_id": "600100-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F08"
+          ]
+        },
+        {
+          "condition_id": "600100-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F09"
+          ]
+        },
+        {
+          "condition_id": "600100-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F10"
+          ]
+        },
+        {
+          "condition_id": "600100-DL07",
+          "verdict": "supported",
+          "fact_ids": [
+            "F11"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F02",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F26",
+        "F27",
+        "F29",
+        "review-add:RF01",
+        "review-add:RF05"
+      ],
+      "scope_reference_only_fact_ids": [],
+      "accepted_model_repairs_independently_supported": [
+        "RF01",
+        "RF02",
+        "RF03",
+        "RF05",
+        "RF06",
+        "RF07",
+        "RF08"
+      ],
+      "remaining_objects": "not_independently_assessed_in_this_round",
+      "source_reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。",
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "ad23b99ec1da592753eb26a91b1c8a3b00fb6acd24c4ab1ecbb720558a0f9666",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F02",
+          "fact_sha256": "a0d78227bdc7598285aacb948f167b4fdb6e10869f6e568ded5ac306853a3c81",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0018"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "cb370451449cddb9fdfcea21c228b3d5537c183e4b7cb350dde0a4dfa0e36a76",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0018"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "009e0eef44c42aba2c083fcf40affebc9600963d5f906e05fa6d718f186ce347",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0010"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F06",
+          "fact_sha256": "2962ae3a7707b09a6bc2be0f9ece1ce71316ce5c248731c767bbbdd0af97b5d8",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F07",
+          "fact_sha256": "80c2de3bb041718e7cd0f610ba0c23bc55e0d5d797f334a625a37ec31c590b6e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F08",
+          "fact_sha256": "6cebd28744ba9fdcd2f48725a05fb282ddc1942f61ce831fc01b63613e6e550d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F09",
+          "fact_sha256": "f283f83d8d9c1eb203d8366c88ade47be9e8a332a66ed73f85328215e5b60e8e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0010"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F10",
+          "fact_sha256": "80c8dcc9b38c2bb41ceceeaab8d3f13850265d0955e74d434ddfb8e6d663aefe",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F11",
+          "fact_sha256": "f4ec2b1c20574c4a7f922e0461da4f171f94bccb667db8a217dbf25b19b50495",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F26",
+          "fact_sha256": "1acafe71c82ded3cd037e586ec0a182f3827066752dc3279bedc317699eef2fb",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0010"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F27",
+          "fact_sha256": "a7209448ad9f5e23dabe043a93696475622e5410e70ca6aa5618c3913cc7ef24",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0010"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "F29",
+          "fact_sha256": "6a68059a1c047a61d28fc4e5ec986cd7cab4146d87803e14e92be38f7e3ef0b5",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "review-add:RF01",
+          "fact_sha256": "2ab0e5d122c914a24724bcc35166665009358db8616306810c8f767ee7f23123",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        },
+        {
+          "fact_id": "review-add:RF05",
+          "fact_sha256": "7f70e3cad3c959285b87272a34197dc3066fbf76e8530b0956481d3171078192",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "reason": "独立核原文p12—16主营/产品/变现/技术与利润变化，p21主营产业构成及抵销，p34子公司身份。七个真实采纳修订在其限定范围支持；F26/F27跨板块保持unclear及原文，不强行标准化为集团；主营合计不是公司营业收入总额。"
+        }
+      ]
+    }
+  ],
+  "input_sha256_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600099/query.json": "fe05f3676c9d5d0d94ae8d73cbbfaff1b21acad5f137329537226ab80103f445",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600099/runtime.json": "33ec2deadeb613c9f08cd9f2cc366cbf7eae3619b74fd28acccbec9643b33950",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600099/summary.json": "00f7a23e984a4f4961c3435a8a8874fb1d71dae8cc6203cb4a50693669a25685",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600099/model-receipts.json": "4010b368bf71c4770797bcb23c9695c0981d192823da56cd53120b451798d377",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600099/budget.json": "e257b74a6d003144f3a990a189d1cefa3d4f055c34c8e24318866b494fb6a40f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600054/query.json": "60567378e961281ab6182ef28c5569e4c4ee954195bff16e52e5d2fec520d36a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600054/runtime.json": "be54bad1d168471140eeb5b2ce419a973aeb57c93c6d2e34c5d77881d4f750e6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600054/summary.json": "f32ad713453cc54822a3a493ab82f6534cca96074876c548acb5d6de96b6cca7",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600054/model-receipts.json": "0ddc7db9e41567e8482a9ad0acf1f8ee81714bde0be6b22e722f4dedaecd9456",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600054/budget.json": "1bbae446d26ede322077308cd3dadf91e0cec41b100671b5e0cf30f71d0b11ab",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/query.json": "7d988cb9d69fc4287c683f7a6a96a15191e4d19b8092d10b438e4e841527a17b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/runtime.json": "bb859e091ed22663820fb3b80813446b17351880880714e6daf0159bc421e1bb",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/summary.json": "5d3f5f5a6ebfdabb430bb1f23f1208992a8c4ea06230266fa4171ccfc9345980",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/model-receipts.json": "32f5fc08739136fa5e17d38baf305cdd5cc7c78f20dacc5b1d8ae67b76ed0e56",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/budget.json": "510dbedfe7dfe2fab51fe2ed23395633b7cb2bf89a0c3f7a508f8bb7d57d6932",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600100/query.json": "92f7eb4045b1e176ae5d754a8c2e0ed19d82c2a07884cc0b4d5a479b1ad2fa2a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600100/runtime.json": "0657d779712c3f70e7158730b42271f160a3eb84653128e9146f2e654f7ce965",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600100/summary.json": "d19b787490c956e0613763db9ec446bd206abe7a985549a91078005aa18103ed",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600100/model-receipts.json": "9af9b71d0e33c6955ebe7489148987e7b0853bbbba2dbaf887c356d1b0ecbfe9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600100/budget.json": "3d2d43328a946e4fc4d287c33b02583ef750da7e8f6d6e1413ba1d47126971b8"
+  },
+  "production_authorization": "not_authorized"
+}

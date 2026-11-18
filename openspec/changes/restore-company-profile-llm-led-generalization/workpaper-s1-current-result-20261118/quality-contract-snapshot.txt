@@ -1,0 +1,144 @@
+"""Freeze prospective source-first business conditions before 6.DL calls."""
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE/'workpaper-s1-current-result-20261118'
+REFERENCE = CHANGE/'workpaper-core-readiness-20261114/source-first-contract.json'
+RISK = CHANGE/'workpaper-fixed-pool-result-20261114/source-first-reference.json'
+PLAN = CHANGE/'workpaper-batch-acceptance-20261118/next-run-plan.json'
+# Human source-based conditions; intentionally no detailed model, precise use,
+# subsidiary inventory, additional parallel revenue label or supply-chain quota.
+CORE = {
+'600094.SH': [
+('business_structure',1,'房地产开发运营为当前主要业务。'),
+('business_structure',1,'金融投资与算力服务分别表达，转型投资不变成上市公司自产飞行器或芯片。'),
+('products_services',2,'提供物业开发销售及运营服务，不强求物业子类齐全。'),
+('products_services',2,'提供算力基础设施运营或算力服务，区别于投资持股。'),
+('revenue_model',3,'房地产通过交付结转销售收入，与租赁运营区分。'),
+('revenue_model',3,'算力服务形成收入，不以交易总额替代其净额收入。')],
+'600103.SH': [
+('business_structure',1,'以浆纸一体业务为主，并保医药、光电子和林业等披露板块。'),
+('products_services',2,'保留浆和纸类产品，包括纸袋纸或伸性纸袋纸。'),
+('products_services',2,'保留纸箱、纸袋等纸制品业务。'),
+('products_services',2,'保留医药产品业务，不要求全部药品及功效。'),
+('products_services',2,'保留光电子器件或光模块业务，不强求全部用途。'),
+('products_services',2,'保留林木产品或林业经营。'),
+('revenue_model',3,'浆纸主业生产销售角色成立，直销或按销定产有源；不将采购写成销售。')],
+'600100.SH': [
+('business_structure',1,'公共安全、数智产业和智慧能源三主业都保留。'),
+('products_services',2,'公共安全提供安检设备、系统或解决方案及相关服务。'),
+('products_services',2,'知识服务/CNKI与数智转型服务保留。'),
+('products_services',2,'热泵、储能或智慧能源方案保留，不要求全部设备细目。'),
+('revenue_model',3,'安检设备/方案销售或运维构成收入。'),
+('revenue_model',3,'知识服务订阅/按需付费与数智技术服务变现有说明。'),
+('revenue_model',3,'能源供货、工程或综合能源服务的收入方式有说明。')],
+'600107.SH': [
+('business_structure',1,'服装研发设计生产销售，国内品牌与国外加工区分。'),
+('products_services',2,'男装及其主要服装产品有说明，不强求型号齐全。'),
+('products_services',2,'女装业务有说明，不强求四系列全列。'),
+('revenue_model',3,'国内零售/团购定制/电商等销售方式有实质说明。'),
+('revenue_model',3,'出口加工或一般贸易的收入方式与内销区分。')],
+'600098.SH': [
+('business_structure',1,'综合能源经营包含电力、天然气、能源物流及新能源/储能。'),
+('products_services',2,'电力/蒸汽和煤炭/天然气/油品等主要能源产品保留。'),
+('products_services',2,'能源管理、装卸运输仓储等服务有说明。'),
+('revenue_model',3,'电汽自产与煤气油等外购销售角色区分。'),
+('revenue_model',3,'电力经电网等渠道及其他能源经管网/平台销售有说明。'),
+('revenue_model',3,'能源托管、节能运维等服务与单纯商品销售区分。')],
+'600104.SH': [
+('business_structure',1,'整车为主，零部件、移动出行/服务及金融板块保留。'),
+('products_services',2,'主要整车产品/业务线有说明，不要求品牌型号全列。'),
+('products_services',2,'零部件产品或业务有实质说明，不强求柴油机/电子子类及主体全表。'),
+('products_services',2,'移动出行/物流等服务有说明。'),
+('products_services',2,'汽车金融服务有说明，不强求贷款/金融产品细目。'),
+('revenue_model',3,'整车、零部件销售及服务/金融等主要收入来源区分。')],
+'600088.SH': [
+('business_structure',1,'影视、广告、旅游及基金投资管理均作为披露业务保留。'),
+('products_services',2,'节目制作销售、影视技术与设备租赁或库存剧发行有说明。'),
+('products_services',2,'频道广告代理/经营资源业务有说明。'),
+('products_services',2,'影视基地旅游及拍摄等服务有说明。'),
+('revenue_model',3,'节目/技术/设备租赁、广告及旅游门票/经营/拍摄等收入方式不混为单一传媒收入。')],
+'600099.SH': [
+('business_structure',1,'森林消防机械、农业机械、特种车辆、摩托车及配件四产品板块保留。'),
+('products_services',2,'森林消防机械的主要产品有说明。'),
+('products_services',2,'农业机械产品有说明。'),
+('products_services',2,'全地形车/特种车辆产品有说明。'),
+('products_services',2,'摩托车产品或板块有说明。'),
+('revenue_model',3,'制造并销售产品，按订单/以销定产与经销模式有实质说明。')],
+'600082.SH': [
+('business_structure',1,'园区开发运营为主，产业投资及孵化服务保留。'),
+('products_services',2,'园区载体、运营或配套服务有说明。'),
+('products_services',2,'产业投资及孵化服务区别于商品自产或主导贸易。'),
+('revenue_model',3,'房产销售与房产租赁/物业服务等变现方式区分。')],
+'600097.SH': [
+('business_structure',1,'捕捞、加工、贸易和运输一体化经营保留。'),
+('products_services',2,'金枪鱼等捕捞产品及磷虾项目产品有说明，不强求全部鱼种。'),
+('products_services',2,'罐头及鱼柳等加工产品有说明。'),
+('products_services',2,'海上运输和渔货贸易服务/业务有说明。'),
+('revenue_model',3,'捕捞加工贸易产品销售与海上运输收入区分，不将内部转移当对外销售。')],
+'600054.SH': [
+('business_structure',1,'景区、索道、酒店、徽菜、旅行社和智慧旅游六业务保留。'),
+('products_services',2,'景区观光休闲服务有说明。'),
+('products_services',2,'索道/缆车客运服务有说明。'),
+('products_services',2,'酒店住宿餐饮与徽菜服务有说明。'),
+('products_services',2,'旅行社服务有说明。'),
+('products_services',2,'智慧旅游/平台等服务有说明。'),
+('revenue_model',3,'观光、客运、住宿餐饮和旅游等服务收费为变现来源。')],
+'600000.SH': [
+('business_structure',1,'公司金融、零售、金融市场与机构、跨境境外四类业务保留。'),
+('products_services',2,'对公信贷/结算/交易银行等企业金融服务有说明。'),
+('products_services',2,'个人信贷、财富等零售金融服务有说明。'),
+('products_services',2,'投资交易、风险管理/托管等金融市场服务有说明。'),
+('products_services',2,'跨境境外金融服务有说明。'),
+('revenue_model',6,'以利息净收入及非息/手续费等形成营业收入，不将AUM/托管或存贷余额当收入。')],
+}
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+if __name__ == '__main__':
+    assert not (DEST/'authorization.json').exists()
+    DEST.mkdir(exist_ok=True)
+    previous = json.loads(REFERENCE.read_text())
+    by_id = {c['instrument_id']: c for c in previous['companies']}
+    order = json.loads(PLAN.read_text())['order']
+    assert set(CORE) == set(order) == set(by_id)
+    rows = []
+    for instrument in order:
+        source = by_id[instrument]
+        contexts = {c['condition_id']: c for c in source['source_contexts']}
+        conditions = []
+        for number, (dimension, context_number, expected) in enumerate(CORE[instrument], 1):
+            context = contexts[instrument[:6]+'-C'+str(context_number)]
+            conditions.append({'condition_id': instrument[:6]+'-DL'+str(number).zfill(2),
+                'dimension': dimension, 'expected': expected,
+                'source_context_id': context['condition_id'], 'physical_pages': context['physical_pages'],
+                'section_paths': context['section_paths'], 'verdict': 'not_assessed'})
+        rows.append({'instrument_id': instrument, 'name': source['name'],
+            'document_version': source['document_version'], 'core_conditions': conditions,
+            'supplementary_source_targets': [c for c in source['source_contexts'] if c['condition_id'].endswith(('-C4','-C5'))]})
+    risk = json.loads(RISK.read_text())['risk_challenges']
+    for challenge in risk:
+        challenge['positive_assertion'] = '主体/期间/科目及经营方向与原文一致；只评价实际审查范围。'
+        challenge['negative_assertion'] = '不采用本风险所述错误归属、借列/造零或经济意义扩大；须记录实际触发证据，未触发不得作反例通过。'
+        challenge['assessment'] = 'not_run'
+    value = {'task':'6.DL','origin':'independent_source_reference_reused_and_prospectively_scoped',
+        'not_model_input':True,'frozen_before_model_calls':True,
+        'source_reference':str(REFERENCE.relative_to(ROOT)),'source_sha256':digest(REFERENCE),
+        'risk_reference':str(RISK.relative_to(ROOT)),'risk_sha256':digest(RISK),
+        'historical_133_conditions_and_scores_unchanged':True,
+        'policy':'基础主干作召回条件，规模/权重优先采集但明细缺失不整公司拒绝；所有实际输出数字/主体/时态仍核原文。',
+        'core_count':sum(len(c['core_conditions']) for c in rows),'companies':rows,'risk_challenges':risk,
+        'accuracy_sampling':{'seed':'company-profile-6DL-20261118.v1',
+            'unit':'instrument_id + fact_id; repeated views deduplicated',
+            'rule':'全部基础支持及高风险对象全核；其余按metrics/qualitative/optional分层各先一条再按SHA256(seed|instrument|fact_id)排序补至20，不足全核；疑点另扩查并去重。'},
+        'scope':'已知12家当前同版回归，不是未见测试或全报告召回；正反程序证明与真实模型语义分列。'}
+    target = DEST/'source-first-contract.json'
+    with target.open('x') as output:
+        output.write(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+    print(json.dumps({'frozen_core_conditions':value['core_count'],'companies':len(rows),'model_requests':0}))

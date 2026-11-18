@@ -1,0 +1,152 @@
+"""6.DL approved operator: reuse original TaskService runner, never old answers."""
+from pathlib import Path
+import json
+import os
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+BASE = CHANGE / 'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'
+DESTINATION = CHANGE / 'workpaper-s1-current-result-20261118'
+PLAN = CHANGE / 'workpaper-batch-acceptance-20261118/next-run-plan.json'
+plan = json.loads(PLAN.read_text())
+source = BASE.read_text().split('\ndef main():', 1)[0]
+# Mechanical task/attempt identity adaptation only. The retained operator still
+# calls the original application, public gateway, writer and read owner.
+for old, new in (
+    ('workpaper-twelve-explanatory-core-result-20261116', 'workpaper-s1-current-result-20261118'),
+    ('6.CT', '6.DL'), ('20261116', '20261118'), ('2026-11-16', '2026-11-18'),
+    ('v18-explanatory-twelve-', 'v20-s1-twelve-'), ('workpaper-ct-', 'workpaper-dl-'),
+):
+    source = source.replace(old, new)
+source = source.replace(
+    "if (DEST/'independent-stop.json').exists():mark_stop('independent_source_stop')",
+    "if (DEST/'independent-stop.json').exists():mark_stop('independent_source_stop')\n"
+    "        if (DEST/'first-four-blocked.json').exists():mark_stop('first_four_core_blocked')",
+)
+source = source.replace(
+    'while pending and stop is None and sum(p.poll() is None for p in processes.values())<4:',
+    "while pending and stop is None and (len(processes)<4 or first_four_allowed()) and sum(p.poll() is None for p in processes.values())<4:",
+)
+# Keep original writer records (not the runtime database) for independent review
+# and read-owner delivery after the disposable work root has been cleaned.
+source = source.replace(
+    "summary['captured_model_contents']=len(captures)",
+    "retain_writer_records(root, destination)\n        summary['captured_model_contents']=len(captures)",
+)
+exec(compile(source, str(BASE), 'exec'), globals())
+ORDER = plan['order']
+APPROVAL = '用户call_bb5fcfd1f294440883000e279d077def明确回复：批准6.DL及仅本批双模型资源档。原12家一次当前完整入口；先四类4，成立后余八；1800秒/500000/10物理含3恢复每逻辑1，并发4，整组7200秒/6000000/120；仅公开所选章节及派生稿给官方DeepSeek及Scorpio/Grok high。90%/98%及底线不降；旧常规与历史失败保留，无追加窗/第13家/充值/共享配置或生产，费用无价unknown、有价每家10元，不承诺总人民币费用。'
+
+
+def code_hashes():
+    return {p: sha(ROOT/p) for p in plan['code_sha256_candidate_must_match_before_freeze']}
+
+
+def first_four_allowed():
+    gate = DEST/'first-four-pass.json'
+    if not gate.exists():
+        return False
+    value = json.loads(gate.read_text())
+    assert value['instruments'] == ORDER[:4] and value['passed'] is True
+    assert all((DEST/i[:6]/'summary.json').exists() for i in ORDER[:4])
+    return True
+
+
+def retain_writer_records(root, destination):
+    records = list((root/'output/company_profile_common_core.v1').glob('*.json'))
+    assert len(records) <= 1
+    if records:
+        target = destination/'runtime.json'
+        assert not target.exists()
+        shutil.copy2(records[0], target)
+
+
+def network_preflight():
+    import httpx
+    import socket
+    from urllib.parse import urlsplit
+    config = config_for_run()
+    checks = []
+    for name in (EXTRACT, REVIEW):
+        host = urlsplit(config.profiles[name].base_url).hostname
+        assert host in ('api.deepseek.com', 'scorpio.reepool.com')
+        begun = time.monotonic()
+        addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
+        # Public TLS GET, no API keys, account data, prompts or paid model call.
+        with httpx.Client(timeout=20, verify=True) as client:
+            response = client.get('https://'+host+'/', follow_redirects=False)
+            stream = response.extensions.get('network_stream')
+            tls = stream.get_extra_info('ssl_object') if stream else None
+            checks.append({'host': host, 'dns_addresses': len(addresses),
+                'status_code': response.status_code, 'tls': tls.version() if tls else 'verified_by_httpx',
+                'seconds': round(time.monotonic()-begun, 3)})
+    dump(DEST/'network-preflight.json', {'task': '6.DL',
+        'namespace': os.readlink('/proc/self/ns/net'), 'permission_mode': 'approved_network_exec',
+        'checks': checks, 'model_requests': 0})
+    print('NETWORK_PREFLIGHT_OK', flush=True)
+
+
+def freeze(directory):
+    config = config_for_run()
+    assert code_hashes() == plan['code_sha256_candidate_must_match_before_freeze']
+    assert sha(ROOT/'config/13_llm.json') == plan['shared_config_sha256_not_contents']
+    network = json.loads((DEST/'network-preflight.json').read_text())
+    assert network['namespace'] == os.readlink('/proc/self/ns/net') and len(network['checks']) == 2
+    reference = DEST/'source-first-contract.json'
+    quality = json.loads(reference.read_text())
+    assert quality['not_model_input'] and len(quality['companies']) == 12
+    assert all(c['core_conditions'] for c in quality['companies'])
+    assert not (DEST/'authorization.json').exists()
+    selected = {name: {'model': p.model, 'source_label': p.source_label,
+        'resource': config.resource_for_profile(p).name, 'reasoning_effort': p.reasoning_effort,
+        'disable_thinking': p.disable_thinking, 'max_retries': p.max_retries,
+        'max_schema_repair_attempts': p.max_schema_repair_attempts}
+        for name, p in config.profiles.items()}
+    frozen = {'task': '6.DL', 'status': 'authorized', 'approval_reference': APPROVAL,
+        'resource_profile': 'only_this_S1_dual_model_1800_500000_10',
+        'base_commit': subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip(),
+        'source_first_reference': str(reference.relative_to(ROOT)), 'source_first_reference_sha256': sha(reference),
+        'prepared_root': str(directory), 'operator_sha256': sha(Path(__file__)),
+        'operator_base': str(BASE.relative_to(ROOT)), 'operator_base_sha256': sha(BASE),
+        'network_context': network, 'network_preflight_sha256': sha(DEST/'network-preflight.json'),
+        'code_sha256': code_hashes(), 'shared_config_sha256': sha(ROOT/'config/13_llm.json'),
+        'selected_profiles': selected, 'order': ORDER,
+        'each_limits': {'business_seconds':1800,'tokens':500000,'physical_requests':10,'recoveries':3,'per_logical':1,'known_cost_cny':10},
+        'group_limits': {'tokens':6000000,'physical_requests':120,'recoveries':36,'business_wall_seconds':7200,'max_concurrency':4},
+        'capture_helper_sha256': sha(CAPTURE_HELPER), 'production_authorization': 'not_authorized',
+        'old_semantic_input': False, 'reference_not_model_input': True,
+        'old_133_reference_unchanged': True, 'reused_engineering_validation': '6.DI/6.DJ exact unchanged business code; no new long suite',
+        'quality_scope': 'new source-first basic conditions; all output core/high-risk; supplemental20 or all if fewer; actual negative coverage separate',
+    }
+    dump(DEST/'source-contract-freeze.json', {'path':str(reference.relative_to(ROOT)), 'sha256':sha(reference),
+        'full_pool_conditions':sum(len(c['core_conditions']) for c in quality['companies']),
+        'selected_instruments':ORDER, 'not_model_input':True})
+    dump(DEST/'authorization.json', frozen)
+    print('FREEZE_DONE '+str(len(quality['companies'])), flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=['prepare','freeze','run','group','preflight','all'])
+    parser.add_argument('--prepared', type=Path)
+    parser.add_argument('--symbol')
+    parser.add_argument('--group-deadline', type=float)
+    args = parser.parse_args()
+    if args.mode == 'prepare':
+        prepare()
+    elif args.mode == 'preflight':
+        network_preflight()
+    elif args.mode == 'freeze':
+        freeze(args.prepared)
+    elif args.mode == 'run':
+        run_one(args.prepared, args.symbol, args.group_deadline)
+    elif args.mode == 'group':
+        group(args.prepared, 1)
+    else:
+        network_preflight()
+        freeze(args.prepared)
+        group(args.prepared, 1)
+
+
+if __name__ == '__main__':
+    main()
