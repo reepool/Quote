@@ -1,0 +1,14 @@
+{
+  "task": "6.DN",
+  "status": "new_dispatch_held_awaiting_rebinding_decision",
+  "owned_parent_pid": 2833342,
+  "mechanism": "SIGSTOP to the dispatch parent only; four in-flight children unchanged",
+  "cause": "Task identity and profiles specify 2450 logical / 1200 high-tier physical, but reused operator constructs CommonGatewaySemanticProvider(timeout_seconds=620). Provider takes the minimum, so actual logical and high-tier physical waits are 620.",
+  "affected_started": ["600094.SH", "600103.SH", "600107.SH", "600098.SH"],
+  "not_started": ["600104.SH", "600088.SH", "600082.SH", "600097.SH"],
+  "business_source_prompt_and_shared_configuration_changed": false,
+  "old_attempts_or_failures_erased": false,
+  "specific_rebinding_question_sent": true,
+  "new_company_or_budget_requested": false,
+  "required_next_step": "Let started children finish, preserve their actual shorter limits and results. Before any remaining dispatch, obtain explicit permission for operator-only correction and a separate frozen binding; otherwise close without more sends."
+}

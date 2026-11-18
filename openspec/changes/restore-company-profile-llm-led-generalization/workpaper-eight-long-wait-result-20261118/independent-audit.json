@@ -1,0 +1,821 @@
+{
+  "task": "6.DN",
+  "method": "Independent reading against previously frozen same-PDF basic reference and actual retained source table/context for repairs; not ID counts or model agreement.",
+  "notes_sha256": "5b53127c823f419de1ea6f465087176d6b98f8313b52a20af0aa285423921f67",
+  "source_reference_sha256": "a3c7007cc778417ace8d3f9f413a44446e11ea0bc2777b7cf306c1d5f0241f0d",
+  "basic_conditions_supported": 24,
+  "basic_conditions_not_executed": 20,
+  "accepted_repairs_independently_checked": 19,
+  "source_checked_objects": 46,
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600094-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ]
+        },
+        {
+          "condition_id": "600094-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F03",
+            "F23"
+          ]
+        },
+        {
+          "condition_id": "600094-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F07"
+          ]
+        },
+        {
+          "condition_id": "600094-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F14"
+          ]
+        },
+        {
+          "condition_id": "600094-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F07",
+            "F22"
+          ]
+        },
+        {
+          "condition_id": "600094-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F08"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F03",
+        "F04",
+        "F05",
+        "F07",
+        "F08",
+        "F14",
+        "F19",
+        "F22",
+        "F23",
+        "F28",
+        "F29",
+        "F30"
+      ],
+      "accepted_repairs_independently_checked": [
+        "F05",
+        "F19",
+        "F28",
+        "F29",
+        "F30"
+      ],
+      "rejected_originals_absent": [],
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "100d17a82fd8fca18079e9e77c8a1298eaf9254f6a440a3b14f7ea255e19ddb8",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F03",
+          "fact_sha256": "cd3e703a066482a8462087d10733ef4c800358a0ce56321447d9c45a8f26bd3c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "19248c6cdb19976126d00b3860e5dc8a2f4d051ceb800cf4f684f29c5b770d88",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "ca6551dcbacf9d6b1e2250c6c6344abe6fdbc71434b1bd68f86d2316352581df",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F07",
+          "fact_sha256": "a4307dc3795dd546065d1a23da9d037ac06516a274e62d114349fb4508f53288",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005",
+            "source-0006"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F08",
+          "fact_sha256": "ec49dfb25ac1914ec7779eb66df93a1534d371364e23348c59de1547bfd75ca3",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F14",
+          "fact_sha256": "a009d5a1ebfa630c25a0254994a985a5e5d66980b531fc6d56c93f3c320afc28",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0007"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F19",
+          "fact_sha256": "9a4f922a51d59f3eecf6d54403a21d41ac73c993ff229ac0ddb26280b179091f",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0005"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": "原p13叙述20.42亿元与p15营业收入表22.4654856951亿元冲突；本条按财务科目值与其来源阅读，保原矛盾轨迹，不宣称原文无冲突。"
+        },
+        {
+          "fact_id": "F22",
+          "fact_sha256": "f7f9893f94d335cff2f63c2a4bcbb237cb22fe215caef4bf59be437d3f3359e1",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F23",
+          "fact_sha256": "358528db9274e4bf82873ec0afebf5a33053cea25678706ed24b04bab36e5a7c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F28",
+          "fact_sha256": "7c2acba6c5aff48bc69e5869e736a5deff6f92c59ba46789e4bca0fac6fdaed5",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F29",
+          "fact_sha256": "4b4fe126af8cc1ebfe5ce6dd0320de11887cae5e43c140c7404c6cc4321ba927",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F30",
+          "fact_sha256": "f8543fe0befc4ee46002c6c78a1943c8fc190c3e5edaebd7ce4f5689185821ee",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "reason": "原基础参考p10/15/16有地产开发运营、金控投资与算力服务及净额收入区分；当前事实实质回答。另核原PDF引用p10未来规划、p13参股20.45%且未并表、p15营业收入2,246,548,569.51元、p27子公司表收入空栏和营业利润3.38/净利润3.37亿元。参股技术不升格公司自产，未来规划不变当期能力。",
+          "limitation": "营业收入未披露仅指所引子公司表该栏为空，不能据此断言整份年报没有披露；其他表内金额按各自科目使用。"
+        }
+      ],
+      "other_facts": "not_independently_assessed"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600103-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-BS-01",
+            "F-BS-02"
+          ]
+        },
+        {
+          "condition_id": "600103-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01",
+            "F-PS-02"
+          ]
+        },
+        {
+          "condition_id": "600103-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-03"
+          ]
+        },
+        {
+          "condition_id": "600103-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-04"
+          ]
+        },
+        {
+          "condition_id": "600103-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-05"
+          ]
+        },
+        {
+          "condition_id": "600103-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-05"
+          ]
+        },
+        {
+          "condition_id": "600103-DL07",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-RM-01",
+            "F-RM-02"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-MC-01",
+        "F-MC-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-01",
+        "F-RM-02",
+        "F-SC-01"
+      ],
+      "accepted_repairs_independently_checked": [
+        "F-MC-01",
+        "F-MC-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-SC-01"
+      ],
+      "rejected_originals_absent": [],
+      "decisions": [
+        {
+          "fact_id": "F-BS-01",
+          "fact_sha256": "9159d75914d40679f39f079a138e4c1e55073b97574fa52e129c30460cfdfe57",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-BS-02",
+          "fact_sha256": "67e58ac8ef19ccccb265f6d3c7455ca1707e5ae36ce30208c565b21d54141120",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-MC-01",
+          "fact_sha256": "349e194266e1c5402c572fc8f97c1ffd524a0bf660b7b2b4f38649c68866fff7",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005",
+            "source-0012"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-MC-02",
+          "fact_sha256": "cca94fcb57cee14df88404fd6fae765e3858d080fea2e2624dfe63271efb7387",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0007",
+            "source-0017"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-01",
+          "fact_sha256": "fd7d4dcb05504cd8797805ecfda6cb7825c6a260d979fd355ce9bde556cab819",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-02",
+          "fact_sha256": "0b663cb80f3764bbbdb5a3794976a4bb2080f6d27757d5da7a4ac0e50b0a7794",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-03",
+          "fact_sha256": "1e3c50139f89fe250db2cf866ebd6ea588f5cdfffa7fad80d3a2d4d645f90afa",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-04",
+          "fact_sha256": "a4a0cb2598deca0223b0f8f4b36b4a3921495dd27d3d6be0b59ab4d8a95385b9",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-05",
+          "fact_sha256": "67f0a6dbd51de4b641e93ee3c33ec528f9fd0006d27e785fcf35c2bc39ff49fb",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-RM-01",
+          "fact_sha256": "33d46ae983ad8083d85d67934959579b100a9c3561868f18f160b8ef582be7f0",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005",
+            "source-0009"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-RM-02",
+          "fact_sha256": "62cd47f746bec0e6b66fb57d0776c950b935717857fc3a330ad745a6aceec464",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-SC-01",
+          "fact_sha256": "206ca281c0bfe4efebc02bc6758174cc1c0c39f9a8921f3e75db2ef407308224",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "p9/10主营产品和用途表、p11采购/自主生产/直销、p16公司营业收入及不适用、p21和p32披露标记核对。表明母公司的浆纸改issuer；未具名子公司保持unclear但保产品原文。p10有主要业务未重大变化正文，其他不适用只表披露项，不推出经济事项未发生；医药/光电子/林业不臆作浆纸下游。",
+          "limitation": null
+        }
+      ],
+      "other_facts": "not_independently_assessed"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600107-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F03"
+          ]
+        },
+        {
+          "condition_id": "600107-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04"
+          ]
+        },
+        {
+          "condition_id": "600107-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ]
+        },
+        {
+          "condition_id": "600107-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02",
+            "F06",
+            "F15"
+          ]
+        },
+        {
+          "condition_id": "600107-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F03",
+            "F09"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F09",
+        "F10",
+        "F13",
+        "F15",
+        "F24",
+        "F25"
+      ],
+      "accepted_repairs_independently_checked": [
+        "F10",
+        "F13",
+        "F24",
+        "F25"
+      ],
+      "rejected_originals_absent": [],
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "9457bd286ef8765c4b9f9d33db8ed5b9eadcbb8f3b55fe48fe8047f537425560",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F02",
+          "fact_sha256": "750ca5bdf52910905c193dc918117ce6623b52a0cbc0e72a69dc464f07ab0609",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F03",
+          "fact_sha256": "161b734becdb831b7e16123afdbbf85d0b0067e8d3a1e15c202520b7437b7c53",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "66f53b016144804d011e3a207d57303147ff94e2eea1f062b6bf95c454349dd1",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "54e59bfb34e23a8410563acdc9cf731ac2b7ed20f38a0bad17acc84f12f691c1",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F06",
+          "fact_sha256": "70d662ffd3f0a6ea269978b0023e572c76a65da135012e6b06f33c50c7d14405",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F09",
+          "fact_sha256": "a484f1ea9eeae5b239629164232074da14b9298e388fbf6ff7f7404254c5172e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F10",
+          "fact_sha256": "2a9b068cb61e8f9ebf99e5da41629d16278552ff440e90816a568f9d0776fd33",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0006"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F13",
+          "fact_sha256": "cbea3f5fdbb13149f026265000ea216ec5fd8ff9d390230f106c82ab788ead6b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F15",
+          "fact_sha256": "781814b58ad2ca7481ed121e09aafde084e032c1210ebc0eb388aa1f623c622a",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F24",
+          "fact_sha256": "66dd38c3257ce160b92fafcbad8081c3e23dcf745c00463fd0c8dcca3ae187c4",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008",
+            "source-0011",
+            "source-0018"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F25",
+          "fact_sha256": "ce1f583b6f6113f4da05e394c982f6d5b9a0b48c8ed0868c55ba7a06b35aeec4",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005",
+            "source-0008",
+            "source-0011"
+          ],
+          "reason": "基础参考p12国内男/女装与国外加工、零售/团购/电商及外贸收入角色支持；修订对p6财务主表、p14经营讨论、p15医药收入影响/不适用及p16—17产销续表、p18/26子公司披露核对。主表净利同比不适用与讨论30.82%分列，约3000万元保不精确/处置时点未明，主要产品合计不冒集团全量。",
+          "limitation": null
+        }
+      ],
+      "other_facts": "not_independently_assessed"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600098-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-BS-01",
+            "F-BS-02"
+          ]
+        },
+        {
+          "condition_id": "600098-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01",
+            "F-PS-02"
+          ]
+        },
+        {
+          "condition_id": "600098-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01",
+            "F-PS-04"
+          ]
+        },
+        {
+          "condition_id": "600098-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-02",
+            "F-RM-02"
+          ]
+        },
+        {
+          "condition_id": "600098-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-RM-01"
+          ]
+        },
+        {
+          "condition_id": "600098-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-04"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-04",
+        "F-RM-01",
+        "F-RM-02",
+        "review-add:REV-001",
+        "review-add:REV-002"
+      ],
+      "accepted_repairs_independently_checked": [
+        "review-add:REV-001",
+        "review-add:REV-002"
+      ],
+      "rejected_originals_absent": [
+        "F-OD-04",
+        "F-SC-D2"
+      ],
+      "decisions": [
+        {
+          "fact_id": "F-BS-01",
+          "fact_sha256": "9d9f6f9f8a0525196c35410b1b18598c2fdde424e2bf0077bb65902cbb34fc9c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-BS-02",
+          "fact_sha256": "4a53a6c75bf759e1b89cd24a246546a07ce71d0e9437f5f43452926e31a0bb7a",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0010",
+            "source-0011"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-01",
+          "fact_sha256": "570ee142348697891f4cf5efce3172fc4a267c1666ec472d5424b014fd870c2c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-02",
+          "fact_sha256": "bb2281b2587129873846634ad24dfc5741c5d7b75c0cedbd5d72b9432ccf677c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-04",
+          "fact_sha256": "974c709ff417c42c8ac04164cec3291035ba8f15a9821b1e298aad7b378076ed",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-RM-01",
+          "fact_sha256": "b7104d410269d0a3ace387dd19d4827fb1db87dbac7d4f379ffe32ccc0686dfb",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-RM-02",
+          "fact_sha256": "5eec6ec4c3f1eb29d45806db36c1f6b634d9e05e3d29ed3fbd31ef5e5bd59a15",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "review-add:REV-001",
+          "fact_sha256": "8d74a1d4caea72b423c776b017acb60f3884f8b0fab16bf8c14e99aa7722d5a9",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0010",
+            "source-0011"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        },
+        {
+          "fact_id": "review-add:REV-002",
+          "fact_sha256": "6c6e11aeb2be5334c491452cc4c2db06cfe4abfd2bdb608abf62a3df4b9aea00",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "reason": "基础参考p9/10综合能源产品、自产和外购、渠道/综合能源服务实质支持。补充对p17利润表及p18变动说明、p18—19跨页分行业表头/人民币元/本期营业收入列核对：五类主要收入原值及资产处置收益1,826,406,356.30元/上期956,186.08元和土地交储原因有据，不把贸易气量或贸易收入替代天然气板块。",
+          "limitation": null
+        }
+      ],
+      "other_facts": "not_independently_assessed"
+    }
+  ],
+  "raw_inputs_sha256_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600094/query.json": "5b0333f5ef4c7112b5fa06aa9544139b42fccee89cec0fbad999fa4bb98bb366",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600094/runtime.json": "61b806252985b2e4098ee17ab0c6d7272bfb34a4d63c1b1c01a5aee59013d4e3",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600094/budget.json": "238dc19028b6d95fefe9b8b0471803e0bffe8fab66a5ae505028142b878a03a5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600094/model-receipts.json": "97429df284a2989b94cc89753a9759e0438f6ece5ead66731ff89d9aff7fbe52",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600094/summary.json": "e7abc4a9c71798496ed4366bac9550847ce4a0df3371966a863d55983ed95caf",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600103/query.json": "4d300d9c23cc619298617d55a2d11c26c4b44f01f01ef07ed52a981b4ed15b00",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600103/runtime.json": "ef44bb161333a18c16b4c1c814551384c474c775626c89a64361ebafac9c222a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600103/budget.json": "648c0045a9351d347cb30afd0a428dac7ce63374f9a4954739882dfff229d171",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600103/model-receipts.json": "5aa36fe35c753dab9a77ffe30e871f10cbe447e4bc65407cb94c9140459cd15a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600103/summary.json": "301bf0d244acfa7a730125829334987fd7a28e43fc6a1921f5871ce557732e1f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600107/query.json": "9ffb49ca9a2df2374fdc21a975735102f53fbd11fa7738b15fd713bc9b567ab5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600107/runtime.json": "c84e4238c220e7e409d28beef5630fbb48183275528c8cd208d40d8cf55b579f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600107/budget.json": "12ef28ce6c2f3fc976f6c765e9a57b8f9d1585e6c6ab99d60b7b715e0f1dac97",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600107/model-receipts.json": "0148b918c37e0fd9f3aef01d8dba48bf2b38dcc6328ceaaf91edd66d657d7db7",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600107/summary.json": "f9bcce132c9ba9f812cc0160e45870e0842c3c501a376c31e95ddfef21d069b3",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600098/query.json": "ac2b071c7f935220097454fbca904e3c5f676d855e056c3218e41a13ca0acdb3",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600098/runtime.json": "d5bf605c603dd06800677edc4992234b5fc4a0a16efb831f4da864b90dec002c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600098/budget.json": "17cd0033841c8c484bddb8d8f1720181c465564681eef096f1690c3e5ccf0875",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600098/model-receipts.json": "d28315dd26dee6589986c5e7c4457fe876540dadacbb33f1fb4f2792a1ee2823",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/600098/summary.json": "b009405d5261d9ad0cdbe9b53d2e52b66db5c899c974b6c6bd0919e3d98ab2e3"
+  },
+  "all_output_accuracy": null,
+  "actual_provider_cap_seconds": 620,
+  "not_long_wait_or_full_eight_acceptance": true,
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}

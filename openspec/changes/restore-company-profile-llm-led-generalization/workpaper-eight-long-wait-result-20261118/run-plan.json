@@ -1,0 +1,162 @@
+{
+  "task": "6.DN",
+  "status": "authorized",
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "asset": {
+        "instrument_id": "600094.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_f33b0049c49d3cd17a1eab62352b9327",
+        "filing_id": "1225155390",
+        "source": "cninfo",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "content_hash": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/f5/f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600094-binding.json",
+      "source_binding_sha256": "57a61a4508e2f8104f497bb5535910747095e9868385da556b07fcd07e0c5944",
+      "prepared_sha256": "84b2b9b269a7a8bc9aea5640239a5ee85918d106ad57203c7066168e69a00680",
+      "pdf_pages": 194
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "asset": {
+        "instrument_id": "600103.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_e26654bf6cc4bf44f45f6c342da566e4",
+        "filing_id": "1225099218",
+        "source": "cninfo",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "content_hash": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/68/6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600103-binding.json",
+      "source_binding_sha256": "9fc8d0c231bd66d7d63776a5c800331658327b2944fcafe89e1fbbda9b347579",
+      "prepared_sha256": "c2f626057a76f8f3038bd67941e523f25a132cb4dd0e1331f188dfef4082920b",
+      "pdf_pages": 220
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "asset": {
+        "instrument_id": "600107.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_4f15063821c1d2a2c762132d3e4c5a3a",
+        "filing_id": "1225264726",
+        "source": "cninfo",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "content_hash": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/2d/2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600107-binding.json",
+      "source_binding_sha256": "c80c16653e9be76ac738ab8d10797c5a1ada5ab9e9a0080397beb552d0e9d904",
+      "prepared_sha256": "3e4bca56e272dec5011edd1b2db32cd8fc8cbedd70a8ff1d613e2cea3495a5e0",
+      "pdf_pages": 243
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "asset": {
+        "instrument_id": "600098.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_1f64d5e8214809eacb37e8a83da0452a",
+        "filing_id": "1225103737",
+        "source": "cninfo",
+        "published_at": "2026-04-14T16:00:00+00:00",
+        "content_hash": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/78/78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600098-binding.json",
+      "source_binding_sha256": "501ef6c2c50d4d054bac531d0619f93b64677b6c329213c5f33db27b7ce9cddb",
+      "prepared_sha256": "a3172117f52b30edde9387200436c0b61b260d0104904180fdc266b42577ed58",
+      "pdf_pages": 259
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "asset": {
+        "instrument_id": "600104.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+        "filing_id": "1225071780",
+        "source": "cninfo",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "content_hash": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/ac/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600104-binding.json",
+      "source_binding_sha256": "db92c9f994064d94bf21a8e64ae1dae6164c7ded34dd0a2cda08c6118da63abd",
+      "prepared_sha256": "30d155652c20763f5f67ed33628a039c0e41506c292652ec32fd3bc4b39e49ee",
+      "pdf_pages": 205
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "asset": {
+        "instrument_id": "600088.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_e7e7327460fd52d9e2d8ccde3ce05102",
+        "filing_id": "1225118832",
+        "source": "cninfo",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "content_hash": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/5a/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600088-binding.json",
+      "source_binding_sha256": "3c02e42160d19b29d8001bbfc4a7bcd0b3970b216734ecbf908ff46774317307",
+      "prepared_sha256": "0ab5c1cccc379d29ce465e595d19dd631d37d189e666a48caa27ea9210c0b79c",
+      "pdf_pages": 177
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "asset": {
+        "instrument_id": "600082.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_77a492082b5827f4129bb8232d1f715a",
+        "filing_id": "1225246039",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/97/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600082-binding.json",
+      "source_binding_sha256": "8d231eef272ea403d7f544c2cbf7244fb00593bfab9ffd11ccbe6286723db428",
+      "prepared_sha256": "c94f5a456519bfe64258e8fa476af6c8904edc4bbfef7e218fd45f56f0e0aef3",
+      "pdf_pages": 203
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "asset": {
+        "instrument_id": "600097.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_88e877bd39b3790446440dc4b4e45b07",
+        "filing_id": "1225039976",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/4c/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600097-binding.json",
+      "source_binding_sha256": "bf0f619c15276241048dd23b4f7a78acbacd2c6c41581a7147cba328fbf49d41",
+      "prepared_sha256": "12f5a8f4e9371db6c6275f13421e965796b38db5744bb3fedff596eaf70f0dbf",
+      "pdf_pages": 158
+    }
+  ],
+  "same_basic_workpaper_contract": true,
+  "optional_missing_not_company_failure": true,
+  "no_reextraction_of_first_four": true,
+  "old_batch_not_revived": true
+}

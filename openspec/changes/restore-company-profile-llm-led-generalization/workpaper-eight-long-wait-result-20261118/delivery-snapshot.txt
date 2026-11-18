@@ -1,0 +1,125 @@
+"""No-call source decisions and original-writer API delivery for completed DN entries."""
+import asyncio
+import hashlib
+import json
+import os
+from collections import Counter
+from pathlib import Path
+import sys
+from unittest.mock import patch
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=C/'workpaper-eight-long-wait-result-20261118'
+OUT=ROOT/'data/research/company_profile_dn_20261118'
+from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import workpaper_elements,workpaper_fact_hash,render_workpaper
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+def read(path):return json.loads(Path(path).read_text())
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2,default=str)+'\n')
+def facts(paper):return {f.fact_id:f for e in workpaper_elements(paper).values() for f in e.facts}
+
+assert not OUT.exists() and not (DEST/'independent-audit.json').exists()
+notes=read(DEST/'audit-notes.json'); auth=read(DEST/'authorization.json')
+contract=read(ROOT/auth['source_first_reference'])
+reference={c['instrument_id']:c for c in contract['companies']}
+group=read(DEST/'group-execution.json')
+assert group['executed']==4 and len(group['not_started'])==4
+assert group['stop_reason']=='independent_source_stop' and group['source_code_unchanged']
+companies=[];papers={};contexts={};inputs={}
+for note in notes['companies']:
+    instrument=note['instrument_id'];folder=DEST/instrument[:6]
+    for name in ('query.json','runtime.json','budget.json','model-receipts.json','summary.json'):
+        inputs[str((folder/name).relative_to(ROOT))]=sha(folder/name)
+    record=CompanyProfileRuntimeRecordV3.model_validate_json((folder/'runtime.json').read_text())
+    paper=record.workpaper;current=facts(paper)
+    assert paper.origin=='llm_generated' and paper.report.document_version==reference[instrument]['document_version']
+    assert len(note['basic_condition_fact_ids'])==len(reference[instrument]['core_conditions'])
+    accepted={f.revised_fact.fact_id for f in paper.quality_review.findings if f.resolution=='corrected_pending_trust'}
+    assert accepted==set(note['accepted_revision_fact_ids'])
+    assert all(f.revised_fact==current[f.revised_fact.fact_id] for f in paper.quality_review.findings if f.resolution=='corrected_pending_trust')
+    checked=set(accepted)
+    for ids in note['basic_condition_fact_ids']:checked.update(ids)
+    assert checked<=current.keys()
+    assert not (set(note.get('rejected_revision_fact_ids',[])) & current.keys())
+    decisions=[{'fact_id':fid,'fact_sha256':workpaper_fact_hash(current[fid]),
+        'disposition':'source_checked','evidence_ids':list(current[fid].evidence_ids),
+        'reason':note['source_reason'],'limitation':note['limitations'].get(fid)} for fid in sorted(checked)]
+    companies.append({'instrument_id':instrument,'basic_conditions':[{'condition_id':condition['condition_id'],
+        'verdict':'supported','fact_ids':ids} for condition,ids in zip(reference[instrument]['core_conditions'],note['basic_condition_fact_ids'])],
+        'source_checked_fact_ids':sorted(checked),'accepted_repairs_independently_checked':sorted(accepted),
+        'rejected_originals_absent':note.get('rejected_revision_fact_ids',[]),'decisions':decisions,
+        'other_facts':'not_independently_assessed'})
+    papers[instrument]=paper;contexts[instrument]=record
+audit={'task':'6.DN','method':'Independent reading against previously frozen same-PDF basic reference and actual retained source table/context for repairs; not ID counts or model agreement.',
+    'notes_sha256':sha(DEST/'audit-notes.json'),'source_reference_sha256':auth['source_first_reference_sha256'],
+    'basic_conditions_supported':sum(len(c['basic_conditions']) for c in companies),'basic_conditions_not_executed':20,
+    'accepted_repairs_independently_checked':sum(len(c['accepted_repairs_independently_checked']) for c in companies),
+    'source_checked_objects':sum(len(c['source_checked_fact_ids']) for c in companies),
+    'companies':companies,'raw_inputs_sha256_unchanged':inputs,'all_output_accuracy':None,
+    'actual_provider_cap_seconds':620,'not_long_wait_or_full_eight_acceptance':True,
+    'formal_S1_pass':False,'production_authorization':'not_authorized'}
+assert audit['basic_conditions_supported']==24 and audit['accepted_repairs_independently_checked']==19
+dump(DEST/'independent-audit.json',audit)
+writer=CompanyProfileResearchWriter(OUT);rows=[]
+for company in companies:
+    instrument=company['instrument_id'];paper=papers[instrument]
+    bound=bind_workpaper_use_review(paper,{'report':paper.report.model_dump(mode='json'),
+        'reviewer':'Codex independent source check: basic questions and actual accepted repairs, not all-output accuracy',
+        'reference':str((DEST/'independent-audit.json').relative_to(ROOT)),
+        'reference_sha256':sha(DEST/'independent-audit.json'),'decisions':company['decisions']})
+    assert facts(bound)==facts(paper) and bound.quality_review==paper.quality_review and bound.generation==paper.generation
+    path=writer.persist(contexts[instrument].model_copy(update={'workpaper':bound}))
+    papers[instrument]=bound
+    rows.append({'instrument_id':instrument,'runtime_record':str(path),'runtime_sha256':sha(path)})
+
+async def verify():
+    import httpx
+    from fastapi import FastAPI
+    from api.company_profile_routes import router
+    os.environ['QUOTE_COMPANY_PROFILE_RESEARCH_ROOT']=str(OUT)
+    app=FastAPI();app.include_router(router,prefix='/api/v1')
+    reader=CompanyProfileReadService(OUT);instruments=tuple(papers)
+    query=reader.query(instruments)
+    exported=reader.export(instruments,export_directory=DEST/'delivery')
+    fresh=CompanyProfileReadService(OUT).query(instruments)
+    assert query['profiles']==exported['profiles']==fresh['profiles']
+    summaries=[]
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://research-local') as client:
+        for row in rows:
+            instrument=row['instrument_id']
+            response=await client.get('/api/v1/research/company/'+instrument+'/annual-profile')
+            assert response.status_code==200 and response.json()==reader.research_profile(instrument)
+            value=response.json();visible=[f for f in value['facts'] if f['fact'] is not None]
+            assert all(f['fact'] is None for f in value['facts'] if f['state'] in {'source_only','withheld','duplicate'})
+            if instrument=='600098.SH':
+                assert not ({'F-OD-04','F-SC-D2'} & {f['fact_id'] for f in value['facts']})
+                assert value['readings'][0]['review_status']=='completed_with_open_findings'
+            folder=DEST/instrument[:6]
+            dump(folder/'api-response.json',value)
+            profile=next(p for p in query['profiles'] if p['instrument_id']==instrument)
+            (folder/'profile.md').write_text(render_workpaper(papers[instrument],
+                delivery=profile['workpaper_delivery']))
+            summaries.append({'instrument_id':instrument,'api_status':200,'API_read_owner_equal':True,
+                'visible_records':len(visible),'metrics':sum(len(f['fact']['metrics']) for f in visible),
+                'delivery_counts':dict(Counter(f['state'] for f in value['facts'])),
+                'information_gaps':value['information_gaps'],'suggested_acquisitions':value['suggested_acquisitions'],
+                'model_review_status':value['readings'][0]['review_status']})
+    return summaries
+
+with patch('socket.socket.connect',side_effect=AssertionError('DN postprocessing: no network/models')):
+    summaries=asyncio.run(verify())
+assert all(sha(ROOT/p)==h for p,h in inputs.items())
+assert all(sha(ROOT/p)==h for p,h in auth['code_sha256'].items())
+assert sha(ROOT/'config/13_llm.json')==auth['shared_config_sha256']
+dump(DEST/'delivery-index.json',{'task':'6.DN','research_output_root':str(OUT),'profiles':rows,
+    'profiles_summary':summaries,'three_reads_equal':4,'API_read_owner_equal':4,
+    'new_model_calls_in_postprocessing':0,'not_deployed':True,'formal_S1_pass':False,
+    'production_authorization':'not_authorized'})
+print(json.dumps({'delivered':4,'visible':sum(p['visible_records'] for p in summaries),
+    'metrics':sum(p['metrics'] for p in summaries),'basic_supported':24,'repairs_checked':19,
+    'source_checked_objects':audit['source_checked_objects'],'new_calls':0},ensure_ascii=False))

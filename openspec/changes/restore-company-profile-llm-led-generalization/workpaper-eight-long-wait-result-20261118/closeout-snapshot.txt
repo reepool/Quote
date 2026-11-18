@@ -1,0 +1,96 @@
+"""Finalize four real DN results and remove only this stopped group's owned scratch."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+ROOT=Path('/home/python/Quote');C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=C/'workpaper-eight-long-wait-result-20261118'
+WORK=ROOT/'data/QuoteBak/workpaper-dn-QqxqY1'
+PREPARED=ROOT/'data/QuoteBak/workpaper-dn-prepared-x17d43c2'
+
+def read(path):return json.loads(Path(path).read_text())
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+
+auth=read(DEST/'authorization.json');group=read(DEST/'group-execution.json')
+audit=read(DEST/'independent-audit.json');delivery=read(DEST/'delivery-index.json')
+assert group['executed']==4 and len(group['not_started'])==4 and group['stop_reason']=='independent_source_stop'
+assert sha(WORK/'dn_runner.py')==auth['operator_sha256']==sha(DEST/'operator-snapshot.txt')
+assert all(sha(ROOT/p)==h for p,h in auth['code_sha256'].items())
+assert sha(ROOT/'config/13_llm.json')==auth['shared_config_sha256']
+assert sha(ROOT/auth['source_first_reference'])==auth['source_first_reference_sha256']
+assert all(sha(ROOT/p)==h for p,h in audit['raw_inputs_sha256_unchanged'].items())
+assert all(sha(p['runtime_record'])==p['runtime_sha256'] for p in delivery['profiles'])
+old=read(C/'workpaper-batch-acceptance-20261118/acceptance.json')
+assert all(sha(ROOT/p)==h for p,h in old['runtime_sha256_unchanged'].items())
+for name in ('workpaper-s1-current-result-20261118','workpaper-pudong-long-review-20261118'):
+    prior=read(C/name/'delivery-index.json')
+    rows=prior.get('profiles') or [prior]
+    assert all(sha(row['runtime_record'])==row['runtime_sha256'] for row in rows)
+rows=[];timing=[]
+for instrument in auth['order']:
+    symbol=instrument[:6];folder=DEST/symbol
+    marker=ROOT/'data/QuoteBak/s1-attempts'/('workpaper-dn-'+symbol+'-20261118.json')
+    if instrument in group['not_started']:
+        assert not folder.exists() and not marker.exists()
+        continue
+    summary=read(folder/'summary.json');budget=read(folder/'budget.json')
+    assert summary['exception'] is None and summary['three_reads_equal'] and marker.exists()
+    assert summary['physical_requests']==5 and summary['recoveries']==0
+    assert all(a['status']=='success' and a.get('usage') for a in budget['attempts'])
+    known=sum(a['usage']['total_tokens'] for a in budget['attempts'])
+    assert known==budget['charged_tokens'] and known<=1000000
+    assert summary['business_seconds']<=6000
+    assert not Path(read(folder/'temporary-root.json')['root']).exists()
+    rows.append({'instrument_id':instrument,'physical_requests':5,'recoveries':0,
+        'supplier_reported_total_tokens':known,'conservative_charged_ledger':known,
+        'unknown_reserved':0,'fee':'unknown','business_seconds':summary['business_seconds'],
+        'preparation_seconds':summary['preparation_seconds'],'supervision_seconds':summary['supervision_seconds'],
+        'runtime_file_bytes_cleaned':summary['cleanup_bytes'],
+        'model_review_status':summary['review_status'],'actual_provider_cap_seconds':620})
+    log=(PREPARED/(symbol+'-run.log')).read_text()
+    lines=[line for line in log.splitlines() if 'event=llm.attempt.first_admitted' in line or 'event=llm.attempt.started' in line]
+    assert len(lines)==10 and any('profile=semantic_extraction__scorpio_grok' in line and 'timeout_seconds=620.0' in line for line in lines)
+    timing.append('COMPANY '+instrument+'\n'+'\n'.join(lines))
+(DEST/'timeout-binding-evidence.log').write_text('\n'.join(timing)+'\n')
+totals={key:sum(r[key] for r in rows) for key in ('physical_requests','recoveries','supplier_reported_total_tokens','conservative_charged_ledger','unknown_reserved','runtime_file_bytes_cleaned')}
+assert totals['physical_requests']==20 and totals['supplier_reported_total_tokens']==554569
+dump(DEST/'resource-summary.json',{'task':'6.DN','executed':4,'not_started':group['not_started'],
+    'companies':rows,'totals':totals,'concurrency_max':4,'group_supervision_wall_seconds':group['supervision_wall_seconds'],
+    'wall_clock_includes_dispatch_hold':True,'fee':'unknown','planned_long_wait_not_actually_applied':True,
+    'planned_identity_logical_seconds':2450,'planned_high_tier_physical_seconds':1200,
+    'actual_provider_and_logical_cap_seconds':620,'all_usage_known_this_group':True,
+    'formal_S1_pass':False,'production_authorization':'not_authorized'})
+for source,target in [('grade_dn.py','delivery-snapshot.txt'),('close_dn.py','closeout-snapshot.txt')]:
+    assert sha(WORK/source)==sha(DEST/target)
+for proc in Path('/proc').iterdir():
+    if not proc.name.isdigit():continue
+    try:parts=(proc/'cmdline').read_bytes().split(b'\0')
+    except (OSError,PermissionError):continue
+    assert str(WORK/'dn_runner.py').encode() not in parts
+    assert b'data/QuoteBak/workpaper-dn-QqxqY1/dn_runner.py' not in parts
+    assert str(WORK/'grade_dn.py').encode() not in parts
+scratch=[]
+for path in (WORK,PREPARED):
+    assert path.parent==ROOT/'data/QuoteBak' and path.is_dir() and not path.is_symlink()
+    scratch.append({'path':str(path),'file_bytes':sum(p.stat().st_size for p in path.rglob('*') if p.is_file())})
+cleanup={'task':'6.DN','runtime_roots_file_bytes':totals['runtime_file_bytes_cleaned'],
+    'scratch_roots':scratch,'total_measured_file_bytes':totals['runtime_file_bytes_cleaned']+sum(p['file_bytes'] for p in scratch),
+    'retained':'Formal PDFs, effective parse cache, original results/failures, used attempt markers, old/new API roots and recoverable operator snapshots.',
+    'remaining_prepared_texts':'Removed duplicate preparation copies; can regenerate from retained same-hash formal PDFs/cache without model calls.',
+    'other_or_preexisting_scratch':'not_deleted'}
+dump(DEST/'cleanup.json',cleanup)
+dump(DEST/'execution-validation.json',{'task':'6.DN','real_entries_completed':4,'not_started':4,
+    'raw_three_reads_equal':4,'graded_three_reads_equal':4,'actual_ASGI_GET_and_read_owner_equal':4,
+    'visible_records':129,'visible_metrics':207,'source_basic_conditions_supported':24,
+    'source_basic_conditions_not_executed':20,'accepted_repairs_independently_checked':19,
+    'source_checked_objects':audit['source_checked_objects'],'all_output_accuracy':None,
+    'rejected_guangzhou_originals_absent_from_API':['F-OD-04','F-SC-D2'],
+    'business_code_prompt_and_shared_configuration_unchanged':True,
+    'old_API_roots_and_inputs_unchanged':True,'actual_timeout_mismatch_not_concealed':True,
+    'remaining_operator_rebinding':'awaiting_explicit_user_response; no new sends',
+    'formal_S1_pass':False,'production_authorization':'not_authorized'})
+print(json.dumps({'finalized_four':True,'visible':129,'metrics':207,'physical_requests':20,'usage':554569,
+    'cleaned_file_bytes':cleanup['total_measured_file_bytes'],'remaining':4,'new_calls':0},ensure_ascii=False),flush=True)
+for path in (PREPARED,WORK):shutil.rmtree(path)

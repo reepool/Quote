@@ -1,0 +1,25 @@
+{
+  "task": "6.DN",
+  "real_entries_completed": 4,
+  "not_started": 4,
+  "raw_three_reads_equal": 4,
+  "graded_three_reads_equal": 4,
+  "actual_ASGI_GET_and_read_owner_equal": 4,
+  "visible_records": 129,
+  "visible_metrics": 207,
+  "source_basic_conditions_supported": 24,
+  "source_basic_conditions_not_executed": 20,
+  "accepted_repairs_independently_checked": 19,
+  "source_checked_objects": 46,
+  "all_output_accuracy": null,
+  "rejected_guangzhou_originals_absent_from_API": [
+    "F-OD-04",
+    "F-SC-D2"
+  ],
+  "business_code_prompt_and_shared_configuration_unchanged": true,
+  "old_API_roots_and_inputs_unchanged": true,
+  "actual_timeout_mismatch_not_concealed": true,
+  "remaining_operator_rebinding": "awaiting_explicit_user_response; no new sends",
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}

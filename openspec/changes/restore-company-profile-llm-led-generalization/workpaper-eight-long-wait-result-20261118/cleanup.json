@@ -1,0 +1,18 @@
+{
+  "task": "6.DN",
+  "runtime_roots_file_bytes": 7895728,
+  "scratch_roots": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dn-QqxqY1",
+      "file_bytes": 25778
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dn-prepared-x17d43c2",
+      "file_bytes": 8196174
+    }
+  ],
+  "total_measured_file_bytes": 16117680,
+  "retained": "Formal PDFs, effective parse cache, original results/failures, used attempt markers, old/new API roots and recoverable operator snapshots.",
+  "remaining_prepared_texts": "Removed duplicate preparation copies; can regenerate from retained same-hash formal PDFs/cache without model calls.",
+  "other_or_preexisting_scratch": "not_deleted"
+}

@@ -1,0 +1,10 @@
+{
+  "task": "6.DN",
+  "reason": "operator_timeout_binding_mismatch_before_remaining_dispatch",
+  "not_source_content_pollution": true,
+  "all_four_started_children_finished_before_signal": true,
+  "child_states_observed": {"2833362":"Z","2833363":"Z","2833364":"Z","2833365":"Z"},
+  "scope": "Use the existing external-stop hook to collect four completed results without dispatching the remaining four. No in-flight request is cancelled.",
+  "remaining_binding_correction_approval": "awaiting_response",
+  "no_new_attempts_or_budget_windows": true
+}

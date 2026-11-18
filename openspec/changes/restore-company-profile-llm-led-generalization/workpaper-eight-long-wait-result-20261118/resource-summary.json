@@ -1,0 +1,91 @@
+{
+  "task": "6.DN",
+  "executed": 4,
+  "not_started": [
+    "600104.SH",
+    "600088.SH",
+    "600082.SH",
+    "600097.SH"
+  ],
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "supplier_reported_total_tokens": 116607,
+      "conservative_charged_ledger": 116607,
+      "unknown_reserved": 0,
+      "fee": "unknown",
+      "business_seconds": 584.333,
+      "preparation_seconds": 45.179,
+      "supervision_seconds": 586.978,
+      "runtime_file_bytes_cleaned": 1788273,
+      "model_review_status": "completed",
+      "actual_provider_cap_seconds": 620
+    },
+    {
+      "instrument_id": "600103.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "supplier_reported_total_tokens": 138581,
+      "conservative_charged_ledger": 138581,
+      "unknown_reserved": 0,
+      "fee": "unknown",
+      "business_seconds": 491.869,
+      "preparation_seconds": 45.025,
+      "supervision_seconds": 495.309,
+      "runtime_file_bytes_cleaned": 1997860,
+      "model_review_status": "completed",
+      "actual_provider_cap_seconds": 620
+    },
+    {
+      "instrument_id": "600107.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "supplier_reported_total_tokens": 122265,
+      "conservative_charged_ledger": 122265,
+      "unknown_reserved": 0,
+      "fee": "unknown",
+      "business_seconds": 576.472,
+      "preparation_seconds": 45.261,
+      "supervision_seconds": 579.75,
+      "runtime_file_bytes_cleaned": 1929618,
+      "model_review_status": "completed",
+      "actual_provider_cap_seconds": 620
+    },
+    {
+      "instrument_id": "600098.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "supplier_reported_total_tokens": 177116,
+      "conservative_charged_ledger": 177116,
+      "unknown_reserved": 0,
+      "fee": "unknown",
+      "business_seconds": 749.274,
+      "preparation_seconds": 45.123,
+      "supervision_seconds": 753.103,
+      "runtime_file_bytes_cleaned": 2179977,
+      "model_review_status": "completed_with_open_findings",
+      "actual_provider_cap_seconds": 620
+    }
+  ],
+  "totals": {
+    "physical_requests": 20,
+    "recoveries": 0,
+    "supplier_reported_total_tokens": 554569,
+    "conservative_charged_ledger": 554569,
+    "unknown_reserved": 0,
+    "runtime_file_bytes_cleaned": 7895728
+  },
+  "concurrency_max": 4,
+  "group_supervision_wall_seconds": 883.214,
+  "wall_clock_includes_dispatch_hold": true,
+  "fee": "unknown",
+  "planned_long_wait_not_actually_applied": true,
+  "planned_identity_logical_seconds": 2450,
+  "planned_high_tier_physical_seconds": 1200,
+  "actual_provider_and_logical_cap_seconds": 620,
+  "all_usage_known_this_group": true,
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}
