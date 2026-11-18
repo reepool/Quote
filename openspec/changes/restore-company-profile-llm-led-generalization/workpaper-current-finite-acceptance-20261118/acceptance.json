@@ -1,0 +1,1953 @@
+{
+  "schema_version": "company_profile_current_finite_acceptance.v1",
+  "input_sha256": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/independent-audit.json": "5212e6614ba7ace7f0be117fb1b788e8ff62459c5748dbd4e4ba2bf10ba293bd",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/resource-summary.json": "309c31bfc7a09dac98c4b5a7840f749a877e1db6087c321c118e7211131611f6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/independent-audit.json": "a5e0de9b92190bb194b8452284831d733d786d94d29a6dc904982b8f9954be30",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/resource-summary.json": "ad7eab77b7f34803a62e41b27315acac8eb52ba70d6b42752b57d4e503fbd91a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/independent-audit.json": "2400c05dddded2982af8c5b09bba0a6e58c91227ee8c1c2ad4f3c25b831a1a85",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/resource-summary.json": "dd1b485244a04cb089c5c0ab2f222e30a006d87e44ff7cd37ac99c8c755da252",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/independent-audit.json": "a459c320c4ba1545a817ca7f24ba4d57c7dff5121942a3ac2edab0cd77b12a13",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/resource-summary.json": "a80174618b8360f8c605c9b1a70df667bfcd69b1240dfb39c54c1571afcf9ba2"
+  },
+  "base_index_sha256": "026a154723fcc054b35219f33b3f0ef987d87bff539b34565f978f016a9d7e76",
+  "source_contract_sha256": "a3c7007cc778417ace8d3f9f413a44446e11ea0bc2777b7cf306c1d5f0241f0d",
+  "source_files_and_detail_snapshot_unchanged": true,
+  "model_requests": 0,
+  "external_requests": 0,
+  "business_writes": 0,
+  "companies": [
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "runtime_sha256": "2f01459c6f0e97c6e13c848e5832a4bd070787289b9221d4e77c5f028de88d98",
+      "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+      "group": "DM",
+      "actual_provider_cap_seconds": 2450,
+      "visible_facts": 51,
+      "visible_metrics": 89,
+      "fact_states": {
+        "reviewed": 44,
+        "limited": 7,
+        "source_only": 2
+      },
+      "independent_visible_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "bs-04",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "ps-04",
+        "ps-05",
+        "rm-01",
+        "rm-02",
+        "rm-03",
+        "rm-04",
+        "rm-05",
+        "sm-03",
+        "sm-04",
+        "cc-06",
+        "od-01",
+        "od-02"
+      ],
+      "model_only_visible_fact_ids": [
+        "sm-01",
+        "sm-02",
+        "sm-05",
+        "sm-06",
+        "sm-07",
+        "oi-01",
+        "oi-02",
+        "oi-03",
+        "oi-04",
+        "oi-05",
+        "oi-06",
+        "oi-07",
+        "cc-01",
+        "cc-02",
+        "cc-03",
+        "cc-04",
+        "cc-05",
+        "od-03",
+        "od-04",
+        "od-05",
+        "od-06",
+        "mc-01",
+        "mc-02",
+        "mc-03",
+        "mc-04",
+        "mc-05",
+        "sc-01",
+        "sc-02",
+        "sc-03",
+        "cf-01",
+        "cf-02",
+        "cf-03"
+      ],
+      "source_only_fact_ids": [
+        "rm-06",
+        "rm-07"
+      ],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/independent-audit.json",
+      "independent_audit_sha256": "a5e0de9b92190bb194b8452284831d733d786d94d29a6dc904982b8f9954be30",
+      "source_conditions": [
+        {
+          "condition_id": "600000-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600000-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-02",
+            "ps-01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600000-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "ps-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600000-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-03",
+            "ps-04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600000-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "bs-04",
+            "ps-05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600000-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "rm-02",
+            "rm-03"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed",
+      "retained_receipt_count": 3,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "revenue_model",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 7,
+        "conservative_charged_ledger": 580514,
+        "supplier_reported_total_tokens": 202682,
+        "unknown_reserved": 377832,
+        "recoveries": 1,
+        "business_seconds": 1465.407,
+        "note": "sum of DL entry and separately authorized DM review; not one first run or wall clock"
+      }
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "work_id": "bp-work-e90e59273c54550629b5724d",
+      "runtime_sha256": "2a005b979fab564170f5373f1b506242ad79a81248c99e7865118047b4355219",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "group": "DL",
+      "actual_provider_cap_seconds": 620,
+      "visible_facts": 32,
+      "visible_metrics": 43,
+      "fact_states": {
+        "reviewed": 32
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33"
+      ],
+      "model_only_visible_fact_ids": [],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "5212e6614ba7ace7f0be117fb1b788e8ff62459c5748dbd4e4ba2bf10ba293bd",
+      "source_conditions": [
+        {
+          "condition_id": "600054-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02",
+            "F03",
+            "F04",
+            "F05",
+            "F06"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600054-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600054-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600054-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F03",
+            "F04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600054-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600054-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600054-DL07",
+          "verdict": "supported",
+          "fact_ids": [
+            "F09"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed_with_open_findings",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "operations_and_inputs",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 113629,
+        "supplier_usage_known": 113629,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 581.952
+      }
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "work_id": "bp-work-a2233d8766efdcb0eb19b903",
+      "runtime_sha256": "eb286510e306a663e8394f482a39fb5ff6a775f757d17367ccb3acb3e583c08c",
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "group": "DN2",
+      "actual_provider_cap_seconds": 2450,
+      "visible_facts": 34,
+      "visible_metrics": 41,
+      "fact_states": {
+        "reviewed": 34
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F02",
+        "F04",
+        "F05",
+        "F08",
+        "F09",
+        "F10",
+        "F16",
+        "F17",
+        "F21",
+        "review-add:RF04"
+      ],
+      "model_only_visible_fact_ids": [
+        "F03",
+        "F06",
+        "F07",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F19",
+        "F20",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "a459c320c4ba1545a817ca7f24ba4d57c7dff5121942a3ac2edab0cd77b12a13",
+      "source_conditions": [
+        {
+          "condition_id": "600082-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600082-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600082-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02",
+            "F08"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600082-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F08",
+            "F09",
+            "F10"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "incomplete",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "operations_and_inputs"
+      ],
+      "suggested_acquisition_elements": [
+        "material_changes"
+      ],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 140415,
+        "supplier_reported_total_tokens": 140415,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 642.22
+      }
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "work_id": "bp-work-fbda70711a8deed52baa9725",
+      "runtime_sha256": "d281e435e017cf8679dfb1aa3b1327a179887bb386a99bf4258db7cfdf862630",
+      "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+      "group": "DN2",
+      "actual_provider_cap_seconds": 2450,
+      "visible_facts": 30,
+      "visible_metrics": 39,
+      "fact_states": {
+        "reviewed": 28,
+        "limited": 2
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F08",
+        "F09",
+        "review-add:R03",
+        "F13"
+      ],
+      "model_only_visible_fact_ids": [
+        "F07",
+        "F11",
+        "F12",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "a459c320c4ba1545a817ca7f24ba4d57c7dff5121942a3ac2edab0cd77b12a13",
+      "source_conditions": [
+        {
+          "condition_id": "600088-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600088-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F03",
+            "F04",
+            "F05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600088-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02",
+            "F09"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600088-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600088-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06",
+            "F08",
+            "F09"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed_with_open_findings",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "operations_and_inputs",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 115485,
+        "supplier_reported_total_tokens": 115485,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 583.298
+      }
+    },
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "work_id": "bp-work-fdbeaa351306bc7b22258d70",
+      "runtime_sha256": "6e969742a30c3a20671e0f04288e6665b9cfccaff0f93a2696f77b87eb7a4705",
+      "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+      "group": "DN1",
+      "actual_provider_cap_seconds": 620,
+      "visible_facts": 29,
+      "visible_metrics": 39,
+      "fact_states": {
+        "reviewed": 23,
+        "limited": 6
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F03",
+        "F04",
+        "F05",
+        "F07",
+        "F08",
+        "F14",
+        "F19",
+        "F22",
+        "F23",
+        "F28",
+        "F29",
+        "F30"
+      ],
+      "model_only_visible_fact_ids": [
+        "F02",
+        "F06",
+        "F09",
+        "F11",
+        "F12",
+        "F13",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F20",
+        "F21",
+        "F24",
+        "F25",
+        "F26",
+        "F27"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "2400c05dddded2982af8c5b09bba0a6e58c91227ee8c1c2ad4f3c25b831a1a85",
+      "source_conditions": [
+        {
+          "condition_id": "600094-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600094-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F03",
+            "F23"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600094-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F07"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600094-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F14"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600094-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F07",
+            "F22"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600094-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F08"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "scale_and_mix"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 116607,
+        "supplier_reported_total_tokens": 116607,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 584.333
+      }
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "work_id": "bp-work-3e4dd887b0c1def19809c334",
+      "runtime_sha256": "7a40625fd3d54d7d03702a82e3249567946f6e6f0fc59e6f4a6f3be9f3a755cb",
+      "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "group": "DN2",
+      "actual_provider_cap_seconds": 2450,
+      "visible_facts": 27,
+      "visible_metrics": 44,
+      "fact_states": {
+        "reviewed": 26,
+        "limited": 1
+      },
+      "independent_visible_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-RM-01",
+        "F-RM-03",
+        "F-SM-04",
+        "F-OI-04",
+        "F-MC-01"
+      ],
+      "model_only_visible_fact_ids": [
+        "F-RM-02",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-OD-02",
+        "F-MC-02",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03",
+        "F-CF-01"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "a459c320c4ba1545a817ca7f24ba4d57c7dff5121942a3ac2edab0cd77b12a13",
+      "source_conditions": [
+        {
+          "condition_id": "600097-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-BS-01",
+            "F-BS-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600097-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600097-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600097-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-03",
+            "F-PS-04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600097-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-RM-01",
+            "F-RM-03"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed_with_open_findings",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "downstream_customers",
+        "material_changes",
+        "operating_drivers",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [
+        "operating_drivers"
+      ],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 125251,
+        "supplier_reported_total_tokens": 125251,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 593.172
+      }
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "work_id": "bp-work-1f1447c6f84f3c47f29babcd",
+      "runtime_sha256": "ce076c139af43bde2f8e713900885dac72d03b9d2577c1c2b4a72d558d76b0d7",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "group": "DN1",
+      "actual_provider_cap_seconds": 620,
+      "visible_facts": 42,
+      "visible_metrics": 47,
+      "fact_states": {
+        "reviewed": 33,
+        "limited": 9
+      },
+      "independent_visible_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-04",
+        "F-RM-01",
+        "F-RM-02",
+        "review-add:REV-001",
+        "review-add:REV-002"
+      ],
+      "model_only_visible_fact_ids": [
+        "F-BS-03",
+        "F-PS-03",
+        "F-RM-03",
+        "F-RM-04",
+        "F-SM-01",
+        "F-SM-05",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-OI-06",
+        "F-CC-01",
+        "F-CC-04",
+        "F-CC-05",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-05",
+        "F-OD-06",
+        "F-OD-07",
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-MC-04",
+        "F-MC-05",
+        "F-MC-06",
+        "F-SC-P1",
+        "F-SC-U1",
+        "F-SC-U2",
+        "F-SC-D1",
+        "F-CF-01",
+        "F-CF-02",
+        "F-CF-03"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "2400c05dddded2982af8c5b09bba0a6e58c91227ee8c1c2ad4f3c25b831a1a85",
+      "source_conditions": [
+        {
+          "condition_id": "600098-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-BS-01",
+            "F-BS-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600098-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01",
+            "F-PS-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600098-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01",
+            "F-PS-04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600098-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-02",
+            "F-RM-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600098-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-RM-01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600098-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed_with_open_findings",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "operations_and_inputs",
+        "scale_and_mix"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 177116,
+        "supplier_reported_total_tokens": 177116,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 749.274
+      }
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "work_id": "bp-work-afdfaa98807b8a4c4e1b0dfa",
+      "runtime_sha256": "a7d9201d7754a78eb2578939961a9aeff88cfe6aa97db54631d5511ed8e5c6fe",
+      "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+      "group": "DL",
+      "actual_provider_cap_seconds": 620,
+      "visible_facts": 32,
+      "visible_metrics": 58,
+      "fact_states": {
+        "reviewed": 32
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F02",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F26",
+        "F29",
+        "F31"
+      ],
+      "model_only_visible_fact_ids": [
+        "F03",
+        "F10",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F27",
+        "F28",
+        "F32",
+        "F33"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "5212e6614ba7ace7f0be117fb1b788e8ff62459c5748dbd4e4ba2bf10ba293bd",
+      "source_conditions": [
+        {
+          "condition_id": "600099-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600099-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600099-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600099-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600099-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F07"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600099-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed_with_open_findings",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "operations_and_inputs",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 135800,
+        "supplier_usage_known": 135800,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 696.432
+      }
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "work_id": "bp-work-f6aff834b339105257473b0c",
+      "runtime_sha256": "93f6bf059edd6d9da0d2c72ea43918e4f09f9e40b0bf24b5ecede7769feabae6",
+      "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+      "group": "DL",
+      "actual_provider_cap_seconds": 620,
+      "visible_facts": 27,
+      "visible_metrics": 32,
+      "fact_states": {
+        "reviewed": 25,
+        "limited": 2
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F02",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "review-add:RF01",
+        "review-add:RF05",
+        "F26",
+        "F27",
+        "F29"
+      ],
+      "model_only_visible_fact_ids": [
+        "F12",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F28"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "5212e6614ba7ace7f0be117fb1b788e8ff62459c5748dbd4e4ba2bf10ba293bd",
+      "source_conditions": [
+        {
+          "condition_id": "600100-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600100-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600100-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06",
+            "F07"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600100-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F08"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600100-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F09"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600100-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F10"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600100-DL07",
+          "verdict": "supported",
+          "fact_ids": [
+            "F11"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed_with_open_findings",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "operations_and_inputs",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [
+        "material_changes"
+      ],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 141263,
+        "supplier_usage_known": 141263,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 714.371
+      }
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "work_id": "bp-work-1d540f9cba8e2c6667657568",
+      "runtime_sha256": "6bc6c92e2ce667d2e8be1277ecb4ee898b646a70ce943bbdd01d9f5369c5afee",
+      "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+      "group": "DN1",
+      "actual_provider_cap_seconds": 620,
+      "visible_facts": 32,
+      "visible_metrics": 62,
+      "fact_states": {
+        "reviewed": 29,
+        "limited": 3
+      },
+      "independent_visible_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-01",
+        "F-RM-02",
+        "F-MC-01",
+        "F-MC-02",
+        "F-SC-01"
+      ],
+      "model_only_visible_fact_ids": [
+        "F-BS-03",
+        "F-PS-06",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-SC-02",
+        "F-SC-03",
+        "F-SC-04"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "2400c05dddded2982af8c5b09bba0a6e58c91227ee8c1c2ad4f3c25b831a1a85",
+      "source_conditions": [
+        {
+          "condition_id": "600103-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-BS-01",
+            "F-BS-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600103-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01",
+            "F-PS-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600103-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-03"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600103-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600103-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600103-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600103-DL07",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-RM-01",
+            "F-RM-02"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "operations_and_inputs",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 138581,
+        "supplier_reported_total_tokens": 138581,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 491.869
+      }
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+      "runtime_sha256": "e6a4fa25fe5522cc96004f3e2d9e8423b8919b81ba0c34801bbc3ee3aec7e513",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "group": "DN2",
+      "actual_provider_cap_seconds": 2450,
+      "visible_facts": 37,
+      "visible_metrics": 56,
+      "fact_states": {
+        "reviewed": 36,
+        "limited": 1
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F11",
+        "F13",
+        "F14",
+        "F20",
+        "F24",
+        "F36",
+        "F37"
+      ],
+      "model_only_visible_fact_ids": [
+        "F02",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F12",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F21",
+        "F22",
+        "F23",
+        "F25",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F33",
+        "F34",
+        "F35",
+        "F41",
+        "F42"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "a459c320c4ba1545a817ca7f24ba4d57c7dff5121942a3ac2edab0cd77b12a13",
+      "source_conditions": [
+        {
+          "condition_id": "600104-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600104-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05",
+            "F06"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600104-DL03",
+          "verdict": "detail_gap",
+          "fact_ids": [
+            "F03",
+            "F11"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600104-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F24",
+            "F36"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600104-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F13"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600104-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F11",
+            "F13",
+            "F14"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed_with_open_findings",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "business_structure",
+        "customers_channels_markets",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "products_services",
+        "revenue_model",
+        "scale_and_mix"
+      ],
+      "suggested_acquisition_elements": [
+        "operations_and_inputs",
+        "revenue_model"
+      ],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 125788,
+        "supplier_reported_total_tokens": 125788,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 502.355
+      }
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "work_id": "bp-work-ca3d6e7b453cfeddb5822b5d",
+      "runtime_sha256": "abeedf30d6c4ac615f604697b1b38a1cd5cafb8705acabcf323fd3da3f7f45c1",
+      "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+      "group": "DN1",
+      "actual_provider_cap_seconds": 620,
+      "visible_facts": 26,
+      "visible_metrics": 59,
+      "fact_states": {
+        "reviewed": 22,
+        "limited": 4
+      },
+      "independent_visible_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F09",
+        "F10",
+        "F13",
+        "F15",
+        "F24",
+        "F25"
+      ],
+      "model_only_visible_fact_ids": [
+        "F07",
+        "F08",
+        "F11",
+        "F12",
+        "F14",
+        "F16",
+        "F17",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F26",
+        "F27",
+        "F28"
+      ],
+      "source_only_fact_ids": [],
+      "independent_audit": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118/independent-audit.json",
+      "independent_audit_sha256": "2400c05dddded2982af8c5b09bba0a6e58c91227ee8c1c2ad4f3c25b831a1a85",
+      "source_conditions": [
+        {
+          "condition_id": "600107-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F03"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600107-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600107-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600107-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02",
+            "F06",
+            "F15"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        },
+        {
+          "condition_id": "600107-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F03",
+            "F09"
+          ],
+          "current_hash_bound_source_checked": true,
+          "current_visible": true
+        }
+      ],
+      "review_status": "completed",
+      "retained_receipt_count": 5,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "material_changes",
+        "operations_and_inputs",
+        "revenue_model",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_elements": [],
+      "resources_including_failed_ancestry": {
+        "physical_requests": 5,
+        "conservative_charged_ledger": 122265,
+        "supplier_reported_total_tokens": 122265,
+        "unknown_reserved": 0,
+        "recoveries": 0,
+        "business_seconds": 576.472
+      }
+    }
+  ],
+  "totals": {
+    "visible_facts": 399,
+    "visible_metrics": 609,
+    "independent_visible_facts": 172,
+    "model_only_visible_facts": 227,
+    "source_conditions": 70,
+    "source_conditions_verdicts": {
+      "supported": 69,
+      "detail_gap": 1
+    },
+    "unbound_condition_fact_ids": [],
+    "physical_requests": 62,
+    "conservative_charged_ledger": 2032714,
+    "known_supplier_total_tokens": 1654882,
+    "unknown_reserved": 377832,
+    "recoveries": 1
+  },
+  "accuracy": null,
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized",
+  "task": "6.DP",
+  "baseline_commit": "b88af3f1",
+  "authority": "Existing public reports and retained real responses; local-only finite acceptance, no new paid/external authority",
+  "code_binding_check": {
+    "common_paths": 63,
+    "common_semantic_paths": 60,
+    "common_path_hashes_equal_across_twelve": true,
+    "missing_manifest_coverage_not_a_code_difference": [
+      "api/company_profile_routes.py"
+    ],
+    "current_common_path_changes": [
+      "research/company_profile/reads.py"
+    ],
+    "current_change_scope": "read-only catalog commit b88af3f1; existing per-stock projections compared equal to frozen API snapshot"
+  },
+  "current_source_readback": {
+    "companies": 9,
+    "physical_pages": 17,
+    "immutable_cache_validated": true,
+    "source_reads": [
+      {
+        "instrument_id": "600094.SH",
+        "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/f5/derived/business_profile_pdfium_recovery.v4/f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "d42ee43dcf6fa4076c5c22258d1a37c08743b39219a1b0470d66e3916c8eecb8",
+        "physical_pages": [
+          10,
+          15,
+          16
+        ],
+        "page_text_sha256": {
+          "10": "ff38a6c1ef0b956693ee43abb89223727e4423557a3bf198c5933b91be73eabe",
+          "15": "edbfde0343827045f9fb2088cff28b6cd3fd68f75f2fd1264d5bf49069bf9737",
+          "16": "79ac779319570e1864106ee725517a1575746acaf45ffa9d46e95db362e622bc"
+        }
+      },
+      {
+        "instrument_id": "600107.SH",
+        "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/2d/derived/business_profile_pdfium_recovery.v4/2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "18805228a156d4e35083d5cd95f43a4ba81ee1d7b47f1df5712b89edb8f0fbb3",
+        "physical_pages": [
+          15,
+          16
+        ],
+        "page_text_sha256": {
+          "15": "8e18968b67c7de2cd030d9e4cb5f339bb954cb0325c611b9d0c29d51fb69d57c",
+          "16": "1179b608e90da1c608715748bec8b8089e297b8ca7eae306237b0884b35b5794"
+        }
+      },
+      {
+        "instrument_id": "600098.SH",
+        "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/78/derived/business_profile_pdfium_recovery.v4/78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "b50658c3be724234cf57f37b0d0109ae1b8a0d7ea60677ab6ddff15543cd0a99",
+        "physical_pages": [
+          9
+        ],
+        "page_text_sha256": {
+          "9": "0ff2c3d2d0355644344341f8154552aabc10d33f27ddcfd32350ac0e593ee27f"
+        }
+      },
+      {
+        "instrument_id": "600103.SH",
+        "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/68/derived/business_profile_pdfium_recovery.v4/6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "0ae6b8df491e0199e0de60aebac48e946a121bf0fece501e4d8140ddeecb2d16",
+        "physical_pages": [
+          11
+        ],
+        "page_text_sha256": {
+          "11": "9f6763543318dec3c6bd9b870958e94dd0576acdda0b3d8821c9c2b9c3e6a866"
+        }
+      },
+      {
+        "instrument_id": "600088.SH",
+        "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/5a/derived/business_profile_pdfium_recovery.v4/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "113fc77208e99642647b1dda436afc4c685566399009de521c7e2a6dd35d4dd2",
+        "physical_pages": [
+          11,
+          17
+        ],
+        "page_text_sha256": {
+          "11": "612bc57ab475dd5c44a0ce32d33bc7a988faad1d9471a6e5b7d5928ee41f5526",
+          "17": "ed1a12addc300d29c5aafa75bf7f45c7dc5f04300b583871a46ffdd2cd6b3a33"
+        }
+      },
+      {
+        "instrument_id": "600082.SH",
+        "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/97/derived/business_profile_pdfium_recovery.v4/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "d9bd2b91dcee5bde08ee2fa7577f0048a813e5932b20c36c98d7918f7fca46bb",
+        "physical_pages": [
+          15,
+          16
+        ],
+        "page_text_sha256": {
+          "15": "2e8d894f3adf555938c6cbb8c15f842000bee9f5d98318a81d0f55ffce0b697c",
+          "16": "3431cdd9ea69042261c9db8429dc57c28ccc8518a0d24087000718838fa3ff83"
+        }
+      },
+      {
+        "instrument_id": "600104.SH",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/ac/derived/business_profile_pdfium_recovery.v4/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "bea656512fa62c37256c1c75d70e75d8ab2162a16cae30220f2901aa40552d79",
+        "physical_pages": [
+          9,
+          10,
+          11
+        ],
+        "page_text_sha256": {
+          "9": "95b0529df65cb23149220de53653c60ccd2219b593300f02c17717511184c69f",
+          "10": "a3403093e2a54de4f3e708b383d3752c427033ba95d3fcbed70fdd8e381d3525",
+          "11": "ad73346e3f3e38420135ebeb48adb2c364918174160ab1644b1cfdb62b468dc7"
+        }
+      },
+      {
+        "instrument_id": "600097.SH",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/4c/derived/business_profile_pdfium_recovery.v4/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "ebeaf29a0091e0fea4469924c68c1a24f280e602ef0393e3d139db389ce19d3e",
+        "physical_pages": [
+          8
+        ],
+        "page_text_sha256": {
+          "8": "88fcf8c409f33da9b11d75c45221ffb94e0966ce443784568b0f56a4f5d61a18"
+        }
+      },
+      {
+        "instrument_id": "600000.SH",
+        "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+        "artifact_path": "/home/python/Quote/data/filings/announcements/blobs/e4/derived/business_profile_pdfium_recovery.v4/e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22_57e1dd4f16ef40ff.json.gz",
+        "artifact_hash": "fb991c36b4350fc854a18993151227fdd623e4a5a2b9487b2cde5f304fe782bd",
+        "physical_pages": [
+          71,
+          72
+        ],
+        "page_text_sha256": {
+          "71": "3cff20e5d585b0313365a848944de3c8eb02203040dcb940e3214f125ea51ca2",
+          "72": "2c9217e2ea0f8f98ce46c69e2f930d50a9e2e3607c013d2e13ffb6ff108e679c"
+        }
+      }
+    ],
+    "new_parsing_or_download": false,
+    "temporary_file_writes": 0
+  },
+  "additional_targeted_fact_checks": [
+    {
+      "instrument_id": "600107.SH",
+      "work_id": "bp-work-ca3d6e7b453cfeddb5822b5d",
+      "fact_id": "F07",
+      "fact_sha256": "766e807784f6be7283e6e066748d66a7a7679d94b1ab1a9aa4d7ccf69889ae55",
+      "source_pages": [
+        15,
+        16
+      ],
+      "verdict": "supported_in_this_targeted_source_check",
+      "api_grade_unchanged": true
+    },
+    {
+      "instrument_id": "600107.SH",
+      "work_id": "bp-work-ca3d6e7b453cfeddb5822b5d",
+      "fact_id": "F08",
+      "fact_sha256": "9c5ddd80020fb80493e31f051c18b5281e813d48cb2cb02684431dcf0dc039ad",
+      "source_pages": [
+        15,
+        16
+      ],
+      "verdict": "supported_in_this_targeted_source_check",
+      "api_grade_unchanged": true
+    },
+    {
+      "instrument_id": "600104.SH",
+      "work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+      "fact_id": "F10",
+      "fact_sha256": "1692b81ff587cf6a9e5fe08ea90c15284dfe56ff48a873515a22d303e4c0e110",
+      "source_pages": [
+        9,
+        10
+      ],
+      "verdict": "supported_in_this_targeted_source_check",
+      "api_grade_unchanged": true
+    }
+  ],
+  "scope_counts_are_not_accuracy": true,
+  "api_usage_decisions_unchanged": true,
+  "risk_scope": [
+    {
+      "category": "body",
+      "companies": [
+        "600082.SH",
+        "600097.SH"
+      ],
+      "verdict": "supported_in_current_selected_scope",
+      "basis": "海泰园区开发/运营与净额代理贸易分开（p15—16及既有主营源核）；开创p8保捕捞、加工、运输、贸易及各自角色。",
+      "program_negative_execution": "not_executed_by_this_card"
+    },
+    {
+      "category": "income_columns_units",
+      "companies": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "verdict": "supported_in_current_selected_scope",
+      "basis": "大名城p15—16金控/金融投资空收入栏不借成本；美尔雅p15—16医疗当前金额空，-100为同比列，不编零。新增核F07/F08金额/元单位/本期/分项主体，分产品小计不称营业总收入。",
+      "program_negative_execution": "not_executed_by_this_card"
+    },
+    {
+      "category": "subject_period",
+      "companies": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "verdict": "supported_with_retained_limits",
+      "basis": "大名城p10为投资6G/eVTOL及控股算力运营，当前F05/F23仍保参股/未并表；美尔雅p15的处置对本期收入影响不推出本期交易发生，当前F24保处置时点未明确。",
+      "program_negative_execution": "not_executed_by_this_card"
+    },
+    {
+      "category": "purchase_sale_direction",
+      "companies": [
+        "600098.SH",
+        "600103.SH"
+      ],
+      "verdict": "supported_in_current_selected_scope",
+      "basis": "广州p9自产电汽、外购天然气煤炭油品、售往终端分开；青山p11木竹片采购、浆纸自主生产、直销以销定产分开。",
+      "program_negative_execution": "not_executed_by_this_card"
+    },
+    {
+      "category": "associated_leasing",
+      "companies": [
+        "600088.SH",
+        "600082.SH"
+      ],
+      "verdict": "supported_in_current_selected_scope",
+      "basis": "中视p11对外设备租赁服务与p17影视成本租赁费分开；海泰p15—16园区开发/租赁运营/代理净额和成本分开。只核这些范围，不称关联交易全查。",
+      "program_negative_execution": "not_executed_by_this_card"
+    },
+    {
+      "category": "financial_disclosure",
+      "companies": [
+        "600098.SH",
+        "600104.SH",
+        "600000.SH"
+      ],
+      "verdict": "supported_with_retained_limits",
+      "basis": "广州p9能源产业金融不当集团银行；上汽p9—11营业总收入/营业收入/分产品及金融业务保科目、主体和原表范围，新增核F10；浦发p71—72营业收入173964百万元与业务总收入325269百万元分开，rm06/rm07仅源参考不因模型通过放行。",
+      "program_negative_execution": "not_executed_by_this_card"
+    }
+  ],
+  "research_decision": {
+    "current_twelve_basic_research": "available_with_explicit_limits",
+    "formal_company_usable_grades": "not_assessed",
+    "new_full_output_accuracy": null,
+    "new_whole_report_recall": null,
+    "formal_S1_pass": false,
+    "S2_release": false,
+    "production_authorization": "not_authorized",
+    "known_new_blocking_content_errors_found_in_targeted_scope": 0,
+    "not_an_assertion_of_zero_unknown_errors": true
+  },
+  "minimum_remaining_evidence": [
+    {
+      "kind": "independent_quality_scope",
+      "status": "incomplete",
+      "can_use_saved_content": true,
+      "requires_new_model_extraction": false,
+      "detail": "既有172内容哈希绑定源核及本轮3定向检查不能代替冻结分层补充抽样与全部高风险核验；227仅模型核范围及其中新查3项分列，当前不计算全稿或正式准确率。"
+    },
+    {
+      "kind": "formal_positive_negative_and_lineage",
+      "status": "incomplete",
+      "can_use_saved_content": true,
+      "requires_new_model_extraction": false,
+      "detail": "六类当前源对照是实物检查，不等于十二家所有适用程序负例执行。原S1首发失败与浦发后段、两种资源接线不拼成同档首发；仅实际已证范围可复用。"
+    },
+    {
+      "kind": "prospective_resource_and_stage_contract",
+      "status": "requires_explicit_decision",
+      "can_use_saved_content": true,
+      "requires_new_model_extraction": false,
+      "detail": "正式旧常规900秒/120000和仅6.DL双模型1800/500000均不因本轮扩展；后续应明确采用实测长等待档，并裁决正式首发/同版后继的补证范围。费用unknown不冒称人民币或成本达标，不自动重跑十二家或放行S2。"
+    }
+  ],
+  "proposed_future_resource_profile": {
+    "status": "proposal_only_not_sendable_or_approved",
+    "scope": "Only a future explicitly approved card; not shared defaults or retroactive scoring",
+    "provider_constructor_and_logical_timeout_seconds": 2450,
+    "high_tier_physical_timeout_seconds": 1200,
+    "flash_physical_timeout_seconds": 600,
+    "company_elapsed_seconds": 6000,
+    "company_conservative_ledger": 1000000,
+    "company_physical_requests": 10,
+    "company_recoveries": 3,
+    "recovery_per_logical_max": 1,
+    "fee_without_reliable_price": "unknown",
+    "priced_component_rmb_cap_per_company": 10,
+    "cannot_guarantee_total_rmb_cap": true
+  },
+  "validation": {
+    "typed_runtime_and_report_versions": 12,
+    "original_and_current_runtime_hashes_equal": 12,
+    "owner_detail_equals_frozen_api_snapshot": 12,
+    "all_existing_use_decisions_match_current_fact_hash": true,
+    "all_use_review_reference_hashes_equal": true,
+    "all_fact_evidence_ids_and_versions_present": true,
+    "source_cache_validated_by_original_artifact_store": 9,
+    "source_pages_read": 17,
+    "business_code_changed": false,
+    "new_model_or_network_requests": 0,
+    "business_writes": 0,
+    "pytest": "not rerun: no application/test change; reuse 6.DO relevant evidence",
+    "strict_openspec": "passed",
+    "review": "passed_scoped_no_remaining_blocking_defect_in_this_delivery",
+    "pre_validation_adaptations": [
+      "bank per-company binding has no code manifest; full successful audit uses the group authorization manifest",
+      "pdftotext is not installed; no installation/reparse; used existing immutable source cache through original owner",
+      "stdout logging prefix excluded from local JSON capture; no business result or failure record changed"
+    ]
+  },
+  "cleanup": {
+    "prior_owned_workpaper_scratch_roots_found": 0,
+    "new_scratch_scripts_or_databases_or_source_copies": 0,
+    "owned_scratch_roots_remaining": 0,
+    "removed_bytes_measured": 0,
+    "retained": "One compact acceptance record and readable decision; existing official PDFs/effective caches/API data/original attempts and concurrent work preserved",
+    "shared_cache_and_logs_not_blindly_deleted": true
+  }
+}
