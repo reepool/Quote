@@ -352,7 +352,7 @@ curl http://127.0.0.1:8000/api/v1/research/company/600104.SH/annual-profile
 
 读取原公司画像read owner的年报研究内容，不同于`/profile`公司档案快照。只读本地，不触发LLM、下载或生产写入；尚无年报画像返回404。默认读取根为既有`data/research/company_profile_common_core`，开发目录不会自动发布到这里；服务是否已部署以实际OpenAPI为准。
 
-需要使用独立研究数据时，在API进程环境显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_current_20261118`。这是当前12家公司399条可读记录、609项指标的统一研究读取快照，各自原工作ID/模型/审核/缺项保留，并非同版新首发或全输出准确率证明；海泰仍有incomplete审核。旧`company_profile_api_preview_20261117`根仍保留，不自动切换。研究根是实际读取数据，不是可清理测试库。配置路径不存在或为空时返回503，不静默改读其他数据。未设置变量仍沿原默认根，不改共享配置或自动重启服务；本次仅完成ASGI接口实物验证，不代表现网已部署。
+需要使用独立研究数据时，在API进程环境显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_audited_20261118`。这是6.DQ审后的12家公司397条可读记录、603项指标：344条独立源核、53条保真限用；海泰两条结构化毛利率增减方向错误已局部隔离，接口保留状态和原因但`fact=null`，不进入指标。原`company_profile_current_20261118`的399/609及更早`company_profile_api_preview_20261117`根仍保留，旧根未覆盖、不会自动切换；消费新数据须显式选审后根。各自原工作ID/模型/缺项和海泰incomplete审核不改，本次不是同版新首发、全报告完整或全市场准确率证明。研究根是实际读取数据，不是可清理测试库。配置路径不存在或为空时返回503，不静默改读其他数据。未设置变量仍沿原默认根，不改共享配置或自动重启服务；本次仅完成ASGI接口实物验证，不代表现网已部署。
 
 - `facts`：分级事实，以`reading_work_id + fact_id`共同定位。隔离、仅源参考和重复对象保状态/原因但`fact=null`，待核/保真限用不冒充正式接受。
 - `information_gaps`：要素、原状态、缺项或不确定原因及所属读取批次；`suggested_acquisitions`是复核提出的补充建议，不是已经取得的事实。
