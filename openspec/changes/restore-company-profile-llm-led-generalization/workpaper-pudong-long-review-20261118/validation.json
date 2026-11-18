@@ -1,0 +1,29 @@
+{
+  "task": "6.DM",
+  "phase": "zero_call_readiness_only",
+  "new_model_requests": 0,
+  "new_network_probes": 0,
+  "formal_attempts_started": 0,
+  "original_input_hashes_verified": 7,
+  "original_source_seed_and_first_request_boundary": "passed; see readiness.json",
+  "boundary_is_not_full_TaskService_or_gateway_success": true,
+  "openspec_strict": "passed",
+  "prepare_snapshot_sha256": "65bf29a7dd68c430ff9a9f98555d278e796b7ed6e7399ef7f8cbe914bce6284e",
+  "cleanup": {
+    "removed_owned_temporary_root": "/home/python/Quote/data/QuoteBak/workpaper-dm-USE8yj",
+    "removed_file_bytes": 6411,
+    "recoverable_from": "prepare-snapshot.txt",
+    "formal_sources_caches_attempt_markers_and_API_roots_preserved": true
+  },
+  "review": {
+    "blocking_business_work_remaining": "New bounded source review requires the specific approval; no new result claimed.",
+    "blocking_defects_in_current_preparation": [],
+    "nonblocking_deferred": "Fine-grained supply chain and optional formatting.",
+    "preexisting_dirty_changes": "Preserved; excluded from current scoped commit."
+  },
+  "DM1": "complete",
+  "DM2": "awaiting_specific_new_call_approval",
+  "DM3": "not_executed",
+  "formal_S1_or_first_run_rescore": false,
+  "production_authorization": "not_authorized"
+}

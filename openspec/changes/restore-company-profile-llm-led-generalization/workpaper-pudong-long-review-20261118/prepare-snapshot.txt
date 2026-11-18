@@ -1,0 +1,100 @@
+"""6.DM zero-call readiness: same real bank draft, longer task-local waits."""
+import hashlib
+import json
+import os
+import runpy
+import sys
+from dataclasses import replace
+from pathlib import Path
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+PRIOR=C/'workpaper-s1-current-result-20261118'
+DEST=C/'workpaper-pudong-long-review-20261118'
+from research.company_profile.workpaper import CompanyProfileWorkpaper,workpaper_elements
+from research.company_profile.workpaper_review import seed_material,workpaper_hash,review_workpaper
+from research.company_profile.workpaper_llm import workpaper_processing_identity
+
+
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path):return json.loads(Path(path).read_text())
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def facts(paper):return {f.fact_id:f.model_dump(mode='json') for e in workpaper_elements(paper).values() for f in e.facts}
+
+
+assert not DEST.exists(),'one readiness copy only'
+DEST.mkdir()
+inputs={str((PRIOR/p).relative_to(ROOT)):sha(PRIOR/p) for p in (
+    '600000/query.json','600000/runtime.json','600000/budget.json','600000/binding.json',
+    'independent-audit.json','delivery-index.json','group-execution.json')}
+query=read(PRIOR/'600000/query.json')
+paper=CompanyProfileWorkpaper.model_validate(query['profiles'][0]['workpaper'])
+assert paper.report.instrument_id=='600000.SH' and paper.quality_review.status=='failed'
+original_hash=paper.quality_review.original_draft_hash
+seed=paper.model_copy(update={'quality_review':None,'use_review':None})
+assert workpaper_hash(seed)==original_hash
+asset=read(PRIOR/'600000/binding.json')['asset']
+assert sha(asset['archive_path'])==seed.report.document_version
+bound,packet,pages=seed_material(seed,report=seed.report,source_pdf_path=asset['archive_path'],real=True)
+assert facts(bound)==facts(seed) and bound.evidence==seed.evidence and bound.generation==seed.generation
+assert len(facts(seed))==53
+H=runpy.run_path(str(C/'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'))
+config=H['config_for_run']()
+profiles=dict(config.profiles)
+profiles[H['REVIEW']]=replace(profiles[H['REVIEW']],timeout_seconds=2450,attempt_timeout_seconds=1200,max_retries=1,max_schema_repair_attempts=1)
+profiles[H['EXTRACT']]=replace(profiles[H['EXTRACT']],timeout_seconds=620,attempt_timeout_seconds=300,max_retries=1,max_schema_repair_attempts=1)
+identity=workpaper_processing_identity(real=True,review=True,review_profile=H['REVIEW'])
+identity.update(logical_request_timeout_seconds=2450,review_max_output_tokens=16384,
+    repair_profile=H['EXTRACT'],review_existing_draft_hash=workpaper_hash(seed))
+
+
+class ReviewBoundary(BaseException):pass
+captured={}
+class BoundaryProvider:
+    def workpaper_request(self,**kwargs):
+        captured.update(kwargs)
+        raise ReviewBoundary()
+
+
+try:
+    review_workpaper(bound,packet=packet,provider=BoundaryProvider(),work_id='dm-zero-call-boundary',identity=identity)
+except ReviewBoundary:
+    pass
+assert captured['purpose']=='review_profile_workpaper' and captured['timeout_seconds']==2450
+assert not any(word in captured['purpose'] for word in ('select','extract'))
+assert 2*profiles[H['REVIEW']].attempt_timeout_seconds+50<=profiles[H['REVIEW']].timeout_seconds
+assert all(sha(ROOT/path)==value for path,value in inputs.items())
+control=read(PRIOR/'delivery-index.json')
+runtime=next(p for p in control['profiles'] if p['instrument_id']=='600000.SH')
+old_use=read(runtime['runtime_record'])['workpaper']['use_review']
+assert {d['fact_id'] for d in old_use['decisions'] if d['disposition']=='source_only'}=={'rm-06','rm-07'}
+plan={'task':'6.DM','status':'awaiting_specific_new_call_approval','attempts_started':0,
+    'user_direction':'等待时间可以再放长些，继续；只做任务局部等待调整，不自动复活6.DL。',
+    'instrument_id':'600000.SH','report':seed.report.model_dump(mode='json'),'asset':asset,
+    'source_query':str((PRIOR/'600000/query.json').relative_to(ROOT)),
+    'source_query_sha256':sha(PRIOR/'600000/query.json'),'review_seed_sha256':workpaper_hash(seed),
+    'source_bound_seed_sha256':workpaper_hash(bound),'source_fact_count':53,
+    'source_independent_controls':old_use,'source_controls_not_model_input':True,
+    'identity':identity,'profiles':{name:{'model':p.model,'source_label':p.source_label,
+        'timeout_seconds':p.timeout_seconds,'attempt_timeout_seconds':p.attempt_timeout_seconds,
+        'max_retries':p.max_retries,'max_schema_repair_attempts':p.max_schema_repair_attempts,
+        'reasoning_effort':p.reasoning_effort,'disable_thinking':p.disable_thinking} for name,p in profiles.items()},
+    'proposed_limits':{'business_seconds':6000,'conservative_ledger':1000000,'physical_requests':6,
+        'recoveries':3,'recoveries_per_logical':1,'merged_revision':1,'known_priced_cost_cny':10},
+    'proposed_scope':'Only initial source review, at most one merged revision and final source check. No selection, extraction, other eight companies, new supplier, top-up, shared configuration or production.',
+    'code_sha256':{path:sha(ROOT/path) for path in read(PRIOR/'authorization.json')['code_sha256']},
+    'shared_config_sha256':sha(ROOT/'config/13_llm.json'),'original_input_sha256_unchanged':inputs,
+    'fee':'unknown_without_reliable_prices','formal_S1_or_first_run_rescore':False,
+    'production_authorization':'not_authorized'}
+dump(DEST/'plan.json',plan)
+dump(DEST/'readiness.json',{'task':'6.DM','new_model_requests':0,'official_PDF_hash_and_source_spans_verified':True,
+    'facts_evidence_generation_unchanged':True,'original_unreviewed_seed_hash_matches_failed_review':True,
+    'real_profile_local_overrides_valid':True,'first_boundary_purpose':captured['purpose'],
+    'first_boundary_timeout_seconds':captured['timeout_seconds'],'boundary_is_not_a_real_gateway_or_model_result':True,
+    'existing_runtime_publishes_pending_draft_before_review':True,
+    'original_failures_controls_and_4_company_results_preserved':True,
+    'no_business_code_or_shared_configuration_change':True})
+print(json.dumps({'readiness':True,'facts':53,'seed_hash_matches':True,
+    'first_new_request_purpose':captured['purpose'],'logical_timeout':2450,'physical_timeout':1200,
+    'new_model_requests':0},ensure_ascii=False))

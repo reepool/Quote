@@ -1,0 +1,355 @@
+{
+  "task": "6.DM",
+  "status": "awaiting_specific_new_call_approval",
+  "attempts_started": 0,
+  "user_direction": "等待时间可以再放长些，继续；只做任务局部等待调整，不自动复活6.DL。",
+  "instrument_id": "600000.SH",
+  "report": {
+    "instrument_id": "600000.SH",
+    "report_id": "1225062336",
+    "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "asset": {
+    "instrument_id": "600000.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_40e282b55b9f660348911fb6a3531126",
+    "filing_id": "1225062336",
+    "source": "cninfo",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "content_hash": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e4/e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22.pdf",
+    "report_type": "annual_report"
+  },
+  "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/query.json",
+  "source_query_sha256": "7d988cb9d69fc4287c683f7a6a96a15191e4d19b8092d10b438e4e841527a17b",
+  "review_seed_sha256": "1b918052c955883e10176ee79618ccaf3ed9320b2c9317ae15bd608043ad950d",
+  "source_bound_seed_sha256": "1b918052c955883e10176ee79618ccaf3ed9320b2c9317ae15bd608043ad950d",
+  "source_fact_count": 53,
+  "source_independent_controls": {
+    "report": {
+      "instrument_id": "600000.SH",
+      "report_id": "1225062336",
+      "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reviewer": "Codex independent source comparison, selected scope",
+    "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/independent-audit.json",
+    "reference_sha256": "5212e6614ba7ace7f0be117fb1b788e8ff62459c5748dbd4e4ba2bf10ba293bd",
+    "decisions": [
+      {
+        "fact_id": "bs-01",
+        "fact_sha256": "e8603afc9561d6efb019c23971358d612c34d419d440701cdc8ad3c38f1b02b8",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0007",
+          "source-0010",
+          "source-0013",
+          "source-0014"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "bs-02",
+        "fact_sha256": "45a296c069bc94372d12de03e4282d2853f671d48b97e234628b3a173d7fc9ff",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "bs-03",
+        "fact_sha256": "bc125250288619efa6c06fe9da6fb4820bd18dfb5a8c7e734298dd7d055a20a6",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0013",
+          "source-0014"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "bs-04",
+        "fact_sha256": "cd50f011e84f905e7f467a9ffd8403a3cf86c61b4bef93f8aa2bf89b1980c3b6",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0014",
+          "source-0015"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "ps-01",
+        "fact_sha256": "beb1efaa1cbfa464ecd288bab1b6fa76cfd5cb78bfce28cca8e07c3718940845",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0007",
+          "source-0008",
+          "source-0009",
+          "source-0010"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "ps-02",
+        "fact_sha256": "b649deafff66723c81f31b79ec542adba9d5b0c138e36399232e0a19f81ee390",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0010",
+          "source-0011",
+          "source-0012",
+          "source-0013"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "ps-03",
+        "fact_sha256": "246ffadc81743c64b006615ab0614f155262c46e013da27f51045b0862e464b5",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "ps-04",
+        "fact_sha256": "0b439527ca41c04c5c923677b358f6e8c67f9184f7086971acb50750047aae86",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0013",
+          "source-0014"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "ps-05",
+        "fact_sha256": "4187b6405351d670d9ebdc6ca1db20543dea78b034221f84adee3be91300082e",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0014",
+          "source-0015"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "rm-01",
+        "fact_sha256": "d133a92034c901a91a898ae924c9c3ae6bc4b8724528e0576b0ba27dfdcaad8c",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0001",
+          "source-0017"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "rm-02",
+        "fact_sha256": "7e3c08566d51154ae0aa175f1c61218fb2e661c0710f42482d1f395f7304cf03",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0017"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "rm-03",
+        "fact_sha256": "18a25174e1154adc76debe8d6c33fe15d0f864b5981c7dc9a92dddd2e09db201",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0001",
+          "source-0017"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "rm-04",
+        "fact_sha256": "7e44fc5b061e446c54be00e0ccf1f344f4c9973c491a6c02a4544d310f159257",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0017",
+          "source-0018"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "rm-05",
+        "fact_sha256": "749a3f38f5459981b02128fc5b21911e835f8eaab89e4eb4186c69678dd420dd",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0018"
+        ],
+        "reason": "独立核原文p62—70公司/零售/金融市场/跨境业务与服务，p71—72集团净收入、业务总收入及其组成；只核已列基本业务和收入对象。原高阶核验失败保留，不把其他待核金额、余额与指标算已核。",
+        "limitation": null
+      },
+      {
+        "fact_id": "rm-06",
+        "fact_sha256": "3b13dc3a81a7edff8ded1a0830bb967b7aa57ebb5f462d725a7b8eccc1c0f242",
+        "disposition": "source_only",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "reason": "原文为报告期内对公业务营业净收入685.79亿元；金额与业务名称有原文，但结构化consolidated_group标签范围偏宽/尚未核清。按原披露参考，不作为集团整体收入或与集团营收相加；不强求本轮确定性归类。",
+        "limitation": "银行高阶复核未完成；这两条仅源参考，不作为规范化集团指标。"
+      },
+      {
+        "fact_id": "rm-07",
+        "fact_sha256": "c26cd3ee87ab069ef0b98969d98a3271d82b0db08929cffc316f80bbba17ecc5",
+        "disposition": "source_only",
+        "evidence_ids": [
+          "source-0014"
+        ],
+        "reason": "原文为报告期内资产托管业务收入24.81亿元；金额与业务名称有原文，但结构化consolidated_group标签范围偏宽/尚未核清。按原披露参考，不作为集团整体收入或与集团营收相加；不强求本轮确定性归类。",
+        "limitation": "银行高阶复核未完成；这两条仅源参考，不作为规范化集团指标。"
+      }
+    ]
+  },
+  "source_controls_not_model_input": true,
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-17.missing-information.v20",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+    "preprocessing_version": "toc_sections_native_layout.v4.labelled-numeric-row",
+    "source_binding_policy": "company_workpaper_source_literals.aligned-cells.v6",
+    "workpaper_format_recovery": "validation_feedback.v1",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 2450,
+    "workpaper_review_policy": "company_profile_workpaper_review.v11",
+    "quality_review_profile": "semantic_extraction__scorpio_grok",
+    "repair_profile": "semantic_extraction__deepseek",
+    "review_max_output_tokens": 16384,
+    "review_existing_draft_hash": "1b918052c955883e10176ee79618ccaf3ed9320b2c9317ae15bd608043ad950d"
+  },
+  "profiles": {
+    "semantic_extraction__deepseek": {
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash",
+      "timeout_seconds": 620,
+      "attempt_timeout_seconds": 300,
+      "max_retries": 1,
+      "max_schema_repair_attempts": 1,
+      "reasoning_effort": "high",
+      "disable_thinking": true
+    },
+    "semantic_extraction__scorpio_grok": {
+      "model": "grok-4.7",
+      "source_label": "scorpio:grok-4.7",
+      "timeout_seconds": 2450,
+      "attempt_timeout_seconds": 1200,
+      "max_retries": 1,
+      "max_schema_repair_attempts": 1,
+      "reasoning_effort": "high",
+      "disable_thinking": false
+    }
+  },
+  "proposed_limits": {
+    "business_seconds": 6000,
+    "conservative_ledger": 1000000,
+    "physical_requests": 6,
+    "recoveries": 3,
+    "recoveries_per_logical": 1,
+    "merged_revision": 1,
+    "known_priced_cost_cny": 10
+  },
+  "proposed_scope": "Only initial source review, at most one merged revision and final source check. No selection, extraction, other eight companies, new supplier, top-up, shared configuration or production.",
+  "code_sha256": {
+    "research/company_profile/__init__.py": "41e5f0c5c3562e789053ce756fe342d1cb8b2c34f4049920eb246855bdbf1364",
+    "research/company_profile/acceptance_policy.py": "d7b96d51401b7c4baac7c56db36d99ae3e5ffb8742c6cac4edc07a7d99776d5c",
+    "research/company_profile/bounded_entry.py": "03b79a7a11ac325b60e870cda4ed226e870f617d0a2b64f0753d85e72e98f428",
+    "research/company_profile/candidate_registry.py": "c782e7fb85379e07b464a1d90fdbf1b0ab527df287376a9091d2d7b00e0473c4",
+    "research/company_profile/commodity_exposure.py": "15d4cbf467013c23bb65db1fe0d8b9a69f68f323abefe2b0ccd1786c3652b063",
+    "research/company_profile/contracts.py": "bd6d1d8d01e7698affc3801f231a66dd72be849e6c7d59fbf49a4ca5768e789f",
+    "research/company_profile/core_assessment_projection.py": "562a2c95c59b05aaa842d32b1eace6e39b89beaab2a2be00f73b2296eb008737",
+    "research/company_profile/core_evidence_selection.py": "ec85df0ec7f0c89e13f6dd1bbeecd4b4838f3af587819a8c4014c95fe60f5f1d",
+    "research/company_profile/core_skeleton.py": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
+    "research/company_profile/counterparty_research.py": "83a3779d2e6c044acfe3f4e560b59b4a8d631bdcc03af8e8a4b686962b17fd83",
+    "research/company_profile/direct_reading.py": "abe8f222bb15eda8521fe7a8447aeb7d54cc0aa6848579764727a030aa0cc167",
+    "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
+    "research/company_profile/first_expansion.py": "a37fef38017082f82e71036d470462f08a92ed05324a4685b21572fef91bf661",
+    "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
+    "research/company_profile/live_plan.py": "12b442cd3334e65d4de050daa70043e02b2cb9271b0b90708be36fdd8e0dd856",
+    "research/company_profile/live_run.py": "ee7208f40879a12f2e87270743475a91aaf178a7bc2ec979cb36e059b4fb1933",
+    "research/company_profile/m4_next_batch.py": "a23249872610f38d1294a9945478cacf609455bfd453790044268c3bd9dc565a",
+    "research/company_profile/material_input_research.py": "1e903edfe38d1b0d569299436e59a150ca909570de5ac14c496630831d4d37ab",
+    "research/company_profile/models.py": "e85e4bd785ad698b814b84ecb69cba750f118a37140775d596fe01c3e12e2a2b",
+    "research/company_profile/operating_quantity_research.py": "d2dfadb2a88a5c2267daea7fda53b2147c47af2c1fe43a8eaa96c147452a029d",
+    "research/company_profile/operations.py": "974afeccb89c76f5c01873fdb1199df833a6db0b8e2f187b61330fd75c97dd47",
+    "research/company_profile/operator_closure.py": "529dd42b014449c0ac20c0e5be3180c8c21b4f9df3cb509d5334fe65bb0232dd",
+    "research/company_profile/projection.py": "504f8446256d157219e1d21ce35474b323f3c625a799d5f0a22809d3e656536c",
+    "research/company_profile/publication.py": "d2c43d7a6199f0fbab64915beec8768a65c11df7d67d6615b25bff76300c6f36",
+    "research/company_profile/reading_budget.py": "6713ca5d88c782709ed931c186d52a570689fa6884dc0fb7c98591c6456a1fe0",
+    "research/company_profile/reads.py": "c3a9617177f4df0166b4f11e6cee15727ed23237b259abb06437ef6a02df9458",
+    "research/company_profile/report_interpretation.py": "775f138cb8e964aa554cbc6a1efb1d406beadd535c6f8a1a2b26f03e6e40a937",
+    "research/company_profile/report_wire.py": "aa1a48b0bc71e2633393a3b49731b4c9d914908ab32f7a98e1334ec9d88a74af",
+    "research/company_profile/resource_probe.py": "760686a09cde4d618f2626a03113e2742306e885284c61fda11fb7c16c561216",
+    "research/company_profile/runtime.py": "5647d8765aecf19af5b152fdd5dd69ec0fdc5c53fdbdfe669ffa7923bacaa437",
+    "research/company_profile/segment_financial_research.py": "1c0e27469a670e68fb289b4ad3dd86e643189c3874186f724c34f763e04a8d1f",
+    "research/company_profile/shadow_batch.py": "155e54e72c43a841683833e0ec46135ebde8e2572a195284b87b6a23340e4792",
+    "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
+    "research/company_profile/shadow_batch_service.py": "bc3be4bd327b49f4abbec98d83cbbd6108993f9ac1253ecf2b42620c0a5dec74",
+    "research/company_profile/shadow_evidence.py": "dc580e45feb9eb55b63e0bea608fe63c4f50bef0e8553eb0ba879da88602970b",
+    "research/company_profile/source_review.py": "4da6bcb7b1aa1be459cb1b232df59a65acef535afc8b8593d8852f26ebe02bf9",
+    "research/company_profile/stage4_restricted_read.py": "f29e14ad0754dd42a0bd950171fb077ebaf7f7175aef12bd55771a82619ccbaf",
+    "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
+    "research/company_profile/stage5_adjudication.py": "0897c27651a83f86da877d3940c7b21af5ddcc06e92b0ca32ffad94752037773",
+    "research/company_profile/stage5_benchmark.py": "c7cc313671af27e7c66687faf8ff8e774a993c47dd7fd97b2dbf83833d27290c",
+    "research/company_profile/stage5_bundle.py": "008b8c7d4de24ce03a75b95fbf97c47b24663d5950f53600761206e6397921c8",
+    "research/company_profile/stage5_provider.py": "3cd322d1cb87a175f250ece460cd32097c36e3d8a6fe7bc7ae5c92dfc3bb785c",
+    "research/company_profile/stage5_service.py": "e53776bfe200ab3341f88d22207a41508020b6867ef03c3312ec9ec250957b11",
+    "research/company_profile/workflow.py": "ea0a0318d2affc207ff43d588d3ed1b03a422b9cfcac0017053499e10046678f",
+    "research/company_profile/workpaper.py": "ac28a75c969e590e5abf6f4570e3d28afacd3e549a200a106434cfe4f2e13727",
+    "research/company_profile/workpaper_delivery.py": "88dd4aaea81229c3d5f02c20e7f824d04606918eb536fba112ddb39e74e0e2c5",
+    "research/company_profile/workpaper_enrichment.py": "4a8249bafe59b0986f50fa8ef2c27dbf371f539073eff1c002bb70266b6c70aa",
+    "research/company_profile/workpaper_llm.py": "d05571a4768ed4349134300cef38732907034bcce52bf1aaf991cc6306c3db4f",
+    "research/company_profile/workpaper_review.py": "d932ad55dee2310468fdfa81ded08a0b5186ff8de811c6f712ac05e854fec0a7",
+    "research/company_profile/workpaper_sections.py": "24638d461bbc4db03ad33a49f06e0ce4a3b398c52216d841f883bded244788eb",
+    "utils/llm/__init__.py": "25a037dbccd41a9c9f2982061e658f7381d8bf79fdcdbc8abd6d5e1e1fe2ae70",
+    "utils/llm/budget.py": "791cbc2f7ee3d580042e286603c758aa488d094044186c7bdf7f5dc5ac0ea66c",
+    "utils/llm/client.py": "fbd98fe49a60614c9dae4cffd8fb89a0f0ca8bc5390f2ce992810ef016f48aed",
+    "utils/llm/config.py": "5327f3d23be58c40eae147bae41ca31761e49ae48a34844dacdab9411944289a",
+    "utils/llm/errors.py": "3625a8325fa761194086e47b161672bb12d1f45b20ab1331b234caa37e7415a6",
+    "utils/llm/models.py": "3337c2936410cb4ac8ee9963ac1ce02caca2b0d2d318c9d17e9a7dee8d4eee84",
+    "utils/llm/rate_limit.py": "edaecaee1df375dfab8e5f3289a364de318fa00c32c233e74788863f730d6cd3",
+    "utils/llm/schema.py": "ec679ed8fec132b3e5e0f8598cca71b772628c73f341658f8c32f690268d6b35",
+    "utils/llm/testing.py": "cca9b7c3ec6c09d20690f4b70b4cfbecc974992f09a8d1f82a9a28ae4e82971a",
+    "utils/llm/transport.py": "a28c0c0e8aa3dffd04347f707f19e2ec5eacba32f21cb4b8f5d782e4f14b974d",
+    "research/storage.py": "119ecf44beae0a1762273d22f83b9744aa7c714e4141a5ba95c48cac2e8bb19c",
+    "research/business_profile_pdf_artifacts.py": "fc3861ab57b15af21434fafd0ed889a5a01cef180f91727bb7a29ab2b0450970",
+    "research/business_profile_production_operations.py": "e4827d7a11a42338bf0f2be0e7bcc16945c85669001ae2ae85b07a66ccf6aea6",
+    "api/company_profile_routes.py": "f1d129e214b71dbfee3fc320b2b47daeb0db59989cacc7cb5a1e0bb14ba39953"
+  },
+  "shared_config_sha256": "7650f2960b036815a6c05649ca9caba7d518b73380e561e334db49d062d82233",
+  "original_input_sha256_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/query.json": "7d988cb9d69fc4287c683f7a6a96a15191e4d19b8092d10b438e4e841527a17b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/runtime.json": "bb859e091ed22663820fb3b80813446b17351880880714e6daf0159bc421e1bb",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/budget.json": "510dbedfe7dfe2fab51fe2ed23395633b7cb2bf89a0c3f7a508f8bb7d57d6932",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/600000/binding.json": "a436be4917151fce2fe512484eeb3123d6abd9400cd8df486e831b233b47afa5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/independent-audit.json": "5212e6614ba7ace7f0be117fb1b788e8ff62459c5748dbd4e4ba2bf10ba293bd",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/delivery-index.json": "b353c90e4d9182faf2c53ebb13a37522be46400e6ba024f390c27e3bb5380fa8",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s1-current-result-20261118/group-execution.json": "f3c9058f5accac7e747ceeb29cff6432e5f70ac150147f260c3434edf4204485"
+  },
+  "fee": "unknown_without_reliable_prices",
+  "formal_S1_or_first_run_rescore": false,
+  "production_authorization": "not_authorized"
+}

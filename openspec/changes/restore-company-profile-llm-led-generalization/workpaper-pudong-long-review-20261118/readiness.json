@@ -1,0 +1,14 @@
+{
+  "task": "6.DM",
+  "new_model_requests": 0,
+  "official_PDF_hash_and_source_spans_verified": true,
+  "facts_evidence_generation_unchanged": true,
+  "original_unreviewed_seed_hash_matches_failed_review": true,
+  "real_profile_local_overrides_valid": true,
+  "first_boundary_purpose": "review_profile_workpaper",
+  "first_boundary_timeout_seconds": 2450.0,
+  "boundary_is_not_a_real_gateway_or_model_result": true,
+  "existing_runtime_publishes_pending_draft_before_review": true,
+  "original_failures_controls_and_4_company_results_preserved": true,
+  "no_business_code_or_shared_configuration_change": true
+}
