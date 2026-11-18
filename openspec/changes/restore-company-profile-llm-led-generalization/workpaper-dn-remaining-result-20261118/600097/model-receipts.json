@@ -1,0 +1,1362 @@
+[
+  {
+    "request_id": "bp-work-3e4dd887b0c1def19809c334:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "422603eeb674278cc101a2368c983ed5fb2f1ee6a5d582b638cdb88b0a064d0d",
+    "response_hash": "652fd3d8aac17da71f64de21986a7741c237f5ef6e7be244b9f1d1d85b446091",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0036\",\"section-0042\",\"section-0044\",\"section-0080\",\"section-0021\",\"section-0022\",\"section-0085\"],\"rationale\":\"优先选取能完整解释公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0034说明公司从事的业务，section-0036为经营情况讨论与分析，section-0042主营业务分析及section-0044收入和成本分析提供收入构成与成本结构，section-0080主要控股参股公司分析补充子公司经营，section-0021/0022提供公司层面主要会计数据与营业收入总额，section-0085经营计划说明未来经营安排。未选纯行业背景、核心竞争力泛化描述及财务报告附注，以避免与经营综述重复或过度扩展。\",\"stop_reason\":\"已覆盖业务、产品用途、经营模式、收入构成、规模与主要子公司经营及经营计划等核心问题；行业背景与详细财务附注对解释公司层面经营增量有限，故在此停止。\",\"deferred\":[\"section-0035 行业情况：属纯行业背景，未直接改变公司层面经营解读\",\"section-0037 核心竞争力分析：偏泛化竞争力描述，与经营综述重叠\",\"section-0256 财务报告及附注：仅在存在实质缺口时定向补充，本次不整体扩展\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0034",
+        "section-0036",
+        "section-0042",
+        "section-0044",
+        "section-0080",
+        "section-0021",
+        "section-0022",
+        "section-0085"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0034说明公司从事的业务，section-0036为经营情况讨论与分析，section-0042主营业务分析及section-0044收入和成本分析提供收入构成与成本结构，section-0080主要控股参股公司分析补充子公司经营，section-0021/0022提供公司层面主要会计数据与营业收入总额，section-0085经营计划说明未来经营安排。未选纯行业背景、核心竞争力泛化描述及财务报告附注，以避免与经营综述重复或过度扩展。",
+      "stop_reason": "已覆盖业务、产品用途、经营模式、收入构成、规模与主要子公司经营及经营计划等核心问题；行业背景与详细财务附注对解释公司层面经营增量有限，故在此停止。",
+      "deferred": [
+        "section-0035 行业情况：属纯行业背景，未直接改变公司层面经营解读",
+        "section-0037 核心竞争力分析：偏泛化竞争力描述，与经营综述重叠",
+        "section-0256 财务报告及附注：仅在存在实质缺口时定向补充，本次不整体扩展"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20893,
+      "output_tokens": 298,
+      "total_tokens": 21191
+    }
+  },
+  {
+    "request_id": "bp-work-3e4dd887b0c1def19809c334:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "54feab7d34cedc2df0aed2b4a7c5a217aa4f60ca5ee421c3c28ac6975fab690b",
+    "response_hash": "9158679617092b44862a34f6dea946252a331cd69bd06711bbce4dfa899926fb",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司业务分为远洋捕捞、加工、海上运输、贸易四大板块；远洋捕捞以金枪鱼围网船队及南极磷虾项目为主，加工以西班牙ALBO公司金枪鱼罐头和国内岱山加工厂鱼柳为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"远洋捕捞产品以鲣鱼、黄鳍金枪鱼为主；南极磷虾项目产品以冻虾和虾粉为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"加工业务中，西班牙ALBO公司加工产品以金枪鱼罐头和罐头方便食品为主，部分产品在当地具有较高市场占有率及品牌知名度；国内岱山加工厂加工金枪鱼原料鱼，产品以鱼柳为主，主要销往国外市场。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"海上运输由冷藏运输船队承担冷冻金枪鱼运输、人员和物资转运，并与金枪鱼围网船队作业配套，同时拓展其他运输业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场，依托“捕捞—加工—贸易”全产业链运营。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司主营业务分行业收入构成为：海洋捕捞950,763,559.03元、食品加工1,054,611,208.73元、渔货贸易318,671,971.02元、海上运输6,765,806.04元，合计2,330,812,544.82元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"主营业务收入-海洋捕捞\",\"raw_value\":\"950,763,559.03\",\"value\":\"950763559.03\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-食品加工\",\"raw_value\":\"1,054,611,208.73\",\"value\":\"1054611208.73\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-渔货贸易\",\"raw_value\":\"318,671,971.02\",\"value\":\"318671971.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-海上运输\",\"raw_value\":\"6,765,806.04\",\"value\":\"6765806.04\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入合计\",\"raw_value\":\"2,330,812,544.82\",\"value\":\"2330812544.82\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"主营业务分产品收入构成为：金枪鱼销售796,979,841.53元、零星鱼种销售153,783,717.50元、罐头食品销售816,352,061.87元、鱼柳加工销售238,259,146.86元、渔货贸易318,671,971.02元、海上运输6,765,806.04元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"主营业务收入-金枪鱼销售\",\"raw_value\":\"796,979,841.53\",\"value\":\"796979841.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-零星鱼种销售\",\"raw_value\":\"153,783,717.50\",\"value\":\"153783717.50\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-罐头食品销售\",\"raw_value\":\"816,352,061.87\",\"value\":\"816352061.87\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-鱼柳加工销售\",\"raw_value\":\"238,259,146.86\",\"value\":\"238259146.86\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"公司主营业务分销售模式均为直销，直销营业收入2,330,812,544.82元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"主营业务收入-直销\",\"raw_value\":\"2,330,812,544.82\",\"value\":\"2330812544.82\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司营业收入2,336,503,042.69元，较上年同期增长0.90%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,336,503,042.69\",\"value\":\"2336503042.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入比上年同期增减\",\"raw_value\":\"0.90\",\"value\":\"0.90\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"2025年归属于上市公司股东的净利润73,894,019.42元，同比增长20.76%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"73,894,019.42\",\"value\":\"73894019.42\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润比上年同期增减\",\"raw_value\":\"20.76\",\"value\":\"20.76\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"主营业务分地区收入：国内1,028,359,860.15元、国外1,302,452,684.67元；2025年境外销售130,245万元，占公司全部营业收入56%，国内销售102,836万元，占44%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"主营业务收入-国内\",\"raw_value\":\"1,028,359,860.15\",\"value\":\"1028359860.15\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-国外\",\"raw_value\":\"1,302,452,684.67\",\"value\":\"1302452684.67\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境外销售收入\",\"raw_value\":\"130,245\",\"value\":\"130245\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境外销售占营业收入比例\",\"raw_value\":\"56\",\"value\":\"56\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国内销售收入\",\"raw_value\":\"102,836\",\"value\":\"102836\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国内销售占营业收入比例\",\"raw_value\":\"44\",\"value\":\"44\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"2025年公司金枪鱼船队共捕捞金枪鱼88,561吨，销售金枪鱼67,096吨，实现销售收入79,698万元；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），实现销售收入15,378万元；罐头食品营业收入81,635万元；鱼柳加工营业收入23,826万元；渔货贸易营业收入31,867万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"金枪鱼捕捞量\",\"raw_value\":\"88,561\",\"value\":\"88561\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"金枪鱼销售量\",\"raw_value\":\"67,096\",\"value\":\"67096\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"金枪鱼销售收入\",\"raw_value\":\"79,698\",\"value\":\"79698\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"磷虾粉产量\",\"raw_value\":\"9,041\",\"value\":\"9041\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"磷虾捕捞量\",\"raw_value\":\"70,092\",\"value\":\"70092\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"磷虾销售收入\",\"raw_value\":\"15,378\",\"value\":\"15378\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"罐头食品营业收入\",\"raw_value\":\"81,635\",\"value\":\"81635\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"鱼柳加工营业收入\",\"raw_value\":\"23,826\",\"value\":\"23826\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"渔货贸易营业收入\",\"raw_value\":\"31,867\",\"value\":\"31867\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"金枪鱼围网船队11艘船舶全负荷运营，在中西太平洋开展生产作业；与江苏深蓝远洋渔业有限公司合作经营，在南极海域捕捞磷虾。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0005\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"各板块主要成本构成：海洋捕捞为燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工为原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费等；渔货贸易为原料鱼、运输费等；海上运输为船舶租金、燃料、船用物资、人工成本、货物保险等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-OI-03\",\"text\":\"2025年营业成本1,642,264,864.02元，同比下降1.32%，主要系海洋捕捞营业成本同比减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"1,642,264,864.02\",\"value\":\"1642264864.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本比上年同期增减\",\"raw_value\":\"-1.32\",\"value\":\"-1.32\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"2025年研发投入合计4,138,549.88元，全部费用化，占营业收入比例0.18%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"4,138,549.88\",\"value\":\"4138549.88\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"0.18\",\"value\":\"0.18\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中关联方销售额0万元，占0%。前五名供应商采购额63,005.62万元，占年度采购总额30.15%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"90,078.38\",\"value\":\"90078.38\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"38.55\",\"value\":\"38.55\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"63,005.62\",\"value\":\"63005.62\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"30.15\",\"value\":\"30.15\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"贸易业务前五名客户合计销售额171,449,586.11元，占年度销售总额7.34%；贸易业务前五名供应商合计采购额179,579,076.08元，占年度采购总额8.59%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"贸易业务前五名客户销售额合计\",\"raw_value\":\"171,449,586.11\",\"value\":\"171449586.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"贸易业务前五名客户销售额占年度销售总额比例\",\"raw_value\":\"7.34\",\"value\":\"7.34\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"贸易业务前五名供应商采购额合计\",\"raw_value\":\"179,579,076.08\",\"value\":\"179579076.08\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"贸易业务前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"8.59\",\"value\":\"8.59\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"驱动业务收入变化的主要原因：金枪鱼围网全年销售价较上一年度有所上涨，销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"捕捞业务收入变动\",\"raw_value\":\"-2,805\",\"value\":\"-2805\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"食品加工营业收入变动\",\"raw_value\":\"8,196\",\"value\":\"8196\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"渔货贸易收入变动\",\"raw_value\":\"-3,262\",\"value\":\"-3262\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"海上运输营业收入变动\",\"raw_value\":\"-276\",\"value\":\"-276\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"ALBO公司沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一，黄鳍金枪鱼品类罐头品牌市占率提升并稳定在第二位，国际市场销售额增幅126%，其中北美市场成为最大增长点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"ALBO国际市场销售额增幅\",\"raw_value\":\"126\",\"value\":\"126\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等不利因素，整体经营业绩出现下滑。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司业务类型、利润构成或利润来源未发生重大变动，主要子公司股权变动导致合并范围变化的情况为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0009\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"2026年度经营计划力争实现营业收入27.25亿元、归属于上市公司股东净利润1.17亿元，并有序推进2艘船舶更新建造工作。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度计划\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"2026年营业收入目标\",\"raw_value\":\"27.25\",\"value\":\"27.25\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度计划\",\"qualifier\":\"exact\"},{\"name\":\"2026年归母净利润目标\",\"raw_value\":\"1.17\",\"value\":\"1.17\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度计划\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"2026年经营目标为计划数据，非已实现结果。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司处于远洋渔业捕捞及水产品加工、贸易、运输环节，形成“捕捞—加工—贸易”全产业链一体化经营格局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"食品加工板块主要成本构成包括原料鱼、辅料、铁罐头、燃料及动力等；渔货贸易板块主要成本构成包括原料鱼、运输费等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]}],\"limitations\":[\"未披露具体原料鱼供应商名称及采购来源国别。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-03\",\"text\":\"公司产品下游包括境外罐头食品市场及国内金枪鱼、磷虾粉、鱼柳等客户；ALBO公司产品基本在境外销售，国内部分以国内客户为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"未披露按客户类型划分的完整下游结构。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司金枪鱼围网船队规模及捕捞产量位居国内领先水平；磷虾项目“深蓝轮”超额完成年度目标任务并创下该项目捕捞量新纪录。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0005\"]}],\"limitations\":[]},\"limitations\":[\"未获取成功：主要控股参股公司分析中部分子公司（如泛太食品、文森特渔业、亚太金枪鱼）经营规模较小，未逐一展开说明。\",\"未获取成功：分季度收入、分产品毛利率变动原因等补充细节未在选定章节中完整披露。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "公司业务分为远洋捕捞、加工、海上运输、贸易四大板块；远洋捕捞以金枪鱼围网船队及南极磷虾项目为主，加工以西班牙ALBO公司金枪鱼罐头和国内岱山加工厂鱼柳为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "远洋捕捞产品以鲣鱼、黄鳍金枪鱼为主；南极磷虾项目产品以冻虾和虾粉为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "加工业务中，西班牙ALBO公司加工产品以金枪鱼罐头和罐头方便食品为主，部分产品在当地具有较高市场占有率及品牌知名度；国内岱山加工厂加工金枪鱼原料鱼，产品以鱼柳为主，主要销往国外市场。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "海上运输由冷藏运输船队承担冷冻金枪鱼运输、人员和物资转运，并与金枪鱼围网船队作业配套，同时拓展其他运输业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场，依托“捕捞—加工—贸易”全产业链运营。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司主营业务分行业收入构成为：海洋捕捞950,763,559.03元、食品加工1,054,611,208.73元、渔货贸易318,671,971.02元、海上运输6,765,806.04元，合计2,330,812,544.82元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-海洋捕捞",
+                  "raw_value": "950,763,559.03",
+                  "value": "950763559.03",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-食品加工",
+                  "raw_value": "1,054,611,208.73",
+                  "value": "1054611208.73",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-渔货贸易",
+                  "raw_value": "318,671,971.02",
+                  "value": "318671971.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-海上运输",
+                  "raw_value": "6,765,806.04",
+                  "value": "6765806.04",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入合计",
+                  "raw_value": "2,330,812,544.82",
+                  "value": "2330812544.82",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "主营业务分产品收入构成为：金枪鱼销售796,979,841.53元、零星鱼种销售153,783,717.50元、罐头食品销售816,352,061.87元、鱼柳加工销售238,259,146.86元、渔货贸易318,671,971.02元、海上运输6,765,806.04元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-金枪鱼销售",
+                  "raw_value": "796,979,841.53",
+                  "value": "796979841.53",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-零星鱼种销售",
+                  "raw_value": "153,783,717.50",
+                  "value": "153783717.50",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-罐头食品销售",
+                  "raw_value": "816,352,061.87",
+                  "value": "816352061.87",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-鱼柳加工销售",
+                  "raw_value": "238,259,146.86",
+                  "value": "238259146.86",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "公司主营业务分销售模式均为直销，直销营业收入2,330,812,544.82元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-直销",
+                  "raw_value": "2,330,812,544.82",
+                  "value": "2330812544.82",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年公司营业收入2,336,503,042.69元，较上年同期增长0.90%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "2,336,503,042.69",
+                  "value": "2336503042.69",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入比上年同期增减",
+                  "raw_value": "0.90",
+                  "value": "0.90",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "2025年归属于上市公司股东的净利润73,894,019.42元，同比增长20.76%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "73,894,019.42",
+                  "value": "73894019.42",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润比上年同期增减",
+                  "raw_value": "20.76",
+                  "value": "20.76",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "主营业务分地区收入：国内1,028,359,860.15元、国外1,302,452,684.67元；2025年境外销售130,245万元，占公司全部营业收入56%，国内销售102,836万元，占44%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-国内",
+                  "raw_value": "1,028,359,860.15",
+                  "value": "1028359860.15",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-国外",
+                  "raw_value": "1,302,452,684.67",
+                  "value": "1302452684.67",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境外销售收入",
+                  "raw_value": "130,245",
+                  "value": "130245",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境外销售占营业收入比例",
+                  "raw_value": "56",
+                  "value": "56",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国内销售收入",
+                  "raw_value": "102,836",
+                  "value": "102836",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国内销售占营业收入比例",
+                  "raw_value": "44",
+                  "value": "44",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "2025年公司金枪鱼船队共捕捞金枪鱼88,561吨，销售金枪鱼67,096吨，实现销售收入79,698万元；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），实现销售收入15,378万元；罐头食品营业收入81,635万元；鱼柳加工营业收入23,826万元；渔货贸易营业收入31,867万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "金枪鱼捕捞量",
+                  "raw_value": "88,561",
+                  "value": "88561",
+                  "unit": "吨",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "金枪鱼销售量",
+                  "raw_value": "67,096",
+                  "value": "67096",
+                  "unit": "吨",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "金枪鱼销售收入",
+                  "raw_value": "79,698",
+                  "value": "79698",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "磷虾粉产量",
+                  "raw_value": "9,041",
+                  "value": "9041",
+                  "unit": "吨",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "磷虾捕捞量",
+                  "raw_value": "70,092",
+                  "value": "70092",
+                  "unit": "吨",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "磷虾销售收入",
+                  "raw_value": "15,378",
+                  "value": "15378",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "罐头食品营业收入",
+                  "raw_value": "81,635",
+                  "value": "81635",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鱼柳加工营业收入",
+                  "raw_value": "23,826",
+                  "value": "23826",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "渔货贸易营业收入",
+                  "raw_value": "31,867",
+                  "value": "31867",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "金枪鱼围网船队11艘船舶全负荷运营，在中西太平洋开展生产作业；与江苏深蓝远洋渔业有限公司合作经营，在南极海域捕捞磷虾。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "各板块主要成本构成：海洋捕捞为燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工为原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费等；渔货贸易为原料鱼、运输费等；海上运输为船舶租金、燃料、船用物资、人工成本、货物保险等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "2025年营业成本1,642,264,864.02元，同比下降1.32%，主要系海洋捕捞营业成本同比减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "1,642,264,864.02",
+                  "value": "1642264864.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本比上年同期增减",
+                  "raw_value": "-1.32",
+                  "value": "-1.32",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "2025年研发投入合计4,138,549.88元，全部费用化，占营业收入比例0.18%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "4,138,549.88",
+                  "value": "4138549.88",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "0.18",
+                  "value": "0.18",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中关联方销售额0万元，占0%。前五名供应商采购额63,005.62万元，占年度采购总额30.15%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "90,078.38",
+                  "value": "90078.38",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "38.55",
+                  "value": "38.55",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "63,005.62",
+                  "value": "63005.62",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "30.15",
+                  "value": "30.15",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "贸易业务前五名客户合计销售额171,449,586.11元，占年度销售总额7.34%；贸易业务前五名供应商合计采购额179,579,076.08元，占年度采购总额8.59%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "贸易业务前五名客户销售额合计",
+                  "raw_value": "171,449,586.11",
+                  "value": "171449586.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "贸易业务前五名客户销售额占年度销售总额比例",
+                  "raw_value": "7.34",
+                  "value": "7.34",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "贸易业务前五名供应商采购额合计",
+                  "raw_value": "179,579,076.08",
+                  "value": "179579076.08",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "贸易业务前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "8.59",
+                  "value": "8.59",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "驱动业务收入变化的主要原因：金枪鱼围网全年销售价较上一年度有所上涨，销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "捕捞业务收入变动",
+                  "raw_value": "-2,805",
+                  "value": "-2805",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "食品加工营业收入变动",
+                  "raw_value": "8,196",
+                  "value": "8196",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "渔货贸易收入变动",
+                  "raw_value": "-3,262",
+                  "value": "-3262",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海上运输营业收入变动",
+                  "raw_value": "-276",
+                  "value": "-276",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "ALBO公司沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一，黄鳍金枪鱼品类罐头品牌市占率提升并稳定在第二位，国际市场销售额增幅126%，其中北美市场成为最大增长点。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "ALBO国际市场销售额增幅",
+                  "raw_value": "126",
+                  "value": "126",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等不利因素，整体经营业绩出现下滑。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动，主要子公司股权变动导致合并范围变化的情况为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "2026年度经营计划力争实现营业收入27.25亿元、归属于上市公司股东净利润1.17亿元，并有序推进2艘船舶更新建造工作。",
+              "subject_scope": "consolidated_group",
+              "period": "2026年度计划",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "2026年营业收入目标",
+                  "raw_value": "27.25",
+                  "value": "27.25",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2026年度计划",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "2026年归母净利润目标",
+                  "raw_value": "1.17",
+                  "value": "1.17",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2026年度计划",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "2026年经营目标为计划数据，非已实现结果。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司处于远洋渔业捕捞及水产品加工、贸易、运输环节，形成“捕捞—加工—贸易”全产业链一体化经营格局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "食品加工板块主要成本构成包括原料鱼、辅料、铁罐头、燃料及动力等；渔货贸易板块主要成本构成包括原料鱼、运输费等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体原料鱼供应商名称及采购来源国别。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-03",
+              "text": "公司产品下游包括境外罐头食品市场及国内金枪鱼、磷虾粉、鱼柳等客户；ALBO公司产品基本在境外销售，国内部分以国内客户为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露按客户类型划分的完整下游结构。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "公司金枪鱼围网船队规模及捕捞产量位居国内领先水平；磷虾项目“深蓝轮”超额完成年度目标任务并创下该项目捕捞量新纪录。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0005"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "未获取成功：主要控股参股公司分析中部分子公司（如泛太食品、文森特渔业、亚太金枪鱼）经营规模较小，未逐一展开说明。",
+        "未获取成功：分季度收入、分产品毛利率变动原因等补充细节未在选定章节中完整披露。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 12669,
+      "output_tokens": 5380,
+      "total_tokens": 18049
+    }
+  },
+  {
+    "request_id": "bp-work-3e4dd887b0c1def19809c334:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "db2707404ff836a41f3ed85e9af7faeac0a3896b15ed3784e2d5e13cb05a930c",
+    "response_hash": "cb40d7d5c09704377db7c2709c34ab0cb48323ab8445037c81660f405d534842",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-OD-02\",\"F-OD-03\",\"F-MC-01\",\"F-MC-02\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\",\"F-CF-01\"],\"findings\":[{\"finding_id\":\"WR-001\",\"element\":\"revenue_model\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-RM-03\",\"evidence_ids\":[\"source-0008\"],\"explanation\":\"“直销”是主营业务分销售模式表中的销售模式行，不是合并集团会计总额本身。即便该行金额与主营业务合计相同，也不能仅凭金额把指标标成consolidated_group。事实中“销售模式均为直销”及金额可保留，指标主体应改为business_segment。\"},{\"finding_id\":\"WR-002\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-SM-04\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"各数量和收入的来源对象均窄于合并集团：金枪鱼捕捞量、销售量及79,698万元销售收入属于公司金枪鱼船队；磷虾粉、捕捞量及15,378万元销售收入属于“深蓝轮”；罐头食品、鱼柳加工、渔货贸易营业收入分别属于对应产品或业务。事实及全部指标却标为consolidated_group，会把分部金额当成集团总量。相近金额不能证明与分产品行口径相同。应保留来源支持的数量和金额，将指标改为business_segment，深蓝轮/磷虾保持项目或分部口径，不得维持合并集团标签。\"},{\"finding_id\":\"WR-003\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-OI-04\",\"evidence_ids\":[\"source-0010\"],\"explanation\":\"研发投入合计与本期费用化研发投入4,138,549.88元、占营业收入0.18%均有来源支持，但本期资本化研发投入及资本化比重为空栏。空栏不能支持“全部费用化”这一零值式断言。应保留金额和占比，删除或限定“全部费用化”。\"},{\"finding_id\":\"WR-004\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-03\",\"evidence_ids\":[\"source-0005\",\"source-0001\"],\"explanation\":\"利润下滑对应的是贸易业务，经营业绩下滑对应的是康隆公司；来源没有说合并集团利润下降。同期归属于上市公司股东的净利润同比增加20.76%。事实subject_scope标为consolidated_group，会把分部和子公司的下滑误接到集团。正文限定可保留，范围应改为业务分部及具名子公司，或拆分事实。\"},{\"finding_id\":\"WR-005\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-01\",\"evidence_ids\":[\"source-0006\",\"source-0009\"],\"explanation\":\"来源只是将“业务类型、利润构成或利润来源发生重大变动的详细说明”以及主要子公司股权变动导致合并范围变化等事项勾选为不适用。适用性勾选只说明该披露项目，不能单独支持“未发生重大变动”。前半句应改回对应事项勾选不适用；后半句已写明不适用，可保留并限定范围，不得写成报告期内经济上未发生变动。\"},{\"finding_id\":\"WR-006\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"来源已说明捕捞业务收入减少2,805万元、食品加工营业收入增加8,196万元、渔货贸易收入减少3,262万元、海上运输营业收入减少276万元，用以解释营业收入近乎持平下的主业结构变动。现有分行业绝对额正确，但未保留这些来源支持的增减，不易理解主要收入构成的此消彼长。此为补充上下文建议，不否定已有金额，也不要求补齐全部尾项或毛利率。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-OD-02",
+        "F-OD-03",
+        "F-MC-01",
+        "F-MC-02",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03",
+        "F-CF-01"
+      ],
+      "findings": [
+        {
+          "finding_id": "WR-001",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-RM-03",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "“直销”是主营业务分销售模式表中的销售模式行，不是合并集团会计总额本身。即便该行金额与主营业务合计相同，也不能仅凭金额把指标标成consolidated_group。事实中“销售模式均为直销”及金额可保留，指标主体应改为business_segment。"
+        },
+        {
+          "finding_id": "WR-002",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-SM-04",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "各数量和收入的来源对象均窄于合并集团：金枪鱼捕捞量、销售量及79,698万元销售收入属于公司金枪鱼船队；磷虾粉、捕捞量及15,378万元销售收入属于“深蓝轮”；罐头食品、鱼柳加工、渔货贸易营业收入分别属于对应产品或业务。事实及全部指标却标为consolidated_group，会把分部金额当成集团总量。相近金额不能证明与分产品行口径相同。应保留来源支持的数量和金额，将指标改为business_segment，深蓝轮/磷虾保持项目或分部口径，不得维持合并集团标签。"
+        },
+        {
+          "finding_id": "WR-003",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-OI-04",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "研发投入合计与本期费用化研发投入4,138,549.88元、占营业收入0.18%均有来源支持，但本期资本化研发投入及资本化比重为空栏。空栏不能支持“全部费用化”这一零值式断言。应保留金额和占比，删除或限定“全部费用化”。"
+        },
+        {
+          "finding_id": "WR-004",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OD-03",
+          "evidence_ids": [
+            "source-0005",
+            "source-0001"
+          ],
+          "explanation": "利润下滑对应的是贸易业务，经营业绩下滑对应的是康隆公司；来源没有说合并集团利润下降。同期归属于上市公司股东的净利润同比增加20.76%。事实subject_scope标为consolidated_group，会把分部和子公司的下滑误接到集团。正文限定可保留，范围应改为业务分部及具名子公司，或拆分事实。"
+        },
+        {
+          "finding_id": "WR-005",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-MC-01",
+          "evidence_ids": [
+            "source-0006",
+            "source-0009"
+          ],
+          "explanation": "来源只是将“业务类型、利润构成或利润来源发生重大变动的详细说明”以及主要子公司股权变动导致合并范围变化等事项勾选为不适用。适用性勾选只说明该披露项目，不能单独支持“未发生重大变动”。前半句应改回对应事项勾选不适用；后半句已写明不适用，可保留并限定范围，不得写成报告期内经济上未发生变动。"
+        },
+        {
+          "finding_id": "WR-006",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "来源已说明捕捞业务收入减少2,805万元、食品加工营业收入增加8,196万元、渔货贸易收入减少3,262万元、海上运输营业收入减少276万元，用以解释营业收入近乎持平下的主业结构变动。现有分行业绝对额正确，但未保留这些来源支持的增减，不易理解主要收入构成的此消彼长。此为补充上下文建议，不否定已有金额，也不要求补齐全部尾项或毛利率。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 18936,
+      "output_tokens": 1137,
+      "total_tokens": 49283
+    }
+  },
+  {
+    "request_id": "bp-work-3e4dd887b0c1def19809c334:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "e148f613b94b24979f8a9de4defcc588ba9f4e928989d611051672754fc7e2cc",
+    "response_hash": "319af20dc72a60f6cc688fd3bf43c49f7c953c232b20ff554a2fc05bac5d27fc",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-RM-03\",\"text\":\"公司主营业务分销售模式均为直销，直销营业收入2,330,812,544.82元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"主营业务收入-直销\",\"raw_value\":\"2,330,812,544.82\",\"value\":\"2330812544.82\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-SM-04\",\"text\":\"2025年公司金枪鱼船队共捕捞金枪鱼88,561吨，销售金枪鱼67,096吨，实现销售收入79,698万元；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），实现销售收入15,378万元；罐头食品营业收入81,635万元；鱼柳加工营业收入23,826万元；渔货贸易营业收入31,867万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"金枪鱼捕捞量\",\"raw_value\":\"88,561\",\"value\":\"88561\",\"unit\":\"吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"金枪鱼销售量\",\"raw_value\":\"67,096\",\"value\":\"67096\",\"unit\":\"吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"金枪鱼销售收入\",\"raw_value\":\"79,698\",\"value\":\"79698\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"磷虾粉产量\",\"raw_value\":\"9,041\",\"value\":\"9041\",\"unit\":\"吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"磷虾捕捞量\",\"raw_value\":\"70,092\",\"value\":\"70092\",\"unit\":\"吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"磷虾销售收入\",\"raw_value\":\"15,378\",\"value\":\"15378\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"罐头食品营业收入\",\"raw_value\":\"81,635\",\"value\":\"81635\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"鱼柳加工营业收入\",\"raw_value\":\"23,826\",\"value\":\"23826\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"渔货贸易营业收入\",\"raw_value\":\"31,867\",\"value\":\"31867\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-OI-04\",\"text\":\"2025年研发投入合计4,138,549.88元，占营业收入比例0.18%；本期资本化研发投入及资本化比重栏目为空。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"4,138,549.88\",\"value\":\"4138549.88\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"0.18\",\"value\":\"0.18\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-OD-03\",\"text\":\"贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等不利因素，整体经营业绩出现下滑。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[],\"uncertainty_reason\":\"贸易业务为业务分部，康隆公司为具名子公司，二者范围不同，无法统一为单一主体范围。\"},{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用；主要子公司股权变动导致合并范围变化的情况为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-RM-03",
+          "text": "公司主营业务分销售模式均为直销，直销营业收入2,330,812,544.82元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务收入-直销",
+              "raw_value": "2,330,812,544.82",
+              "value": "2330812544.82",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SM-04",
+          "text": "2025年公司金枪鱼船队共捕捞金枪鱼88,561吨，销售金枪鱼67,096吨，实现销售收入79,698万元；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），实现销售收入15,378万元；罐头食品营业收入81,635万元；鱼柳加工营业收入23,826万元；渔货贸易营业收入31,867万元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "金枪鱼捕捞量",
+              "raw_value": "88,561",
+              "value": "88561",
+              "unit": "吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "金枪鱼销售量",
+              "raw_value": "67,096",
+              "value": "67096",
+              "unit": "吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "金枪鱼销售收入",
+              "raw_value": "79,698",
+              "value": "79698",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "磷虾粉产量",
+              "raw_value": "9,041",
+              "value": "9041",
+              "unit": "吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "磷虾捕捞量",
+              "raw_value": "70,092",
+              "value": "70092",
+              "unit": "吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "磷虾销售收入",
+              "raw_value": "15,378",
+              "value": "15378",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "罐头食品营业收入",
+              "raw_value": "81,635",
+              "value": "81635",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "鱼柳加工营业收入",
+              "raw_value": "23,826",
+              "value": "23826",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "渔货贸易营业收入",
+              "raw_value": "31,867",
+              "value": "31867",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-OI-04",
+          "text": "2025年研发投入合计4,138,549.88元，占营业收入比例0.18%；本期资本化研发投入及资本化比重栏目为空。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "研发投入合计",
+              "raw_value": "4,138,549.88",
+              "value": "4138549.88",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "研发投入总额占营业收入比例",
+              "raw_value": "0.18",
+              "value": "0.18",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-OD-03",
+          "text": "贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等不利因素，整体经营业绩出现下滑。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "贸易业务为业务分部，康隆公司为具名子公司，二者范围不同，无法统一为单一主体范围。"
+        },
+        {
+          "fact_id": "F-MC-01",
+          "text": "报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用；主要子公司股权变动导致合并范围变化的情况为不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11440,
+      "output_tokens": 1332,
+      "total_tokens": 12772
+    }
+  },
+  {
+    "request_id": "bp-work-3e4dd887b0c1def19809c334:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "857f8c5b1098a46c3a4574ee65c0087a9d292dfe9563c361fccac2fc4656b699",
+    "response_hash": "7ecb0497f61d2f7841d4259589f1e7b7af189f68acf3bab82ec3b2f388553c29",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-RM-03\",\"F-SM-04\",\"F-OI-04\",\"F-OD-03\",\"F-MC-01\"],\"checks\":[{\"fact_id\":\"F-RM-03\",\"accepted\":true,\"evidence_ids\":[\"source-0008\"],\"explanation\":\"source-0008主营业务分销售模式表仅列“直销”，营业收入为2,330,812,544.82元，合计与该行相同。候选保留直销类别、金额、元及2025年度，并将事实和指标主体改为business_segment，未再把销售模式行标成合并集团会计总额，主体问题已纠正。\"},{\"fact_id\":\"F-SM-04\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007将金枪鱼捕捞88,561吨、销售67,096吨及销售收入79,698万元归于金枪鱼船队，将磷虾粉9,041吨、捕捞70,092吨及销售收入15,378万元归于“深蓝轮”，罐头食品、鱼柳加工、渔货贸易收入分别归于对应产品或业务。候选保留这些对象、数量、金额和单位，指标改为business_segment，未维持合并集团标签，也未仅凭相近金额等同分产品表口径。\"},{\"fact_id\":\"F-OI-04\",\"accepted\":true,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"source-0010支持研发投入合计4,138,549.88元及占营业收入0.18%，本期资本化研发投入和资本化比重为空栏。候选保留金额、占比及合并口径，删除“全部费用化”断言，仅忠实说明栏目为空，没有把空栏推断为资本化金额为零。\"},{\"fact_id\":\"F-OD-03\",\"accepted\":false,\"evidence_ids\":[\"source-0005\",\"source-0013\"],\"explanation\":\"source-0005中利润下滑对应贸易业务，经营业绩下滑对应康隆公司；source-0013列明康隆（香港）航运有限公司为子公司。候选正文虽不再声称合并集团利润下降，但结构化主体仍只标business_segment，不能覆盖具名子公司；其不确定性说明亦承认二者无法统一。未改为业务分部及具名子公司或拆分事实，主体错误未实质解决。\"},{\"fact_id\":\"F-MC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0009\"],\"explanation\":\"source-0006将业务类型、利润构成或利润来源发生重大变动的详细说明勾选不适用，source-0009将主要子公司股权变动导致合并范围变化勾选不适用。候选只复述相应披露项目为不适用，没有写成报告期内经济上未发生重大变动，主体、期间和证据正确。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-RM-03",
+        "F-SM-04",
+        "F-OI-04",
+        "F-OD-03",
+        "F-MC-01"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-RM-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "source-0008主营业务分销售模式表仅列“直销”，营业收入为2,330,812,544.82元，合计与该行相同。候选保留直销类别、金额、元及2025年度，并将事实和指标主体改为business_segment，未再把销售模式行标成合并集团会计总额，主体问题已纠正。"
+        },
+        {
+          "fact_id": "F-SM-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007将金枪鱼捕捞88,561吨、销售67,096吨及销售收入79,698万元归于金枪鱼船队，将磷虾粉9,041吨、捕捞70,092吨及销售收入15,378万元归于“深蓝轮”，罐头食品、鱼柳加工、渔货贸易收入分别归于对应产品或业务。候选保留这些对象、数量、金额和单位，指标改为business_segment，未维持合并集团标签，也未仅凭相近金额等同分产品表口径。"
+        },
+        {
+          "fact_id": "F-OI-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "source-0010支持研发投入合计4,138,549.88元及占营业收入0.18%，本期资本化研发投入和资本化比重为空栏。候选保留金额、占比及合并口径，删除“全部费用化”断言，仅忠实说明栏目为空，没有把空栏推断为资本化金额为零。"
+        },
+        {
+          "fact_id": "F-OD-03",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0005",
+            "source-0013"
+          ],
+          "explanation": "source-0005中利润下滑对应贸易业务，经营业绩下滑对应康隆公司；source-0013列明康隆（香港）航运有限公司为子公司。候选正文虽不再声称合并集团利润下降，但结构化主体仍只标business_segment，不能覆盖具名子公司；其不确定性说明亦承认二者无法统一。未改为业务分部及具名子公司或拆分事实，主体错误未实质解决。"
+        },
+        {
+          "fact_id": "F-MC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0009"
+          ],
+          "explanation": "source-0006将业务类型、利润构成或利润来源发生重大变动的详细说明勾选不适用，source-0009将主要子公司股权变动导致合并范围变化勾选不适用。候选只复述相应披露项目为不适用，没有写成报告期内经济上未发生重大变动，主体、期间和证据正确。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 13444,
+      "output_tokens": 624,
+      "total_tokens": 23956
+    }
+  }
+]

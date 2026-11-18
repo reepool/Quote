@@ -1,0 +1,63 @@
+{
+  "task": "6.DN unused-four rebind",
+  "new_model_requests": 0,
+  "physical_attempts_reserved": 0,
+  "actual_compiled_operator_provider_cap": 2450,
+  "old_negative_and_three_fixed_gateway_boundaries": [
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "timeout_seconds": 620,
+      "schema_name": "review_profile_workpaper",
+      "metadata": {
+        "workload": "company_profile_stage5",
+        "validation_feedback_on_retry": true,
+        "run_id": "dn-bind-check",
+        "stage": "verify",
+        "logical_request_id": "d2be971cde93e1a3afd83439978a62c5aecd5d7a6c7efc3ce256634589479fc9",
+        "business_item_key": "600104.SH:review_profile_workpaper"
+      }
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "timeout_seconds": 2450,
+      "schema_name": "review_profile_workpaper",
+      "metadata": {
+        "workload": "company_profile_stage5",
+        "validation_feedback_on_retry": true,
+        "run_id": "dn-bind-check",
+        "stage": "verify",
+        "logical_request_id": "d2be971cde93e1a3afd83439978a62c5aecd5d7a6c7efc3ce256634589479fc9",
+        "business_item_key": "600104.SH:review_profile_workpaper"
+      }
+    },
+    {
+      "profile": "semantic_extraction__deepseek",
+      "timeout_seconds": 2450,
+      "schema_name": "repair_profile_workpaper",
+      "metadata": {
+        "workload": "company_profile_stage5",
+        "validation_feedback_on_retry": true,
+        "run_id": "dn-bind-check",
+        "stage": "extract",
+        "logical_request_id": "53550330b648d302d1858b1c7d89600ecc851f42fc6a8d3c2798b0d019fc8340",
+        "business_item_key": "600104.SH:repair_profile_workpaper"
+      }
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "timeout_seconds": 2450,
+      "schema_name": "verify_profile_workpaper_repair",
+      "metadata": {
+        "workload": "company_profile_stage5",
+        "validation_feedback_on_retry": true,
+        "run_id": "dn-bind-check",
+        "stage": "verify",
+        "logical_request_id": "6951df2a42b9602b4005418bd4200ac73c10820f20e5599dc86b59738cd17b93",
+        "business_item_key": "600104.SH:verify_profile_workpaper_repair"
+      }
+    }
+  ],
+  "high_tier_profile_physical_seconds": 1200,
+  "Flash_profile_physical_seconds": 600,
+  "not_a_real_model_or_full_TaskService_success": true
+}

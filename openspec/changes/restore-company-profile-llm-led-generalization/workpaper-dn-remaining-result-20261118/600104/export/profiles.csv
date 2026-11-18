@@ -1,0 +1,5 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model,workpaper_delivery_reviewed_count,workpaper_delivery_pending_count,workpaper_delivery_limited_count,workpaper_delivery_source_only_count,workpaper_delivery_withheld_count,workpaper_delivery_duplicate_count,workpaper_delivery_pending_review_count
+600104.SH,2025-12-31,2026-04-01T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司业务以整车业务为核心，并涵盖零部件、移动出行和服务、金融等板块，报告期内聚焦整车业务、优化业务结构，强化零部件、移动出行和服务、金融等业务协同。
+整车业务按品牌/主体组织，包括上汽大众、上汽通用、上汽集团乘用车分公司、上汽通用五菱、上汽大通、智己汽车、上汽正大、上汽通用五菱印尼、捷仕达名爵汽车印度等整车企业，其他主要含上海申沃客车、上汽红岩、南京依维柯等。
+零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。
+金融板块加强汽车金融服务精细化发展，并加快拓展海外金融服务；汽车金融业务由上海汽车集团财务有限责任公司、上汽通用汽车金融有限责任公司、上海东正汽车金融股份有限公司等子公司开展。",37,56,completed_with_open_findings,2,deepseek-flash,grok-4.7,37,0,0,0,0,0,0

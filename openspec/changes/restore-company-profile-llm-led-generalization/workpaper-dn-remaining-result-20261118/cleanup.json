@@ -1,0 +1,18 @@
+{
+  "task": "6.DN remaining four",
+  "runtime_file_bytes": 7373638,
+  "scratch_roots": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dn-rebind-0fU7ed",
+      "file_bytes": 29289
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dn-prepared-t1p6bzgx",
+      "file_bytes": 3908230
+    }
+  ],
+  "total_measured_file_bytes": 11311157,
+  "additional_verification_exports": "TemporaryDirectory/finally removed; bytes not measured, not added",
+  "retained": "Formal PDFs, effective caches, original first-four results and attempt markers, old/new research roots, authoritative receipts and recoverable script snapshots",
+  "unrelated_preexisting_scratch": "not_deleted"
+}

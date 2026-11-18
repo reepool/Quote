@@ -1,0 +1,44 @@
+COMPANY 600104.SH
+[INFO][2026-11-18 14:25:15][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=fe718edfd7d44b1698030017d22a59b4 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:15][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=fe718edfd7d44b1698030017d22a59b4 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:25:21][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=b1b637e966724b8c872a7818ec06b804 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:21][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=b1b637e966724b8c872a7818ec06b804 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:26:07][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=a3a4f8dc7e7d4ecfb515d866740d9097 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:26:07][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=a3a4f8dc7e7d4ecfb515d866740d9097 attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:31:56][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=b0491bbff95c4a38b0bcbd5481a33270 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:31:56][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=b0491bbff95c4a38b0bcbd5481a33270 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:31:58][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=7a00a766d94041f38cc83d6b4d3088a3 initial_queue_wait_ms=1 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:31:58][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=7a00a766d94041f38cc83d6b4d3088a3 attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2449.9
+COMPANY 600088.SH
+[INFO][2026-11-18 14:25:13][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=5f49771acb2349df99c080bf196ce660 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:13][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=5f49771acb2349df99c080bf196ce660 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:25:19][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=c4f9f780894f4139af3e1e933fdea741 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:19][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=c4f9f780894f4139af3e1e933fdea741 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:25:38][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=4d0baea069b64daf9d31829e84d197b9 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:38][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=4d0baea069b64daf9d31829e84d197b9 attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:33:02][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=d5b9867675ca4e87a3446ec29322b10c initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:33:02][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=d5b9867675ca4e87a3446ec29322b10c attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:33:06][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=08e98aa6515247ecb60401b44723c0ec initial_queue_wait_ms=1 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:33:06][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=08e98aa6515247ecb60401b44723c0ec attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0
+COMPANY 600082.SH
+[INFO][2026-11-18 14:25:15][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=c9c5502551894d879b33fe32f7b50b39 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:15][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=c9c5502551894d879b33fe32f7b50b39 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2449.9
+[INFO][2026-11-18 14:25:20][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=8f9613881e674b83ba0925b8e721276c initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:20][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=8f9613881e674b83ba0925b8e721276c attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:25:42][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=8db879821e9247bbba206d8152ff446f initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:42][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=8db879821e9247bbba206d8152ff446f attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:33:39][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=07b7c8247a094369b98e2f85dce51fcb initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:33:39][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=07b7c8247a094369b98e2f85dce51fcb attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:33:43][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=b7db7da584064ac58893ce45122aaa29 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:33:43][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=b7db7da584064ac58893ce45122aaa29 attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0
+COMPANY 600097.SH
+[INFO][2026-11-18 14:25:15][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=5776914fdad341c8b94d38f81cc37f02 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:15][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=5776914fdad341c8b94d38f81cc37f02 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:25:21][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=8632b4585be74fa8af18ec37bc748f51 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:21][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=8632b4585be74fa8af18ec37bc748f51 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:25:42][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=5e76c7cd56b44c5db09617e6e6cdcd0c initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:25:42][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=5e76c7cd56b44c5db09617e6e6cdcd0c attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:32:27][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=d1235e1a75224a46b5b662e3340e4a65 initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:32:27][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=d1235e1a75224a46b5b662e3340e4a65 attempt=1/2 timeout_seconds=600.0 remaining_seconds=2450.0
+[INFO][2026-11-18 14:32:33][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=9bbce6d5f34e479e8f19aa545f50c09e initial_queue_wait_ms=0 execution_timeout_seconds=2450.0
+[INFO][2026-11-18 14:32:33][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=9bbce6d5f34e479e8f19aa545f50c09e attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0

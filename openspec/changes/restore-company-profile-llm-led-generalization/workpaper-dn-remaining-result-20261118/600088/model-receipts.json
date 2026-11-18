@@ -1,0 +1,1147 @@
+[
+  {
+    "request_id": "bp-work-fbda70711a8deed52baa9725:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "9c16f2a6b36cebe8b2eabaa88258b558cc0c21399c5d4a5ed1c93e0b2af56f92",
+    "response_hash": "b1b6bcfa024d3e4a4b2a2ced2e106bae896197a06f477735729ed85f0f00fa71",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0049\",\"section-0050\",\"section-0054\",\"section-0055\",\"section-0056\",\"section-0062\",\"section-0072\",\"section-0074\"],\"rationale\":\"选择公司业务情况（section-0049及其影视、广告、旅游、基金四个业务子节）以说明公司做什么、产品/服务用途与经营模式；选择经营情况讨论与分析（section-0062）以获取各业务板块本期经营变化；选择主营业务分析（section-0072）及收入和成本分析（section-0074）以获取营业收入总额、收入构成与主要业务权重，满足变现与收入结构问题。未选行业背景与核心竞争力，因其为次要且不直接改变公司层面解读；未选财务报告附注，因管理层讨论已覆盖收入与成本主表信息。\",\"stop_reason\":\"已覆盖业务结构、产品服务、经营模式、收入构成与本期经营变化等核心问题，行业背景与详细财务附注属次要或重复，可在不扩读全报告的前提下停止。\",\"deferred\":[\"section-0057行业情况：纯行业背景，非公司层面经营实质\",\"section-0067核心竞争力：泛化竞争优势，非收入与经营结构必需\",\"section-0317财务报告及附注：仅在收入构成有实质缺口时定向补充，当前管理层讨论已覆盖\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0049",
+        "section-0050",
+        "section-0054",
+        "section-0055",
+        "section-0056",
+        "section-0062",
+        "section-0072",
+        "section-0074"
+      ],
+      "rationale": "选择公司业务情况（section-0049及其影视、广告、旅游、基金四个业务子节）以说明公司做什么、产品/服务用途与经营模式；选择经营情况讨论与分析（section-0062）以获取各业务板块本期经营变化；选择主营业务分析（section-0072）及收入和成本分析（section-0074）以获取营业收入总额、收入构成与主要业务权重，满足变现与收入结构问题。未选行业背景与核心竞争力，因其为次要且不直接改变公司层面解读；未选财务报告附注，因管理层讨论已覆盖收入与成本主表信息。",
+      "stop_reason": "已覆盖业务结构、产品服务、经营模式、收入构成与本期经营变化等核心问题，行业背景与详细财务附注属次要或重复，可在不扩读全报告的前提下停止。",
+      "deferred": [
+        "section-0057行业情况：纯行业背景，非公司层面经营实质",
+        "section-0067核心竞争力：泛化竞争优势，非收入与经营结构必需",
+        "section-0317财务报告及附注：仅在收入构成有实质缺口时定向补充，当前管理层讨论已覆盖"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20832,
+      "output_tokens": 294,
+      "total_tokens": 21126
+    }
+  },
+  {
+    "request_id": "bp-work-fbda70711a8deed52baa9725:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "f0a52667ac549356cef345375b9159dba32c4975282316b1e6894a83ed089f5c",
+    "response_hash": "1c00864bebbf3f9e888f8ed36db673e40c026603cb3c0893369f792de8cdde75",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司已形成多平台协同发展的业务格局，涵盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营以及基金投资与管理等多个领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"影视业务主要包括电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块；广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源；旅游业务主要为无锡影视基地和南海影视城的影视拍摄基地经营；基金业务由全资子公司宁波梅山保税港区国视融媒投资管理有限公司承担，专注融合媒体等特色细分行业投资。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"电视节目制作与销售业务聚焦超高清/高清纪录片、电视栏目、大型晚会活动及宣传片等全链条服务，覆盖策划、投资、制作、运营与管理的全生命周期，并拓展新媒体直播、宣传推广及短视频制作等业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F04\",\"text\":\"影视技术服务和设备租赁业务包括影视前期与后期技术服务及专业设备租赁：技术服务提供剪辑、包装、调色及设备、机房、演播室运维等全流程服务；设备租赁为超高清及高清电视剧、数字电影、纪录片、大型转播活动等提供设备租赁与技术支持。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F05\",\"text\":\"影视库存剧销售业务依托公司媒资资源，发行历年投资、制作及引进的电视剧、纪录片、电视栏目等作品，推动多轮发行与销售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F06\",\"text\":\"旅游业务主要收入来源包括旅游门票销售、园内经营和影视拍摄服务；无锡影视基地由三国城、水浒城等景区组成，南海影视城涵盖天朝宫殿区、江南水乡区、港澳文化区和休闲游乐区，业务涉及影视拍摄、休闲旅游、研学教育、户外拓展、婚纱摄影、品牌展示等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F07\",\"text\":\"公司2025年实现营业收入1,037,484,312.21元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,037,484,312.21\",\"value\":\"1037484312.21\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F08\",\"text\":\"按主营业务分行业口径，影视业务营业收入597,703,872.09元，毛利率10.04%；广告业务营业收入289,904,563.86元，毛利率8.43%；旅游业务营业收入147,151,456.42元，毛利率27.23%；基金业务营业收入1,503,221.93元，毛利率100.00%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"影视业务营业收入\",\"raw_value\":\"597,703,872.09\",\"value\":\"597703872.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"影视业务毛利率\",\"raw_value\":\"10.04\",\"value\":\"10.04\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"广告业务营业收入\",\"raw_value\":\"289,904,563.86\",\"value\":\"289904563.86\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"广告业务毛利率\",\"raw_value\":\"8.43\",\"value\":\"8.43\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游业务营业收入\",\"raw_value\":\"147,151,456.42\",\"value\":\"147151456.42\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游业务毛利率\",\"raw_value\":\"27.23\",\"value\":\"27.23\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"基金业务营业收入\",\"raw_value\":\"1,503,221.93\",\"value\":\"1503221.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"基金业务毛利率\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"广告业务通过承包经营总台科教频道及农业农村频道整频道广告资源获取收入，并布局短视频与电商领域，向频道商务运营商转型；基金业务收入来自基金投资与管理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F10\",\"text\":\"2025年公司影视业务收入597,703,872.09元，较上年同期增长2.56%；广告业务收入289,904,563.86元，较上年同期减少25.30%；旅游业务收入147,151,456.42元，较上年同期减少10.00%；基金业务收入1,503,221.93元，较上年同期减少3.69%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"影视业务收入同比增减\",\"raw_value\":\"2.56\",\"value\":\"2.56\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"},{\"name\":\"广告业务收入同比增减\",\"raw_value\":\"-25.30\",\"value\":\"-25.30\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"},{\"name\":\"旅游业务收入同比增减\",\"raw_value\":\"-10.00\",\"value\":\"-10.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"},{\"name\":\"基金业务收入同比增减\",\"raw_value\":\"-3.69\",\"value\":\"-3.69\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"}]},{\"fact_id\":\"F11\",\"text\":\"按主营业务分地区口径，上海地区营业收入242,121,065.72元，无锡地区124,148,585.98元，北京地区642,811,084.51元，佛山地区25,679,156.16元，宁波地区1,503,221.93元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"上海地区营业收入\",\"raw_value\":\"242,121,065.72\",\"value\":\"242121065.72\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"无锡地区营业收入\",\"raw_value\":\"124,148,585.98\",\"value\":\"124148585.98\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"北京地区营业收入\",\"raw_value\":\"642,811,084.51\",\"value\":\"642811084.51\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"佛山地区营业收入\",\"raw_value\":\"25,679,156.16\",\"value\":\"25679156.16\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"宁波地区营业收入\",\"raw_value\":\"1,503,221.93\",\"value\":\"1503221.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分行业收入构成表未列示各业务收入占比，未计算占比。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F12\",\"text\":\"影视技术服务方面，公司作为总台准制作岛和技术服务的长期供应商，年均完成节目技审及通过专属节目传输通道在总台入库播出的节目约8,000小时。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"年均完成节目技审及入库播出节目时长\",\"raw_value\":\"约8,000\",\"value\":\"8000\",\"unit\":\"小时\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F13\",\"text\":\"无锡影视基地位于无锡太湖之滨，占地面积超1,000亩；南海影视城位于广东省佛山市南海区，占地面积近1,500亩。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"无锡影视基地占地面积\",\"raw_value\":\"超1,000\",\"value\":\"1000\",\"unit\":\"亩\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"南海影视城占地面积\",\"raw_value\":\"近1,500\",\"value\":\"1500\",\"unit\":\"亩\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F14\",\"text\":\"影视业务成本构成中，职工薪酬250,999,754.59元（占本期总成本46.68%），技术服务费121,668,134.32元（22.63%），劳务费49,006,201.93元（9.11%），制作费47,272,703.17元（8.79%）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"影视业务职工薪酬成本\",\"raw_value\":\"250,999,754.59\",\"value\":\"250999754.59\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"影视业务技术服务费成本\",\"raw_value\":\"121,668,134.32\",\"value\":\"121668134.32\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"影视业务劳务费成本\",\"raw_value\":\"49,006,201.93\",\"value\":\"49006201.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"影视业务制作费成本\",\"raw_value\":\"47,272,703.17\",\"value\":\"47272703.17\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"广告业务成本构成中，媒体广告成本141,251,521.88元（占本期总成本53.21%），制作费22,124,254.09元（8.33%）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"广告业务媒体广告成本\",\"raw_value\":\"141,251,521.88\",\"value\":\"141251521.88\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"广告业务制作费成本\",\"raw_value\":\"22,124,254.09\",\"value\":\"22124254.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"成本分析表未列示基金业务成本构成。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F16\",\"text\":\"前五名客户销售额730,193,949.69元，占年度销售总额70.38%；其中前五名客户销售额中关联方销售额660,494,898.68元，占年度销售总额63.66%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"730,193,949.69\",\"value\":\"730193949.69\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"70.38\",\"value\":\"70.38\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户中关联方销售额\",\"raw_value\":\"660,494,898.68\",\"value\":\"660494898.68\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户中关联方销售额占年度销售总额比例\",\"raw_value\":\"63.66\",\"value\":\"63.66\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"报告期内向单个客户销售比例超过总额50%的客户为中央广播电视总台，销售额660,494,898.68元，占年度销售总额比例63.66%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"中央广播电视总台销售额\",\"raw_value\":\"660,494,898.68\",\"value\":\"660494898.68\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中央广播电视总台销售额占年度销售总额比例\",\"raw_value\":\"63.66\",\"value\":\"63.66\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F18\",\"text\":\"前五名供应商采购额173,681,466.18元，占年度采购总额23.77%；其中前五名供应商采购额中关联方采购额127,258,664.50元，占年度采购总额17.42%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"173,681,466.18\",\"value\":\"173681466.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"23.77\",\"value\":\"23.77\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商中关联方采购额\",\"raw_value\":\"127,258,664.50\",\"value\":\"127258664.50\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商中关联方采购额占年度采购总额比例\",\"raw_value\":\"17.42\",\"value\":\"17.42\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"公司电视节目制作与销售业务与总台保持紧密合作，同时积极拓展台外市场，深化与各级政府、企事业单位和社会组织的合作；广告业务深耕“乡村振兴”“大健康”等核心赛道。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F20\",\"text\":\"影视业务收入增长主要因公司积极开拓市场、承接项目数量有所增加，实现影视业务收入略有增长。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F21\",\"text\":\"广告业务收入减少主要受传统广告市场承压和制作项目调整等因素影响。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F22\",\"text\":\"旅游业务收入下降主要因景区周边同质化竞争加剧导致客源分流，加之极端天气等综合因素影响。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F23\",\"text\":\"公司归属于上市公司股东的净利润为-17,956,761.63元，出现亏损主要受所得税费用因素影响：参与投资的基金减持“海看股份”和“无线传媒”股票产生大额所得税费用，同时子公司中视广告前期大额未弥补亏损到期转回递延所得税费用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"-17,956,761.63\",\"value\":\"-17956761.63\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"报告期内公司新增重要非主营业务说明为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用；报告期主要子公司股权变动导致合并范围变化为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0007\"]},{\"fact_id\":\"F25\",\"text\":\"报告期内，公司参与投资的基金减持“海看股份”和“无线传媒”股票，其中海看股份完成部分减持，无线传媒已基本完成减持工作。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"公司业务覆盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营及基金投资与管理，兼具内容制作、技术服务、广告代理和景区运营等经营角色。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"影视业务对外采购劳务服务、制作服务，并发生场地租赁、低值易耗品、道具、制景等制作相关支出；广告业务对外采购制作服务并承担媒体广告成本。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"未披露具体原材料或能源供应商名称。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F28\",\"text\":\"公司客户包括中央广播电视总台（第一大客户，销售额占年度销售总额63.66%），以及各级政府、企事业单位和社会组织等台外市场客户；旅游业务面向游客及影视拍摄、研学教育、户外拓展等团队客源。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\",\"source-0008\"]}],\"limitations\":[]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"公司自2018年起布局基金投资业务，成立全资子公司宁波梅山保税港区国视融媒投资管理有限公司，专注融合媒体等特色细分行业投资；中视传媒及国视融媒共参与两只专项基金和两只融媒体产业基金的设立与募集。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F30\",\"text\":\"公司积极推进AI技术在创意策划、视觉设计、节目包装、字幕初审、内容制作等环节的落地应用，有效支撑台内外项目开展。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]}],\"limitations\":[]},\"limitations\":[\"分行业收入构成表未列示各业务收入占比，未计算占比。\",\"成本分析表未列示基金业务成本构成。\",\"未披露具体原材料或能源供应商名称。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司已形成多平台协同发展的业务格局，涵盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营以及基金投资与管理等多个领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "影视业务主要包括电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块；广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源；旅游业务主要为无锡影视基地和南海影视城的影视拍摄基地经营；基金业务由全资子公司宁波梅山保税港区国视融媒投资管理有限公司承担，专注融合媒体等特色细分行业投资。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "电视节目制作与销售业务聚焦超高清/高清纪录片、电视栏目、大型晚会活动及宣传片等全链条服务，覆盖策划、投资、制作、运营与管理的全生命周期，并拓展新媒体直播、宣传推广及短视频制作等业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "影视技术服务和设备租赁业务包括影视前期与后期技术服务及专业设备租赁：技术服务提供剪辑、包装、调色及设备、机房、演播室运维等全流程服务；设备租赁为超高清及高清电视剧、数字电影、纪录片、大型转播活动等提供设备租赁与技术支持。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "影视库存剧销售业务依托公司媒资资源，发行历年投资、制作及引进的电视剧、纪录片、电视栏目等作品，推动多轮发行与销售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "旅游业务主要收入来源包括旅游门票销售、园内经营和影视拍摄服务；无锡影视基地由三国城、水浒城等景区组成，南海影视城涵盖天朝宫殿区、江南水乡区、港澳文化区和休闲游乐区，业务涉及影视拍摄、休闲旅游、研学教育、户外拓展、婚纱摄影、品牌展示等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F07",
+              "text": "公司2025年实现营业收入1,037,484,312.21元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "1,037,484,312.21",
+                  "value": "1037484312.21",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "按主营业务分行业口径，影视业务营业收入597,703,872.09元，毛利率10.04%；广告业务营业收入289,904,563.86元，毛利率8.43%；旅游业务营业收入147,151,456.42元，毛利率27.23%；基金业务营业收入1,503,221.93元，毛利率100.00%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "影视业务营业收入",
+                  "raw_value": "597,703,872.09",
+                  "value": "597703872.09",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "影视业务毛利率",
+                  "raw_value": "10.04",
+                  "value": "10.04",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "广告业务营业收入",
+                  "raw_value": "289,904,563.86",
+                  "value": "289904563.86",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "广告业务毛利率",
+                  "raw_value": "8.43",
+                  "value": "8.43",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游业务营业收入",
+                  "raw_value": "147,151,456.42",
+                  "value": "147151456.42",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游业务毛利率",
+                  "raw_value": "27.23",
+                  "value": "27.23",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "基金业务营业收入",
+                  "raw_value": "1,503,221.93",
+                  "value": "1503221.93",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "基金业务毛利率",
+                  "raw_value": "100.00",
+                  "value": "100.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "广告业务通过承包经营总台科教频道及农业农村频道整频道广告资源获取收入，并布局短视频与电商领域，向频道商务运营商转型；基金业务收入来自基金投资与管理。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F10",
+              "text": "2025年公司影视业务收入597,703,872.09元，较上年同期增长2.56%；广告业务收入289,904,563.86元，较上年同期减少25.30%；旅游业务收入147,151,456.42元，较上年同期减少10.00%；基金业务收入1,503,221.93元，较上年同期减少3.69%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "影视业务收入同比增减",
+                  "raw_value": "2.56",
+                  "value": "2.56",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                },
+                {
+                  "name": "广告业务收入同比增减",
+                  "raw_value": "-25.30",
+                  "value": "-25.30",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                },
+                {
+                  "name": "旅游业务收入同比增减",
+                  "raw_value": "-10.00",
+                  "value": "-10.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                },
+                {
+                  "name": "基金业务收入同比增减",
+                  "raw_value": "-3.69",
+                  "value": "-3.69",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "按主营业务分地区口径，上海地区营业收入242,121,065.72元，无锡地区124,148,585.98元，北京地区642,811,084.51元，佛山地区25,679,156.16元，宁波地区1,503,221.93元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "上海地区营业收入",
+                  "raw_value": "242,121,065.72",
+                  "value": "242121065.72",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "无锡地区营业收入",
+                  "raw_value": "124,148,585.98",
+                  "value": "124148585.98",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "北京地区营业收入",
+                  "raw_value": "642,811,084.51",
+                  "value": "642811084.51",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "佛山地区营业收入",
+                  "raw_value": "25,679,156.16",
+                  "value": "25679156.16",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "宁波地区营业收入",
+                  "raw_value": "1,503,221.93",
+                  "value": "1503221.93",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分行业收入构成表未列示各业务收入占比，未计算占比。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F12",
+              "text": "影视技术服务方面，公司作为总台准制作岛和技术服务的长期供应商，年均完成节目技审及通过专属节目传输通道在总台入库播出的节目约8,000小时。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "年均完成节目技审及入库播出节目时长",
+                  "raw_value": "约8,000",
+                  "value": "8000",
+                  "unit": "小时",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "无锡影视基地位于无锡太湖之滨，占地面积超1,000亩；南海影视城位于广东省佛山市南海区，占地面积近1,500亩。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "无锡影视基地占地面积",
+                  "raw_value": "超1,000",
+                  "value": "1000",
+                  "unit": "亩",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "南海影视城占地面积",
+                  "raw_value": "近1,500",
+                  "value": "1500",
+                  "unit": "亩",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "影视业务成本构成中，职工薪酬250,999,754.59元（占本期总成本46.68%），技术服务费121,668,134.32元（22.63%），劳务费49,006,201.93元（9.11%），制作费47,272,703.17元（8.79%）。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "影视业务职工薪酬成本",
+                  "raw_value": "250,999,754.59",
+                  "value": "250999754.59",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "影视业务技术服务费成本",
+                  "raw_value": "121,668,134.32",
+                  "value": "121668134.32",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "影视业务劳务费成本",
+                  "raw_value": "49,006,201.93",
+                  "value": "49006201.93",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "影视业务制作费成本",
+                  "raw_value": "47,272,703.17",
+                  "value": "47272703.17",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "广告业务成本构成中，媒体广告成本141,251,521.88元（占本期总成本53.21%），制作费22,124,254.09元（8.33%）。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "广告业务媒体广告成本",
+                  "raw_value": "141,251,521.88",
+                  "value": "141251521.88",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "广告业务制作费成本",
+                  "raw_value": "22,124,254.09",
+                  "value": "22124254.09",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "成本分析表未列示基金业务成本构成。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F16",
+              "text": "前五名客户销售额730,193,949.69元，占年度销售总额70.38%；其中前五名客户销售额中关联方销售额660,494,898.68元，占年度销售总额63.66%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "730,193,949.69",
+                  "value": "730193949.69",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "70.38",
+                  "value": "70.38",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户中关联方销售额",
+                  "raw_value": "660,494,898.68",
+                  "value": "660494898.68",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户中关联方销售额占年度销售总额比例",
+                  "raw_value": "63.66",
+                  "value": "63.66",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "报告期内向单个客户销售比例超过总额50%的客户为中央广播电视总台，销售额660,494,898.68元，占年度销售总额比例63.66%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "中央广播电视总台销售额",
+                  "raw_value": "660,494,898.68",
+                  "value": "660494898.68",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中央广播电视总台销售额占年度销售总额比例",
+                  "raw_value": "63.66",
+                  "value": "63.66",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "前五名供应商采购额173,681,466.18元，占年度采购总额23.77%；其中前五名供应商采购额中关联方采购额127,258,664.50元，占年度采购总额17.42%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "173,681,466.18",
+                  "value": "173681466.18",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "23.77",
+                  "value": "23.77",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商中关联方采购额",
+                  "raw_value": "127,258,664.50",
+                  "value": "127258664.50",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商中关联方采购额占年度采购总额比例",
+                  "raw_value": "17.42",
+                  "value": "17.42",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "公司电视节目制作与销售业务与总台保持紧密合作，同时积极拓展台外市场，深化与各级政府、企事业单位和社会组织的合作；广告业务深耕“乡村振兴”“大健康”等核心赛道。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F20",
+              "text": "影视业务收入增长主要因公司积极开拓市场、承接项目数量有所增加，实现影视业务收入略有增长。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "广告业务收入减少主要受传统广告市场承压和制作项目调整等因素影响。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "旅游业务收入下降主要因景区周边同质化竞争加剧导致客源分流，加之极端天气等综合因素影响。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "公司归属于上市公司股东的净利润为-17,956,761.63元，出现亏损主要受所得税费用因素影响：参与投资的基金减持“海看股份”和“无线传媒”股票产生大额所得税费用，同时子公司中视广告前期大额未弥补亏损到期转回递延所得税费用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "-17,956,761.63",
+                  "value": "-17956761.63",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F24",
+              "text": "报告期内公司新增重要非主营业务说明为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用；报告期主要子公司股权变动导致合并范围变化为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "报告期内，公司参与投资的基金减持“海看股份”和“无线传媒”股票，其中海看股份完成部分减持，无线传媒已基本完成减持工作。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F26",
+              "text": "公司业务覆盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营及基金投资与管理，兼具内容制作、技术服务、广告代理和景区运营等经营角色。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F27",
+              "text": "影视业务对外采购劳务服务、制作服务，并发生场地租赁、低值易耗品、道具、制景等制作相关支出；广告业务对外采购制作服务并承担媒体广告成本。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体原材料或能源供应商名称。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F28",
+              "text": "公司客户包括中央广播电视总台（第一大客户，销售额占年度销售总额63.66%），以及各级政府、企事业单位和社会组织等台外市场客户；旅游业务面向游客及影视拍摄、研学教育、户外拓展等团队客源。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002",
+                "source-0008"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F29",
+            "text": "公司自2018年起布局基金投资业务，成立全资子公司宁波梅山保税港区国视融媒投资管理有限公司，专注融合媒体等特色细分行业投资；中视传媒及国视融媒共参与两只专项基金和两只融媒体产业基金的设立与募集。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ]
+          },
+          {
+            "fact_id": "F30",
+            "text": "公司积极推进AI技术在创意策划、视觉设计、节目包装、字幕初审、内容制作等环节的落地应用，有效支撑台内外项目开展。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0003"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "分行业收入构成表未列示各业务收入占比，未计算占比。",
+        "成本分析表未列示基金业务成本构成。",
+        "未披露具体原材料或能源供应商名称。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 11208,
+      "output_tokens": 4986,
+      "total_tokens": 16194
+    }
+  },
+  {
+    "request_id": "bp-work-fbda70711a8deed52baa9725:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "5cbbc1ecc78533c4d81a2c441949c00214937526487e032dc79e11840444ce05",
+    "response_hash": "9003f88f9961c97825bad9dbf49e17e18eda001bf2126968f9a3f2d656effd84",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"R01\",\"element\":\"business_structure\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F02\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"影视、广告、旅游业务范围与原文一致，但“基金业务由全资子公司宁波梅山保税港区国视融媒投资管理有限公司承担”把主体收窄为该子公司独家承担。原文是公司自2018年起布局基金投资并设立该全资子公司专注融合媒体等特色细分行业投资，同时写明中视传媒及国视融媒共同参与两只专项基金和两只融媒体产业基金的设立与募集。应保留子公司专注相关投资的内容，并标明母公司与子公司共同参与，不得写成基金业务仅由该子公司承担。\"},{\"finding_id\":\"R02\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F13\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"区位和面积与原文相符：无锡影视基地位于无锡太湖之滨、占地超1,000亩，南海影视城位于广东省佛山市南海区、占地近1,500亩。但原文将其表述为公司旅游业务的影视拍摄基地和景区，并未界定为子公司。事实及两项面积指标的subject_scope标为named_subsidiary缺乏依据，不能仅凭地名和面积认定子公司。应保留区位、面积及“超”“近”限定，主体改按公司旅游业务经营场所理解；若无法精确对应既有范围，标unclear，不要维持named_subsidiary。\"},{\"finding_id\":\"R03\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F08\",\"evidence_ids\":[\"source-0005\"],\"explanation\":\"分行业表已支持基金业务营业收入1,503,221.93元、毛利率100.00%，但同一主营业务分析列示投资收益本期-4,583,169.75元、上年同期22,261,022.17元、变动比例-120.59%，并说明主要因基金业务投资收益较上年同期大幅减少。该变动相对基金业务营业收入和公司盈利均属重大，现有构成只保留营业收入口径，未交代基金投资回报由盈转亏，容易把基金获利机制误读为仅有约150万元、毛利率100%的小额经营收入。建议保留已支持的分行业营业收入，另补充该投资收益及变动原因，不要把投资收益改记入营业收入。\"},{\"finding_id\":\"R04\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0008\"],\"explanation\":\"选定章节未见具体原材料或能源供应商名称，只能说明本摘录未知，不能写成公司“未披露”。主要供应商章节已披露前五名供应商采购额，以及中央广播电视总台采购额127,258,664.50元、占年度采购总额17.42%。应改为选定材料未列明原材料或能源供应商，而不是认定未披露。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "R01",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F02",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "影视、广告、旅游业务范围与原文一致，但“基金业务由全资子公司宁波梅山保税港区国视融媒投资管理有限公司承担”把主体收窄为该子公司独家承担。原文是公司自2018年起布局基金投资并设立该全资子公司专注融合媒体等特色细分行业投资，同时写明中视传媒及国视融媒共同参与两只专项基金和两只融媒体产业基金的设立与募集。应保留子公司专注相关投资的内容，并标明母公司与子公司共同参与，不得写成基金业务仅由该子公司承担。"
+        },
+        {
+          "finding_id": "R02",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F13",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "区位和面积与原文相符：无锡影视基地位于无锡太湖之滨、占地超1,000亩，南海影视城位于广东省佛山市南海区、占地近1,500亩。但原文将其表述为公司旅游业务的影视拍摄基地和景区，并未界定为子公司。事实及两项面积指标的subject_scope标为named_subsidiary缺乏依据，不能仅凭地名和面积认定子公司。应保留区位、面积及“超”“近”限定，主体改按公司旅游业务经营场所理解；若无法精确对应既有范围，标unclear，不要维持named_subsidiary。"
+        },
+        {
+          "finding_id": "R03",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F08",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "分行业表已支持基金业务营业收入1,503,221.93元、毛利率100.00%，但同一主营业务分析列示投资收益本期-4,583,169.75元、上年同期22,261,022.17元、变动比例-120.59%，并说明主要因基金业务投资收益较上年同期大幅减少。该变动相对基金业务营业收入和公司盈利均属重大，现有构成只保留营业收入口径，未交代基金投资回报由盈转亏，容易把基金获利机制误读为仅有约150万元、毛利率100%的小额经营收入。建议保留已支持的分行业营业收入，另补充该投资收益及变动原因，不要把投资收益改记入营业收入。"
+        },
+        {
+          "finding_id": "R04",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "选定章节未见具体原材料或能源供应商名称，只能说明本摘录未知，不能写成公司“未披露”。主要供应商章节已披露前五名供应商采购额，以及中央广播电视总台采购额127,258,664.50元、占年度采购总额17.42%。应改为选定材料未列明原材料或能源供应商，而不是认定未披露。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30"
+      ]
+    },
+    "usage": {
+      "input_tokens": 16950,
+      "output_tokens": 834,
+      "total_tokens": 48438
+    }
+  },
+  {
+    "request_id": "bp-work-fbda70711a8deed52baa9725:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "99b7115410c95842c5d8c267aa2dd27005da1b79a3e0739c6d0373bd21a21f67",
+    "response_hash": "82af31516b767da234855c1785c5b75e8f5471bf8362de189d0dddc65259b51f",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F02\",\"text\":\"影视业务主要包括电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块；广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源；旅游业务主要为无锡影视基地和南海影视城的影视拍摄基地经营；公司自2018年起布局基金投资业务，成立全资子公司宁波梅山保税港区国视融媒投资管理有限公司，专注融合媒体等特色细分行业的投资，中视传媒及国视融媒共参与两只专项基金和两只融媒体产业基金的设立与募集。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F13\",\"text\":\"无锡影视基地位于无锡太湖之滨，占地面积超1,000亩；南海影视城位于广东省佛山市南海区，占地面积近1,500亩。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"无锡影视基地占地面积\",\"raw_value\":\"超1,000\",\"value\":\"1000\",\"unit\":\"亩\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":\"原文未界定该基地为子公司，仅作为公司旅游业务的影视拍摄基地经营场所描述\"},{\"name\":\"南海影视城占地面积\",\"raw_value\":\"近1,500\",\"value\":\"1500\",\"unit\":\"亩\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":\"原文未界定该影视城为子公司，仅作为公司旅游业务的影视拍摄基地经营场所描述\"}],\"uncertainty_reason\":\"原文未界定两处基地为子公司，主体范围无法精确对应\"},{\"fact_id\":\"review-add:R03\",\"text\":\"按主营业务分行业口径，基金业务营业收入1,503,221.93元，毛利率100.00%；同期投资收益本期-4,583,169.75元、上年同期22,261,022.17元、变动比例-120.59%，主要原因是报告期公司基金业务产生的投资收益较上年同期大幅减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"基金业务营业收入\",\"raw_value\":\"1,503,221.93\",\"value\":\"1503221.93\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"基金业务毛利率\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资收益本期数\",\"raw_value\":\"-4,583,169.75\",\"value\":\"-4583169.75\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资收益上年同期数\",\"raw_value\":\"22,261,022.17\",\"value\":\"22261022.17\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资收益变动比例\",\"raw_value\":\"-120.59\",\"value\":\"-120.59\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F02",
+          "text": "影视业务主要包括电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块；广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源；旅游业务主要为无锡影视基地和南海影视城的影视拍摄基地经营；公司自2018年起布局基金投资业务，成立全资子公司宁波梅山保税港区国视融媒投资管理有限公司，专注融合媒体等特色细分行业的投资，中视传媒及国视融媒共参与两只专项基金和两只融媒体产业基金的设立与募集。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F13",
+          "text": "无锡影视基地位于无锡太湖之滨，占地面积超1,000亩；南海影视城位于广东省佛山市南海区，占地面积近1,500亩。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "无锡影视基地占地面积",
+              "raw_value": "超1,000",
+              "value": "1000",
+              "unit": "亩",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": "原文未界定该基地为子公司，仅作为公司旅游业务的影视拍摄基地经营场所描述"
+            },
+            {
+              "name": "南海影视城占地面积",
+              "raw_value": "近1,500",
+              "value": "1500",
+              "unit": "亩",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": "原文未界定该影视城为子公司，仅作为公司旅游业务的影视拍摄基地经营场所描述"
+            }
+          ],
+          "uncertainty_reason": "原文未界定两处基地为子公司，主体范围无法精确对应"
+        },
+        {
+          "fact_id": "review-add:R03",
+          "text": "按主营业务分行业口径，基金业务营业收入1,503,221.93元，毛利率100.00%；同期投资收益本期-4,583,169.75元、上年同期22,261,022.17元、变动比例-120.59%，主要原因是报告期公司基金业务产生的投资收益较上年同期大幅减少。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "基金业务营业收入",
+              "raw_value": "1,503,221.93",
+              "value": "1503221.93",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "基金业务毛利率",
+              "raw_value": "100.00",
+              "value": "100.00",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益本期数",
+              "raw_value": "-4,583,169.75",
+              "value": "-4583169.75",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益上年同期数",
+              "raw_value": "22,261,022.17",
+              "value": "22261022.17",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益变动比例",
+              "raw_value": "-120.59",
+              "value": "-120.59",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10039,
+      "output_tokens": 916,
+      "total_tokens": 10955
+    }
+  },
+  {
+    "request_id": "bp-work-fbda70711a8deed52baa9725:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "6c3a53aaa61104005d3d70aa82a507833f9a51531a48f9e33800e58d238d4c6d",
+    "response_hash": "23b5ad296c2883325e50c6a7de4de16c5954f3f743c91ce487d95cd23496c1eb",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F02\",\"F13\",\"review-add:R03\"],\"checks\":[{\"fact_id\":\"F02\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"explanation\":\"已按原文恢复影视、广告、旅游业务范围，并写明公司自2018年起布局基金投资、设立全资子公司国视融媒专注融合媒体等投资，同时中视传媒及国视融媒共同参与两只专项基金和两只融媒体产业基金的设立与募集，不再把基金业务收窄为仅由该子公司承担。报告正文中的“公司”按合并口径理解正确，期间与证据相符。\"},{\"fact_id\":\"F13\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"区位、面积及“超”“近”限定与原文一致，且未再将两处基地标为named_subsidiary。原文仅将其作为公司旅游业务的影视拍摄基地描述、未界定为子公司，候选对事实及两项面积指标保留unclear、greater_than和approximate及相应不确定性，符合纠正要求。\"},{\"fact_id\":\"review-add:R03\",\"accepted\":true,\"evidence_ids\":[\"source-0005\"],\"explanation\":\"候选分别保留分行业基金业务营业收入1,503,221.93元和表内明示毛利率100.00%，并另行列示公司利润表投资收益本期-4,583,169.75元、上年同期22,261,022.17元、变动-120.59%及其主要因基金业务投资收益大幅减少的原因，未把投资收益改记入营业收入，也未由空白成本推断为零。各指标主体、栏目、期间、单位与证据一致。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F02",
+        "F13",
+        "review-add:R03"
+      ],
+      "checks": [
+        {
+          "fact_id": "F02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "explanation": "已按原文恢复影视、广告、旅游业务范围，并写明公司自2018年起布局基金投资、设立全资子公司国视融媒专注融合媒体等投资，同时中视传媒及国视融媒共同参与两只专项基金和两只融媒体产业基金的设立与募集，不再把基金业务收窄为仅由该子公司承担。报告正文中的“公司”按合并口径理解正确，期间与证据相符。"
+        },
+        {
+          "fact_id": "F13",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "区位、面积及“超”“近”限定与原文一致，且未再将两处基地标为named_subsidiary。原文仅将其作为公司旅游业务的影视拍摄基地描述、未界定为子公司，候选对事实及两项面积指标保留unclear、greater_than和approximate及相应不确定性，符合纠正要求。"
+        },
+        {
+          "fact_id": "review-add:R03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "候选分别保留分行业基金业务营业收入1,503,221.93元和表内明示毛利率100.00%，并另行列示公司利润表投资收益本期-4,583,169.75元、上年同期22,261,022.17元、变动-120.59%及其主要因基金业务投资收益大幅减少的原因，未把投资收益改记入营业收入，也未由空白成本推断为零。各指标主体、栏目、期间、单位与证据一致。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11616,
+      "output_tokens": 388,
+      "total_tokens": 18772
+    }
+  }
+]

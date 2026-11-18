@@ -1,0 +1,8 @@
+{
+  "phase": "before any formal entry or model request",
+  "events": ["freeze refused because reused operator resolved the prior result directory", "a subsequent group command also refused the already-existing prior group identity"],
+  "new_model_requests": 0,
+  "formal_attempts_used": 0,
+  "correction": "Task-local destination adaptation fixed and explicitly asserted before freeze. Public preflight evidence moved to new result directory; prior committed preflight restored exactly. No business code, prompt, shared configuration, model result or used attempt changed.",
+  "prior_network_preflight_restored_from": "afd0c9c6"
+}

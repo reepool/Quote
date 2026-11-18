@@ -1,0 +1,256 @@
+{
+  "task": "6.DN remaining four",
+  "research_output_root": "/home/python/Quote/data/research/company_profile_dn_remaining_20261118",
+  "profiles": [
+    {
+      "instrument_id": "600104.SH",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_dn_remaining_20261118/company_profile_common_core.v1/bp-work-75d5a851ac622e93bd8cbd89.json",
+      "runtime_sha256": "e6a4fa25fe5522cc96004f3e2d9e8423b8919b81ba0c34801bbc3ee3aec7e513",
+      "actual_provider_cap_seconds": 2450,
+      "resource_binding_version": "unused_four_provider_2450"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_dn_remaining_20261118/company_profile_common_core.v1/bp-work-fbda70711a8deed52baa9725.json",
+      "runtime_sha256": "d281e435e017cf8679dfb1aa3b1327a179887bb386a99bf4258db7cfdf862630",
+      "actual_provider_cap_seconds": 2450,
+      "resource_binding_version": "unused_four_provider_2450"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_dn_remaining_20261118/company_profile_common_core.v1/bp-work-a2233d8766efdcb0eb19b903.json",
+      "runtime_sha256": "eb286510e306a663e8394f482a39fb5ff6a775f757d17367ccb3acb3e583c08c",
+      "actual_provider_cap_seconds": 2450,
+      "resource_binding_version": "unused_four_provider_2450"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "runtime_record": "/home/python/Quote/data/research/company_profile_dn_remaining_20261118/company_profile_common_core.v1/bp-work-3e4dd887b0c1def19809c334.json",
+      "runtime_sha256": "7a40625fd3d54d7d03702a82e3249567946f6e6f0fc59e6f4a6f3be9f3a755cb",
+      "actual_provider_cap_seconds": 2450,
+      "resource_binding_version": "unused_four_provider_2450"
+    }
+  ],
+  "profiles_summary": [
+    {
+      "instrument_id": "600104.SH",
+      "api_status": 200,
+      "visible_records": 37,
+      "metrics": 56,
+      "delivery_counts": {
+        "reviewed": 36,
+        "limited": 1
+      },
+      "review_status": "completed_with_open_findings",
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "business_structure",
+          "status": "observed",
+          "reasons": [
+            "未获取各板块内部更细的组织层级与股权结构说明。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "未获取各具体车型的完整产品清单及分车型销量明细。",
+            "程序独立使用说明：本轮零部件信息仅到板块、华域主体和收入，具体零部件产品及用途未获取成功，建议后续按股精读；不因此拒绝基础画像。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "未获取分产品的销量与单价拆分，无法进一步解释各业务收入变动的量价构成。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "分地区收入中“其他地区”口径含上汽通用五菱出口销量，与境外销量口径不完全一致。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取主要原材料的具体采购量、采购单价及分供应商采购结构。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "未获取前五名客户及供应商的具体名称。",
+            "未获取分品牌、分车型的终端客户结构数据。",
+            "指标格式隔离：事实F26未作为结论采用；metrics.0: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "未获取各业务板块对净利润贡献的拆分数据。",
+            "指标格式隔离：事实F32未作为结论采用；metrics.1: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-75d5a851ac622e93bd8cbd89",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "未获取上汽红岩司法重整的具体实施进度及财务影响。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600088.SH",
+      "api_status": 200,
+      "visible_records": 30,
+      "metrics": 39,
+      "delivery_counts": {
+        "reviewed": 28,
+        "limited": 2
+      },
+      "review_status": "completed_with_open_findings",
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-fbda70711a8deed52baa9725",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fbda70711a8deed52baa9725",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-fbda70711a8deed52baa9725",
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600082.SH",
+      "api_status": 200,
+      "visible_records": 34,
+      "metrics": 41,
+      "delivery_counts": {
+        "reviewed": 34
+      },
+      "review_status": "incomplete",
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-a2233d8766efdcb0eb19b903",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "事实F15已隔离，未作为结论采用：metric number is absent from cited source: 科技园区开发土地成本",
+            "事实F18已隔离，未作为结论采用：narrative financial zero lacks a corresponding metric or explicit source clause"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600097.SH",
+      "api_status": 200,
+      "visible_records": 27,
+      "metrics": 44,
+      "delivery_counts": {
+        "reviewed": 26,
+        "limited": 1
+      },
+      "review_status": "completed_with_open_findings",
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-3e4dd887b0c1def19809c334",
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "事实F-OD-01已隔离，未作为结论采用：metric number is absent from cited source: 捕捞业务收入变动"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-3e4dd887b0c1def19809c334",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "2026年经营目标为计划数据，非已实现结果。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-3e4dd887b0c1def19809c334",
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "未披露具体原料鱼供应商名称及采购来源国别。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-3e4dd887b0c1def19809c334",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "未披露按客户类型划分的完整下游结构。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ]
+    }
+  ],
+  "three_reads_equal": 4,
+  "API_read_owner_equal": 4,
+  "new_model_calls": 0,
+  "not_deployed": true
+}

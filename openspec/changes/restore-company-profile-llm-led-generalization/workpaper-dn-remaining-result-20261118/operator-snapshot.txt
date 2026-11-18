@@ -1,0 +1,126 @@
+"""6.DN unused four entries: approved operator-cap correction, no new batch budget."""
+from pathlib import Path
+import json
+import os
+import sys
+import time
+import ast
+
+ROOT=Path('/home/python/Quote')
+PRIOR=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-eight-long-wait-result-20261118'
+PRIOR_OPERATOR=PRIOR/'operator-snapshot.txt'
+DN_ORIGINAL_DEADLINE=json.loads((PRIOR/'group-clock.json').read_text())['deadline_monotonic']
+DN_PRIOR_USAGE=json.loads((PRIOR/'resource-summary.json').read_text())['totals']
+REBIND_APPROVAL='用户call_91b3de3aa24d4b6e9b86bfce5b6c56d3明确回复：允许仅纠正未启动四家的接线后继续。只将operator的provider构造上限由620改为原批准2450，再冻结后运行上汽600104、中视600088、海泰600082、开创600097。不改业务代码/提示/共享配置，不增加公司、尝试或6.DN已批准总预算；原四家实际620及成败保留，接线版本分列，不冒称整组资源同版。沿原每家6000秒/1000000/10物理含3恢复每逻辑1、并发4，原整组12600秒/8000000/80物理，费用无价unknown、有价每家10元，不追加窗/充值/生产。'
+
+wrapper_source=PRIOR_OPERATOR.read_text().split("\nif __name__=='__main__':",1)[0]
+old_order="ORDERED=['600094.SH','600103.SH','600107.SH','600098.SH','600104.SH','600088.SH','600082.SH','600097.SH']"
+new_order="ORDERED=['600104.SH','600088.SH','600082.SH','600097.SH']"
+for old,new in (
+    ("DESTINATION=CHANGE/'workpaper-eight-long-wait-result-20261118'","DESTINATION=CHANGE/'workpaper-dn-remaining-result-20261118'"),
+    ("('workpaper-twelve-explanatory-core-result-20261116','workpaper-eight-long-wait-result-20261118')","('workpaper-twelve-explanatory-core-result-20261116','workpaper-dn-remaining-result-20261118')"),
+    (old_order,new_order),
+    ("len(ORDER)==8 and len(set(ORDER))==8","len(ORDER)==4 and len(set(ORDER))==4"),
+    ("CHANGE/'workpaper-s1-current-result-20261118/group-execution.json'","CHANGE/'workpaper-eight-long-wait-result-20261118/group-execution.json'"),
+    ("selected_conditions==44","selected_conditions==20"),
+    ("'this_group_conditions':44","'this_group_conditions':20"),
+    ("'companies':8,'basic_conditions':44","'companies':4,'basic_conditions':20"),
+    ("44 independently frozen basic conditions","20 independently frozen basic conditions"),
+):
+    assert old in wrapper_source,old
+    wrapper_source=wrapper_source.replace(old,new)
+hook="exec(compile(source,str(BASE),'exec'),globals())"
+assert wrapper_source.count(hook)==1
+# The sole execution-semantic correction: the concrete provider must not cap
+# the already-approved 2450-second logical timeout at 620 seconds.
+injection=(
+    "assert source.count('timeout_seconds=620,execution_authorization')==1\n"
+    "source=source.replace('timeout_seconds=620,execution_authorization','timeout_seconds=2450,execution_authorization')\n"
+    "source=source.replace('started+12600','DN_ORIGINAL_DEADLINE')\n"
+    "source=source.replace(\"totals['physical_requests']>=80\",\"totals['physical_requests']>=60\")\n"
+    "source=source.replace(\"totals['charged_tokens']>=8000000\",\"totals['charged_tokens']>=7445431\")\n"
+)
+wrapper_source=wrapper_source.replace(hook,injection+hook,1)
+exec(compile(wrapper_source,str(PRIOR_OPERATOR),'exec'),globals())
+assert DEST==CHANGE/'workpaper-dn-remaining-result-20261118' and DEST!=PRIOR
+APPROVAL=APPROVAL+'；'+REBIND_APPROVAL
+_base_freeze=freeze
+
+def boundary_check():
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.workpaper import WorkpaperReviewResponse,WorkpaperRepairResponse,WorkpaperRepairVerificationResponse
+    provider_calls=[node for node in ast.walk(ast.parse(source)) if isinstance(node,ast.Call)
+        and isinstance(node.func,ast.Name) and node.func.id=='CommonGatewaySemanticProvider']
+    assert len(provider_calls)==1
+    cap=next(ast.literal_eval(k.value) for k in provider_calls[0].keywords if k.arg=='timeout_seconds')
+    assert cap==2450
+    config=config_for_run();asset=source_items()[0]['asset']
+    report=ReportIdentity(instrument_id=asset['instrument_id'],report_id=asset['filing_id'],
+        document_version=asset['content_hash'],report_period=asset['report_period'],published_at=asset['published_at'])
+    captured=[]
+    class Boundary(BaseException):pass
+    class Client:
+        physical_budget=object()
+        def __init__(self):self.config=config
+        async def complete(self,request):
+            captured.append({'profile':request.profile,'timeout_seconds':request.timeout_seconds,
+                'schema_name':request.schema_name,'metadata':request.metadata})
+            raise Boundary()
+    for constructor,purpose,model,profile in (
+        (620,'review_profile_workpaper',WorkpaperReviewResponse,REVIEW),
+        (cap,'review_profile_workpaper',WorkpaperReviewResponse,REVIEW),
+        (cap,'repair_profile_workpaper',WorkpaperRepairResponse,EXTRACT),
+        (cap,'verify_profile_workpaper_repair',WorkpaperRepairVerificationResponse,REVIEW),
+    ):
+        provider=CommonGatewaySemanticProvider(client=Client(),profile=EXTRACT,max_output_tokens=16384,timeout_seconds=constructor,
+            execution_authorization={'status':'authorized','document_version':report.document_version,'approval_reference':REBIND_APPROVAL})
+        try:
+            provider.workpaper_request(request_id='dn-bind-check:'+purpose,purpose=purpose,report=report,
+                payload={'source_text':'Local parameter boundary only; no network or model response.'},
+                instructions='Local parameter check',response_model=model,max_output_tokens=16384,
+                timeout_seconds=2450,profile_override=profile)
+        except Boundary:pass
+    assert [r['timeout_seconds'] for r in captured]==[620,2450,2450,2450]
+    assert config.profiles[REVIEW].attempt_timeout_seconds==1200
+    assert config.profiles[EXTRACT].attempt_timeout_seconds==600
+    result={'task':'6.DN unused-four rebind','new_model_requests':0,'physical_attempts_reserved':0,
+        'actual_compiled_operator_provider_cap':cap,'old_negative_and_three_fixed_gateway_boundaries':captured,
+        'high_tier_profile_physical_seconds':1200,'Flash_profile_physical_seconds':600,
+        'not_a_real_model_or_full_TaskService_success':True}
+    dump(DEST/'binding-check.json',result)
+    print('BINDING_CHECK_OK '+json.dumps({'provider':cap,'gateway_request_timeouts':[r['timeout_seconds'] for r in captured],'new_model_calls':0}),flush=True)
+
+def freeze(directory):
+    assert DN_PRIOR_USAGE['physical_requests']==20 and DN_PRIOR_USAGE['conservative_charged_ledger']==554569
+    prior=json.loads((PRIOR/'authorization.json').read_text())
+    assert code_hashes()==prior['code_sha256'] and sha(ROOT/'config/13_llm.json')==prior['shared_config_sha256']
+    assert time.monotonic()<DN_ORIGINAL_DEADLINE,'original batch deadline expired; never reset it'
+    assert json.loads((DEST/'binding-check.json').read_text())['actual_compiled_operator_provider_cap']==2450
+    _base_freeze(directory)
+    frozen=json.loads((DEST/'authorization.json').read_text())
+    frozen.update(rebinding_approval=REBIND_APPROVAL,prior_operator=str(PRIOR_OPERATOR.relative_to(ROOT)),
+        prior_operator_sha256=sha(PRIOR_OPERATOR),prior_authorization_sha256=sha(PRIOR/'authorization.json'),
+        prior_resource_summary_sha256=sha(PRIOR/'resource-summary.json'),
+        original_absolute_deadline_monotonic=DN_ORIGINAL_DEADLINE,
+        original_group_limits=prior['group_limits'],prior_usage=DN_PRIOR_USAGE,
+        this_subset_absolute_max={'tokens':4000000,'physical_requests':40,'companies':4},
+        gateway_binding_check_sha256=sha(DEST/'binding-check.json'),
+        inherited_parent_results_not_rewritten=True,resource_binding_version='provider_cap_2450.unused_four_only')
+    frozen['group_limits']={**prior['group_limits'],'tokens':7445431,'physical_requests':60,
+        'absolute_deadline_monotonic':DN_ORIGINAL_DEADLINE,
+        'remaining_seconds_at_freeze':round(DN_ORIGINAL_DEADLINE-time.monotonic(),3)}
+    dump(DEST/'authorization.json',frozen)
+    print('REBIND_FROZEN '+json.dumps({'companies':4,'provider_cap':2450,'remaining_seconds':frozen['group_limits']['remaining_seconds_at_freeze'],
+        'original_deadline_preserved':True,'new_budget_window':False}),flush=True)
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['check','prepare','preflight','freeze','run','group'])
+    parser.add_argument('--prepared',type=Path);parser.add_argument('--symbol');parser.add_argument('--group-deadline',type=float)
+    parser.add_argument('--batch',type=int,default=1);args=parser.parse_args()
+    if args.mode=='check':boundary_check()
+    elif args.mode=='prepare':prepare()
+    elif args.mode=='preflight':network_preflight()
+    elif args.mode=='freeze':freeze(args.prepared)
+    elif args.mode=='run':run_one(args.prepared,args.symbol,args.group_deadline)
+    else:group(args.prepared,args.batch)

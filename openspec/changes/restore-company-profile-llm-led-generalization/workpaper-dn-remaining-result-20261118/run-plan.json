@@ -1,0 +1,86 @@
+{
+  "task": "6.DN",
+  "status": "authorized",
+  "companies": [
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "asset": {
+        "instrument_id": "600104.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+        "filing_id": "1225071780",
+        "source": "cninfo",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "content_hash": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/ac/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600104-binding.json",
+      "source_binding_sha256": "db92c9f994064d94bf21a8e64ae1dae6164c7ded34dd0a2cda08c6118da63abd",
+      "prepared_sha256": "ed1df67db46e9119000188dbb11c32b6f017c3912d6afcf24eac0b40ece6fb8f",
+      "pdf_pages": 205
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "asset": {
+        "instrument_id": "600088.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_e7e7327460fd52d9e2d8ccde3ce05102",
+        "filing_id": "1225118832",
+        "source": "cninfo",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "content_hash": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/5a/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600088-binding.json",
+      "source_binding_sha256": "3c02e42160d19b29d8001bbfc4a7bcd0b3970b216734ecbf908ff46774317307",
+      "prepared_sha256": "f1f3b7279f5b3534f008287a9a4dae94c89f3d6a63cac96cc03ed32bf9fb5d34",
+      "pdf_pages": 177
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "asset": {
+        "instrument_id": "600082.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_77a492082b5827f4129bb8232d1f715a",
+        "filing_id": "1225246039",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/97/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600082-binding.json",
+      "source_binding_sha256": "8d231eef272ea403d7f544c2cbf7244fb00593bfab9ffd11ccbe6286723db428",
+      "prepared_sha256": "a2b7086667ada70dbd7864bdd03ed522671ad2f00f2c44c23f53258a3512743e",
+      "pdf_pages": 203
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "asset": {
+        "instrument_id": "600097.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_88e877bd39b3790446440dc4b4e45b07",
+        "filing_id": "1225039976",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/4c/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c.pdf",
+        "report_type": "annual_report"
+      },
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600097-binding.json",
+      "source_binding_sha256": "bf0f619c15276241048dd23b4f7a78acbacd2c6c41581a7147cba328fbf49d41",
+      "prepared_sha256": "ef2d22a2d4a027c687ae182469d9a3925f04f59c365a75d102c049547336067f",
+      "pdf_pages": 158
+    }
+  ],
+  "same_basic_workpaper_contract": true,
+  "optional_missing_not_company_failure": true,
+  "no_reextraction_of_first_four": true,
+  "old_batch_not_revived": true
+}

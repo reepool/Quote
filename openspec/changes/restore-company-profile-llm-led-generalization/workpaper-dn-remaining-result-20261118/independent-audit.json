@@ -1,0 +1,756 @@
+{
+  "task": "6.DN remaining four",
+  "method": "Independent source-context comparison plus frozen same-PDF basic reference; not model agreement.",
+  "notes_sha256": "76746d6b78452323a0c8b58f887c7b22159ffb4714d5de1849b6e7348de8edef",
+  "source_reference_sha256": "a3c7007cc778417ace8d3f9f413a44446e11ea0bc2777b7cf306c1d5f0241f0d",
+  "basic_supported": 19,
+  "basic_detail_gaps": 1,
+  "basic_assessed": 20,
+  "accepted_repairs_independently_checked": 13,
+  "source_checked_objects": 44,
+  "companies": [
+    {
+      "instrument_id": "600104.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600104-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01"
+          ]
+        },
+        {
+          "condition_id": "600104-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F05",
+            "F06"
+          ]
+        },
+        {
+          "condition_id": "600104-DL03",
+          "verdict": "detail_gap",
+          "fact_ids": [
+            "F03",
+            "F11"
+          ]
+        },
+        {
+          "condition_id": "600104-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F24",
+            "F36"
+          ]
+        },
+        {
+          "condition_id": "600104-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F13"
+          ]
+        },
+        {
+          "condition_id": "600104-DL06",
+          "verdict": "supported",
+          "fact_ids": [
+            "F11",
+            "F13",
+            "F14"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F11",
+        "F13",
+        "F14",
+        "F20",
+        "F24",
+        "F36",
+        "F37"
+      ],
+      "accepted_repairs_independently_checked": [
+        "F20",
+        "F37"
+      ],
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "f51aec48b024ac350a1c8866a0b046ef72201725847ffedc412589ec98973b44",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F03",
+          "fact_sha256": "c0dafd24c9cf4e2bbe4e39f709d97557984b2fb0fba92c73ae033365a7a454b2",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "390f17e86712c9ba846f67b5bcb95da8be650ee9c98ef30d80674e51ae1c051e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003",
+            "source-0014"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "5ffd4e98abf6d50dafbbb2dcf26e6c1ab3a588b79057fb2edda841fd05118168",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F06",
+          "fact_sha256": "b976ad8aa3c56b90ec70dbc4a08903544fd1ee11c5a6a3d3052647545409ff59",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F11",
+          "fact_sha256": "82a26330196bacd0687bbabbbbcb73a8744a738bcf7f10ca924be2f160a711a2",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F13",
+          "fact_sha256": "9e87509387a484a5098a73d10d82cc73ace41fd727217c3e32512d90a7b48d0b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0013",
+            "source-0014"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F14",
+          "fact_sha256": "865f34b30853a04c07f1a2db098ec5fe7df821849dd2b9ad39b4b9d345eb3815",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F20",
+          "fact_sha256": "2949bfc77fb9f17253bb85c207f332b5d782aa42d249988f491d875815a6d650",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": "约699.2万、451.6万辆是所引主要工厂九行的加总，不是原文明示的集团总产能；只在该表范围估算使用。表含子公司及乘用车分公司，不按统一named_subsidiary标签认定各行法律主体。"
+        },
+        {
+          "fact_id": "F24",
+          "fact_sha256": "cc4a444d4d241f27856531b0384d3f91a56327f7c7a1a3593992a238781887e1",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F36",
+          "fact_sha256": "1d514b100b1454df40096680bbd6ef8ae7fd00cb7c9539c7e8693842ad6cb54b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F37",
+          "fact_sha256": "62fd8b4aef9a8aa2e0091c176e34cc13b2ddaf84c23031ed919a49585e5e2086",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006",
+            "source-0008"
+          ],
+          "reason": "基本整车、移动出行/安吉物流、金融与收入分项对照原p8/9和当前源有据；零部件只到板块/华域主体及收入，具体产品与用途未获取，不以此拒绝整份画像。另核p11/p13不适用披露项及p16现有产能表，修订保原勾选而非无变化断言，四个利用率行匹配原文。",
+          "limitation": null
+        }
+      ],
+      "remaining_scope": "not_whole_output_accuracy"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600088-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ]
+        },
+        {
+          "condition_id": "600088-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F03",
+            "F04",
+            "F05"
+          ]
+        },
+        {
+          "condition_id": "600088-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02",
+            "F09"
+          ]
+        },
+        {
+          "condition_id": "600088-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06"
+          ]
+        },
+        {
+          "condition_id": "600088-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F06",
+            "F08",
+            "F09"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F08",
+        "F09",
+        "F13",
+        "review-add:R03"
+      ],
+      "accepted_repairs_independently_checked": [
+        "F02",
+        "F13",
+        "review-add:R03"
+      ],
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "d3034bcbe5480457cddc6ab771162a83063fc1a1c1ef53e5b5899486b1927f7b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F02",
+          "fact_sha256": "dc023aa56059aec9a281e2947b6017c1c586b2737be3afe7a2c2c657f5be6fbe",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F03",
+          "fact_sha256": "0a9f8004d90c24623c7e47026d1d0bf91e8b75e95d86bc128a4bef1d8be8ca3d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "686a25911793530bc1bc0e1c14a1ef03274584cee31ab59a02245db46bf147b0",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "3f608eab6c9e163cbba519bed2456a728c5ae642c0bf296ac3820f1d8af3594e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F06",
+          "fact_sha256": "61e3e668206ba297a6b78a5c6743746fb8d732cff49d208e12b7f346d196c355",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F08",
+          "fact_sha256": "be7fb4b52a1520d20a41fff6432eae18823ce8fb1566124de46c78dbc0a0e55b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F09",
+          "fact_sha256": "988454c80bfcd72374274bbafd345f4251570e95d04638d6f96b6433099a2eaa",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F13",
+          "fact_sha256": "059527d83330fdfe1681a0940f080bad9bc49eab63c1796bf741a3504c164ed0",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        },
+        {
+          "fact_id": "review-add:R03",
+          "fact_sha256": "6746f48836b17ca340f71577b74b3deedfdb11dd15fc82a4e9d19103ca8b4a73",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "原p11/12影视/广告/旅游/基金及变现说明支持基本问题；p12原文为中视传媒及国视融媒共同参与基金，不是子公司独家。基地占地超1000亩/近1500亩保原限定且不认定法定子公司。p16基金营业收入1,503,221.93元与投资收益-4,583,169.75元/上期22,261,022.17元分科目保留及基金收益减少原因有据，不混作同一营业收入。原范围说明已由owner暂停采用，所选外仍未知。",
+          "limitation": null
+        }
+      ],
+      "remaining_scope": "not_whole_output_accuracy"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600082-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ]
+        },
+        {
+          "condition_id": "600082-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F04",
+            "F05"
+          ]
+        },
+        {
+          "condition_id": "600082-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F02",
+            "F08"
+          ]
+        },
+        {
+          "condition_id": "600082-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F08",
+            "F09",
+            "F10"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F01",
+        "F02",
+        "F04",
+        "F05",
+        "F08",
+        "F09",
+        "F10",
+        "F16",
+        "F17",
+        "F21",
+        "review-add:RF04"
+      ],
+      "accepted_repairs_independently_checked": [
+        "F16",
+        "F17",
+        "F21",
+        "review-add:RF04"
+      ],
+      "decisions": [
+        {
+          "fact_id": "F01",
+          "fact_sha256": "2d062ae9900097b803da3448305ac74a34746b01536b90e837a702adbfc4276e",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F02",
+          "fact_sha256": "abf2c78daa387c4a468e75226d15e16f2ec2a42af96edba301ad94dbe6f5d010",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F04",
+          "fact_sha256": "6b3a2b63514d46fec7fa24737a0e6acd853e2448ecb7e65fe3616afb7e67a9c1",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F05",
+          "fact_sha256": "0015823808778e202155103af9ef7e74039f3c95772bcad71f0534b59c2ef956",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F08",
+          "fact_sha256": "a6c53e90940633df4a78e600bf4cf26659e29e65a3e065e3680235c94d175697",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0006",
+            "source-0007"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F09",
+          "fact_sha256": "5d5d0e4fbc9b8f988414ec0acb8b3010d01735fc3797bb72bd8b4faff3b32c2f",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0021",
+            "source-0022"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F10",
+          "fact_sha256": "f2dd5d6ccbb9da4ecad5451d4358fd0c8bbb2bc63f9b1f71f5e3eb0055881a9b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F16",
+          "fact_sha256": "9310b9d4ba65bb6d294bcfbbdaf72d325464c8c9c428d0f2c6b2d2209235314f",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F17",
+          "fact_sha256": "807c86ae1f8405dcf8920fe81b9ce6003e2f2a249d466bef381fd8669116ec56",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F21",
+          "fact_sha256": "2246bae4b55236c49029d0a9a588c6a5bc0b24a532e8b94a41a871c7de45fc52",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006",
+            "source-0012"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        },
+        {
+          "fact_id": "review-add:RF04",
+          "fact_sha256": "c0ff6763a0c6a65257ef2268e5441817802977b7a3d00d77961e22664ce47eac",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "p11园区/产业投资/孵化服务与p14—16收入/租赁变现参考支持基本问题；p21境外资产情况仅不适用，p22三地块面积及p24各项目租金有原表，项目行不作集团合计。p14资产减值损失-45,477,408.86元/上期-11,336,444.84元明确损失以负数表示，并有存货跌价及投资性房地产减值原因。原review incomplete及F15/F18无效编号保留，不由独立核部分事实改成复核全通过。",
+          "limitation": null
+        }
+      ],
+      "remaining_scope": "not_whole_output_accuracy"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "basic_conditions": [
+        {
+          "condition_id": "600097-DL01",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-BS-01",
+            "F-BS-02"
+          ]
+        },
+        {
+          "condition_id": "600097-DL02",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-01"
+          ]
+        },
+        {
+          "condition_id": "600097-DL03",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-02"
+          ]
+        },
+        {
+          "condition_id": "600097-DL04",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-PS-03",
+            "F-PS-04"
+          ]
+        },
+        {
+          "condition_id": "600097-DL05",
+          "verdict": "supported",
+          "fact_ids": [
+            "F-RM-01",
+            "F-RM-03"
+          ]
+        }
+      ],
+      "source_checked_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-MC-01",
+        "F-OI-04",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-RM-01",
+        "F-RM-03",
+        "F-SM-04"
+      ],
+      "accepted_repairs_independently_checked": [
+        "F-MC-01",
+        "F-OI-04",
+        "F-RM-03",
+        "F-SM-04"
+      ],
+      "decisions": [
+        {
+          "fact_id": "F-BS-01",
+          "fact_sha256": "92de93bbf8dbdc251180cd305cceb851c6ec1dc229915050012b4a2619b59ea5",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-BS-02",
+          "fact_sha256": "f779c86c3e4b3f3c0b689b66a1ff05f157e10546d9749f21750e8a4859d06fd0",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-MC-01",
+          "fact_sha256": "b3512a1a23305c5f0fe915404a01ff06b64d711d0ecaf233f666d773ca5dfdc1",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006",
+            "source-0009"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-OI-04",
+          "fact_sha256": "23bfac701981707f8217f9d1cf62ccd24dcabdf6b46f1632620b1de8421d7824",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-01",
+          "fact_sha256": "05cb68dcda2d677dbc6d36f754f2b87afd7a7dde5f2f02b6d34109ade5f4d585",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-02",
+          "fact_sha256": "a5e9b7afe7b621c074c465c98ac6aeabaf696ab313f80362b78d5916e0caae9b",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-03",
+          "fact_sha256": "99c8a1b85d796e60f287e1adda52ae5c060c9a4aadbe608ba7edd954fd954cf4",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-PS-04",
+          "fact_sha256": "1130ffb11cb393a4bd9c902f4272d1552073f453a482a597f66658b227ee37f9",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-RM-01",
+          "fact_sha256": "2dbac4aeaf188344fcdda6e808cf89b44ff6dc4444effc0721aaa92b718649f4",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-RM-03",
+          "fact_sha256": "6ecb05b8b1107d17969097e38c799b14da1cc7c1cfc3b0d5fa7f6421745755d6",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        },
+        {
+          "fact_id": "F-SM-04",
+          "fact_sha256": "6410d6ccbfcbc4f4902030b7d6f387762a4a7cfc9a13af8b1f654369b8730c50",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "p8捕捞/加工/贸易/运输及产品、p11/12主要收入变现参考支持基本问题。p11金枪鱼/深蓝轮和罐头/鱼柳/贸易数量金额保原对象，不归集团全部。p12直销收入2,330,812,544.82元属销售模式行。p14研发4,138,549.88元及0.18%有据，资本化空栏不推出全部费用化；p10/13适用性只作披露标记。F-OD-03拒绝候选未采纳，不在普通API。",
+          "limitation": null
+        }
+      ],
+      "remaining_scope": "not_whole_output_accuracy"
+    }
+  ],
+  "raw_inputs_sha256_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600104/query.json": "5b57195e9af4a0567c18ed37a40c36ccca416498f785bb10f56bfd2ea1f1fdd5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600104/runtime.json": "cd536cfc68f01c54d9c552ece316783177dfc18f905821a5ff16559d434db2e4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600104/budget.json": "fcc862a7c108e9a9fbe4de45c750b45b891061de9231df7ede80389172ca2a16",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600104/model-receipts.json": "9077ef902fdc9b8a9459e36e4b8e0caab7bb5aa0b7ff2fc448fd3c9417008065",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600104/summary.json": "128ccd4d57276c84470a9ad76e7de94120f87be580865cfafc62c15e604cf96a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600088/query.json": "0e4babcca08add3cd9dd2c7e7983f6b7d37dbd35a5794077fec1d8f340e6d8c8",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600088/runtime.json": "af53c06858bebe119ac52542ae45f9176065192f42f3e9d723ff1d6c04eebf1b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600088/budget.json": "7b089da42557daad0d737b6d7170166fdf154a4eeb5144acc3e5cb18713a5178",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600088/model-receipts.json": "5bd3b4c017cbb1d6657cd0dcf02e1c2fd1508d041287e993bc0a1781a3bbb0f9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600088/summary.json": "590ada7ef174d0ef97f9bf5039afeb49cb19d4a8686c87bee72b223b6c4a6f96",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600082/query.json": "19fce4b03eedb57f40b5026aecd6c6de7463acdcd67ff54713a9fc4f04321f52",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600082/runtime.json": "b3a2f3b2d14065cfc4e371099f54b054c4c6d88a8094af8976c6624a6d88715a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600082/budget.json": "e2128b17d7649ae4ad3bf0219409e6648afce100acb7c0ffe2c4ee7c4aa53263",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600082/model-receipts.json": "0060f866aa94926a4d48b01bd17dd310eae31ed0fbb3de6bf83eb75de07a3b6a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600082/summary.json": "53fb070cd4ce4239655562d193bfa66f7d4ee5a8666bad1a3cad3b0fae20922c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600097/query.json": "03f0a0aa6a3ddc4b8cbd543a7a190e951cad1fc7a071390d7edad75507f5fa58",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600097/runtime.json": "88a79ee0b9836614446bd3c490df8df5ac575f0d091e7f7723848a1f3e136b9c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600097/budget.json": "79b05235faa8d9384a0cfadcd81ce90bda2a47a544ace44158c205dd27604d01",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600097/model-receipts.json": "5c8d271bc32c7df69bacad1e607ed071df156a19403eb6a62b4758e23600c6a9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-dn-remaining-result-20261118/600097/summary.json": "4a2e2ac9e7fba2adc0f128165e6f5cf002a7d710586655ffaac98733c7a28a1f"
+  },
+  "all_output_accuracy": null,
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}
