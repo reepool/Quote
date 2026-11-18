@@ -1,5 +1,17 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 328. 6.DM浦发延长等待真实闭环完成，7项范围修订另核
+
+用户call_d305b0c1d2084a88bc084c237992fd93明确批准后，按openspec-apply-change/business-first-goal及原TaskService直接连续执行，没有再按字段请批。开工HEAD35d0a6b1/暂存空；配置/骨架/市场数据与原混合规划段视为既有保护。前轮本人DM准备物已清，本轮独立QuoteBak脚本根及运行库，先在同一获准联网环境核官方DeepSeek/Scorpio DNS与TLSv1.3、公开GET401/200（零模型探针）后冻结源码/配置/原稿/等待参数/授权。没有业务代码、Schema、提示或共享配置修改，没有选章或抽取。
+
+[浦发实物](workpaper-pudong-long-review-20261118/result.md)是原53真实候选的后继：Grok初核674.174秒一次成功，确实超过旧物理600秒但在新1200内；identity逻辑2450为恢复留空间。初核发现7项产品/地区/业务子集范围过宽，Flash一次合并修订、Grok最终7/7实际接受；只改事实及16指标的scope，文本/金额/期间/引用不变，其他46对象不变。独立直接核正式PDF p32/57/62/69/82表头/期间/正文，七项当前业务子集有据，不把business_segment说成都是会计分部。两项旧源参考按本卡保留，不因模型accepted自动解除；新的限制说明不再误称本轮复核未完成。模型将“超”称“上界”的解释措辞有误，实际greater_than及原句正确，按大于阈值限用，不另开细节修订。
+
+原writer交新独立研究根data/research/company_profile_pudong_review_20261118，API实际本地GET200等于read owner、原入口及独立绑定后三读均一致。53/91原对象保留，普通可见51记录89指标，44研究已核/7保真限用/2源参考，8类缺项仍可见；旧四家及原十二家API记录hash未变。复核completed不等于全53独立准确率或正式发布，core_complete=false与信任状态保原边界；旧首发/S1/133、失败费用、余八未启及生产not_authorized不改。
+
+3逻辑/3物理/0恢复、供应商total与账本152824（初核89335/修订27289/最终36200），unknown费用不写0，不用输入＋可见输出自行重算隐藏token。业务772.295、准备29.067、监督803.047秒分列，在本次6000/1000000/6含3恢复内；旧超时预留另存，不借余额追加窗。冻结代码/配置/原输入hash与七项仅范围差异、实际模型/finish stop/accepted和源坐标、writer/API/两组三读均验证，无业务代码变化不重跑长套件。OpenSpec strict与本人隔离差异检查后正常Git收尾。
+
+Review未见本轮剩余A类阻塞；B类模型意见措辞/精细供应链/可选缺项后置，C类原并行不动。运行根finally清2342077文件字节，三份脚本与权威快照hash一致后清31511，合计2373588；正式PDF/有效缓存/原结果/attempt/新旧研究读取根保留，脚本可恢复。本卡结案、change不归档，下一应按新合并合同回到未启动批量，不重抽浦发追细目或自动新增付费。
+
 ## 327. 6.DM浦发保存稿延长等待，零调用准备就绪
 
 用户要求“等待时间可以再放长些，继续”，继续使用openspec-apply-change/business-first-goal及原TaskService，不转回分包或重抽。最小后继见[延长等待准备](workpaper-pudong-long-review-20261118/readiness.md)：浦发53条真实候选、正式PDF/引用/事实作者与失败前seed hash核齐，只去掉新seed中的失败核验元数据；七份原输入hash未变。边界检查首请求为review_profile_workpaper且逻辑2450秒，任务局部Grok profile拟物理1200秒，可留两次完整等待；这不是实际网关、TaskService成功或真实复核结果。原runtime已在慢复核前保存待核稿，不重复建设。

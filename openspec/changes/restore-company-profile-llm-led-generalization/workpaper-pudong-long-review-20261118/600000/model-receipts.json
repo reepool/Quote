@@ -1,0 +1,572 @@
+[
+  {
+    "request_id": "bp-work-ee0ae60323842858e8603f4f:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "690031f618dca5779c3af2f95d09c6542f68ef240c68d3ae48d493545a736f53",
+    "response_hash": "f7470e2b9fb958c66d1dffb8cdce1f932d041d2511c1bb3cd13445911ab29651",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"F001\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"sm-03\",\"evidence_ids\":[\"source-0022\"],\"explanation\":\"企业贷款、票据贴现、零售贷款是合并贷款产品结构表中的产品行，不是集团贷款总额。三行余额合计才等于贷款总额5,703,973百万元。事实及三项指标均标为consolidated_group，属于产品行继承合并表范围。应改为business_segment并保留原余额，不要改标为issuer。\"},{\"finding_id\":\"F002\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"sm-04\",\"evidence_ids\":[\"source-0022\"],\"explanation\":\"个人按揭贷款、个人经营贷款、信用卡及透支、消费贷款及其他是零售贷款下的产品子行，不是集团范围总量。subject_scope应改为business_segment。四项余额与贷款余额列一致，可保留。\"},{\"finding_id\":\"F003\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"rm-06\",\"evidence_ids\":[\"source-0007\",\"source-0017\"],\"explanation\":\"685.79亿元是对公业务营业净收入，不是本集团营业收入。集团营业收入为173,964百万元。将该指标标为consolidated_group会改变收入主体。应改为business_segment并保留金额；来源未写明母公司，不要改标为issuer。\"},{\"finding_id\":\"F004\",\"element\":\"revenue_model\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"rm-07\",\"evidence_ids\":[\"source-0014\"],\"explanation\":\"24.81亿元是资产托管业务的托管收入，不是集团营业收入。指标对象是指定业务，subject_scope应改为business_segment。金额及同比增长7.23%与来源一致，可保留。\"},{\"finding_id\":\"F005\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"cc-06\",\"evidence_ids\":[\"source-0005\",\"source-0023\"],\"explanation\":\"长三角区域贷款是地区贷款，不是集团贷款总额。地区表长三角余额为2,002,864百万元，同内容在sm-06已标为business_segment。本事实两项指标不应标consolidated_group，应改为business_segment。超2万亿元、超1,600亿元是来源上界，可保留。\"},{\"finding_id\":\"F006\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"od-01\",\"evidence_ids\":[\"source-0003\"],\"explanation\":\"制造业中长期贷款3,599.26亿元是贷款子类，远小于集团贷款总额，不能标为consolidated_group。同段另用“集团”指称贷款占比，本项只写“公司”，也不能升格为issuer。应改为business_segment，保留余额、12.86%及高于整体贷款增速7个百分点这一百分点差。\"},{\"finding_id\":\"F007\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"od-02\",\"evidence_ids\":[\"source-0005\"],\"explanation\":\"在岸银团贷款、并购融资和新发放并购贷款都是指定产品余额或发放额，不是集团贷款总额。应改为business_segment。6,438.47亿元、15.59%、2,431亿元、1,139亿元与来源一致，可保留；新发放额的指标期间已是2025年度。\"}],\"reviewed_fact_ids\":[\"bs-01\",\"bs-02\",\"bs-03\",\"bs-04\",\"ps-01\",\"ps-02\",\"ps-03\",\"ps-04\",\"ps-05\",\"rm-01\",\"rm-02\",\"rm-03\",\"rm-04\",\"rm-05\",\"rm-06\",\"rm-07\",\"sm-01\",\"sm-02\",\"sm-03\",\"sm-04\",\"sm-05\",\"sm-06\",\"sm-07\",\"oi-01\",\"oi-02\",\"oi-03\",\"oi-04\",\"oi-05\",\"oi-06\",\"oi-07\",\"cc-01\",\"cc-02\",\"cc-03\",\"cc-04\",\"cc-05\",\"cc-06\",\"od-01\",\"od-02\",\"od-03\",\"od-04\",\"od-05\",\"od-06\",\"mc-01\",\"mc-02\",\"mc-03\",\"mc-04\",\"mc-05\",\"sc-01\",\"sc-02\",\"sc-03\",\"cf-01\",\"cf-02\",\"cf-03\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "F001",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "sm-03",
+          "evidence_ids": [
+            "source-0022"
+          ],
+          "explanation": "企业贷款、票据贴现、零售贷款是合并贷款产品结构表中的产品行，不是集团贷款总额。三行余额合计才等于贷款总额5,703,973百万元。事实及三项指标均标为consolidated_group，属于产品行继承合并表范围。应改为business_segment并保留原余额，不要改标为issuer。"
+        },
+        {
+          "finding_id": "F002",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "sm-04",
+          "evidence_ids": [
+            "source-0022"
+          ],
+          "explanation": "个人按揭贷款、个人经营贷款、信用卡及透支、消费贷款及其他是零售贷款下的产品子行，不是集团范围总量。subject_scope应改为business_segment。四项余额与贷款余额列一致，可保留。"
+        },
+        {
+          "finding_id": "F003",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "rm-06",
+          "evidence_ids": [
+            "source-0007",
+            "source-0017"
+          ],
+          "explanation": "685.79亿元是对公业务营业净收入，不是本集团营业收入。集团营业收入为173,964百万元。将该指标标为consolidated_group会改变收入主体。应改为business_segment并保留金额；来源未写明母公司，不要改标为issuer。"
+        },
+        {
+          "finding_id": "F004",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "rm-07",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "24.81亿元是资产托管业务的托管收入，不是集团营业收入。指标对象是指定业务，subject_scope应改为business_segment。金额及同比增长7.23%与来源一致，可保留。"
+        },
+        {
+          "finding_id": "F005",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "cc-06",
+          "evidence_ids": [
+            "source-0005",
+            "source-0023"
+          ],
+          "explanation": "长三角区域贷款是地区贷款，不是集团贷款总额。地区表长三角余额为2,002,864百万元，同内容在sm-06已标为business_segment。本事实两项指标不应标consolidated_group，应改为business_segment。超2万亿元、超1,600亿元是来源上界，可保留。"
+        },
+        {
+          "finding_id": "F006",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "od-01",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "制造业中长期贷款3,599.26亿元是贷款子类，远小于集团贷款总额，不能标为consolidated_group。同段另用“集团”指称贷款占比，本项只写“公司”，也不能升格为issuer。应改为business_segment，保留余额、12.86%及高于整体贷款增速7个百分点这一百分点差。"
+        },
+        {
+          "finding_id": "F007",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "od-02",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "在岸银团贷款、并购融资和新发放并购贷款都是指定产品余额或发放额，不是集团贷款总额。应改为business_segment。6,438.47亿元、15.59%、2,431亿元、1,139亿元与来源一致，可保留；新发放额的指标期间已是2025年度。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "bs-04",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "ps-04",
+        "ps-05",
+        "rm-01",
+        "rm-02",
+        "rm-03",
+        "rm-04",
+        "rm-05",
+        "rm-06",
+        "rm-07",
+        "sm-01",
+        "sm-02",
+        "sm-03",
+        "sm-04",
+        "sm-05",
+        "sm-06",
+        "sm-07",
+        "oi-01",
+        "oi-02",
+        "oi-03",
+        "oi-04",
+        "oi-05",
+        "oi-06",
+        "oi-07",
+        "cc-01",
+        "cc-02",
+        "cc-03",
+        "cc-04",
+        "cc-05",
+        "cc-06",
+        "od-01",
+        "od-02",
+        "od-03",
+        "od-04",
+        "od-05",
+        "od-06",
+        "mc-01",
+        "mc-02",
+        "mc-03",
+        "mc-04",
+        "mc-05",
+        "sc-01",
+        "sc-02",
+        "sc-03",
+        "cf-01",
+        "cf-02",
+        "cf-03"
+      ]
+    },
+    "usage": {
+      "input_tokens": 40874,
+      "output_tokens": 1129,
+      "total_tokens": 89335
+    }
+  },
+  {
+    "request_id": "bp-work-ee0ae60323842858e8603f4f:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "9ed168efc9bfd1fb0369a216f02359e5df4d2f7c2a4620a0ef2b7b67fe19389b",
+    "response_hash": "97ca76e8d86a91b51f0cc1afcec5eedb5e9beb72afd54e6d8ffec41ed4168a2b",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"sm-03\",\"text\":\"按产品类型划分，报告期末企业贷款余额3,588,500百万元、票据贴现187,225百万元、零售贷款1,928,248百万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0022\"],\"metrics\":[{\"name\":\"企业贷款余额\",\"raw_value\":\"3,588,500\",\"value\":\"3588500\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"票据贴现余额\",\"raw_value\":\"187,225\",\"value\":\"187225\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"零售贷款余额\",\"raw_value\":\"1,928,248\",\"value\":\"1928248\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"sm-04\",\"text\":\"零售贷款中，个人按揭贷款余额908,639百万元、个人经营贷款408,434百万元、信用卡及透支389,327百万元、消费贷款及其他221,848百万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0022\"],\"metrics\":[{\"name\":\"个人按揭贷款余额\",\"raw_value\":\"908,639\",\"value\":\"908639\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"个人经营贷款余额\",\"raw_value\":\"408,434\",\"value\":\"408434\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"信用卡及透支余额\",\"raw_value\":\"389,327\",\"value\":\"389327\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"消费贷款及其他余额\",\"raw_value\":\"221,848\",\"value\":\"221848\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"rm-06\",\"text\":\"报告期内实现对公业务营业净收入685.79亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"对公业务营业净收入\",\"raw_value\":\"685.79\",\"value\":\"685.79\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"rm-07\",\"text\":\"报告期内资产托管业务实现托管收入24.81亿元，同比增长7.23%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"托管收入\",\"raw_value\":\"24.81\",\"value\":\"24.81\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"cc-06\",\"text\":\"区域布局上，长三角区域贷款余额超2万亿元，较上年末增加超1,600亿元，占公司贷款增量一半以上。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"长三角区域贷款余额\",\"raw_value\":\"超2\",\"value\":\"2\",\"unit\":\"万亿元\",\"source_unit\":\"万亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null},{\"name\":\"长三角区域贷款较上年末增加额\",\"raw_value\":\"超1,600\",\"value\":\"1600\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"od-01\",\"text\":\"报告期内“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增长12.86%，高于整体贷款增速7个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"制造业中长期贷款总额\",\"raw_value\":\"3,599.26\",\"value\":\"3599.26\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"制造业中长期贷款增速\",\"raw_value\":\"12.86\",\"value\":\"12.86\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"od-02\",\"text\":\"报告期末在岸银团贷款余额6,438.47亿元，较上年末增长15.59%；并购融资余额2,431亿元，新发放并购贷款1,139亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"在岸银团贷款余额\",\"raw_value\":\"6,438.47\",\"value\":\"6438.47\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"并购融资余额\",\"raw_value\":\"2,431\",\"value\":\"2431\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"新发放并购贷款\",\"raw_value\":\"1,139\",\"value\":\"1139\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "sm-03",
+          "text": "按产品类型划分，报告期末企业贷款余额3,588,500百万元、票据贴现187,225百万元、零售贷款1,928,248百万元。",
+          "subject_scope": "business_segment",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0022"
+          ],
+          "metrics": [
+            {
+              "name": "企业贷款余额",
+              "raw_value": "3,588,500",
+              "value": "3588500",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "票据贴现余额",
+              "raw_value": "187,225",
+              "value": "187225",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "零售贷款余额",
+              "raw_value": "1,928,248",
+              "value": "1928248",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "sm-04",
+          "text": "零售贷款中，个人按揭贷款余额908,639百万元、个人经营贷款408,434百万元、信用卡及透支389,327百万元、消费贷款及其他221,848百万元。",
+          "subject_scope": "business_segment",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0022"
+          ],
+          "metrics": [
+            {
+              "name": "个人按揭贷款余额",
+              "raw_value": "908,639",
+              "value": "908639",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "个人经营贷款余额",
+              "raw_value": "408,434",
+              "value": "408434",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用卡及透支余额",
+              "raw_value": "389,327",
+              "value": "389327",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "消费贷款及其他余额",
+              "raw_value": "221,848",
+              "value": "221848",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "rm-06",
+          "text": "报告期内实现对公业务营业净收入685.79亿元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "对公业务营业净收入",
+              "raw_value": "685.79",
+              "value": "685.79",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "rm-07",
+          "text": "报告期内资产托管业务实现托管收入24.81亿元，同比增长7.23%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "metrics": [
+            {
+              "name": "托管收入",
+              "raw_value": "24.81",
+              "value": "24.81",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "cc-06",
+          "text": "区域布局上，长三角区域贷款余额超2万亿元，较上年末增加超1,600亿元，占公司贷款增量一半以上。",
+          "subject_scope": "business_segment",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "长三角区域贷款余额",
+              "raw_value": "超2",
+              "value": "2",
+              "unit": "万亿元",
+              "source_unit": "万亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "长三角区域贷款较上年末增加额",
+              "raw_value": "超1,600",
+              "value": "1600",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "od-01",
+          "text": "报告期内“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增长12.86%，高于整体贷款增速7个百分点。",
+          "subject_scope": "business_segment",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "制造业中长期贷款总额",
+              "raw_value": "3,599.26",
+              "value": "3599.26",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "制造业中长期贷款增速",
+              "raw_value": "12.86",
+              "value": "12.86",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "od-02",
+          "text": "报告期末在岸银团贷款余额6,438.47亿元，较上年末增长15.59%；并购融资余额2,431亿元，新发放并购贷款1,139亿元。",
+          "subject_scope": "business_segment",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "在岸银团贷款余额",
+              "raw_value": "6,438.47",
+              "value": "6438.47",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "并购融资余额",
+              "raw_value": "2,431",
+              "value": "2431",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "新发放并购贷款",
+              "raw_value": "1,139",
+              "value": "1139",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 25626,
+      "output_tokens": 1663,
+      "total_tokens": 27289
+    }
+  },
+  {
+    "request_id": "bp-work-ee0ae60323842858e8603f4f:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "493df3ec4805427c1da5ceafd3d3c6def019ecd40ef3e8ced2e0cc532eb3b6d4",
+    "response_hash": "0fda9110ee4e5892491fb82623add4a8703a72fbe49b3929a2fa44cd8d0269b0",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"sm-03\",\"sm-04\",\"rm-06\",\"rm-07\",\"cc-06\",\"od-01\",\"od-02\"],\"checks\":[{\"fact_id\":\"sm-03\",\"accepted\":true,\"evidence_ids\":[\"source-0022\"],\"explanation\":\"source-0022产品结构表报告期末贷款余额列分别为企业贷款3,588,500、票据贴现187,225、零售贷款1,928,248百万元，三者是产品行而非贷款总额。修复后主体改为business_segment，期间、栏目、单位与金额均与来源一致，已纠正原合并范围继承问题。\"},{\"fact_id\":\"sm-04\",\"accepted\":true,\"evidence_ids\":[\"source-0022\"],\"explanation\":\"source-0022显示个人按揭贷款908,639、个人经营贷款408,434、信用卡及透支389,327、消费贷款及其他221,848百万元，均为零售贷款下的产品子行余额。修复后四项均标为business_segment并保留原余额，主体、期末、单位正确。\"},{\"fact_id\":\"rm-06\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007明确报告期内对公业务营业净收入为685.79亿元，并非集团营业收入，且未标明母公司口径。修复后保留该业务类别与金额，主体改为business_segment、期间为2025年度，已消除主体错置。\"},{\"fact_id\":\"rm-07\",\"accepted\":true,\"evidence_ids\":[\"source-0014\"],\"explanation\":\"source-0014载明报告期内资产托管业务托管收入24.81亿元、同比增长7.23%，属于指定业务收入而非集团营业收入。修复后主体为business_segment，金额、期间和来源类别一致，正文亦保留增速。\"},{\"fact_id\":\"cc-06\",\"accepted\":true,\"evidence_ids\":[\"source-0005\"],\"explanation\":\"source-0005称长三角区域贷款余额超2万亿元、较上年末增加超1,600亿元，属于地区贷款而非集团贷款总额。修复后两项均标business_segment，并以greater_than保留“超”的上界表述，期间与证据匹配。\"},{\"fact_id\":\"od-01\",\"accepted\":true,\"evidence_ids\":[\"source-0003\"],\"explanation\":\"source-0003载明制造业中长期贷款总额3,599.26亿元、较上年末增长12.86%、高于整体贷款增速7个百分点，属贷款子类；同段“公司”不能升格为母公司。修复后主体为business_segment，核心余额、增速及百分点差均保留。\"},{\"fact_id\":\"od-02\",\"accepted\":true,\"evidence_ids\":[\"source-0005\"],\"explanation\":\"source-0005分别给出在岸银团贷款余额6,438.47亿元及增长15.59%、并购融资余额2,431亿元、新发放并购贷款1,139亿元，均为指定产品而非集团贷款总额。修复后主体为business_segment，存量期间为2025年末，新发放额期间为2025年度，金额与证据一致。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "sm-03",
+        "sm-04",
+        "rm-06",
+        "rm-07",
+        "cc-06",
+        "od-01",
+        "od-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "sm-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0022"
+          ],
+          "explanation": "source-0022产品结构表报告期末贷款余额列分别为企业贷款3,588,500、票据贴现187,225、零售贷款1,928,248百万元，三者是产品行而非贷款总额。修复后主体改为business_segment，期间、栏目、单位与金额均与来源一致，已纠正原合并范围继承问题。"
+        },
+        {
+          "fact_id": "sm-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0022"
+          ],
+          "explanation": "source-0022显示个人按揭贷款908,639、个人经营贷款408,434、信用卡及透支389,327、消费贷款及其他221,848百万元，均为零售贷款下的产品子行余额。修复后四项均标为business_segment并保留原余额，主体、期末、单位正确。"
+        },
+        {
+          "fact_id": "rm-06",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007明确报告期内对公业务营业净收入为685.79亿元，并非集团营业收入，且未标明母公司口径。修复后保留该业务类别与金额，主体改为business_segment、期间为2025年度，已消除主体错置。"
+        },
+        {
+          "fact_id": "rm-07",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "source-0014载明报告期内资产托管业务托管收入24.81亿元、同比增长7.23%，属于指定业务收入而非集团营业收入。修复后主体为business_segment，金额、期间和来源类别一致，正文亦保留增速。"
+        },
+        {
+          "fact_id": "cc-06",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "source-0005称长三角区域贷款余额超2万亿元、较上年末增加超1,600亿元，属于地区贷款而非集团贷款总额。修复后两项均标business_segment，并以greater_than保留“超”的上界表述，期间与证据匹配。"
+        },
+        {
+          "fact_id": "od-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "source-0003载明制造业中长期贷款总额3,599.26亿元、较上年末增长12.86%、高于整体贷款增速7个百分点，属贷款子类；同段“公司”不能升格为母公司。修复后主体为business_segment，核心余额、增速及百分点差均保留。"
+        },
+        {
+          "fact_id": "od-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "source-0005分别给出在岸银团贷款余额6,438.47亿元及增长15.59%、并购融资余额2,431亿元、新发放并购贷款1,139亿元，均为指定产品而非集团贷款总额。修复后主体为business_segment，存量期间为2025年末，新发放额期间为2025年度，金额与证据一致。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 29922,
+      "output_tokens": 701,
+      "total_tokens": 36200
+    }
+  }
+]

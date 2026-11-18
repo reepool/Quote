@@ -1,0 +1,106 @@
+{
+  "task": "6.DM",
+  "research_output_root": "/home/python/Quote/data/research/company_profile_pudong_review_20261118",
+  "runtime_record": "/home/python/Quote/data/research/company_profile_pudong_review_20261118/company_profile_common_core.v1/bp-work-ee0ae60323842858e8603f4f.json",
+  "runtime_sha256": "2f01459c6f0e97c6e13c848e5832a4bd070787289b9221d4e77c5f028de88d98",
+  "not_deployed": true,
+  "independent_audit_sha256": "a5e0de9b92190bb194b8452284831d733d786d94d29a6dc904982b8f9954be30",
+  "api_status": 200,
+  "API_read_owner_equal": true,
+  "three_reads_equal": true,
+  "visible_records": 51,
+  "metrics": 89,
+  "delivery_counts": {
+    "reviewed": 44,
+    "limited": 7,
+    "source_only": 2
+  },
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取按公司金融、零售金融、金融市场、跨境业务四大板块划分的完整营业收入及占比明细；对公业务营业净收入与集团营业收入口径不同，不可直接相加或等同。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "未获取按四大业务板块划分的资产、收入完整规模及占比数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取按业务板块划分的完整成本、费用及资本占用明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取按客户类型划分的完整收入贡献及渠道销售占比数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未获取各经营驱动因素对营业收入或利润的量化贡献拆分。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取报告期内重大资产重组、重大收购或出售等结构性变化的完整说明。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取按资金来源类型划分的完整余额及成本明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-ee0ae60323842858e8603f4f",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取按客户类型划分的完整收入贡献数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "model_review_status": "completed",
+  "new_calls_in_postprocessing": 0,
+  "old_API_roots_unchanged": true,
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,87 @@
+"""Close the approved 6.DM run; hash verification and owned scratch cleanup only."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+ROOT=Path('/home/python/Quote')
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=C/'workpaper-pudong-long-review-20261118'
+WORK=ROOT/'data/QuoteBak/workpaper-dm-run-QVH6sh'
+
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path):return json.loads(Path(path).read_text())
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+
+plan=read(DEST/'plan.json');auth=read(DEST/'authorization.json')
+summary=read(DEST/'600000/summary.json');budget=read(DEST/'600000/budget.json')
+audit=read(DEST/'independent-audit.json');delivery=read(DEST/'delivery-index.json')
+assert summary['exception'] is None and summary['three_reads_equal'] and summary['resource_limits_met']
+assert summary['review_status']=='completed' and summary['physical_requests']==3 and summary['recoveries']==0
+assert delivery['API_read_owner_equal'] and delivery['three_reads_equal']
+assert (delivery['visible_records'],delivery['metrics'])==(51,89)
+assert sha(WORK/'dm_runner.py')==auth['operator_sha256']==sha(DEST/'operator-snapshot.txt')
+assert all(sha(ROOT/p)==h for p,h in auth['code_sha256'].items())
+assert sha(ROOT/'config/13_llm.json')==auth['shared_config_sha256']
+assert all(sha(ROOT/p)==h for p,h in plan['original_input_sha256_unchanged'].items())
+assert all(sha(ROOT/p)==h for p,h in audit['raw_inputs_sha256_unchanged'].items())
+assert sha(delivery['runtime_record'])==delivery['runtime_sha256']
+old_four=read(C/'workpaper-s1-current-result-20261118/delivery-index.json')
+assert all(sha(p['runtime_record'])==p['runtime_sha256'] for p in old_four['profiles'])
+old_twelve=read(C/'workpaper-batch-acceptance-20261118/acceptance.json')
+assert all(sha(ROOT/p)==h for p,h in old_twelve['runtime_sha256_unchanged'].items())
+receipts=read(DEST/'600000/model-receipts.json');traces=read(DEST/'600000/provider-traces.json')
+assert [r['purpose'] for r in receipts]==['review_profile_workpaper','repair_profile_workpaper','verify_profile_workpaper_repair']
+assert all(r['finish_reason']=='stop' and r['contract_status']=='accepted' for r in receipts)
+assert all(a['status']=='success' and a['usage'] for a in budget['attempts'])
+known=sum(a['usage']['total_tokens'] for a in budget['attempts'])
+assert known==budget['charged_tokens']==152824
+assert len(traces)==3 and 600000<traces[0]['latency_ms']<1200000
+resource={'task':'6.DM','physical_requests':3,'logical_requests':3,'recoveries':0,
+    'supplier_reported_total_tokens':known,'conservative_charged_ledger':budget['charged_tokens'],
+    'usage_unknown_attempts':0,'unknown_reserved':0,'fee':'unknown',
+    'preparation_seconds':summary['preparation_seconds'],'business_seconds':summary['business_seconds'],
+    'supervision_seconds':summary['supervision_seconds'],
+    'stages':[{'purpose':r['purpose'],'model':r['model'],'source_label':r['source_label'],
+        'usage':r['usage'],'logical_latency_ms':t['latency_ms']} for r,t in zip(receipts,traces)],
+    'all_within_approved_limits':True,'first_review_outlived_old_600_second_physical_limit':True,
+    'old_timeout_charges_preserved_separately':True,'not_new_extraction_or_S1_first_run':True}
+dump(DEST/'resource-summary.json',resource)
+for source,target in [('deliver_dm.py','delivery-snapshot.txt'),('finalize_dm.py','closeout-snapshot.txt')]:
+    assert sha(WORK/source)==sha(DEST/target)
+runtime_root=Path(read(DEST/'600000/temporary-root.json')['root'])
+assert not runtime_root.exists() and runtime_root.parent==ROOT/'data/QuoteBak'
+for proc in Path('/proc').iterdir():
+    if not proc.name.isdigit():continue
+    try:parts=(proc/'cmdline').read_bytes().split(b'\0')
+    except (OSError,PermissionError):continue
+    assert str(WORK/'dm_runner.py').encode() not in parts
+    assert str(WORK/'deliver_dm.py').encode() not in parts
+    assert b'data/QuoteBak/workpaper-dm-run-QVH6sh/dm_runner.py' not in parts
+    assert b'data/QuoteBak/workpaper-dm-run-QVH6sh/deliver_dm.py' not in parts
+assert WORK.is_dir() and not WORK.is_symlink() and WORK.parent==ROOT/'data/QuoteBak'
+scratch_bytes=sum(p.stat().st_size for p in WORK.rglob('*') if p.is_file())
+cleanup={'task':'6.DM','runtime_root_removed_in_finally':str(runtime_root),
+    'runtime_file_bytes':summary['cleanup_bytes'],'owned_scripts_root_removed':str(WORK),
+    'script_file_bytes':scratch_bytes,'total_measured_file_bytes':summary['cleanup_bytes']+scratch_bytes,
+    'scripts_recoverable_from':'operator-snapshot.txt, delivery-snapshot.txt, closeout-snapshot.txt',
+    'formal_PDF_effective_cache_original_failures_attempt_marker_old_and_new_API_roots':'retained',
+    'other_people_or_unknown_scratch':'not_deleted'}
+dump(DEST/'cleanup.json',cleanup)
+validation={'task':'6.DM','real_review_repair_final_completed':True,'new_model_requests':3,
+    'new_selection_or_extraction_requests':0,'real_recoveries_used':0,
+    'raw_entrance_three_reads_equal':True,'graded_delivery_three_reads_equal':True,
+    'actual_ASGI_GET_status':200,'API_read_owner_equal':True,'API_information_gaps':8,
+    'facts_preserved':53,'metrics_preserved':91,'facts_changed_only_in_scope':7,
+    'independent_original_PDF_repair_checks':7,'all_output_accuracy':None,
+    'old_source_only_retained':2,'old_API_records_hashes_preserved':len(old_four['profiles'])+len(old_twelve['runtime_sha256_unchanged']),
+    'frozen_business_code_and_shared_config_unchanged':True,
+    'original_authorization_sources_failure_and_usage_unchanged':True,
+    'business_code_tests_reused':'No business code changed; existing review-seed path verification reused. This run validates real entry, source spans, writer, query/export/fresh reader and actual local API.',
+    'not_full_report_accuracy_or_formal_current_twelve':True,'formal_S1_pass':False,
+    'production_authorization':'not_authorized'}
+dump(DEST/'execution-validation.json',validation)
+print(json.dumps({'closed':True,'physical_requests':3,'known_total_tokens':known,
+    'business_seconds':summary['business_seconds'],'visible':51,'metrics':89,
+    'cleaned_file_bytes':cleanup['total_measured_file_bytes']},ensure_ascii=False),flush=True)
+shutil.rmtree(WORK)

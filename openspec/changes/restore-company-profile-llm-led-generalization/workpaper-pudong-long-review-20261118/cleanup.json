@@ -1,0 +1,11 @@
+{
+  "task": "6.DM",
+  "runtime_root_removed_in_finally": "/home/python/Quote/data/QuoteBak/workpaper-dm-600000-as0zt68u",
+  "runtime_file_bytes": 2342077,
+  "owned_scripts_root_removed": "/home/python/Quote/data/QuoteBak/workpaper-dm-run-QVH6sh",
+  "script_file_bytes": 31511,
+  "total_measured_file_bytes": 2373588,
+  "scripts_recoverable_from": "operator-snapshot.txt, delivery-snapshot.txt, closeout-snapshot.txt",
+  "formal_PDF_effective_cache_original_failures_attempt_marker_old_and_new_API_roots": "retained",
+  "other_people_or_unknown_scratch": "not_deleted"
+}

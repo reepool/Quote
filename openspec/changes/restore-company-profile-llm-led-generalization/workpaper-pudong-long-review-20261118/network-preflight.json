@@ -1,0 +1,21 @@
+{
+  "permission_mode": "approved_network_exec",
+  "namespace": "net:[4026531840]",
+  "checks": [
+    {
+      "host": "api.deepseek.com",
+      "dns_addresses": 2,
+      "public_get_status": 401,
+      "tls": "TLSv1.3",
+      "seconds": 0.283
+    },
+    {
+      "host": "scorpio.reepool.com",
+      "dns_addresses": 1,
+      "public_get_status": 200,
+      "tls": "TLSv1.3",
+      "seconds": 0.274
+    }
+  ],
+  "model_requests": 0
+}

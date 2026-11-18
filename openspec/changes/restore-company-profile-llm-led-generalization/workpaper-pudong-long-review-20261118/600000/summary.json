@@ -1,0 +1,42 @@
+{
+  "task": "6.DM",
+  "instrument_id": "600000.SH",
+  "entry_started": true,
+  "readable": true,
+  "original_fact_count": 53,
+  "three_reads_equal": true,
+  "exception": null,
+  "preparation_seconds": 29.067,
+  "business_seconds": 772.295,
+  "core_complete": false,
+  "facts": 53,
+  "metrics": 91,
+  "review_status": "completed",
+  "review_error": null,
+  "new_or_changed_fact_ids": [
+    "rm-06",
+    "rm-07",
+    "sm-03",
+    "sm-04",
+    "cc-06",
+    "od-01",
+    "od-02"
+  ],
+  "removed_original_fact_ids": [],
+  "delivery_counts": {
+    "reviewed": 44,
+    "pending": 0,
+    "limited": 7,
+    "source_only": 2,
+    "withheld": 0,
+    "duplicate": 0
+  },
+  "physical_requests": 3,
+  "conservative_ledger": 152824,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stop_reason": null,
+  "resource_limits_met": true,
+  "supervision_seconds": 803.047,
+  "cleanup_bytes": 2342077
+}

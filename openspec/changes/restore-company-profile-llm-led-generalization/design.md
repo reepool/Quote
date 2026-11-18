@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 6.DM实测：等待设置有效且原owner闭环不变
+
+在本卡获准联网环境冻结后，任务identity逻辑2450与Grok profile物理1200真实生效，初核674.174秒一次成功；只复用53候选，经一次Flash合并修订/Grok最终再核完成。7项只改业务/产品/地区子集范围，独立核原PDF，不新增字段或规则。两源参考限制按授权保留，后继使用绑定说明本轮核验已完成而非沿用“未核”旧时态；原始意见与旧失败不改。原writer新独立根供API并保缺项，旧根不覆；该后继不是旧同版首发或生产接受，不因剩余额度自动继续。
+
 ### 6.DM：等待参数只作用于一次保存稿复核
 
 从6.DL浦发原query取53对象，新seed只移除失败quality_review元数据且须匹配原original_draft_hash；原事实/来源/generation与旧失败不改。沿现有review_existing_draft_hash→seed_material→原TaskService，不改业务代码或Schema；原独立源参考控制只在本地继承，不送模型，不被模型接受自动解除。

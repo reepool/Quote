@@ -1,0 +1,119 @@
+"""No-model independent use binding and API verification of the completed 6.DM run."""
+import asyncio
+import hashlib
+import json
+import os
+from pathlib import Path
+import sys
+from collections import Counter
+from unittest.mock import patch
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=C/'workpaper-pudong-long-review-20261118'
+OUT=ROOT/'data/research/company_profile_pudong_review_20261118'
+from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import CompanyProfileWorkpaper,workpaper_elements,workpaper_fact_hash,render_workpaper
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path):return json.loads(Path(path).read_text())
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2,default=str)+'\n')
+def facts(paper):return {f.fact_id:f for e in workpaper_elements(paper).values() for f in e.facts}
+
+assert not OUT.exists() and not (DEST/'independent-audit.json').exists()
+plan=read(DEST/'plan.json'); auth=read(DEST/'authorization.json')
+record=CompanyProfileRuntimeRecordV3.model_validate_json((DEST/'600000/runtime.json').read_text())
+paper=record.workpaper
+old=CompanyProfileWorkpaper.model_validate(read(ROOT/plan['source_query'])['profiles'][0]['workpaper'])
+current,before=facts(paper),facts(old)
+assert current.keys()==before.keys() and len(current)==53
+changed={fid for fid in current if current[fid]!=before[fid]}
+notes=read(DEST/'source-check-notes.json')
+assert changed=={n['fact_id'] for n in notes['checks']}
+for fid in changed:
+    left=before[fid].model_dump(mode='json');right=current[fid].model_dump(mode='json')
+    assert left.pop('subject_scope')=='consolidated_group'
+    assert right.pop('subject_scope')=='business_segment'
+    for prior,now in zip(left['metrics'],right['metrics']):
+        assert prior.pop('subject_scope')=='consolidated_group'
+        assert now.pop('subject_scope')=='business_segment'
+    assert left==right,'only fact and metric scope may differ'
+assert paper.generation==old.generation and paper.evidence==old.evidence and paper.reading_scope==old.reading_scope
+assert paper.quality_review.status=='completed' and len(paper.quality_review.checked_fact_ids)==53
+assert len(paper.quality_review.findings)==7
+assert all(f.resolution=='corrected_pending_trust' for f in paper.quality_review.findings)
+assert {f.revised_fact.fact_id for f in paper.quality_review.findings}==changed
+raw_final=next(r for r in read(DEST/'600000/model-receipts.json') if r['purpose']=='verify_profile_workpaper_repair')
+final=json.loads(raw_final['raw_content'])
+assert {c['fact_id'] for c in final['checks'] if c['accepted']}==changed
+inputs={str((DEST/'600000'/name).relative_to(ROOT)):sha(DEST/'600000'/name)
+    for name in ('runtime.json','query.json','model-receipts.json','budget.json','summary.json')}
+audit={'task':'6.DM','source_notes':str((DEST/'source-check-notes.json').relative_to(ROOT)),
+    'source_notes_sha256':sha(DEST/'source-check-notes.json'),'accepted_repairs_independently_checked':7,
+    'changed_fact_ids':sorted(changed),'only_fact_and_metric_scope_changed':True,
+    'unchanged_facts':46,'original_evidence_reading_scope_and_generation_unchanged':True,
+    'prior_source_only_retained':['rm-06','rm-07'],'all_output_accuracy':None,
+    'old_source_controls_inherited_only_when_hash_matches':True,'raw_inputs_sha256_unchanged':inputs,
+    'production_authorization':'not_authorized'}
+dump(DEST/'independent-audit.json',audit)
+decisions={d.fact_id:d.model_dump(mode='json') for d in paper.use_review.decisions}
+for note in notes['checks']:
+    fid=note['fact_id'];fact=current[fid]
+    decisions[fid]={'fact_id':fid,'fact_sha256':workpaper_fact_hash(fact),
+        'disposition':'source_only' if fid in {'rm-06','rm-07'} else 'source_checked',
+        'evidence_ids':list(fact.evidence_ids),'reason':note['reason'],
+        'limitation':'本轮模型复核已完成、文本及业务子集已独立核对；仍按本次授权保留源参考，不作为规范化集团整体指标。' if fid in {'rm-06','rm-07'} else None}
+bound=bind_workpaper_use_review(paper,{'report':paper.report.model_dump(mode='json'),
+    'reviewer':'Codex：独立核7项真实修订，其他继承原hash绑定核验，不是全53项人工准确率',
+    'reference':str((DEST/'independent-audit.json').relative_to(ROOT)),
+    'reference_sha256':sha(DEST/'independent-audit.json'),'decisions':list(decisions.values())})
+assert facts(bound)==facts(paper) and bound.quality_review==paper.quality_review and bound.generation==paper.generation
+writer=CompanyProfileResearchWriter(OUT)
+path=writer.persist(record.model_copy(update={'workpaper':bound}))
+
+async def verify():
+    import httpx
+    from fastapi import FastAPI
+    from api.company_profile_routes import router
+    os.environ['QUOTE_COMPANY_PROFILE_RESEARCH_ROOT']=str(OUT)
+    app=FastAPI();app.include_router(router,prefix='/api/v1')
+    reader=CompanyProfileReadService(OUT)
+    query=reader.query(('600000.SH',))
+    exported=reader.export(('600000.SH',),export_directory=DEST/'delivery')
+    fresh=CompanyProfileReadService(OUT).query(('600000.SH',))
+    assert query['profiles']==exported['profiles']==fresh['profiles']
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://research-local') as client:
+        response=await client.get('/api/v1/research/company/600000.SH/annual-profile')
+        assert response.status_code==200 and response.json()==reader.research_profile('600000.SH')
+    value=response.json()
+    assert value['readings'][0]['review_status']=='completed'
+    assert all(next(f for f in value['facts'] if f['fact_id']==fid)['state']=='source_only' for fid in ('rm-06','rm-07'))
+    assert all(f['fact'] is None for f in value['facts'] if f['state'] in {'source_only','withheld','duplicate'})
+    assert value['information_gaps'], 'remaining information gaps must stay API-visible'
+    visible=[f for f in value['facts'] if f['fact'] is not None]
+    dump(DEST/'api-response.json',value)
+    profile=query['profiles'][0]
+    (DEST/'profile.md').write_text(render_workpaper(bound,delivery=profile['workpaper_delivery']))
+    return {'api_status':response.status_code,'API_read_owner_equal':True,'three_reads_equal':True,
+        'visible_records':len(visible),'metrics':sum(len(f['fact']['metrics']) for f in visible),
+        'delivery_counts':dict(Counter(f['state'] for f in value['facts'])),
+        'information_gaps':value['information_gaps'],'suggested_acquisitions':value['suggested_acquisitions'],
+        'model_review_status':value['readings'][0]['review_status']}
+
+with patch('socket.socket.connect',side_effect=AssertionError('postprocessing must not call models/network')):
+    summary=asyncio.run(verify())
+assert all(sha(ROOT/p)==h for p,h in inputs.items())
+assert all(sha(ROOT/p)==h for p,h in plan['original_input_sha256_unchanged'].items())
+assert all(sha(ROOT/p)==h for p,h in auth['code_sha256'].items())
+assert sha(ROOT/'config/13_llm.json')==auth['shared_config_sha256']
+dump(DEST/'delivery-index.json',{'task':'6.DM','research_output_root':str(OUT),
+    'runtime_record':str(path),'runtime_sha256':sha(path),'not_deployed':True,
+    'independent_audit_sha256':sha(DEST/'independent-audit.json'),**summary,
+    'new_calls_in_postprocessing':0,'old_API_roots_unchanged':True,'formal_S1_pass':False,
+    'production_authorization':'not_authorized'})
+print(json.dumps({'delivered':True,'visible':summary['visible_records'],'metrics':summary['metrics'],
+    'counts':summary['delivery_counts'],'api_status':summary['api_status'],'three_reads_equal':True,
+    'repairs_independently_checked':7,'old_source_only_retained':2,'new_calls':0},ensure_ascii=False))

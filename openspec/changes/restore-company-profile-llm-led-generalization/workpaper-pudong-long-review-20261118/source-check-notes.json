@@ -1,0 +1,18 @@
+{
+  "task": "6.DM",
+  "method": "Independent direct extraction and reading of the official PDF pages, table headers and qualifiers; not model agreement.",
+  "PDF_sha256": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "checks": [
+    {"fact_id":"sm-03","physical_pages":[82],"section":"3.10.2 按产品类型划分的贷款结构及贷款质量","verdict":"supported_with_business_subset_scope","reason":"报告期末贷款余额列的企业贷款3,588,500、票据贴现187,225、零售贷款1,928,248百万元均为产品行；合计为5,703,973百万元，产品行不作为集团贷款总额。"},
+    {"fact_id":"sm-04","physical_pages":[82],"section":"3.10.2 按产品类型划分的贷款结构及贷款质量","verdict":"supported_with_business_subset_scope","reason":"个人按揭908,639、个人经营408,434、信用卡及透支389,327、消费贷款及其他221,848百万元属于零售贷款子行，单位人民币百万元、期间为报告期末。"},
+    {"fact_id":"rm-06","physical_pages":[62],"section":"3.6.2 公司金融业务","verdict":"supported_text_but_prior_source_only_retained","reason":"原文为报告期内对公业务营业净收入685.79亿元；business_segment保业务子集，不改成发行人或集团整体收入。按本次授权保留原两项源参考限制，不由模型接受自动解除。"},
+    {"fact_id":"rm-07","physical_pages":[69],"section":"3.6.4金融市场与金融机构业务／资产托管业务","verdict":"supported_text_but_prior_source_only_retained","reason":"原文为报告期内托管收入24.81亿元，同比增长7.23%；业务收入不作为集团整体收入。按本次授权保留源参考限制，不强求母公司或合并主体确定性。"},
+    {"fact_id":"cc-06","physical_pages":[57],"section":"3.5.1 关于资产投放","verdict":"supported_with_business_subset_scope_and_bound","reason":"原文为长三角区域贷款余额超2万亿元、较上年末增加超1,600亿元、占公司贷款增量一半以上。greater_than保留大于阈值的限定，不作为恰好2万亿元或1600亿元。"},
+    {"fact_id":"od-01","physical_pages":[32],"section":"3.1 公司总体经营情况","verdict":"supported_with_business_subset_scope","reason":"原文制造业中长期贷款总额3,599.26亿元、增长12.86%、高于整体贷款增速7个百分点；这是制造业中长期贷款子集，非集团全部贷款。"},
+    {"fact_id":"od-02","physical_pages":[57],"section":"3.5.1 关于资产投放","verdict":"supported_with_business_subset_scope","reason":"原文在岸银团贷款余额6,438.47亿元及增长15.59%、并购融资余额2,431亿元、新发放并购贷款1,139亿元；余额为期末，新增发放为期间流量，修订保留区别。"}
+  ],
+  "scope_note": "business_segment在此保业务／产品／区域子集，不宣称这些都是会计准则下的正式报告分部，也不推定母公司口径。",
+  "review_prose_limitation": "模型复核解释把‘超’称为上界，措辞有误；实际候选greater_than及原句正确，本地按大于阈值理解。原始模型意见保留，不为此再开修订或调用。",
+  "full_53_fact_accuracy": "not_independently_assessed",
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,32 @@
+{
+  "task": "6.DM",
+  "source_notes": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/source-check-notes.json",
+  "source_notes_sha256": "f4bfdedd482d53f10e8bbb800ae8c8ad2a113292af53a5f204e2a54acb3598c1",
+  "accepted_repairs_independently_checked": 7,
+  "changed_fact_ids": [
+    "cc-06",
+    "od-01",
+    "od-02",
+    "rm-06",
+    "rm-07",
+    "sm-03",
+    "sm-04"
+  ],
+  "only_fact_and_metric_scope_changed": true,
+  "unchanged_facts": 46,
+  "original_evidence_reading_scope_and_generation_unchanged": true,
+  "prior_source_only_retained": [
+    "rm-06",
+    "rm-07"
+  ],
+  "all_output_accuracy": null,
+  "old_source_controls_inherited_only_when_hash_matches": true,
+  "raw_inputs_sha256_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/600000/runtime.json": "7533c4c88b01ee9cc474431c2a676656c7350a6cb17d0dba7f87cbcfbd7cad14",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/600000/query.json": "6395d715508ff5480c09743f497cc049a6de7c900d2d7be9fb78da66a482a1cf",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/600000/model-receipts.json": "1957d95c91440ad8124d10980190402f2099a0f09e60fcd371b2bda6560ba77f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/600000/budget.json": "db468424a91048f9b7157b7771fb5a447b4afa574154dea79f8c62c87483d0ac",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pudong-long-review-20261118/600000/summary.json": "23f3d3a17e9ae0a514dd32542b9bc99262f47c445bac06999da46380a6b53bef"
+  },
+  "production_authorization": "not_authorized"
+}
