@@ -1,0 +1,1498 @@
+{
+  "task": "6.DK",
+  "new_model_calls": 0,
+  "research_delivery": {
+    "companies": 12,
+    "readings": 13,
+    "visible_records": 371,
+    "visible_metrics": 524,
+    "unique_economic_discoveries": "not_assessed",
+    "all_have_basic_research_description": true,
+    "not_a_formal_company_score": true
+  },
+  "formal_S1": {
+    "passed": false,
+    "historical_count_unchanged": "0/12",
+    "verdict": "not_passed_not_a_claim_of_zero_research_outputs",
+    "remaining": [
+      "当前完整自动首读链尚无十二家同版完整正反/独立质量与资源的联合验收；后继稿与补读不拼首发。",
+      "已审对象准确率须以独立核源的唯一对象及实际判定统计，不能把已核分级或模型接受数直接当准确率。",
+      "六类适用风险须逐家公司绑定实际正反输入/输出，未触发或未核范围不算通过。",
+      "旧常规900秒/120000/16与双模型开发1800秒/500000/10不同；unknown费用不证明10元达标。"
+    ]
+  },
+  "S2_released": false,
+  "production_authorization": "not_authorized",
+  "formal_accuracy": null,
+  "timing_reference": {
+    "source": "workpaper-research-export-result-20261117/acceptance.json",
+    "historical_CT_median_all_entries_seconds": 412.7475,
+    "not_current_end_to_end_latency": true,
+    "includes_failed_entries": true
+  },
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "report": {
+        "instrument_id": "600094.SH",
+        "report_id": "1225155390",
+        "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "fact_ids": [
+            "F01",
+            "F02",
+            "F04"
+          ],
+          "evidence_ids": [
+            "source-0002",
+            "source-0003"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "fact_ids": [
+            "F01",
+            "F06"
+          ],
+          "evidence_ids": [
+            "source-0002",
+            "source-0008"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "fact_ids": [
+            "F06",
+            "F08",
+            "F10"
+          ],
+          "evidence_ids": [
+            "source-0006",
+            "source-0007",
+            "source-0008"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 22,
+      "visible_metrics": 22,
+      "delivery_counts": {
+        "reviewed": 17,
+        "limited": 5
+      },
+      "excluded_records_without_fact_payload": 1,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "upstream_inputs",
+          "status": "not_disclosed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bf979a385ba617f21a839898",
+          "element": "company_features",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600094.SH",
+        "supported": 9,
+        "partial": 1,
+        "missing": 0,
+        "total": 10,
+        "selected_scope_core_recall": 0.9,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600094.SH",
+        "physical_requests": 5,
+        "ledger": 105260,
+        "business_seconds": 565.083,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "report": {
+        "instrument_id": "600103.SH",
+        "report_id": "1225099218",
+        "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-5d88bbcf3252b4b833c64f62",
+          "fact_ids": [
+            "F01",
+            "F02",
+            "F03"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-5d88bbcf3252b4b833c64f62",
+          "fact_ids": [
+            "F04",
+            "F05",
+            "F06",
+            "F07",
+            "F08"
+          ],
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-5d88bbcf3252b4b833c64f62",
+          "fact_ids": [
+            "F10",
+            "F11"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0007"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 31,
+      "visible_metrics": 67,
+      "delivery_counts": {
+        "reviewed": 27,
+        "limited": 4
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-5d88bbcf3252b4b833c64f62",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "事实F12已隔离，未作为结论采用：metric number is absent from cited source: 营业收入同比增减"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600103.SH",
+        "supported": 11,
+        "partial": 1,
+        "missing": 0,
+        "total": 12,
+        "selected_scope_core_recall": 0.9166666666666666,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600103.SH",
+        "physical_requests": 5,
+        "ledger": 123514,
+        "business_seconds": 393.092,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "report": {
+        "instrument_id": "600100.SH",
+        "report_id": "1225244797",
+        "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-495cd447d05207d84da133ac",
+          "fact_ids": [
+            "F01"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-495cd447d05207d84da133ac",
+          "fact_ids": [
+            "F05",
+            "F06",
+            "F07",
+            "F08"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0010"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-495cd447d05207d84da133ac",
+          "fact_ids": [
+            "F09",
+            "F10",
+            "F11",
+            "F12"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0010"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 27,
+      "visible_metrics": 30,
+      "delivery_counts": {
+        "reviewed": 27
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-495cd447d05207d84da133ac",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "指标格式隔离：事实F20未作为结论采用；metrics.0: Value error, metric values must be decimal strings; metrics.1: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-495cd447d05207d84da133ac",
+          "element": "upstream_inputs",
+          "status": "not_disclosed",
+          "reasons": [
+            "选定章节未披露公司主要原材料、能源等具体采购投入构成，仅列示前五名供应商采购额及占比。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600100.SH",
+        "supported": 12,
+        "partial": 0,
+        "missing": 0,
+        "total": 12,
+        "selected_scope_core_recall": 1.0,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600100.SH",
+        "physical_requests": 5,
+        "ledger": 121005,
+        "business_seconds": 453.232,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "report": {
+        "instrument_id": "600107.SH",
+        "report_id": "1225264726",
+        "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-b94e5bae3f3267bd35912a70",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ],
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-b94e5bae3f3267bd35912a70",
+          "fact_ids": [
+            "F03",
+            "F04"
+          ],
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-b94e5bae3f3267bd35912a70",
+          "fact_ids": [
+            "F06",
+            "F07"
+          ],
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 22,
+      "visible_metrics": 38,
+      "delivery_counts": {
+        "reviewed": 17,
+        "limited": 5
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-b94e5bae3f3267bd35912a70",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-b94e5bae3f3267bd35912a70",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-b94e5bae3f3267bd35912a70",
+          "element": "upstream_inputs",
+          "status": "not_disclosed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600107.SH",
+        "supported": 9,
+        "partial": 1,
+        "missing": 0,
+        "total": 10,
+        "selected_scope_core_recall": 0.9,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600107.SH",
+        "physical_requests": 5,
+        "ledger": 104567,
+        "business_seconds": 427.958,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "report": {
+        "instrument_id": "600098.SH",
+        "report_id": "1225103737",
+        "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-14T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "fact_ids": [
+            "F01",
+            "F03",
+            "F04",
+            "F05"
+          ],
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "fact_ids": [
+            "F06",
+            "F07",
+            "F08"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "fact_ids": [
+            "F09",
+            "F10"
+          ],
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 30,
+      "visible_metrics": 63,
+      "delivery_counts": {
+        "reviewed": 24,
+        "limited": 6
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "事实F12已隔离，未作为结论采用：narrative number is absent from cited source: 294.85亿元",
+            "事实F13已隔离，未作为结论采用：narrative number is absent from cited source: 230.65亿元",
+            "事实F14已隔离，未作为结论采用：narrative number is absent from cited source: 284.90亿元"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "独立使用审核建议获取（600098-K09）：公司利润表营业收入科目尚未单独取得；已有营业总收入及主要构成，不能把营业总收入改名代替。",
+            "独立使用审核建议获取（600098-K12）：收入构成中的金融业务小项尚未完整取得；不影响已有主要能源业务画像。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "事实F18已隔离，未作为结论采用：narrative number is absent from cited source: 227.26亿元"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "事实F24已隔离，未作为结论采用：metric number is absent from cited source: 合并口径火力发电企业上网电量同比"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "事实F32已隔离，未作为结论采用：narrative number is absent from cited source: 63.96亿元"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [
+        {
+          "reading_work_id": "bp-work-2f39f21066ff4a3203e66cac",
+          "finding_id": "RF01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "reason": "底稿已列公司电力总产量243.76亿千瓦时和新能源发电量增长，但未收录来源明确披露的合并口径火力发电企业发电量157.10亿千瓦时、上网电量149.21亿千瓦时，以及同比下降7.87%和7.77%。source-0019火电行亦列示发电量1,570,966.12万千瓦时、同比-7.87%，并披露火电可控装机483.65万千瓦、同比减少11.7%。火电仍是发电量的主要部分，其收缩及来源所述省内供需偏宽松、珠江电厂煤电环保替代关停机组等原因，会改变对电力业务结构的理解。应按来源类别补充上述产量、上网电量和装机变动及原因；不得用总产量减新能源发电量自行推算，也不得与分行业收入行混为同一口径。F15的叙事装机1,097万千瓦、484万千瓦可保留，只需补充变动，不必改写成无来源的精确值。",
+          "evidence_ids": [
+            "source-0005",
+            "source-0019"
+          ]
+        }
+      ],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600098.SH",
+        "supported": 10,
+        "partial": 1,
+        "missing": 1,
+        "total": 12,
+        "selected_scope_core_recall": 0.8333333333333334,
+        "recall_reference_ge_90_percent": false,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600098.SH",
+        "physical_requests": 3,
+        "ledger": 94059,
+        "business_seconds": 72.217,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "report": {
+        "instrument_id": "600104.SH",
+        "report_id": "1225071780",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-dc4ab5559a9258d1a6cf3d44",
+          "fact_ids": [
+            "F01",
+            "F03"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0012"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-dc4ab5559a9258d1a6cf3d44",
+          "fact_ids": [
+            "F04",
+            "F06",
+            "F07",
+            "F08"
+          ],
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-dc4ab5559a9258d1a6cf3d44",
+          "fact_ids": [
+            "F09"
+          ],
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 2,
+      "visible_records": 39,
+      "visible_metrics": 38,
+      "delivery_counts": {
+        "reviewed": 30,
+        "limited": 9
+      },
+      "excluded_records_without_fact_payload": 5,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-dc4ab5559a9258d1a6cf3d44",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "独立使用审核建议获取（600104-K03）：零部件的柴油机、汽车电子等具体子类及板块归属尚未完整取得；不是基础画像必填项。",
+            "独立使用审核建议获取（600104-K04）：汽车金融贷款等具体服务及其披露范围尚未完整取得；不采用行业毛利率与子公司贷款范围的无据组合。"
+          ],
+          "supplemental_reading_work_ids": [
+            "bp-work-2ae4196b91569edcee5d22a4"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        },
+        {
+          "reading_work_id": "bp-work-dc4ab5559a9258d1a6cf3d44",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "事实F19已隔离，未作为结论采用：narrative number is absent from cited source: 6562.44亿元",
+            "独立使用审核建议获取（600104-K07）：公司营业收入科目及与营业总收入的区别尚未单独完整交付；现有营业总收入和主要收入构成继续可用，不以同金额分行业行代替该科目。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2ae4196b91569edcee5d22a4",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [
+        {
+          "reading_work_id": "bp-work-2ae4196b91569edcee5d22a4",
+          "finding_id": "REV-003",
+          "element": "products_services",
+          "severity": "minor",
+          "reason": "定向问题要求找出已披露的零部件相关产品子类。所供章节在贸易业务中写明本期主要系汽车芯片及相关汽车零部件的出口贸易，但草稿未收录该产品描述。其收入相对零部件业务分产品收入属于小额尾部，且口径是贸易业务而非零部件业务分产品行，不得并入口径或当作主业构成缺失。建议仅作补充提示，不要求补全金额，也不否定已有华域汽车等主体事实。",
+          "evidence_ids": [
+            "source-0005"
+          ]
+        }
+      ],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600104.SH",
+        "supported": 7,
+        "partial": 3,
+        "missing": 0,
+        "total": 10,
+        "selected_scope_core_recall": 0.7,
+        "recall_reference_ge_90_percent": false,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600104.SH",
+        "physical_requests": 3,
+        "ledger": 85856,
+        "business_seconds": 361.007,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "report": {
+        "instrument_id": "600088.SH",
+        "report_id": "1225118832",
+        "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-6f932ea0fd112fc97a36a9cc",
+          "fact_ids": [
+            "F01",
+            "F02",
+            "F03"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-6f932ea0fd112fc97a36a9cc",
+          "fact_ids": [
+            "F04",
+            "F05",
+            "F06",
+            "F07",
+            "F08"
+          ],
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-6f932ea0fd112fc97a36a9cc",
+          "fact_ids": [
+            "F08",
+            "F10",
+            "F11",
+            "F12",
+            "F13"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0003",
+            "source-0004",
+            "source-0005"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 34,
+      "visible_metrics": 40,
+      "delivery_counts": {
+        "reviewed": 33,
+        "limited": 1
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600088.SH",
+        "supported": 11,
+        "partial": 0,
+        "missing": 0,
+        "total": 11,
+        "selected_scope_core_recall": 1.0,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600088.SH",
+        "physical_requests": 3,
+        "ledger": 78572,
+        "business_seconds": 397.537,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "report": {
+        "instrument_id": "600099.SH",
+        "report_id": "1225042363",
+        "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-c54e4f3a694d9c45a55755d3",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0005"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-c54e4f3a694d9c45a55755d3",
+          "fact_ids": [
+            "F03",
+            "F04",
+            "F05",
+            "F06"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0004",
+            "source-0005"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-c54e4f3a694d9c45a55755d3",
+          "fact_ids": [
+            "F07"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0005"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 28,
+      "visible_metrics": 48,
+      "delivery_counts": {
+        "reviewed": 26,
+        "limited": 2
+      },
+      "excluded_records_without_fact_payload": 1,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-c54e4f3a694d9c45a55755d3",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "事实F26已隔离，未作为结论采用：narrative number is absent from cited source: 9.27%"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600099.SH",
+        "supported": 12,
+        "partial": 0,
+        "missing": 0,
+        "total": 12,
+        "selected_scope_core_recall": 1.0,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600099.SH",
+        "physical_requests": 5,
+        "ledger": 121849,
+        "business_seconds": 474.926,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "report": {
+        "instrument_id": "600082.SH",
+        "report_id": "1225246039",
+        "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-8d0d94e5189e97cae31466fa",
+          "fact_ids": [
+            "F01",
+            "F02"
+          ],
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-8d0d94e5189e97cae31466fa",
+          "fact_ids": [
+            "F03",
+            "F04",
+            "F05"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0006",
+            "source-0007",
+            "source-0017"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-8d0d94e5189e97cae31466fa",
+          "fact_ids": [
+            "F06",
+            "F07"
+          ],
+          "evidence_ids": [
+            "source-0006",
+            "source-0021",
+            "source-0022"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 28,
+      "visible_metrics": 25,
+      "delivery_counts": {
+        "reviewed": 28
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-8d0d94e5189e97cae31466fa",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "事实F14已隔离，未作为结论采用：metric number is absent from cited source: 科技园区开发土地成本"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [
+        {
+          "reading_work_id": "bp-work-8d0d94e5189e97cae31466fa",
+          "finding_id": "REV-F01-ONLY",
+          "element": "business_structure",
+          "severity": "minor",
+          "reason": "来源开篇写明公司是天津滨海高新区唯一的国有控股上市公司。F01保留了国有控股上市公司及双轮主业表述，但删去“唯一”。该限定应补回，其余已有依据的主业描述不必改写。",
+          "evidence_ids": [
+            "source-0001"
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-8d0d94e5189e97cae31466fa",
+          "finding_id": "REV-F24-RPT",
+          "element": "material_changes",
+          "severity": "minor",
+          "reason": "转让天津海发方信置地有限公司100%股权、价格9,065.95万元、受让方及报告期内完成付款和交割均有依据。但议案明确为“转让全资子公司股权暨关联交易”，现有事实未说明关联交易属性。应补充该限定，不要改动已支持的价格、比例和交割事实。",
+          "evidence_ids": [
+            "source-0008",
+            "source-0018"
+          ]
+        }
+      ],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600082.SH",
+        "supported": 10,
+        "partial": 0,
+        "missing": 0,
+        "total": 10,
+        "selected_scope_core_recall": 1.0,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600082.SH",
+        "physical_requests": 3,
+        "ledger": 91987,
+        "business_seconds": 529.08,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "report": {
+        "instrument_id": "600097.SH",
+        "report_id": "1225039976",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-3525cda24575d90a4cc66978",
+          "fact_ids": [
+            "bs-01",
+            "bs-02"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0005"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-3525cda24575d90a4cc66978",
+          "fact_ids": [
+            "ps-01",
+            "ps-02",
+            "ps-03"
+          ],
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-3525cda24575d90a4cc66978",
+          "fact_ids": [
+            "rm-01",
+            "rm-07"
+          ],
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 29,
+      "visible_metrics": 30,
+      "delivery_counts": {
+        "reviewed": 26,
+        "limited": 3
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-3525cda24575d90a4cc66978",
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "事实od-01已隔离，未作为结论采用：metric number is absent from cited source: 捕捞业务收入变动"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600097.SH",
+        "supported": 9,
+        "partial": 1,
+        "missing": 0,
+        "total": 10,
+        "selected_scope_core_recall": 0.9,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600097.SH",
+        "physical_requests": 5,
+        "ledger": 116104,
+        "business_seconds": 506.874,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "report": {
+        "instrument_id": "600054.SH",
+        "report_id": "1225118314",
+        "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "fact_ids": [
+            "F01",
+            "F02",
+            "F03",
+            "F04",
+            "F05",
+            "F06"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "fact_ids": [
+            "F08"
+          ],
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "fact_ids": [
+            "F13",
+            "F14",
+            "F15",
+            "F16",
+            "F17"
+          ],
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 42,
+      "visible_metrics": 49,
+      "delivery_counts": {
+        "reviewed": 40,
+        "limited": 2
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "element": "business_structure",
+          "status": "observed",
+          "reasons": [
+            "分部划分口径（园林开发、旅游服务、其他）与主营业务分行业口径（酒店、索道及缆车、景区、旅游服务、徽菜）不一致，两者不可直接对应。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "主营业务分行业收入为未合并抵消口径，合计大于合并营业收入，不能直接加总视为公司总收入。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "分部主营业务收入合计206,034.42万元与合并营业收入210,932.51万元存在差异，报告未在所选章节中解释该差异。",
+            "事实F21已隔离，未作为结论采用：metric number is absent from cited source: 归属于上市公司股东的净利润"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "所选章节未披露主要原材料采购的具体品类与金额，无法确认公司生产性投入结构。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "所选章节未按业务板块披露客户结构、渠道占比或区域收入构成。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "所选章节未披露具体原材料、能源或设备供应商名称及采购金额。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5e0abe90ca0571db02fcf3cb",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "所选章节未披露按客户类型划分的收入占比。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600054.SH",
+        "supported": 13,
+        "partial": 0,
+        "missing": 0,
+        "total": 13,
+        "selected_scope_core_recall": 1.0,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600054.SH",
+        "physical_requests": 5,
+        "ledger": 102870,
+        "business_seconds": 337.368,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "report": {
+        "instrument_id": "600000.SH",
+        "report_id": "1225062336",
+        "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "research_readability": "basic_business_description_present_in_selected_scope",
+      "assessment_basis": "human_reading_of_current_statements_and_existing_independent_audits_not_new_PDF_audit",
+      "basic_answers": {
+        "business_structure": {
+          "reading_work_id": "bp-work-adab8ac791bb78855e9bacfc",
+          "fact_ids": [
+            "bs-1"
+          ],
+          "evidence_ids": [
+            "source-0007",
+            "source-0013",
+            "source-0015"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "products_services": {
+          "reading_work_id": "bp-work-adab8ac791bb78855e9bacfc",
+          "fact_ids": [
+            "ps-1",
+            "ps-2",
+            "ps-3"
+          ],
+          "evidence_ids": [
+            "source-0007",
+            "source-0008",
+            "source-0009",
+            "source-0010",
+            "source-0011",
+            "source-0012",
+            "source-0013",
+            "source-0014",
+            "source-0015"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        },
+        "revenue_model": {
+          "reading_work_id": "bp-work-adab8ac791bb78855e9bacfc",
+          "fact_ids": [
+            "rm-1",
+            "rm-2"
+          ],
+          "evidence_ids": [
+            "source-0001",
+            "source-0017"
+          ],
+          "conclusion": "substantive_research_answer_present"
+        }
+      },
+      "readings": 1,
+      "visible_records": 39,
+      "visible_metrics": 74,
+      "delivery_counts": {
+        "reviewed": 32,
+        "limited": 7
+      },
+      "excluded_records_without_fact_payload": 0,
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-adab8ac791bb78855e9bacfc",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "指标格式隔离：事实cc-5未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-adab8ac791bb78855e9bacfc",
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "指标格式隔离：事实od-2未作为结论采用；metrics.0: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "suggested_acquisitions": [],
+      "historical_133_reference_unchanged": {
+        "instrument_id": "600000.SH",
+        "supported": 10,
+        "partial": 1,
+        "missing": 0,
+        "total": 11,
+        "selected_scope_core_recall": 0.9090909090909091,
+        "recall_reference_ge_90_percent": true,
+        "formal_company_usable": "not_assessed"
+      },
+      "historical_complete_entry_resource_not_current_or_cumulative": {
+        "instrument_id": "600000.SH",
+        "physical_requests": 3,
+        "ledger": 93022,
+        "business_seconds": 262.559,
+        "cost": "unknown"
+      },
+      "formal_accuracy": null,
+      "formal_company_usable": "not_assessed",
+      "full_report_completeness": "not_assessed"
+    }
+  ],
+  "input_sha256": {
+    "workpaper-api-delivery-result-20261117/index.json": "c706c290ff216df150b711cd7c0f8f951e7f9c4755a00e808b1038cb7a684ed2",
+    "workpaper-research-export-result-20261117/acceptance.json": "5ed2a472bbb38959ae0ec6d4fb0f0ce9c6acb059c52b8790f39752287fe58d60",
+    "workpaper-core-readiness-20261114/source-first-contract.json": "1f52e5bbf76610a1dd156d2135b0b4276c03c1693a23467accc56e17bf307d62",
+    "workpaper-quality-and-regression-readiness-20261113/source-readiness.json": "f45e06ddc4acf5da5609cc77d193c790f305d01fa1c4a290aa729edcbadf7f94",
+    "workpaper-final-source-review-result-20261117/independent-audit.json": "682e14bdce2a4be7c08b824c6b746e66cc77abbed7707fc827085b9e1c68cb21",
+    "workpaper-three-final-source-review-result-20261117/independent-audit.json": "bd330190aedcad84dec65b3ca59fd86d5ba098467d2b474ad236fe1006856a25",
+    "workpaper-saic-enrichment-result-20261117/independent-audit.json": "62e2d4f39ac6e8e2cea2c74f547bd3dfe0fb8418da0ff9cd425a229b84a62fcc"
+  },
+  "runtime_sha256_unchanged": {
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-2ae4196b91569edcee5d22a4.json": "fa1005cd696647a4b5294c7634bd5086097140c8e4770405c0ce3a5474e55991",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-2f39f21066ff4a3203e66cac.json": "def0805fd5e33bef6997f006e9e939aba8043664c9c224930bff38fe5120bea1",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-3525cda24575d90a4cc66978.json": "a5f33616c7f4db8a2bbfb8cb4607f3b55b98460100c81be40912f814c12f76c4",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-495cd447d05207d84da133ac.json": "8d91f61cf4cebf57dda6cb62dcbb646dc8a64130b5fb3705b4e6b58feec34c9e",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-5d88bbcf3252b4b833c64f62.json": "32e2226086de06b127b496629599894d8371372c120b802a7b89e2b707c37312",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-5e0abe90ca0571db02fcf3cb.json": "bdb1a5fa8ff4eaa11dfe686b963e2c52b2872831075f0246ed4997a282e09396",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-6f932ea0fd112fc97a36a9cc.json": "03edc5c0a7afe1a2d568ee0e1aeb9c877ee5c74fb4239975424387bba7ec6e55",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-8d0d94e5189e97cae31466fa.json": "30ae0c29fd33af2b46b94301b51637ea1007db4349ed8fe111d2b3c1b06ae892",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-adab8ac791bb78855e9bacfc.json": "9c705d6b6d5f46c65a1dcb28c317e0aad9f4a7bdd064dc506f173fe35f79b162",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-b94e5bae3f3267bd35912a70.json": "d87a241233924df1a2054f00747065dbd1c44e92c1ac6f1900ede1c8cda0e850",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-bf979a385ba617f21a839898.json": "39312b24274e789f7ba75852f5ff7a99243b7d2fefd5e6a52b4519a072608164",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-c54e4f3a694d9c45a55755d3.json": "042e91f7629785ab0dd9da8823b3e609f23a40d2980c04dead0ea209713fd900",
+    "data/research/company_profile_api_preview_20261117/company_profile_common_core.v1/bp-work-dc4ab5559a9258d1a6cf3d44.json": "2f1fb89e4af34ff271deda7c21c309831c63ef80c1dbb240047e031bd267becb"
+  }
+}

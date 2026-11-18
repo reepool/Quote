@@ -1,0 +1,703 @@
+{
+  "contract_id": "company_profile_basic_questions.2026-11-18.v1",
+  "status": "frozen_for_prospective_evaluation_not_executed",
+  "source_reference": "workpaper-core-readiness-20261114/source-first-contract.json",
+  "source_reference_sha256": "1f52e5bbf76610a1dd156d2135b0b4276c03c1693a23467accc56e17bf307d62",
+  "reference_sent_to_models": false,
+  "historical_133_and_scores_unchanged": true,
+  "purpose": "区分基础业务可读性与建议补充，不把36个粗问题替代正式核心召回分母。",
+  "formal_scoring": "按独立源范围在运行前拆成可判定的实质业务条件并冻结；重要补充不作强制条件；不从本轮模型答案反推分母。",
+  "supplementary_not_company_veto": [
+    "产品型号和用途细目",
+    "子公司完整清单",
+    "并列营业收入科目",
+    "金融服务细项",
+    "精细供应链和数量",
+    "其他非主营遗漏"
+  ],
+  "scale_priority": "优先获取有据公司规模和主要构成；没有精确金额可明示未获取，不造数，不因此否定成立的三项基本描述。",
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "report": {
+        "instrument_id": "600094.SH",
+        "report_id": "1225155390",
+        "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600094-C1",
+          "source_expected": "地产开发运营、金控投资与算力服务；6G及eVTOL为投资布局，不能当上市公司自产产品。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600094-C2",
+          "source_expected": "物业开发销售及运营、算力服务与投资平台；非被投飞行器的自主制造。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            10,
+            16
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600094-C3",
+          "source_expected": "房地产销售交付结转、开发物业租赁运营、算力服务；金融投资本期收入空，不造零。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            15,
+            16
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600103.SH",
+      "report": {
+        "instrument_id": "600103.SH",
+        "report_id": "1225099218",
+        "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600103-C1",
+          "source_expected": "制浆造纸一体，兼医药、光电子、林业及其他披露业务；不只保纸行业。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600103-C2",
+          "source_expected": "纸袋纸、竹木浆、溶解浆、纸箱纸袋、风油精、光器件光模块等；用途包括包装和纺织粘胶纤维。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600103-C3",
+          "source_expected": "浆纸自主生产、产品直销/以销定产；子公司医药有经销。木竹片挂牌及燃料设备招标是投入而非销售。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            11,
+            18
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600100.SH",
+      "report": {
+        "instrument_id": "600100.SH",
+        "report_id": "1225244797",
+        "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600100-C1",
+          "source_expected": "公共安全、数智产业、智慧能源；其他/总部及抵销另列，上年计算机业务出表不写成本年发生。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            12,
+            13,
+            14,
+            21
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600100-C2",
+          "source_expected": "安检系统/运维、CNKI知识服务/数智转型、热泵储能及能源方案。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            12,
+            13
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600100-C3",
+          "source_expected": "机构订阅为主+个人按需付费，技术授权/软件开发；能源咨询、供货、工程、节能及运维。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            12,
+            13
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600107.SH",
+      "report": {
+        "instrument_id": "600107.SH",
+        "report_id": "1225264726",
+        "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600107-C1",
+          "source_expected": "服装服饰研发设计生产销售；国内品牌与国外加工，医疗收入本期空栏，处置影响不强定处置发生年。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            12,
+            15,
+            16
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600107-C2",
+          "source_expected": "中高档商务政务男装：西服衬衣等；女装职业/礼服/时装/休闲，出口加工。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            12
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600107-C3",
+          "source_expected": "直营/加盟商场零售、团购定制、电商；出口以来料/进料加工为主及一般贸易。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            12,
+            16
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600098.SH",
+      "report": {
+        "instrument_id": "600098.SH",
+        "report_id": "1225103737",
+        "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-14T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600098-C1",
+          "source_expected": "综合能源：电力、天然气、能源物流、新能源储能及能源金融，产购销储运用；金融是能源产业支持非全集团银行。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600098-C2",
+          "source_expected": "电力煤炭天然气蒸汽成品油、能源管理以及装卸运输仓储服务。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            9
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600098-C3",
+          "source_expected": "电力蒸汽自产，煤气油外购；电力经电网销售，其他经自有管网平台等；托管节能及产融支持。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600104.SH",
+      "report": {
+        "instrument_id": "600104.SH",
+        "report_id": "1225071780",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600104-C1",
+          "source_expected": "整车为主，协同零部件、移动出行和服务、汽车金融；量产/中试和研发分开。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            8,
+            9
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600104-C2",
+          "source_expected": "自主/合资整车及新能源汽车，零部件、物流出行和汽车金融；品牌例全新MG4、荣威M7、尚界H5、智己等有当前披露。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            8,
+            9
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600104-C3",
+          "source_expected": "汽车制造销售与相应金融/出行服务协同，含经销网络、海外当地生产和物流支持，不由技术研发推原料采购。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600088.SH",
+      "report": {
+        "instrument_id": "600088.SH",
+        "report_id": "1225118832",
+        "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600088-C1",
+          "source_expected": "影视、广告、旅游、基金投资管理；不把基金投资收益当全基金收入。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            11,
+            12
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600088-C2",
+          "source_expected": "节目制作销售/技术/设备租赁/库存剧发行，频道广告，影视基地观光及拍摄服务。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            11
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600088-C3",
+          "source_expected": "节目/技术/租赁销售、承包频道广告资源转售，旅游门票/园内经营/拍摄服务，基金管理投资。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            11,
+            12
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600099.SH",
+      "report": {
+        "instrument_id": "600099.SH",
+        "report_id": "1225042363",
+        "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600099-C1",
+          "source_expected": "森林消防机械、农业机械、特种车辆ATV、摩托车及配件制造销售。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            8,
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600099-C2",
+          "source_expected": "消防车泵/风力灭火机、插秧机收割机、ATV及摩托车；消防/农业/越野用途有源。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            8,
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600099-C3",
+          "source_expected": "以销定产按单生产适度备货，以经销为主；采购替代两项限定农业机械。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            10,
+            15,
+            16
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600082.SH",
+      "report": {
+        "instrument_id": "600082.SH",
+        "report_id": "1225246039",
+        "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600082-C1",
+          "source_expected": "工业/科技园区开发运营，产业投资和孵化服务；不能以商品贸易替主业。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            11
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600082-C2",
+          "source_expected": "园区载体/招商、科创投资、在孵企业咨询培训及配套服务。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            11
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600082-C3",
+          "source_expected": "房产销售和租赁运营、商品销售以代理人净额法贸易；不把合同收款和集团收入直接等同。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            14,
+            15,
+            16
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600097.SH",
+      "report": {
+        "instrument_id": "600097.SH",
+        "report_id": "1225039976",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600097-C1",
+          "source_expected": "远洋捕捞、水产品加工销售、贸易、运输一体化；磷虾合作经营不是独立自产推定。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            8
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600097-C2",
+          "source_expected": "金枪鱼鲣鱼黄鳍、磷虾冻虾虾粉、ALBO罐头及国内鱼柳加工。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            8
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600097-C3",
+          "source_expected": "捕捞/加工/贸易产品销售及海上运输服务，以直销为主，国内外客户分开；内部转移不是对外加工服务量。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            8,
+            11,
+            12
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "report": {
+        "instrument_id": "600054.SH",
+        "report_id": "1225118314",
+        "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600054-C1",
+          "source_expected": "景区、索道缆车、酒店、徽菜、旅行社、智慧旅游六业务；不能只用p9支持后三类。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600054-C2",
+          "source_expected": "观光休闲、客运、住宿餐饮、徽菜、旅行/会展/疗休养、平台OTA等服务。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600054-C3",
+          "source_expected": "景区观光客运、旅宿餐饮等服务收入；已开业项目与2026经营计划分开，不造客源占比。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "source_pages_for_independent_review_only": [
+            9,
+            10,
+            11
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600000.SH",
+      "report": {
+        "instrument_id": "600000.SH",
+        "report_id": "1225062336",
+        "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "questions": [
+        {
+          "question": "business_structure",
+          "meaning": "公司当前主要做什么；不漏整个主要板块，投资/计划不能当已经营。",
+          "source_context_reference": "600000-C1",
+          "source_expected": "公司金融、零售、金融市场与机构、跨境境外四大业务，五大赛道与业务分部不强制互斥。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 3.6 公司主要业务情况",
+            "第三节 管理层讨论与分析 / 3.2.2 做强五大赛道"
+          ],
+          "source_pages_for_independent_review_only": [
+            33,
+            62,
+            65,
+            68,
+            69
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "products_services",
+          "meaning": "主要板块提供何种产品或服务；不强求所有型号、细用途、子公司清单。",
+          "source_context_reference": "600000-C2",
+          "source_expected": "信贷存款结算投行交易财富托管跨境金融，服务企业个人金融机构，不套制造原料。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 3.6 公司主要业务情况",
+            "第三节 管理层讨论与分析 / 3.2.2 做强五大赛道"
+          ],
+          "source_pages_for_independent_review_only": [
+            62,
+            65,
+            66,
+            68,
+            69
+          ],
+          "assessment": "not_run"
+        },
+        {
+          "question": "revenue_model",
+          "meaning": "主要业务怎样产生收入；分清制造、贸易、运营或服务等实际角色。",
+          "source_context_reference": "600000-C3",
+          "source_expected": "金融中介及金融服务、对公营业净收入685.79亿元、托管收入24.81亿元；净息差1.42%，完整利息/非息分解在未读3.7，不能用AUM补。",
+          "source_sections": [
+            "第三节 管理层讨论与分析 / 3.6 公司主要业务情况",
+            "第三节 管理层讨论与分析 / 3.2.2 做强五大赛道"
+          ],
+          "source_pages_for_independent_review_only": [
+            32,
+            62,
+            69
+          ],
+          "assessment": "not_run"
+        }
+      ]
+    }
+  ]
+}

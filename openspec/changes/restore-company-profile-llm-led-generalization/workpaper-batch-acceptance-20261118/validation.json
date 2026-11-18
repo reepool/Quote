@@ -1,0 +1,43 @@
+{
+  "task": "6.DK",
+  "new_model_calls": 0,
+  "verification": {
+    "command": "bash scripts/quote_dev_env.sh env PYTHONPATH=/home/python/Quote /home/python/miniconda3/envs/Quote/bin/python openspec/changes/restore-company-profile-llm-led-generalization/workpaper-batch-acceptance-20261118/build_acceptance.py",
+    "passed": true,
+    "companies_read_through_existing_owner": 12,
+    "runtime_input_hashes_unchanged": 13,
+    "formal_PDF_versions_checked": 12,
+    "old_audit_hashes_preserved": true,
+    "basic_answer_fact_and_evidence_ids_exist_and_are_visible": true,
+    "new_read_instance_equal": true,
+    "visible_records": 371,
+    "visible_metrics": 524,
+    "new_full_PDF_semantic_audit": false,
+    "new_business_entry_or_model_quality_score": false
+  },
+  "strict_openspec_validation": "passed",
+  "diff_whitespace_check": "passed",
+  "local_result_links": {"checked": 3, "passed": true},
+  "plan_checks": {
+    "twelve_unique_companies": true,
+    "four_representatives_in_same_group": true,
+    "group_budget_equals_twelve_company_budgets": true,
+    "model_execution_and_resource_policy_not_authorized": true,
+    "thirty_six_basic_questions_not_formal_scoring_denominator": true
+  },
+  "review": {
+    "blocking_defects_remaining_in_current_delivery": [],
+    "nonblocking_deferred": ["产品细清单", "精细供应链", "跨轮自动消歧"],
+    "unrelated_preexisting_changes": "protected_not_staged"
+  },
+  "cleanup": {
+    "own_prior_DJ_disposable_residue_found": false,
+    "current_QuoteBak_root": "data/QuoteBak/workpaper-dk-1Agonx",
+    "release_scope": "staging helper and its work root only, after Git staging",
+    "disposable_helper_file_bytes": 2264,
+    "API_research_runtime": "retained",
+    "formal_sources_effective_cache_old_receipts_and_attempts": "retained"
+  },
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}

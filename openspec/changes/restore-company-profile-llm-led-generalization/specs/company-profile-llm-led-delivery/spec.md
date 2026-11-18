@@ -2,6 +2,19 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Acceptance separates basic business answers from supplementary acquisition and resource policy
+New batch acceptance contracts MUST separate substantive principal-business, main-product/service and earning-mechanism answers from recommended supplementary detail. Missing detailed models, uses, subsidiary inventories, parallel income labels or fine-grained supply-chain information MUST NOT alone reject an otherwise supported basic research profile. Whole major business lines and known false assertions remain subject to the existing correctness requirements. Existing frozen conditions and results MUST NOT be rescored by removing inconvenient items. A current research-delivery assessment MUST NOT be reported as a same-version first-run success, a new source audit or measured accuracy.
+
+#### Scenario: Existing profiles contain useful basic answers and optional omissions
+- **WHEN** existing real profiles have source-linked substantive business answers but retain optional acquisition gaps
+- **THEN** the current research data remains readable with those gaps and limitations
+- **AND** formal batch, audit and resource requirements are assessed separately without inventing a formal stage pass
+
+#### Scenario: High-tier review changes the applicable resource envelope
+- **WHEN** a proposed extraction-and-review batch needs a different resource profile from the frozen ordinary contract
+- **THEN** the proposal records both profiles, the requested prospective applicability and unknown costs before any new calls
+- **AND** only explicit authorization can activate that batch's new resource contract; historical results, ordinary-cost claims and production permission remain unchanged
+
 ### Requirement: Source-backed uncertainty does not require deterministic closure
 New workpapers MUST retain source qualifications such as approximate values, bounds, differing units and unclear scope without forcing exact normalization. A metric MAY carry a null normalized value with its original spelling, source reference and uncertainty reason. Such a metric MUST NOT enter exact arithmetic. Facts with unclear scope MAY retain sourced text and an explicit uncertainty reason. Rendering MUST expose the qualification and original source, and MUST NOT label unknown scope as absence of disclosure. Correctly qualified uncertainty alone MUST NOT trigger repair or block the remaining profile or review workflow. Known false assertions and invalid evidence MUST remain withdrawn or rejected, not laundered by an uncertainty label. Historical results MUST remain unchanged.
 
