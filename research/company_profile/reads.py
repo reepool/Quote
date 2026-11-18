@@ -14,6 +14,7 @@ import json
 import os
 import re
 import threading
+from collections import Counter
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from html import escape
@@ -186,6 +187,10 @@ class CompanyProfileReadService:
         root = self._latest_by_instrument().get(instrument_id)
         if not isinstance(root, CompanyProfileRuntimeRecordV3):
             raise FileNotFoundError("annual-report company profile not found")
+        return self._research_profile_from_record(root)
+
+    def _research_profile_from_record(self, root: CompanyProfileRuntimeRecordV3) -> dict[str, Any]:
+        """Project one selected base and its exact supplemental-reading chain."""
         from .workpaper import workpaper_elements
         from .workpaper_delivery import project_workpaper_delivery
         from .workpaper_enrichment import WorkpaperEnrichmentPlan
@@ -240,13 +245,51 @@ class CompanyProfileReadService:
                 and fact["fact"] is not None))
             gap["follow_up_state"] = ("supplemented_not_fully_reassessed"
                                       if gap["supplemental_reading_work_ids"] else "no_supplement_yet")
-        return {"schema_version": "company_profile_research_api.v1", "instrument_id": instrument_id,
+        return {"schema_version": "company_profile_research_api.v1", "instrument_id": root.report.instrument_id,
             "report": root.report.model_dump(mode="json"), "base_work_id": root.work_id,
             "latest_reading_work_id": readings[-1]["work_id"], "readings": readings, "facts": facts,
             "information_gaps": gaps, "suggested_acquisitions": suggestions,
             "coverage_assessment": "selected_scope_only", "full_report_completeness": "not_assessed",
             "cross_reading_reconciliation": "not_assessed", "research_only": True,
             "production_authorization": PRODUCTION_AUTHORIZATION}
+
+    def research_profile_catalog(self) -> dict[str, Any]:
+        """List readable workpapers without inferring accuracy or completeness.
+
+        Counts and gap elements come from the same graded projection as detail
+        reads, including valid supplements; excluded payloads are never counted.
+        """
+        items = []
+        for instrument_id, record in sorted(self._latest_by_instrument().items()):
+            if not isinstance(record, CompanyProfileRuntimeRecordV3):
+                continue
+            profile = self._research_profile_from_record(record)
+            visible = [entry["fact"] for entry in profile["facts"] if entry["fact"] is not None]
+            items.append({
+                "instrument_id": instrument_id,
+                "report": profile["report"],
+                "base_work_id": profile["base_work_id"],
+                "latest_reading_work_id": profile["latest_reading_work_id"],
+                "visible_fact_count": len(visible),
+                "visible_metric_count": sum(len(fact["metrics"]) for fact in visible),
+                "fact_states": dict(sorted(Counter(entry["state"] for entry in profile["facts"]).items())),
+                "readings": [{key: reading[key] for key in ("work_id", "origin", "review_status")}
+                             for reading in profile["readings"]],
+                "information_gap_count": len(profile["information_gaps"]),
+                "information_gap_elements": sorted({gap["element"] for gap in profile["information_gaps"]}),
+                "suggested_acquisition_count": len(profile["suggested_acquisitions"]),
+                "suggested_acquisition_elements": sorted({item["element"] for item in profile["suggested_acquisitions"]}),
+            })
+        return {
+            "schema_version": "company_profile_research_catalog.v1",
+            "state": "found" if items else "idle",
+            "total": len(items),
+            "profiles": items,
+            "coverage_assessment": "selected_scope_only",
+            "full_report_completeness": "not_assessed",
+            "research_only": True,
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+        }
 
     def plan_enrichment(self, instrument_id: str, *, request_id: str, targets,
                         base_work_id: str | None = None) -> dict[str, Any]:

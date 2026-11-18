@@ -353,6 +353,12 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** original writer records, actual attribution and use decisions remain traceable; independently established acquisition gaps MAY be appended as local usage limitations on a successor research copy without changing source facts or historical artifacts
 - **AND** selecting a research dataset MUST NOT enable production tasks, model calls, automatic replay or a production quality claim
 
+#### Scenario: API clients discover saved research profiles before selecting a stock
+- **WHEN** a client requests the annual-profile catalog on the explicitly selected research root
+- **THEN** the same read owner MUST list the currently readable workpaper companies, report/work identities, visible fact/metric counts, per-reading origins and actual review statuses, and known gap/suggested-acquisition elements from the same-report detail projection
+- **AND** hidden/source-only/duplicate payloads MUST NOT be exposed or counted as visible content; pending and limited facts remain distinguishable, and incomplete review MUST NOT be inferred complete from nonempty counts
+- **AND** no readable workpapers yields an empty catalog, an unavailable configured root remains an explicit error, and the read performs no model calls, implicit root selection, business writes or change to historical/S1/production status
+
 #### Scenario: A useful workpaper has no trusted core facts yet
 - **WHEN** query/export reads a sourced workpaper whose trusted-core accepted_fact_count is still zero
 - **THEN** it MUST also expose a separate workpaper summary with its original business description, fact/metric counts, origin, review status, unresolved-finding count and known actual extraction/review models

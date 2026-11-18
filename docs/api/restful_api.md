@@ -335,11 +335,24 @@ curl -X POST "http://localhost:8000/api/v1/gaps/fill" \
 
 研究域接口统一使用 `/api/v1/research` 前缀。已落到本地 `research.db` 的标准化快照或物化结果原则上都应提供 API 读路径；未开放模块会返回明确的 gated/disabled 原因。
 
+### GET /api/v1/research/company/annual-profiles
+
+只读当前研究根中可用的年报画像目录，不调用模型或修改数据。返回`total`及按股票排序的`profiles`；每项包含报告身份、首读/后续工作ID、`visible_fact_count`、`visible_metric_count`、事实分级计数`fact_states`、各轮实际`origin/review_status`，以及缺项/建议补充的要素和条数。具体正文、原因、来源及模型仍由下方单股接口读取；补读计划沿既有POST接口生成。
+
+可读数量含待核/限用，不含隔离、仅源参考或重复对象的隐藏正文/指标，不能用它推算准确率或完整性。多轮审核状态不合成一个“通过”；空数据返回200、`state=idle,total=0,profiles=[]`，没有把旧版非底稿记录伪装成新画像。配置的研究根失效仍503。
+
+```bash
+curl http://127.0.0.1:8000/api/v1/research/company/annual-profiles
+curl http://127.0.0.1:8000/api/v1/research/company/600104.SH/annual-profile
+```
+
+以上假设本地API已启动且挂载当前代码；本轮不自动部署或重启服务。
+
 ### GET /api/v1/research/company/{instrument_id}/annual-profile
 
 读取原公司画像read owner的年报研究内容，不同于`/profile`公司档案快照。只读本地，不触发LLM、下载或生产写入；尚无年报画像返回404。默认读取根为既有`data/research/company_profile_common_core`，开发目录不会自动发布到这里；服务是否已部署以实际OpenAPI为准。
 
-需要使用独立研究数据时，在API进程环境显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`。当前十二份已保存真实稿的研究读取根是`/home/python/Quote/data/research/company_profile_api_preview_20261117`，已逐家验证API与原read owner一致；该目录是实际读取数据，不是可清理测试库。配置路径不存在或为空时返回503，不静默改读其他数据。未设置变量仍沿原默认根，不改共享配置或自动重启服务；本次仅完成ASGI接口实物验证，不代表现网已部署。
+需要使用独立研究数据时，在API进程环境显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_current_20261118`。这是当前12家公司399条可读记录、609项指标的统一研究读取快照，各自原工作ID/模型/审核/缺项保留，并非同版新首发或全输出准确率证明；海泰仍有incomplete审核。旧`company_profile_api_preview_20261117`根仍保留，不自动切换。研究根是实际读取数据，不是可清理测试库。配置路径不存在或为空时返回503，不静默改读其他数据。未设置变量仍沿原默认根，不改共享配置或自动重启服务；本次仅完成ASGI接口实物验证，不代表现网已部署。
 
 - `facts`：分级事实，以`reading_work_id + fact_id`共同定位。隔离、仅源参考和重复对象保状态/原因但`fact=null`，待核/保真限用不冒充正式接受。
 - `information_gaps`：要素、原状态、缺项或不确定原因及所属读取批次；`suggested_acquisitions`是复核提出的补充建议，不是已经取得的事实。

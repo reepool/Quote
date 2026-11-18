@@ -1,0 +1,71 @@
+{
+  "schema_version": "company_profile_catalog_verification.v1",
+  "scope": "6.DO read-only research catalog, not new extraction or quality scoring",
+  "baseline_commit": "ee2530d5",
+  "research_root": "/home/python/Quote/data/research/company_profile_current_20261118",
+  "detail_reference": "workpaper-dn-remaining-result-20261118/current-research-profiles.json",
+  "detail_reference_sha256": "a01565ba04b8905f7a5a88964a9e0feae5b43725a4a1aeb90c6be8369e565828",
+  "execution": {
+    "transport": "local FastAPI ASGI, original router and read owner",
+    "network_create_connection_connect_and_dns_blocked": true,
+    "external_requests": 0,
+    "model_requests": 0,
+    "business_writes": 0,
+    "catalog_get_status": 200,
+    "detail_gets": 12,
+    "detail_get_status": 200,
+    "plan_post_status": 200,
+    "plan_execution_started": false,
+    "elapsed_seconds_excluding_imports": 27.241
+  },
+  "checks": {
+    "catalog_matches_original_read_owner": true,
+    "all_detail_responses_equal_frozen_snapshot": true,
+    "counts_states_readings_gaps_and_suggestions_match_details": true,
+    "all_12_runtime_file_hashes_unchanged": true,
+    "haitech_review_remains_incomplete": true,
+    "saic_products_services_gap_remains_visible": true,
+    "plan_binds_current_reading_and_does_not_execute": true,
+    "catalog_compact_bytes": 10203,
+    "catalog_sha256_sorted_keys_compact_utf8": "cb55adc64092b951d71b41865405755e39e4f19f0ab5add94b5df013ba026920"
+  },
+  "companies": [
+    {"instrument_id": "600000.SH", "visible_facts": 51, "visible_metrics": 89, "review_status": "completed"},
+    {"instrument_id": "600054.SH", "visible_facts": 32, "visible_metrics": 43, "review_status": "completed_with_open_findings"},
+    {"instrument_id": "600082.SH", "visible_facts": 34, "visible_metrics": 41, "review_status": "incomplete"},
+    {"instrument_id": "600088.SH", "visible_facts": 30, "visible_metrics": 39, "review_status": "completed_with_open_findings"},
+    {"instrument_id": "600094.SH", "visible_facts": 29, "visible_metrics": 39, "review_status": "completed"},
+    {"instrument_id": "600097.SH", "visible_facts": 27, "visible_metrics": 44, "review_status": "completed_with_open_findings"},
+    {"instrument_id": "600098.SH", "visible_facts": 42, "visible_metrics": 47, "review_status": "completed_with_open_findings"},
+    {"instrument_id": "600099.SH", "visible_facts": 32, "visible_metrics": 58, "review_status": "completed_with_open_findings"},
+    {"instrument_id": "600100.SH", "visible_facts": 27, "visible_metrics": 32, "review_status": "completed_with_open_findings"},
+    {"instrument_id": "600103.SH", "visible_facts": 32, "visible_metrics": 62, "review_status": "completed"},
+    {"instrument_id": "600104.SH", "visible_facts": 37, "visible_metrics": 56, "review_status": "completed_with_open_findings"},
+    {"instrument_id": "600107.SH", "visible_facts": 26, "visible_metrics": 59, "review_status": "completed"}
+  ],
+  "totals": {"companies": 12, "visible_facts": 399, "visible_metrics": 609},
+  "tests": {
+    "initial_configuration_error": "-p no:cacheprovider conflicted with repository cache_dir; no tests ran",
+    "first_related_run": {"passed": 35, "failed": 1, "seconds": 85.42,
+      "failure": "new test used execution.processing_identity rather than execution.input_identity.processing_identity"},
+    "after_test_fixture_fix": {"catalog_passed": 5, "seconds": 8.73},
+    "unchanged_related_tests_reused": 31,
+    "commands": [
+      "bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_catalog.py tests/unit/test_research/test_company_profile_enrichment.py tests/unit/test_research/test_company_profile_workpaper_delivery.py -q",
+      "bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_catalog.py -q"
+    ],
+    "coverage": ["hidden grades excluded from visible counts", "pending retained", "incomplete not promoted",
+      "multiple companies", "same-report supplement retained without closing gaps", "orphan hash excluded",
+      "legacy-only company not fabricated", "HTTP catalog equals owner", "empty data 200", "invalid configured root 503"]
+  },
+  "cleanup": {
+    "prior_owned_workpaper_scratch_roots_found": 0,
+    "test_roots_removed_by_temporary_directory": true,
+    "remaining_workpaper_do_scratch_roots": 0,
+    "removed_test_file_bytes": null,
+    "note": "No scratch script, database copy, PDF copy or duplicate full profile created. Test bytes not measured; reusable shared caches/logs and research datasets retained."
+  },
+  "research_only": true,
+  "formal_S1_pass": false,
+  "production_authorization": "not_authorized"
+}

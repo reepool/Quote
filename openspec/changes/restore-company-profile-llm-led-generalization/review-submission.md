@@ -1,5 +1,17 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 331. 6.DO研究画像目录API与当前12家只读消费
+
+用户“继续”。沿openspec-apply-change/business-first-goal、产品/验收/交付/A-B v3，开工HEADee2530d5/暂存空；配置/骨架/市场数据、混合规划及未跟踪内容均视为既有保护。方向由重复付费抽取转为实际消费：现有逐股详情/补读计划已可用，但缺公司目录且API文档仍指旧研究根。本卡只零调用打通“目录发现→单股内容/缺项→具体问题计划”，不重抽、修语义细目或启生产；先盘点本人相关workpaper临时根0，无盲删历史/并行。
+
+原CompanyProfileReadService复用同报告分级投影新增research_profile_catalog，薄GET `/api/v1/research/company/annual-profiles` 列股票、报告/工作ID、可见事实/指标、分级计数、每轮origin/review_status及缺项/建议要素。隐藏/source_only/重复不计入可见内容，待核/限用保分级，incomplete不改绿；空数据200空目录，显式根失效仍503、不自动择最新目录。已有逐股GET/计划POST行为不变；API文档更新到current_20261118，未改共享配置/部署/默认根，未新增writer/模型阶段/事实库。
+
+[只读核验](workpaper-catalog-verification-20261118.json)：本地真实FastAPI/ASGI路由封锁socket连接及DNS，目录GET、12逐股GET及上汽计划POST成功，计划未执行；12详情逐对象等于§330冻结快照、全部12个持久runtime hash前后相同。目录汇总仍12家399可见记录609指标，海泰incomplete及上汽产品待补、其他开放/限用保留。27.241秒是本地核验、不含导入，不是公司采集耗时或质量评分；0外部/模型请求、0业务写入，不产生新首发/S1/准确率或生产声明。
+
+直接回归先因禁用cacheprovider与仓库cache_dir冲突在执行前退出；改用仓库原配置后35通过/1新用例失败85.42秒。失败仅新补读夹具错用execution.processing_identity，修为真实input_identity嵌套后新目录5项8.73秒全过，未变的31相关通过复用，不再重复61秒旧TaskService。覆盖多公司/同报告补读/坏hash孤儿/三种隐藏/待核与incomplete/旧版/空目录/503；6依赖警告不属本卡，OpenSpec strict及隔离diff收尾。Review A类新夹具构造已纠正，无本轮剩余阻塞；B类未来分页/性能与可选补读不扩，C类既有脏改不动。真实全市场质量和生产验收仍未完成。
+
+用例TemporaryDirectory均自行清理、结束workpaper-do-*残留0，未建临时脚本/整库/PDF副本或另一份全量画像；清理字节未量不虚报。持久仅紧凑核验一份，正式源/有效缓存/当前与旧研究根、历史attempt及共享缓存/日志保留。本人代码/测试/文档块隔离Review、正常提交推送；活跃开发/审核时间未精确统计。下一按API实际使用反馈和指定股票问题精读，或按正式验收计划另授权新阶段，不自动追加付费/重跑十二家。
+
 ## 330. 6.DN余四真实收尾，当前12家研究API统一读取
 
 用户call_91b3de3aa24d4b6e9b86bfce5b6c56d3明确允许仅纠正未启动四家operator接线后继续，沿openspec-apply-change/business-first-goal执行，开工HEADafd0c9c6/空暂存，配置/骨架/市场数据及原混合段视为既有保护。前序DN临时物已清；只用四个未启动原名额，独立结果目录和同一TaskService，provider cap620→2450，不改业务代码/Schema/提示/共享配置。真实adapter到LlmRequest旧620负例和新初核/修订/最终2450边界零调用通过；启动前目录适配错误曾被原断言拒绝，0模型/0正式尝试，新预检暂误写旧位置后已恢复原字节并核原hash，错误与新证据分列，未抹去或假装已发成功。此后新冻结同联网环境/参数/代码/原源，保持原批次绝对截止，不重新计12600秒，首四20/554569已用先扣除。
