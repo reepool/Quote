@@ -1,0 +1,41 @@
+[
+  {
+    "request_id": "bp-work-c7026f842258726453ae5b4c:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "668c889f90f8ec4bc9413ae091d7bc00e2d73df7dce29d19c37ed0a5f1a2079e",
+    "response_hash": "906ef5c10efac7e3e1e1c509142525645fa25e93cffe4a3d87193f3485b158b7",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0017\",\"section-0021\",\"section-0038\",\"section-0039\",\"section-0040\",\"section-0070\",\"section-0731\"],\"rationale\":\"选择覆盖公司业务与经营的核心实质子节：section-0017（主要业务，含珠宝与物理平台板块）说明做什么与产品用途；section-0021（珠宝业务经营模式，含销售/生产/采购/门店/线上/存货）说明经营方式与渠道；section-0038（主营业务分析）及其子节section-0039（概述）与section-0040（收入与成本）提供公司收入总额、收入构成与成本结构，是货币化与主要业务权重的关键；section-0070（主要控股参股公司分析）补充各经营主体规模与贡献；section-0731（分部信息）用于按业务分部核对收入与利润构成，弥补板块权重缺口。未选纯行业背景（section-0028/0029）与泛化核心竞争力（section-0034），因其对公司层面解释力次要；未选财务报告全文及会计政策等附录。\",\"deferred\":[\"section-0028 行业情况：属行业背景，非公司层面经营实质，暂不纳入\",\"section-0034 核心竞争力分析：偏泛化竞争优势描述，信息密度低于经营与收入分析\",\"section-0053 资产及负债状况分析：资产结构非收入来源，暂缓\",\"section-0254 财务报告全文及会计政策、附注：仅按需定向补充，不整体扩读\"],\"stop_reason\":\"已选子节共同覆盖业务结构、产品服务与用途、经营模式与渠道、收入总额与构成、主要经营主体及分部权重，足以回答经营与货币化问题；行业背景与资产附注属次要或可定向补充范围，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0017",
+        "section-0021",
+        "section-0038",
+        "section-0039",
+        "section-0040",
+        "section-0070",
+        "section-0731"
+      ],
+      "rationale": "选择覆盖公司业务与经营的核心实质子节：section-0017（主要业务，含珠宝与物理平台板块）说明做什么与产品用途；section-0021（珠宝业务经营模式，含销售/生产/采购/门店/线上/存货）说明经营方式与渠道；section-0038（主营业务分析）及其子节section-0039（概述）与section-0040（收入与成本）提供公司收入总额、收入构成与成本结构，是货币化与主要业务权重的关键；section-0070（主要控股参股公司分析）补充各经营主体规模与贡献；section-0731（分部信息）用于按业务分部核对收入与利润构成，弥补板块权重缺口。未选纯行业背景（section-0028/0029）与泛化核心竞争力（section-0034），因其对公司层面解释力次要；未选财务报告全文及会计政策等附录。",
+      "deferred": [
+        "section-0028 行业情况：属行业背景，非公司层面经营实质，暂不纳入",
+        "section-0034 核心竞争力分析：偏泛化竞争优势描述，信息密度低于经营与收入分析",
+        "section-0053 资产及负债状况分析：资产结构非收入来源，暂缓",
+        "section-0254 财务报告全文及会计政策、附注：仅按需定向补充，不整体扩读"
+      ],
+      "stop_reason": "已选子节共同覆盖业务结构、产品服务与用途、经营模式与渠道、收入总额与构成、主要经营主体及分部权重，足以回答经营与货币化问题；行业背景与资产附注属次要或可定向补充范围，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 14728,
+      "output_tokens": 400,
+      "total_tokens": 15128
+    }
+  }
+]

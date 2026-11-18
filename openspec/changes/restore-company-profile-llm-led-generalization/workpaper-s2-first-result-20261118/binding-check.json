@@ -1,0 +1,25 @@
+{
+  "provider_cap": 2450,
+  "gateway_boundaries": [
+    {
+      "purpose": null,
+      "profile": "semantic_extraction__scorpio_grok",
+      "timeout_seconds": 2450
+    },
+    {
+      "purpose": null,
+      "profile": "semantic_extraction__deepseek",
+      "timeout_seconds": 2450
+    },
+    {
+      "purpose": null,
+      "profile": "semantic_extraction__scorpio_grok",
+      "timeout_seconds": 2450
+    }
+  ],
+  "profile_physical_seconds": {
+    "review": 1200,
+    "flash": 600
+  },
+  "new_model_requests": 0
+}

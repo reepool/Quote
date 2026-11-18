@@ -1,0 +1,409 @@
+# File: finalize_ds.py
+"""6.DS finite delivery of saved real results; no model/network calls."""
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+
+from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import workpaper_elements, workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118'
+RESEARCH = ROOT / 'data/research/company_profile_s2_first_20261118'
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
+def dump(path, payload):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main():
+    audit_path = DEST / 'audit-decisions.json'
+    audit = load(audit_path)
+    group = load(DEST / 'group-execution.json')
+    manifest = load(DEST / 'source-manifest.json')['companies']
+    assert len(manifest) == group['executed'] == 20 and not group['not_started']
+    writer = CompanyProfileResearchWriter(RESEARCH)
+    rows, budgets, checked, original_hashes = [], [], [], {}
+    total = Counter()
+    all_api = []
+    for item in manifest:
+        code = item['instrument_id']
+        folder = DEST / code[:6]
+        summary = load(folder / 'summary.json')
+        budget_path = folder / 'budget.json'
+        budget = load(budget_path) if budget_path.exists() else {'physical_requests': 0, 'charged_tokens': 0, 'attempts': []}
+        attempts = budget['attempts']
+        assert budget['physical_requests'] == len(attempts) <= 10
+        assert budget['charged_tokens'] == sum(a['charged_tokens'] for a in attempts) <= 1000000
+        counts = Counter(a['logical_request_id'] for a in attempts)
+        assert max(counts.values(), default=0) <= 2
+        recoveries = sum(n - 1 for n in counts.values())
+        assert recoveries <= 3
+        unknown, usage = 0, 0
+        for attempt in attempts:
+            known = (attempt.get('usage') or {}).get('total_tokens')
+            if known is None:
+                unknown += attempt['charged_tokens']
+            else:
+                assert attempt['charged_tokens'] == known
+                usage += known
+        total.update(physical_requests=len(attempts), charged_tokens=budget['charged_tokens'],
+                     recoveries=recoveries, known_supplier_total=usage, unknown_usage_reservations=unknown)
+        budgets.append({'instrument_id': code, 'physical_requests': len(attempts), 'recoveries': recoveries,
+                        'ledger': budget['charged_tokens'], 'known_supplier_total': usage,
+                        'unknown_usage_reservations': unknown, 'fee': 'unknown'})
+        row = {'instrument_id': code, 'name': item['name'], 'raw_fact_count': 0,
+               'status': 'no_profile', 'independent_core_answers': None,
+               'business_seconds': summary.get('business_seconds'), 'review_status': summary.get('review_status')}
+        path = folder / 'runtime.json'
+        if path.exists():
+            raw = path.read_bytes()
+            original_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(raw).hexdigest()
+            record = CompanyProfileRuntimeRecordV3.model_validate_json(raw)
+            original = record.workpaper.model_dump(mode='json')
+            facts = {f.fact_id: f for e in workpaper_elements(record.workpaper).values() for f in e.facts}
+            assert len(facts) == summary['total_facts_with_optional']
+            row.update(raw_fact_count=len(facts), status='content_requires_remaining_independent_assessment')
+            decisions = []
+            company = audit['companies'].get(code)
+            if company:
+                ids = company['checked_fact_ids'] + company.get('additional_checked_fact_ids', [])
+                assert len(ids) == len(set(ids)) and set(ids) <= set(facts)
+                row['independent_core_answers'] = company['core']
+                row['status'] = ('basic_description_source_supported' if all(company['core'].values())
+                                 else 'basic_description_incomplete')
+                for fid in ids:
+                    fact = facts[fid]
+                    reason = company['basis']
+                    disposition = 'source_checked'
+                    if fid in company.get('errors', {}):
+                        disposition, reason = 'withheld', company['errors'][fid]
+                    elif fid in company.get('duplicates', {}):
+                        disposition, reason = 'duplicate', company['duplicates'][fid]
+                    limitation = company.get('limitations', {}).get(fid)
+                    provenance = company.get('provenance_limitations', {})
+                    if provenance:
+                        limitation = '；'.join(filter(None, [limitation, *provenance.values()]))
+                    decisions.append({'fact_id': fid, 'fact_sha256': workpaper_fact_hash(fact),
+                                      'disposition': disposition, 'evidence_ids': list(fact.evidence_ids),
+                                      'reason': reason, 'limitation': limitation})
+                    checked.append({'instrument_id': code, **decisions[-1]})
+                paper = bind_workpaper_use_review(record.workpaper, {
+                    'report': record.report.model_dump(mode='json'), 'reviewer': 'Codex independent source audit 6.DS',
+                    'reference': str(audit_path.relative_to(ROOT)), 'reference_sha256': sha(audit_path), 'decisions': decisions})
+                candidate = paper.model_dump(mode='json')
+                candidate.pop('use_review', None)
+                prior = dict(original)
+                prior.pop('use_review', None)
+                assert candidate == prior, 'only local use-review may change'
+                record = record.model_copy(update={'workpaper': paper})
+            target = writer.output_root / f'{record.work_id}.json'
+            if target.exists():
+                assert target.read_text() == record.model_dump_json(indent=2), 'do not overwrite unrelated output'
+            else:
+                writer.persist(record)
+            total['raw_facts'] += len(facts)
+            total['profiles_with_content'] += 1
+        rows.append(row)
+    assert total['physical_requests'] == 88 and total['charged_tokens'] == 2532366
+    assert total['raw_facts'] == 475 and total['profiles_with_content'] == 16
+    assert len(checked) == 227
+    instruments = [i['instrument_id'] for i in manifest]
+    reader = CompanyProfileReadService(RESEARCH)
+    query = reader.query(instruments)
+    assert query['delivered'] == 16
+    assert set(query['missing_instrument_ids']) == {'600113.SH', '000025.SZ', '000001.SZ', '000166.SZ'}
+    exported = reader.export(instruments, export_directory=DEST / 'delivery')
+    assert query['profiles'] == exported['profiles']
+    assert CompanyProfileReadService(RESEARCH).query(instruments)['profiles'] == query['profiles']
+    delivery_counts = Counter()
+    for row in rows:
+        if row['status'] == 'no_profile':
+            continue
+        api = reader.research_profile(row['instrument_id'])
+        assert api == CompanyProfileReadService(RESEARCH).research_profile(row['instrument_id'])
+        visible = [entry for entry in api['facts'] if entry['fact'] is not None]
+        row['visible_fact_count'] = len(visible)
+        row['visible_metric_count'] = sum(len(entry['fact']['metrics']) for entry in visible)
+        row['gap_count'] = len(api['information_gaps'])
+        row['suggested_acquisition_count'] = len(api['suggested_acquisitions'])
+        for entry in api['facts']:
+            delivery_counts[entry['state']] += 1
+        row['independently_checked_objects'] = sum(entry['review_basis'] == 'independent_source_check' for entry in api['facts'])
+        total['visible_facts'] += row['visible_fact_count']
+        total['visible_metrics'] += row['visible_metric_count']
+        all_api.append(api)
+    for name, digest in original_hashes.items():
+        assert sha(ROOT / name) == digest
+    dump(DEST / 'resource-audit.json', {'per_company': budgets, 'totals': dict(total),
+        'group_supervision_wall_seconds': group['supervision_wall_seconds'], 'fee': 'unknown',
+        'supplier_total_not_input_plus_output': True, 'preparation_and_independent_review_time': 'not_completely_measured'})
+    dump(DEST / 'delivery' / 'annual-api.json', {'catalog': reader.research_profile_catalog(),
+        'profiles': all_api, 'requested_instrument_ids': instruments, 'missing_instrument_ids': query['missing_instrument_ids']})
+    dump(DEST / 'batch-assessment.json', {'phase': 'S2_first_group', 'status': 'not_passed', 'executed': 20,
+        'not_started': [], 'nonempty_profiles': 16, 'basic_complete_candidate_upper_bound': 14,
+        'required_first_delivery_companies': 18, 'basic_recall_upper_bound': 0.75,
+        'required_basic_macro_recall': 0.95, 'full_group_audited_accuracy': 'not_assessed',
+        'required_audited_accuracy': 0.99, 'independent_objects_checked': len(checked),
+        'independent_companies_checked': len(audit['companies']), 'known_independent_errors_withheld': 1,
+        'local_duplicate_not_redisplayed': 1, 'full_formal_400_supplement_sample': 'not_completed',
+        'delivery_states': dict(delivery_counts), 'research_output_root': str(RESEARCH), 'rows': rows,
+        'limits': ['75%为由4无稿及2实质不完整推得的最有利上限，不是已完成整组召回计分。',
+                   '14家只是其余全部成立时的上限，不是已独立通过14家。',
+                   '227对象为有限后验核查，不推算全组准确率；未独立核对象保实际模型状态。',
+                   'S1旧失败不改，S2本组不通过，未授权确认组、S3或生产。']})
+    dump(DEST / 'readback-check.json', {'query_export_new_reader_equal': True, 'api_detail_fresh_reader_equal': True,
+        'profile_count': 16, 'missing_instrument_ids': query['missing_instrument_ids'], 'raw_runtime_sha256_unchanged': original_hashes,
+        'review_reference_sha256': sha(audit_path), 'new_model_requests_in_finalization': 0})
+    print(json.dumps({'totals': dict(total), 'delivery_states': dict(delivery_counts), 'root': str(RESEARCH)}, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()
+
+
+# File: verify_api.py
+"""Read-only in-process ASGI verification; no model or TCP requests."""
+import asyncio
+import json
+from pathlib import Path
+from unittest.mock import patch
+
+import httpx
+from fastapi import FastAPI
+from api.company_profile_routes import annual_profile_reader, router
+from research.company_profile.reads import CompanyProfileReadService
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118'
+reader = CompanyProfileReadService(ROOT / 'data/research/company_profile_s2_first_20261118')
+
+
+async def main():
+    saved = json.loads((DEST / 'delivery/annual-api.json').read_text())
+    app = FastAPI()
+    app.include_router(router, prefix='/api/v1')
+    app.dependency_overrides[annual_profile_reader] = lambda: reader
+    statuses = {}
+    with patch('socket.create_connection', side_effect=AssertionError('external sockets forbidden')):
+        async with asyncio.timeout(120):
+            async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://local') as client:
+                catalog = await client.get('/api/v1/research/company/annual-profiles')
+                assert catalog.status_code == 200 and catalog.json() == saved['catalog']
+                by_code = {p['instrument_id']: p for p in saved['profiles']}
+                for code in saved['requested_instrument_ids']:
+                    response = await client.get(f'/api/v1/research/company/{code}/annual-profile')
+                    expected = 200 if code in by_code else 404
+                    assert response.status_code == expected
+                    if expected == 200:
+                        assert response.json() == by_code[code]
+                    statuses[code] = response.status_code
+    result = {'catalog_http_status': 200, 'detail_statuses': statuses,
+              'details_equal_canonical_api': True, 'external_sockets_forbidden': True,
+              'new_model_requests': 0, 'runtime_default_configuration_changed': False}
+    (DEST / 'api-check.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    print(json.dumps(result, ensure_ascii=False), flush=True)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+
+# File: present_ds.py
+"""Human view and diagnostics derived only from saved 6.DS receipts/API."""
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118'
+
+
+def load(name):
+    return json.loads((DEST / name).read_text())
+
+
+def dump(name, data):
+    (DEST / name).write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+
+api = load('delivery/annual-api.json')
+assessment = load('batch-assessment.json')
+resources = {row['instrument_id']: row for row in load('resource-audit.json')['per_company']}
+by_code = {p['instrument_id']: p for p in api['profiles']}
+labels = dict(business_structure='它做什么', products_services='产品与服务', revenue_model='怎么赚钱',
+              scale_and_mix='规模与业务构成', operations_and_inputs='经营方式与投入',
+              customers_channels_markets='客户、渠道与市场', operating_drivers='经营影响因素',
+              material_changes='重要变化', position='供应链位置（可选）', upstream_inputs='上游投入（可选）',
+              downstream_customers='下游领域（可选）', company_features='公司特色与自主发现（可选）')
+state_labels = dict(basic_description_source_supported='基础三问已有限独立源核',
+                    content_requires_remaining_independent_assessment='有内容，保原模型核，未独立完成基础评分',
+                    basic_description_incomplete='有片段，基础业务描述不完整', no_profile='未成稿')
+failures = {'600113.SH': '全文标题误分类，业务入口前拒绝，0模型；本批名额已用。',
+            '000025.SZ': '导航成功，正文及唯一恢复非法JSON，未成稿。',
+            '000001.SZ': '导航成功，正文及唯一恢复非法JSON，未成稿。',
+            '000166.SZ': '导航成功，选中物理p29的native layout失败，未到抽取。'}
+lines = ['# 固定20家真实画像与缺项', '',
+         '仅研究用途，非正式接受或生产发布。20家已观察，16家有内容；基础完整候选最多14，S2本批未通过。', '',
+         '下文逐条文字与分级直接来自原read owner的API，不另写模型摘要。已核分独立源核/模型源核；限用仍须保原限定。来源是本报告物理页，完整Evidence原文/版本/偏移在annual-api.json；章节路径存在目录误分段时，以原页及所列独核限制为准。', '',
+         '| 公司 | 可读/原对象 | 基础描述状态 | 实际模型核状态 | 物理/账本 | 业务秒 |',
+         '| --- | ---: | --- | --- | ---: | ---: |']
+for row in assessment['rows']:
+    code = row['instrument_id']; resource = resources[code]
+    lines.append(f"| {row['name']} {code} | {row.get('visible_fact_count', 0)}/{row['raw_fact_count']} | {state_labels[row['status']]} | {row['review_status'] or '无成稿复核'} | {resource['physical_requests']}/{resource['ledger']} | {row['business_seconds'] if row['business_seconds'] is not None else '未入业务'} |")
+lines += ['', '合计88物理/5恢复，账本2532366（其中273814为未知usage预留），费用unknown；并发监督2962.918秒，准备和人工核查另计。227对象有限独核不推算全组准确率。', '']
+for row in assessment['rows']:
+    code = row['instrument_id']
+    lines += [f"## {row['name']} {code}", '', state_labels[row['status']] + '。', '']
+    if code not in by_code:
+        lines += [failures[code], '']; continue
+    profile = by_code[code]
+    reading = profile['readings'][0]
+    evidence = {e['evidence_id']: e for e in reading['evidence']}
+    generation = reading.get('generation') or {}
+    models = sorted({c['model'] for c in reading['review_calls'] if c.get('model')})
+    lines += [f"报告期：{profile['report']['report_period']}；原工作ID：{profile['base_work_id']}。", '',
+              f"原始生成信息见JSON的readings.generation；实际复核模型：{', '.join(models)}，状态：{reading['review_status']}。", '']
+    previous = None
+    for entry in profile['facts']:
+        fact = entry['fact']
+        if fact is None:
+            continue
+        if entry['element'] != previous:
+            lines += ['### ' + labels.get(entry['element'], entry['element']), '']
+            previous = entry['element']
+        citations = []
+        for eid in fact['evidence_ids']:
+            e = evidence[eid]
+            pages = sorted({s['page'] for s in e['source_spans']})
+            citations.append(' / '.join(e['section_path']) + '，物理p' + ','.join(map(str, pages)))
+        lines += [f"- [{entry['label']}] `{fact['fact_id']}` {fact['text']}",
+                  '  来源：' + '；'.join(dict.fromkeys(citations)) + '。']
+        if entry['reasons']:
+            lines += ['  使用说明：' + '；'.join(entry['reasons'])]
+        lines += ['']
+    lines += ['### 缺项与阅读限制', '']
+    for gap in profile['information_gaps']:
+        lines += ['- ' + labels.get(gap['element'], gap['element']) + '：' + gap['status'] + '；' + '；'.join(gap['reasons']), '']
+    for suggestion in profile['suggested_acquisitions']:
+        lines += ['- 建议获取：' + suggestion['reason'], '']
+    for reason in reading['limitations']:
+        lines += ['- 原阅读限制：' + reason, '']
+    hidden = [e for e in profile['facts'] if e['fact'] is None]
+    for entry in hidden:
+        lines += [f"- `{entry['fact_id']}` {entry['label']}：" + '；'.join(entry['reasons']), '']
+(DEST / 'delivery/portraits.md').write_text('\n'.join(lines))
+
+diagnostics = {'new_model_requests': 0, 'original_failure_changed': False, 'json_cases': []}
+for code in ['000025', '000001']:
+    cases = []
+    for path in sorted((DEST / code / 'failed-model-content').glob('content-*.json')):
+        raw = json.loads(path.read_text()); content = raw['content']
+        try:
+            json.loads(content)
+        except json.JSONDecodeError as error:
+            syntax_only = json.loads(content + '}')
+            cases.append({'path': str(path.relative_to(ROOT)), 'sha256': raw['content_sha256'],
+                          'length': len(content), 'error_position': error.pos, 'message': str(error),
+                          'diagnostic_only_appending_one_brace_parses': True,
+                          'diagnostic_keys': list(syntax_only), 'accepted_or_repaired': False})
+    diagnostics['json_cases'].append({'code': code, 'saved_attempts': cases,
+        'same_content_after_recovery': cases[0]['sha256'] == cases[1]['sha256'],
+        'finish_reason': 'stop', 'schema_and_semantic_recovery': 'not_proven'})
+prepared = json.loads((ROOT / 'data/QuoteBak/workpaper-ds-prepared-u6h4f36z/000166.json').read_text())
+page = next(p for p in prepared['pages'] if p['page'] == 29)
+diagnostics['native_layout_case'] = {'code': '000166.SZ', 'physical_page': 29,
+    'native_text_characters': len(page['text']), 'native_text_sha256': hashlib.sha256(page['text'].encode()).hexdigest(),
+    'text_topic': '主要奖项及荣誉', 'saved_error': 'ValueError: selected page has unreadable native layout: 29',
+    'diagnosis': '原生文本存在但固定宽度layout拒绝，整包未到抽取；未在本轮降级或热修。'}
+dump('failure-diagnostics.json', diagnostics)
+print('Human view and read-only diagnostics created.')
+
+
+# File: close_ds.py
+"""Bounded 6.DS artifact cleanup after successful saved-result verification."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118'
+TASK = ROOT / 'data/QuoteBak/workpaper-ds-7G92Ao'
+PREPARED = ROOT / 'data/QuoteBak/workpaper-ds-prepared-u6h4f36z'
+
+
+def load(name):
+    return json.loads((DEST / name).read_text())
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+assert load('group-execution.json')['executed'] == 20
+assert load('readback-check.json')['query_export_new_reader_equal']
+assert load('api-check.json')['details_equal_canonical_api']
+for name, sha in load('readback-check.json')['raw_runtime_sha256_unchanged'].items():
+    assert digest(ROOT / name) == sha
+for item in load('source-manifest.json')['companies']:
+    assert digest(Path(item['asset']['archive_path'])) == item['asset']['content_hash']
+for timing in DEST.glob('*/temporary-root.json'):
+    assert not Path(json.loads(timing.read_text())['root']).exists()
+processes = subprocess.check_output(['ps', '-eo', 'pid=,args='], text=True).splitlines()
+assert not any(('ds_runner.py' in line or 'verify_api.py' in line or 'finalize_ds.py' in line)
+               and not line.lstrip().split()[1:2] == ['rg'] for line in processes), 'active task process; do not clean'
+snapshots = []
+for name in ['finalize_ds.py', 'verify_api.py', 'present_ds.py', 'close_ds.py']:
+    snapshots.append(f'# File: {name}\n' + (TASK / name).read_text())
+(DEST / 'finalization-snapshot.txt').write_text('\n\n'.join(snapshots))
+preserved = {'delivery/annual-api.json': digest(DEST / 'delivery/annual-api.json'),
+             'delivery/portraits.md': digest(DEST / 'delivery/portraits.md')}
+deleted = []
+
+
+def remove(path):
+    path = path.resolve()
+    assert path == PREPARED or path == TASK or path.is_relative_to(DEST)
+    files = [p for p in path.rglob('*') if p.is_file()] if path.is_dir() else [path]
+    deleted.append({'path': str(path), 'files': len(files), 'file_bytes': sum(p.stat().st_size for p in files)})
+    if path.is_dir():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
+
+
+for row in load('source-manifest.json')['companies']:
+    export = DEST / row['instrument_id'][:6] / 'export'
+    if export.is_dir():
+        remove(export)
+for path in list((DEST / 'delivery').iterdir()):
+    if path.is_file() and path.name not in {'annual-api.json', 'portraits.md'}:
+        remove(path)
+remove(PREPARED)
+remove(TASK)
+for name, sha in preserved.items():
+    assert digest(DEST / name) == sha
+runtime_cleanup = sum(r.get('cleanup_bytes', 0) for r in load('group-execution.json')['results'])
+data = {'deleted': deleted, 'closing_file_bytes': sum(x['file_bytes'] for x in deleted),
+        'runtime_finally_cleanup_file_bytes': runtime_cleanup,
+        'total_observed_file_bytes': runtime_cleanup + sum(x['file_bytes'] for x in deleted),
+        'final_canonical_outputs_sha256': preserved, 'other_task_or_unknown_ownership_removed': False,
+        'preserved': ['official_PDF_and_shared_valid_native_cache', 'original_query_runtime_budget_model_failures',
+                      'used_attempt_markers', 'isolated_persistent_API_root', 'previous_research_roots_and_baseline_changes'],
+        'recovery': 'Deleted derived exports/preparation/scripts are reproducible from preserved receipts/source/snapshots; no source assets deleted.'}
+(DEST / 'cleanup.json').write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({k:v for k,v in data.items() if k not in {'deleted', 'preserved'}}, ensure_ascii=False))

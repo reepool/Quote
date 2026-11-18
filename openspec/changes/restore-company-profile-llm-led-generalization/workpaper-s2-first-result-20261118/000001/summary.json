@@ -1,0 +1,40 @@
+{
+  "instrument_id": "000001.SZ",
+  "name": "平安银行",
+  "run_id": "v21-s2-first-000001-20261118",
+  "three_reads_equal": true,
+  "exception": null,
+  "provider_constructor_binding_verified_before_entry": true,
+  "business_started_monotonic": 10209026.466374062,
+  "preparation_seconds": 34.381,
+  "state": "incomplete",
+  "business_ended_monotonic": 10209093.615930848,
+  "business_seconds": 67.15,
+  "contract_errors": [],
+  "failed_calls": [
+    {
+      "stage": "extract",
+      "code": "candidate_schema_invalid",
+      "detail": "LLM response is not valid JSON: Expecting ',' delimiter at line 1 column 23015 (char 23014)"
+    }
+  ],
+  "readable": false,
+  "facts": 0,
+  "review_status": null,
+  "core_missing_elements": [
+    "business_structure",
+    "products_services",
+    "revenue_model"
+  ],
+  "review_limit_error": null,
+  "failure_signature": "{\"code\": \"candidate_schema_invalid\", \"detail\": \"LLM response is not valid JSON: Expecting ',' delimiter at line # column # (char #)\", \"stage\": \"extract\"}",
+  "physical_requests": 3,
+  "charged_tokens": 70301,
+  "cost": "unknown",
+  "stopped_reason": null,
+  "recoveries": 1,
+  "supervision_seconds": 68.548,
+  "captured_model_contents": 3,
+  "failed_contents_retained": 2,
+  "cleanup_bytes": 1885509
+}

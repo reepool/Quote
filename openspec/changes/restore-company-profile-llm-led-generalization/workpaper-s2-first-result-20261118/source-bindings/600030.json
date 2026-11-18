@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "600030.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-966ac8c0a22e5ab07a22c32c",
+    "filing_id": "1225036081",
+    "source": "cninfo",
+    "published_at": "2026-03-26T16:00:00+00:00",
+    "content_hash": "438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/43/438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "bp-frontier-966ac8c0a22e5ab07a22c32c",
+    "source": "cninfo",
+    "announcement_id": "1225036081",
+    "title": "中信证券股份有限公司2025年年度报告",
+    "published_at": "2026-03-26T16:00:00+00:00",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225036081.PDF",
+    "exchange": "SSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}

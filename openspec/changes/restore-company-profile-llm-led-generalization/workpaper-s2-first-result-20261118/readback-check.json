@@ -1,0 +1,31 @@
+{
+  "query_export_new_reader_equal": true,
+  "api_detail_fresh_reader_equal": true,
+  "profile_count": 16,
+  "missing_instrument_ids": [
+    "600113.SH",
+    "000025.SZ",
+    "000001.SZ",
+    "000166.SZ"
+  ],
+  "raw_runtime_sha256_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600110/runtime.json": "b5cb4d460b6cbff440119175493d8df2059940d073bd02d2c8f42440ffc6ea29",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600111/runtime.json": "eb77b2a04de78b94e5ee02256a761fcc775d8c9de3ea9f602da7786c4d3297af",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000008/runtime.json": "d40fc2a3060f55fd040fb24bb89c531f1c12b8f06f01ea332e8e453e24c42d97",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000009/runtime.json": "a58dd1bf1987af05cddced30ef01fe42b7d985069da3c42bf0067628ccf9bd69",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/920000/runtime.json": "17348f8e0eae78b3da12236d91546ad85af89b3e4a8a964cb27fc7681fc46e66",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/920001/runtime.json": "b8c804187d92a775fd3c17d8b9c1080c63ad22f3c5400bfc1c5750d328685c39",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600116/runtime.json": "678d3008f1227cbbe1cef9a52686e9f51311a505dd47dc55814474dd74c5060b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600106/runtime.json": "61e0d8ab9b9cafaa4df00542b03df2f576318e13e7414b146e4f4f907b3377fc",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000002/runtime.json": "f54406b5d98882b56c492d40350b642d41d42ba6e7e661917cf43d76cb413919",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000007/runtime.json": "5a0d5c9114175f8feaa6c868ee229de4731cf66f274f66af50a6accbab3f16c9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000010/runtime.json": "c4b320bdfed0cb12b3b5fcb743fc3260bd2682b973bf0c2c512641d1a6c336d9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600682/runtime.json": "bab6a189be4ac80e38a80df651be6938a2e4c09f6866236e0487b612f8be2ee2",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600620/runtime.json": "7e67f45c569a1514362ed62081b0cff50b063ea3e29135d8c77749b36e7ec209",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000421/runtime.json": "40958d6692a3010050d4399a588e025797dc35cab2f71a9bdd8dbee7fde00eba",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600030/runtime.json": "b3f40ac6d7593504117eeba41ab090285f1a9b908e8f263cbfde7c3e9c7c5851",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/601318/runtime.json": "18a9ebd61da274e0cc7fae865035e962d2549f03aacb05577d01b4c2123c5873"
+  },
+  "review_reference_sha256": "19e54ca3fbe7ef8bcecf5ff46f0abbf8e1e3b4529b788d6e13867091ee3410dd",
+  "new_model_requests_in_finalization": 0
+}

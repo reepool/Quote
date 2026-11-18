@@ -1,0 +1,368 @@
+{
+  "task": "6.DS",
+  "status": "authorized",
+  "companies": [
+    {
+      "instrument_id": "600110.SH",
+      "name": "诺德股份",
+      "asset": {
+        "instrument_id": "600110.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-e086ce9916a0717de1de0a2b",
+        "filing_id": "1225150851",
+        "source": "cninfo",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "content_hash": "08e177351e29f3cd8f8b3d6d356794249375dee292923c2fa5be75de5dd0abe4",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/08/08e177351e29f3cd8f8b3d6d356794249375dee292923c2fa5be75de5dd0abe4.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "125e660ebc7888bd321ab2f794fd324205e88383e84b63ec0671324b982827e4",
+      "pdf_pages": 323
+    },
+    {
+      "instrument_id": "600111.SH",
+      "name": "北方稀土",
+      "asset": {
+        "instrument_id": "600111.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-c0e98740f47ade2cfa60af24",
+        "filing_id": "1225118607",
+        "source": "cninfo",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "content_hash": "401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/40/401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "f4f994591139104b255f7be9eb22214c2cb0ac17cb8235d56f1cd8a1deef0ad7",
+      "pdf_pages": 263
+    },
+    {
+      "instrument_id": "000008.SZ",
+      "name": "神州高铁",
+      "asset": {
+        "instrument_id": "000008.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-8067b8485ef66b714436506f",
+        "filing_id": "1225116810",
+        "source": "cninfo",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "content_hash": "c0358b156cc0a4a1ed19b1ee423654ceec784b0058cc849e6bf773654af23220",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/c0/c0358b156cc0a4a1ed19b1ee423654ceec784b0058cc849e6bf773654af23220.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "b3239ef46a056e1f814a42074543b5d72ca8c18f1dd3280555ecfd474d374907",
+      "pdf_pages": 174
+    },
+    {
+      "instrument_id": "000009.SZ",
+      "name": "中国宝安",
+      "asset": {
+        "instrument_id": "000009.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-47584ea3a0d93015f9113e76",
+        "filing_id": "1225191885",
+        "source": "cninfo",
+        "published_at": "2026-04-24T16:00:00+00:00",
+        "content_hash": "a72585593e269cc1d4ea07f7fe4199e405ab2f6f64a470344fedfbd642b221d4",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/a7/a72585593e269cc1d4ea07f7fe4199e405ab2f6f64a470344fedfbd642b221d4.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "b3584c912adc709c13c9685f836743a78313b8c630be964de13c9fb6d7973ec0",
+      "pdf_pages": 218
+    },
+    {
+      "instrument_id": "920000.BJ",
+      "name": "安徽凤凰",
+      "asset": {
+        "instrument_id": "920000.BJ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-def433386354a940fda856f7",
+        "filing_id": "1225139795",
+        "source": "cninfo",
+        "published_at": "2026-04-20T16:00:00+00:00",
+        "content_hash": "e5db3aef86c24bf4dac3f4370d4189a435ca5db907025c88419f26906d8cd3cc",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e5/e5db3aef86c24bf4dac3f4370d4189a435ca5db907025c88419f26906d8cd3cc.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "BSE",
+      "prepared_sha256": "15433b755b0de73e732f142779ad9be6e927315379a12b3c173f707d87e3b9c9",
+      "pdf_pages": 171
+    },
+    {
+      "instrument_id": "920001.BJ",
+      "name": "纬达光电",
+      "asset": {
+        "instrument_id": "920001.BJ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-5fc6b78cc67fe1719e318254",
+        "filing_id": "1225045712",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "6aaa5d923e055572eb19a38a058a56f678b19ebb7bb6997d032b3f98e4def345",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/6a/6aaa5d923e055572eb19a38a058a56f678b19ebb7bb6997d032b3f98e4def345.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "BSE",
+      "prepared_sha256": "f43cc2e41991d2b7636b83293ab85a00b65ea6bc416afa519edccb5f966003aa",
+      "pdf_pages": 139
+    },
+    {
+      "instrument_id": "600116.SH",
+      "name": "三峡水利",
+      "asset": {
+        "instrument_id": "600116.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-f37c3d5aa206f481c8475fac",
+        "filing_id": "1225150377",
+        "source": "cninfo",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "content_hash": "c2c7bfc3fdd348b9be15aeab6562b761c030d7db605c00f88a9c315854ee1486",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/c2/c2c7bfc3fdd348b9be15aeab6562b761c030d7db605c00f88a9c315854ee1486.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "682d6e027e14362fc99b15f86d180b53211a7aa466211aa1b2c97f38f7250635",
+      "pdf_pages": 297
+    },
+    {
+      "instrument_id": "600106.SH",
+      "name": "重庆路桥",
+      "asset": {
+        "instrument_id": "600106.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-791950eaecb60c575cbc30a3",
+        "filing_id": "1225151501",
+        "source": "cninfo",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "content_hash": "810897ccf0c758112af455abbd3ea9aac19cf468c39c90e019be726c42525411",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/81/810897ccf0c758112af455abbd3ea9aac19cf468c39c90e019be726c42525411.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "12475c9285f8d0a1e7b86efddeacb67645fc75c48ff59d9cab5ba379606b0714",
+      "pdf_pages": 186
+    },
+    {
+      "instrument_id": "600113.SH",
+      "name": "XD浙江东",
+      "asset": {
+        "instrument_id": "600113.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_f2dda829c32d3b60bf4c34f5087921bf",
+        "filing_id": "1225000442",
+        "source": "cninfo",
+        "published_at": "2026-03-06T16:00:00+00:00",
+        "content_hash": "15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/15/15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "4fbf58a36554c7d65ae6b4cd78bda5b0c77b4add6f39dbf0ead54714cebf5eea",
+      "pdf_pages": 220
+    },
+    {
+      "instrument_id": "000002.SZ",
+      "name": "万  科Ａ",
+      "asset": {
+        "instrument_id": "000002.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-de335269e533a083a5ee0bd5",
+        "filing_id": "1225067794",
+        "source": "cninfo",
+        "published_at": "2026-03-31T16:00:00+00:00",
+        "content_hash": "b2befc9da2a9e09c798702c351e6af65a4b148e32baa07737b941edc2caf1eba",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/b2/b2befc9da2a9e09c798702c351e6af65a4b148e32baa07737b941edc2caf1eba.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "1dd136397d31a8e843b12722c05c3d3740bebd7bace69b5385e836108e9d0aa8",
+      "pdf_pages": 298
+    },
+    {
+      "instrument_id": "000007.SZ",
+      "name": "全新好",
+      "asset": {
+        "instrument_id": "000007.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-882d4c344b3b777071f54c0c",
+        "filing_id": "1225232778",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "73dd66bdf47eeaa56000b7b80da8f9c614d9b9e0c1ae77bff1e1c748b4f693a5",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/73/73dd66bdf47eeaa56000b7b80da8f9c614d9b9e0c1ae77bff1e1c748b4f693a5.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "e99135f8b8b57c4bf46392207e5055e4f34e51878ac907170b1b85d22c3621a1",
+      "pdf_pages": 163
+    },
+    {
+      "instrument_id": "000010.SZ",
+      "name": "*ST美丽",
+      "asset": {
+        "instrument_id": "000010.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-53f52ae644be6d55b1a34bf8",
+        "filing_id": "1225251718",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "7f01310fc02eeda772e7ee08b809bcd9296908b27f69dd84ba50acb63901d9f3",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/7f/7f01310fc02eeda772e7ee08b809bcd9296908b27f69dd84ba50acb63901d9f3.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "396396565f809c610a17ee08f135005f5b42a069efbdc3edbbebc5066726552c",
+      "pdf_pages": 164
+    },
+    {
+      "instrument_id": "600682.SH",
+      "name": "南京新百",
+      "asset": {
+        "instrument_id": "600682.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-099ba1ee47185a616197405b",
+        "filing_id": "1225265623",
+        "source": "cninfo",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "content_hash": "d0216e94df98c69b58eeb2bd4268ec53f6a07c418bd08b8eb6f330569f895795",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/d0/d0216e94df98c69b58eeb2bd4268ec53f6a07c418bd08b8eb6f330569f895795.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "6d36c57883ab5f560d56400b3a666404a5855ed73428456efa3f857e67dcd020",
+      "pdf_pages": 341
+    },
+    {
+      "instrument_id": "600620.SH",
+      "name": "天宸股份",
+      "asset": {
+        "instrument_id": "600620.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-9491f1854982ce67de2ec4e4",
+        "filing_id": "1225258755",
+        "source": "cninfo",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "content_hash": "327e365226b1402751a6f5cc1de7f6b8070dfec4410ba4e511901f460c835677",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/32/327e365226b1402751a6f5cc1de7f6b8070dfec4410ba4e511901f460c835677.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "e8403f7775c81d496a786381ff23bcfba5090aac2bd6e8a20522b7892c4bce94",
+      "pdf_pages": 164
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "name": "特  力Ａ",
+      "asset": {
+        "instrument_id": "000025.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-e6e544cf126421e9a24b225b",
+        "filing_id": "1225138352",
+        "source": "cninfo",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "content_hash": "e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e7/e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "9ea531f1fd0e19462252cc1bf45e9b1712c1339d2dd7e35fe2f3d9da9700a2ac",
+      "pdf_pages": 170
+    },
+    {
+      "instrument_id": "000421.SZ",
+      "name": "南京公用",
+      "asset": {
+        "instrument_id": "000421.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-dffa9df321ce06834138667f",
+        "filing_id": "1225091928",
+        "source": "cninfo",
+        "published_at": "2026-04-12T16:00:00+00:00",
+        "content_hash": "020bc6606fe2f27a760767b1c9409c45f4d3a0e1a76085a2b903eac3c6a2618e",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/02/020bc6606fe2f27a760767b1c9409c45f4d3a0e1a76085a2b903eac3c6a2618e.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "ae9517845f30b16e2a18e2ff92fb474e3e02d59baf913d03d0b1ee15b1b6e47d",
+      "pdf_pages": 225
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "name": "平安银行",
+      "asset": {
+        "instrument_id": "000001.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-4e7c579345d807aa0699ee5e",
+        "filing_id": "1225022887",
+        "source": "cninfo",
+        "published_at": "2026-03-20T16:00:00+00:00",
+        "content_hash": "2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/22/2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "0c66d912a3c2628ca930ce19113500be0b30edd4ba67e6ec96ec0e8d3d880ba9",
+      "pdf_pages": 288
+    },
+    {
+      "instrument_id": "600030.SH",
+      "name": "中信证券",
+      "asset": {
+        "instrument_id": "600030.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-966ac8c0a22e5ab07a22c32c",
+        "filing_id": "1225036081",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/43/438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "698323674d00e47c2b84a45e44cd365f622d446287a433f30d0e1ed4c1373fc9",
+      "pdf_pages": 389
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "name": "申万宏源",
+      "asset": {
+        "instrument_id": "000166.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-d48f7d90d7413020a7850ebd",
+        "filing_id": "1225045474",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/6a/6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SZSE",
+      "prepared_sha256": "7651a9e153842523c76153e9345b43395a56585d411e12a239450c475ba8a96b",
+      "pdf_pages": 458
+    },
+    {
+      "instrument_id": "601318.SH",
+      "name": "中国平安",
+      "asset": {
+        "instrument_id": "601318.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-efc068d2819d50a9092aa70a",
+        "filing_id": "1225038263",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/86/860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a.pdf",
+        "report_type": "annual_report"
+      },
+      "exchange": "SSE",
+      "prepared_sha256": "7aec78c59f635ad4691ce7a7fde5adb85c5a801953d5ca9b900374fddbf31720",
+      "pdf_pages": 370
+    }
+  ],
+  "same_basic_workpaper_contract": true,
+  "optional_missing_not_company_failure": true
+}

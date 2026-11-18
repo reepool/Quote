@@ -1,0 +1,290 @@
+{
+  "deleted": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600110/export",
+      "files": 6,
+      "file_bytes": 671053
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600111/export",
+      "files": 6,
+      "file_bytes": 589219
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000008/export",
+      "files": 6,
+      "file_bytes": 445687
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000009/export",
+      "files": 6,
+      "file_bytes": 635995
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/920000/export",
+      "files": 6,
+      "file_bytes": 499628
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/920001/export",
+      "files": 6,
+      "file_bytes": 523813
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600116/export",
+      "files": 6,
+      "file_bytes": 784535
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600106/export",
+      "files": 6,
+      "file_bytes": 542994
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000002/export",
+      "files": 6,
+      "file_bytes": 693743
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000007/export",
+      "files": 6,
+      "file_bytes": 480523
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000010/export",
+      "files": 6,
+      "file_bytes": 534455
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600682/export",
+      "files": 6,
+      "file_bytes": 856872
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600620/export",
+      "files": 6,
+      "file_bytes": 707575
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000421/export",
+      "files": 6,
+      "file_bytes": 732343
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600030/export",
+      "files": 6,
+      "file_bytes": 314145
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/601318/export",
+      "files": 6,
+      "file_bytes": 464880
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/profiles.csv",
+      "files": 1,
+      "file_bytes": 14756
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600111.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 407794
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600682.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 129563
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/research_profiles.json",
+      "files": 1,
+      "file_bytes": 2316913
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600111.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 83553
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000421.SZ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 97216
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600106.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 423834
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000010.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 345372
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000008.SZ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 49477
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600106.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 66293
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/920000.BJ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 78788
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600620.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 456364
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000009.SZ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 77509
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600682.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 585523
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/export_manifest.json",
+      "files": 1,
+      "file_bytes": 8169
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/920001.BJ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 62985
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000010.SZ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 57312
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600030.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 30292
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000002.SZ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 67942
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600110.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 477432
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000421.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 453268
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600620.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 71034
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000007.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 309413
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600116.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 90294
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/920001.BJ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 317704
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600116.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 532478
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600030.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 222101
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/920000.BJ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 406627
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000007.SZ_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 47793
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/profiles.md",
+      "files": 1,
+      "file_bytes": 17422
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000002.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 455032
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000009.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 455085
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/600110.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 82242
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/000008.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 309759
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/601318.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 372378
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/delivery/601318.SH_2025-12-31.md",
+      "files": 1,
+      "file_bytes": 45431
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-ds-prepared-u6h4f36z",
+      "files": 40,
+      "file_bytes": 21177565
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-ds-7G92Ao",
+      "files": 8,
+      "file_bytes": 53064
+    }
+  ],
+  "closing_file_bytes": 40733237,
+  "runtime_finally_cleanup_file_bytes": 37889428,
+  "total_observed_file_bytes": 78622665,
+  "final_canonical_outputs_sha256": {
+    "delivery/annual-api.json": "f712e5f50ea3a8b1428b83207914051d0a65d4aa5cc3b773e6c66199e3841e25",
+    "delivery/portraits.md": "668313c7973086ba8e9e277affffc7d581dbbbd34f3305c4da938d9f36ef4127"
+  },
+  "other_task_or_unknown_ownership_removed": false,
+  "preserved": [
+    "official_PDF_and_shared_valid_native_cache",
+    "original_query_runtime_budget_model_failures",
+    "used_attempt_markers",
+    "isolated_persistent_API_root",
+    "previous_research_roots_and_baseline_changes"
+  ],
+  "recovery": "Deleted derived exports/preparation/scripts are reproducible from preserved receipts/source/snapshots; no source assets deleted."
+}

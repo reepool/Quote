@@ -1,0 +1,11 @@
+{
+  "instrument_id": "600113.SH",
+  "name": "XD浙江东",
+  "run_id": "v21-s2-first-600113-20261118",
+  "three_reads_equal": false,
+  "exception": "ValueError: frontier record is not a business-profile disclosure",
+  "supervision_seconds": null,
+  "captured_model_contents": 0,
+  "failed_contents_retained": 0,
+  "cleanup_bytes": 1163264
+}

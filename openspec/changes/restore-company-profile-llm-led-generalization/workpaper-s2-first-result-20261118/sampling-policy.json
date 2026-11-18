@@ -1,0 +1,23 @@
+{
+  "task": "6.DS",
+  "source": "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/s2-execution-freeze.json",
+  "source_sha256": "7eddfa474152dfed59fbb585380eec939a7dc7ea9dde4e5334b2762559119785",
+  "sampling": {
+    "seed": "S2-20260917-v1",
+    "core_answers_support_and_high_risk": "all",
+    "supplemental_min_each": 20,
+    "fewer_than_20": "audit all and report actual denominator",
+    "algorithm": "Exclude already fully audited core/high-risk objects. Deduplicate by object_type + canonical source_native + original Evidence version/page/text/section (JSON sorted keys; retain actor, direction, field, amount, unit, period, status; exclude generated record/work IDs). Bucket remaining objects by actual object_type, sort within bucket by SHA256(seed|instrument|canonical_key); round-robin sorted bucket names until min(20,total) selected. Preserve selected keys before review; add all suspicious objects. Expand all affected same-kind objects on error.",
+    "accuracy": "已审/抽样准确率; correct audited unique objects / all audited unique objects; separate core/supplemental/suspicious then deduplicate; never assume unchecked correct",
+    "native_field_checks": [
+      "original_category_and_column",
+      "actor_and_relationship",
+      "period_and_status",
+      "amount_unit_and_blank",
+      "evidence_semantics_and_answer_support"
+    ]
+  },
+  "adaptation": "WorkpaperFact is the actual delivered object. Core/high-risk independently identified; remaining qualitative/quantitative/optional fact types round-robin by the pre-existing seed and stable source-linked fact hash; fewer than 20 all checked. Additional doubts added, duplicates not counted twice.",
+  "declared_before_first_output_content_inspection": true,
+  "no_model_or_runtime_change": true
+}

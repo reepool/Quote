@@ -1,0 +1,42 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "a87fb3526b35811431ca65b46f05c0635298057c1ae7a9d9f2aee2dde3372685",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 22692,
+        "completion_tokens": 376,
+        "total_tokens": 23068
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 2,
+      "content_sha256": "2ad115b2ac7aaa4979798a2501fc86d43182e5d80d6818776e77ffd5a6b5a8c8",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 10317,
+        "completion_tokens": 8167,
+        "total_tokens": 18484
+      },
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000001/failed-model-content/content-002.json"
+    },
+    {
+      "physical_sequence": 3,
+      "content_sha256": "2ad115b2ac7aaa4979798a2501fc86d43182e5d80d6818776e77ffd5a6b5a8c8",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 20582,
+        "completion_tokens": 8167,
+        "total_tokens": 28749
+      },
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000001/failed-model-content/content-003.json"
+    }
+  ],
+  "duplicates_not_copied": 1
+}

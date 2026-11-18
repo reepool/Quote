@@ -1,0 +1,42 @@
+[
+  {
+    "request_id": "bp-work-8b149600a912a1d276d63519:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "ed5b78059223db373ac09ed8e26c3a83384be65234e4b06e4651f5f55c87046f",
+    "response_hash": "6fabd66d234d094aa32d23c967a292e1388fb4a8194f6a07e763968da88d128c",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0059\",\"section-0076\",\"section-0088\",\"section-0098\",\"section-0106\",\"section-0118\",\"section-0119\",\"section-0140\"],\"rationale\":\"优先选取能完整解释公司业务结构、产品服务、收入来源与规模权重的实质经营子节。section-0059为报告期内主要业务总述（企业金融、个人金融、机构服务及交易、投资管理四大板块）；section-0076主营业务情况为各板块经营总览；section-0088、section-0098、section-0106分别覆盖个人金融、机构服务及交易、投资管理三大板块的具体经营情况，与企业金融共同构成完整业务组合；section-0118收入与成本及其子节section-0119营业收入构成提供公司层面收入总额与分业务收入构成，是货币化与主要业务权重的核心来源；section-0140主营业务分业务情况补充分业务收入与利润权重。以上均为公司层面经营讨论，非纯行业背景，且不选祖先与子节重叠项。\",\"deferred\":[\"section-0052行业基本情况：属行业背景，非公司层面经营，仅在需要解释行业变化对公司的传导时再读\",\"section-0141主营业务分地区情况：地区分部为次要维度，公司整体收入构成已由section-0119覆盖\",\"section-0177公司未来发展的展望：前瞻性计划，非本期经营事实，暂不纳入\",\"section-0640财务报告：体量过大，仅在收入构成存在实质缺口时定向补充附注\"],\"stop_reason\":\"已覆盖业务结构、产品服务、四大板块经营、公司收入总额与分业务收入构成及权重，足以回答做什么、怎么赚钱与规模结构；行业背景、地区分部、前瞻展望与整本财务报告属次要或超范围，无需继续扩展。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0059",
+        "section-0076",
+        "section-0088",
+        "section-0098",
+        "section-0106",
+        "section-0118",
+        "section-0119",
+        "section-0140"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、产品服务、收入来源与规模权重的实质经营子节。section-0059为报告期内主要业务总述（企业金融、个人金融、机构服务及交易、投资管理四大板块）；section-0076主营业务情况为各板块经营总览；section-0088、section-0098、section-0106分别覆盖个人金融、机构服务及交易、投资管理三大板块的具体经营情况，与企业金融共同构成完整业务组合；section-0118收入与成本及其子节section-0119营业收入构成提供公司层面收入总额与分业务收入构成，是货币化与主要业务权重的核心来源；section-0140主营业务分业务情况补充分业务收入与利润权重。以上均为公司层面经营讨论，非纯行业背景，且不选祖先与子节重叠项。",
+      "deferred": [
+        "section-0052行业基本情况：属行业背景，非公司层面经营，仅在需要解释行业变化对公司的传导时再读",
+        "section-0141主营业务分地区情况：地区分部为次要维度，公司整体收入构成已由section-0119覆盖",
+        "section-0177公司未来发展的展望：前瞻性计划，非本期经营事实，暂不纳入",
+        "section-0640财务报告：体量过大，仅在收入构成存在实质缺口时定向补充附注"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、四大板块经营、公司收入总额与分业务收入构成及权重，足以回答做什么、怎么赚钱与规模结构；行业背景、地区分部、前瞻展望与整本财务报告属次要或超范围，无需继续扩展。"
+    },
+    "usage": {
+      "input_tokens": 19403,
+      "output_tokens": 398,
+      "total_tokens": 19801
+    }
+  }
+]

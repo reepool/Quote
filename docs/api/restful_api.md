@@ -354,6 +354,8 @@ curl http://127.0.0.1:8000/api/v1/research/company/600104.SH/annual-profile
 
 需要使用独立研究数据时，在API进程环境显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_audited_20261118`。这是6.DQ审后的12家公司397条可读记录、603项指标：344条独立源核、53条保真限用；海泰两条结构化毛利率增减方向错误已局部隔离，接口保留状态和原因但`fact=null`，不进入指标。原`company_profile_current_20261118`的399/609及更早`company_profile_api_preview_20261117`根仍保留，旧根未覆盖、不会自动切换；消费新数据须显式选审后根。各自原工作ID/模型/缺项和海泰incomplete审核不改，本次不是同版新首发、全报告完整或全市场准确率证明。研究根是实际读取数据，不是可清理测试库。配置路径不存在或为空时返回503，不静默改读其他数据。未设置变量仍沿原默认根，不改共享配置或自动重启服务；本次仅完成ASGI接口实物验证，不代表现网已部署。
 
+6.DS固定20家新观察的独立根为`/home/python/Quote/data/research/company_profile_s2_first_20261118`，可用相同环境变量显式选择，不覆盖上述12家审后根。该根有16家内容、473条可读记录/672指标；中信证券和中国平安基础业务描述尚不完整，浙江东日/特力A/平安银行/申万宏源未成稿、详情返回404。20家批次失败原因及名单见当前change的`workpaper-s2-first-result-20261118/result.md`；读取目录只列已有内容，不等于全部请求成功。仅9家227对象有限独立核查，不推算整组准确率，S2本批未通过、未启生产；其余保持实际模型核和限制。
+
 - `facts`：分级事实，以`reading_work_id + fact_id`共同定位。隔离、仅源参考和重复对象保状态/原因但`fact=null`，待核/保真限用不冒充正式接受。
 - `information_gaps`：要素、原状态、缺项或不确定原因及所属读取批次；`suggested_acquisitions`是复核提出的补充建议，不是已经取得的事实。
 - `readings`：各轮实际章节/原页、未读或后置范围、来源Evidence、模型及审核状态。事实的Evidence编号在其所属读取批次内解析。

@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "600110.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-e086ce9916a0717de1de0a2b",
+    "filing_id": "1225150851",
+    "source": "cninfo",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "content_hash": "08e177351e29f3cd8f8b3d6d356794249375dee292923c2fa5be75de5dd0abe4",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/08/08e177351e29f3cd8f8b3d6d356794249375dee292923c2fa5be75de5dd0abe4.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "bp-frontier-e086ce9916a0717de1de0a2b",
+    "source": "cninfo",
+    "announcement_id": "1225150851",
+    "title": "诺德新材料股份有限公司2025年年度报告",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-23/1225150851.PDF",
+    "exchange": "SSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}

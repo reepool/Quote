@@ -1,0 +1,1290 @@
+[
+  {
+    "request_id": "bp-work-6671846100d4fa50920ff61a:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "5ea726a0f8645619ea5db85429cbdb66c25d2f8c979c8d85f2d1e5d2c22b937e",
+    "response_hash": "ad5415a89217ab22fde14e57c0c353a3685cdb182066d1971740adfcf8076501",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0038\",\"section-0051\",\"section-0053\",\"section-0021\",\"section-0022\",\"section-0088\",\"section-0090\"],\"rationale\":\"选取公司业务与经营模式（section-0034，含主要业务与经营模式子节）说明产品、用途与经营方式；经营情况讨论与分析（section-0038）说明本期经营变化；主营业务分析（section-0051）及其收入和成本分析（section-0053）提供营业收入构成、成本与主要业务权重，是货币化与收入结构核心；近三年主要会计数据（section-0021/0022）提供公司层面收入与利润总额摘要；主要控股参股公司分析（section-0088）补充子公司经营规模；未来发展讨论（section-0090）保留经营计划与风险限定。未选纯行业背景、核心竞争力泛化章节及财务报告附注，避免与经营综述重复或过度扩展。\",\"stop_reason\":\"已覆盖业务结构、产品用途、经营模式、收入构成与主要业务权重、公司层面收入摘要及经营变化与展望，满足公司经营画像所需；行业背景与详细财务附注属次要或重复范围，不再扩读。\",\"deferred\":[\"section-0037 行业情况：纯行业背景，非公司层面经营解释\",\"section-0044 核心竞争力：泛化竞争优势，非收入或经营实质\",\"section-0326 财务报告附注：仅在收入构成有缺口时定向补充，当前已由主营业务分析覆盖\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0034",
+        "section-0038",
+        "section-0051",
+        "section-0053",
+        "section-0021",
+        "section-0022",
+        "section-0088",
+        "section-0090"
+      ],
+      "rationale": "选取公司业务与经营模式（section-0034，含主要业务与经营模式子节）说明产品、用途与经营方式；经营情况讨论与分析（section-0038）说明本期经营变化；主营业务分析（section-0051）及其收入和成本分析（section-0053）提供营业收入构成、成本与主要业务权重，是货币化与收入结构核心；近三年主要会计数据（section-0021/0022）提供公司层面收入与利润总额摘要；主要控股参股公司分析（section-0088）补充子公司经营规模；未来发展讨论（section-0090）保留经营计划与风险限定。未选纯行业背景、核心竞争力泛化章节及财务报告附注，避免与经营综述重复或过度扩展。",
+      "stop_reason": "已覆盖业务结构、产品用途、经营模式、收入构成与主要业务权重、公司层面收入摘要及经营变化与展望，满足公司经营画像所需；行业背景与详细财务附注属次要或重复范围，不再扩读。",
+      "deferred": [
+        "section-0037 行业情况：纯行业背景，非公司层面经营解释",
+        "section-0044 核心竞争力：泛化竞争优势，非收入或经营实质",
+        "section-0326 财务报告附注：仅在收入构成有缺口时定向补充，当前已由主营业务分析覆盖"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20963,
+      "output_tokens": 334,
+      "total_tokens": 21297
+    }
+  },
+  {
+    "request_id": "bp-work-6671846100d4fa50920ff61a:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "ac48a5b4bca6a59f4db4b5eed442e1003beb6e788664ba1df24d0c0363763ada",
+    "response_hash": "99b7d357cdc54d9478e73d089da9a33ce5bf8314e2fa253e5ff690eb04601a53",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司属制造业门类下有色金属冶炼及压延加工业中的稀土金属冶炼及压延加工业小类；报告期主要业务、经营模式未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司按稀土原料产品、稀土新材料产品、稀土终端应用产品三个层次组织业务，形成磁性材料—稀土永磁电机、储氢材料—氢能两轮车的终端应用布局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0005\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"公司依靠控股股东包钢（集团）公司掌控的白云鄂博稀土资源，采购包钢股份生产的稀土精矿，分离为稀土氯化物、盐类、氧化物，并将部分氧化物加工为稀土金属；同时通过并购重组、独资设立、合资组建等方式发展磁性、抛光、储氢等新材料产业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"公司可生产各类稀土产品11个大类、100余种、上千个规格；稀土原料产品包括稀土盐类、稀土氧化物及稀土金属，是下游稀土新材料及新材料产品生产加工企业的主要生产原料。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"稀土新材料产品包括稀土磁性材料、抛光材料、储氢材料、催化材料、稀土合金等；稀土终端应用产品主要为稀土永磁高效节能电机、固态储氢瓶、氢能两轮车等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"原料类产品中，氧化镧用于特种合金、精密光学玻璃、陶瓷电容器等；氧化铈用于特种合金、稀土催化材料、着色剂、热稳定剂等；碳酸镧铈用于稀土抛光材料、农用化肥、水处理等；氧化镨钕用于稀土金属、电子工业等；金属镨钕、金属钕用于磁性材料；金属镧铈、金属镧、金属铈用于储氢材料、打火石、燃料电池、稀土合金等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"材料类产品中，永磁材料用于驱动电机、伺服电机、微特电机、新能源汽车、变频空调、风力发电、节能电梯等；储氢材料用于镍氢电池、氢能储运等；抛光材料用于液晶/硬盘玻璃基板、手机盖板、半导体光掩膜等；催化材料用于汽车尾气净化、工业废气净化等；稀土合金用于钢铁、建筑、汽车制造等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"应用产品中，永磁电机用于风电、新能源汽车、工业电机、电子通信、高端医疗、人形机器人、储能电机、低空飞行器等；加氢站相关产品用于氢能电动两轮车、固态储氢叉车、景区固态储氢观光车、亲子车等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司以稀土精矿为起点，经分离、金属加工并向磁性、抛光、储氢等新材料及永磁电机、氢能两轮车等终端应用延伸，通过生产销售稀土原料、新材料及应用产品获取收入；所属稀土新材料企业按战略规划开发、生产、销售各自领域产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"主营业务分行业口径下，工业营业收入330.87亿元、毛利率13.84%，商业（贸易业务）营业收入77.94亿元、毛利率1.92%，环保板块营业收入14.70亿元、毛利率23.44%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0012\"],\"metrics\":[{\"name\":\"主营业务分行业营业收入-工业\",\"raw_value\":\"33,087,212,435.11\",\"value\":\"33087212435.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业毛利率-工业\",\"raw_value\":\"13.84\",\"value\":\"13.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业营业收入-商业\",\"raw_value\":\"7,794,208,427.98\",\"value\":\"7794208427.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业毛利率-商业\",\"raw_value\":\"1.92\",\"value\":\"1.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业营业收入-环保板块\",\"raw_value\":\"1,469,594,740.70\",\"value\":\"1469594740.70\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业毛利率-环保板块\",\"raw_value\":\"23.44\",\"value\":\"23.44\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"主营业务分产品口径下，稀土主要产品营业收入326.37亿元、毛利率13.97%，稀土应用产品及其他营业收入4.50亿元、毛利率4.62%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"主营业务分产品营业收入-稀土主要产品\",\"raw_value\":\"32,637,397,422.11\",\"value\":\"32637397422.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分产品毛利率-稀土主要产品\",\"raw_value\":\"13.97\",\"value\":\"13.97\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分产品营业收入-稀土应用产品及其他\",\"raw_value\":\"449,815,013.00\",\"value\":\"449815013.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分产品毛利率-稀土应用产品及其他\",\"raw_value\":\"4.62\",\"value\":\"4.62\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-04\",\"text\":\"主营业务分销售模式口径下，线上营业收入107.47亿元、毛利率9.30%，线下营业收入316.04亿元、毛利率12.89%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"主营业务分销售模式营业收入-线上\",\"raw_value\":\"10,746,572,871.01\",\"value\":\"10746572871.01\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分销售模式毛利率-线上\",\"raw_value\":\"9.30\",\"value\":\"9.30\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分销售模式营业收入-线下\",\"raw_value\":\"31,604,442,732.78\",\"value\":\"31604442732.78\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分销售模式毛利率-线下\",\"raw_value\":\"12.89\",\"value\":\"12.89\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司营业收入425.63亿元，同比增长29.11%；利润总额33.84亿元，同比增长84.20%；归属于上市公司股东的净利润22.51亿元，同比增长124.17%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"42,563,083,233.34\",\"value\":\"42563083233.34\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"29.11\",\"value\":\"29.11\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"利润总额\",\"raw_value\":\"3,384,289,543.79\",\"value\":\"3384289543.79\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"利润总额同比增长率\",\"raw_value\":\"84.20\",\"value\":\"84.20\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"2,251,272,073.68\",\"value\":\"2251272073.68\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比增长率\",\"raw_value\":\"124.17\",\"value\":\"124.17\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"报告期公司实现主营业务收入423.51亿元，同比增加29.10%；主营业务成本372.78亿元，同比增加26.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"423.51\",\"value\":\"423.51\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入同比增加率\",\"raw_value\":\"29.10\",\"value\":\"29.10\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务成本\",\"raw_value\":\"372.78\",\"value\":\"372.78\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务成本同比增加率\",\"raw_value\":\"26.48\",\"value\":\"26.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"主营业务分地区口径下，国内营业收入417.37亿元、毛利率11.94%，国外营业收入6.14亿元、毛利率14.52%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"主营业务分地区营业收入-国内\",\"raw_value\":\"41,737,048,515.17\",\"value\":\"41737048515.17\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分地区毛利率-国内\",\"raw_value\":\"11.94\",\"value\":\"11.94\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分地区营业收入-国外\",\"raw_value\":\"613,967,088.62\",\"value\":\"613967088.62\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分地区毛利率-国外\",\"raw_value\":\"14.52\",\"value\":\"14.52\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"贸易业务本期营业收入77.94亿元，上期70.52亿元，同比增长10.53%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"贸易业务营业收入\",\"raw_value\":\"7,794,208,427.98\",\"value\":\"7794208427.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"贸易业务营业收入同比增长率\",\"raw_value\":\"10.53\",\"value\":\"10.53\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司采购控股股东包钢（集团）公司控股子公司包钢股份生产的稀土精矿作为原料，将稀土精矿分离为单一或混合稀土氯化物、稀土盐类、稀土氧化物，并将部分稀土氧化物加工成稀土金属。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"已签订的重大采购合同中，稀土精矿合同对方为包钢股份，合同总金额120.00亿元（含税），合计已履行94.17亿元（含税），本报告期履行94.17亿元（含税），正常履行。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"稀土精矿重大采购合同总金额\",\"raw_value\":\"120.00\",\"value\":\"120.00\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"含税\"},{\"name\":\"稀土精矿重大采购合同本报告期履行金额\",\"raw_value\":\"94.17\",\"value\":\"94.17\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"含税\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"工业分行业成本构成中，原料本期金额237.03亿元、占总成本83.14%，材料与动力25.83亿元、占9.06%，人工成本9.06亿元、占3.18%，制造费用13.17亿元、占4.62%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"工业成本构成-原料\",\"raw_value\":\"23,702,856,109.37\",\"value\":\"23702856109.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"工业成本构成-原料占总成本比例\",\"raw_value\":\"83.14\",\"value\":\"83.14\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"工业成本构成-材料与动力\",\"raw_value\":\"2,582,790,614.49\",\"value\":\"2582790614.49\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"工业成本构成-人工成本\",\"raw_value\":\"905,630,121.82\",\"value\":\"905630121.82\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"工业成本构成-制造费用\",\"raw_value\":\"1,316,860,728.76\",\"value\":\"1316860728.76\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"公司以下属稀土院为核心，发挥科研平台人才、技术和创新优势，为产业运营发展提供技术支撑；报告期研发投入合计3.18亿元，研发投入总额占营业收入比例0.75%，研发人员1,320人、占公司总人数12.06%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0016\",\"source-0017\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"318,090,827.61\",\"value\":\"318090827.61\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"0.75\",\"value\":\"0.75\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量\",\"raw_value\":\"1,320\",\"value\":\"1320\",\"unit\":\"人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"12.06\",\"value\":\"12.06\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户销售额139.59亿元，占年度销售总额32.80%，其中关联方销售额0万元、占0%；前五名供应商采购额154.41亿元，占年度采购总额44.71%，其中关联方采购额85.90亿元、占24.88%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"1,395,913.10\",\"value\":\"1395913.10\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"32.80\",\"value\":\"32.80\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"1,544,072.96\",\"value\":\"1544072.96\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"44.71\",\"value\":\"44.71\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"公司销售以线下为主、线上为辅，主营业务分销售模式中线下收入316.04亿元、线上收入107.47亿元；分地区以国内为主，国内收入417.37亿元、国外收入6.14亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-CC-03\",\"text\":\"公司产品下游覆盖磁性材料、储氢材料、抛光材料、催化材料、稀土合金等新材料生产加工企业，以及新能源汽车、风电、工业电机、人形机器人、低空飞行器、氢能储运等应用领域。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"营业收入同比增长29.11%，主要因稀土市场价格整体上行，公司统筹推进“五统一”科学组产模式，冶炼分离、稀土金属、稀土新材料、稀土永磁电机等主要产品产销量均同比增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F-OD-02\",\"text\":\"营业成本同比增长26.29%，主要因主要稀土产品销量增加、结转营业成本增加；工业分行业原料成本本期金额同比增长45.63%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0013\"],\"metrics\":[{\"name\":\"营业成本同比增长率\",\"raw_value\":\"26.29\",\"value\":\"26.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"工业成本构成-原料本期金额较上年同期变动比例\",\"raw_value\":\"45.63\",\"value\":\"45.63\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"报告期主要产品产量创历史新高，磁材、储氢、抛光、永磁电机等产品产销量均创历史新高，固态储氢装置实现量产；近年来首次实现镧铈产品年度销大于产，镧铈产品库存消化成效显著。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]},{\"fact_id\":\"F-OD-04\",\"text\":\"公司开发13种新产品投放市场，单镧、单铈年产量同比提升，稀土金属产量同比提升；绿色冶炼升级改造项目一期已投产、产线全线贯通，二期开工建设并加快推进。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期合并报表范围子公司较上年减少3家、增加2家：平源镁铝、河北华凯全部股权出售，稀宝通用破产清算移交管理人控制，均剔除合并范围；新设北方金龙（持股51%）、北方招宝（持股40%）纳入合并范围。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"公司转让所持河北华凯全部40%股权、平源镁铝全部51%股权实现投资退出，转让后二者不再纳入合并报表范围，对公司财务状况和经营成果不构成重大影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"公司2026年经营计划目标为实现营业收入440亿元以上、利润总额35亿元以上，该目标仅为计划目标，最终能否完成存在不确定性，不构成对投资者的实质承诺。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度计划\",\"evidence_ids\":[\"source-0025\"],\"metrics\":[{\"name\":\"2026年营业收入计划目标\",\"raw_value\":\"440\",\"value\":\"440\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度计划\",\"qualifier\":\"greater_than\"},{\"name\":\"2026年利润总额计划目标\",\"raw_value\":\"35\",\"value\":\"35\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度计划\",\"qualifier\":\"greater_than\"}]}]},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司主要子公司中，甘肃稀土营业收入100.05亿元、净利润2.49亿元；北方磁材营业收入96.78亿元、净利润1.20亿元；国贸公司营业收入77.17亿元、净利润0.52亿元；华美公司营业收入45.77亿元、净利润0.14亿元；淄博灵芝营业收入32.66亿元、净利润2.83亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"甘肃稀土营业收入\",\"raw_value\":\"1,000,542.46\",\"value\":\"1000542.46\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"甘肃稀土净利润\",\"raw_value\":\"24,892.24\",\"value\":\"24892.24\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"北方磁材营业收入\",\"raw_value\":\"967,823.12\",\"value\":\"967823.12\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"北方磁材净利润\",\"raw_value\":\"11,961.09\",\"value\":\"11961.09\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国贸公司营业收入\",\"raw_value\":\"771,685.75\",\"value\":\"771685.75\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国贸公司净利润\",\"raw_value\":\"5,187.08\",\"value\":\"5187.08\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"华美公司营业收入\",\"raw_value\":\"457,668.46\",\"value\":\"457668.46\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"华美公司净利润\",\"raw_value\":\"1,424.20\",\"value\":\"1424.20\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"淄博灵芝营业收入\",\"raw_value\":\"326,603.18\",\"value\":\"326603.18\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"淄博灵芝净利润\",\"raw_value\":\"28,291.95\",\"value\":\"28291.95\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司获评国家工信部首批卓越级智能工厂，关键工序数控化率及生产设备数字化率进一步提升；天骄清美、瑞鑫稀土、华星稀土、贮氢公司、安泰北方获评专精特新中小企业，和发公司获评省级制造业单项冠军企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]}]},\"limitations\":[]},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司处于稀土产业链中上游，从事稀土精矿分离、稀土金属加工，并向磁性、抛光、储氢等新材料及永磁电机、氢能两轮车等终端应用延伸，形成上下游一体化布局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"公司生产所需主要上游原料为包钢股份生产的稀土精矿，来源依托控股股东包钢（集团）公司掌控的白云鄂博稀土资源；成本构成中原料占工业总成本83.14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0013\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-03\",\"text\":\"公司稀土原料产品是下游稀土新材料及新材料产品生产加工企业的主要生产原料；新材料产品进一步用于新能源汽车、风电、工业电机、人形机器人、氢能储运、半导体、汽车尾气净化等终端领域。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]}]},\"limitations\":[]},\"limitations\":[\"未获取成功：产销量情况分析表标注为不适用，未取得分产品具体产量、销量及库存数量数据。\",\"未获取成功：主营业务分行业、分产品表中未单独披露稀土原料、稀土新材料、终端应用产品各细分类别的收入金额，仅有稀土主要产品与稀土应用产品及其他两类。\",\"未获取成功：未取得分产品毛利率的完整明细及主要产品单价、单位成本数据。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司属制造业门类下有色金属冶炼及压延加工业中的稀土金属冶炼及压延加工业小类；报告期主要业务、经营模式未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "公司按稀土原料产品、稀土新材料产品、稀土终端应用产品三个层次组织业务，形成磁性材料—稀土永磁电机、储氢材料—氢能两轮车的终端应用布局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-BS-03",
+              "text": "公司依靠控股股东包钢（集团）公司掌控的白云鄂博稀土资源，采购包钢股份生产的稀土精矿，分离为稀土氯化物、盐类、氧化物，并将部分氧化物加工为稀土金属；同时通过并购重组、独资设立、合资组建等方式发展磁性、抛光、储氢等新材料产业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "公司可生产各类稀土产品11个大类、100余种、上千个规格；稀土原料产品包括稀土盐类、稀土氧化物及稀土金属，是下游稀土新材料及新材料产品生产加工企业的主要生产原料。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "稀土新材料产品包括稀土磁性材料、抛光材料、储氢材料、催化材料、稀土合金等；稀土终端应用产品主要为稀土永磁高效节能电机、固态储氢瓶、氢能两轮车等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "原料类产品中，氧化镧用于特种合金、精密光学玻璃、陶瓷电容器等；氧化铈用于特种合金、稀土催化材料、着色剂、热稳定剂等；碳酸镧铈用于稀土抛光材料、农用化肥、水处理等；氧化镨钕用于稀土金属、电子工业等；金属镨钕、金属钕用于磁性材料；金属镧铈、金属镧、金属铈用于储氢材料、打火石、燃料电池、稀土合金等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "材料类产品中，永磁材料用于驱动电机、伺服电机、微特电机、新能源汽车、变频空调、风力发电、节能电梯等；储氢材料用于镍氢电池、氢能储运等；抛光材料用于液晶/硬盘玻璃基板、手机盖板、半导体光掩膜等；催化材料用于汽车尾气净化、工业废气净化等；稀土合金用于钢铁、建筑、汽车制造等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "应用产品中，永磁电机用于风电、新能源汽车、工业电机、电子通信、高端医疗、人形机器人、储能电机、低空飞行器等；加氢站相关产品用于氢能电动两轮车、固态储氢叉车、景区固态储氢观光车、亲子车等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司以稀土精矿为起点，经分离、金属加工并向磁性、抛光、储氢等新材料及永磁电机、氢能两轮车等终端应用延伸，通过生产销售稀土原料、新材料及应用产品获取收入；所属稀土新材料企业按战略规划开发、生产、销售各自领域产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "主营业务分行业口径下，工业营业收入330.87亿元、毛利率13.84%，商业（贸易业务）营业收入77.94亿元、毛利率1.92%，环保板块营业收入14.70亿元、毛利率23.44%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分行业营业收入-工业",
+                  "raw_value": "33,087,212,435.11",
+                  "value": "33087212435.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业毛利率-工业",
+                  "raw_value": "13.84",
+                  "value": "13.84",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业营业收入-商业",
+                  "raw_value": "7,794,208,427.98",
+                  "value": "7794208427.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业毛利率-商业",
+                  "raw_value": "1.92",
+                  "value": "1.92",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业营业收入-环保板块",
+                  "raw_value": "1,469,594,740.70",
+                  "value": "1469594740.70",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业毛利率-环保板块",
+                  "raw_value": "23.44",
+                  "value": "23.44",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "主营业务分产品口径下，稀土主要产品营业收入326.37亿元、毛利率13.97%，稀土应用产品及其他营业收入4.50亿元、毛利率4.62%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分产品营业收入-稀土主要产品",
+                  "raw_value": "32,637,397,422.11",
+                  "value": "32637397422.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分产品毛利率-稀土主要产品",
+                  "raw_value": "13.97",
+                  "value": "13.97",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分产品营业收入-稀土应用产品及其他",
+                  "raw_value": "449,815,013.00",
+                  "value": "449815013.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分产品毛利率-稀土应用产品及其他",
+                  "raw_value": "4.62",
+                  "value": "4.62",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-04",
+              "text": "主营业务分销售模式口径下，线上营业收入107.47亿元、毛利率9.30%，线下营业收入316.04亿元、毛利率12.89%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分销售模式营业收入-线上",
+                  "raw_value": "10,746,572,871.01",
+                  "value": "10746572871.01",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分销售模式毛利率-线上",
+                  "raw_value": "9.30",
+                  "value": "9.30",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分销售模式营业收入-线下",
+                  "raw_value": "31,604,442,732.78",
+                  "value": "31604442732.78",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分销售模式毛利率-线下",
+                  "raw_value": "12.89",
+                  "value": "12.89",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年公司营业收入425.63亿元，同比增长29.11%；利润总额33.84亿元，同比增长84.20%；归属于上市公司股东的净利润22.51亿元，同比增长124.17%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "42,563,083,233.34",
+                  "value": "42563083233.34",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增长率",
+                  "raw_value": "29.11",
+                  "value": "29.11",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利润总额",
+                  "raw_value": "3,384,289,543.79",
+                  "value": "3384289543.79",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利润总额同比增长率",
+                  "raw_value": "84.20",
+                  "value": "84.20",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "2,251,272,073.68",
+                  "value": "2251272073.68",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比增长率",
+                  "raw_value": "124.17",
+                  "value": "124.17",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "报告期公司实现主营业务收入423.51亿元，同比增加29.10%；主营业务成本372.78亿元，同比增加26.48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入",
+                  "raw_value": "423.51",
+                  "value": "423.51",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入同比增加率",
+                  "raw_value": "29.10",
+                  "value": "29.10",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务成本",
+                  "raw_value": "372.78",
+                  "value": "372.78",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务成本同比增加率",
+                  "raw_value": "26.48",
+                  "value": "26.48",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "主营业务分地区口径下，国内营业收入417.37亿元、毛利率11.94%，国外营业收入6.14亿元、毛利率14.52%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分地区营业收入-国内",
+                  "raw_value": "41,737,048,515.17",
+                  "value": "41737048515.17",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分地区毛利率-国内",
+                  "raw_value": "11.94",
+                  "value": "11.94",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分地区营业收入-国外",
+                  "raw_value": "613,967,088.62",
+                  "value": "613967088.62",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分地区毛利率-国外",
+                  "raw_value": "14.52",
+                  "value": "14.52",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "贸易业务本期营业收入77.94亿元，上期70.52亿元，同比增长10.53%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "贸易业务营业收入",
+                  "raw_value": "7,794,208,427.98",
+                  "value": "7794208427.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "贸易业务营业收入同比增长率",
+                  "raw_value": "10.53",
+                  "value": "10.53",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司采购控股股东包钢（集团）公司控股子公司包钢股份生产的稀土精矿作为原料，将稀土精矿分离为单一或混合稀土氯化物、稀土盐类、稀土氧化物，并将部分稀土氧化物加工成稀土金属。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "已签订的重大采购合同中，稀土精矿合同对方为包钢股份，合同总金额120.00亿元（含税），合计已履行94.17亿元（含税），本报告期履行94.17亿元（含税），正常履行。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "稀土精矿重大采购合同总金额",
+                  "raw_value": "120.00",
+                  "value": "120.00",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "含税"
+                },
+                {
+                  "name": "稀土精矿重大采购合同本报告期履行金额",
+                  "raw_value": "94.17",
+                  "value": "94.17",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "含税"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "工业分行业成本构成中，原料本期金额237.03亿元、占总成本83.14%，材料与动力25.83亿元、占9.06%，人工成本9.06亿元、占3.18%，制造费用13.17亿元、占4.62%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "工业成本构成-原料",
+                  "raw_value": "23,702,856,109.37",
+                  "value": "23702856109.37",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "工业成本构成-原料占总成本比例",
+                  "raw_value": "83.14",
+                  "value": "83.14",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "工业成本构成-材料与动力",
+                  "raw_value": "2,582,790,614.49",
+                  "value": "2582790614.49",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "工业成本构成-人工成本",
+                  "raw_value": "905,630,121.82",
+                  "value": "905630121.82",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "工业成本构成-制造费用",
+                  "raw_value": "1,316,860,728.76",
+                  "value": "1316860728.76",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "公司以下属稀土院为核心，发挥科研平台人才、技术和创新优势，为产业运营发展提供技术支撑；报告期研发投入合计3.18亿元，研发投入总额占营业收入比例0.75%，研发人员1,320人、占公司总人数12.06%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0016",
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "318,090,827.61",
+                  "value": "318090827.61",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "0.75",
+                  "value": "0.75",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "1,320",
+                  "value": "1320",
+                  "unit": "人",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量占公司总人数比例",
+                  "raw_value": "12.06",
+                  "value": "12.06",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "前五名客户销售额139.59亿元，占年度销售总额32.80%，其中关联方销售额0万元、占0%；前五名供应商采购额154.41亿元，占年度采购总额44.71%，其中关联方采购额85.90亿元、占24.88%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "1,395,913.10",
+                  "value": "1395913.10",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "32.80",
+                  "value": "32.80",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "1,544,072.96",
+                  "value": "1544072.96",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "44.71",
+                  "value": "44.71",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "公司销售以线下为主、线上为辅，主营业务分销售模式中线下收入316.04亿元、线上收入107.47亿元；分地区以国内为主，国内收入417.37亿元、国外收入6.14亿元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "公司产品下游覆盖磁性材料、储氢材料、抛光材料、催化材料、稀土合金等新材料生产加工企业，以及新能源汽车、风电、工业电机、人形机器人、低空飞行器、氢能储运等应用领域。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "营业收入同比增长29.11%，主要因稀土市场价格整体上行，公司统筹推进“五统一”科学组产模式，冶炼分离、稀土金属、稀土新材料、稀土永磁电机等主要产品产销量均同比增长。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "营业成本同比增长26.29%，主要因主要稀土产品销量增加、结转营业成本增加；工业分行业原料成本本期金额同比增长45.63%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本同比增长率",
+                  "raw_value": "26.29",
+                  "value": "26.29",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "工业成本构成-原料本期金额较上年同期变动比例",
+                  "raw_value": "45.63",
+                  "value": "45.63",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "报告期主要产品产量创历史新高，磁材、储氢、抛光、永磁电机等产品产销量均创历史新高，固态储氢装置实现量产；近年来首次实现镧铈产品年度销大于产，镧铈产品库存消化成效显著。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "公司开发13种新产品投放市场，单镧、单铈年产量同比提升，稀土金属产量同比提升；绿色冶炼升级改造项目一期已投产、产线全线贯通，二期开工建设并加快推进。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期合并报表范围子公司较上年减少3家、增加2家：平源镁铝、河北华凯全部股权出售，稀宝通用破产清算移交管理人控制，均剔除合并范围；新设北方金龙（持股51%）、北方招宝（持股40%）纳入合并范围。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "公司转让所持河北华凯全部40%股权、平源镁铝全部51%股权实现投资退出，转让后二者不再纳入合并报表范围，对公司财务状况和经营成果不构成重大影响。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020"
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "公司2026年经营计划目标为实现营业收入440亿元以上、利润总额35亿元以上，该目标仅为计划目标，最终能否完成存在不确定性，不构成对投资者的实质承诺。",
+              "subject_scope": "consolidated_group",
+              "period": "2026年度计划",
+              "evidence_ids": [
+                "source-0025"
+              ],
+              "metrics": [
+                {
+                  "name": "2026年营业收入计划目标",
+                  "raw_value": "440",
+                  "value": "440",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2026年度计划",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "2026年利润总额计划目标",
+                  "raw_value": "35",
+                  "value": "35",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2026年度计划",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ]
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CF-01",
+              "text": "公司主要子公司中，甘肃稀土营业收入100.05亿元、净利润2.49亿元；北方磁材营业收入96.78亿元、净利润1.20亿元；国贸公司营业收入77.17亿元、净利润0.52亿元；华美公司营业收入45.77亿元、净利润0.14亿元；淄博灵芝营业收入32.66亿元、净利润2.83亿元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "甘肃稀土营业收入",
+                  "raw_value": "1,000,542.46",
+                  "value": "1000542.46",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "甘肃稀土净利润",
+                  "raw_value": "24,892.24",
+                  "value": "24892.24",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "北方磁材营业收入",
+                  "raw_value": "967,823.12",
+                  "value": "967823.12",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "北方磁材净利润",
+                  "raw_value": "11,961.09",
+                  "value": "11961.09",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国贸公司营业收入",
+                  "raw_value": "771,685.75",
+                  "value": "771685.75",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国贸公司净利润",
+                  "raw_value": "5,187.08",
+                  "value": "5187.08",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "华美公司营业收入",
+                  "raw_value": "457,668.46",
+                  "value": "457668.46",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "华美公司净利润",
+                  "raw_value": "1,424.20",
+                  "value": "1424.20",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "淄博灵芝营业收入",
+                  "raw_value": "326,603.18",
+                  "value": "326603.18",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "淄博灵芝净利润",
+                  "raw_value": "28,291.95",
+                  "value": "28291.95",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CF-02",
+              "text": "公司获评国家工信部首批卓越级智能工厂，关键工序数控化率及生产设备数字化率进一步提升；天骄清美、瑞鑫稀土、华星稀土、贮氢公司、安泰北方获评专精特新中小企业，和发公司获评省级制造业单项冠军企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            }
+          ]
+        },
+        "limitations": []
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司处于稀土产业链中上游，从事稀土精矿分离、稀土金属加工，并向磁性、抛光、储氢等新材料及永磁电机、氢能两轮车等终端应用延伸，形成上下游一体化布局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "公司生产所需主要上游原料为包钢股份生产的稀土精矿，来源依托控股股东包钢（集团）公司掌控的白云鄂博稀土资源；成本构成中原料占工业总成本83.14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0013"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-03",
+              "text": "公司稀土原料产品是下游稀土新材料及新材料产品生产加工企业的主要生产原料；新材料产品进一步用于新能源汽车、风电、工业电机、人形机器人、氢能储运、半导体、汽车尾气净化等终端领域。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "limitations": []
+      },
+      "limitations": [
+        "未获取成功：产销量情况分析表标注为不适用，未取得分产品具体产量、销量及库存数量数据。",
+        "未获取成功：主营业务分行业、分产品表中未单独披露稀土原料、稀土新材料、终端应用产品各细分类别的收入金额，仅有稀土主要产品与稀土应用产品及其他两类。",
+        "未获取成功：未取得分产品毛利率的完整明细及主要产品单价、单位成本数据。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 18019,
+      "output_tokens": 6765,
+      "total_tokens": 24784
+    }
+  },
+  {
+    "request_id": "bp-work-6671846100d4fa50920ff61a:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "a9ffe8ec10b86c3394505833d31bbc7432930b1fd2afc477e4709b97054f342d",
+    "response_hash": "648bfd0e198eb88d39a6be934037b03a0665bb209e726055d892719041882937",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-RM-01\",\"F-RM-02\",\"F-SM-01\",\"F-SM-02\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-CC-03\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-MC-01\",\"F-MC-02\"],\"findings\":[{\"finding_id\":\"FR-001\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0012\"],\"explanation\":\"已采纳的主营业务构成只有分行业口径（工业、商业/贸易、环保板块）及公司营业收入、主营业务收入总额。分产品口径下的来源原生类别及金额、毛利率未进入结论：稀土主要产品营业收入32,637,397,422.11元、毛利率13.97%，稀土应用产品及其他营业收入449,815,013.00元、毛利率4.62%。稀土主要产品是产品口径的主要收入类别，工业合计或公司总额不能代替该构成；两行金额相加等于工业营业收入33,087,212,435.11元，属于工业内部构成，不能再与分行业金额相加。该缺口会改变对主要产品收入集中度及终端应用产品收入权重的理解。先前因正文未出现“326.37亿元”字样而隔离，不能视为来源没有该金额。\"},{\"finding_id\":\"FR-002\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F-PS-03\",\"evidence_ids\":[\"source-0003\"],\"explanation\":\"原料类多数用途概括可保留，但金属镧铈、金属镧、金属铈被合并写成共同用于储氢材料、打火石、燃料电池、稀土合金等，与分项用途不符。原文中金属镧铈为储氢材料、打火石等，金属镧为储氢材料、燃料电池、稀土合金等，金属铈为储氢材料、磁性材料、燃料电池、稀土合金等。合并表述把打火石扩到金属镧和金属铈，把燃料电池、稀土合金扩到金属镧铈，并漏掉金属铈的磁性材料用途。应保留原料产品清单，按原文分项用途修正，不得把不同产品用途视为同一用途。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-01",
+        "F-RM-02",
+        "F-SM-01",
+        "F-SM-02",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-CC-03",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-MC-01",
+        "F-MC-02"
+      ],
+      "findings": [
+        {
+          "finding_id": "FR-001",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "explanation": "已采纳的主营业务构成只有分行业口径（工业、商业/贸易、环保板块）及公司营业收入、主营业务收入总额。分产品口径下的来源原生类别及金额、毛利率未进入结论：稀土主要产品营业收入32,637,397,422.11元、毛利率13.97%，稀土应用产品及其他营业收入449,815,013.00元、毛利率4.62%。稀土主要产品是产品口径的主要收入类别，工业合计或公司总额不能代替该构成；两行金额相加等于工业营业收入33,087,212,435.11元，属于工业内部构成，不能再与分行业金额相加。该缺口会改变对主要产品收入集中度及终端应用产品收入权重的理解。先前因正文未出现“326.37亿元”字样而隔离，不能视为来源没有该金额。"
+        },
+        {
+          "finding_id": "FR-002",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F-PS-03",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "原料类多数用途概括可保留，但金属镧铈、金属镧、金属铈被合并写成共同用于储氢材料、打火石、燃料电池、稀土合金等，与分项用途不符。原文中金属镧铈为储氢材料、打火石等，金属镧为储氢材料、燃料电池、稀土合金等，金属铈为储氢材料、磁性材料、燃料电池、稀土合金等。合并表述把打火石扩到金属镧和金属铈，把燃料电池、稀土合金扩到金属镧铈，并漏掉金属铈的磁性材料用途。应保留原料产品清单，按原文分项用途修正，不得把不同产品用途视为同一用途。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 23654,
+      "output_tokens": 603,
+      "total_tokens": 50480
+    }
+  },
+  {
+    "request_id": "bp-work-6671846100d4fa50920ff61a:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "f60d9f0b2e3e57ceee77bae456941510b8e71ddfd5653e882a2e37bc56d5599d",
+    "response_hash": "51ba51a25099861f78b53c5d9849f8b7d3f2c2b1cb13c22d650973b1aa343873",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:FR-001\",\"text\":\"主营业务分产品情况：稀土主要产品营业收入32,637,397,422.11元，毛利率13.97%；稀土应用产品及其他营业收入449,815,013.00元，毛利率4.62%。上述两行合计对应主营业务分行业情况中的工业营业收入33,087,212,435.11元，属于工业内部构成。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"主营业务分产品营业收入-稀土主要产品\",\"raw_value\":\"32,637,397,422.11\",\"value\":\"32637397422.11\",\"unit\":\"元\",\"currency\":\"人民币\",\"source_unit\":\"元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"主营业务分产品毛利率-稀土主要产品\",\"raw_value\":\"13.97\",\"value\":\"13.97\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"主营业务分产品营业收入-稀土应用产品及其他\",\"raw_value\":\"449,815,013.00\",\"value\":\"449815013.00\",\"unit\":\"元\",\"currency\":\"人民币\",\"source_unit\":\"元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"主营业务分产品毛利率-稀土应用产品及其他\",\"raw_value\":\"4.62\",\"value\":\"4.62\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-PS-03\",\"text\":\"原料类产品中，氧化镧用于制造特种合金、精密光学玻璃、高折射光学纤维板、陶瓷电容器等；氧化铈用于制造特种合金、稀土催化材料、稀土着色剂、稀土热稳定剂等；碳酸镧铈用于稀土抛光材料、农用化肥、水处理等；氧化镨钕用于稀土金属、电子工业等；金属镨钕、金属钕用于磁性材料；金属镧铈用于储氢材料、打火石等；金属镧用于储氢材料、燃料电池、稀土合金等；金属铈用于储氢材料、磁性材料、燃料电池、稀土合金等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:FR-001",
+          "text": "主营业务分产品情况：稀土主要产品营业收入32,637,397,422.11元，毛利率13.97%；稀土应用产品及其他营业收入449,815,013.00元，毛利率4.62%。上述两行合计对应主营业务分行业情况中的工业营业收入33,087,212,435.11元，属于工业内部构成。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务分产品营业收入-稀土主要产品",
+              "raw_value": "32,637,397,422.11",
+              "value": "32637397422.11",
+              "unit": "元",
+              "currency": "人民币",
+              "source_unit": "元",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品毛利率-稀土主要产品",
+              "raw_value": "13.97",
+              "value": "13.97",
+              "unit": "%",
+              "currency": null,
+              "source_unit": "%",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品营业收入-稀土应用产品及其他",
+              "raw_value": "449,815,013.00",
+              "value": "449815013.00",
+              "unit": "元",
+              "currency": "人民币",
+              "source_unit": "元",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品毛利率-稀土应用产品及其他",
+              "raw_value": "4.62",
+              "value": "4.62",
+              "unit": "%",
+              "currency": null,
+              "source_unit": "%",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-PS-03",
+          "text": "原料类产品中，氧化镧用于制造特种合金、精密光学玻璃、高折射光学纤维板、陶瓷电容器等；氧化铈用于制造特种合金、稀土催化材料、稀土着色剂、稀土热稳定剂等；碳酸镧铈用于稀土抛光材料、农用化肥、水处理等；氧化镨钕用于稀土金属、电子工业等；金属镨钕、金属钕用于磁性材料；金属镧铈用于储氢材料、打火石等；金属镧用于储氢材料、燃料电池、稀土合金等；金属铈用于储氢材料、磁性材料、燃料电池、稀土合金等。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15100,
+      "output_tokens": 621,
+      "total_tokens": 15721
+    }
+  },
+  {
+    "request_id": "bp-work-6671846100d4fa50920ff61a:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "5087d00ec0efd41ef01019106f229ed6e989799974277939f163e56b9fddfb6b",
+    "response_hash": "497bcb21aa96e93dec94594787b27a128003ebe46f155c76703baf9ae4a3469b",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-PS-03\"],\"checks\":[{\"fact_id\":\"F-PS-03\",\"accepted\":true,\"evidence_ids\":[\"source-0003\"],\"explanation\":\"候选事实已按原文分项纠正金属镧铈、金属镧、金属铈的用途，未再把打火石扩至金属镧和金属铈，也未把燃料电池、稀土合金扩至金属镧铈，并保留金属铈的磁性材料用途；其余所列原料产品用途均与source-0003一致，主体、期间及证据匹配，省略未涉及争议的后续产品不影响该核心更正。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-PS-03"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-PS-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "候选事实已按原文分项纠正金属镧铈、金属镧、金属铈的用途，未再把打火石扩至金属镧和金属铈，也未把燃料电池、稀土合金扩至金属镧铈，并保留金属铈的磁性材料用途；其余所列原料产品用途均与source-0003一致，主体、期间及证据匹配，省略未涉及争议的后续产品不影响该核心更正。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 17532,
+      "output_tokens": 138,
+      "total_tokens": 20532
+    }
+  }
+]

@@ -1,0 +1,329 @@
+{
+  "phase": "S2_first_group",
+  "status": "not_passed",
+  "executed": 20,
+  "not_started": [],
+  "nonempty_profiles": 16,
+  "basic_complete_candidate_upper_bound": 14,
+  "required_first_delivery_companies": 18,
+  "basic_recall_upper_bound": 0.75,
+  "required_basic_macro_recall": 0.95,
+  "full_group_audited_accuracy": "not_assessed",
+  "required_audited_accuracy": 0.99,
+  "independent_objects_checked": 227,
+  "independent_companies_checked": 9,
+  "known_independent_errors_withheld": 1,
+  "local_duplicate_not_redisplayed": 1,
+  "full_formal_400_supplement_sample": "not_completed",
+  "delivery_states": {
+    "reviewed": 356,
+    "limited": 117,
+    "withheld": 1,
+    "duplicate": 1
+  },
+  "research_output_root": "/home/python/Quote/data/research/company_profile_s2_first_20261118",
+  "rows": [
+    {
+      "instrument_id": "600110.SH",
+      "name": "诺德股份",
+      "raw_fact_count": 42,
+      "status": "basic_description_source_supported",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "business_seconds": 591.747,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 41,
+      "visible_metric_count": 16,
+      "gap_count": 1,
+      "suggested_acquisition_count": 2,
+      "independently_checked_objects": 42
+    },
+    {
+      "instrument_id": "600111.SH",
+      "name": "北方稀土",
+      "raw_fact_count": 22,
+      "status": "basic_description_source_supported",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "business_seconds": 510.791,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 22,
+      "visible_metric_count": 25,
+      "gap_count": 5,
+      "suggested_acquisition_count": 1,
+      "independently_checked_objects": 22
+    },
+    {
+      "instrument_id": "000008.SZ",
+      "name": "神州高铁",
+      "raw_fact_count": 28,
+      "status": "basic_description_source_supported",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "business_seconds": 460.263,
+      "review_status": "completed",
+      "visible_fact_count": 28,
+      "visible_metric_count": 32,
+      "gap_count": 5,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 28
+    },
+    {
+      "instrument_id": "000009.SZ",
+      "name": "中国宝安",
+      "raw_fact_count": 34,
+      "status": "basic_description_source_supported",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "business_seconds": 535.602,
+      "review_status": "completed",
+      "visible_fact_count": 34,
+      "visible_metric_count": 62,
+      "gap_count": 0,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 34
+    },
+    {
+      "instrument_id": "920000.BJ",
+      "name": "安徽凤凰",
+      "raw_fact_count": 35,
+      "status": "basic_description_source_supported",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "business_seconds": 618.778,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 35,
+      "visible_metric_count": 47,
+      "gap_count": 7,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 35
+    },
+    {
+      "instrument_id": "920001.BJ",
+      "name": "纬达光电",
+      "raw_fact_count": 31,
+      "status": "content_requires_remaining_independent_assessment",
+      "independent_core_answers": null,
+      "business_seconds": 581.508,
+      "review_status": "completed",
+      "visible_fact_count": 31,
+      "visible_metric_count": 31,
+      "gap_count": 1,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 0
+    },
+    {
+      "instrument_id": "600116.SH",
+      "name": "三峡水利",
+      "raw_fact_count": 34,
+      "status": "content_requires_remaining_independent_assessment",
+      "independent_core_answers": null,
+      "business_seconds": 766.318,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 34,
+      "visible_metric_count": 62,
+      "gap_count": 6,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 0
+    },
+    {
+      "instrument_id": "600106.SH",
+      "name": "重庆路桥",
+      "raw_fact_count": 28,
+      "status": "basic_description_source_supported",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "business_seconds": 728.121,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 27,
+      "visible_metric_count": 38,
+      "gap_count": 8,
+      "suggested_acquisition_count": 1,
+      "independently_checked_objects": 28
+    },
+    {
+      "instrument_id": "600113.SH",
+      "name": "XD浙江东",
+      "raw_fact_count": 0,
+      "status": "no_profile",
+      "independent_core_answers": null,
+      "business_seconds": null,
+      "review_status": null
+    },
+    {
+      "instrument_id": "000002.SZ",
+      "name": "万  科Ａ",
+      "raw_fact_count": 36,
+      "status": "content_requires_remaining_independent_assessment",
+      "independent_core_answers": null,
+      "business_seconds": 1107.769,
+      "review_status": "completed",
+      "visible_fact_count": 36,
+      "visible_metric_count": 61,
+      "gap_count": 7,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 0
+    },
+    {
+      "instrument_id": "000007.SZ",
+      "name": "全新好",
+      "raw_fact_count": 25,
+      "status": "content_requires_remaining_independent_assessment",
+      "independent_core_answers": null,
+      "business_seconds": 638.704,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 25,
+      "visible_metric_count": 56,
+      "gap_count": 5,
+      "suggested_acquisition_count": 1,
+      "independently_checked_objects": 0
+    },
+    {
+      "instrument_id": "000010.SZ",
+      "name": "*ST美丽",
+      "raw_fact_count": 26,
+      "status": "content_requires_remaining_independent_assessment",
+      "independent_core_answers": null,
+      "business_seconds": 493.782,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 26,
+      "visible_metric_count": 52,
+      "gap_count": 2,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 0
+    },
+    {
+      "instrument_id": "600682.SH",
+      "name": "南京新百",
+      "raw_fact_count": 42,
+      "status": "basic_description_source_supported",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "business_seconds": 680.485,
+      "review_status": "completed",
+      "visible_fact_count": 42,
+      "visible_metric_count": 49,
+      "gap_count": 6,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 20
+    },
+    {
+      "instrument_id": "600620.SH",
+      "name": "天宸股份",
+      "raw_fact_count": 34,
+      "status": "content_requires_remaining_independent_assessment",
+      "independent_core_answers": null,
+      "business_seconds": 514.742,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 34,
+      "visible_metric_count": 73,
+      "gap_count": 8,
+      "suggested_acquisition_count": 1,
+      "independently_checked_objects": 0
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "name": "特  力Ａ",
+      "raw_fact_count": 0,
+      "status": "no_profile",
+      "independent_core_answers": null,
+      "business_seconds": 57.876,
+      "review_status": null
+    },
+    {
+      "instrument_id": "000421.SZ",
+      "name": "南京公用",
+      "raw_fact_count": 40,
+      "status": "content_requires_remaining_independent_assessment",
+      "independent_core_answers": null,
+      "business_seconds": 598.795,
+      "review_status": "completed",
+      "visible_fact_count": 40,
+      "visible_metric_count": 47,
+      "gap_count": 1,
+      "suggested_acquisition_count": 0,
+      "independently_checked_objects": 0
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "name": "平安银行",
+      "raw_fact_count": 0,
+      "status": "no_profile",
+      "independent_core_answers": null,
+      "business_seconds": 67.15,
+      "review_status": null
+    },
+    {
+      "instrument_id": "600030.SH",
+      "name": "中信证券",
+      "raw_fact_count": 5,
+      "status": "basic_description_incomplete",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": false,
+        "revenue_model": false
+      },
+      "business_seconds": 484.092,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 5,
+      "visible_metric_count": 10,
+      "gap_count": 8,
+      "suggested_acquisition_count": 1,
+      "independently_checked_objects": 5
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "name": "申万宏源",
+      "raw_fact_count": 0,
+      "status": "no_profile",
+      "independent_core_answers": null,
+      "business_seconds": 18.384,
+      "review_status": null
+    },
+    {
+      "instrument_id": "601318.SH",
+      "name": "中国平安",
+      "raw_fact_count": 13,
+      "status": "basic_description_incomplete",
+      "independent_core_answers": {
+        "principal_business": true,
+        "products_services": true,
+        "revenue_model": false
+      },
+      "business_seconds": 542.867,
+      "review_status": "completed_with_open_findings",
+      "visible_fact_count": 13,
+      "visible_metric_count": 11,
+      "gap_count": 6,
+      "suggested_acquisition_count": 3,
+      "independently_checked_objects": 13
+    }
+  ],
+  "limits": [
+    "75%为由4无稿及2实质不完整推得的最有利上限，不是已完成整组召回计分。",
+    "14家只是其余全部成立时的上限，不是已独立通过14家。",
+    "227对象为有限后验核查，不推算全组准确率；未独立核对象保实际模型状态。",
+    "S1旧失败不改，S2本组不通过，未授权确认组、S3或生产。"
+  ]
+}

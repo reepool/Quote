@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "000421.SZ",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-dffa9df321ce06834138667f",
+    "filing_id": "1225091928",
+    "source": "cninfo",
+    "published_at": "2026-04-12T16:00:00+00:00",
+    "content_hash": "020bc6606fe2f27a760767b1c9409c45f4d3a0e1a76085a2b903eac3c6a2618e",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/02/020bc6606fe2f27a760767b1c9409c45f4d3a0e1a76085a2b903eac3c6a2618e.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "bp-frontier-dffa9df321ce06834138667f",
+    "source": "cninfo",
+    "announcement_id": "1225091928",
+    "title": "2025年年度报告",
+    "published_at": "2026-04-12T16:00:00+00:00",
+    "source_url": "shared-asset://asset_569fb7d028fd16f0f35c87ad32802223",
+    "exchange": "SZSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}

@@ -1,0 +1,29 @@
+{
+  "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-first-contract.json",
+  "sha256": "3336c0756528466306ae61f8f24e3b8e098a486890135dac85432bdd9e6a2b9e",
+  "full_pool_conditions": 60,
+  "this_group_conditions": 60,
+  "selected_instruments": [
+    "600110.SH",
+    "600111.SH",
+    "000008.SZ",
+    "000009.SZ",
+    "920000.BJ",
+    "920001.BJ",
+    "600116.SH",
+    "600106.SH",
+    "600113.SH",
+    "000002.SZ",
+    "000007.SZ",
+    "000010.SZ",
+    "600682.SH",
+    "600620.SH",
+    "000025.SZ",
+    "000421.SZ",
+    "000001.SZ",
+    "600030.SH",
+    "000166.SZ",
+    "601318.SH"
+  ],
+  "not_model_input": true
+}

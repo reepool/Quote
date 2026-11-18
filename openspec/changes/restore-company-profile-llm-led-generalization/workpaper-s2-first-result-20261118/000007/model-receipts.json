@@ -1,0 +1,1185 @@
+[
+  {
+    "request_id": "bp-work-e559625bc5f6ffd81073d892:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "b99823f5cd7075ff1c96727b973db9a56acbbe2c02233f9312967be4821db991",
+    "response_hash": "05e5cec1d53c3c5e19cff22dfa923092332d54cc8b39b6523ef9c60b53788469",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0016\",\"section-0029\",\"section-0033\",\"section-0034\",\"section-0062\",\"section-0009\",\"section-0064\"],\"rationale\":\"选择覆盖公司业务结构、收入构成与经营变化的核心章节：section-0016（主要业务，含物业租赁、汽车销售、杀菌卫生贸易、医药销售四个板块）说明做什么与经营方式；section-0029（主营业务分析）为经营综述与各板块经营情况；section-0033（大健康行业业务）与section-0034（收入与成本）提供收入构成、成本与主要业务权重，是货币化与收入结构的关键；section-0062（主要控股参股公司分析）补充子公司经营规模；section-0009（主要会计数据和财务指标）提供公司层面营业收入总额与总体财务规模；section-0064（未来发展展望）仅取计划性经营因素与变化。未选纯行业背景（section-0021）与泛化核心竞争力（section-0025），因对公司层面解释力较弱。\",\"deferred\":[\"section-0021 行业情况：属行业背景，非公司层面经营实质，暂不选\",\"section-0025 核心竞争力：偏泛化描述，信息密度低于经营分析\",\"section-0170 财务报告及附注：仅在收入/分部存在实质缺口时定向补充，不整体扩读\",\"section-0068 公司治理：与经营、产品、收入解释无关\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成与主要业务权重、经营规模与本期变化，可停止；行业背景与治理章节不改变公司层面解读，财务报告附注仅在出现收入或分部缺口时再定向补充。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0016",
+        "section-0029",
+        "section-0033",
+        "section-0034",
+        "section-0062",
+        "section-0009",
+        "section-0064"
+      ],
+      "rationale": "选择覆盖公司业务结构、收入构成与经营变化的核心章节：section-0016（主要业务，含物业租赁、汽车销售、杀菌卫生贸易、医药销售四个板块）说明做什么与经营方式；section-0029（主营业务分析）为经营综述与各板块经营情况；section-0033（大健康行业业务）与section-0034（收入与成本）提供收入构成、成本与主要业务权重，是货币化与收入结构的关键；section-0062（主要控股参股公司分析）补充子公司经营规模；section-0009（主要会计数据和财务指标）提供公司层面营业收入总额与总体财务规模；section-0064（未来发展展望）仅取计划性经营因素与变化。未选纯行业背景（section-0021）与泛化核心竞争力（section-0025），因对公司层面解释力较弱。",
+      "deferred": [
+        "section-0021 行业情况：属行业背景，非公司层面经营实质，暂不选",
+        "section-0025 核心竞争力：偏泛化描述，信息密度低于经营分析",
+        "section-0170 财务报告及附注：仅在收入/分部存在实质缺口时定向补充，不整体扩读",
+        "section-0068 公司治理：与经营、产品、收入解释无关"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成与主要业务权重、经营规模与本期变化，可停止；行业背景与治理章节不改变公司层面解读，财务报告附注仅在出现收入或分部缺口时再定向补充。"
+    },
+    "usage": {
+      "input_tokens": 13712,
+      "output_tokens": 373,
+      "total_tokens": 14085
+    }
+  },
+  {
+    "request_id": "bp-work-e559625bc5f6ffd81073d892:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "59f0bd02ef2d378416c8f7fd3e023fb397d41c2ba8807383594cdbc6294b6f90",
+    "response_hash": "d84e20629f92b61e36779a193c4c6a99d8c2b3be51b8c1fc940ae6463f3836bb",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"报告期内公司主要业务由物业租赁及管理、汽车销售及服务、杀菌卫生产品及日常用品贸易、医药及医疗器械销售等业务组成。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"汽车销售及服务由控股子公司盐城新城福德（别克品牌授权经销商）及南通耀众（一汽大众品牌授权经销商）开展；大健康业务由零度大健康与都合纸业开展杀菌纸巾及日常用品贸易，医药及医疗器械销售由浙江全新好医药及其控股子公司浙江易联医疗器械开展。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0005\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"物业租赁及管理为老牌业务，主要经营活动区域为深圳华强北，从事物业管理（含停车场）和租赁。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"汽车销售及服务通过从经销商处采购汽车、零配件，从事新车销售、零配件销售、车辆售后维修、保养及其他相应服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"杀菌卫生产品及日常用品贸易中，零度大健康拥有日本eleten株式会社世界专利技术授权（纳米胶囊零度分解技术、干式生活杀菌纸巾），通过与相关厂商签订承揽开展业务；江门都合具有出口经营权，主要从事杀菌纸巾类产品及日常用品贸易。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0005\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"医药及医疗器械销售业务由浙江全新好医药有限公司开展，具体由浙江易联医疗器械有限公司经营，公司自2025年开始涉足，目前处于初步发展萌芽期，整体业务规模较小。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司营业收入合计395,737,287.76元，同比增长28.79%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"395,737,287.76\",\"value\":\"395737287.76\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入合计同比增减\",\"raw_value\":\"28.79%\",\"value\":\"28.79\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"分行业看，房地产行业收入41,563,910.59元，占营业收入10.50%；汽车销售与服务行业收入329,232,053.46元，占83.19%；药品及医疗器械行业收入22,695,323.37元，占5.74%；批发和零售行业收入1,254,362.33元，占0.32%；其他收入991,638.01元，占0.25%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"房地产行业营业收入\",\"raw_value\":\"41,563,910.59\",\"value\":\"41563910.59\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产行业占营业收入比重\",\"raw_value\":\"10.50%\",\"value\":\"10.50\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售与服务行业营业收入\",\"raw_value\":\"329,232,053.46\",\"value\":\"329232053.46\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售与服务行业占营业收入比重\",\"raw_value\":\"83.19%\",\"value\":\"83.19\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"药品及医疗器械行业营业收入\",\"raw_value\":\"22,695,323.37\",\"value\":\"22695323.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"药品及医疗器械行业占营业收入比重\",\"raw_value\":\"5.74%\",\"value\":\"5.74\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"批发和零售行业营业收入\",\"raw_value\":\"1,254,362.33\",\"value\":\"1254362.33\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"批发和零售行业占营业收入比重\",\"raw_value\":\"0.32%\",\"value\":\"0.32\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他营业收入\",\"raw_value\":\"991,638.01\",\"value\":\"991638.01\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他占营业收入比重\",\"raw_value\":\"0.25%\",\"value\":\"0.25\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"分产品看，汽车销售及相关服务收入299,733,572.35元，占75.74%；汽车售后服务收入29,498,481.11元，占7.45%；物业租赁及其他服务收入41,563,910.59元，占10.50%；医疗器械批发收入22,659,641.96元，占5.73%；日常用品收入1,254,362.33元，占0.32%；药品销售收入35,681.41元，占0.01%；其他收入991,638.01元，占0.25%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"汽车销售及相关服务营业收入\",\"raw_value\":\"299,733,572.35\",\"value\":\"299733572.35\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售及相关服务占营业收入比重\",\"raw_value\":\"75.74%\",\"value\":\"75.74\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车售后服务营业收入\",\"raw_value\":\"29,498,481.11\",\"value\":\"29498481.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车售后服务占营业收入比重\",\"raw_value\":\"7.45%\",\"value\":\"7.45\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业租赁及其他服务营业收入\",\"raw_value\":\"41,563,910.59\",\"value\":\"41563910.59\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业租赁及其他服务占营业收入比重\",\"raw_value\":\"10.50%\",\"value\":\"10.50\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"医疗器械批发营业收入\",\"raw_value\":\"22,659,641.96\",\"value\":\"22659641.96\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"医疗器械批发占营业收入比重\",\"raw_value\":\"5.73%\",\"value\":\"5.73\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"日常用品营业收入\",\"raw_value\":\"1,254,362.33\",\"value\":\"1254362.33\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"日常用品占营业收入比重\",\"raw_value\":\"0.32%\",\"value\":\"0.32\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"药品销售收入\",\"raw_value\":\"35,681.41\",\"value\":\"35681.41\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"药品销售占营业收入比重\",\"raw_value\":\"0.01%\",\"value\":\"0.01\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-04\",\"text\":\"营业收入扣除医疗器械批发等其他业务收入23,062,155.28元后金额为372,675,132.48元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"医疗器械批发等其他业务收入\",\"raw_value\":\"23,062,155.28\",\"value\":\"23062155.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入扣除后金额\",\"raw_value\":\"372,675,132.48\",\"value\":\"372675132.48\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分地区、分销售模式收入构成在原文中为空，未获取成功。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司营业收入395,737,287.76元，归属于上市公司股东的净利润1,927,223.06元，同比下降96.58%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"395,737,287.76\",\"value\":\"395737287.76\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"1,927,223.06\",\"value\":\"1927223.06\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比增减\",\"raw_value\":\"-96.58%\",\"value\":\"-96.58\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"汽车销售与服务行业毛利率3.49%，其中汽车销售及相关服务毛利率0.41%；房地产行业毛利率69.04%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"汽车销售与服务行业毛利率\",\"raw_value\":\"3.49%\",\"value\":\"3.49\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售及相关服务毛利率\",\"raw_value\":\"0.41%\",\"value\":\"0.41\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产行业毛利率\",\"raw_value\":\"69.04%\",\"value\":\"69.04\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"汽车销售及服务业务通过从经销商处采购汽车、零配件开展经营；前五名供应商合计采购金额350,910,940.02元，占年度采购总额82.05%，其中上汽通用汽车销售有限公司占47.20%、一汽-大众销售有限责任公司占31.90%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0007\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"350,910,940.02\",\"value\":\"350910940.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"82.05%\",\"value\":\"82.05\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上汽通用汽车销售有限公司采购额占年度采购总额比例\",\"raw_value\":\"47.20%\",\"value\":\"47.20\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"一汽-大众销售有限责任公司采购额占年度采购总额比例\",\"raw_value\":\"31.90%\",\"value\":\"31.90\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"营业成本构成中，汽车销售及相关服务成本298,513,565.16元，占营业成本86.10%；汽车售后服务成本19,226,473.03元，占5.54%；医疗器械销售成本15,604,983.89元，占4.50%；物业租赁、管理及停车费成本12,868,804.63元，占3.72%；日常用品成本472,173.03元，占0.14%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"汽车销售及相关服务营业成本\",\"raw_value\":\"298,513,565.16\",\"value\":\"298513565.16\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售及相关服务占营业成本比重\",\"raw_value\":\"86.10%\",\"value\":\"86.10\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车售后服务营业成本\",\"raw_value\":\"19,226,473.03\",\"value\":\"19226473.03\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"医疗器械销售营业成本\",\"raw_value\":\"15,604,983.89\",\"value\":\"15604983.89\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业租赁、管理及停车费营业成本\",\"raw_value\":\"12,868,804.63\",\"value\":\"12868804.63\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"日常用品营业成本\",\"raw_value\":\"472,173.03\",\"value\":\"472173.03\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"研发投入原文标注为不适用，未获取研发相关投入数据。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户合计销售金额28,676,274.62元，占年度销售总额7.25%；其中浙江金华广福肿瘤医院销售额5,458,259.17元占1.38%，横店文荣医院3,697,077.71元占0.93%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"28,676,274.62\",\"value\":\"28676274.62\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"7.25%\",\"value\":\"7.25\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"浙江金华广福肿瘤医院销售额占年度销售总额比例\",\"raw_value\":\"1.38%\",\"value\":\"1.38\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"横店文荣医院销售额占年度销售总额比例\",\"raw_value\":\"0.93%\",\"value\":\"0.93\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"物业租赁及管理主要经营活动区域为深圳华强北，华强北为国内知名综合电子专业市场，聚集大量电子产品交易商。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"分地区收入构成在原文中为空，未获取成功。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"汽车销售与服务行业收入同比增长32.56%，营业成本同比增长34.95%，毛利率同比下降1.71个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"汽车销售与服务行业营业收入同比增减\",\"raw_value\":\"32.56%\",\"value\":\"32.56\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售与服务行业营业成本同比增减\",\"raw_value\":\"34.95%\",\"value\":\"34.95\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售与服务行业毛利率同比增减\",\"raw_value\":\"-1.71%\",\"value\":\"-1.71\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"销售费用16,811,796.17元，同比增长46.15%，主要为本期合并范围较上期增加易联医疗所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"销售费用\",\"raw_value\":\"16,811,796.17\",\"value\":\"16811796.17\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"销售费用同比增减\",\"raw_value\":\"46.15%\",\"value\":\"46.15\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"经营活动产生的现金流量净额360,419,910.74元，同比增长80.28%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"360,419,910.74\",\"value\":\"360419910.74\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额同比增减\",\"raw_value\":\"80.28%\",\"value\":\"80.28\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"公司全资子公司全新好医药以自有资金人民币1,200万元收购启联医疗持有的易联医疗60%股权，交易完成后易联医疗成为全新好医药控股子公司并纳入合并报表范围。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"收购易联医疗60%股权对价\",\"raw_value\":\"1,200万元\",\"value\":\"1200\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-02\",\"text\":\"杀菌卫生产品及日常用品贸易业务因市场占有率较低、为公司产生的效益也较低，公司已于2026年3月份完成剥离。\",\"subject_scope\":\"business_segment\",\"period\":\"2026年3月\",\"evidence_ids\":[\"source-0003\",\"source-0005\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"报告期收购南通耀众汽车有限公司扩大汽车销售服务业务，同时通过设立浙江全新好医药有限公司并收购易联医疗60%股权涉足大健康医药、医疗器械销售领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司汽车销售及服务业务以品牌授权经销商身份开展，通过从经销商处采购汽车、零配件，从事新车销售、零配件销售、车辆售后维修、保养及其他相应服务。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"汽车销售及服务业务主要向整车销售企业采购，前五名供应商中上汽通用汽车销售有限公司采购额占年度采购总额47.20%，一汽-大众销售有限责任公司占31.90%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"上汽通用汽车销售有限公司采购额占年度采购总额比例\",\"raw_value\":\"47.20%\",\"value\":\"47.20\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"一汽-大众销售有限责任公司采购额占年度采购总额比例\",\"raw_value\":\"31.90%\",\"value\":\"31.90\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"杀菌纸巾及日常用品贸易的具体原材料采购来源未在选定章节披露。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-03\",\"text\":\"医药及医疗器械销售客户包括医院，前五名客户中浙江金华广福肿瘤医院、横店文荣医院为医疗机构客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"汽车销售及服务业务的具体终端客户类型未在选定章节披露。\"]}},\"limitations\":[\"分地区、分销售模式收入构成在原文中为空，未获取成功。\",\"研发投入原文标注为不适用，未获取研发相关投入数据。\",\"杀菌纸巾及日常用品贸易的具体原材料采购来源未在选定章节披露。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "报告期内公司主要业务由物业租赁及管理、汽车销售及服务、杀菌卫生产品及日常用品贸易、医药及医疗器械销售等业务组成。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "汽车销售及服务由控股子公司盐城新城福德（别克品牌授权经销商）及南通耀众（一汽大众品牌授权经销商）开展；大健康业务由零度大健康与都合纸业开展杀菌纸巾及日常用品贸易，医药及医疗器械销售由浙江全新好医药及其控股子公司浙江易联医疗器械开展。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "物业租赁及管理为老牌业务，主要经营活动区域为深圳华强北，从事物业管理（含停车场）和租赁。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "汽车销售及服务通过从经销商处采购汽车、零配件，从事新车销售、零配件销售、车辆售后维修、保养及其他相应服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "杀菌卫生产品及日常用品贸易中，零度大健康拥有日本eleten株式会社世界专利技术授权（纳米胶囊零度分解技术、干式生活杀菌纸巾），通过与相关厂商签订承揽开展业务；江门都合具有出口经营权，主要从事杀菌纸巾类产品及日常用品贸易。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "医药及医疗器械销售业务由浙江全新好医药有限公司开展，具体由浙江易联医疗器械有限公司经营，公司自2025年开始涉足，目前处于初步发展萌芽期，整体业务规模较小。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司营业收入合计395,737,287.76元，同比增长28.79%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "395,737,287.76",
+                  "value": "395737287.76",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入合计同比增减",
+                  "raw_value": "28.79%",
+                  "value": "28.79",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "分行业看，房地产行业收入41,563,910.59元，占营业收入10.50%；汽车销售与服务行业收入329,232,053.46元，占83.19%；药品及医疗器械行业收入22,695,323.37元，占5.74%；批发和零售行业收入1,254,362.33元，占0.32%；其他收入991,638.01元，占0.25%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产行业营业收入",
+                  "raw_value": "41,563,910.59",
+                  "value": "41563910.59",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产行业占营业收入比重",
+                  "raw_value": "10.50%",
+                  "value": "10.50",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售与服务行业营业收入",
+                  "raw_value": "329,232,053.46",
+                  "value": "329232053.46",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售与服务行业占营业收入比重",
+                  "raw_value": "83.19%",
+                  "value": "83.19",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "药品及医疗器械行业营业收入",
+                  "raw_value": "22,695,323.37",
+                  "value": "22695323.37",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "药品及医疗器械行业占营业收入比重",
+                  "raw_value": "5.74%",
+                  "value": "5.74",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "批发和零售行业营业收入",
+                  "raw_value": "1,254,362.33",
+                  "value": "1254362.33",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "批发和零售行业占营业收入比重",
+                  "raw_value": "0.32%",
+                  "value": "0.32",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他营业收入",
+                  "raw_value": "991,638.01",
+                  "value": "991638.01",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他占营业收入比重",
+                  "raw_value": "0.25%",
+                  "value": "0.25",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "分产品看，汽车销售及相关服务收入299,733,572.35元，占75.74%；汽车售后服务收入29,498,481.11元，占7.45%；物业租赁及其他服务收入41,563,910.59元，占10.50%；医疗器械批发收入22,659,641.96元，占5.73%；日常用品收入1,254,362.33元，占0.32%；药品销售收入35,681.41元，占0.01%；其他收入991,638.01元，占0.25%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "汽车销售及相关服务营业收入",
+                  "raw_value": "299,733,572.35",
+                  "value": "299733572.35",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售及相关服务占营业收入比重",
+                  "raw_value": "75.74%",
+                  "value": "75.74",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车售后服务营业收入",
+                  "raw_value": "29,498,481.11",
+                  "value": "29498481.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车售后服务占营业收入比重",
+                  "raw_value": "7.45%",
+                  "value": "7.45",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业租赁及其他服务营业收入",
+                  "raw_value": "41,563,910.59",
+                  "value": "41563910.59",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业租赁及其他服务占营业收入比重",
+                  "raw_value": "10.50%",
+                  "value": "10.50",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "医疗器械批发营业收入",
+                  "raw_value": "22,659,641.96",
+                  "value": "22659641.96",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "医疗器械批发占营业收入比重",
+                  "raw_value": "5.73%",
+                  "value": "5.73",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "日常用品营业收入",
+                  "raw_value": "1,254,362.33",
+                  "value": "1254362.33",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "日常用品占营业收入比重",
+                  "raw_value": "0.32%",
+                  "value": "0.32",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "药品销售收入",
+                  "raw_value": "35,681.41",
+                  "value": "35681.41",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "药品销售占营业收入比重",
+                  "raw_value": "0.01%",
+                  "value": "0.01",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-04",
+              "text": "营业收入扣除医疗器械批发等其他业务收入23,062,155.28元后金额为372,675,132.48元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "医疗器械批发等其他业务收入",
+                  "raw_value": "23,062,155.28",
+                  "value": "23062155.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入扣除后金额",
+                  "raw_value": "372,675,132.48",
+                  "value": "372675132.48",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分地区、分销售模式收入构成在原文中为空，未获取成功。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年公司营业收入395,737,287.76元，归属于上市公司股东的净利润1,927,223.06元，同比下降96.58%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "395,737,287.76",
+                  "value": "395737287.76",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "1,927,223.06",
+                  "value": "1927223.06",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比增减",
+                  "raw_value": "-96.58%",
+                  "value": "-96.58",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "汽车销售与服务行业毛利率3.49%，其中汽车销售及相关服务毛利率0.41%；房地产行业毛利率69.04%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "汽车销售与服务行业毛利率",
+                  "raw_value": "3.49%",
+                  "value": "3.49",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售及相关服务毛利率",
+                  "raw_value": "0.41%",
+                  "value": "0.41",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产行业毛利率",
+                  "raw_value": "69.04%",
+                  "value": "69.04",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "汽车销售及服务业务通过从经销商处采购汽车、零配件开展经营；前五名供应商合计采购金额350,910,940.02元，占年度采购总额82.05%，其中上汽通用汽车销售有限公司占47.20%、一汽-大众销售有限责任公司占31.90%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "350,910,940.02",
+                  "value": "350910940.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "82.05%",
+                  "value": "82.05",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上汽通用汽车销售有限公司采购额占年度采购总额比例",
+                  "raw_value": "47.20%",
+                  "value": "47.20",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "一汽-大众销售有限责任公司采购额占年度采购总额比例",
+                  "raw_value": "31.90%",
+                  "value": "31.90",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "营业成本构成中，汽车销售及相关服务成本298,513,565.16元，占营业成本86.10%；汽车售后服务成本19,226,473.03元，占5.54%；医疗器械销售成本15,604,983.89元，占4.50%；物业租赁、管理及停车费成本12,868,804.63元，占3.72%；日常用品成本472,173.03元，占0.14%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "汽车销售及相关服务营业成本",
+                  "raw_value": "298,513,565.16",
+                  "value": "298513565.16",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售及相关服务占营业成本比重",
+                  "raw_value": "86.10%",
+                  "value": "86.10",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车售后服务营业成本",
+                  "raw_value": "19,226,473.03",
+                  "value": "19226473.03",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "医疗器械销售营业成本",
+                  "raw_value": "15,604,983.89",
+                  "value": "15604983.89",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业租赁、管理及停车费营业成本",
+                  "raw_value": "12,868,804.63",
+                  "value": "12868804.63",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "日常用品营业成本",
+                  "raw_value": "472,173.03",
+                  "value": "472173.03",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "研发投入原文标注为不适用，未获取研发相关投入数据。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "前五名客户合计销售金额28,676,274.62元，占年度销售总额7.25%；其中浙江金华广福肿瘤医院销售额5,458,259.17元占1.38%，横店文荣医院3,697,077.71元占0.93%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "28,676,274.62",
+                  "value": "28676274.62",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "7.25%",
+                  "value": "7.25",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "浙江金华广福肿瘤医院销售额占年度销售总额比例",
+                  "raw_value": "1.38%",
+                  "value": "1.38",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "横店文荣医院销售额占年度销售总额比例",
+                  "raw_value": "0.93%",
+                  "value": "0.93",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "物业租赁及管理主要经营活动区域为深圳华强北，华强北为国内知名综合电子专业市场，聚集大量电子产品交易商。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": [
+            "分地区收入构成在原文中为空，未获取成功。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "汽车销售与服务行业收入同比增长32.56%，营业成本同比增长34.95%，毛利率同比下降1.71个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "汽车销售与服务行业营业收入同比增减",
+                  "raw_value": "32.56%",
+                  "value": "32.56",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售与服务行业营业成本同比增减",
+                  "raw_value": "34.95%",
+                  "value": "34.95",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售与服务行业毛利率同比增减",
+                  "raw_value": "-1.71%",
+                  "value": "-1.71",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "销售费用16,811,796.17元，同比增长46.15%，主要为本期合并范围较上期增加易联医疗所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "销售费用",
+                  "raw_value": "16,811,796.17",
+                  "value": "16811796.17",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "销售费用同比增减",
+                  "raw_value": "46.15%",
+                  "value": "46.15",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "经营活动产生的现金流量净额360,419,910.74元，同比增长80.28%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "360,419,910.74",
+                  "value": "360419910.74",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额同比增减",
+                  "raw_value": "80.28%",
+                  "value": "80.28",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "公司全资子公司全新好医药以自有资金人民币1,200万元收购启联医疗持有的易联医疗60%股权，交易完成后易联医疗成为全新好医药控股子公司并纳入合并报表范围。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "收购易联医疗60%股权对价",
+                  "raw_value": "1,200万元",
+                  "value": "1200",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "杀菌卫生产品及日常用品贸易业务因市场占有率较低、为公司产生的效益也较低，公司已于2026年3月份完成剥离。",
+              "subject_scope": "business_segment",
+              "period": "2026年3月",
+              "evidence_ids": [
+                "source-0003",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "报告期收购南通耀众汽车有限公司扩大汽车销售服务业务，同时通过设立浙江全新好医药有限公司并收购易联医疗60%股权涉足大健康医药、医疗器械销售领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司汽车销售及服务业务以品牌授权经销商身份开展，通过从经销商处采购汽车、零配件，从事新车销售、零配件销售、车辆售后维修、保养及其他相应服务。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "汽车销售及服务业务主要向整车销售企业采购，前五名供应商中上汽通用汽车销售有限公司采购额占年度采购总额47.20%，一汽-大众销售有限责任公司占31.90%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "上汽通用汽车销售有限公司采购额占年度采购总额比例",
+                  "raw_value": "47.20%",
+                  "value": "47.20",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "一汽-大众销售有限责任公司采购额占年度采购总额比例",
+                  "raw_value": "31.90%",
+                  "value": "31.90",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "杀菌纸巾及日常用品贸易的具体原材料采购来源未在选定章节披露。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-03",
+              "text": "医药及医疗器械销售客户包括医院，前五名客户中浙江金华广福肿瘤医院、横店文荣医院为医疗机构客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": [
+            "汽车销售及服务业务的具体终端客户类型未在选定章节披露。"
+          ]
+        }
+      },
+      "limitations": [
+        "分地区、分销售模式收入构成在原文中为空，未获取成功。",
+        "研发投入原文标注为不适用，未获取研发相关投入数据。",
+        "杀菌纸巾及日常用品贸易的具体原材料采购来源未在选定章节披露。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 10795,
+      "output_tokens": 5586,
+      "total_tokens": 16381
+    }
+  },
+  {
+    "request_id": "bp-work-e559625bc5f6ffd81073d892:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "5619927d02f3ff38c4df3cda1062d209b2067d525cd828acfe15227eb7e87a6f",
+    "response_hash": "48d0ac14964d8f7d8aa8b3b001f179e10f19854960df9141015b0ef100ac4117",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FR-01\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-03\",\"evidence_ids\":[\"source-0011\",\"source-0010\",\"source-0003\",\"source-0006\"],\"explanation\":\"F-MC-03把展望章节的“报告期收购南通耀众汽车有限公司”“报告期设立浙江全新好医药有限公司”写成2025年报告期已发生事实，与更具体披露冲突。报告期内取得和处置子公司只列浙江易联医疗器械有限公司为一般受让，未列南通耀众；主要业务章节称公司自2020年底已涉足汽车销售及服务，南通耀众在报告期内已是开展该业务的控股子公司，选定章节不能支持其于2025年被收购。全新好医药写明为2024年四季度以认缴1000万元设立，不是2025年报告期设立。2025年可以保留的是全新好医药以自有资金1200万元收购易联医疗60%股权并纳入合并范围，该事项已由F-MC-01按董事会决议和合并范围变动披露记载。应删除“报告期收购南通耀众”和“报告期设立全新好医药”；设立时点如需保留，应改为2024年四季度，且不得为南通耀众编造收购年份。\"},{\"finding_id\":\"FR-02\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F-PS-04\",\"evidence_ids\":[\"source-0005\",\"source-0003\",\"source-0006\"],\"explanation\":\"F-PS-04写公司自2025年开始涉足医药及医疗器械销售，但同一报告已写明2024年四季度设立全新好医药开展医药销售，分产品表2024年药品销售为9054.16元，并非2025年才出现。医疗器械销售的主要起点是2025年8月29日收购易联医疗60%股权。萌芽期、整体规模较小可以保留。应改为医药销售子公司于2024年四季度设立，2025年收购易联医疗后开展医疗器械销售，不要把两类业务统一写成自2025年才涉足。\"},{\"finding_id\":\"FR-03\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-03\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"前五名客户表只记载浙江金华广福肿瘤医院销售额5458259.17元、占年度销售总额1.38%，横店文荣医院3697077.71元、占0.93%，并未说明二者属于医药及医疗器械销售客户。医院名称和金额不能单独确立业务板块归属。应保留二者为公司合并口径前五名客户这一有来源内容，删除“医药及医疗器械销售客户包括医院”的确定判断，或明确选定章节未披露其所属业务。\"},{\"finding_id\":\"FR-04\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F-SM-01\",\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"explanation\":\"归母净利润1927223.06元及同比下降96.58%与主要指标表一致，但同节已勾选“利润总额、净利润、扣除非经常性损益后的净利润三者孰低为负值”为是。同页归母净利润和扣非净利润均为正，选定章节又未给出利润总额，因此不能把该勾选改写成某一具体利润为零或某个未列示的负数。建议在规模或盈利描述中补充这一披露标记，并说明它与已列示正数利润如何对应，在选定章节中尚不能确定。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-RM-04\",\"F-SM-01\",\"F-SM-02\",\"F-OI-01\",\"F-OI-02\",\"F-CC-01\",\"F-CC-02\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-MC-01\",\"F-MC-02\",\"F-MC-03\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FR-01",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F-MC-03",
+          "evidence_ids": [
+            "source-0011",
+            "source-0010",
+            "source-0003",
+            "source-0006"
+          ],
+          "explanation": "F-MC-03把展望章节的“报告期收购南通耀众汽车有限公司”“报告期设立浙江全新好医药有限公司”写成2025年报告期已发生事实，与更具体披露冲突。报告期内取得和处置子公司只列浙江易联医疗器械有限公司为一般受让，未列南通耀众；主要业务章节称公司自2020年底已涉足汽车销售及服务，南通耀众在报告期内已是开展该业务的控股子公司，选定章节不能支持其于2025年被收购。全新好医药写明为2024年四季度以认缴1000万元设立，不是2025年报告期设立。2025年可以保留的是全新好医药以自有资金1200万元收购易联医疗60%股权并纳入合并范围，该事项已由F-MC-01按董事会决议和合并范围变动披露记载。应删除“报告期收购南通耀众”和“报告期设立全新好医药”；设立时点如需保留，应改为2024年四季度，且不得为南通耀众编造收购年份。"
+        },
+        {
+          "finding_id": "FR-02",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F-PS-04",
+          "evidence_ids": [
+            "source-0005",
+            "source-0003",
+            "source-0006"
+          ],
+          "explanation": "F-PS-04写公司自2025年开始涉足医药及医疗器械销售，但同一报告已写明2024年四季度设立全新好医药开展医药销售，分产品表2024年药品销售为9054.16元，并非2025年才出现。医疗器械销售的主要起点是2025年8月29日收购易联医疗60%股权。萌芽期、整体规模较小可以保留。应改为医药销售子公司于2024年四季度设立，2025年收购易联医疗后开展医疗器械销售，不要把两类业务统一写成自2025年才涉足。"
+        },
+        {
+          "finding_id": "FR-03",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-SC-03",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "前五名客户表只记载浙江金华广福肿瘤医院销售额5458259.17元、占年度销售总额1.38%，横店文荣医院3697077.71元、占0.93%，并未说明二者属于医药及医疗器械销售客户。医院名称和金额不能单独确立业务板块归属。应保留二者为公司合并口径前五名客户这一有来源内容，删除“医药及医疗器械销售客户包括医院”的确定判断，或明确选定章节未披露其所属业务。"
+        },
+        {
+          "finding_id": "FR-04",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F-SM-01",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "explanation": "归母净利润1927223.06元及同比下降96.58%与主要指标表一致，但同节已勾选“利润总额、净利润、扣除非经常性损益后的净利润三者孰低为负值”为是。同页归母净利润和扣非净利润均为正，选定章节又未给出利润总额，因此不能把该勾选改写成某一具体利润为零或某个未列示的负数。建议在规模或盈利描述中补充这一披露标记，并说明它与已列示正数利润如何对应，在选定章节中尚不能确定。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-RM-04",
+        "F-SM-01",
+        "F-SM-02",
+        "F-OI-01",
+        "F-OI-02",
+        "F-CC-01",
+        "F-CC-02",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03"
+      ]
+    },
+    "usage": {
+      "input_tokens": 17235,
+      "output_tokens": 1067,
+      "total_tokens": 43920
+    }
+  },
+  {
+    "request_id": "bp-work-e559625bc5f6ffd81073d892:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "756a20ff17fbf03d5d0bd30bd7fb5fa58caad41b80e4c764667bdb0dfa06746b",
+    "response_hash": "3b7e50a3528c11b351289bb7c7ff54fdd31030ad931923bb0814d6514797be55",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-MC-03\",\"text\":\"2025年，公司全资子公司全新好医药以自有资金人民币1200万元收购启联医疗持有的易联医疗60%股权，交易完成后易联医疗成为全新好医药的控股子公司并纳入公司合并报表范围。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0010\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-PS-04\",\"text\":\"医药及医疗器械销售业务由浙江全新好医药有限公司开展，具体由浙江易联医疗器械有限公司经营；全新好医药于2024年四季度设立开展医药销售业务，2025年收购易联医疗60%股权后开展医疗器械销售，目前处于初步发展萌芽期，整体业务规模较小。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0003\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-SC-03\",\"text\":\"公司前五名客户中包括浙江金华广福肿瘤医院（销售额5,458,259.17元，占年度销售总额1.38%）和横店文荣医院（销售额3,697,077.71元，占年度销售总额0.93%）；选定章节未披露其所属业务板块。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[],\"uncertainty_reason\":\"选定章节未披露上述客户所属业务板块\"}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-MC-03",
+          "text": "2025年，公司全资子公司全新好医药以自有资金人民币1200万元收购启联医疗持有的易联医疗60%股权，交易完成后易联医疗成为全新好医药的控股子公司并纳入公司合并报表范围。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0010"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-PS-04",
+          "text": "医药及医疗器械销售业务由浙江全新好医药有限公司开展，具体由浙江易联医疗器械有限公司经营；全新好医药于2024年四季度设立开展医药销售业务，2025年收购易联医疗60%股权后开展医疗器械销售，目前处于初步发展萌芽期，整体业务规模较小。",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SC-03",
+          "text": "公司前五名客户中包括浙江金华广福肿瘤医院（销售额5,458,259.17元，占年度销售总额1.38%）和横店文荣医院（销售额3,697,077.71元，占年度销售总额0.93%）；选定章节未披露其所属业务板块。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "选定章节未披露上述客户所属业务板块"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 8271,
+      "output_tokens": 355,
+      "total_tokens": 8626
+    }
+  },
+  {
+    "request_id": "bp-work-e559625bc5f6ffd81073d892:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "84d4530e7c6c8585e414117259de700a441a25980b6af7f39da004b1b1b790bd",
+    "response_hash": "00098e90218fa7c1545ae4b974a27e0339fe94c8df479ff355507919c6f95725",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-MC-03\",\"F-PS-04\",\"F-SC-03\"],\"checks\":[{\"fact_id\":\"F-MC-03\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0010\"],\"explanation\":\"候选删除了与更具体披露冲突的“报告期收购南通耀众”和“报告期设立全新好医药”，仅保留2025年可成立的事项。source-0006载明董事会同意全资子公司全新好医药以自有资金1200万元收购启联医疗所持易联医疗60%股权，完成后纳入合并报表；source-0010将浙江易联医疗器械有限公司列为报告期内一般受让取得的子公司。合并范围、期间、金额和股权比例均有来源，未编造南通耀众收购年份。\"},{\"fact_id\":\"F-PS-04\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0005\"],\"explanation\":\"候选不再把两类业务统一写成自2025年才涉足。source-0003表明全新好医药于2024年四季度设立并开展医药销售，2025年收购易联医疗60%股权；source-0005表明该业务主要由全新好医药开展、由易联医疗经营，且处于萌芽期、整体规模较小。正文已区分起点，结构化期间未把2024年设立或次年计划改写成2025年当期结果。\"},{\"fact_id\":\"F-SC-03\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007仅列示浙江金华广福肿瘤医院销售额5458259.17元、占年度销售总额1.38%，以及横店文荣医院销售额3697077.71元、占0.93%，并未说明业务板块。候选保留合并口径前五名客户及对应金额、比例，并明确选定章节未披露所属板块，删除了无来源的医药及医疗器械客户判断，不确定性得以保留。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-MC-03",
+        "F-PS-04",
+        "F-SC-03"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-MC-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0010"
+          ],
+          "explanation": "候选删除了与更具体披露冲突的“报告期收购南通耀众”和“报告期设立全新好医药”，仅保留2025年可成立的事项。source-0006载明董事会同意全资子公司全新好医药以自有资金1200万元收购启联医疗所持易联医疗60%股权，完成后纳入合并报表；source-0010将浙江易联医疗器械有限公司列为报告期内一般受让取得的子公司。合并范围、期间、金额和股权比例均有来源，未编造南通耀众收购年份。"
+        },
+        {
+          "fact_id": "F-PS-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003",
+            "source-0005"
+          ],
+          "explanation": "候选不再把两类业务统一写成自2025年才涉足。source-0003表明全新好医药于2024年四季度设立并开展医药销售，2025年收购易联医疗60%股权；source-0005表明该业务主要由全新好医药开展、由易联医疗经营，且处于萌芽期、整体规模较小。正文已区分起点，结构化期间未把2024年设立或次年计划改写成2025年当期结果。"
+        },
+        {
+          "fact_id": "F-SC-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007仅列示浙江金华广福肿瘤医院销售额5458259.17元、占年度销售总额1.38%，以及横店文荣医院销售额3697077.71元、占0.93%，并未说明业务板块。候选保留合并口径前五名客户及对应金额、比例，并明确选定章节未披露所属板块，删除了无来源的医药及医疗器械客户判断，不确定性得以保留。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10001,
+      "output_tokens": 446,
+      "total_tokens": 22007
+    }
+  }
+]

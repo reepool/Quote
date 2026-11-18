@@ -1,0 +1,1825 @@
+[
+  {
+    "request_id": "bp-work-acd85d4690967d0a28bec592:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "9d5f94ab4f878037865d8c592e30471add9eb62082a8540e25651abcc3b1fda7",
+    "response_hash": "fd56ef2fcca20fa5540f35bca6045eab810d942c9e4f5592203bffa5ce7d85d4",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0035\",\"section-0036\",\"section-0038\",\"section-0039\",\"section-0056\",\"section-0058\",\"section-0088\"],\"rationale\":\"优先选取能完整解释公司业务结构、收入来源与经营变化的实质子节：第三节“报告期内公司从事的业务情况”及其路桥收费、股权投资两个业务子项说明公司做什么与经营模式；经营情况讨论与分析（含1.98亿元收入增长14.28%的综述及路桥收费、股权投资情况）给出本期经营变化；主营业务分析下的“收入和成本分析”提供营业收入构成与成本口径，是收入与主要业务权重的核心来源；主要控股参股公司分析补充股权投资板块的载体与规模。未选纯行业背景、核心竞争力泛化描述及财务报告附注，以避免与经营综述重复或过度扩张。\",\"stop_reason\":\"已覆盖业务结构、产品/服务用途、经营模式、收入总额与构成、本期经营变化及主要参股公司，足以回答公司经营与赚钱方式；行业背景与详细财务附注属次要或重复，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0034",
+        "section-0035",
+        "section-0036",
+        "section-0038",
+        "section-0039",
+        "section-0056",
+        "section-0058",
+        "section-0088"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、收入来源与经营变化的实质子节：第三节“报告期内公司从事的业务情况”及其路桥收费、股权投资两个业务子项说明公司做什么与经营模式；经营情况讨论与分析（含1.98亿元收入增长14.28%的综述及路桥收费、股权投资情况）给出本期经营变化；主营业务分析下的“收入和成本分析”提供营业收入构成与成本口径，是收入与主要业务权重的核心来源；主要控股参股公司分析补充股权投资板块的载体与规模。未选纯行业背景、核心竞争力泛化描述及财务报告附注，以避免与经营综述重复或过度扩张。",
+      "stop_reason": "已覆盖业务结构、产品/服务用途、经营模式、收入总额与构成、本期经营变化及主要参股公司，足以回答公司经营与赚钱方式；行业背景与详细财务附注属次要或重复，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 17768,
+      "output_tokens": 248,
+      "total_tokens": 18016
+    }
+  },
+  {
+    "request_id": "bp-work-acd85d4690967d0a28bec592:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "f9d1e6f1832a7badb0f3c59c505f3a9f3f90a824630ba135dd52ddef4b6d1419",
+    "response_hash": "5884bdaaa5f7d319131d2eca0b02a6bb44f6ce5c48a9e018ea4a4be16fc7c006",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司业务分为路桥收费业务与股权投资业务两大板块：路桥收费依托所持嘉陵江嘉华大桥特许经营权收取通行费，股权投资包括直接股权投资和参与产业股权投资基金投资。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"公司拥有重庆市主城区嘉陵江嘉华大桥的特许经营权；嘉陵江石门大桥经营期已于2021年12月31日届满，截至报告期末相关资产尚未移交，仍由公司代管。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"路桥收费业务的产品/服务为嘉华大桥通行费收取，并包含“桥隧”附属设施租赁及利用；全年路桥通行费收入19,480万元，附属设施租赁及利用收入合计41.98万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"路桥通行费收入\",\"raw_value\":\"19,480\",\"value\":\"19480\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"“桥隧”附属设施租赁及利用收入\",\"raw_value\":\"41.98\",\"value\":\"41.98\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F04\",\"text\":\"股权投资业务通过直接股权投资及参与产业股权投资基金开展，报告期内实现股权投资收益8,602.53万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"股权投资收益\",\"raw_value\":\"8,602.53\",\"value\":\"8602.53\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"公司营业收入主要来自路桥BOT项目经营收益，按建造期间投入成本作为BOT项目摊余成本，连同未来现金流入折现计算实际利率，经营期间按摊余成本与实际利率确认BOT项目收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]},{\"fact_id\":\"F06\",\"text\":\"2025年公司实现营业收入11,289.40万元，其中路桥BOT项目经营收益11,141.52万元，其他业务收入147.88万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"11,289.40\",\"value\":\"11289.40\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥BOT项目经营收益\",\"raw_value\":\"11,141.52\",\"value\":\"11141.52\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"147.88\",\"value\":\"147.88\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F07\",\"text\":\"营业成本1,005.58万元，其中路桥运营成本897.21万元，其他业务成本108.37万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"1,005.58\",\"value\":\"1005.58\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥运营成本\",\"raw_value\":\"897.21\",\"value\":\"897.21\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务成本\",\"raw_value\":\"108.37\",\"value\":\"108.37\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F08\",\"text\":\"主营业务分行业仅路桥行业一项，营业收入111,415,201.20元，营业成本8,972,076.09元，毛利率91.95%，营业收入比上年减少0.06%，营业成本比上年减少47.03%，毛利率比上年增加7.14个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"路桥行业营业收入\",\"raw_value\":\"111,415,201.20\",\"value\":\"111415201.20\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业营业成本\",\"raw_value\":\"8,972,076.09\",\"value\":\"8972076.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业毛利率\",\"raw_value\":\"91.95\",\"value\":\"91.95\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业营业收入比上年增减\",\"raw_value\":\"-0.06\",\"value\":\"-0.06\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业营业成本比上年增减\",\"raw_value\":\"-47.03\",\"value\":\"-47.03\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业毛利率比上年增减\",\"raw_value\":\"7.14\",\"value\":\"7.14\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"公司全年实现营业收入1.13亿元，其中路桥BOT项目经营收益1.11亿元；实现营业利润1.98亿元，比去年增加14.28%；实现净利润1.14亿元，比去年下降27.59%；每股收益0.09元/股。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"营业收入（经营综述口径）\",\"raw_value\":\"1.13\",\"value\":\"1.13\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥BOT项目经营收益（经营综述口径）\",\"raw_value\":\"1.11\",\"value\":\"1.11\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业利润\",\"raw_value\":\"1.98\",\"value\":\"1.98\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业利润比上年增减\",\"raw_value\":\"14.28\",\"value\":\"14.28\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"净利润\",\"raw_value\":\"1.14\",\"value\":\"1.14\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"净利润比上年增减\",\"raw_value\":\"-27.59\",\"value\":\"-27.59\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"每股收益\",\"raw_value\":\"0.09\",\"value\":\"0.09\",\"unit\":\"元/股\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"经营综述口径营业收入1.13亿元、路桥BOT项目经营收益1.11亿元为四舍五入表述，与主营业务分析中11,289.40万元、11,141.52万元存在精度差异，未作换算合并。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F10\",\"text\":\"路桥运营以桥梁管护为核心：执行日常巡查、每周不少于两次的周检查、每月一次的经常性检查，并针对天气等季节特点开展特殊检查巡查；对桥梁设施完好、交通及设备运行状况实行24小时不间断监控巡视。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F11\",\"text\":\"报告期组织完成石门大桥桥梁变形观测、嘉华大桥综合观测以及石门大桥、嘉华大桥和嘉华隧道的结构定期检测，并依托嘉华大桥运营状态结构健康监测系统开展监测管理和分析评估。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F12\",\"text\":\"路桥行业成本构成项目为维护管理，本期金额8,972,076.09元，占总成本比例100.00%，上年同期16,937,018.32元，同比下降47.03%；主要系上年同期实施嘉华大桥路面大修、本期无大修项目，维护成本相应减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0006\"],\"metrics\":[{\"name\":\"路桥行业维护管理成本\",\"raw_value\":\"8,972,076.09\",\"value\":\"8972076.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业维护管理成本占总成本比例\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业维护管理成本上年同期\",\"raw_value\":\"16,937,018.32\",\"value\":\"16937018.32\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业维护管理成本同比增减\",\"raw_value\":\"-47.03\",\"value\":\"-47.03\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取路桥维护的具体供应商、材料或能源采购明细；报告披露重大采购合同、重大销售合同履行情况为不适用。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"路桥收费业务的客户为通行嘉华大桥的车辆用户，收入形式为路桥通行费；年度应收路桥通行费19,480万元已全额到账。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"年度应收路桥通行费\",\"raw_value\":\"19,480\",\"value\":\"19480\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"公司主要销售客户及主要供应商情况披露为不适用，报告期内不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]}],\"limitations\":[\"未披露具体客户名称、客户集中度数据及分地区收入构成。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F15\",\"text\":\"公司参股企业渝涪高速2025年度持续推进收费站智慧化升级改造，建设风险点和高边坡预警监测系统，加强全路段监控监测设备加密部署，并以大数据支撑业务稽查体系。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F16\",\"text\":\"公司参股企业重庆银行资产规模突破万亿元大关，营收与净利润实现同比两位数增长；报告期内该行进行2024年度、2025年度第三季度利润分配，公司共计收到红利款约7,130万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"收到重庆银行红利款\",\"raw_value\":\"约7,130\",\"value\":\"7130\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F17\",\"text\":\"公司参股企业渝涪高速报告期内实施2024年度红利分配，公司收到红利660万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"收到渝涪高速红利\",\"raw_value\":\"660\",\"value\":\"660\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F18\",\"text\":\"公司投资的嘉兴临澜股权投资合伙企业（有限合伙）持有安徽长飞先进半导体有限公司509.7821万股股份，占总股本1.6445%；2025年长飞先进总投资超200亿元的武汉基地正式投产，新开发产品超65个。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"嘉兴临澜所持长飞先进股份数\",\"raw_value\":\"509.7821\",\"value\":\"509.7821\",\"unit\":\"万股\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"嘉兴临澜持股占总股本比例\",\"raw_value\":\"1.6445\",\"value\":\"1.6445\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"长飞先进武汉基地总投资\",\"raw_value\":\"超200\",\"value\":\"200\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"长飞先进武汉基地新开发产品数\",\"raw_value\":\"超65\",\"value\":\"65\",\"unit\":\"个\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F19\",\"text\":\"公司参股企业重庆联顺创业投资基金合伙企业于2022年10月进入清算期，2025年工作重点仍是努力寻求项目的退出机会。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F20\",\"text\":\"公司参股企业城投金卡信息产业（集团）股份有限公司2025年建立政府采购数据服务新机制、谋划数据采购服务收入，但受大环境影响营业收入有所下降。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"未披露各参股基金及参股企业的具体投资成本、持股比例（除长飞先进外）及退出进度细节。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"营业成本本期10,055,791.54元，上年同期17,607,179.10元，同比下降42.89%，主要系上年同期实施嘉华大桥路面大修、本期无大修项目实施，相应维护成本减少所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"10,055,791.54\",\"value\":\"10055791.54\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本上年同期\",\"raw_value\":\"17,607,179.10\",\"value\":\"17607179.10\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比增减\",\"raw_value\":\"-42.89\",\"value\":\"-42.89\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F22\",\"text\":\"经营活动产生的现金流量净额本期55,136,909.61元，上年同期147,653,045.76元，同比下降62.66%，主要系本期根据《行政复议决定书》（渝税复决字〔2025〕125号）补缴长寿湖旅游高速公路BOT项目回购涉及的税款及滞纳金所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0009\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"55,136,909.61\",\"value\":\"55136909.61\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额上年同期\",\"raw_value\":\"147,653,045.76\",\"value\":\"147653045.76\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额同比增减\",\"raw_value\":\"-62.66\",\"value\":\"-62.66\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F23\",\"text\":\"投资活动产生的现金流量净额本期-86,273,476.62元，上年同期2,965,709.38元，同比变动-3,009.03%，主要系本期金融资产投资增加所致；筹资活动产生的现金流量净额本期-427,109,392.75元，上年同期-236,261,830.98元，同比变动-80.78%，主要系本期归还到期贷款、融资规模下降所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0009\"],\"metrics\":[{\"name\":\"投资活动产生的现金流量净额\",\"raw_value\":\"-86,273,476.62\",\"value\":\"-86273476.62\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"投资活动产生的现金流量净额同比增减\",\"raw_value\":\"-3,009.03\",\"value\":\"-3009.03\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"筹资活动产生的现金流量净额\",\"raw_value\":\"-427,109,392.75\",\"value\":\"-427109392.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"筹资活动产生的现金流量净额同比增减\",\"raw_value\":\"-80.78\",\"value\":\"-80.78\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F24\",\"text\":\"税金及附加本期6,150,719.37元，上期2,450,191.84元，同比增加151.03%，主要系本期应缴税费增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"税金及附加\",\"raw_value\":\"6,150,719.37\",\"value\":\"6150719.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"税金及附加上期\",\"raw_value\":\"2,450,191.84\",\"value\":\"2450191.84\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"税金及附加同比增减\",\"raw_value\":\"151.03\",\"value\":\"151.03\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F25\",\"text\":\"公司全资子公司重庆鼎顺房地产开发有限公司积极推动解决平顶山土地开发项目长期闲置问题，经与政府及相关部门沟通，就解决相关历史遗留问题达成共识和可行方案，为项目后续开发奠定基础。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F26\",\"text\":\"公司盘活南坪国汇中心、大桥附属设施等现有资产，加快存量资产处置、优化资产出租策略，探索资产经营新模式以提高存量资产收益率。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[\"未披露石门大桥资产回购（或置换）的具体时间表与金额。\"]},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"主要参股公司中，重庆渝涪高速公路有限公司注册资本200,000万元，总资产799,702.25万元，净资产543,487.18万元，营业收入53,581.67万元，营业利润5,961.59万元，净利润4,465.97万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"渝涪高速注册资本\",\"raw_value\":\"200,000\",\"value\":\"200000\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"渝涪高速总资产\",\"raw_value\":\"799,702.25\",\"value\":\"799702.25\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"渝涪高速净资产\",\"raw_value\":\"543,487.18\",\"value\":\"543487.18\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"渝涪高速营业收入\",\"raw_value\":\"53,581.67\",\"value\":\"53581.67\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"渝涪高速营业利润\",\"raw_value\":\"5,961.59\",\"value\":\"5961.59\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"渝涪高速净利润\",\"raw_value\":\"4,465.97\",\"value\":\"4465.97\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F28\",\"text\":\"主要参股公司重庆银行股份有限公司注册资本347,458.80万元，总资产103,372,568.10万元，净资产6,599,884.20万元，营业收入1,511,345.60万元，营业利润676,697.10万元，净利润610,506.40万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"重庆银行注册资本\",\"raw_value\":\"347,458.80\",\"value\":\"347458.80\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"重庆银行总资产\",\"raw_value\":\"103,372,568.10\",\"value\":\"103372568.10\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"重庆银行净资产\",\"raw_value\":\"6,599,884.20\",\"value\":\"6599884.20\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"重庆银行营业收入\",\"raw_value\":\"1,511,345.60\",\"value\":\"1511345.60\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"重庆银行营业利润\",\"raw_value\":\"676,697.10\",\"value\":\"676697.10\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"重庆银行净利润\",\"raw_value\":\"610,506.40\",\"value\":\"610506.40\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F29\",\"text\":\"全资子公司重庆鼎顺房地产开发有限公司注册资本4,520万元，总资产36,053.16万元，净资产29,888.67万元，营业利润-7.53万元，净利润-7.53万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"鼎顺房地产注册资本\",\"raw_value\":\"4,520\",\"value\":\"4520\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"鼎顺房地产总资产\",\"raw_value\":\"36,053.16\",\"value\":\"36053.16\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"鼎顺房地产净资产\",\"raw_value\":\"29,888.67\",\"value\":\"29888.67\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"鼎顺房地产营业利润\",\"raw_value\":\"-7.53\",\"value\":\"-7.53\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"鼎顺房地产净利润\",\"raw_value\":\"-7.53\",\"value\":\"-7.53\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"参股公司财务数据为个别报表口径，未披露公司对其持股比例及权益法核算影响。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F30\",\"text\":\"公司在路桥收费业务中承担嘉华大桥的特许经营与运营管理角色，负责桥梁及附属设施的日常巡查、检测、维护维修与安全监控。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"路桥运营的主要投入为维护管理成本，本期8,972,076.09元，占总成本100.00%；报告期组织实施了李家坪立交及嘉华大桥北引道人行道铺装维修、嘉华大桥支座维护作业平台搭设及华村立交挂板检查维护、石门大桥南引桥桥墩支座维护等工程。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0004\"],\"metrics\":[{\"name\":\"路桥行业维护管理成本\",\"raw_value\":\"8,972,076.09\",\"value\":\"8972076.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"路桥行业维护管理成本占总成本比例\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未披露维护工程的具体承包商、材料及能源采购来源。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F32\",\"text\":\"路桥收费业务的下游为经嘉华大桥通行的车辆用户，公司以收取通行费方式取得收入；股权投资业务的下游为被投资企业及产业基金，公司通过参股获取投资收益与红利。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"]}],\"limitations\":[\"未披露具体通行量、车型结构或客户画像数据。\"]}}}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司业务分为路桥收费业务与股权投资业务两大板块：路桥收费依托所持嘉陵江嘉华大桥特许经营权收取通行费，股权投资包括直接股权投资和参与产业股权投资基金投资。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司拥有重庆市主城区嘉陵江嘉华大桥的特许经营权；嘉陵江石门大桥经营期已于2021年12月31日届满，截至报告期末相关资产尚未移交，仍由公司代管。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "路桥收费业务的产品/服务为嘉华大桥通行费收取，并包含“桥隧”附属设施租赁及利用；全年路桥通行费收入19,480万元，附属设施租赁及利用收入合计41.98万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "路桥通行费收入",
+                  "raw_value": "19,480",
+                  "value": "19480",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "“桥隧”附属设施租赁及利用收入",
+                  "raw_value": "41.98",
+                  "value": "41.98",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "股权投资业务通过直接股权投资及参与产业股权投资基金开展，报告期内实现股权投资收益8,602.53万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "股权投资收益",
+                  "raw_value": "8,602.53",
+                  "value": "8602.53",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F05",
+              "text": "公司营业收入主要来自路桥BOT项目经营收益，按建造期间投入成本作为BOT项目摊余成本，连同未来现金流入折现计算实际利率，经营期间按摊余成本与实际利率确认BOT项目收益。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "2025年公司实现营业收入11,289.40万元，其中路桥BOT项目经营收益11,141.52万元，其他业务收入147.88万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "11,289.40",
+                  "value": "11289.40",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥BOT项目经营收益",
+                  "raw_value": "11,141.52",
+                  "value": "11141.52",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务收入",
+                  "raw_value": "147.88",
+                  "value": "147.88",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "营业成本1,005.58万元，其中路桥运营成本897.21万元，其他业务成本108.37万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "1,005.58",
+                  "value": "1005.58",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥运营成本",
+                  "raw_value": "897.21",
+                  "value": "897.21",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务成本",
+                  "raw_value": "108.37",
+                  "value": "108.37",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F08",
+              "text": "主营业务分行业仅路桥行业一项，营业收入111,415,201.20元，营业成本8,972,076.09元，毛利率91.95%，营业收入比上年减少0.06%，营业成本比上年减少47.03%，毛利率比上年增加7.14个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "路桥行业营业收入",
+                  "raw_value": "111,415,201.20",
+                  "value": "111415201.20",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业营业成本",
+                  "raw_value": "8,972,076.09",
+                  "value": "8972076.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业毛利率",
+                  "raw_value": "91.95",
+                  "value": "91.95",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业营业收入比上年增减",
+                  "raw_value": "-0.06",
+                  "value": "-0.06",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业营业成本比上年增减",
+                  "raw_value": "-47.03",
+                  "value": "-47.03",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业毛利率比上年增减",
+                  "raw_value": "7.14",
+                  "value": "7.14",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "公司全年实现营业收入1.13亿元，其中路桥BOT项目经营收益1.11亿元；实现营业利润1.98亿元，比去年增加14.28%；实现净利润1.14亿元，比去年下降27.59%；每股收益0.09元/股。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入（经营综述口径）",
+                  "raw_value": "1.13",
+                  "value": "1.13",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥BOT项目经营收益（经营综述口径）",
+                  "raw_value": "1.11",
+                  "value": "1.11",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业利润",
+                  "raw_value": "1.98",
+                  "value": "1.98",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业利润比上年增减",
+                  "raw_value": "14.28",
+                  "value": "14.28",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净利润",
+                  "raw_value": "1.14",
+                  "value": "1.14",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净利润比上年增减",
+                  "raw_value": "-27.59",
+                  "value": "-27.59",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "每股收益",
+                  "raw_value": "0.09",
+                  "value": "0.09",
+                  "unit": "元/股",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "经营综述口径营业收入1.13亿元、路桥BOT项目经营收益1.11亿元为四舍五入表述，与主营业务分析中11,289.40万元、11,141.52万元存在精度差异，未作换算合并。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F10",
+              "text": "路桥运营以桥梁管护为核心：执行日常巡查、每周不少于两次的周检查、每月一次的经常性检查，并针对天气等季节特点开展特殊检查巡查；对桥梁设施完好、交通及设备运行状况实行24小时不间断监控巡视。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "报告期组织完成石门大桥桥梁变形观测、嘉华大桥综合观测以及石门大桥、嘉华大桥和嘉华隧道的结构定期检测，并依托嘉华大桥运营状态结构健康监测系统开展监测管理和分析评估。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "路桥行业成本构成项目为维护管理，本期金额8,972,076.09元，占总成本比例100.00%，上年同期16,937,018.32元，同比下降47.03%；主要系上年同期实施嘉华大桥路面大修、本期无大修项目，维护成本相应减少。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "路桥行业维护管理成本",
+                  "raw_value": "8,972,076.09",
+                  "value": "8972076.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业维护管理成本占总成本比例",
+                  "raw_value": "100.00",
+                  "value": "100.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业维护管理成本上年同期",
+                  "raw_value": "16,937,018.32",
+                  "value": "16937018.32",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业维护管理成本同比增减",
+                  "raw_value": "-47.03",
+                  "value": "-47.03",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取路桥维护的具体供应商、材料或能源采购明细；报告披露重大采购合同、重大销售合同履行情况为不适用。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F13",
+              "text": "路桥收费业务的客户为通行嘉华大桥的车辆用户，收入形式为路桥通行费；年度应收路桥通行费19,480万元已全额到账。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "年度应收路桥通行费",
+                  "raw_value": "19,480",
+                  "value": "19480",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "公司主要销售客户及主要供应商情况披露为不适用，报告期内不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称、客户集中度数据及分地区收入构成。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F15",
+              "text": "公司参股企业渝涪高速2025年度持续推进收费站智慧化升级改造，建设风险点和高边坡预警监测系统，加强全路段监控监测设备加密部署，并以大数据支撑业务稽查体系。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "公司参股企业重庆银行资产规模突破万亿元大关，营收与净利润实现同比两位数增长；报告期内该行进行2024年度、2025年度第三季度利润分配，公司共计收到红利款约7,130万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "收到重庆银行红利款",
+                  "raw_value": "约7,130",
+                  "value": "7130",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "公司参股企业渝涪高速报告期内实施2024年度红利分配，公司收到红利660万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "收到渝涪高速红利",
+                  "raw_value": "660",
+                  "value": "660",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "公司投资的嘉兴临澜股权投资合伙企业（有限合伙）持有安徽长飞先进半导体有限公司509.7821万股股份，占总股本1.6445%；2025年长飞先进总投资超200亿元的武汉基地正式投产，新开发产品超65个。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "嘉兴临澜所持长飞先进股份数",
+                  "raw_value": "509.7821",
+                  "value": "509.7821",
+                  "unit": "万股",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "嘉兴临澜持股占总股本比例",
+                  "raw_value": "1.6445",
+                  "value": "1.6445",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "长飞先进武汉基地总投资",
+                  "raw_value": "超200",
+                  "value": "200",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "长飞先进武汉基地新开发产品数",
+                  "raw_value": "超65",
+                  "value": "65",
+                  "unit": "个",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "公司参股企业重庆联顺创业投资基金合伙企业于2022年10月进入清算期，2025年工作重点仍是努力寻求项目的退出机会。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "公司参股企业城投金卡信息产业（集团）股份有限公司2025年建立政府采购数据服务新机制、谋划数据采购服务收入，但受大环境影响营业收入有所下降。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露各参股基金及参股企业的具体投资成本、持股比例（除长飞先进外）及退出进度细节。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F21",
+              "text": "营业成本本期10,055,791.54元，上年同期17,607,179.10元，同比下降42.89%，主要系上年同期实施嘉华大桥路面大修、本期无大修项目实施，相应维护成本减少所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "10,055,791.54",
+                  "value": "10055791.54",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本上年同期",
+                  "raw_value": "17,607,179.10",
+                  "value": "17607179.10",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本同比增减",
+                  "raw_value": "-42.89",
+                  "value": "-42.89",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "经营活动产生的现金流量净额本期55,136,909.61元，上年同期147,653,045.76元，同比下降62.66%，主要系本期根据《行政复议决定书》（渝税复决字〔2025〕125号）补缴长寿湖旅游高速公路BOT项目回购涉及的税款及滞纳金所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "55,136,909.61",
+                  "value": "55136909.61",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额上年同期",
+                  "raw_value": "147,653,045.76",
+                  "value": "147653045.76",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额同比增减",
+                  "raw_value": "-62.66",
+                  "value": "-62.66",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "投资活动产生的现金流量净额本期-86,273,476.62元，上年同期2,965,709.38元，同比变动-3,009.03%，主要系本期金融资产投资增加所致；筹资活动产生的现金流量净额本期-427,109,392.75元，上年同期-236,261,830.98元，同比变动-80.78%，主要系本期归还到期贷款、融资规模下降所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "投资活动产生的现金流量净额",
+                  "raw_value": "-86,273,476.62",
+                  "value": "-86273476.62",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资活动产生的现金流量净额同比增减",
+                  "raw_value": "-3,009.03",
+                  "value": "-3009.03",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "筹资活动产生的现金流量净额",
+                  "raw_value": "-427,109,392.75",
+                  "value": "-427109392.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "筹资活动产生的现金流量净额同比增减",
+                  "raw_value": "-80.78",
+                  "value": "-80.78",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "税金及附加本期6,150,719.37元，上期2,450,191.84元，同比增加151.03%，主要系本期应缴税费增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "税金及附加",
+                  "raw_value": "6,150,719.37",
+                  "value": "6150719.37",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "税金及附加上期",
+                  "raw_value": "2,450,191.84",
+                  "value": "2450191.84",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "税金及附加同比增减",
+                  "raw_value": "151.03",
+                  "value": "151.03",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "公司全资子公司重庆鼎顺房地产开发有限公司积极推动解决平顶山土地开发项目长期闲置问题，经与政府及相关部门沟通，就解决相关历史遗留问题达成共识和可行方案，为项目后续开发奠定基础。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "公司盘活南坪国汇中心、大桥附属设施等现有资产，加快存量资产处置、优化资产出租策略，探索资产经营新模式以提高存量资产收益率。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露石门大桥资产回购（或置换）的具体时间表与金额。"
+          ]
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F27",
+              "text": "主要参股公司中，重庆渝涪高速公路有限公司注册资本200,000万元，总资产799,702.25万元，净资产543,487.18万元，营业收入53,581.67万元，营业利润5,961.59万元，净利润4,465.97万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "渝涪高速注册资本",
+                  "raw_value": "200,000",
+                  "value": "200000",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "渝涪高速总资产",
+                  "raw_value": "799,702.25",
+                  "value": "799702.25",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "渝涪高速净资产",
+                  "raw_value": "543,487.18",
+                  "value": "543487.18",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "渝涪高速营业收入",
+                  "raw_value": "53,581.67",
+                  "value": "53581.67",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "渝涪高速营业利润",
+                  "raw_value": "5,961.59",
+                  "value": "5961.59",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "渝涪高速净利润",
+                  "raw_value": "4,465.97",
+                  "value": "4465.97",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "主要参股公司重庆银行股份有限公司注册资本347,458.80万元，总资产103,372,568.10万元，净资产6,599,884.20万元，营业收入1,511,345.60万元，营业利润676,697.10万元，净利润610,506.40万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "重庆银行注册资本",
+                  "raw_value": "347,458.80",
+                  "value": "347458.80",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "重庆银行总资产",
+                  "raw_value": "103,372,568.10",
+                  "value": "103372568.10",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "重庆银行净资产",
+                  "raw_value": "6,599,884.20",
+                  "value": "6599884.20",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "重庆银行营业收入",
+                  "raw_value": "1,511,345.60",
+                  "value": "1511345.60",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "重庆银行营业利润",
+                  "raw_value": "676,697.10",
+                  "value": "676697.10",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "重庆银行净利润",
+                  "raw_value": "610,506.40",
+                  "value": "610506.40",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "全资子公司重庆鼎顺房地产开发有限公司注册资本4,520万元，总资产36,053.16万元，净资产29,888.67万元，营业利润-7.53万元，净利润-7.53万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "鼎顺房地产注册资本",
+                  "raw_value": "4,520",
+                  "value": "4520",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鼎顺房地产总资产",
+                  "raw_value": "36,053.16",
+                  "value": "36053.16",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鼎顺房地产净资产",
+                  "raw_value": "29,888.67",
+                  "value": "29888.67",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鼎顺房地产营业利润",
+                  "raw_value": "-7.53",
+                  "value": "-7.53",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鼎顺房地产净利润",
+                  "raw_value": "-7.53",
+                  "value": "-7.53",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "参股公司财务数据为个别报表口径，未披露公司对其持股比例及权益法核算影响。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F30",
+              "text": "公司在路桥收费业务中承担嘉华大桥的特许经营与运营管理角色，负责桥梁及附属设施的日常巡查、检测、维护维修与安全监控。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F31",
+              "text": "路桥运营的主要投入为维护管理成本，本期8,972,076.09元，占总成本100.00%；报告期组织实施了李家坪立交及嘉华大桥北引道人行道铺装维修、嘉华大桥支座维护作业平台搭设及华村立交挂板检查维护、石门大桥南引桥桥墩支座维护等工程。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "路桥行业维护管理成本",
+                  "raw_value": "8,972,076.09",
+                  "value": "8972076.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "路桥行业维护管理成本占总成本比例",
+                  "raw_value": "100.00",
+                  "value": "100.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露维护工程的具体承包商、材料及能源采购来源。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F32",
+              "text": "路桥收费业务的下游为经嘉华大桥通行的车辆用户，公司以收取通行费方式取得收入；股权投资业务的下游为被投资企业及产业基金，公司通过参股获取投资收益与红利。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体通行量、车型结构或客户画像数据。"
+          ]
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 8760,
+      "output_tokens": 6750,
+      "total_tokens": 15510
+    }
+  },
+  {
+    "request_id": "bp-work-acd85d4690967d0a28bec592:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "bef1327f17c28ba4a538397adfe8cca4349718da0b1e6d356442bf7ee03a468d",
+    "response_hash": "96780067fecd3d29e92aac682d24293be1b1150b88389e1ea1311e555d3d9935",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"R01\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\",\"source-0003\",\"source-0001\"],\"explanation\":\"已采用规模事实只有分行业“路桥行业营业收入”111,415,201.20元，不能代替公司收入构成。source-0006正文已直接写明单位为万元：营业收入11,289.40万元，其中路桥BOT项目经营收益11,141.52万元、其他业务收入147.88万元；同页利润表营业收入为112,893,960.36元。source-0003的1.13亿元、1.11亿元只是四舍五入口径，与上述精确数不冲突，不能因此整段不采用。source-0007已说明路桥行业即嘉华嘉陵江大桥BOT项目，故分行业行可对应BOT经营收益，但公司营业收入总额仍未作为事实列出；通行费收入19,480万元是另一口径，也不能填补。其他业务收入约占1.3%，本身属小尾项，但补公司总额时应按来源类别一并写入。同段成本构成已采用，收入构成不应缺失。\"},{\"finding_id\":\"R02\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F08\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"explanation\":\"F08的路桥行业收入、成本、毛利率91.95%及增减幅度与source-0006表一致，毛利率增减用百分点也正确。但source-0007紧接说明：该行是嘉华嘉陵江大桥BOT项目，按摊余成本与实际利率确认收益，毛利率与其他项目不具可比性。缺少这一限定，会把核算方法造成的高毛利率理解成普通经营毛利。应保留原数字，只补充来源已有的不可比限定。\"},{\"finding_id\":\"R03\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F14\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"source-0007对“主要销售客户及主要供应商情况”，以及对“单个客户销售超过50%、前5名客户存在新增客户或严重依赖少数客户”这一或列事项，均勾选不适用；source-0008对供应商集中和前五名客户也是不适用。不适用只表示该披露事项未适用，不能单独证明经济上“不存在”这些情形，或列标题也不能理解成每一项都未发生。F14前半句复述勾选结果可以保留，后半句“报告期内不存在……情形”应删除，改回相应披露事项勾选不适用。\"},{\"finding_id\":\"R04\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F18\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"source-0004只称嘉兴临澜为公司投资的合伙企业，并由该合伙企业持有长飞先进509.7821万股、占总股本1.6445%；超200亿元基地投资和超65个新产品属于长飞先进，不是公司子公司，也不是合伙企业自身报表数。F18及其指标均标为named_subsidiary。named_subsidiary只指明确子公司。应改为unclear，正文保留“公司投资的合伙企业/长飞先进”归属；“超”的下限表述可保留，不得把200亿元记入子公司口径。\"},{\"finding_id\":\"R05\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F16\",\"evidence_ids\":[\"source-0004\",\"source-0011\"],\"explanation\":\"source-0004称重庆银行为参股企业，source-0011公司类型为参股公司，不是子公司。F16事实级主体却标为named_subsidiary，并把该行资产规模突破万亿元、营收与净利润两位数增长放在该主体下，按子公司理解会改变公司规模。公司收到红利约7,130万元的指标已标consolidated_group，与“公司收到”一致，可保留。应只修正事实主体为unclear并保留参股定性，不要删除红利事实，也不要把约7,130万元改成精确数。\"},{\"finding_id\":\"R06\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F15\",\"evidence_ids\":[\"source-0004\",\"source-0010\"],\"explanation\":\"渝涪高速在source-0004为参股企业，source-0010公司类型为参股公司，经营的是渝涪高速公路，不是公司子公司；公司特许经营桥梁是嘉华大桥。F15正文“参股企业”正确，但subject_scope标成named_subsidiary，会把参股方的收费站改造、监测和稽查误列入子公司经营。应改为unclear，保留参股动态，不要整段隔离。\"},{\"finding_id\":\"R07\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F19\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"source-0004明确重庆联顺为参股企业，2022年10月进入清算期，2025年仍在寻求退出，并未将其列为子公司。F19标为named_subsidiary与参股身份不符。应改为unclear，保留参股和清算期表述；该条无金额，不需补充未给出的退出进度。\"},{\"finding_id\":\"R08\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F20\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"source-0004称城投金卡为参股企业，只说受大环境影响营业收入有所下降，没有降幅。F20标为named_subsidiary不当。应改为unclear并保留参股定性及“有所下降”的原文程度，不要补造金额或把参股公司写成子公司。\"},{\"finding_id\":\"R09\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F13\",\"evidence_ids\":[\"source-0004\",\"source-0001\"],\"explanation\":\"source-0004只支持年度应收路桥通行费19,480万元已全额到账，source-0001支持实现路桥通行费收入19,480万元，两处都没有把客户界定为通行车辆用户。客户身份是未证实推断，且与“应收已到账”的结算表述不一定相同。应保留通行费收入形式和19,480万元全额到账，删除或改写未经来源支持的车辆用户客户认定。\"},{\"finding_id\":\"R10\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F32\",\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"explanation\":\"来源支持路桥业务以通行费取得收入、股权投资以投资收益和红利取得回报，但没有把下游界定为通行车辆用户，也没有把被投资企业和产业基金写成下游客户。后一种写法是供应链框架外推。应保留已证实的收入取得方式，去掉未经来源支持的下游主体认定，不必为此补造通行量或客户画像。\"},{\"finding_id\":\"R11\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\",\"source-0007\",\"source-0004\"],\"explanation\":\"客户、上游、下游和参股限制中，把选定章节未出现的客户名称、集中度、分地区收入、通行量车型、参股投资成本和持股比例写成“未披露”。本包只是选定章节，未见不等于全报告未披露，也不能当成经济上不存在。应改为选定章节未见、目前未知。石门大桥回购在已提供讨论中确实未列时间表和金额，该点可保留为该章节未列明。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F07\",\"F08\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F30\",\"F31\",\"F32\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "R01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0006",
+            "source-0003",
+            "source-0001"
+          ],
+          "explanation": "已采用规模事实只有分行业“路桥行业营业收入”111,415,201.20元，不能代替公司收入构成。source-0006正文已直接写明单位为万元：营业收入11,289.40万元，其中路桥BOT项目经营收益11,141.52万元、其他业务收入147.88万元；同页利润表营业收入为112,893,960.36元。source-0003的1.13亿元、1.11亿元只是四舍五入口径，与上述精确数不冲突，不能因此整段不采用。source-0007已说明路桥行业即嘉华嘉陵江大桥BOT项目，故分行业行可对应BOT经营收益，但公司营业收入总额仍未作为事实列出；通行费收入19,480万元是另一口径，也不能填补。其他业务收入约占1.3%，本身属小尾项，但补公司总额时应按来源类别一并写入。同段成本构成已采用，收入构成不应缺失。"
+        },
+        {
+          "finding_id": "R02",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F08",
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "explanation": "F08的路桥行业收入、成本、毛利率91.95%及增减幅度与source-0006表一致，毛利率增减用百分点也正确。但source-0007紧接说明：该行是嘉华嘉陵江大桥BOT项目，按摊余成本与实际利率确认收益，毛利率与其他项目不具可比性。缺少这一限定，会把核算方法造成的高毛利率理解成普通经营毛利。应保留原数字，只补充来源已有的不可比限定。"
+        },
+        {
+          "finding_id": "R03",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F14",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "source-0007对“主要销售客户及主要供应商情况”，以及对“单个客户销售超过50%、前5名客户存在新增客户或严重依赖少数客户”这一或列事项，均勾选不适用；source-0008对供应商集中和前五名客户也是不适用。不适用只表示该披露事项未适用，不能单独证明经济上“不存在”这些情形，或列标题也不能理解成每一项都未发生。F14前半句复述勾选结果可以保留，后半句“报告期内不存在……情形”应删除，改回相应披露事项勾选不适用。"
+        },
+        {
+          "finding_id": "R04",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F18",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "source-0004只称嘉兴临澜为公司投资的合伙企业，并由该合伙企业持有长飞先进509.7821万股、占总股本1.6445%；超200亿元基地投资和超65个新产品属于长飞先进，不是公司子公司，也不是合伙企业自身报表数。F18及其指标均标为named_subsidiary。named_subsidiary只指明确子公司。应改为unclear，正文保留“公司投资的合伙企业/长飞先进”归属；“超”的下限表述可保留，不得把200亿元记入子公司口径。"
+        },
+        {
+          "finding_id": "R05",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F16",
+          "evidence_ids": [
+            "source-0004",
+            "source-0011"
+          ],
+          "explanation": "source-0004称重庆银行为参股企业，source-0011公司类型为参股公司，不是子公司。F16事实级主体却标为named_subsidiary，并把该行资产规模突破万亿元、营收与净利润两位数增长放在该主体下，按子公司理解会改变公司规模。公司收到红利约7,130万元的指标已标consolidated_group，与“公司收到”一致，可保留。应只修正事实主体为unclear并保留参股定性，不要删除红利事实，也不要把约7,130万元改成精确数。"
+        },
+        {
+          "finding_id": "R06",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F15",
+          "evidence_ids": [
+            "source-0004",
+            "source-0010"
+          ],
+          "explanation": "渝涪高速在source-0004为参股企业，source-0010公司类型为参股公司，经营的是渝涪高速公路，不是公司子公司；公司特许经营桥梁是嘉华大桥。F15正文“参股企业”正确，但subject_scope标成named_subsidiary，会把参股方的收费站改造、监测和稽查误列入子公司经营。应改为unclear，保留参股动态，不要整段隔离。"
+        },
+        {
+          "finding_id": "R07",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F19",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "source-0004明确重庆联顺为参股企业，2022年10月进入清算期，2025年仍在寻求退出，并未将其列为子公司。F19标为named_subsidiary与参股身份不符。应改为unclear，保留参股和清算期表述；该条无金额，不需补充未给出的退出进度。"
+        },
+        {
+          "finding_id": "R08",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F20",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "source-0004称城投金卡为参股企业，只说受大环境影响营业收入有所下降，没有降幅。F20标为named_subsidiary不当。应改为unclear并保留参股定性及“有所下降”的原文程度，不要补造金额或把参股公司写成子公司。"
+        },
+        {
+          "finding_id": "R09",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F13",
+          "evidence_ids": [
+            "source-0004",
+            "source-0001"
+          ],
+          "explanation": "source-0004只支持年度应收路桥通行费19,480万元已全额到账，source-0001支持实现路桥通行费收入19,480万元，两处都没有把客户界定为通行车辆用户。客户身份是未证实推断，且与“应收已到账”的结算表述不一定相同。应保留通行费收入形式和19,480万元全额到账，删除或改写未经来源支持的车辆用户客户认定。"
+        },
+        {
+          "finding_id": "R10",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F32",
+          "evidence_ids": [
+            "source-0001",
+            "source-0004"
+          ],
+          "explanation": "来源支持路桥业务以通行费取得收入、股权投资以投资收益和红利取得回报，但没有把下游界定为通行车辆用户，也没有把被投资企业和产业基金写成下游客户。后一种写法是供应链框架外推。应保留已证实的收入取得方式，去掉未经来源支持的下游主体认定，不必为此补造通行量或客户画像。"
+        },
+        {
+          "finding_id": "R11",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0006",
+            "source-0007",
+            "source-0004"
+          ],
+          "explanation": "客户、上游、下游和参股限制中，把选定章节未出现的客户名称、集中度、分地区收入、通行量车型、参股投资成本和持股比例写成“未披露”。本包只是选定章节，未见不等于全报告未披露，也不能当成经济上不存在。应改为选定章节未见、目前未知。石门大桥回购在已提供讨论中确实未列时间表和金额，该点可保留为该章节未列明。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F07",
+        "F08",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F30",
+        "F31",
+        "F32"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14081,
+      "output_tokens": 2048,
+      "total_tokens": 53511
+    }
+  },
+  {
+    "request_id": "bp-work-acd85d4690967d0a28bec592:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "65e1a440565059be060f0cc91a5bc2a12dd17a615f05fc6486bd62f5ddba06d9",
+    "response_hash": "b7d55221aa79a851fa32471451fc8f48f31d17e70981f1afe91a44521344364f",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:R01\",\"text\":\"报告期内，公司实现营业收入11,289.40万元，其中路桥BOT项目经营收益11,141.52万元，其他业务收入147.88万元；营业成本1,005.58万元，其中路桥运营成本897.21万元，其他业务成本108.37万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"11,289.40\",\"value\":\"11289.40\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"路桥BOT项目经营收益\",\"raw_value\":\"11,141.52\",\"value\":\"11141.52\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务收入\",\"raw_value\":\"147.88\",\"value\":\"147.88\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业成本\",\"raw_value\":\"1,005.58\",\"value\":\"1005.58\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"路桥运营成本\",\"raw_value\":\"897.21\",\"value\":\"897.21\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务成本\",\"raw_value\":\"108.37\",\"value\":\"108.37\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:R02\",\"text\":\"主营业务分行业仅路桥行业一项，营业收入111,415,201.20元，营业成本8,972,076.09元，毛利率91.95%，营业收入比上年减少0.06%，营业成本比上年减少47.03%，毛利率比上年增加7.14个百分点。该行为公司所属嘉华嘉陵江大桥BOT项目，按摊余成本与实际利率确认BOT项目收益，其毛利率与其他项目不具可比性。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"路桥行业营业收入\",\"raw_value\":\"111,415,201.20\",\"value\":\"111415201.20\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"路桥行业营业成本\",\"raw_value\":\"8,972,076.09\",\"value\":\"8972076.09\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"路桥行业毛利率\",\"raw_value\":\"91.95\",\"value\":\"91.95\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"路桥行业营业收入比上年增减\",\"raw_value\":\"-0.06\",\"value\":\"-0.06\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"路桥行业营业成本比上年增减\",\"raw_value\":\"-47.03\",\"value\":\"-47.03\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"路桥行业毛利率比上年增减\",\"raw_value\":\"7.14\",\"value\":\"7.14\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F14\",\"text\":\"公司主要销售客户及主要供应商情况披露为不适用；报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖于少数客户的情形披露为不适用；报告期内向单个供应商的采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖于少数供应商的情形披露为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F18\",\"text\":\"公司投资的嘉兴临澜股权投资合伙企业（有限合伙）持有安徽长飞先进半导体有限公司509.7821万股股份，占总股本1.6445%；2025年长飞先进总投资超200亿元的武汉基地正式投产，新开发产品超65个。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"嘉兴临澜所持长飞先进股份数\",\"raw_value\":\"509.7821\",\"value\":\"509.7821\",\"unit\":\"万股\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"嘉兴临澜持股占总股本比例\",\"raw_value\":\"1.6445\",\"value\":\"1.6445\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"长飞先进武汉基地总投资\",\"raw_value\":\"超200\",\"value\":\"200\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null},{\"name\":\"长飞先进武汉基地新开发产品数\",\"raw_value\":\"超65\",\"value\":\"65\",\"unit\":\"个\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"来源仅说明嘉兴临澜为公司投资的合伙企业、长飞先进为其持股对象，未明确为子公司口径。\"},{\"fact_id\":\"F16\",\"text\":\"公司参股企业重庆银行资产规模突破万亿元大关，营收与净利润实现同比两位数增长；报告期内该行进行2024年度、2025年度第三季度利润分配，公司共计收到红利款约7,130万元。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0011\"],\"metrics\":[{\"name\":\"收到重庆银行红利款\",\"raw_value\":\"约7,130\",\"value\":\"7130\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"重庆银行为参股公司，非子公司；事实主体按参股口径保留为unclear。\"},{\"fact_id\":\"F15\",\"text\":\"公司参股企业渝涪高速2025年度持续推进收费站智慧化升级改造，建设风险点和高边坡预警监测系统，加强全路段监控监测设备加密部署，并以大数据支撑业务稽查体系。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0010\"],\"metrics\":[],\"uncertainty_reason\":\"渝涪高速为参股公司，非子公司。\"},{\"fact_id\":\"F19\",\"text\":\"公司参股企业重庆联顺创业投资基金合伙企业于2022年10月进入清算期，2025年工作重点仍是努力寻求项目的退出机会。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[],\"uncertainty_reason\":\"重庆联顺为参股企业，非子公司。\"},{\"fact_id\":\"F20\",\"text\":\"公司参股企业城投金卡信息产业（集团）股份有限公司2025年建立政府采购数据服务新机制、谋划数据采购服务收入，但受大环境影响营业收入有所下降。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[],\"uncertainty_reason\":\"城投金卡为参股企业，非子公司。\"},{\"fact_id\":\"F13\",\"text\":\"路桥收费业务的收入形式为路桥通行费；年度应收路桥通行费19,480万元已全额到账。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0001\"],\"metrics\":[{\"name\":\"年度应收路桥通行费\",\"raw_value\":\"19,480\",\"value\":\"19480\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F32\",\"text\":\"路桥收费业务以收取通行费方式取得收入；股权投资业务通过参股获取投资收益与红利。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:R01",
+          "text": "报告期内，公司实现营业收入11,289.40万元，其中路桥BOT项目经营收益11,141.52万元，其他业务收入147.88万元；营业成本1,005.58万元，其中路桥运营成本897.21万元，其他业务成本108.37万元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "11,289.40",
+              "value": "11289.40",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "路桥BOT项目经营收益",
+              "raw_value": "11,141.52",
+              "value": "11141.52",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务收入",
+              "raw_value": "147.88",
+              "value": "147.88",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业成本",
+              "raw_value": "1,005.58",
+              "value": "1005.58",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "路桥运营成本",
+              "raw_value": "897.21",
+              "value": "897.21",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务成本",
+              "raw_value": "108.37",
+              "value": "108.37",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:R02",
+          "text": "主营业务分行业仅路桥行业一项，营业收入111,415,201.20元，营业成本8,972,076.09元，毛利率91.95%，营业收入比上年减少0.06%，营业成本比上年减少47.03%，毛利率比上年增加7.14个百分点。该行为公司所属嘉华嘉陵江大桥BOT项目，按摊余成本与实际利率确认BOT项目收益，其毛利率与其他项目不具可比性。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "路桥行业营业收入",
+              "raw_value": "111,415,201.20",
+              "value": "111415201.20",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "路桥行业营业成本",
+              "raw_value": "8,972,076.09",
+              "value": "8972076.09",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "路桥行业毛利率",
+              "raw_value": "91.95",
+              "value": "91.95",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "路桥行业营业收入比上年增减",
+              "raw_value": "-0.06",
+              "value": "-0.06",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "路桥行业营业成本比上年增减",
+              "raw_value": "-47.03",
+              "value": "-47.03",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "路桥行业毛利率比上年增减",
+              "raw_value": "7.14",
+              "value": "7.14",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F14",
+          "text": "公司主要销售客户及主要供应商情况披露为不适用；报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖于少数客户的情形披露为不适用；报告期内向单个供应商的采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖于少数供应商的情形披露为不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F18",
+          "text": "公司投资的嘉兴临澜股权投资合伙企业（有限合伙）持有安徽长飞先进半导体有限公司509.7821万股股份，占总股本1.6445%；2025年长飞先进总投资超200亿元的武汉基地正式投产，新开发产品超65个。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "嘉兴临澜所持长飞先进股份数",
+              "raw_value": "509.7821",
+              "value": "509.7821",
+              "unit": "万股",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "嘉兴临澜持股占总股本比例",
+              "raw_value": "1.6445",
+              "value": "1.6445",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "长飞先进武汉基地总投资",
+              "raw_value": "超200",
+              "value": "200",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "长飞先进武汉基地新开发产品数",
+              "raw_value": "超65",
+              "value": "65",
+              "unit": "个",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "来源仅说明嘉兴临澜为公司投资的合伙企业、长飞先进为其持股对象，未明确为子公司口径。"
+        },
+        {
+          "fact_id": "F16",
+          "text": "公司参股企业重庆银行资产规模突破万亿元大关，营收与净利润实现同比两位数增长；报告期内该行进行2024年度、2025年度第三季度利润分配，公司共计收到红利款约7,130万元。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "收到重庆银行红利款",
+              "raw_value": "约7,130",
+              "value": "7130",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "重庆银行为参股公司，非子公司；事实主体按参股口径保留为unclear。"
+        },
+        {
+          "fact_id": "F15",
+          "text": "公司参股企业渝涪高速2025年度持续推进收费站智慧化升级改造，建设风险点和高边坡预警监测系统，加强全路段监控监测设备加密部署，并以大数据支撑业务稽查体系。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0010"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "渝涪高速为参股公司，非子公司。"
+        },
+        {
+          "fact_id": "F19",
+          "text": "公司参股企业重庆联顺创业投资基金合伙企业于2022年10月进入清算期，2025年工作重点仍是努力寻求项目的退出机会。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "重庆联顺为参股企业，非子公司。"
+        },
+        {
+          "fact_id": "F20",
+          "text": "公司参股企业城投金卡信息产业（集团）股份有限公司2025年建立政府采购数据服务新机制、谋划数据采购服务收入，但受大环境影响营业收入有所下降。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "城投金卡为参股企业，非子公司。"
+        },
+        {
+          "fact_id": "F13",
+          "text": "路桥收费业务的收入形式为路桥通行费；年度应收路桥通行费19,480万元已全额到账。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "年度应收路桥通行费",
+              "raw_value": "19,480",
+              "value": "19480",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F32",
+          "text": "路桥收费业务以收取通行费方式取得收入；股权投资业务通过参股获取投资收益与红利。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0004"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 9109,
+      "output_tokens": 2344,
+      "total_tokens": 11453
+    }
+  },
+  {
+    "request_id": "bp-work-acd85d4690967d0a28bec592:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "1bbc59e599e3a789f1df4399bc03e74176e43a21ef75e85951b8499f29cbacf6",
+    "response_hash": "5bfd446f074bc7a1a0ef95b32bcda4b78511320d579f423fb1608824f490c265",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:R02\",\"F14\",\"F18\",\"F16\",\"F15\",\"F19\",\"F20\",\"F13\",\"F32\"],\"checks\":[{\"fact_id\":\"review-add:R02\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"explanation\":\"分行业表仅列路桥行业，营业收入111,415,201.20元、营业成本8,972,076.09元、毛利率91.95%、收入与成本同比-0.06%和-47.03%、毛利率增加7.14个百分点均与source-0006一致，且毛利率变动按百分点而非普通百分数理解。指标主体保持业务分部，未套用合并口径。正文补入source-0007已有的嘉华嘉陵江大桥BOT项目及摊余成本、实际利率核算导致毛利率与其他项目不可比的限定，解决了把核算高毛利率当成普通经营毛利的遗漏。\"},{\"fact_id\":\"F14\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"三条均改为相应披露事项勾选不适用，分别对应主要客户及供应商、单一客户销售超50%或前五名客户新增或严重依赖、单一供应商采购超50%或前五名供应商新增或严重依赖。未把勾选结果写成经济上不存在，也未把或列标题拆成各项均未发生，主体按报告正文中的公司取合并口径，解决了原不支持断言。\"},{\"fact_id\":\"F18\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"正文保留公司投资的合伙企业持有长飞先进509.7821万股、占1.6445%，以及长飞先进自身超200亿元基地投资和超65个新产品的归属；超字以大于下限保留，未记成精确值或子公司口径。事实及各指标主体均为unclear，并说明来源未将其明确为子公司，解决了named_subsidiary错置。\"},{\"fact_id\":\"F16\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0011\"],\"explanation\":\"事实主体改为unclear并保留参股企业定性，与source-0004、source-0011的参股公司一致；资产规模突破万亿元和两位数增长仍归于该行，未按子公司并入公司规模。公司收到红利约7,130万元单独保持合并口径和约数，未改成精确值，也未删除红利事实。\"},{\"fact_id\":\"F15\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0010\"],\"explanation\":\"正文仍表述为参股企业渝涪高速的收费站改造、监测和稽查，主体改为unclear，与source-0004、source-0010的参股身份一致，未再标成子公司经营。省略红利等可选细节不影响该主体纠错，参股经营动态亦未整段删除。\"},{\"fact_id\":\"F19\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"改为unclear并明确重庆联顺为参股企业，保留2022年10月进入清算期、2025年仍寻求退出的原文，没有补造来源未给的退出进度或金额，纠正了named_subsidiary错置。\"},{\"fact_id\":\"F20\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"改为unclear并保留城投金卡参股企业定性；营业收入仅保留受大环境影响有所下降，没有补造降幅或金额，也未写成子公司，符合source-0004。\"},{\"fact_id\":\"F13\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"explanation\":\"保留路桥通行费这一收入形式，以及年度应收路桥通行费19,480万元已全额到账；指标名称维持应收通行费类别、单位为万元、期间为报告年度，主体按公司表述取合并口径。已删除来源未支持的通行车辆用户客户认定。\"},{\"fact_id\":\"F32\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"explanation\":\"仅保留来源已证实的取得方式：路桥收费业务收取通行费，股权投资业务取得投资收益和红利，并去掉通行车辆用户、被投资企业及产业基金等下游客户外推。未补造通行量或客户画像，主体按报告业务表述取合并口径。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:R02",
+        "F14",
+        "F18",
+        "F16",
+        "F15",
+        "F19",
+        "F20",
+        "F13",
+        "F32"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:R02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "explanation": "分行业表仅列路桥行业，营业收入111,415,201.20元、营业成本8,972,076.09元、毛利率91.95%、收入与成本同比-0.06%和-47.03%、毛利率增加7.14个百分点均与source-0006一致，且毛利率变动按百分点而非普通百分数理解。指标主体保持业务分部，未套用合并口径。正文补入source-0007已有的嘉华嘉陵江大桥BOT项目及摊余成本、实际利率核算导致毛利率与其他项目不可比的限定，解决了把核算高毛利率当成普通经营毛利的遗漏。"
+        },
+        {
+          "fact_id": "F14",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "三条均改为相应披露事项勾选不适用，分别对应主要客户及供应商、单一客户销售超50%或前五名客户新增或严重依赖、单一供应商采购超50%或前五名供应商新增或严重依赖。未把勾选结果写成经济上不存在，也未把或列标题拆成各项均未发生，主体按报告正文中的公司取合并口径，解决了原不支持断言。"
+        },
+        {
+          "fact_id": "F18",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "正文保留公司投资的合伙企业持有长飞先进509.7821万股、占1.6445%，以及长飞先进自身超200亿元基地投资和超65个新产品的归属；超字以大于下限保留，未记成精确值或子公司口径。事实及各指标主体均为unclear，并说明来源未将其明确为子公司，解决了named_subsidiary错置。"
+        },
+        {
+          "fact_id": "F16",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0011"
+          ],
+          "explanation": "事实主体改为unclear并保留参股企业定性，与source-0004、source-0011的参股公司一致；资产规模突破万亿元和两位数增长仍归于该行，未按子公司并入公司规模。公司收到红利约7,130万元单独保持合并口径和约数，未改成精确值，也未删除红利事实。"
+        },
+        {
+          "fact_id": "F15",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0010"
+          ],
+          "explanation": "正文仍表述为参股企业渝涪高速的收费站改造、监测和稽查，主体改为unclear，与source-0004、source-0010的参股身份一致，未再标成子公司经营。省略红利等可选细节不影响该主体纠错，参股经营动态亦未整段删除。"
+        },
+        {
+          "fact_id": "F19",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "改为unclear并明确重庆联顺为参股企业，保留2022年10月进入清算期、2025年仍寻求退出的原文，没有补造来源未给的退出进度或金额，纠正了named_subsidiary错置。"
+        },
+        {
+          "fact_id": "F20",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "改为unclear并保留城投金卡参股企业定性；营业收入仅保留受大环境影响有所下降，没有补造降幅或金额，也未写成子公司，符合source-0004。"
+        },
+        {
+          "fact_id": "F13",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0004"
+          ],
+          "explanation": "保留路桥通行费这一收入形式，以及年度应收路桥通行费19,480万元已全额到账；指标名称维持应收通行费类别、单位为万元、期间为报告年度，主体按公司表述取合并口径。已删除来源未支持的通行车辆用户客户认定。"
+        },
+        {
+          "fact_id": "F32",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0004"
+          ],
+          "explanation": "仅保留来源已证实的取得方式：路桥收费业务收取通行费，股权投资业务取得投资收益和红利，并去掉通行车辆用户、被投资企业及产业基金等下游客户外推。未补造通行量或客户画像，主体按报告业务表述取合并口径。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10327,
+      "output_tokens": 1019,
+      "total_tokens": 23787
+    }
+  }
+]

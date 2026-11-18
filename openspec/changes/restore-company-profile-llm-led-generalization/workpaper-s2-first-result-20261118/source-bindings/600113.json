@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "600113.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_f2dda829c32d3b60bf4c34f5087921bf",
+    "filing_id": "1225000442",
+    "source": "cninfo",
+    "published_at": "2026-03-06T16:00:00+00:00",
+    "content_hash": "15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/15/15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "ann_f2dda829c32d3b60bf4c34f5087921bf",
+    "source": "cninfo",
+    "announcement_id": "1225000442",
+    "title": "浙江东日股份有限公司2025年年度报告（全文）",
+    "published_at": "2026-03-06T16:00:00+00:00",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-03-07/1225000442.PDF",
+    "exchange": "SSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}

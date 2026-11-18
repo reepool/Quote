@@ -1,0 +1,923 @@
+[
+  {
+    "request_id": "bp-work-d4b1cb5e4786dfa700b1fa87:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "c53495e0989624bfa607e56a86b1d5d82b58ac343bd6f7d5997b2bb0a922928c",
+    "response_hash": "b6afc09a48f4c61718b313991a5618190fbc8b6b31346941c3b7ccc0c485470f",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0018\",\"section-0019\",\"section-0020\",\"section-0035\",\"section-0036\",\"section-0039\",\"section-0070\",\"section-0072\"],\"rationale\":\"选择公司业务介绍（含轨道交通运营检修装备、维保服务两个子业务）以说明产品/服务与经营模式；选择主营业务分析中的概述与收入成本子节，获取公司层面营业收入总额、分业务收入构成与成本结构，回答“怎么赚钱、主要业务权重”；选择主要控股参股公司分析补充子公司经营规模；选择未来发展展望（含经营计划与风险）说明经营因素与本期变化。行业背景、核心竞争力、治理与财务报告附注因非公司层面经营实质或过于细碎而暂缓。\",\"deferred\":[\"section-0021 行业情况：属行业背景，非公司层面经营实质，暂缓\",\"section-0031 核心竞争力分析：泛化竞争优势，信息密度低于业务与收入分析，暂缓\",\"section-0086 公司治理、环境和社会：治理与人员细节，与经营解释关联弱，暂缓\",\"section-0282 财务报告：仅在有明确收入/分部缺口时定向补充，暂不整体展开\"],\"stop_reason\":\"已覆盖业务结构、产品用途、收入构成与主要业务权重、子公司经营规模及经营计划与风险，形成公司层面经营解释闭环；剩余为行业背景、治理与财务附注细节，不改变公司层面解读，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0018",
+        "section-0019",
+        "section-0020",
+        "section-0035",
+        "section-0036",
+        "section-0039",
+        "section-0070",
+        "section-0072"
+      ],
+      "rationale": "选择公司业务介绍（含轨道交通运营检修装备、维保服务两个子业务）以说明产品/服务与经营模式；选择主营业务分析中的概述与收入成本子节，获取公司层面营业收入总额、分业务收入构成与成本结构，回答“怎么赚钱、主要业务权重”；选择主要控股参股公司分析补充子公司经营规模；选择未来发展展望（含经营计划与风险）说明经营因素与本期变化。行业背景、核心竞争力、治理与财务报告附注因非公司层面经营实质或过于细碎而暂缓。",
+      "deferred": [
+        "section-0021 行业情况：属行业背景，非公司层面经营实质，暂缓",
+        "section-0031 核心竞争力分析：泛化竞争优势，信息密度低于业务与收入分析，暂缓",
+        "section-0086 公司治理、环境和社会：治理与人员细节，与经营解释关联弱，暂缓",
+        "section-0282 财务报告：仅在有明确收入/分部缺口时定向补充，暂不整体展开"
+      ],
+      "stop_reason": "已覆盖业务结构、产品用途、收入构成与主要业务权重、子公司经营规模及经营计划与风险，形成公司层面经营解释闭环；剩余为行业背景、治理与财务附注细节，不改变公司层面解读，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 15618,
+      "output_tokens": 323,
+      "total_tokens": 15941
+    }
+  },
+  {
+    "request_id": "bp-work-d4b1cb5e4786dfa700b1fa87:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "d8c095cde78ef36a99647f5ae8aff2495379c6f7cc8ddad9465e933ec282d312",
+    "response_hash": "8c57e89e4a465ee3a0e1f65c296232f70c4a916fbb6aecb563ed956bafe9ba17",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司聚焦轨道交通领域，形成轨道交通运营检修装备、轨道交通运营维保服务两大核心业务板块，构建“6+1”业务布局；报告期内主营业务未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"公司完成“装备+运营”业务整合，形成“6+1”产业布局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"轨道交通运营检修装备业务覆盖车辆检修、信号控制、线路维护、轨边检测、车载电子等全产业链环节，核心产品包括高铁车轮/车轴探伤检测系统、高铁/地铁车辆清洗系统、计算机联锁系统、通过式车轮探伤系统等，广泛应用于国内主要高铁线路、城市轨道交通线路及货运铁路。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F04\",\"text\":\"装备板块各主体核心产品：新联铁为高铁车轮/车轴探伤检测系统、高铁/地铁车辆清洗系统、机车车辆工艺检修装备、转向架试验台、大数据修车系统等；交大微联为计算机联锁系统、列控中心系统、信号集中监测系统、ATS系统、RBC系统、城轨CBTC系统等；南京拓控为通过式车轮探伤系统、360°动态图像检测系统、车轮踏面图像检测、多边形检测等轨边在线检测产品。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F05\",\"text\":\"武汉利德产品为多功能线路维修机（换枕机）、轨道衡、超偏载检测系统、铁路货运高清视频监视系统等；神州城轨为城市轨道交通智能架大修设备及解决方案；华兴华高为车载接触网运行状态检测装置、受电弓监测装置、动车组安全监测系统、智能巡检机器人、走行部检测系统等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F06\",\"text\":\"轨道交通运营维保服务业务涵盖地铁运营、货运专用铁路线运维、轨道交通职业人才培训、BIM仿真等，与装备业务形成协同。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F07\",\"text\":\"公司重点研发空心车轴探伤机器人、轮辋轮辐探伤机器人、智能焊轨基地打磨机器人等智能产品，且已实现应用落地。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F08\",\"text\":\"2025年度公司实现营业收入21.20亿元，同比增长1.84%；营业成本15.48亿元，主要集中于装备制造及维保服务核心业务环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"21.20亿元\",\"value\":\"21.20\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"1.84%\",\"value\":\"1.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本\",\"raw_value\":\"15.48亿元\",\"value\":\"15.48\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"按产品划分，2025年轨道交通运营检修装备营业收入1,842,343,021.99元，占营业收入比重86.89%；轨道交通运营维保服务营业收入268,907,346.83元，占比12.68%；其他营业收入9,148,765.95元，占比0.43%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"轨道交通运营检修装备营业收入\",\"raw_value\":\"1,842,343,021.99\",\"value\":\"1842343021.99\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"轨道交通运营检修装备营业收入占营业收入比重\",\"raw_value\":\"86.89%\",\"value\":\"86.89\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"轨道交通运营维保服务营业收入\",\"raw_value\":\"268,907,346.83\",\"value\":\"268907346.83\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"轨道交通运营维保服务营业收入占营业收入比重\",\"raw_value\":\"12.68%\",\"value\":\"12.68\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他营业收入\",\"raw_value\":\"9,148,765.95\",\"value\":\"9148765.95\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他营业收入占营业收入比重\",\"raw_value\":\"0.43%\",\"value\":\"0.43\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F10\",\"text\":\"分产品毛利率：轨道交通运营检修装备毛利率27.41%，轨道交通运营维保服务毛利率24.15%；分行业轨道交通毛利率27.00%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"轨道交通运营检修装备毛利率\",\"raw_value\":\"27.41%\",\"value\":\"27.41\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"轨道交通运营维保服务毛利率\",\"raw_value\":\"24.15%\",\"value\":\"24.15\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"轨道交通毛利率\",\"raw_value\":\"27.00%\",\"value\":\"27.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"2025年度公司新签合同金额达25.53亿元，合同规模保持稳定。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"新签合同金额\",\"raw_value\":\"25.53亿元\",\"value\":\"25.53\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F12\",\"text\":\"2025年公司营业收入合计2,120,399,134.77元，2024年为2,082,012,354.78元，同比增减1.84%；分行业轨道交通收入占比100.00%，分销售模式直销占比100.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"2,120,399,134.77\",\"value\":\"2120399134.77\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入合计同比增减\",\"raw_value\":\"1.84%\",\"value\":\"1.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"分地区营业收入：华北地区637,066,610.45元（占30.04%）、华东地区724,721,785.85元（占34.18%）、东北地区99,069,689.26元（占4.67%）、华南地区56,291,969.71元（占2.65%）、华中地区209,178,947.74元（占9.87%）、西北地区182,538,984.39元（占8.61%）、西南地区186,946,466.09元（占8.82%）、海外24,584,681.28元（占1.16%）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"华北地区营业收入\",\"raw_value\":\"637,066,610.45\",\"value\":\"637066610.45\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"华东地区营业收入\",\"raw_value\":\"724,721,785.85\",\"value\":\"724721785.85\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"海外营业收入\",\"raw_value\":\"24,584,681.28\",\"value\":\"24584681.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"2025年轨道交通产品销售量1,704台/套，生产量1,731台/套，库存量284台/套。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"销售量\",\"raw_value\":\"1,704\",\"value\":\"1704\",\"unit\":\"台/套\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"生产量\",\"raw_value\":\"1,731\",\"value\":\"1731\",\"unit\":\"台/套\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"库存量\",\"raw_value\":\"284\",\"value\":\"284\",\"unit\":\"台/套\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F15\",\"text\":\"营业成本构成按产品分类：轨道交通运营检修装备营业成本1,337,322,842.75元（占营业成本86.40%），轨道交通运营维保服务203,953,195.46元（占13.18%），其他6,511,819.86元（占0.42%）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"轨道交通运营检修装备营业成本\",\"raw_value\":\"1,337,322,842.75\",\"value\":\"1337322842.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"轨道交通运营维保服务营业成本\",\"raw_value\":\"203,953,195.46\",\"value\":\"203953195.46\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F16\",\"text\":\"2025年度研发投入金额181,078,624.21元，占营业收入比例8.54%；研发投入同比增长10.05%；全年累计申请发明专利28项，授权发明专利18项。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0010\"],\"metrics\":[{\"name\":\"研发投入金额\",\"raw_value\":\"181,078,624.21\",\"value\":\"181078624.21\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入占营业收入比例\",\"raw_value\":\"8.54%\",\"value\":\"8.54\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入同比增减\",\"raw_value\":\"10.05%\",\"value\":\"10.05\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"2025年度经营活动现金流净额1.77亿元；公司审慎计提商誉减值、存货跌价准备等各项减值准备共计8.22亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"经营活动现金流净额\",\"raw_value\":\"1.77亿元\",\"value\":\"1.77\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"计提各项减值准备\",\"raw_value\":\"8.22亿元\",\"value\":\"8.22\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取主要原材料、能源等具体采购品类的披露；供应商情况仅列示前五名采购金额，未说明具体采购物资构成。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F18\",\"text\":\"公司主要销售客户情况：前五名客户合计销售金额1,485,337,959.61元，占年度销售总额比例70.06%；其中关联方销售额占年度销售总额比例1.75%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"1,485,337,959.61\",\"value\":\"1485337959.61\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"70.06%\",\"value\":\"70.06\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"公司主要供应商情况：前五名供应商合计采购金额189,599,094.09元，占年度采购总额比例15.71%；其中关联方采购额占年度采购总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"189,599,094.09\",\"value\":\"189599094.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"15.71%\",\"value\":\"15.71\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F20\",\"text\":\"公司深化与国铁集团、铁科院等行业机构的常态化对接，并积极开拓战略性客户，与中交轨道交通、北京城建智控等签订战略合作协议。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[\"客户与供应商名称均以“第一名”等匿名列示，未披露具体名称。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"神铁运营为公司运营维保业务核心运营主体，负责天津地铁2号线运营管理，参与天津地铁3号线、7号线运营管理工作，并承接其他城市地铁运营维保相关业务，为智能化运营检修装备与数据系统提供应用场景及孵化载体。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F22\",\"text\":\"公司成立人工智能创新中心，组建自有算法团队，实现部分产品算法自研，降低外部技术依赖。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F23\",\"text\":\"报告期内公司强化成本费用精细化管理，销售费用与管理费用合计较2024年减少0.45亿元，同比下降9.78%；财务费用同比下降16.71%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"销售费用与管理费用合计同比减少额\",\"raw_value\":\"0.45亿元\",\"value\":\"0.45\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"销售费用与管理费用合计同比增减\",\"raw_value\":\"-9.78%\",\"value\":\"-9.78\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财务费用同比增减\",\"raw_value\":\"-16.71%\",\"value\":\"-16.71\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F24\",\"text\":\"主要子公司经营规模：新联铁营业收入444,830,929.19元、净利润16,263,267.30元；交大微联营业收入320,011,124.93元、净利润23,199,978.00元；南京拓控营业收入174,458,225.28元、净利润31,147,851.37元；神铁运营营业收入243,541,707.35元、净利润52,691,370.84元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"新联铁营业收入\",\"raw_value\":\"444,830,929.19\",\"value\":\"444830929.19\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"新联铁净利润\",\"raw_value\":\"16,263,267.30\",\"value\":\"16263267.30\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"交大微联营业收入\",\"raw_value\":\"320,011,124.93\",\"value\":\"320011124.93\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"南京拓控营业收入\",\"raw_value\":\"174,458,225.28\",\"value\":\"174458225.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"神铁运营营业收入\",\"raw_value\":\"243,541,707.35\",\"value\":\"243541707.35\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"神铁运营净利润\",\"raw_value\":\"52,691,370.84\",\"value\":\"52691370.84\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各业务板块分季度或分产品细类的经营驱动因素披露。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F25\",\"text\":\"报告期内合并范围变动：本年无新增子公司，减少主要是已完成注销三级子公司北京新联百通科技发展有限公司、北京联讯伟业科技发展有限公司、北京天熔焊接技术有限公司，目的为清算低效子公司、优化结构、聚焦主业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0013\"]},{\"fact_id\":\"F26\",\"text\":\"报告期内公司业务类型、利润构成及利润来源未发生重大变动，主要利润仍来源于核心业务板块；利润变动受各项资产减值计提影响较大。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F27\",\"text\":\"公司披露的风险包括：宏观环境风险、市场竞争风险（行业投资规模收缩、上下游企业向装备延伸致竞争加剧）、资产减值风险（商誉和长期股权投资金额较高）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0016\"]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F28\",\"text\":\"公司为轨道交通运营检修装备制造商与运营维保服务提供商，装备业务覆盖车辆检修、信号控制、线路维护、轨边检测、车载电子等环节，并通过神铁运营开展地铁运营与维保服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"未获取成功：选定章节未披露具体原材料、零部件或能源采购品类；仅列示前五名供应商采购金额，未说明采购物资构成。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"公司产品广泛应用于国内主要高铁线路、城市轨道交通线路及货运铁路；客户集中度较高，前五名客户合计占年度销售总额70.06%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0008\"]}],\"limitations\":[\"未披露具体客户名称及下游行业细分占比。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F30\",\"text\":\"神州高铁是国投集团控股的央企上市公司，历经二十余年产业深耕，聚焦轨道交通领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"limitations\":[\"未获取主要原材料及能源等具体采购品类信息。\",\"客户与供应商名称均匿名列示，未披露具体名称。\",\"行业背景、核心竞争力、治理与财务报告附注章节未纳入本次阅读范围。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司聚焦轨道交通领域，形成轨道交通运营检修装备、轨道交通运营维保服务两大核心业务板块，构建“6+1”业务布局；报告期内主营业务未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司完成“装备+运营”业务整合，形成“6+1”产业布局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "轨道交通运营检修装备业务覆盖车辆检修、信号控制、线路维护、轨边检测、车载电子等全产业链环节，核心产品包括高铁车轮/车轴探伤检测系统、高铁/地铁车辆清洗系统、计算机联锁系统、通过式车轮探伤系统等，广泛应用于国内主要高铁线路、城市轨道交通线路及货运铁路。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "装备板块各主体核心产品：新联铁为高铁车轮/车轴探伤检测系统、高铁/地铁车辆清洗系统、机车车辆工艺检修装备、转向架试验台、大数据修车系统等；交大微联为计算机联锁系统、列控中心系统、信号集中监测系统、ATS系统、RBC系统、城轨CBTC系统等；南京拓控为通过式车轮探伤系统、360°动态图像检测系统、车轮踏面图像检测、多边形检测等轨边在线检测产品。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "武汉利德产品为多功能线路维修机（换枕机）、轨道衡、超偏载检测系统、铁路货运高清视频监视系统等；神州城轨为城市轨道交通智能架大修设备及解决方案；华兴华高为车载接触网运行状态检测装置、受电弓监测装置、动车组安全监测系统、智能巡检机器人、走行部检测系统等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "轨道交通运营维保服务业务涵盖地铁运营、货运专用铁路线运维、轨道交通职业人才培训、BIM仿真等，与装备业务形成协同。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "公司重点研发空心车轴探伤机器人、轮辋轮辐探伤机器人、智能焊轨基地打磨机器人等智能产品，且已实现应用落地。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F08",
+              "text": "2025年度公司实现营业收入21.20亿元，同比增长1.84%；营业成本15.48亿元，主要集中于装备制造及维保服务核心业务环节。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "21.20亿元",
+                  "value": "21.20",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "1.84%",
+                  "value": "1.84",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "15.48亿元",
+                  "value": "15.48",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "按产品划分，2025年轨道交通运营检修装备营业收入1,842,343,021.99元，占营业收入比重86.89%；轨道交通运营维保服务营业收入268,907,346.83元，占比12.68%；其他营业收入9,148,765.95元，占比0.43%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "轨道交通运营检修装备营业收入",
+                  "raw_value": "1,842,343,021.99",
+                  "value": "1842343021.99",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "轨道交通运营检修装备营业收入占营业收入比重",
+                  "raw_value": "86.89%",
+                  "value": "86.89",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "轨道交通运营维保服务营业收入",
+                  "raw_value": "268,907,346.83",
+                  "value": "268907346.83",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "轨道交通运营维保服务营业收入占营业收入比重",
+                  "raw_value": "12.68%",
+                  "value": "12.68",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他营业收入",
+                  "raw_value": "9,148,765.95",
+                  "value": "9148765.95",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他营业收入占营业收入比重",
+                  "raw_value": "0.43%",
+                  "value": "0.43",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "分产品毛利率：轨道交通运营检修装备毛利率27.41%，轨道交通运营维保服务毛利率24.15%；分行业轨道交通毛利率27.00%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "轨道交通运营检修装备毛利率",
+                  "raw_value": "27.41%",
+                  "value": "27.41",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "轨道交通运营维保服务毛利率",
+                  "raw_value": "24.15%",
+                  "value": "24.15",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "轨道交通毛利率",
+                  "raw_value": "27.00%",
+                  "value": "27.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "2025年度公司新签合同金额达25.53亿元，合同规模保持稳定。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "新签合同金额",
+                  "raw_value": "25.53亿元",
+                  "value": "25.53",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F12",
+              "text": "2025年公司营业收入合计2,120,399,134.77元，2024年为2,082,012,354.78元，同比增减1.84%；分行业轨道交通收入占比100.00%，分销售模式直销占比100.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "2,120,399,134.77",
+                  "value": "2120399134.77",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入合计同比增减",
+                  "raw_value": "1.84%",
+                  "value": "1.84",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "分地区营业收入：华北地区637,066,610.45元（占30.04%）、华东地区724,721,785.85元（占34.18%）、东北地区99,069,689.26元（占4.67%）、华南地区56,291,969.71元（占2.65%）、华中地区209,178,947.74元（占9.87%）、西北地区182,538,984.39元（占8.61%）、西南地区186,946,466.09元（占8.82%）、海外24,584,681.28元（占1.16%）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "华北地区营业收入",
+                  "raw_value": "637,066,610.45",
+                  "value": "637066610.45",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "华东地区营业收入",
+                  "raw_value": "724,721,785.85",
+                  "value": "724721785.85",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海外营业收入",
+                  "raw_value": "24,584,681.28",
+                  "value": "24584681.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "2025年轨道交通产品销售量1,704台/套，生产量1,731台/套，库存量284台/套。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "销售量",
+                  "raw_value": "1,704",
+                  "value": "1704",
+                  "unit": "台/套",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生产量",
+                  "raw_value": "1,731",
+                  "value": "1731",
+                  "unit": "台/套",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "库存量",
+                  "raw_value": "284",
+                  "value": "284",
+                  "unit": "台/套",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F15",
+              "text": "营业成本构成按产品分类：轨道交通运营检修装备营业成本1,337,322,842.75元（占营业成本86.40%），轨道交通运营维保服务203,953,195.46元（占13.18%），其他6,511,819.86元（占0.42%）。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "轨道交通运营检修装备营业成本",
+                  "raw_value": "1,337,322,842.75",
+                  "value": "1337322842.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "轨道交通运营维保服务营业成本",
+                  "raw_value": "203,953,195.46",
+                  "value": "203953195.46",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "2025年度研发投入金额181,078,624.21元，占营业收入比例8.54%；研发投入同比增长10.05%；全年累计申请发明专利28项，授权发明专利18项。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入金额",
+                  "raw_value": "181,078,624.21",
+                  "value": "181078624.21",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入占营业收入比例",
+                  "raw_value": "8.54%",
+                  "value": "8.54",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入同比增减",
+                  "raw_value": "10.05%",
+                  "value": "10.05",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "2025年度经营活动现金流净额1.77亿元；公司审慎计提商誉减值、存货跌价准备等各项减值准备共计8.22亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动现金流净额",
+                  "raw_value": "1.77亿元",
+                  "value": "1.77",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "计提各项减值准备",
+                  "raw_value": "8.22亿元",
+                  "value": "8.22",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取主要原材料、能源等具体采购品类的披露；供应商情况仅列示前五名采购金额，未说明具体采购物资构成。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F18",
+              "text": "公司主要销售客户情况：前五名客户合计销售金额1,485,337,959.61元，占年度销售总额比例70.06%；其中关联方销售额占年度销售总额比例1.75%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "1,485,337,959.61",
+                  "value": "1485337959.61",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "70.06%",
+                  "value": "70.06",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "公司主要供应商情况：前五名供应商合计采购金额189,599,094.09元，占年度采购总额比例15.71%；其中关联方采购额占年度采购总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "189,599,094.09",
+                  "value": "189599094.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "15.71%",
+                  "value": "15.71",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "公司深化与国铁集团、铁科院等行业机构的常态化对接，并积极开拓战略性客户，与中交轨道交通、北京城建智控等签订战略合作协议。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": [
+            "客户与供应商名称均以“第一名”等匿名列示，未披露具体名称。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F21",
+              "text": "神铁运营为公司运营维保业务核心运营主体，负责天津地铁2号线运营管理，参与天津地铁3号线、7号线运营管理工作，并承接其他城市地铁运营维保相关业务，为智能化运营检修装备与数据系统提供应用场景及孵化载体。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "公司成立人工智能创新中心，组建自有算法团队，实现部分产品算法自研，降低外部技术依赖。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "报告期内公司强化成本费用精细化管理，销售费用与管理费用合计较2024年减少0.45亿元，同比下降9.78%；财务费用同比下降16.71%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "销售费用与管理费用合计同比减少额",
+                  "raw_value": "0.45亿元",
+                  "value": "0.45",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "销售费用与管理费用合计同比增减",
+                  "raw_value": "-9.78%",
+                  "value": "-9.78",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财务费用同比增减",
+                  "raw_value": "-16.71%",
+                  "value": "-16.71",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "主要子公司经营规模：新联铁营业收入444,830,929.19元、净利润16,263,267.30元；交大微联营业收入320,011,124.93元、净利润23,199,978.00元；南京拓控营业收入174,458,225.28元、净利润31,147,851.37元；神铁运营营业收入243,541,707.35元、净利润52,691,370.84元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "新联铁营业收入",
+                  "raw_value": "444,830,929.19",
+                  "value": "444830929.19",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新联铁净利润",
+                  "raw_value": "16,263,267.30",
+                  "value": "16263267.30",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "交大微联营业收入",
+                  "raw_value": "320,011,124.93",
+                  "value": "320011124.93",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "南京拓控营业收入",
+                  "raw_value": "174,458,225.28",
+                  "value": "174458225.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "神铁运营营业收入",
+                  "raw_value": "243,541,707.35",
+                  "value": "243541707.35",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "神铁运营净利润",
+                  "raw_value": "52,691,370.84",
+                  "value": "52691370.84",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各业务板块分季度或分产品细类的经营驱动因素披露。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F25",
+              "text": "报告期内合并范围变动：本年无新增子公司，减少主要是已完成注销三级子公司北京新联百通科技发展有限公司、北京联讯伟业科技发展有限公司、北京天熔焊接技术有限公司，目的为清算低效子公司、优化结构、聚焦主业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "报告期内公司业务类型、利润构成及利润来源未发生重大变动，主要利润仍来源于核心业务板块；利润变动受各项资产减值计提影响较大。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "公司披露的风险包括：宏观环境风险、市场竞争风险（行业投资规模收缩、上下游企业向装备延伸致竞争加剧）、资产减值风险（商誉和长期股权投资金额较高）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015",
+                "source-0016"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F28",
+              "text": "公司为轨道交通运营检修装备制造商与运营维保服务提供商，装备业务覆盖车辆检修、信号控制、线路维护、轨边检测、车载电子等环节，并通过神铁运营开展地铁运营与维保服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "未获取成功：选定章节未披露具体原材料、零部件或能源采购品类；仅列示前五名供应商采购金额，未说明采购物资构成。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F29",
+              "text": "公司产品广泛应用于国内主要高铁线路、城市轨道交通线路及货运铁路；客户集中度较高，前五名客户合计占年度销售总额70.06%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0008"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称及下游行业细分占比。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F30",
+            "text": "神州高铁是国投集团控股的央企上市公司，历经二十余年产业深耕，聚焦轨道交通领域。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "未获取主要原材料及能源等具体采购品类信息。",
+        "客户与供应商名称均匿名列示，未披露具体名称。",
+        "行业背景、核心竞争力、治理与财务报告附注章节未纳入本次阅读范围。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 12619,
+      "output_tokens": 5229,
+      "total_tokens": 17848
+    }
+  },
+  {
+    "request_id": "bp-work-d4b1cb5e4786dfa700b1fa87:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "cbcbf23b5e5ae3a0266a5c1065a43fe20abe7d6b80f9e777044fb0f0879e4480",
+    "response_hash": "ece07449d4fd7d2b1b80685660799c3ce1ecbeac142c49d0e4ec8b3042871994",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\"]}",
+    "response_payload": {
+      "findings": [],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30"
+      ]
+    },
+    "usage": {
+      "input_tokens": 18654,
+      "output_tokens": 97,
+      "total_tokens": 43530
+    }
+  }
+]

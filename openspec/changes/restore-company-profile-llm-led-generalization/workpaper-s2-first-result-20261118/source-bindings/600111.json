@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "600111.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-c0e98740f47ade2cfa60af24",
+    "filing_id": "1225118607",
+    "source": "cninfo",
+    "published_at": "2026-04-17T16:00:00+00:00",
+    "content_hash": "401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/40/401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "bp-frontier-c0e98740f47ade2cfa60af24",
+    "source": "cninfo",
+    "announcement_id": "1225118607",
+    "title": "北方稀土2025年度报告全文",
+    "published_at": "2026-04-17T16:00:00+00:00",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-18/1225118607.PDF",
+    "exchange": "SSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}

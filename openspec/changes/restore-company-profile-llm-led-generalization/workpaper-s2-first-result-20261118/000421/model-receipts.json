@@ -1,0 +1,1227 @@
+[
+  {
+    "request_id": "bp-work-5aa75bd07a33f8e920bb1d4c:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "8ee7eb798da6d7864fe07daf34b69080df051ce853ec4e59f8d4e1ecf35a3746",
+    "response_hash": "7bada7f769118754aeae832ea0038489fdf818e510753767354821acad4a3fb2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0020\",\"section-0021\",\"section-0032\",\"section-0033\",\"section-0056\",\"section-0058\",\"section-0098\",\"section-0109\"],\"rationale\":\"选取第三节管理层讨论与分析中的核心经营子节：section-0020（主要业务，含能源、房地产、客运三大板块的产品/服务与经营模式）、section-0021（能源产业经营细节）、section-0032（房地产产业）、section-0033（客运产业），共同说明业务结构、产品用途与经营方式；section-0056（主营业务分析）及其收入与成本子节section-0058提供公司营业收入总额、分业务收入构成与成本，是货币化与主要业务权重的实质来源；section-0098（主要控股参股公司分析）补充重要子公司经营与规模；section-0109（未来发展展望）保留计划限定的经营因素与变化。未选纯行业背景（section-0036）与核心竞争力（section-0049），因其为泛化背景，对解释公司本期经营变化帮助有限。\",\"deferred\":[\"第四节公司治理、第五节重要事项、第六节股份变动等非经营章节\",\"第八节财务报告中的会计政策、附注明细与审计事项，仅在收入构成出现缺口时定向补充\",\"行业背景与核心竞争力章节，因公司层面经营讨论已覆盖主要解释\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成与主要业务权重、重要子公司经营及计划性展望，足以回答经营与货币化问题；剩余为治理、合规与财务附注细节，超出本次经营阅读范围，无需继续扩展。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0020",
+        "section-0021",
+        "section-0032",
+        "section-0033",
+        "section-0056",
+        "section-0058",
+        "section-0098",
+        "section-0109"
+      ],
+      "rationale": "选取第三节管理层讨论与分析中的核心经营子节：section-0020（主要业务，含能源、房地产、客运三大板块的产品/服务与经营模式）、section-0021（能源产业经营细节）、section-0032（房地产产业）、section-0033（客运产业），共同说明业务结构、产品用途与经营方式；section-0056（主营业务分析）及其收入与成本子节section-0058提供公司营业收入总额、分业务收入构成与成本，是货币化与主要业务权重的实质来源；section-0098（主要控股参股公司分析）补充重要子公司经营与规模；section-0109（未来发展展望）保留计划限定的经营因素与变化。未选纯行业背景（section-0036）与核心竞争力（section-0049），因其为泛化背景，对解释公司本期经营变化帮助有限。",
+      "deferred": [
+        "第四节公司治理、第五节重要事项、第六节股份变动等非经营章节",
+        "第八节财务报告中的会计政策、附注明细与审计事项，仅在收入构成出现缺口时定向补充",
+        "行业背景与核心竞争力章节，因公司层面经营讨论已覆盖主要解释"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成与主要业务权重、重要子公司经营及计划性展望，足以回答经营与货币化问题；剩余为治理、合规与财务附注细节，超出本次经营阅读范围，无需继续扩展。"
+    },
+    "usage": {
+      "input_tokens": 20162,
+      "output_tokens": 353,
+      "total_tokens": 20515
+    }
+  },
+  {
+    "request_id": "bp-work-5aa75bd07a33f8e920bb1d4c:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "e2527280e8b6fd6ac14db64a9580c08db1890bdfef50015ca732321e8c8a094d",
+    "response_hash": "63bc9c0134f4d5fc7c9649d99f155a15b3a170b1e9ae034ffcf5b014055671b5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司业务分为能源产业、房地产产业和客运产业三大板块；能源产业包括城市燃气产业（天然气销售及延伸业务）和围绕“光、储、充、换”及电力服务的新能源产业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"公司通过控股子公司南京港华燃气有限公司经营南京市主城区管道燃气，持股51%，香港中华煤气持股49%，特许经营期限30年。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"]},{\"fact_id\":\"F03\",\"text\":\"公司通过子公司南京新能源产业集团有限公司布局新能源产业，并新设南京能网云创新能源科技有限公司（持股51%）聚焦虚拟电厂业务。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0011\"]},{\"fact_id\":\"F04\",\"text\":\"房地产产业由南京中北盛业房地产开发有限公司等子公司经营，形成“区域自建+联合开发+基金投资”的多元发展模式，树立“中北地产”品牌。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0018\"]},{\"fact_id\":\"F05\",\"text\":\"客运产业统筹推进巡游出租车运营与旅游客运运营两大板块，由中北的士等经营主体开展。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F06\",\"text\":\"城市燃气业务向居民、工商用户及大型工业项目供应管道天然气，并延伸开展供暖业务、燃气报警器安装、燃气具、自闭阀等产品与服务。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0023\"]},{\"fact_id\":\"F07\",\"text\":\"新能源产业聚焦光伏、储能、充换电、售电及虚拟电厂业务；截至2025年12月底已运营光伏电站36个，总装机规模37.69兆瓦。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F08\",\"text\":\"充电业务截至2025年12月底累计在线运营充电站点231个，配备充电终端3315个，累计装机功率163,472千瓦，并取得南京江北区域17个公交充电站运营权。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F09\",\"text\":\"换电业务开展电动自行车换电试点，推广“以换代充”模式；储能业务运营湖西街和雨花东路2个“光储充换+”示范站。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F10\",\"text\":\"2025年6月公司获准开展售电业务，签约售电规模超亿度，构建“设施运营+电力服务”双轮驱动的盈利模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F11\",\"text\":\"房地产产业开发住宅类项目，产品定位改善性住房，如建邺区中胜NO.2025G72地块拟打造南京优质四代居住宅产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]},{\"fact_id\":\"F12\",\"text\":\"客运产业经营巡游出租车和旅游客运；截至2025年12月底在运巡游出租车1780辆，其中新能源出租车1738辆，占在运出租车辆运营规模的97.64%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"公司2025年度实现营业收入698,134.16万元，较上年同期增加6.27%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"698,134.16\",\"value\":\"698134.16\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"6.27\",\"value\":\"6.27\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"}]},{\"fact_id\":\"F14\",\"text\":\"分行业营业收入构成：房产开发3,222,362,704.50元，占46.16%；燃气销售2,703,496,719.18元，占38.72%；燃气工程362,037,372.38元，占5.19%；其他381,339,510.34元，占5.46%；汽车营运159,715,763.13元，占2.29%；旅游服务91,998,279.72元，占1.32%；新能源业务42,659,440.37元，占0.61%；汽车销售17,731,819.38元，占0.25%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"房产开发营业收入\",\"raw_value\":\"3,222,362,704.50\",\"value\":\"3222362704.50\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房产开发营业收入占营业收入比重\",\"raw_value\":\"46.16\",\"value\":\"46.16\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"燃气销售收入\",\"raw_value\":\"2,703,496,719.18\",\"value\":\"2703496719.18\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"燃气销售收入占营业收入比重\",\"raw_value\":\"38.72\",\"value\":\"38.72\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"燃气工程收入\",\"raw_value\":\"362,037,372.38\",\"value\":\"362037372.38\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"燃气工程收入占营业收入比重\",\"raw_value\":\"5.19\",\"value\":\"5.19\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他收入\",\"raw_value\":\"381,339,510.34\",\"value\":\"381339510.34\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他收入占营业收入比重\",\"raw_value\":\"5.46\",\"value\":\"5.46\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车营运收入\",\"raw_value\":\"159,715,763.13\",\"value\":\"159715763.13\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车营运收入占营业收入比重\",\"raw_value\":\"2.29\",\"value\":\"2.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务收入\",\"raw_value\":\"91,998,279.72\",\"value\":\"91998279.72\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务收入占营业收入比重\",\"raw_value\":\"1.32\",\"value\":\"1.32\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"新能源业务收入\",\"raw_value\":\"42,659,440.37\",\"value\":\"42659440.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"新能源业务收入占营业收入比重\",\"raw_value\":\"0.61\",\"value\":\"0.61\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售收入\",\"raw_value\":\"17,731,819.38\",\"value\":\"17731819.38\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"汽车销售收入占营业收入比重\",\"raw_value\":\"0.25\",\"value\":\"0.25\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"房产开发毛利率11.92%，燃气销售毛利率12.59%；房产开发营业收入同比增长32.57%，燃气销售收入同比下降8.67%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"房产开发毛利率\",\"raw_value\":\"11.92\",\"value\":\"11.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"燃气销售毛利率\",\"raw_value\":\"12.59\",\"value\":\"12.59\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房产开发营业收入同比增减\",\"raw_value\":\"32.57\",\"value\":\"32.57\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"},{\"name\":\"燃气销售收入同比增减\",\"raw_value\":\"-8.67\",\"value\":\"-8.67\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"}]},{\"fact_id\":\"F16\",\"text\":\"公司本期营业成本593,677.84万元，较上年同期增加4.55%，主要系房产项目楼盘交付确认成本增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0011\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"593,677.84\",\"value\":\"593677.84\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比增减\",\"raw_value\":\"4.55\",\"value\":\"4.55\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F17\",\"text\":\"公司营业收入以房产开发和燃气销售为主，两者合计占营业收入约84.88%；燃气工程、其他、汽车营运、旅游服务、新能源业务和汽车销售合计占比约15.12%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"]},{\"fact_id\":\"F18\",\"text\":\"分地区营业收入：江苏6,941,188,910.27元，占99.43%；安徽37,287,192.49元，占0.53%；浙江2,865,506.24元，占0.04%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"江苏地区营业收入\",\"raw_value\":\"6,941,188,910.27\",\"value\":\"6941188910.27\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"江苏地区营业收入占营业收入比重\",\"raw_value\":\"99.43\",\"value\":\"99.43\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"安徽地区营业收入\",\"raw_value\":\"37,287,192.49\",\"value\":\"37287192.49\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"安徽地区营业收入占营业收入比重\",\"raw_value\":\"0.53\",\"value\":\"0.53\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"浙江地区营业收入\",\"raw_value\":\"2,865,506.24\",\"value\":\"2865506.24\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"浙江地区营业收入占营业收入比重\",\"raw_value\":\"0.04\",\"value\":\"0.04\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"南京港华燃气有限公司2025年度营业收入3,076,300,942.75元，净利润52,351,854.92元；期末管网长度5346公里，客户总数198万户。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0021\"],\"metrics\":[{\"name\":\"南京港华燃气有限公司营业收入\",\"raw_value\":\"3,076,300,942.75\",\"value\":\"3076300942.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"南京港华燃气有限公司净利润\",\"raw_value\":\"52,351,854.92\",\"value\":\"52351854.92\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分业务收入构成中“其他”类别未在选定章节中进一步拆分说明。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F20\",\"text\":\"城市燃气业务以多气源采购为基础，前五名供应商合计采购金额2,435,299,358.61元，占年度采购总额66.75%，其中第一大供应商为中国石油天然气股份有限公司江苏销售分公司，采购额1,596,328,477.29元，占43.75%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"2,435,299,358.61\",\"value\":\"2435299358.61\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"66.75\",\"value\":\"66.75\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F21\",\"text\":\"燃气销售成本中原材料2,231,964,104.64元，占营业成本37.60%；房产开发成本中土地成本2,059,628,853.84元，占34.69%，建筑安装658,456,329.83元，占11.09%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"燃气销售原材料成本\",\"raw_value\":\"2,231,964,104.64\",\"value\":\"2231964104.64\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"燃气销售原材料成本占营业成本比重\",\"raw_value\":\"37.60\",\"value\":\"37.60\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房产开发土地成本\",\"raw_value\":\"2,059,628,853.84\",\"value\":\"2059628853.84\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房产开发土地成本占营业成本比重\",\"raw_value\":\"34.69\",\"value\":\"34.69\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房产开发建筑安装成本\",\"raw_value\":\"658,456,329.83\",\"value\":\"658456329.83\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房产开发建筑安装成本占营业成本比重\",\"raw_value\":\"11.09\",\"value\":\"11.09\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F22\",\"text\":\"南京港华燃气拥有2座天然气接收门站、10座天然气高中压调压站、2座应急调峰储配站、6个客户服务中心，期末管网长度5346公里。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"]},{\"fact_id\":\"F23\",\"text\":\"公司研发投入金额19,529,349.69元，占营业收入比例0.28%；研发人员81人，占比2.94%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"研发投入金额\",\"raw_value\":\"19,529,349.69\",\"value\":\"19529349.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入占营业收入比例\",\"raw_value\":\"0.28\",\"value\":\"0.28\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"公司前五名客户合计销售金额308,331,236.57元，占年度销售总额比例4.42%，客户集中度较低。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"308,331,236.57\",\"value\":\"308331236.57\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"4.42\",\"value\":\"4.42\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F25\",\"text\":\"南京港华燃气特许经营区域覆盖江南主城玄武区、鼓楼区、秦淮区、建邺区、雨花台区、栖霞区及江宁区汤山部分区域，是南京市规模最大的管道燃气经营企业。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0021\"]},{\"fact_id\":\"F26\",\"text\":\"充电业务遵循“精准选址，高效投建”原则完善南京市充电“一张网”版图，充电站规模稳居南京市第一梯队；并与南京公交集团合作获得江北区域17个公交充电站运营权。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F27\",\"text\":\"客运产业与南京有滴网约车平台、T3出行平台达成合作意向，开展“巡约一体”服务，接入数字出行生态；旅游客运加强与大型旅游公司合作开发省际旅游业务，并承接院校出游、企业单位培训等活动用车。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]}],\"limitations\":[]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F28\",\"text\":\"房地产开发收入同比增长32.57%，主要系本期房产项目楼盘交付确认收入，交付体量较上期增加；燃气销售收入同比下降8.67%，主要系南京港华本期燃气销售量及平均销售单价较上年同期减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F29\",\"text\":\"汽车营运收入同比下降15.38%，主要系市场持续低迷，公司客运规模下降，客运量和出租车承包金较上期减少；汽车销售收入同比下降60.11%，主要系中北汽服汽车销售量较上年减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F30\",\"text\":\"旅游服务收入同比下降11.86%，主要系旅游板块组织架构调整，出境业务减少；新能源业务收入同比下降1.30%，基本与上期持平。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F31\",\"text\":\"公司新能源出租车占在运出租车辆运营总数的97.64%，为充电网络提供稳定基础负荷，形成内部业务协同。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\"]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F32\",\"text\":\"2025年11月，子公司南京新能源产业集团有限公司与上海博般数据技术有限公司合资设立南京能网云创新能源科技有限公司，公司持股51%，自设立之日起纳入合并报表范围。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0020\"]},{\"fact_id\":\"F33\",\"text\":\"报告期内公司完成多项内部吸收合并：南京能网新能源科技发展有限公司吸收合并南京能网固城新能源科技发展有限公司（2025年5月完成）、公司吸收合并南京金宫实业有限公司（2025年8月完成）、南京新能源产业集团有限公司吸收合并南京能网新能源科技发展有限公司及南京公用绿投新能源科技有限公司（均于2025年11月完成）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0020\"]},{\"fact_id\":\"F34\",\"text\":\"公司通过公开挂牌转让方式处置子公司南京中北金基房地产开发有限公司和南京中北金基新业房地产开发有限公司，工商变更分别于2026年1月5日和2026年1月19日完成。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0020\"]},{\"fact_id\":\"F35\",\"text\":\"2025年10月11日公司成功竞得建邺区中胜NO.2025G72地块，土地总价款132,300万元，权益比例45%，权益对价59,535万元，规划用途为住宅。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"中胜NO.2025G72地块土地总价款\",\"raw_value\":\"132,300\",\"value\":\"132300\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中胜NO.2025G72地块权益对价\",\"raw_value\":\"59,535\",\"value\":\"59535\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F36\",\"text\":\"公司以城市燃气供应和燃气设施运营为基础，同时开展光伏电站、充电站、储能站等新能源设施的投资运营，并向综合能源服务商转型。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F37\",\"text\":\"燃气销售主要原材料为天然气，前五名供应商中中国石油天然气股份有限公司江苏销售分公司采购额占年度采购总额43.75%，江苏省天然气销售有限公司占11.29%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F38\",\"text\":\"新能源业务成本中原材料13,200,122.26元，占营业成本0.22%，折旧19,631,071.74元，占0.33%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F39\",\"text\":\"城市燃气下游客户包括居民用户、工商用户及大型工业项目，期末客户总数198万户；新能源下游包括公交充电、电动自行车换电及市场化售电客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\",\"source-0021\"]}]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F40\",\"text\":\"公司依托上市公司平台实现能源产业与客运产业协同：客运新能源出租车为充电网络提供基础负荷，同时推进换电车型出租车市场布局，探索“车-电-站”联动模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F41\",\"text\":\"公司参股华润电力唐山丰润有限公司20%，2025年该公司净利润94,582,625.81元，净利润较上年同期增加主要系煤价持续下降降低成本。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0022\"],\"metrics\":[{\"name\":\"华润电力唐山丰润有限公司净利润\",\"raw_value\":\"94,582,625.81\",\"value\":\"94582625.81\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"limitations\":[\"分业务收入构成中“其他”类别未在选定章节中进一步拆分说明。\",\"主要子公司分析中部分房地产项目公司因股权转让或项目阶段原因，其收入利润数据不代表持续经营口径。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司业务分为能源产业、房地产产业和客运产业三大板块；能源产业包括城市燃气产业（天然气销售及延伸业务）和围绕“光、储、充、换”及电力服务的新能源产业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司通过控股子公司南京港华燃气有限公司经营南京市主城区管道燃气，持股51%，香港中华煤气持股49%，特许经营期限30年。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "公司通过子公司南京新能源产业集团有限公司布局新能源产业，并新设南京能网云创新能源科技有限公司（持股51%）聚焦虚拟电厂业务。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "房地产产业由南京中北盛业房地产开发有限公司等子公司经营，形成“区域自建+联合开发+基金投资”的多元发展模式，树立“中北地产”品牌。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0018"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "客运产业统筹推进巡游出租车运营与旅游客运运营两大板块，由中北的士等经营主体开展。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F06",
+              "text": "城市燃气业务向居民、工商用户及大型工业项目供应管道天然气，并延伸开展供暖业务、燃气报警器安装、燃气具、自闭阀等产品与服务。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0023"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "新能源产业聚焦光伏、储能、充换电、售电及虚拟电厂业务；截至2025年12月底已运营光伏电站36个，总装机规模37.69兆瓦。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "充电业务截至2025年12月底累计在线运营充电站点231个，配备充电终端3315个，累计装机功率163,472千瓦，并取得南京江北区域17个公交充电站运营权。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "换电业务开展电动自行车换电试点，推广“以换代充”模式；储能业务运营湖西街和雨花东路2个“光储充换+”示范站。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "2025年6月公司获准开展售电业务，签约售电规模超亿度，构建“设施运营+电力服务”双轮驱动的盈利模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "房地产产业开发住宅类项目，产品定位改善性住房，如建邺区中胜NO.2025G72地块拟打造南京优质四代居住宅产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "客运产业经营巡游出租车和旅游客运；截至2025年12月底在运巡游出租车1780辆，其中新能源出租车1738辆，占在运出租车辆运营规模的97.64%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F13",
+              "text": "公司2025年度实现营业收入698,134.16万元，较上年同期增加6.27%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "698,134.16",
+                  "value": "698134.16",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "6.27",
+                  "value": "6.27",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "分行业营业收入构成：房产开发3,222,362,704.50元，占46.16%；燃气销售2,703,496,719.18元，占38.72%；燃气工程362,037,372.38元，占5.19%；其他381,339,510.34元，占5.46%；汽车营运159,715,763.13元，占2.29%；旅游服务91,998,279.72元，占1.32%；新能源业务42,659,440.37元，占0.61%；汽车销售17,731,819.38元，占0.25%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "房产开发营业收入",
+                  "raw_value": "3,222,362,704.50",
+                  "value": "3222362704.50",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产开发营业收入占营业收入比重",
+                  "raw_value": "46.16",
+                  "value": "46.16",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气销售收入",
+                  "raw_value": "2,703,496,719.18",
+                  "value": "2703496719.18",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气销售收入占营业收入比重",
+                  "raw_value": "38.72",
+                  "value": "38.72",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气工程收入",
+                  "raw_value": "362,037,372.38",
+                  "value": "362037372.38",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气工程收入占营业收入比重",
+                  "raw_value": "5.19",
+                  "value": "5.19",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他收入",
+                  "raw_value": "381,339,510.34",
+                  "value": "381339510.34",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他收入占营业收入比重",
+                  "raw_value": "5.46",
+                  "value": "5.46",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车营运收入",
+                  "raw_value": "159,715,763.13",
+                  "value": "159715763.13",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车营运收入占营业收入比重",
+                  "raw_value": "2.29",
+                  "value": "2.29",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务收入",
+                  "raw_value": "91,998,279.72",
+                  "value": "91998279.72",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务收入占营业收入比重",
+                  "raw_value": "1.32",
+                  "value": "1.32",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源业务收入",
+                  "raw_value": "42,659,440.37",
+                  "value": "42659440.37",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源业务收入占营业收入比重",
+                  "raw_value": "0.61",
+                  "value": "0.61",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售收入",
+                  "raw_value": "17,731,819.38",
+                  "value": "17731819.38",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "汽车销售收入占营业收入比重",
+                  "raw_value": "0.25",
+                  "value": "0.25",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "房产开发毛利率11.92%，燃气销售毛利率12.59%；房产开发营业收入同比增长32.57%，燃气销售收入同比下降8.67%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "房产开发毛利率",
+                  "raw_value": "11.92",
+                  "value": "11.92",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气销售毛利率",
+                  "raw_value": "12.59",
+                  "value": "12.59",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产开发营业收入同比增减",
+                  "raw_value": "32.57",
+                  "value": "32.57",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                },
+                {
+                  "name": "燃气销售收入同比增减",
+                  "raw_value": "-8.67",
+                  "value": "-8.67",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "公司本期营业成本593,677.84万元，较上年同期增加4.55%，主要系房产项目楼盘交付确认成本增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "593,677.84",
+                  "value": "593677.84",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本同比增减",
+                  "raw_value": "4.55",
+                  "value": "4.55",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F17",
+              "text": "公司营业收入以房产开发和燃气销售为主，两者合计占营业收入约84.88%；燃气工程、其他、汽车营运、旅游服务、新能源业务和汽车销售合计占比约15.12%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "分地区营业收入：江苏6,941,188,910.27元，占99.43%；安徽37,287,192.49元，占0.53%；浙江2,865,506.24元，占0.04%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "江苏地区营业收入",
+                  "raw_value": "6,941,188,910.27",
+                  "value": "6941188910.27",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "江苏地区营业收入占营业收入比重",
+                  "raw_value": "99.43",
+                  "value": "99.43",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "安徽地区营业收入",
+                  "raw_value": "37,287,192.49",
+                  "value": "37287192.49",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "安徽地区营业收入占营业收入比重",
+                  "raw_value": "0.53",
+                  "value": "0.53",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "浙江地区营业收入",
+                  "raw_value": "2,865,506.24",
+                  "value": "2865506.24",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "浙江地区营业收入占营业收入比重",
+                  "raw_value": "0.04",
+                  "value": "0.04",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "南京港华燃气有限公司2025年度营业收入3,076,300,942.75元，净利润52,351,854.92元；期末管网长度5346公里，客户总数198万户。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019",
+                "source-0021"
+              ],
+              "metrics": [
+                {
+                  "name": "南京港华燃气有限公司营业收入",
+                  "raw_value": "3,076,300,942.75",
+                  "value": "3076300942.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "南京港华燃气有限公司净利润",
+                  "raw_value": "52,351,854.92",
+                  "value": "52351854.92",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分业务收入构成中“其他”类别未在选定章节中进一步拆分说明。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F20",
+              "text": "城市燃气业务以多气源采购为基础，前五名供应商合计采购金额2,435,299,358.61元，占年度采购总额66.75%，其中第一大供应商为中国石油天然气股份有限公司江苏销售分公司，采购额1,596,328,477.29元，占43.75%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "2,435,299,358.61",
+                  "value": "2435299358.61",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "66.75",
+                  "value": "66.75",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "燃气销售成本中原材料2,231,964,104.64元，占营业成本37.60%；房产开发成本中土地成本2,059,628,853.84元，占34.69%，建筑安装658,456,329.83元，占11.09%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "燃气销售原材料成本",
+                  "raw_value": "2,231,964,104.64",
+                  "value": "2231964104.64",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气销售原材料成本占营业成本比重",
+                  "raw_value": "37.60",
+                  "value": "37.60",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产开发土地成本",
+                  "raw_value": "2,059,628,853.84",
+                  "value": "2059628853.84",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产开发土地成本占营业成本比重",
+                  "raw_value": "34.69",
+                  "value": "34.69",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产开发建筑安装成本",
+                  "raw_value": "658,456,329.83",
+                  "value": "658456329.83",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产开发建筑安装成本占营业成本比重",
+                  "raw_value": "11.09",
+                  "value": "11.09",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "南京港华燃气拥有2座天然气接收门站、10座天然气高中压调压站、2座应急调峰储配站、6个客户服务中心，期末管网长度5346公里。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "公司研发投入金额19,529,349.69元，占营业收入比例0.28%；研发人员81人，占比2.94%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入金额",
+                  "raw_value": "19,529,349.69",
+                  "value": "19529349.69",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入占营业收入比例",
+                  "raw_value": "0.28",
+                  "value": "0.28",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F24",
+              "text": "公司前五名客户合计销售金额308,331,236.57元，占年度销售总额比例4.42%，客户集中度较低。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "308,331,236.57",
+                  "value": "308331236.57",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "4.42",
+                  "value": "4.42",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "南京港华燃气特许经营区域覆盖江南主城玄武区、鼓楼区、秦淮区、建邺区、雨花台区、栖霞区及江宁区汤山部分区域，是南京市规模最大的管道燃气经营企业。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0021"
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "充电业务遵循“精准选址，高效投建”原则完善南京市充电“一张网”版图，充电站规模稳居南京市第一梯队；并与南京公交集团合作获得江北区域17个公交充电站运营权。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "客运产业与南京有滴网约车平台、T3出行平台达成合作意向，开展“巡约一体”服务，接入数字出行生态；旅游客运加强与大型旅游公司合作开发省际旅游业务，并承接院校出游、企业单位培训等活动用车。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F28",
+              "text": "房地产开发收入同比增长32.57%，主要系本期房产项目楼盘交付确认收入，交付体量较上期增加；燃气销售收入同比下降8.67%，主要系南京港华本期燃气销售量及平均销售单价较上年同期减少。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "汽车营运收入同比下降15.38%，主要系市场持续低迷，公司客运规模下降，客运量和出租车承包金较上期减少；汽车销售收入同比下降60.11%，主要系中北汽服汽车销售量较上年减少。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "旅游服务收入同比下降11.86%，主要系旅游板块组织架构调整，出境业务减少；新能源业务收入同比下降1.30%，基本与上期持平。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F31",
+              "text": "公司新能源出租车占在运出租车辆运营总数的97.64%，为充电网络提供稳定基础负荷，形成内部业务协同。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F32",
+              "text": "2025年11月，子公司南京新能源产业集团有限公司与上海博般数据技术有限公司合资设立南京能网云创新能源科技有限公司，公司持股51%，自设立之日起纳入合并报表范围。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0020"
+              ]
+            },
+            {
+              "fact_id": "F33",
+              "text": "报告期内公司完成多项内部吸收合并：南京能网新能源科技发展有限公司吸收合并南京能网固城新能源科技发展有限公司（2025年5月完成）、公司吸收合并南京金宫实业有限公司（2025年8月完成）、南京新能源产业集团有限公司吸收合并南京能网新能源科技发展有限公司及南京公用绿投新能源科技有限公司（均于2025年11月完成）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0020"
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "text": "公司通过公开挂牌转让方式处置子公司南京中北金基房地产开发有限公司和南京中北金基新业房地产开发有限公司，工商变更分别于2026年1月5日和2026年1月19日完成。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0020"
+              ]
+            },
+            {
+              "fact_id": "F35",
+              "text": "2025年10月11日公司成功竞得建邺区中胜NO.2025G72地块，土地总价款132,300万元，权益比例45%，权益对价59,535万元，规划用途为住宅。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "中胜NO.2025G72地块土地总价款",
+                  "raw_value": "132,300",
+                  "value": "132300",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中胜NO.2025G72地块权益对价",
+                  "raw_value": "59,535",
+                  "value": "59535",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F36",
+              "text": "公司以城市燃气供应和燃气设施运营为基础，同时开展光伏电站、充电站、储能站等新能源设施的投资运营，并向综合能源服务商转型。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F37",
+              "text": "燃气销售主要原材料为天然气，前五名供应商中中国石油天然气股份有限公司江苏销售分公司采购额占年度采购总额43.75%，江苏省天然气销售有限公司占11.29%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F38",
+              "text": "新能源业务成本中原材料13,200,122.26元，占营业成本0.22%，折旧19,631,071.74元，占0.33%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F39",
+              "text": "城市燃气下游客户包括居民用户、工商用户及大型工业项目，期末客户总数198万户；新能源下游包括公交充电、电动自行车换电及市场化售电客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002",
+                "source-0021"
+              ]
+            }
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F40",
+            "text": "公司依托上市公司平台实现能源产业与客运产业协同：客运新能源出租车为充电网络提供基础负荷，同时推进换电车型出租车市场布局，探索“车-电-站”联动模式。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ]
+          },
+          {
+            "fact_id": "F41",
+            "text": "公司参股华润电力唐山丰润有限公司20%，2025年该公司净利润94,582,625.81元，净利润较上年同期增加主要系煤价持续下降降低成本。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0019",
+              "source-0022"
+            ],
+            "metrics": [
+              {
+                "name": "华润电力唐山丰润有限公司净利润",
+                "raw_value": "94,582,625.81",
+                "value": "94582625.81",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "qualifier": "exact"
+              }
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "分业务收入构成中“其他”类别未在选定章节中进一步拆分说明。",
+        "主要子公司分析中部分房地产项目公司因股权转让或项目阶段原因，其收入利润数据不代表持续经营口径。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 23491,
+      "output_tokens": 6200,
+      "total_tokens": 29691
+    }
+  },
+  {
+    "request_id": "bp-work-5aa75bd07a33f8e920bb1d4c:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "3494c087453a8c56dfa331c07e5838e12af57bcc5f4b7374d5eb4e5863170245",
+    "response_hash": "4541d000c426fc3f6e457d31822b34f11b9a928496e0ed0f00e264d4948d19a6",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\",\"F34\",\"F35\",\"F36\",\"F37\",\"F38\",\"F39\",\"F40\",\"F41\"],\"findings\":[{\"finding_id\":\"WPF-001\",\"element\":\"business_structure\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F05\",\"evidence_ids\":[\"source-0006\",\"source-0013\"],\"explanation\":\"客运产业统筹巡游出租车运营与旅游客运运营两大板块有原文支持，但“由中北的士等经营主体开展”没有依据。选定章节仅在研发项目名称“中北的士出租车运营管理系统升级”中出现“中北的士”，不能据此认定其为客运经营主体。应保留两大板块的核心表述，删除未经支持的经营主体。\"},{\"finding_id\":\"WPF-002\",\"element\":\"company_features\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F41\",\"evidence_ids\":[\"source-0019\",\"source-0022\"],\"explanation\":\"华润电力唐山丰润有限公司2025年净利润94,582,625.81元，以及净利润增加主要因煤价持续下降降低成本，均与原文一致，正文也正确写明公司参股20%。但该公司明确是参股公司而非子公司，事实及指标的subject_scope标为named_subsidiary，把参股主体误标为指定子公司。应保留金额、期间和参股资格，不得将主体范围标成named_subsidiary。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39",
+        "F40",
+        "F41"
+      ],
+      "findings": [
+        {
+          "finding_id": "WPF-001",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F05",
+          "evidence_ids": [
+            "source-0006",
+            "source-0013"
+          ],
+          "explanation": "客运产业统筹巡游出租车运营与旅游客运运营两大板块有原文支持，但“由中北的士等经营主体开展”没有依据。选定章节仅在研发项目名称“中北的士出租车运营管理系统升级”中出现“中北的士”，不能据此认定其为客运经营主体。应保留两大板块的核心表述，删除未经支持的经营主体。"
+        },
+        {
+          "finding_id": "WPF-002",
+          "element": "company_features",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F41",
+          "evidence_ids": [
+            "source-0019",
+            "source-0022"
+          ],
+          "explanation": "华润电力唐山丰润有限公司2025年净利润94,582,625.81元，以及净利润增加主要因煤价持续下降降低成本，均与原文一致，正文也正确写明公司参股20%。但该公司明确是参股公司而非子公司，事实及指标的subject_scope标为named_subsidiary，把参股主体误标为指定子公司。应保留金额、期间和参股资格，不得将主体范围标成named_subsidiary。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 33249,
+      "output_tokens": 449,
+      "total_tokens": 61077
+    }
+  },
+  {
+    "request_id": "bp-work-5aa75bd07a33f8e920bb1d4c:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "90bff43c8e9b0f74dcff81997119ca3b526ac0be2973b013f8290309a7f3ea6c",
+    "response_hash": "8c6bb28d7f2ab401ccfbdff2c4f8c3402862170279dfd79e2c2151d7ef23558b",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F05\",\"text\":\"客运产业统筹推进巡游出租车运营与旅游客运运营两大板块。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F41\",\"text\":\"公司参股华润电力唐山丰润有限公司20%，2025年该公司净利润94,582,625.81元，净利润较上年同期增加主要系煤价持续下降降低成本。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0022\"],\"metrics\":[{\"name\":\"华润电力唐山丰润有限公司净利润\",\"raw_value\":\"94,582,625.81\",\"value\":\"94582625.81\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"华润电力唐山丰润有限公司为参股公司，非指定子公司，主体范围无法归入named_subsidiary\"}],\"uncertainty_reason\":\"华润电力唐山丰润有限公司为参股公司，非指定子公司，主体范围无法归入named_subsidiary\"}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F05",
+          "text": "客运产业统筹推进巡游出租车运营与旅游客运运营两大板块。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F41",
+          "text": "公司参股华润电力唐山丰润有限公司20%，2025年该公司净利润94,582,625.81元，净利润较上年同期增加主要系煤价持续下降降低成本。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0019",
+            "source-0022"
+          ],
+          "metrics": [
+            {
+              "name": "华润电力唐山丰润有限公司净利润",
+              "raw_value": "94,582,625.81",
+              "value": "94582625.81",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "华润电力唐山丰润有限公司为参股公司，非指定子公司，主体范围无法归入named_subsidiary"
+            }
+          ],
+          "uncertainty_reason": "华润电力唐山丰润有限公司为参股公司，非指定子公司，主体范围无法归入named_subsidiary"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 20820,
+      "output_tokens": 286,
+      "total_tokens": 21106
+    }
+  },
+  {
+    "request_id": "bp-work-5aa75bd07a33f8e920bb1d4c:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "0cc149c596285d0c7a9ce012b5c928c8586af863f51ee67c150bbb3a4e00f963",
+    "response_hash": "303ad81bd7737a5607156d63a432738cf3de85ce5d3e0446c6cbf5da7fd7cb3e",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F05\",\"F41\"],\"checks\":[{\"fact_id\":\"F05\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"候选已删除选定章节无法支持的“中北的士等经营主体”表述，仅保留两大板块这一核心事实。source-0006载明报告期内公司客运交通业务统筹推进巡游出租车运营与旅游客运运营两大板块；正文“公司”按合并集团理解，2025年度期间正确，证据足以解决原问题。\"},{\"fact_id\":\"F41\",\"accepted\":true,\"evidence_ids\":[\"source-0019\",\"source-0022\"],\"explanation\":\"source-0019列明华润电力唐山丰润有限公司为参股公司，当期净利润为94,582,625.81元；source-0022确认公司持股20%，并说明2025年净利润增加主要因煤价持续下降降低成本。候选保留金额、期间、单位和参股关系，事实及指标均未再标为named_subsidiary，而以unclear保留无法归入指定子公司的范围，已实质纠正主体错误。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F05",
+        "F41"
+      ],
+      "checks": [
+        {
+          "fact_id": "F05",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "候选已删除选定章节无法支持的“中北的士等经营主体”表述，仅保留两大板块这一核心事实。source-0006载明报告期内公司客运交通业务统筹推进巡游出租车运营与旅游客运运营两大板块；正文“公司”按合并集团理解，2025年度期间正确，证据足以解决原问题。"
+        },
+        {
+          "fact_id": "F41",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0019",
+            "source-0022"
+          ],
+          "explanation": "source-0019列明华润电力唐山丰润有限公司为参股公司，当期净利润为94,582,625.81元；source-0022确认公司持股20%，并说明2025年净利润增加主要因煤价持续下降降低成本。候选保留金额、期间、单位和参股关系，事实及指标均未再标为named_subsidiary，而以unclear保留无法归入指定子公司的范围，已实质纠正主体错误。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 24900,
+      "output_tokens": 251,
+      "total_tokens": 31520
+    }
+  }
+]

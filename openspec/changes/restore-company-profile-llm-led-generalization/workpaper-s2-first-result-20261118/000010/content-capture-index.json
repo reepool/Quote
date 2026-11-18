@@ -1,0 +1,78 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "9d41aa06f792013a218abc513f291065f205c7674f751fd94b50835defe4c264",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 15096,
+        "completion_tokens": 304,
+        "total_tokens": 15400
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 2,
+      "content_sha256": "93263b6a1958c343d341cda5714b052eab511c912e0dff266e02864c35c9260f",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 13447,
+        "completion_tokens": 5772,
+        "total_tokens": 19219
+      },
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000010/failed-model-content/content-002.json"
+    },
+    {
+      "physical_sequence": 3,
+      "content_sha256": "9f365f914d6963ee880c55bebc8e71ce61cebc15de0b01a700f88c1c99c99d3d",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 20619,
+        "completion_tokens": 5773,
+        "total_tokens": 26392
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 4,
+      "content_sha256": "25c1247447a3fb992bd6a7e25edd83ddbfcb46dbcbf21c14d86121462b7811b5",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 20084,
+        "completion_tokens": 989,
+        "total_tokens": 39410
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 5,
+      "content_sha256": "e455e512815a0272074d402aaff7c31022259be209d55e11bd8623c109a60cbe",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 11500,
+        "completion_tokens": 867,
+        "total_tokens": 12367
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 6,
+      "content_sha256": "ac3aaa99d5f9a8abb00a9502f7e98279e249bbe742e44b0b9d6d357484b5d9bc",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 14027,
+        "completion_tokens": 504,
+        "total_tokens": 22646
+      },
+      "retained": false,
+      "retained_path": null
+    }
+  ],
+  "duplicates_not_copied": 5
+}

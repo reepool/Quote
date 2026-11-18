@@ -1,0 +1,8 @@
+{
+  "source_manifest_sha256": "42d57c8e4543214cef2b53fcf729af82e676f7687eb8621585e1e665630922fe",
+  "old_exclusions_distinct": true,
+  "saved_model_search_positive_selfcheck": true,
+  "saved_model_output_hits": [],
+  "search_pattern": "\"instrument_id\"\\s*:\\s*\"(?:600110\\.SH|600111\\.SH|000008\\.SZ|000009\\.SZ|920000\\.BJ|920001\\.BJ|600116\\.SH|600106\\.SH|600113\\.SH|000002\\.SZ|000007\\.SZ|000010\\.SZ|600682\\.SH|600620\\.SH|000025\\.SZ|000421\\.SZ|000001\\.SZ|600030\\.SH|000166\\.SZ|601318\\.SH)\"",
+  "before_first_model": true
+}

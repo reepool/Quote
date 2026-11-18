@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "600106.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-791950eaecb60c575cbc30a3",
+    "filing_id": "1225151501",
+    "source": "cninfo",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "content_hash": "810897ccf0c758112af455abbd3ea9aac19cf468c39c90e019be726c42525411",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/81/810897ccf0c758112af455abbd3ea9aac19cf468c39c90e019be726c42525411.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "bp-frontier-791950eaecb60c575cbc30a3",
+    "source": "cninfo",
+    "announcement_id": "1225151501",
+    "title": "重庆路桥股份有限公司2025年年度报告",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-23/1225151501.PDF",
+    "exchange": "SSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}

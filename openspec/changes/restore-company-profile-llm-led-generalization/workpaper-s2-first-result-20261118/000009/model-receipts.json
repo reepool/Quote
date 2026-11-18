@@ -1,0 +1,1282 @@
+[
+  {
+    "request_id": "bp-work-9000e4b7087feba6ec7a177e:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "172d2a611ab021b96f9ec7c83a057556d5409196ac9bff24feb0444b0ec6fd61",
+    "response_hash": "cf1a1e7e9491602ce6de98c80389aad22a80507a97b9ecf53cde941e1c621494",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0018\",\"section-0027\",\"section-0028\",\"section-0029\",\"section-0030\",\"section-0031\",\"section-0035\",\"section-0082\",\"section-0913\"],\"rationale\":\"本报告为中国宝安2025年年报，业务横跨高新技术、生物医药、房地产三大板块。选取第三节中公司主要业务（section-0018）说明各产业的产品/服务与经营定位；主营业务分析（section-0027）及其概述（section-0028）提供公司整体经营与收入规模；高新技术（section-0029）、生物医药（section-0030）、房地产及其他（section-0031）三个板块子节分别说明各业务经营情况与规模；房地产板块下的收入与成本（section-0035）含收入构成表，用于解释主要收入来源与权重；主要控股参股公司分析（section-0082）补充重要子公司（如贝特瑞）的经营贡献；财务报告中的分部信息（section-0913）提供按业务分部的收入与利润构成，弥补板块收入权重缺口。以上均为公司层面实质经营与收入构成内容，避免纯行业背景、治理与附录细节。\",\"deferred\":[\"section-0022行业情况：属行业背景，非公司层面经营，仅在必要时参考\",\"section-0026核心竞争力：泛化描述，信息密度低于业务与收入分析\",\"section-0055资产及负债状况分析、section-0061投资状况分析：偏财务与投资明细，非主营收入构成核心\",\"第八节财务报告其余附注（会计政策、资产明细等）：仅按需定向补充，不整体扩读\"],\"stop_reason\":\"已覆盖公司业务结构、各板块产品与经营、整体及分部收入构成、重要子公司贡献等核心经营信息，可支撑业务与收入权重分析；行业背景与财务附注细节属次要或定向补充范围，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0018",
+        "section-0027",
+        "section-0028",
+        "section-0029",
+        "section-0030",
+        "section-0031",
+        "section-0035",
+        "section-0082",
+        "section-0913"
+      ],
+      "rationale": "本报告为中国宝安2025年年报，业务横跨高新技术、生物医药、房地产三大板块。选取第三节中公司主要业务（section-0018）说明各产业的产品/服务与经营定位；主营业务分析（section-0027）及其概述（section-0028）提供公司整体经营与收入规模；高新技术（section-0029）、生物医药（section-0030）、房地产及其他（section-0031）三个板块子节分别说明各业务经营情况与规模；房地产板块下的收入与成本（section-0035）含收入构成表，用于解释主要收入来源与权重；主要控股参股公司分析（section-0082）补充重要子公司（如贝特瑞）的经营贡献；财务报告中的分部信息（section-0913）提供按业务分部的收入与利润构成，弥补板块收入权重缺口。以上均为公司层面实质经营与收入构成内容，避免纯行业背景、治理与附录细节。",
+      "deferred": [
+        "section-0022行业情况：属行业背景，非公司层面经营，仅在必要时参考",
+        "section-0026核心竞争力：泛化描述，信息密度低于业务与收入分析",
+        "section-0055资产及负债状况分析、section-0061投资状况分析：偏财务与投资明细，非主营收入构成核心",
+        "第八节财务报告其余附注（会计政策、资产明细等）：仅按需定向补充，不整体扩读"
+      ],
+      "stop_reason": "已覆盖公司业务结构、各板块产品与经营、整体及分部收入构成、重要子公司贡献等核心经营信息，可支撑业务与收入权重分析；行业背景与财务附注细节属次要或定向补充范围，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 19176,
+      "output_tokens": 415,
+      "total_tokens": 19591
+    }
+  },
+  {
+    "request_id": "bp-work-9000e4b7087feba6ec7a177e:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "030512e1feb3782ac4b568f931296d3c773dfc67de9cd8eefc7063ec962a3b55",
+    "response_hash": "254f334a5432df0c25f21154a769546e87cd005bc43605f2e1f9e61151898298",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"本集团业务分为高新技术产业、生物医药产业、房地产及其他产业三大板块；高新技术产业主要涉及新材料、新能源汽车、精密零件制造等领域，生物医药产业主要涉及药品生产经营、医院诊疗服务、有机农业等领域，房地产及其他产业涉及房地产开发及投融资、矿产资源采选等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"高新技术产业板块主要由贝特瑞（锂离子电池负极材料、正极材料及先进新材料）、国际精密（超高精密金属零部件）和友诚科技（电动汽车充电连接器）构成。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F03\",\"text\":\"生物医药产业板块主要由马应龙（医药工业、医药商业和医疗服务）和绿金高新（生物农药、生物肥料和生物饲料）构成。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"F04\",\"text\":\"房地产业务在广东、海南、天津、湖北、山东、新疆等地区开展，开发“江南系列”产品；其他产业通过参股或控股专业公司运营投融资、矿产资源采选等业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"贝特瑞专业从事锂离子电池负极材料、正极材料及先进新材料的研发、生产和销售，拥有锂离子电池负极材料完整产业链，产品主要应用于新能源汽车动力电池、储能及电子数码领域。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F06\",\"text\":\"国际精密聚焦研发、生产和销售超高精密金属零部件及其延伸业务，产品涵盖汽车核心部件、精密液压元件、消费电子产品零部件、工业机器人和数控机床等。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F07\",\"text\":\"友诚科技主要产品为电动汽车交直流充电连接器，广泛应用于新能源汽车和充电设备、设施等相关领域，市场占有率位居前列。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F08\",\"text\":\"马应龙业务范围包括医药工业、医药商业和医疗服务等，为肛肠治痔领域优势品牌，并拓展眼美康和皮肤健康业务。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"F09\",\"text\":\"绿金高新主要产品为生物农药、生物肥料和生物饲料，是集原药生产、生物农药、生物菌肥、微生物菌剂、生物饲料等产品的研发、生产和销售为一体的高新技术企业。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F10\",\"text\":\"报告期内本集团实现营业总收入2,303,627.72万元，比上年同期增长13.87%；营业成本1,708,866.28万元，比上年同期增长16.17%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"营业总收入\",\"raw_value\":\"2,303,627.72\",\"value\":\"2303627.72\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业总收入同比增长率\",\"raw_value\":\"13.87\",\"value\":\"13.87\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年同期\"},{\"name\":\"营业成本\",\"raw_value\":\"1,708,866.28\",\"value\":\"1708866.28\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比增长率\",\"raw_value\":\"16.17\",\"value\":\"16.17\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年同期\"}]},{\"fact_id\":\"F11\",\"text\":\"按行业划分，2025年高新技术行业营业收入18,698,371,280.77元，占营业收入比重81.17%；生物医药行业营业收入3,940,978,301.06元，占比17.11%；房地产行业营业收入135,587,369.27元，占比0.59%；其他行业营业收入261,338,349.60元，占比1.13%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\"],\"metrics\":[{\"name\":\"高新技术行业营业收入\",\"raw_value\":\"18,698,371,280.77\",\"value\":\"18698371280.77\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"高新技术行业营业收入占营业收入比重\",\"raw_value\":\"81.17\",\"value\":\"81.17\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"生物医药行业营业收入\",\"raw_value\":\"3,940,978,301.06\",\"value\":\"3940978301.06\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"生物医药行业营业收入占营业收入比重\",\"raw_value\":\"17.11\",\"value\":\"17.11\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产行业营业收入\",\"raw_value\":\"135,587,369.27\",\"value\":\"135587369.27\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产行业营业收入占营业收入比重\",\"raw_value\":\"0.59\",\"value\":\"0.59\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他行业营业收入\",\"raw_value\":\"261,338,349.60\",\"value\":\"261338349.60\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他行业营业收入占营业收入比重\",\"raw_value\":\"1.13\",\"value\":\"1.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"按地区划分，2025年中国大陆地区营业收入17,791,344,144.94元，占营业收入比重77.23%；中国大陆地区以外的国家和地区营业收入5,244,931,155.76元，占比22.77%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"中国大陆地区营业收入\",\"raw_value\":\"17,791,344,144.94\",\"value\":\"17791344144.94\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中国大陆地区营业收入占营业收入比重\",\"raw_value\":\"77.23\",\"value\":\"77.23\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中国大陆地区以外的国家和地区营业收入\",\"raw_value\":\"5,244,931,155.76\",\"value\":\"5244931155.76\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中国大陆地区以外的国家和地区营业收入占营业收入比重\",\"raw_value\":\"22.77\",\"value\":\"22.77\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"分行业毛利率方面，高新技术行业毛利率21.44%，生物医药行业毛利率48.38%，房地产行业毛利率24.91%，其他行业毛利率-0.74%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"高新技术行业毛利率\",\"raw_value\":\"21.44\",\"value\":\"21.44\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"生物医药行业毛利率\",\"raw_value\":\"48.38\",\"value\":\"48.38\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产行业毛利率\",\"raw_value\":\"24.91\",\"value\":\"24.91\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他行业毛利率\",\"raw_value\":\"-0.74\",\"value\":\"-0.74\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F14\",\"text\":\"报告期内高新技术产业实现销售收入1,869,837.13万元，同比增长17.68%；实现利润总额139,020.31万元，同比增长18.22%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"高新技术产业销售收入\",\"raw_value\":\"1,869,837.13\",\"value\":\"1869837.13\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"高新技术产业销售收入同比增长率\",\"raw_value\":\"17.68\",\"value\":\"17.68\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比增长\"},{\"name\":\"高新技术产业利润总额\",\"raw_value\":\"139,020.31\",\"value\":\"139020.31\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"高新技术产业利润总额同比增长率\",\"raw_value\":\"18.22\",\"value\":\"18.22\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比增长\"}]},{\"fact_id\":\"F15\",\"text\":\"报告期内生物医药产业实现销售收入394,097.83万元，同比增长3.87%；实现利润总额69,165.57万元，同比增长8.21%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"生物医药产业销售收入\",\"raw_value\":\"394,097.83\",\"value\":\"394097.83\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"生物医药产业销售收入同比增长率\",\"raw_value\":\"3.87\",\"value\":\"3.87\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比增长\"},{\"name\":\"生物医药产业利润总额\",\"raw_value\":\"69,165.57\",\"value\":\"69165.57\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"生物医药产业利润总额同比增长率\",\"raw_value\":\"8.21\",\"value\":\"8.21\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比增长\"}]},{\"fact_id\":\"F16\",\"text\":\"报告期内房地产业实现销售收入13,558.74万元，同比下降40.21%；实现利润总额-15,013.16万元，同比下降4.79%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"房地产业销售收入\",\"raw_value\":\"13,558.74\",\"value\":\"13558.74\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产业销售收入同比增长率\",\"raw_value\":\"-40.21\",\"value\":\"-40.21\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降\"},{\"name\":\"房地产业利润总额\",\"raw_value\":\"-15,013.16\",\"value\":\"-15013.16\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产业利润总额同比增长率\",\"raw_value\":\"-4.79\",\"value\":\"-4.79\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降\"}]},{\"fact_id\":\"F17\",\"text\":\"贝特瑞2025年实现营业收入1,698,282.46万元，净利润87,507.71万元；马应龙实现营业收入386,660.82万元，净利润58,149.24万元；友诚科技实现营业收入53,007.89万元，净利润6,007.26万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"贝特瑞营业收入\",\"raw_value\":\"1,698,282.46\",\"value\":\"1698282.46\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"贝特瑞净利润\",\"raw_value\":\"87,507.71\",\"value\":\"87507.71\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"马应龙营业收入\",\"raw_value\":\"386,660.82\",\"value\":\"386660.82\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"马应龙净利润\",\"raw_value\":\"58,149.24\",\"value\":\"58149.24\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"友诚科技营业收入\",\"raw_value\":\"53,007.89\",\"value\":\"53007.89\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"友诚科技净利润\",\"raw_value\":\"6,007.26\",\"value\":\"6007.26\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F18\",\"text\":\"贝特瑞国内产能已形成覆盖华南、华东、华北及中西部新能源产业集群的完备网络；报告期内印尼年产8万吨负极材料一体化项目（二期）顺利投产，印尼基地已形成16万吨负极材料总产能；摩洛哥基地5万吨/年正极材料、6万吨/年负极材料产能项目稳步推进。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"印尼基地负极材料总产能\",\"raw_value\":\"16\",\"value\":\"16\",\"unit\":\"万吨\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"摩洛哥基地正极材料产能\",\"raw_value\":\"5\",\"value\":\"5\",\"unit\":\"万吨/年\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"摩洛哥基地负极材料产能\",\"raw_value\":\"6\",\"value\":\"6\",\"unit\":\"万吨/年\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"高新技术行业营业成本中直接材料10,255,650,688.52元，占营业成本比重60.48%；直接人工695,385,773.58元，占比4.10%；制造费用2,220,542,233.40元，占比13.10%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"高新技术行业直接材料成本\",\"raw_value\":\"10,255,650,688.52\",\"value\":\"10255650688.52\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"高新技术行业直接材料占营业成本比重\",\"raw_value\":\"60.48\",\"value\":\"60.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"高新技术行业直接人工成本\",\"raw_value\":\"695,385,773.58\",\"value\":\"695385773.58\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"高新技术行业制造费用\",\"raw_value\":\"2,220,542,233.40\",\"value\":\"2220542233.40\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F20\",\"text\":\"报告期内公司研发投入金额1,084,780,043.99元，占营业收入比例4.71%；研发人员数量1,748人，占比10.93%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"研发投入金额\",\"raw_value\":\"1,084,780,043.99\",\"value\":\"1084780043.99\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入占营业收入比例\",\"raw_value\":\"4.71\",\"value\":\"4.71\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量\",\"raw_value\":\"1,748\",\"value\":\"1748\",\"unit\":\"人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量占比\",\"raw_value\":\"10.93\",\"value\":\"10.93\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"公司前五名客户合计销售金额10,830,157,167.42元，占年度销售总额比例47.01%；前五名客户销售额中关联方销售额占年度销售总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"10,830,157,167.42\",\"value\":\"10830157167.42\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"47.01\",\"value\":\"47.01\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F22\",\"text\":\"公司前五名供应商合计采购金额3,518,767,647.00元，占年度采购总额比例20.93%；前五名供应商采购额中关联方采购额占年度采购总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"3,518,767,647.00\",\"value\":\"3518767647.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"20.93\",\"value\":\"20.93\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F23\",\"text\":\"友诚科技继续执行大客户战略，与主流车企、桩企客户保持稳定合作关系，并设立印度尼西亚工厂开拓海外市场。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"高新技术产业在新能源汽车及储能市场需求增长带动下，依托“技术创新+全球化布局”双轮驱动，持续稳固业务基本盘。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F25\",\"text\":\"贝特瑞多维度深化降本提效，通过优化全球采购体系和革新采购模式稳定原材料供应，依托工艺改进与设备改造深挖工序降本空间，以数智化升级赋能运营效能提升。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F26\",\"text\":\"国际精密面对复杂多变的国际贸易环境及关税政策影响，积极优化调整产能布局，持续深耕新兴市场；液压设备零件板块聚焦高毛利新产品，营收贡献最大并实现稳健增长；汽车零件板块积极开发新领域、新客户、新项目，拓展中欧及东欧市场。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F27\",\"text\":\"马应龙完善医药工业三大产线运营体系，巩固深化肛肠领域核心优势，加强研发创新引领，有序推进创新药物研发、肠道微生态、肛周微生态研究；积极拓展眼美康和皮肤健康业务。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F28\",\"text\":\"报告期内因新设纳入合并范围的子公司共11家，因处置、清算不再纳入合并范围的子公司共6家。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"新设纳入合并范围子公司数量\",\"raw_value\":\"11\",\"value\":\"11\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"处置清算不再纳入合并范围子公司数量\",\"raw_value\":\"6\",\"value\":\"6\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F29\",\"text\":\"房地产行业收入总额同比下降40.21%，主要系本报告期房地产行业销售承压。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"房地产行业收入总额同比增减\",\"raw_value\":\"-40.21\",\"value\":\"-40.21\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降\"}]},{\"fact_id\":\"F30\",\"text\":\"财务费用670,110,603.11元，同比增长105.41%，主要系高新行业子公司在建工程陆续建成投产，利息资本化减少，费用化的利息支出相应增加；境外公司本期汇兑损失增加以及本期定期存款利息收入减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"财务费用\",\"raw_value\":\"670,110,603.11\",\"value\":\"670110603.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财务费用同比增长率\",\"raw_value\":\"105.41\",\"value\":\"105.41\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比增长\"}]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"本集团高新技术产业涉及新材料、新能源汽车、精密零件制造等领域，贝特瑞拥有锂离子电池负极材料完整产业链，是全球锂离子电池负极材料龙头企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F32\",\"text\":\"高新技术行业营业成本中直接材料占比60.48%，原辅材料为生物医药行业主要成本项目之一；贝特瑞通过优化全球采购体系和革新采购模式稳定原材料供应。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0002\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F33\",\"text\":\"贝特瑞产品主要应用于新能源汽车动力电池、储能及电子数码领域；友诚科技充电连接器广泛应用于新能源汽车和充电设备、设施等相关领域。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]}},\"limitations\":[\"未获取各业务板块分产品的详细收入拆分（如负极材料、正极材料各自收入），仅获取行业层面收入构成。\",\"分部信息表（source-0016）中对外营业收入合计23,036,277,153.40元与营业收入构成表合计23,036,275,300.70元存在小额差异，未作调整。\",\"未获取房地产板块分项目的收入确认明细及土地储备开发计划的具体时间安排。\",\"未获取贝特瑞海外各基地的产能利用率及实际产量数据。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "本集团业务分为高新技术产业、生物医药产业、房地产及其他产业三大板块；高新技术产业主要涉及新材料、新能源汽车、精密零件制造等领域，生物医药产业主要涉及药品生产经营、医院诊疗服务、有机农业等领域，房地产及其他产业涉及房地产开发及投融资、矿产资源采选等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "高新技术产业板块主要由贝特瑞（锂离子电池负极材料、正极材料及先进新材料）、国际精密（超高精密金属零部件）和友诚科技（电动汽车充电连接器）构成。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "生物医药产业板块主要由马应龙（医药工业、医药商业和医疗服务）和绿金高新（生物农药、生物肥料和生物饲料）构成。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "房地产业务在广东、海南、天津、湖北、山东、新疆等地区开展，开发“江南系列”产品；其他产业通过参股或控股专业公司运营投融资、矿产资源采选等业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F05",
+              "text": "贝特瑞专业从事锂离子电池负极材料、正极材料及先进新材料的研发、生产和销售，拥有锂离子电池负极材料完整产业链，产品主要应用于新能源汽车动力电池、储能及电子数码领域。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "国际精密聚焦研发、生产和销售超高精密金属零部件及其延伸业务，产品涵盖汽车核心部件、精密液压元件、消费电子产品零部件、工业机器人和数控机床等。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "友诚科技主要产品为电动汽车交直流充电连接器，广泛应用于新能源汽车和充电设备、设施等相关领域，市场占有率位居前列。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "马应龙业务范围包括医药工业、医药商业和医疗服务等，为肛肠治痔领域优势品牌，并拓展眼美康和皮肤健康业务。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "绿金高新主要产品为生物农药、生物肥料和生物饲料，是集原药生产、生物农药、生物菌肥、微生物菌剂、生物饲料等产品的研发、生产和销售为一体的高新技术企业。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F10",
+              "text": "报告期内本集团实现营业总收入2,303,627.72万元，比上年同期增长13.87%；营业成本1,708,866.28万元，比上年同期增长16.17%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "营业总收入",
+                  "raw_value": "2,303,627.72",
+                  "value": "2303627.72",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业总收入同比增长率",
+                  "raw_value": "13.87",
+                  "value": "13.87",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "比上年同期"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "1,708,866.28",
+                  "value": "1708866.28",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本同比增长率",
+                  "raw_value": "16.17",
+                  "value": "16.17",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "比上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "按行业划分，2025年高新技术行业营业收入18,698,371,280.77元，占营业收入比重81.17%；生物医药行业营业收入3,940,978,301.06元，占比17.11%；房地产行业营业收入135,587,369.27元，占比0.59%；其他行业营业收入261,338,349.60元，占比1.13%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "高新技术行业营业收入",
+                  "raw_value": "18,698,371,280.77",
+                  "value": "18698371280.77",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "高新技术行业营业收入占营业收入比重",
+                  "raw_value": "81.17",
+                  "value": "81.17",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生物医药行业营业收入",
+                  "raw_value": "3,940,978,301.06",
+                  "value": "3940978301.06",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生物医药行业营业收入占营业收入比重",
+                  "raw_value": "17.11",
+                  "value": "17.11",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产行业营业收入",
+                  "raw_value": "135,587,369.27",
+                  "value": "135587369.27",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产行业营业收入占营业收入比重",
+                  "raw_value": "0.59",
+                  "value": "0.59",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他行业营业收入",
+                  "raw_value": "261,338,349.60",
+                  "value": "261338349.60",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他行业营业收入占营业收入比重",
+                  "raw_value": "1.13",
+                  "value": "1.13",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "按地区划分，2025年中国大陆地区营业收入17,791,344,144.94元，占营业收入比重77.23%；中国大陆地区以外的国家和地区营业收入5,244,931,155.76元，占比22.77%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "中国大陆地区营业收入",
+                  "raw_value": "17,791,344,144.94",
+                  "value": "17791344144.94",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中国大陆地区营业收入占营业收入比重",
+                  "raw_value": "77.23",
+                  "value": "77.23",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中国大陆地区以外的国家和地区营业收入",
+                  "raw_value": "5,244,931,155.76",
+                  "value": "5244931155.76",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中国大陆地区以外的国家和地区营业收入占营业收入比重",
+                  "raw_value": "22.77",
+                  "value": "22.77",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "分行业毛利率方面，高新技术行业毛利率21.44%，生物医药行业毛利率48.38%，房地产行业毛利率24.91%，其他行业毛利率-0.74%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "高新技术行业毛利率",
+                  "raw_value": "21.44",
+                  "value": "21.44",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生物医药行业毛利率",
+                  "raw_value": "48.38",
+                  "value": "48.38",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产行业毛利率",
+                  "raw_value": "24.91",
+                  "value": "24.91",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他行业毛利率",
+                  "raw_value": "-0.74",
+                  "value": "-0.74",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F14",
+              "text": "报告期内高新技术产业实现销售收入1,869,837.13万元，同比增长17.68%；实现利润总额139,020.31万元，同比增长18.22%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "高新技术产业销售收入",
+                  "raw_value": "1,869,837.13",
+                  "value": "1869837.13",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "高新技术产业销售收入同比增长率",
+                  "raw_value": "17.68",
+                  "value": "17.68",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比增长"
+                },
+                {
+                  "name": "高新技术产业利润总额",
+                  "raw_value": "139,020.31",
+                  "value": "139020.31",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "高新技术产业利润总额同比增长率",
+                  "raw_value": "18.22",
+                  "value": "18.22",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比增长"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "报告期内生物医药产业实现销售收入394,097.83万元，同比增长3.87%；实现利润总额69,165.57万元，同比增长8.21%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "生物医药产业销售收入",
+                  "raw_value": "394,097.83",
+                  "value": "394097.83",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生物医药产业销售收入同比增长率",
+                  "raw_value": "3.87",
+                  "value": "3.87",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比增长"
+                },
+                {
+                  "name": "生物医药产业利润总额",
+                  "raw_value": "69,165.57",
+                  "value": "69165.57",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生物医药产业利润总额同比增长率",
+                  "raw_value": "8.21",
+                  "value": "8.21",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比增长"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "报告期内房地产业实现销售收入13,558.74万元，同比下降40.21%；实现利润总额-15,013.16万元，同比下降4.79%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产业销售收入",
+                  "raw_value": "13,558.74",
+                  "value": "13558.74",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产业销售收入同比增长率",
+                  "raw_value": "-40.21",
+                  "value": "-40.21",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比下降"
+                },
+                {
+                  "name": "房地产业利润总额",
+                  "raw_value": "-15,013.16",
+                  "value": "-15013.16",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产业利润总额同比增长率",
+                  "raw_value": "-4.79",
+                  "value": "-4.79",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比下降"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "贝特瑞2025年实现营业收入1,698,282.46万元，净利润87,507.71万元；马应龙实现营业收入386,660.82万元，净利润58,149.24万元；友诚科技实现营业收入53,007.89万元，净利润6,007.26万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "贝特瑞营业收入",
+                  "raw_value": "1,698,282.46",
+                  "value": "1698282.46",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "贝特瑞净利润",
+                  "raw_value": "87,507.71",
+                  "value": "87507.71",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "马应龙营业收入",
+                  "raw_value": "386,660.82",
+                  "value": "386660.82",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "马应龙净利润",
+                  "raw_value": "58,149.24",
+                  "value": "58149.24",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "友诚科技营业收入",
+                  "raw_value": "53,007.89",
+                  "value": "53007.89",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "友诚科技净利润",
+                  "raw_value": "6,007.26",
+                  "value": "6007.26",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F18",
+              "text": "贝特瑞国内产能已形成覆盖华南、华东、华北及中西部新能源产业集群的完备网络；报告期内印尼年产8万吨负极材料一体化项目（二期）顺利投产，印尼基地已形成16万吨负极材料总产能；摩洛哥基地5万吨/年正极材料、6万吨/年负极材料产能项目稳步推进。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "印尼基地负极材料总产能",
+                  "raw_value": "16",
+                  "value": "16",
+                  "unit": "万吨",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "摩洛哥基地正极材料产能",
+                  "raw_value": "5",
+                  "value": "5",
+                  "unit": "万吨/年",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "摩洛哥基地负极材料产能",
+                  "raw_value": "6",
+                  "value": "6",
+                  "unit": "万吨/年",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "高新技术行业营业成本中直接材料10,255,650,688.52元，占营业成本比重60.48%；直接人工695,385,773.58元，占比4.10%；制造费用2,220,542,233.40元，占比13.10%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "高新技术行业直接材料成本",
+                  "raw_value": "10,255,650,688.52",
+                  "value": "10255650688.52",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "高新技术行业直接材料占营业成本比重",
+                  "raw_value": "60.48",
+                  "value": "60.48",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "高新技术行业直接人工成本",
+                  "raw_value": "695,385,773.58",
+                  "value": "695385773.58",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "高新技术行业制造费用",
+                  "raw_value": "2,220,542,233.40",
+                  "value": "2220542233.40",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "报告期内公司研发投入金额1,084,780,043.99元，占营业收入比例4.71%；研发人员数量1,748人，占比10.93%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入金额",
+                  "raw_value": "1,084,780,043.99",
+                  "value": "1084780043.99",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入占营业收入比例",
+                  "raw_value": "4.71",
+                  "value": "4.71",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "1,748",
+                  "value": "1748",
+                  "unit": "人",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量占比",
+                  "raw_value": "10.93",
+                  "value": "10.93",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F21",
+              "text": "公司前五名客户合计销售金额10,830,157,167.42元，占年度销售总额比例47.01%；前五名客户销售额中关联方销售额占年度销售总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "10,830,157,167.42",
+                  "value": "10830157167.42",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "47.01",
+                  "value": "47.01",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "公司前五名供应商合计采购金额3,518,767,647.00元，占年度采购总额比例20.93%；前五名供应商采购额中关联方采购额占年度采购总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "3,518,767,647.00",
+                  "value": "3518767647.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "20.93",
+                  "value": "20.93",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "友诚科技继续执行大客户战略，与主流车企、桩企客户保持稳定合作关系，并设立印度尼西亚工厂开拓海外市场。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F24",
+              "text": "高新技术产业在新能源汽车及储能市场需求增长带动下，依托“技术创新+全球化布局”双轮驱动，持续稳固业务基本盘。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "贝特瑞多维度深化降本提效，通过优化全球采购体系和革新采购模式稳定原材料供应，依托工艺改进与设备改造深挖工序降本空间，以数智化升级赋能运营效能提升。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "国际精密面对复杂多变的国际贸易环境及关税政策影响，积极优化调整产能布局，持续深耕新兴市场；液压设备零件板块聚焦高毛利新产品，营收贡献最大并实现稳健增长；汽车零件板块积极开发新领域、新客户、新项目，拓展中欧及东欧市场。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "马应龙完善医药工业三大产线运营体系，巩固深化肛肠领域核心优势，加强研发创新引领，有序推进创新药物研发、肠道微生态、肛周微生态研究；积极拓展眼美康和皮肤健康业务。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F28",
+              "text": "报告期内因新设纳入合并范围的子公司共11家，因处置、清算不再纳入合并范围的子公司共6家。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "新设纳入合并范围子公司数量",
+                  "raw_value": "11",
+                  "value": "11",
+                  "unit": "家",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "处置清算不再纳入合并范围子公司数量",
+                  "raw_value": "6",
+                  "value": "6",
+                  "unit": "家",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "房地产行业收入总额同比下降40.21%，主要系本报告期房地产行业销售承压。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产行业收入总额同比增减",
+                  "raw_value": "-40.21",
+                  "value": "-40.21",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比下降"
+                }
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "财务费用670,110,603.11元，同比增长105.41%，主要系高新行业子公司在建工程陆续建成投产，利息资本化减少，费用化的利息支出相应增加；境外公司本期汇兑损失增加以及本期定期存款利息收入减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "财务费用",
+                  "raw_value": "670,110,603.11",
+                  "value": "670110603.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财务费用同比增长率",
+                  "raw_value": "105.41",
+                  "value": "105.41",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比增长"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F31",
+              "text": "本集团高新技术产业涉及新材料、新能源汽车、精密零件制造等领域，贝特瑞拥有锂离子电池负极材料完整产业链，是全球锂离子电池负极材料龙头企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F32",
+              "text": "高新技术行业营业成本中直接材料占比60.48%，原辅材料为生物医药行业主要成本项目之一；贝特瑞通过优化全球采购体系和革新采购模式稳定原材料供应。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F33",
+              "text": "贝特瑞产品主要应用于新能源汽车动力电池、储能及电子数码领域；友诚科技充电连接器广泛应用于新能源汽车和充电设备、设施等相关领域。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "未获取各业务板块分产品的详细收入拆分（如负极材料、正极材料各自收入），仅获取行业层面收入构成。",
+        "分部信息表（source-0016）中对外营业收入合计23,036,277,153.40元与营业收入构成表合计23,036,275,300.70元存在小额差异，未作调整。",
+        "未获取房地产板块分项目的收入确认明细及土地储备开发计划的具体时间安排。",
+        "未获取贝特瑞海外各基地的产能利用率及实际产量数据。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 18913,
+      "output_tokens": 6127,
+      "total_tokens": 25040
+    }
+  },
+  {
+    "request_id": "bp-work-9000e4b7087feba6ec7a177e:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "037d57375f878bd9a6f22d0055442cb2f4f529dc9624099079650e84bd338204",
+    "response_hash": "26ac3236c68db5558bbcf780221fd3c35963016385770311efa78599cd1626a2",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"R1\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"来源概述在营业总收入、营业成本之外，明确列示归属于母公司所有者的净利润20,304.17万元、比上年同期增长17.62%，以及扣除非经常性损益后净利润-7,159.65万元、比上年同期下降341.34%。草稿已有各板块利润总额，但未记录上述归母净利润和扣非净利润。扣非后为亏损，且与板块利润总额、归母净利润的方向和量级均不同，缺失会改变对集团收益质量和盈利结果的理解。应补入这两项来源口径，不能把板块利润总额当作归母净利润或经常性利润。\"},{\"finding_id\":\"R2\",\"element\":\"upstream_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_unit_or_denominator\",\"action\":\"correct\",\"affected_fact_id\":\"F32\",\"evidence_ids\":[\"source-0006\",\"source-0005\"],\"explanation\":\"60.48%是营业成本构成表中高新技术行业直接材料“占营业成本比重”，分母为合并营业成本，不是高新技术行业自身营业成本的内部占比。F32写成“高新技术行业营业成本中直接材料占比60.48%”，改变了分母。直接材料金额可以保留，比例应改回来源口径或删除；生物医药原辅材料为主要成本项目、贝特瑞优化全球采购的表述有来源支持，应保留。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "R1",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "来源概述在营业总收入、营业成本之外，明确列示归属于母公司所有者的净利润20,304.17万元、比上年同期增长17.62%，以及扣除非经常性损益后净利润-7,159.65万元、比上年同期下降341.34%。草稿已有各板块利润总额，但未记录上述归母净利润和扣非净利润。扣非后为亏损，且与板块利润总额、归母净利润的方向和量级均不同，缺失会改变对集团收益质量和盈利结果的理解。应补入这两项来源口径，不能把板块利润总额当作归母净利润或经常性利润。"
+        },
+        {
+          "finding_id": "R2",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_unit_or_denominator",
+          "action": "correct",
+          "affected_fact_id": "F32",
+          "evidence_ids": [
+            "source-0006",
+            "source-0005"
+          ],
+          "explanation": "60.48%是营业成本构成表中高新技术行业直接材料“占营业成本比重”，分母为合并营业成本，不是高新技术行业自身营业成本的内部占比。F32写成“高新技术行业营业成本中直接材料占比60.48%”，改变了分母。直接材料金额可以保留，比例应改回来源口径或删除；生物医药原辅材料为主要成本项目、贝特瑞优化全球采购的表述有来源支持，应保留。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33"
+      ]
+    },
+    "usage": {
+      "input_tokens": 27853,
+      "output_tokens": 483,
+      "total_tokens": 53628
+    }
+  },
+  {
+    "request_id": "bp-work-9000e4b7087feba6ec7a177e:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "f207c7d0b23eeba8a3602b95fbfbb2770c26644e7f22702e1a3ff16cd8dfe52c",
+    "response_hash": "590814526de11ac7127b310726ed4fb11f5e9ec336a4e15c1474c59e778d0522",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:R1\",\"text\":\"报告期内，本集团实现归属于母公司所有者的净利润20,304.17万元，比上年同期增长17.62%；归属于母公司所有者的扣除非经常性损益的净利润-7,159.65万元，比上年同期下降341.34%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"归属于母公司所有者的净利润\",\"raw_value\":\"20,304.17万元\",\"value\":\"20304.17\",\"unit\":\"万元\",\"currency\":\"人民币\",\"source_unit\":\"万元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年同期增长17.62%\"},{\"name\":\"归属于母公司所有者的扣除非经常性损益的净利润\",\"raw_value\":\"-7,159.65万元\",\"value\":\"-7159.65\",\"unit\":\"万元\",\"currency\":\"人民币\",\"source_unit\":\"万元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年同期下降341.34%\"}],\"uncertainty_reason\":null},{\"fact_id\":\"F32\",\"text\":\"高新技术行业营业成本构成中，直接材料金额10,255,650,688.52元，占营业成本比重60.48%；原辅材料为生物医药行业主要成本项目之一；贝特瑞通过优化全球采购体系和革新采购模式稳定原材料供应。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0002\"],\"metrics\":[{\"name\":\"高新技术行业营业成本-直接材料金额\",\"raw_value\":\"10,255,650,688.52\",\"value\":\"10255650688.52\",\"unit\":\"元\",\"currency\":\"人民币\",\"source_unit\":\"元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null},{\"name\":\"高新技术行业营业成本-直接材料占营业成本比重\",\"raw_value\":\"60.48%\",\"value\":\"60.48\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"占营业成本比重（合并营业成本口径）\"}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:R1",
+          "text": "报告期内，本集团实现归属于母公司所有者的净利润20,304.17万元，比上年同期增长17.62%；归属于母公司所有者的扣除非经常性损益的净利润-7,159.65万元，比上年同期下降341.34%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "归属于母公司所有者的净利润",
+              "raw_value": "20,304.17万元",
+              "value": "20304.17",
+              "unit": "万元",
+              "currency": "人民币",
+              "source_unit": "万元",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "比上年同期增长17.62%"
+            },
+            {
+              "name": "归属于母公司所有者的扣除非经常性损益的净利润",
+              "raw_value": "-7,159.65万元",
+              "value": "-7159.65",
+              "unit": "万元",
+              "currency": "人民币",
+              "source_unit": "万元",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "比上年同期下降341.34%"
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F32",
+          "text": "高新技术行业营业成本构成中，直接材料金额10,255,650,688.52元，占营业成本比重60.48%；原辅材料为生物医药行业主要成本项目之一；贝特瑞通过优化全球采购体系和革新采购模式稳定原材料供应。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "高新技术行业营业成本-直接材料金额",
+              "raw_value": "10,255,650,688.52",
+              "value": "10255650688.52",
+              "unit": "元",
+              "currency": "人民币",
+              "source_unit": "元",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null
+            },
+            {
+              "name": "高新技术行业营业成本-直接材料占营业成本比重",
+              "raw_value": "60.48%",
+              "value": "60.48",
+              "unit": "%",
+              "currency": null,
+              "source_unit": "%",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "占营业成本比重（合并营业成本口径）"
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15999,
+      "output_tokens": 516,
+      "total_tokens": 16515
+    }
+  },
+  {
+    "request_id": "bp-work-9000e4b7087feba6ec7a177e:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "36cda749b0babd4b93c349c38c781436b72a19d3a5a637e25ee9c759db96546e",
+    "response_hash": "ffc2f301cd7f8066b66f707a2493d1b044b35992214ffd2d4a4062b40b805062",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:R1\",\"F32\"],\"checks\":[{\"fact_id\":\"review-add:R1\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"source-0002明确记载报告期内本集团归属于母公司所有者的净利润20,304.17万元、比上年同期增长17.62%，以及扣除非经常性损益的净利润-7,159.65万元、比上年同期下降341.34%。候选事实的合并主体、2025年度期间、金额、万元单位和同比口径均与原文一致，补入了原先缺失的归母净利润及扣非亏损，且未把板块利润总额混同为归母或经常性利润，实质性解决了R1遗漏。\"},{\"fact_id\":\"F32\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0002\"],\"explanation\":\"source-0006营业成本构成表列示高新技术行业直接材料10,255,650,688.52元、占营业成本比重60.48%，分母为合并营业成本。候选已改回该列口径，并在比较基础中标明合并营业成本口径，金额、元单位和2025年度期间正确；指标主体保持高新技术行业，未把行业行误升为合并主体。生物医药原辅材料为主要成本项目及贝特瑞优化全球采购稳定原材料供应，分别有source-0006、source-0002支持。该修复实质性纠正了R2的分母错误。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:R1",
+        "F32"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:R1",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "source-0002明确记载报告期内本集团归属于母公司所有者的净利润20,304.17万元、比上年同期增长17.62%，以及扣除非经常性损益的净利润-7,159.65万元、比上年同期下降341.34%。候选事实的合并主体、2025年度期间、金额、万元单位和同比口径均与原文一致，补入了原先缺失的归母净利润及扣非亏损，且未把板块利润总额混同为归母或经常性利润，实质性解决了R1遗漏。"
+        },
+        {
+          "fact_id": "F32",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0002"
+          ],
+          "explanation": "source-0006营业成本构成表列示高新技术行业直接材料10,255,650,688.52元、占营业成本比重60.48%，分母为合并营业成本。候选已改回该列口径，并在比较基础中标明合并营业成本口径，金额、元单位和2025年度期间正确；指标主体保持高新技术行业，未把行业行误升为合并主体。生物医药原辅材料为主要成本项目及贝特瑞优化全球采购稳定原材料供应，分别有source-0006、source-0002支持。该修复实质性纠正了R2的分母错误。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 19871,
+      "output_tokens": 334,
+      "total_tokens": 25043
+    }
+  }
+]

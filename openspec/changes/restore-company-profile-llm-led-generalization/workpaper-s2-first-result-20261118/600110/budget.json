@@ -1,0 +1,182 @@
+{
+  "physical_requests": 5,
+  "charged_tokens": 146363,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": null,
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "f84f9072db2348e09bddadb1aa051e1d",
+      "logical_request_id": "272d9b33f36562cc377398f47a710b7ba4ab72e97719c546e3c064caaedb863b",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 95749,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 26306,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 25926,
+        "output_tokens": 380,
+        "total_tokens": 26306
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 382,
+        "content_fragments": 380,
+        "content_chars": 764,
+        "content_sha256": "1cf8c9bd5752f1f582abd0bff70f937be2f89ce4fea86a576e2e428520697019",
+        "reasoning_present": false,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    },
+    {
+      "sequence": 2,
+      "request_id": "d7425e36c0114f4bb8898f767be7eb1e",
+      "logical_request_id": "aa42dd4e4cc756e8fe1aad36afa9ca2bc469fdab0c0305ce2e57d46b1c23d12a",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 92961,
+      "reserved_output_tokens": 12000,
+      "charged_tokens": 23885,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 17358,
+        "output_tokens": 6527,
+        "total_tokens": 23885
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 6526,
+        "content_fragments": 6524,
+        "content_chars": 17286,
+        "content_sha256": "aeef75435790ca0ac22e0be9366be3488a122e0d6d92251fb033c75ac96eb33e",
+        "reasoning_present": false,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    },
+    {
+      "sequence": 3,
+      "request_id": "c2deb3d29a4a43a1b131748342369170",
+      "logical_request_id": "ca71a355a1d1da454626bad2f2c04bc1bdfc5abb71fe75be39b2ced70cce689f",
+      "source_label": "scorpio:grok-4.7",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_grok",
+      "provider_resource": "scorpio:grok",
+      "model": "grok-4.7",
+      "reserved_input_tokens": 101081,
+      "reserved_output_tokens": 16384,
+      "charged_tokens": 54772,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 23684,
+        "output_tokens": 1681,
+        "total_tokens": 54772
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 1984,
+        "content_fragments": 1681,
+        "content_chars": 3502,
+        "content_sha256": "b4d1c05af220c823133605dadb4ef9db561e78d9c972a7c9661fcc64107df9fb",
+        "reasoning_present": true,
+        "reasoning_chars": 24550,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    },
+    {
+      "sequence": 4,
+      "request_id": "9d77f2389fc349a49d158a9ed7363b20",
+      "logical_request_id": "7f728f971cf499c743dbc8486bcef1878ad3292a6b44d2627045727ec4655be2",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 84887,
+      "reserved_output_tokens": 16384,
+      "charged_tokens": 17320,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 15924,
+        "output_tokens": 1396,
+        "total_tokens": 17320
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 1398,
+        "content_fragments": 1396,
+        "content_chars": 3995,
+        "content_sha256": "a6bf6ac99e0a40c385662219052fb3435009fc82e384b9003cbf5877d9c3e92a",
+        "reasoning_present": false,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    },
+    {
+      "sequence": 5,
+      "request_id": "95c29925630f433da53626b1547148fe",
+      "logical_request_id": "ba04ddfa6c6133039cd4f9257e2f55db5a283ca49e677872c932ad1be8bae560",
+      "source_label": "scorpio:grok-4.7",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_grok",
+      "provider_resource": "scorpio:grok",
+      "model": "grok-4.7",
+      "reserved_input_tokens": 79896,
+      "reserved_output_tokens": 16384,
+      "charged_tokens": 24080,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 18426,
+        "output_tokens": 517,
+        "total_tokens": 24080
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 560,
+        "content_fragments": 517,
+        "content_chars": 1072,
+        "content_sha256": "b48d5269f6be50d28f5b730dba1e9ccd276f972861986a14f380410ae932d3d2",
+        "reasoning_present": true,
+        "reasoning_chars": 1427,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    }
+  ]
+}

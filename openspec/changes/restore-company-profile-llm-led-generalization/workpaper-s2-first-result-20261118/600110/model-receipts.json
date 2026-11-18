@@ -1,0 +1,1472 @@
+[
+  {
+    "request_id": "bp-work-de5a7dc92bd35d7b861bc2cc:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "44fdc480849c7beb47f18696f788474dd555179e3f323db03bdee10a6d09f475",
+    "response_hash": "1cf8c9bd5752f1f582abd0bff70f937be2f89ce4fea86a576e2e428520697019",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0049\",\"section-0050\",\"section-0053\",\"section-0103\",\"section-0141\",\"section-0143\",\"section-0021\",\"section-0022\"],\"rationale\":\"优先选取能完整解释公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0049（报告期内公司从事的业务情况）及其子节0050（主要业务及主要产品）、0053（主营业务的经营模式，含采购/生产/销售模式）构成业务与经营模式主线；section-0103（经营情况讨论与分析）提供本期经营变化与产能/产品结构等公司层面动态；section-0141（主营业务分析）与0143（收入和成本分析）提供营业收入、成本及分产品/分行业构成，是货币化与主要业务权重的核心来源；section-0021及0022（近三年主要会计数据）作为紧凑的公司总量摘要，补充营业收入等总量口径，避免仅依赖明细表。未选纯行业背景（0066）与泛化核心竞争力（0127），因其对公司层面解释力次要。\",\"deferred\":[\"section-0066 行业情况：属行业背景，非公司层面经营实质，暂不纳入\",\"section-0127 核心竞争力：偏泛化竞争优势描述，与业务/收入解释重叠度低，暂不纳入\",\"section-0486 财务报告及附注：仅在收入构成存在缺口时定向补充，不整体扩读\"],\"stop_reason\":\"已覆盖业务与产品、经营模式、本期经营变化、收入与成本构成及公司总量摘要，足以回答做什么、怎么经营、怎么赚钱与主要业务权重；行业背景与详细附注属次要或定向补充范围，可在不扩读全报告的前提下停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0049",
+        "section-0050",
+        "section-0053",
+        "section-0103",
+        "section-0141",
+        "section-0143",
+        "section-0021",
+        "section-0022"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0049（报告期内公司从事的业务情况）及其子节0050（主要业务及主要产品）、0053（主营业务的经营模式，含采购/生产/销售模式）构成业务与经营模式主线；section-0103（经营情况讨论与分析）提供本期经营变化与产能/产品结构等公司层面动态；section-0141（主营业务分析）与0143（收入和成本分析）提供营业收入、成本及分产品/分行业构成，是货币化与主要业务权重的核心来源；section-0021及0022（近三年主要会计数据）作为紧凑的公司总量摘要，补充营业收入等总量口径，避免仅依赖明细表。未选纯行业背景（0066）与泛化核心竞争力（0127），因其对公司层面解释力次要。",
+      "deferred": [
+        "section-0066 行业情况：属行业背景，非公司层面经营实质，暂不纳入",
+        "section-0127 核心竞争力：偏泛化竞争优势描述，与业务/收入解释重叠度低，暂不纳入",
+        "section-0486 财务报告及附注：仅在收入构成存在缺口时定向补充，不整体扩读"
+      ],
+      "stop_reason": "已覆盖业务与产品、经营模式、本期经营变化、收入与成本构成及公司总量摘要，足以回答做什么、怎么经营、怎么赚钱与主要业务权重；行业背景与详细附注属次要或定向补充范围，可在不扩读全报告的前提下停止。"
+    },
+    "usage": {
+      "input_tokens": 25926,
+      "output_tokens": 380,
+      "total_tokens": 26306
+    }
+  },
+  {
+    "request_id": "bp-work-de5a7dc92bd35d7b861bc2cc:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "2c76eaac4c190cf9e61ca2569b3f5353df44a74794beda10c7c94e57d338d9df",
+    "response_hash": "aeef75435790ca0ac22e0be9366be3488a122e0d6d92251fb033c75ac96eb33e",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司主要从事电解铜箔的研发、生产和销售，报告期内还从事光伏储能、电线电缆及附件的生产与销售、物资贸易等其他业务板块；报告期内聚焦电解铜箔主业，主营业务未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司以“集中化管控”“专业化经营”“精细化管理”组织经营，通过总部统筹与子公司协同，构建覆盖锂电与电子电路两大赛道的一体化铜箔供应体系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[]},{\"fact_id\":\"F-BS-03\",\"text\":\"公司在国内拥有广东惠州、青海西宁、湖北黄石、江西贵溪四大铜箔生产基地，均实现稳定量产，形成覆盖华南、华中、西北的产能布局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"公司主要产品包括3-6微米超薄铜箔、高抗拉强度铜箔、高延伸率铜箔、多孔铜箔、超厚电解铜箔、复合集流体（复合铜箔、复合铝箔）、HVLP超低轮廓铜箔、RTF反转铜箔及HTE高温延展电解铜箔等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[]},{\"fact_id\":\"F-PS-02\",\"text\":\"3-6微米超薄铜箔主要用于新能源汽车动力电池和储能电池制造，铜箔减薄可加大锂电池续航里程、提高电池能量密度。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[]},{\"fact_id\":\"F-PS-03\",\"text\":\"固态电池用镀镍合金箔通过致密镍合金镀层实现耐200℃高温、抗强腐蚀及机械性能提升，主要应用于新能源汽车动力电池、低空经济及高端电子消费领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[]},{\"fact_id\":\"F-PS-04\",\"text\":\"复合集流体（复合铜箔/复合铝箔）为新型电池集流体材料，主要应用于动力与储能电池导电集流体。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[]},{\"fact_id\":\"F-PS-05\",\"text\":\"锂电池用多孔铜箔可用作锂离子电池、固态锂离子电池、锂离子电容器、超级电容器等导电集流体，同时适用于镍镉、镍氢电池等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[]},{\"fact_id\":\"F-PS-06\",\"text\":\"印制电路板用电解铜箔为名义厚度9微米至70微米的标准轮廓高温延展性铜箔，适用于各类树脂体系的双面、多层印制线路板；超厚电解铜箔适用于电力、汽车等大功率电路用“大电流PCB”的制造。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[]},{\"fact_id\":\"F-PS-07\",\"text\":\"HVLP超低轮廓铜箔适用于高频高速材料，主要用于挠性电路板、高频线路板和超微细电路板；RTF反转铜箔主要应用于高频高速场景，如AI服务器、高速交换机主板及高端HDI板。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[]},{\"fact_id\":\"F-PS-08\",\"text\":\"载体可剥离/极薄铜箔主要应用于FCBGA封装基板、Chiplet互联等先进封装场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[]},{\"fact_id\":\"F-PS-09\",\"text\":\"其他业务产品包括屋顶光伏覆盖、用户侧储能、军工线束、高压电缆附件、光伏电力电缆及光伏系统安装用线、专用接地线等，分别由诺德智慧、长春中科、湖州上辐等子公司开展。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\",\"source-0008\"],\"metrics\":[]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"铜箔销售采用“铜价+加工费”联动定价：铜箔售价=上月电解铜现货均价+差异化加工费，加工费根据产品厚度、技术等级、表面处理工艺、客户批量、订单期限差异化定价，可对冲铜价波动风险、锁定加工利润。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[]},{\"fact_id\":\"F-RM-02\",\"text\":\"各生产基地产品全部统一销售至全资子公司百嘉达，由百嘉达作为集团唯一对外销售主体，实施直销为主、大客户直供、战略绑定的销售模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[]},{\"fact_id\":\"F-RM-03\",\"text\":\"公司建立客户资质评估与信用分级体系，信用账期分为月结30天、60天、90天，并定期复核客户信用、动态调整账期与授信额度。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[]},{\"fact_id\":\"F-RM-04\",\"text\":\"公司营业收入变动主要系本期产品销量增加及销售价格上涨等所致；营业成本变动主要系本期产品原材料价格上涨及销量增加等所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司营业收入7,328,097,724.70元，上年同期5,277,316,433.27元，同比增长38.86%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0017\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"7,328,097,724.70\",\"value\":\"7328097724.70\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业收入\",\"raw_value\":\"5,277,316,433.27\",\"value\":\"5277316433.27\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2024年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"38.86\",\"value\":\"38.86\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"2025年主营业务分行业构成：电子信息材料营业收入6,745,344,486.37元、毛利率7.64%；电线电缆营业收入315,802,261.25元、毛利率9.74%；贸易营业收入121,119,752.47元、毛利率99.68%；发电及储能营业收入59,507,780.23元、毛利率42.39%；合计7,241,774,280.32元、毛利率9.56%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"主营业务收入-电子信息材料\",\"raw_value\":\"6,745,344,486.37\",\"value\":\"6745344486.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"毛利率-电子信息材料\",\"raw_value\":\"7.64\",\"value\":\"7.64\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务收入-电线电缆\",\"raw_value\":\"315,802,261.25\",\"value\":\"315802261.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"毛利率-电线电缆\",\"raw_value\":\"9.74\",\"value\":\"9.74\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务收入-贸易\",\"raw_value\":\"121,119,752.47\",\"value\":\"121119752.47\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"毛利率-贸易\",\"raw_value\":\"99.68\",\"value\":\"99.68\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务收入-发电及储能\",\"raw_value\":\"59,507,780.23\",\"value\":\"59507780.23\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"毛利率-发电及储能\",\"raw_value\":\"42.39\",\"value\":\"42.39\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务收入合计\",\"raw_value\":\"7,241,774,280.32\",\"value\":\"7241774280.32\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务毛利率合计\",\"raw_value\":\"9.56\",\"value\":\"9.56\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"2025年主营业务分产品构成：铜箔产品营业收入6,745,344,486.37元、毛利率7.64%；电线电缆及附件营业收入315,802,261.25元、毛利率9.74%；贸易营业收入121,119,752.47元、毛利率99.68%；发电及储能营业收入59,507,780.23元、毛利率42.39%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"主营业务收入-铜箔产品\",\"raw_value\":\"6,745,344,486.37\",\"value\":\"6745344486.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"毛利率-铜箔产品\",\"raw_value\":\"7.64\",\"value\":\"7.64\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务收入-电线电缆及附件\",\"raw_value\":\"315,802,261.25\",\"value\":\"315802261.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务收入-贸易\",\"raw_value\":\"121,119,752.47\",\"value\":\"121119752.47\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务收入-发电及储能\",\"raw_value\":\"59,507,780.23\",\"value\":\"59507780.23\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"2025年主营业务分地区构成：国内营业收入7,081,174,016.16元、毛利率9.67%；国外营业收入160,600,264.16元、毛利率4.63%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"主营业务收入-国内\",\"raw_value\":\"7,081,174,016.16\",\"value\":\"7081174016.16\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"毛利率-国内\",\"raw_value\":\"9.67\",\"value\":\"9.67\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务收入-国外\",\"raw_value\":\"160,600,264.16\",\"value\":\"160600264.16\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"毛利率-国外\",\"raw_value\":\"4.63\",\"value\":\"4.63\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-SM-05\",\"text\":\"2025年铜箔生产量71,800吨、销售量72,363吨、库存量2,615吨，生产量比上年增减38.96%、销售量比上年增减35.75%、库存量比上年增减10.62%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"铜箔生产量\",\"raw_value\":\"71,800\",\"value\":\"71800\",\"unit\":\"吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"吨\"},{\"name\":\"铜箔销售量\",\"raw_value\":\"72,363\",\"value\":\"72363\",\"unit\":\"吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"吨\"},{\"name\":\"铜箔库存量\",\"raw_value\":\"2,615\",\"value\":\"2615\",\"unit\":\"吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"吨\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司依托全资子公司百嘉达搭建集团统一采购中枢，对阴极铜、硫酸、添加剂等核心大宗原材料实施战略集中采购、长协锁价、规模议价；各生产基地设立属地采购部执行集采计划、采购本地辅料及备品备件。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[]},{\"fact_id\":\"F-OI-02\",\"text\":\"公司采用以销定产、柔性连续生产模式，以客户订单为核心制定生产计划；核心工序包括溶铜（电解液制备）、生箔（电沉积）、表面处理及分切检验包装。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[]},{\"fact_id\":\"F-OI-03\",\"text\":\"生箔工序采用专用钛质阴极辊、铱钽混合涂层钛阳极，通过低电压、大电流、恒流恒压电解技术使铜离子在阴极辊表面定向结晶析出，形成3μm–12μm锂电铜箔、9μm–70μm PCB铜箔的原生铜箔。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[]},{\"fact_id\":\"F-OI-04\",\"text\":\"截至报告期，公司总产能达14万吨，其中3万吨具备高端电子电路铜箔生产能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"铜箔总产能\",\"raw_value\":\"14\",\"value\":\"14\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万吨\"},{\"name\":\"高端电子电路铜箔产能\",\"raw_value\":\"3\",\"value\":\"3\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万吨\"}]},{\"fact_id\":\"F-OI-05\",\"text\":\"2025年研发投入合计338,123,908.91元，其中费用化244,263,062.67元、资本化93,860,846.24元，研发投入总额占营业收入比例4.61%，研发人员312人、占公司总人数10.11%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"338,123,908.91\",\"value\":\"338123908.91\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"4.61\",\"value\":\"4.61\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"研发人员数量\",\"raw_value\":\"312\",\"value\":\"312\",\"unit\":\"人\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"人\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户销售额437,906.63万元，占年度销售总额59.76%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"437,906.63\",\"value\":\"437906.63\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"59.76\",\"value\":\"59.76\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"前五名供应商采购额635,199.68万元，占年度采购总额32.49%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"635,199.68\",\"value\":\"635199.68\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"32.49\",\"value\":\"32.49\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"公司已进入LG化学、SKI等海外优质客户的供应链，实现批量稳定供货；2025年12月初自主研发的复合铝箔产品完成首批海外订单交付。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[]},{\"fact_id\":\"F-CC-04\",\"text\":\"公司业务覆盖动力电池、储能、消费电子、高端PCB等多元化应用领域；与中创新航、楚能新能源、蜂巢能源、江苏天合储能等头部储能电池厂商深度合作，开发适配储能电池的定制化铜箔产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0014\"],\"metrics\":[]},{\"fact_id\":\"F-CC-05\",\"text\":\"RTF-3已小批量出货，HVLP-1/2/3/4产品已向台系核心客户完成小批量送样并进入性能验证阶段；RTF-3及HVLP-1/2产品已进入国内和台系多家头部厂商供应链体系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"2025年全球铜价创历史新高，新能源汽车销量转向稳健增长，储能产业及AI算力爆发，带动上游锂电铜箔行业迎来周期性拐点，行业整体盈利状况有所改善。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[]},{\"fact_id\":\"F-OD-02\",\"text\":\"公司率先实现3.5μm极薄铜箔规模化量产，成为行业内少数能稳定量产该规格产品的企业；该产品可直接减轻电池整体重量，铜材占比约降低40%，综合成本下降15–20%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[]},{\"fact_id\":\"F-OD-03\",\"text\":\"相较于传统8μm铜箔，3.5μm超薄铜箔可在相同面积或体积内负载更多活性物质，助力电池能量密度提升8–12%，循环寿命延长15–20%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[]},{\"fact_id\":\"F-OD-04\",\"text\":\"2025年推出的耐高温双面镀镍合金箔镀层厚度精确控制在0.08-0.20μm范围内，抗拉强度相比纯铜箔提升约10%，耐弯折性能提升25%以上，耐高温性能达到200℃、48小时不变色。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[]},{\"fact_id\":\"F-OD-05\",\"text\":\"公司高附加值产品如超高抗超高延、高端电子标箔等的订单量稳步上升，订单情况较为饱满；在4.5微米以下极薄铜箔市场占据先发优势。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司聚焦电解铜箔主业，主营业务未发生重大变化；本期公司业务类型、利润构成或利润来源未发生重大变动。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0018\"],\"metrics\":[]},{\"fact_id\":\"F-MC-02\",\"text\":\"公司已将光伏储能业务从辅助配套升级为战略级增长引擎，通过技术协同、场景创新及产业链闭环布局，逐步实现从材料供应商向能源综合服务商的转型。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[]},{\"fact_id\":\"F-MC-03\",\"text\":\"公司在湖北黄石投资建设诺德光储能源电站零碳智慧产业园项目，建设分布式光伏电站、工商业储能电站等设施，形成“生产-储能-消纳”闭环，打造“自发自用+余电交易”的商业模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[]},{\"fact_id\":\"F-MC-04\",\"text\":\"2025年公司推出股票期权激励计划，累计向董事、高级管理人员、中层管理人员及核心技术（业务）骨干授予3500万份股票期权。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"授予股票期权数量\",\"raw_value\":\"3500\",\"value\":\"3500\",\"unit\":\"万份\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万份\"}]}]},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司建立了“总部+区域研发中心+产学研合作”的三级研发体系，依托国家级技术研发平台，已成功实现极薄铜箔规模化量产，主导制定了多项锂电铜箔国家标准。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司组建的“鲁班实验室”汇聚日韩台资深行业专家，团队深耕高端电子铜箔领域多年，已培育从研发设计到生产制造的全流程专业队伍。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[]},{\"fact_id\":\"F-CF-03\",\"text\":\"铜箔生产是高耗电行业，公司结合自身生产需求，通过自建分布式光伏电站和储能系统降低用电成本并实现清洁能源供应。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司专注于锂离子电池用电解铜箔、PCB电子电路铜箔的研发、生产与销售及锂电池材料开发业务，处于铜箔材料制造环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"公司核心大宗原材料包括阴极铜、硫酸、添加剂等，由百嘉达实施战略集中采购、长协锁价、规模议价。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[]},{\"fact_id\":\"F-SC-03\",\"text\":\"溶铜工序将淬火处理后的高纯度铜线、铜米等投入溶铜罐，与稀硫酸溶液反应成为硫酸铜溶液，经精密过滤、温度调控、电解液成分优化制备硫酸铜电解液。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-04\",\"text\":\"公司铜箔产品下游应用覆盖新能源汽车动力电池、储能电池、消费电子、高端PCB、AI服务器、人形机器人等高端电子领域供应链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0013\"],\"metrics\":[]},{\"fact_id\":\"F-SC-05\",\"text\":\"公司已进入LG化学、SKI等海外优质客户供应链并批量稳定供货；与中创新航、楚能新能源、蜂巢能源、江苏天合储能等头部储能电池厂商深度合作。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0014\"],\"metrics\":[]}]}},\"limitations\":[\"未获取成功：分销售模式收入构成未在选定章节中披露，无法说明直销/经销等模式的具体收入占比。\",\"未获取成功：铜箔产品按锂电铜箔与PCB铜箔细分的收入金额未单独披露，仅有电子信息材料/铜箔产品合并口径。\",\"未获取成功：各子公司（诺德智慧、长春中科、湖州上辐等）的分部收入与利润数据未在选定章节中披露。\",\"贸易业务毛利率99.68%系营业成本极低所致，其收入与成本口径差异未在选定章节中进一步说明。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司主要从事电解铜箔的研发、生产和销售，报告期内还从事光伏储能、电线电缆及附件的生产与销售、物资贸易等其他业务板块；报告期内聚焦电解铜箔主业，主营业务未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "公司以“集中化管控”“专业化经营”“精细化管理”组织经营，通过总部统筹与子公司协同，构建覆盖锂电与电子电路两大赛道的一体化铜箔供应体系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-BS-03",
+              "text": "公司在国内拥有广东惠州、青海西宁、湖北黄石、江西贵溪四大铜箔生产基地，均实现稳定量产，形成覆盖华南、华中、西北的产能布局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": []
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "公司主要产品包括3-6微米超薄铜箔、高抗拉强度铜箔、高延伸率铜箔、多孔铜箔、超厚电解铜箔、复合集流体（复合铜箔、复合铝箔）、HVLP超低轮廓铜箔、RTF反转铜箔及HTE高温延展电解铜箔等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "3-6微米超薄铜箔主要用于新能源汽车动力电池和储能电池制造，铜箔减薄可加大锂电池续航里程、提高电池能量密度。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "固态电池用镀镍合金箔通过致密镍合金镀层实现耐200℃高温、抗强腐蚀及机械性能提升，主要应用于新能源汽车动力电池、低空经济及高端电子消费领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "复合集流体（复合铜箔/复合铝箔）为新型电池集流体材料，主要应用于动力与储能电池导电集流体。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "锂电池用多孔铜箔可用作锂离子电池、固态锂离子电池、锂离子电容器、超级电容器等导电集流体，同时适用于镍镉、镍氢电池等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-06",
+              "text": "印制电路板用电解铜箔为名义厚度9微米至70微米的标准轮廓高温延展性铜箔，适用于各类树脂体系的双面、多层印制线路板；超厚电解铜箔适用于电力、汽车等大功率电路用“大电流PCB”的制造。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-07",
+              "text": "HVLP超低轮廓铜箔适用于高频高速材料，主要用于挠性电路板、高频线路板和超微细电路板；RTF反转铜箔主要应用于高频高速场景，如AI服务器、高速交换机主板及高端HDI板。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-08",
+              "text": "载体可剥离/极薄铜箔主要应用于FCBGA封装基板、Chiplet互联等先进封装场景。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-PS-09",
+              "text": "其他业务产品包括屋顶光伏覆盖、用户侧储能、军工线束、高压电缆附件、光伏电力电缆及光伏系统安装用线、专用接地线等，分别由诺德智慧、长春中科、湖州上辐等子公司开展。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": []
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "铜箔销售采用“铜价+加工费”联动定价：铜箔售价=上月电解铜现货均价+差异化加工费，加工费根据产品厚度、技术等级、表面处理工艺、客户批量、订单期限差异化定价，可对冲铜价波动风险、锁定加工利润。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "各生产基地产品全部统一销售至全资子公司百嘉达，由百嘉达作为集团唯一对外销售主体，实施直销为主、大客户直供、战略绑定的销售模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "公司建立客户资质评估与信用分级体系，信用账期分为月结30天、60天、90天，并定期复核客户信用、动态调整账期与授信额度。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-RM-04",
+              "text": "公司营业收入变动主要系本期产品销量增加及销售价格上涨等所致；营业成本变动主要系本期产品原材料价格上涨及销量增加等所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": []
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年公司营业收入7,328,097,724.70元，上年同期5,277,316,433.27元，同比增长38.86%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "7,328,097,724.70",
+                  "value": "7328097724.70",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "营业收入",
+                  "raw_value": "5,277,316,433.27",
+                  "value": "5277316433.27",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2024年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "38.86",
+                  "value": "38.86",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "2025年主营业务分行业构成：电子信息材料营业收入6,745,344,486.37元、毛利率7.64%；电线电缆营业收入315,802,261.25元、毛利率9.74%；贸易营业收入121,119,752.47元、毛利率99.68%；发电及储能营业收入59,507,780.23元、毛利率42.39%；合计7,241,774,280.32元、毛利率9.56%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-电子信息材料",
+                  "raw_value": "6,745,344,486.37",
+                  "value": "6745344486.37",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "毛利率-电子信息材料",
+                  "raw_value": "7.64",
+                  "value": "7.64",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务收入-电线电缆",
+                  "raw_value": "315,802,261.25",
+                  "value": "315802261.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "毛利率-电线电缆",
+                  "raw_value": "9.74",
+                  "value": "9.74",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务收入-贸易",
+                  "raw_value": "121,119,752.47",
+                  "value": "121119752.47",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "毛利率-贸易",
+                  "raw_value": "99.68",
+                  "value": "99.68",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务收入-发电及储能",
+                  "raw_value": "59,507,780.23",
+                  "value": "59507780.23",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "毛利率-发电及储能",
+                  "raw_value": "42.39",
+                  "value": "42.39",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务收入合计",
+                  "raw_value": "7,241,774,280.32",
+                  "value": "7241774280.32",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务毛利率合计",
+                  "raw_value": "9.56",
+                  "value": "9.56",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "2025年主营业务分产品构成：铜箔产品营业收入6,745,344,486.37元、毛利率7.64%；电线电缆及附件营业收入315,802,261.25元、毛利率9.74%；贸易营业收入121,119,752.47元、毛利率99.68%；发电及储能营业收入59,507,780.23元、毛利率42.39%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-铜箔产品",
+                  "raw_value": "6,745,344,486.37",
+                  "value": "6745344486.37",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "毛利率-铜箔产品",
+                  "raw_value": "7.64",
+                  "value": "7.64",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务收入-电线电缆及附件",
+                  "raw_value": "315,802,261.25",
+                  "value": "315802261.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务收入-贸易",
+                  "raw_value": "121,119,752.47",
+                  "value": "121119752.47",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务收入-发电及储能",
+                  "raw_value": "59,507,780.23",
+                  "value": "59507780.23",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "2025年主营业务分地区构成：国内营业收入7,081,174,016.16元、毛利率9.67%；国外营业收入160,600,264.16元、毛利率4.63%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-国内",
+                  "raw_value": "7,081,174,016.16",
+                  "value": "7081174016.16",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "毛利率-国内",
+                  "raw_value": "9.67",
+                  "value": "9.67",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务收入-国外",
+                  "raw_value": "160,600,264.16",
+                  "value": "160600264.16",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "毛利率-国外",
+                  "raw_value": "4.63",
+                  "value": "4.63",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-05",
+              "text": "2025年铜箔生产量71,800吨、销售量72,363吨、库存量2,615吨，生产量比上年增减38.96%、销售量比上年增减35.75%、库存量比上年增减10.62%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "铜箔生产量",
+                  "raw_value": "71,800",
+                  "value": "71800",
+                  "unit": "吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "吨"
+                },
+                {
+                  "name": "铜箔销售量",
+                  "raw_value": "72,363",
+                  "value": "72363",
+                  "unit": "吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "吨"
+                },
+                {
+                  "name": "铜箔库存量",
+                  "raw_value": "2,615",
+                  "value": "2615",
+                  "unit": "吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "吨"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司依托全资子公司百嘉达搭建集团统一采购中枢，对阴极铜、硫酸、添加剂等核心大宗原材料实施战略集中采购、长协锁价、规模议价；各生产基地设立属地采购部执行集采计划、采购本地辅料及备品备件。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "公司采用以销定产、柔性连续生产模式，以客户订单为核心制定生产计划；核心工序包括溶铜（电解液制备）、生箔（电沉积）、表面处理及分切检验包装。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "生箔工序采用专用钛质阴极辊、铱钽混合涂层钛阳极，通过低电压、大电流、恒流恒压电解技术使铜离子在阴极辊表面定向结晶析出，形成3μm–12μm锂电铜箔、9μm–70μm PCB铜箔的原生铜箔。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "截至报告期，公司总产能达14万吨，其中3万吨具备高端电子电路铜箔生产能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "铜箔总产能",
+                  "raw_value": "14",
+                  "value": "14",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万吨"
+                },
+                {
+                  "name": "高端电子电路铜箔产能",
+                  "raw_value": "3",
+                  "value": "3",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万吨"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-05",
+              "text": "2025年研发投入合计338,123,908.91元，其中费用化244,263,062.67元、资本化93,860,846.24元，研发投入总额占营业收入比例4.61%，研发人员312人、占公司总人数10.11%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "338,123,908.91",
+                  "value": "338123908.91",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "4.61",
+                  "value": "4.61",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "312",
+                  "value": "312",
+                  "unit": "人",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "人"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "前五名客户销售额437,906.63万元，占年度销售总额59.76%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "437,906.63",
+                  "value": "437906.63",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "59.76",
+                  "value": "59.76",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "前五名供应商采购额635,199.68万元，占年度采购总额32.49%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "635,199.68",
+                  "value": "635199.68",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "32.49",
+                  "value": "32.49",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "公司已进入LG化学、SKI等海外优质客户的供应链，实现批量稳定供货；2025年12月初自主研发的复合铝箔产品完成首批海外订单交付。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "公司业务覆盖动力电池、储能、消费电子、高端PCB等多元化应用领域；与中创新航、楚能新能源、蜂巢能源、江苏天合储能等头部储能电池厂商深度合作，开发适配储能电池的定制化铜箔产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013",
+                "source-0014"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-CC-05",
+              "text": "RTF-3已小批量出货，HVLP-1/2/3/4产品已向台系核心客户完成小批量送样并进入性能验证阶段；RTF-3及HVLP-1/2产品已进入国内和台系多家头部厂商供应链体系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": []
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "2025年全球铜价创历史新高，新能源汽车销量转向稳健增长，储能产业及AI算力爆发，带动上游锂电铜箔行业迎来周期性拐点，行业整体盈利状况有所改善。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "公司率先实现3.5μm极薄铜箔规模化量产，成为行业内少数能稳定量产该规格产品的企业；该产品可直接减轻电池整体重量，铜材占比约降低40%，综合成本下降15–20%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "相较于传统8μm铜箔，3.5μm超薄铜箔可在相同面积或体积内负载更多活性物质，助力电池能量密度提升8–12%，循环寿命延长15–20%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "2025年推出的耐高温双面镀镍合金箔镀层厚度精确控制在0.08-0.20μm范围内，抗拉强度相比纯铜箔提升约10%，耐弯折性能提升25%以上，耐高温性能达到200℃、48小时不变色。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-OD-05",
+              "text": "公司高附加值产品如超高抗超高延、高端电子标箔等的订单量稳步上升，订单情况较为饱满；在4.5微米以下极薄铜箔市场占据先发优势。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": []
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期内公司聚焦电解铜箔主业，主营业务未发生重大变化；本期公司业务类型、利润构成或利润来源未发生重大变动。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0018"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "公司已将光伏储能业务从辅助配套升级为战略级增长引擎，通过技术协同、场景创新及产业链闭环布局，逐步实现从材料供应商向能源综合服务商的转型。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "公司在湖北黄石投资建设诺德光储能源电站零碳智慧产业园项目，建设分布式光伏电站、工商业储能电站等设施，形成“生产-储能-消纳”闭环，打造“自发自用+余电交易”的商业模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-MC-04",
+              "text": "2025年公司推出股票期权激励计划，累计向董事、高级管理人员、中层管理人员及核心技术（业务）骨干授予3500万份股票期权。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "授予股票期权数量",
+                  "raw_value": "3500",
+                  "value": "3500",
+                  "unit": "万份",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万份"
+                }
+              ]
+            }
+          ]
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CF-01",
+              "text": "公司建立了“总部+区域研发中心+产学研合作”的三级研发体系，依托国家级技术研发平台，已成功实现极薄铜箔规模化量产，主导制定了多项锂电铜箔国家标准。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-CF-02",
+              "text": "公司组建的“鲁班实验室”汇聚日韩台资深行业专家，团队深耕高端电子铜箔领域多年，已培育从研发设计到生产制造的全流程专业队伍。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-CF-03",
+              "text": "铜箔生产是高耗电行业，公司结合自身生产需求，通过自建分布式光伏电站和储能系统降低用电成本并实现清洁能源供应。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": []
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司专注于锂离子电池用电解铜箔、PCB电子电路铜箔的研发、生产与销售及锂电池材料开发业务，处于铜箔材料制造环节。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": []
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "公司核心大宗原材料包括阴极铜、硫酸、添加剂等，由百嘉达实施战略集中采购、长协锁价、规模议价。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-SC-03",
+              "text": "溶铜工序将淬火处理后的高纯度铜线、铜米等投入溶铜罐，与稀硫酸溶液反应成为硫酸铜溶液，经精密过滤、温度调控、电解液成分优化制备硫酸铜电解液。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": []
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-04",
+              "text": "公司铜箔产品下游应用覆盖新能源汽车动力电池、储能电池、消费电子、高端PCB、AI服务器、人形机器人等高端电子领域供应链。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0013"
+              ],
+              "metrics": []
+            },
+            {
+              "fact_id": "F-SC-05",
+              "text": "公司已进入LG化学、SKI等海外优质客户供应链并批量稳定供货；与中创新航、楚能新能源、蜂巢能源、江苏天合储能等头部储能电池厂商深度合作。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013",
+                "source-0014"
+              ],
+              "metrics": []
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "未获取成功：分销售模式收入构成未在选定章节中披露，无法说明直销/经销等模式的具体收入占比。",
+        "未获取成功：铜箔产品按锂电铜箔与PCB铜箔细分的收入金额未单独披露，仅有电子信息材料/铜箔产品合并口径。",
+        "未获取成功：各子公司（诺德智慧、长春中科、湖州上辐等）的分部收入与利润数据未在选定章节中披露。",
+        "贸易业务毛利率99.68%系营业成本极低所致，其收入与成本口径差异未在选定章节中进一步说明。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 17358,
+      "output_tokens": 6527,
+      "total_tokens": 23885
+    }
+  },
+  {
+    "request_id": "bp-work-de5a7dc92bd35d7b861bc2cc:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "fbc5b7d502565a968f248d41a45560d0e7540fc1bbf0e12d15bfd7c4cff07436",
+    "response_hash": "b4d1c05af220c823133605dadb4ef9db561e78d9c972a7c9661fcc64107df9fb",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FND-001\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-01\",\"evidence_ids\":[\"source-0003\",\"source-0018\"],\"explanation\":\"前半句“聚焦电解铜箔主业，主营业务未发生重大变化”有source-0003直接叙述支持，应保留。后半句“业务类型、利润构成或利润来源未发生重大变动”仅由source-0018“发生重大变动的详细说明”勾选√不适用推出。适用性勾选只标识该披露项目，不能单独支持“未发生变动/未发生该事项”的经济结论。应改为该详细说明项目标记为不适用，或删除该肯定性表述，不得据此写成利润构成或利润来源未发生重大变动。\"},{\"finding_id\":\"FND-002\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0018\",\"source-0001\"],\"explanation\":\"已采纳规模事实只有公司营业收入总额和铜箔产销量，公司总额或最大类别不能代替主营业务构成。source-0018已列示分行业/分产品收入：电子信息材料与铜箔产品均为6,745,344,486.37元，电线电缆与电线电缆及附件均为315,802,261.25元，贸易121,119,752.47元，发电及储能59,507,780.23元，合计7,241,774,280.32元。该合计对应source-0001扣除与主营业务无关的业务收入和不具备商业实质的收入后的营业收入，不能直接当作营业收入7,328,097,724.70元的分项，也不能把38.86%与主营业务合计增幅39.07%混用。草案限制项称上述金额在引用源中缺失，与source-0018不符。理解主业结构必须补入电子信息材料/铜箔产品及电线电缆及附件的来源金额；贸易、发电及储能占比较小，单独缺失不构成材料性遗漏，若写入须使用上述来源金额。不要求补地区拆分、毛利率或同比附列。\"},{\"finding_id\":\"FND-003\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-02\",\"evidence_ids\":[\"source-0014\"],\"explanation\":\"source-0014将“已将光伏储能业务从辅助配套升级为战略级增长引擎”作为当期战略表述，可以保留。但“逐步实现从材料供应商向能源综合服务商的转型”位于“未来，公司将持续深化……逐步实现”的计划句，草案未保留“未来/将”，写成了当前正在实现的转型。应保留升级为战略级增长引擎的来源表述，并把向能源综合服务商转型限定为未来计划。\"},{\"finding_id\":\"FND-004\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-03\",\"evidence_ids\":[\"source-0014\"],\"explanation\":\"source-0014支持公司在湖北黄石投资建设诺德光储能源电站零碳智慧产业园项目，该核心事实应保留。但分布式光伏电站、工商业储能电站是“将建设”，形成“生产-储能-消纳”闭环和打造“自发自用+余电交易”商业模式是“旨在”的目标，不是已完成经营结果。应删除或改为计划/目标口径，不能写成设施已经建成并已形成该商业模式。\"},{\"finding_id\":\"FND-005\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-04\",\"evidence_ids\":[\"source-0013\",\"source-0006\"],\"explanation\":\"source-0013支持当前业务覆盖动力电池、储能、消费电子、高端PCB，该部分应保留。同一来源写明HVLP等产品“未来将切入AI服务器、人形机器人等高端电子领域供应链”，并非已经覆盖。source-0006对RTF“主要应用于AI服务器”等是产品用途，不能把人形机器人写成已进入的下游供应链。应把AI服务器、人形机器人限定为未来切入或产品目标应用。\"},{\"finding_id\":\"FND-006\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-SM-05\",\"evidence_ids\":[\"source-0019\"],\"explanation\":\"71,800吨、72,363吨、2,615吨及生产量、销售量、库存量同比38.96%、35.75%、10.62%与source-0019主要产品“铜箔”行一致，指标级business_segment也可保留。但该行是铜箔产品口径，不能继承合并集团主体。事实级subject_scope不应标为consolidated_group，应改为business_segment；不要改数量或单位。\"},{\"finding_id\":\"FND-007\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0017\"],\"explanation\":\"F-SM-01的营业收入及38.86%增幅本身正确，但不反映同期仍亏损及经营现金流转负。source-0001列示2025年利润总额-292,731,220.39元、归属于上市公司股东的净利润-298,505,714.31元、扣除非经常性损益后净利润-201,116,917.71元；source-0017经营活动现金流量净额-461,523,769.82元，上年同期为616,482,488.16元。同比15.12%、22.49%、51.58%是亏损收窄，不能写成扭亏。此为补充经营结果的建议，不否定已支持的收入事实，也不要求补齐全部财务指标。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-PS-06\",\"F-PS-07\",\"F-PS-08\",\"F-PS-09\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-RM-04\",\"F-SM-01\",\"F-SM-05\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-OI-05\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-CC-05\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-OD-05\",\"F-MC-01\",\"F-MC-02\",\"F-MC-03\",\"F-MC-04\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\",\"F-SC-04\",\"F-SC-05\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FND-001",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-MC-01",
+          "evidence_ids": [
+            "source-0003",
+            "source-0018"
+          ],
+          "explanation": "前半句“聚焦电解铜箔主业，主营业务未发生重大变化”有source-0003直接叙述支持，应保留。后半句“业务类型、利润构成或利润来源未发生重大变动”仅由source-0018“发生重大变动的详细说明”勾选√不适用推出。适用性勾选只标识该披露项目，不能单独支持“未发生变动/未发生该事项”的经济结论。应改为该详细说明项目标记为不适用，或删除该肯定性表述，不得据此写成利润构成或利润来源未发生重大变动。"
+        },
+        {
+          "finding_id": "FND-002",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0018",
+            "source-0001"
+          ],
+          "explanation": "已采纳规模事实只有公司营业收入总额和铜箔产销量，公司总额或最大类别不能代替主营业务构成。source-0018已列示分行业/分产品收入：电子信息材料与铜箔产品均为6,745,344,486.37元，电线电缆与电线电缆及附件均为315,802,261.25元，贸易121,119,752.47元，发电及储能59,507,780.23元，合计7,241,774,280.32元。该合计对应source-0001扣除与主营业务无关的业务收入和不具备商业实质的收入后的营业收入，不能直接当作营业收入7,328,097,724.70元的分项，也不能把38.86%与主营业务合计增幅39.07%混用。草案限制项称上述金额在引用源中缺失，与source-0018不符。理解主业结构必须补入电子信息材料/铜箔产品及电线电缆及附件的来源金额；贸易、发电及储能占比较小，单独缺失不构成材料性遗漏，若写入须使用上述来源金额。不要求补地区拆分、毛利率或同比附列。"
+        },
+        {
+          "finding_id": "FND-003",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F-MC-02",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "source-0014将“已将光伏储能业务从辅助配套升级为战略级增长引擎”作为当期战略表述，可以保留。但“逐步实现从材料供应商向能源综合服务商的转型”位于“未来，公司将持续深化……逐步实现”的计划句，草案未保留“未来/将”，写成了当前正在实现的转型。应保留升级为战略级增长引擎的来源表述，并把向能源综合服务商转型限定为未来计划。"
+        },
+        {
+          "finding_id": "FND-004",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F-MC-03",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "source-0014支持公司在湖北黄石投资建设诺德光储能源电站零碳智慧产业园项目，该核心事实应保留。但分布式光伏电站、工商业储能电站是“将建设”，形成“生产-储能-消纳”闭环和打造“自发自用+余电交易”商业模式是“旨在”的目标，不是已完成经营结果。应删除或改为计划/目标口径，不能写成设施已经建成并已形成该商业模式。"
+        },
+        {
+          "finding_id": "FND-005",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F-SC-04",
+          "evidence_ids": [
+            "source-0013",
+            "source-0006"
+          ],
+          "explanation": "source-0013支持当前业务覆盖动力电池、储能、消费电子、高端PCB，该部分应保留。同一来源写明HVLP等产品“未来将切入AI服务器、人形机器人等高端电子领域供应链”，并非已经覆盖。source-0006对RTF“主要应用于AI服务器”等是产品用途，不能把人形机器人写成已进入的下游供应链。应把AI服务器、人形机器人限定为未来切入或产品目标应用。"
+        },
+        {
+          "finding_id": "FND-006",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-SM-05",
+          "evidence_ids": [
+            "source-0019"
+          ],
+          "explanation": "71,800吨、72,363吨、2,615吨及生产量、销售量、库存量同比38.96%、35.75%、10.62%与source-0019主要产品“铜箔”行一致，指标级business_segment也可保留。但该行是铜箔产品口径，不能继承合并集团主体。事实级subject_scope不应标为consolidated_group，应改为business_segment；不要改数量或单位。"
+        },
+        {
+          "finding_id": "FND-007",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0017"
+          ],
+          "explanation": "F-SM-01的营业收入及38.86%增幅本身正确，但不反映同期仍亏损及经营现金流转负。source-0001列示2025年利润总额-292,731,220.39元、归属于上市公司股东的净利润-298,505,714.31元、扣除非经常性损益后净利润-201,116,917.71元；source-0017经营活动现金流量净额-461,523,769.82元，上年同期为616,482,488.16元。同比15.12%、22.49%、51.58%是亏损收窄，不能写成扭亏。此为补充经营结果的建议，不否定已支持的收入事实，也不要求补齐全部财务指标。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-PS-06",
+        "F-PS-07",
+        "F-PS-08",
+        "F-PS-09",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-RM-04",
+        "F-SM-01",
+        "F-SM-05",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-OI-05",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-CC-05",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-OD-05",
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-MC-04",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03",
+        "F-SC-04",
+        "F-SC-05"
+      ]
+    },
+    "usage": {
+      "input_tokens": 23684,
+      "output_tokens": 1681,
+      "total_tokens": 54772
+    }
+  },
+  {
+    "request_id": "bp-work-de5a7dc92bd35d7b861bc2cc:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "557b5da6536a7945379f92aaa93d6320bde78152344a56473893cfb7b0a7e3fc",
+    "response_hash": "a6bf6ac99e0a40c385662219052fb3435009fc82e384b9003cbf5877d9c3e92a",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司聚焦电解铜箔主业，主营业务未发生重大变化；本期公司业务类型、利润构成或利润来源发生重大变动的详细说明项目标记为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0018\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:FND-002\",\"text\":\"2025年主营业务分行业/分产品收入：电子信息材料（铜箔产品）6,745,344,486.37元，电线电缆（电线电缆及附件）315,802,261.25元，贸易121,119,752.47元，发电及储能59,507,780.23元，合计7,241,774,280.32元；该合计对应扣除与主营业务无关的业务收入和不具备商业实质的收入后的营业收入，不等于营业收入7,328,097,724.70元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\",\"source-0001\"],\"metrics\":[{\"name\":\"主营业务分行业收入-电子信息材料\",\"raw_value\":\"6,745,344,486.37\",\"value\":\"6745344486.37\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品收入-铜箔产品\",\"raw_value\":\"6,745,344,486.37\",\"value\":\"6745344486.37\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分行业收入-电线电缆\",\"raw_value\":\"315,802,261.25\",\"value\":\"315802261.25\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品收入-电线电缆及附件\",\"raw_value\":\"315,802,261.25\",\"value\":\"315802261.25\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分行业收入-贸易\",\"raw_value\":\"121,119,752.47\",\"value\":\"121119752.47\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务分行业收入-发电及储能\",\"raw_value\":\"59,507,780.23\",\"value\":\"59507780.23\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务收入合计\",\"raw_value\":\"7,241,774,280.32\",\"value\":\"7241774280.32\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-MC-02\",\"text\":\"公司已将光伏储能业务从辅助配套升级为战略级增长引擎；未来，公司将持续深化光伏储能领域布局，推动技术迭代与场景拓展，逐步实现从材料供应商向能源综合服务商的转型。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-MC-03\",\"text\":\"公司在湖北黄石投资建设诺德光储能源电站零碳智慧产业园项目，该项目将建设分布式光伏电站、工商业储能电站等设施，旨在形成“生产-储能-消纳”闭环，打造“自发自用+余电交易”的商业模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-SC-04\",\"text\":\"公司铜箔产品下游应用覆盖新能源汽车动力电池、储能电池、消费电子、高端PCB等领域；未来将切入AI服务器、人形机器人等高端电子领域供应链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0006\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-SM-05\",\"text\":\"2025年铜箔生产量71,800吨、销售量72,363吨、库存量2,615吨，生产量比上年增减38.96%、销售量比上年增减35.75%、库存量比上年增减10.62%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"铜箔生产量\",\"raw_value\":\"71,800\",\"value\":\"71800\",\"unit\":\"吨\",\"source_unit\":\"吨\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"铜箔销售量\",\"raw_value\":\"72,363\",\"value\":\"72363\",\"unit\":\"吨\",\"source_unit\":\"吨\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"铜箔库存量\",\"raw_value\":\"2,615\",\"value\":\"2615\",\"unit\":\"吨\",\"source_unit\":\"吨\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-MC-01",
+          "text": "报告期内公司聚焦电解铜箔主业，主营业务未发生重大变化；本期公司业务类型、利润构成或利润来源发生重大变动的详细说明项目标记为不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0018"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:FND-002",
+          "text": "2025年主营业务分行业/分产品收入：电子信息材料（铜箔产品）6,745,344,486.37元，电线电缆（电线电缆及附件）315,802,261.25元，贸易121,119,752.47元，发电及储能59,507,780.23元，合计7,241,774,280.32元；该合计对应扣除与主营业务无关的业务收入和不具备商业实质的收入后的营业收入，不等于营业收入7,328,097,724.70元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0018",
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务分行业收入-电子信息材料",
+              "raw_value": "6,745,344,486.37",
+              "value": "6745344486.37",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品收入-铜箔产品",
+              "raw_value": "6,745,344,486.37",
+              "value": "6745344486.37",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分行业收入-电线电缆",
+              "raw_value": "315,802,261.25",
+              "value": "315802261.25",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品收入-电线电缆及附件",
+              "raw_value": "315,802,261.25",
+              "value": "315802261.25",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分行业收入-贸易",
+              "raw_value": "121,119,752.47",
+              "value": "121119752.47",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分行业收入-发电及储能",
+              "raw_value": "59,507,780.23",
+              "value": "59507780.23",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务收入合计",
+              "raw_value": "7,241,774,280.32",
+              "value": "7241774280.32",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-MC-02",
+          "text": "公司已将光伏储能业务从辅助配套升级为战略级增长引擎；未来，公司将持续深化光伏储能领域布局，推动技术迭代与场景拓展，逐步实现从材料供应商向能源综合服务商的转型。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-MC-03",
+          "text": "公司在湖北黄石投资建设诺德光储能源电站零碳智慧产业园项目，该项目将建设分布式光伏电站、工商业储能电站等设施，旨在形成“生产-储能-消纳”闭环，打造“自发自用+余电交易”的商业模式。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SC-04",
+          "text": "公司铜箔产品下游应用覆盖新能源汽车动力电池、储能电池、消费电子、高端PCB等领域；未来将切入AI服务器、人形机器人等高端电子领域供应链。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013",
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SM-05",
+          "text": "2025年铜箔生产量71,800吨、销售量72,363吨、库存量2,615吨，生产量比上年增减38.96%、销售量比上年增减35.75%、库存量比上年增减10.62%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0019"
+          ],
+          "metrics": [
+            {
+              "name": "铜箔生产量",
+              "raw_value": "71,800",
+              "value": "71800",
+              "unit": "吨",
+              "source_unit": "吨",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "铜箔销售量",
+              "raw_value": "72,363",
+              "value": "72363",
+              "unit": "吨",
+              "source_unit": "吨",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "铜箔库存量",
+              "raw_value": "2,615",
+              "value": "2615",
+              "unit": "吨",
+              "source_unit": "吨",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15924,
+      "output_tokens": 1396,
+      "total_tokens": 17320
+    }
+  },
+  {
+    "request_id": "bp-work-de5a7dc92bd35d7b861bc2cc:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "689247a8dbe84064c30e054aed7bc04462e31f23844e4fb067b587a924f19316",
+    "response_hash": "b48d5269f6be50d28f5b730dba1e9ccd276f972861986a14f380410ae932d3d2",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-MC-01\",\"F-MC-02\",\"F-MC-03\",\"F-SC-04\",\"F-SM-05\"],\"checks\":[{\"fact_id\":\"F-MC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0018\"],\"explanation\":\"前半句与source-0003“聚焦电解铜箔主业，主营业务未发生重大变化”一致；后半句仅如实转述source-0018详细说明项目勾选不适用，未把适用性勾选写成利润构成或利润来源未发生重大变动的经济结论，主体、期间和证据均正确。\"},{\"fact_id\":\"F-MC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0014\"],\"explanation\":\"source-0014支持当期已将光伏储能业务升级为战略级增长引擎；候选文本保留“未来，公司将……逐步实现”的计划口径，未把向能源综合服务商转型写成2025年已实现结果，期间限定已纠正。\"},{\"fact_id\":\"F-MC-03\",\"accepted\":true,\"evidence_ids\":[\"source-0014\"],\"explanation\":\"source-0014支持公司在湖北黄石投资建设该零碳智慧产业园项目；候选保留“将建设”设施及“旨在”形成闭环和商业模式的目标口径，未把设施建成或商业模式落地写成已完成经营结果。\"},{\"fact_id\":\"F-SC-04\",\"accepted\":true,\"evidence_ids\":[\"source-0013\",\"source-0006\"],\"explanation\":\"当前覆盖动力电池、储能、消费电子、高端PCB有source-0013支持，新能源汽车动力电池与储能电池亦有产品用途叙述支持；AI服务器、人形机器人已按source-0013限定为未来切入供应链，未把产品用途或未来计划写成已进入下游。\"},{\"fact_id\":\"F-SM-05\",\"accepted\":true,\"evidence_ids\":[\"source-0019\"],\"explanation\":\"71,800吨、72,363吨、2,615吨及同比38.96%、35.75%、10.62%均对应source-0019铜箔产品行，单位为吨；事实及各指标主体均为business_segment，未继承合并集团口径，数量、单位和期间未改错。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-SC-04",
+        "F-SM-05"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-MC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003",
+            "source-0018"
+          ],
+          "explanation": "前半句与source-0003“聚焦电解铜箔主业，主营业务未发生重大变化”一致；后半句仅如实转述source-0018详细说明项目勾选不适用，未把适用性勾选写成利润构成或利润来源未发生重大变动的经济结论，主体、期间和证据均正确。"
+        },
+        {
+          "fact_id": "F-MC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "source-0014支持当期已将光伏储能业务升级为战略级增长引擎；候选文本保留“未来，公司将……逐步实现”的计划口径，未把向能源综合服务商转型写成2025年已实现结果，期间限定已纠正。"
+        },
+        {
+          "fact_id": "F-MC-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "source-0014支持公司在湖北黄石投资建设该零碳智慧产业园项目；候选保留“将建设”设施及“旨在”形成闭环和商业模式的目标口径，未把设施建成或商业模式落地写成已完成经营结果。"
+        },
+        {
+          "fact_id": "F-SC-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0013",
+            "source-0006"
+          ],
+          "explanation": "当前覆盖动力电池、储能、消费电子、高端PCB有source-0013支持，新能源汽车动力电池与储能电池亦有产品用途叙述支持；AI服务器、人形机器人已按source-0013限定为未来切入供应链，未把产品用途或未来计划写成已进入下游。"
+        },
+        {
+          "fact_id": "F-SM-05",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0019"
+          ],
+          "explanation": "71,800吨、72,363吨、2,615吨及同比38.96%、35.75%、10.62%均对应source-0019铜箔产品行，单位为吨；事实及各指标主体均为business_segment，未继承合并集团口径，数量、单位和期间未改错。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 18426,
+      "output_tokens": 517,
+      "total_tokens": 24080
+    }
+  }
+]

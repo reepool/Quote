@@ -1,0 +1,926 @@
+[
+  {
+    "request_id": "bp-work-3e4fad3325085755d65b816e:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "cdc4fba26b26e9f48bca5a9a05e4247da7fc9403e4e0fb230e8405b224e4efd5",
+    "response_hash": "41d37f26ec15042281e101e225f656d38ca0f0cceaa0a8e13a10f5e1ea0816fd",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0072\",\"section-0073\",\"section-0074\",\"section-0075\",\"section-0076\",\"section-0365\",\"section-0366\",\"section-0367\",\"section-0369\",\"section-0370\",\"section-0371\"],\"rationale\":\"所选章节为合并利润表及分部/补充信息：section-0072至0076给出公司本期营业收入、营业支出、营业利润、利润总额与净利润的完整利润表口径，直接回答收入规模与盈利结构；section-0365至0370按业务分部列示营业收入、营业支出、营业利润、资产总额与负债总额，可解释主要业务板块的收入权重与经营规模；section-0371补充信息进一步支撑分部口径。这些均为公司层面实质经营与收入构成数据，优先于纯行业背景与治理类章节。\",\"deferred\":[\"公司业务/经营模式与产品服务介绍章节未在候选树中清晰出现，暂不扩读\",\"现金流量表及股东权益变动表细节，非收入构成核心，暂缓\",\"审计报告关键审计事项与治理、薪酬、关联交易制度类章节，与经营收入解释关联弱，暂缓\"],\"stop_reason\":\"已覆盖公司本期营业收入总额、利润表主要项目及分部收入与资产负债规模，足以解释业务结构、收入来源与主要业务权重；其余为财务附注细节或治理类内容，继续扩读边际价值低，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0072",
+        "section-0073",
+        "section-0074",
+        "section-0075",
+        "section-0076",
+        "section-0365",
+        "section-0366",
+        "section-0367",
+        "section-0369",
+        "section-0370",
+        "section-0371"
+      ],
+      "rationale": "所选章节为合并利润表及分部/补充信息：section-0072至0076给出公司本期营业收入、营业支出、营业利润、利润总额与净利润的完整利润表口径，直接回答收入规模与盈利结构；section-0365至0370按业务分部列示营业收入、营业支出、营业利润、资产总额与负债总额，可解释主要业务板块的收入权重与经营规模；section-0371补充信息进一步支撑分部口径。这些均为公司层面实质经营与收入构成数据，优先于纯行业背景与治理类章节。",
+      "deferred": [
+        "公司业务/经营模式与产品服务介绍章节未在候选树中清晰出现，暂不扩读",
+        "现金流量表及股东权益变动表细节，非收入构成核心，暂缓",
+        "审计报告关键审计事项与治理、薪酬、关联交易制度类章节，与经营收入解释关联弱，暂缓"
+      ],
+      "stop_reason": "已覆盖公司本期营业收入总额、利润表主要项目及分部收入与资产负债规模，足以解释业务结构、收入来源与主要业务权重；其余为财务附注细节或治理类内容，继续扩读边际价值低，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 6583,
+      "output_tokens": 312,
+      "total_tokens": 6895
+    }
+  },
+  {
+    "request_id": "bp-work-3e4fad3325085755d65b816e:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "3665423fc36ddea3fea923c83acea26000934756cf1b5528dfcbffff68f02517",
+    "response_hash": "f407a994ddbebc7aab884686fd6008fdbc301d1076057174a3a393f6993ee7e4",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司为中信证券股份有限公司，按业务分部划分为经纪业务、资产管理业务、证券投资业务、证券承销业务及其他五个分部。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0014\"]}],\"limitations\":[\"未获取公司业务/经营模式与产品服务介绍章节，业务层级与子公司结构说明有限。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F02\",\"text\":\"公司通过经纪业务手续费、投资银行业务手续费、资产管理业务手续费、利息净收入、投资收益等科目取得收入，反映证券经纪、投资银行、资产管理与自营投资等主要服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"经纪业务手续费净收入\",\"raw_value\":\"14,753,461,556.47\",\"value\":\"14753461556.47\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"投资银行业务手续费净收入\",\"raw_value\":\"6,336,351,703.46\",\"value\":\"6336351703.46\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"资产管理业务手续费净收入\",\"raw_value\":\"12,176,744,500.62\",\"value\":\"12176744500.62\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各产品/服务的具体用途与客户类型说明。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"公司营业收入主要来自手续费及佣金净收入、利息净收入、投资收益及其他净收入等，其中手续费及佣金净收入为最大收入来源。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"74,854,368,352.85\",\"value\":\"74854368352.85\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"手续费及佣金净收入\",\"raw_value\":\"34,847,738,217.01\",\"value\":\"34847738217.01\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"利息净收入\",\"raw_value\":\"1,630,420,350.77\",\"value\":\"1630420350.77\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"投资收益\",\"raw_value\":\"40,272,248,119.11\",\"value\":\"40272248119.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F04\",\"text\":\"公司营业支出为34,688,917,174.83元，其中业务及管理费33,114,094,162.21元，为最大支出项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"营业支出\",\"raw_value\":\"34,688,917,174.83\",\"value\":\"34688917174.83\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"业务及管理费\",\"raw_value\":\"33,114,094,162.21\",\"value\":\"33114094162.21\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各业务条线的定价与收费机制细节。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"按业务分部列示，证券投资业务营业收入27,605,377,070.99元，为各分部中最高；经纪业务营业收入20,787,402,940.51元，资产管理业务14,294,329,181.83元，证券承销业务6,055,217,321.40元，其他6,112,041,838.12元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"经纪业务营业收入\",\"raw_value\":\"20,787,402,940.51\",\"value\":\"20787402940.51\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"资产管理业务营业收入\",\"raw_value\":\"14,294,329,181.83\",\"value\":\"14294329181.83\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"证券投资业务营业收入\",\"raw_value\":\"27,605,377,070.99\",\"value\":\"27605377070.99\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"证券承销业务营业收入\",\"raw_value\":\"6,055,217,321.40\",\"value\":\"6055217321.40\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他分部营业收入\",\"raw_value\":\"6,112,041,838.12\",\"value\":\"6112041838.12\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F06\",\"text\":\"公司2025年度净利润31,006,679,490.28元，其中归属于母公司股东的净利润30,076,100,951.50元，少数股东损益930,578,538.78元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"净利润\",\"raw_value\":\"31,006,679,490.28\",\"value\":\"31006679490.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"30,076,100,951.50\",\"value\":\"30076100951.50\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"少数股东损益\",\"raw_value\":\"930,578,538.78\",\"value\":\"930578538.78\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分部表未提供各分部收入占比的明确百分比，需自行计算，故未列示占比。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F07\",\"text\":\"公司2025年度折旧和摊销费用2,174,373,430.79元，资本性支出1,494,547,333.62元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"折旧和摊销费用\",\"raw_value\":\"2,174,373,430.79\",\"value\":\"2174373430.79\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"资本性支出\",\"raw_value\":\"1,494,547,333.62\",\"value\":\"1494547333.62\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取公司具体经营资源、人员及技术投入等运营细节。\"]},\"customers_channels_markets\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"所选章节未披露客户类型、渠道及市场分布信息，未获取成功。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F08\",\"text\":\"公司营业利润40,165,451,178.02元，利润总额39,822,903,030.26元，所得税费用8,816,223,539.98元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\"],\"metrics\":[{\"name\":\"营业利润\",\"raw_value\":\"40,165,451,178.02\",\"value\":\"40165451178.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"利润总额\",\"raw_value\":\"39,822,903,030.26\",\"value\":\"39822903030.26\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"所得税费用\",\"raw_value\":\"8,816,223,539.98\",\"value\":\"8816223539.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取管理层对经营驱动因素的讨论与分析。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F09\",\"text\":\"公司于2026年1月29日完成2026年短期公司债券（第一期）发行，规模人民币100亿元，期限181天，票面利率1.67%；于2026年2月10日完成第二期发行。\",\"subject_scope\":\"issuer\",\"period\":\"2026年1-2月\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"短期公司债券（第一期）发行规模\",\"raw_value\":\"100亿元\",\"value\":\"100\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"issuer\",\"period\":\"2026年1月\",\"qualifier\":\"exact\"},{\"name\":\"短期公司债券（第一期）票面利率\",\"raw_value\":\"1.67%\",\"value\":\"1.67\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"issuer\",\"period\":\"2026年1月\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"第二期发行规模及利率未在所选章节中完整披露。\",\"资产负债表日后事项，非本期经营变化。\"]}},\"supply_chain\":null,\"company_features\":null,\"limitations\":[\"所选章节为合并利润表及分部信息，未包含公司业务模式、客户与渠道等定性描述。\",\"分部表未提供各分部收入占比的明确百分比。\",\"未获取公司具体经营资源与投入细节。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司为中信证券股份有限公司，按业务分部划分为经纪业务、资产管理业务、证券投资业务、证券承销业务及其他五个分部。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0014"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取公司业务/经营模式与产品服务介绍章节，业务层级与子公司结构说明有限。"
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F02",
+              "text": "公司通过经纪业务手续费、投资银行业务手续费、资产管理业务手续费、利息净收入、投资收益等科目取得收入，反映证券经纪、投资银行、资产管理与自营投资等主要服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "经纪业务手续费净收入",
+                  "raw_value": "14,753,461,556.47",
+                  "value": "14753461556.47",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资银行业务手续费净收入",
+                  "raw_value": "6,336,351,703.46",
+                  "value": "6336351703.46",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资产管理业务手续费净收入",
+                  "raw_value": "12,176,744,500.62",
+                  "value": "12176744500.62",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各产品/服务的具体用途与客户类型说明。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "公司营业收入主要来自手续费及佣金净收入、利息净收入、投资收益及其他净收入等，其中手续费及佣金净收入为最大收入来源。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "74,854,368,352.85",
+                  "value": "74854368352.85",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "手续费及佣金净收入",
+                  "raw_value": "34,847,738,217.01",
+                  "value": "34847738217.01",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利息净收入",
+                  "raw_value": "1,630,420,350.77",
+                  "value": "1630420350.77",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资收益",
+                  "raw_value": "40,272,248,119.11",
+                  "value": "40272248119.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "公司营业支出为34,688,917,174.83元，其中业务及管理费33,114,094,162.21元，为最大支出项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "营业支出",
+                  "raw_value": "34,688,917,174.83",
+                  "value": "34688917174.83",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "业务及管理费",
+                  "raw_value": "33,114,094,162.21",
+                  "value": "33114094162.21",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各业务条线的定价与收费机制细节。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F05",
+              "text": "按业务分部列示，证券投资业务营业收入27,605,377,070.99元，为各分部中最高；经纪业务营业收入20,787,402,940.51元，资产管理业务14,294,329,181.83元，证券承销业务6,055,217,321.40元，其他6,112,041,838.12元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "经纪业务营业收入",
+                  "raw_value": "20,787,402,940.51",
+                  "value": "20787402940.51",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资产管理业务营业收入",
+                  "raw_value": "14,294,329,181.83",
+                  "value": "14294329181.83",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "证券投资业务营业收入",
+                  "raw_value": "27,605,377,070.99",
+                  "value": "27605377070.99",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "证券承销业务营业收入",
+                  "raw_value": "6,055,217,321.40",
+                  "value": "6055217321.40",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他分部营业收入",
+                  "raw_value": "6,112,041,838.12",
+                  "value": "6112041838.12",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "公司2025年度净利润31,006,679,490.28元，其中归属于母公司股东的净利润30,076,100,951.50元，少数股东损益930,578,538.78元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "净利润",
+                  "raw_value": "31,006,679,490.28",
+                  "value": "31006679490.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的净利润",
+                  "raw_value": "30,076,100,951.50",
+                  "value": "30076100951.50",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "少数股东损益",
+                  "raw_value": "930,578,538.78",
+                  "value": "930578538.78",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分部表未提供各分部收入占比的明确百分比，需自行计算，故未列示占比。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F07",
+              "text": "公司2025年度折旧和摊销费用2,174,373,430.79元，资本性支出1,494,547,333.62元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "折旧和摊销费用",
+                  "raw_value": "2,174,373,430.79",
+                  "value": "2174373430.79",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资本性支出",
+                  "raw_value": "1,494,547,333.62",
+                  "value": "1494547333.62",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取公司具体经营资源、人员及技术投入等运营细节。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "所选章节未披露客户类型、渠道及市场分布信息，未获取成功。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F08",
+              "text": "公司营业利润40,165,451,178.02元，利润总额39,822,903,030.26元，所得税费用8,816,223,539.98元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业利润",
+                  "raw_value": "40,165,451,178.02",
+                  "value": "40165451178.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利润总额",
+                  "raw_value": "39,822,903,030.26",
+                  "value": "39822903030.26",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "所得税费用",
+                  "raw_value": "8,816,223,539.98",
+                  "value": "8816223539.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取管理层对经营驱动因素的讨论与分析。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F09",
+              "text": "公司于2026年1月29日完成2026年短期公司债券（第一期）发行，规模人民币100亿元，期限181天，票面利率1.67%；于2026年2月10日完成第二期发行。",
+              "subject_scope": "issuer",
+              "period": "2026年1-2月",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "短期公司债券（第一期）发行规模",
+                  "raw_value": "100亿元",
+                  "value": "100",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "issuer",
+                  "period": "2026年1月",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "短期公司债券（第一期）票面利率",
+                  "raw_value": "1.67%",
+                  "value": "1.67",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "issuer",
+                  "period": "2026年1月",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "第二期发行规模及利率未在所选章节中完整披露。",
+            "资产负债表日后事项，非本期经营变化。"
+          ]
+        }
+      },
+      "supply_chain": null,
+      "company_features": null,
+      "limitations": [
+        "所选章节为合并利润表及分部信息，未包含公司业务模式、客户与渠道等定性描述。",
+        "分部表未提供各分部收入占比的明确百分比。",
+        "未获取公司具体经营资源与投入细节。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 9606,
+      "output_tokens": 2517,
+      "total_tokens": 12123
+    }
+  },
+  {
+    "request_id": "bp-work-3e4fad3325085755d65b816e:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "92546ae2f8258576427b351f9c77ecc8cb8b21381878fcadf309c3310f2ae646",
+    "response_hash": "87c927f9c37026e0714f5f5b126464078c7fab102f775a50dd53b14698a3be99",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"RF01\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F03\",\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"explanation\":\"F03称手续费及佣金净收入为最大收入来源，与来源矛盾。合并利润表2025年度投资收益40,272,248,119.11元高于手续费及佣金净收入34,847,738,217.01元；分部附注其他净收入合计37,866,590,909.17元亦更高。其他净收入已包含投资收益的主要部分（剔除对联营及合营企业投资收益509,618,875.90元，并计入公允价值变动、汇兑等），不能与投资收益并列、相加作为独立主来源。利息净收入仅1,630,420,350.77元，亦不宜与上述大项并称为主要来源。各已列金额与2025年度本集团口径一致，应予保留；删除“最大收入来源”判断，并按来源原科目分开表述。若继续描述收入构成，公允价值变动收益为损失1,158,299,209.08元、汇兑收益为损失1,568,916,475.08元，须保留负号，不得当成收入。\"},{\"finding_id\":\"RF02\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0008\",\"source-0010\",\"source-0014\"],\"explanation\":\"草稿只列合并营业收入和利润表科目，未列来源已有的分部营业收入，不能说明主要业务构成；公司合计或单一科目不能替代该构成。按续表列头顺序（经纪业务、资产管理业务、证券投资业务、证券承销业务、其他、合计），2025年度营业收入分别为20,787,402,940.51元、14,294,329,181.83元、27,605,377,070.99元、6,055,217,321.40元、6,112,041,838.12元，合计74,854,368,352.85元，与合并营业收入一致。证券投资业务为最大分部，经纪、资产管理次之，证券承销与其他各约61亿元，均非可省略尾项。此前隔离F05所称经纪业务营业收入不在来源中，与source-0008不符。同期分部营业利润亦有支持：7,801,817,908.76元、6,108,244,642.24元、18,692,107,342.21元、2,214,645,456.27元、5,348,635,828.54元，合计40,165,451,178.02元，证券投资业务贡献最高。补充分部收入时须使用上述分部口径，不得与利润表“经纪业务手续费净收入”等科目互相替代。\"},{\"finding_id\":\"RF03\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F02\",\"evidence_ids\":[\"source-0001\",\"source-0014\"],\"explanation\":\"三项手续费净收入金额及合并集团、2025年度口径与合并利润表一致，可保留。但来源没有把利息净收入或投资收益界定为“自营投资”服务；分部名称是证券投资业务，不是自营投资。金额或科目名称不能建立二者等同。应删除“自营投资”这一未证实服务表述，改用来源原有科目或分部名称。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F06\",\"F08\",\"F09\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F03",
+          "evidence_ids": [
+            "source-0001",
+            "source-0008"
+          ],
+          "explanation": "F03称手续费及佣金净收入为最大收入来源，与来源矛盾。合并利润表2025年度投资收益40,272,248,119.11元高于手续费及佣金净收入34,847,738,217.01元；分部附注其他净收入合计37,866,590,909.17元亦更高。其他净收入已包含投资收益的主要部分（剔除对联营及合营企业投资收益509,618,875.90元，并计入公允价值变动、汇兑等），不能与投资收益并列、相加作为独立主来源。利息净收入仅1,630,420,350.77元，亦不宜与上述大项并称为主要来源。各已列金额与2025年度本集团口径一致，应予保留；删除“最大收入来源”判断，并按来源原科目分开表述。若继续描述收入构成，公允价值变动收益为损失1,158,299,209.08元、汇兑收益为损失1,568,916,475.08元，须保留负号，不得当成收入。"
+        },
+        {
+          "finding_id": "RF02",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0008",
+            "source-0010",
+            "source-0014"
+          ],
+          "explanation": "草稿只列合并营业收入和利润表科目，未列来源已有的分部营业收入，不能说明主要业务构成；公司合计或单一科目不能替代该构成。按续表列头顺序（经纪业务、资产管理业务、证券投资业务、证券承销业务、其他、合计），2025年度营业收入分别为20,787,402,940.51元、14,294,329,181.83元、27,605,377,070.99元、6,055,217,321.40元、6,112,041,838.12元，合计74,854,368,352.85元，与合并营业收入一致。证券投资业务为最大分部，经纪、资产管理次之，证券承销与其他各约61亿元，均非可省略尾项。此前隔离F05所称经纪业务营业收入不在来源中，与source-0008不符。同期分部营业利润亦有支持：7,801,817,908.76元、6,108,244,642.24元、18,692,107,342.21元、2,214,645,456.27元、5,348,635,828.54元，合计40,165,451,178.02元，证券投资业务贡献最高。补充分部收入时须使用上述分部口径，不得与利润表“经纪业务手续费净收入”等科目互相替代。"
+        },
+        {
+          "finding_id": "RF03",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F02",
+          "evidence_ids": [
+            "source-0001",
+            "source-0014"
+          ],
+          "explanation": "三项手续费净收入金额及合并集团、2025年度口径与合并利润表一致，可保留。但来源没有把利息净收入或投资收益界定为“自营投资”服务；分部名称是证券投资业务，不是自营投资。金额或科目名称不能建立二者等同。应删除“自营投资”这一未证实服务表述，改用来源原有科目或分部名称。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F06",
+        "F08",
+        "F09"
+      ]
+    },
+    "usage": {
+      "input_tokens": 9706,
+      "output_tokens": 863,
+      "total_tokens": 28880
+    }
+  },
+  {
+    "request_id": "bp-work-3e4fad3325085755d65b816e:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "cbab9cedc425c52829d5bdaaf99b833a057873184dcabcd2fd124209b9e33e41",
+    "response_hash": "80603af1ff8e6318e905c77fc0eaf834ecd3917512a02939520f9a48befa0ad4",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F03\",\"text\":\"公司营业收入主要来自手续费及佣金净收入、利息净收入、投资收益及其他净收入等科目；按合并利润表，2025年度手续费及佣金净收入34,847,738,217.01元、利息净收入1,630,420,350.77元、投资收益40,272,248,119.11元，公允价值变动收益为损失1,158,299,209.08元、汇兑收益为损失1,568,916,475.08元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"74,854,368,352.85\",\"value\":\"74854368352.85\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"手续费及佣金净收入\",\"raw_value\":\"34,847,738,217.01\",\"value\":\"34847738217.01\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"利息净收入\",\"raw_value\":\"1,630,420,350.77\",\"value\":\"1630420350.77\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资收益\",\"raw_value\":\"40,272,248,119.11\",\"value\":\"40272248119.11\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"公允价值变动收益（损失以负号列示）\",\"raw_value\":\"(1,158,299,209.08)\",\"value\":\"-1158299209.08\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"汇兑收益（损失以负号列示）\",\"raw_value\":\"(1,568,916,475.08)\",\"value\":\"-1568916475.08\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:RF02\",\"text\":\"按分部口径，2025年度营业收入为：经纪业务20,787,402,940.51元、资产管理业务14,294,329,181.83元、证券投资业务27,605,377,070.99元、证券承销业务6,055,217,321.40元、其他6,112,041,838.12元，合计74,854,368,352.85元，与合并营业收入一致；证券投资业务为最大分部。同期分部营业利润为：经纪业务7,801,817,908.76元、资产管理业务6,108,244,642.24元、证券投资业务18,692,107,342.21元、证券承销业务2,214,645,456.27元、其他5,348,635,828.54元，合计40,165,451,178.02元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0010\",\"source-0014\"],\"metrics\":[{\"name\":\"分部营业收入—经纪业务\",\"raw_value\":\"20,787,402,940.51\",\"value\":\"20787402940.51\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业收入—资产管理业务\",\"raw_value\":\"14,294,329,181.83\",\"value\":\"14294329181.83\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业收入—证券投资业务\",\"raw_value\":\"27,605,377,070.99\",\"value\":\"27605377070.99\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业收入—证券承销业务\",\"raw_value\":\"6,055,217,321.40\",\"value\":\"6055217321.40\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业收入—其他\",\"raw_value\":\"6,112,041,838.12\",\"value\":\"6112041838.12\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业收入—合计\",\"raw_value\":\"74,854,368,352.85\",\"value\":\"74854368352.85\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业利润—经纪业务\",\"raw_value\":\"7,801,817,908.76\",\"value\":\"7801817908.76\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业利润—资产管理业务\",\"raw_value\":\"6,108,244,642.24\",\"value\":\"6108244642.24\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业利润—证券投资业务\",\"raw_value\":\"18,692,107,342.21\",\"value\":\"18692107342.21\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业利润—证券承销业务\",\"raw_value\":\"2,214,645,456.27\",\"value\":\"2214645456.27\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业利润—其他\",\"raw_value\":\"5,348,635,828.54\",\"value\":\"5348635828.54\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分部营业利润—合计\",\"raw_value\":\"40,165,451,178.02\",\"value\":\"40165451178.02\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F02\",\"text\":\"公司通过经纪业务手续费、投资银行业务手续费、资产管理业务手续费、利息净收入、投资收益等科目取得收入，反映证券经纪、投资银行、资产管理及证券投资等业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0014\"],\"metrics\":[{\"name\":\"经纪业务手续费净收入\",\"raw_value\":\"14,753,461,556.47\",\"value\":\"14753461556.47\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资银行业务手续费净收入\",\"raw_value\":\"6,336,351,703.46\",\"value\":\"6336351703.46\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"资产管理业务手续费净收入\",\"raw_value\":\"12,176,744,500.62\",\"value\":\"12176744500.62\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F03",
+          "text": "公司营业收入主要来自手续费及佣金净收入、利息净收入、投资收益及其他净收入等科目；按合并利润表，2025年度手续费及佣金净收入34,847,738,217.01元、利息净收入1,630,420,350.77元、投资收益40,272,248,119.11元，公允价值变动收益为损失1,158,299,209.08元、汇兑收益为损失1,568,916,475.08元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "74,854,368,352.85",
+              "value": "74854368352.85",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手续费及佣金净收入",
+              "raw_value": "34,847,738,217.01",
+              "value": "34847738217.01",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利息净收入",
+              "raw_value": "1,630,420,350.77",
+              "value": "1630420350.77",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益",
+              "raw_value": "40,272,248,119.11",
+              "value": "40272248119.11",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "公允价值变动收益（损失以负号列示）",
+              "raw_value": "(1,158,299,209.08)",
+              "value": "-1158299209.08",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "汇兑收益（损失以负号列示）",
+              "raw_value": "(1,568,916,475.08)",
+              "value": "-1568916475.08",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:RF02",
+          "text": "按分部口径，2025年度营业收入为：经纪业务20,787,402,940.51元、资产管理业务14,294,329,181.83元、证券投资业务27,605,377,070.99元、证券承销业务6,055,217,321.40元、其他6,112,041,838.12元，合计74,854,368,352.85元，与合并营业收入一致；证券投资业务为最大分部。同期分部营业利润为：经纪业务7,801,817,908.76元、资产管理业务6,108,244,642.24元、证券投资业务18,692,107,342.21元、证券承销业务2,214,645,456.27元、其他5,348,635,828.54元，合计40,165,451,178.02元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008",
+            "source-0010",
+            "source-0014"
+          ],
+          "metrics": [
+            {
+              "name": "分部营业收入—经纪业务",
+              "raw_value": "20,787,402,940.51",
+              "value": "20787402940.51",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业收入—资产管理业务",
+              "raw_value": "14,294,329,181.83",
+              "value": "14294329181.83",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业收入—证券投资业务",
+              "raw_value": "27,605,377,070.99",
+              "value": "27605377070.99",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业收入—证券承销业务",
+              "raw_value": "6,055,217,321.40",
+              "value": "6055217321.40",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业收入—其他",
+              "raw_value": "6,112,041,838.12",
+              "value": "6112041838.12",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业收入—合计",
+              "raw_value": "74,854,368,352.85",
+              "value": "74854368352.85",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业利润—经纪业务",
+              "raw_value": "7,801,817,908.76",
+              "value": "7801817908.76",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业利润—资产管理业务",
+              "raw_value": "6,108,244,642.24",
+              "value": "6108244642.24",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业利润—证券投资业务",
+              "raw_value": "18,692,107,342.21",
+              "value": "18692107342.21",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业利润—证券承销业务",
+              "raw_value": "2,214,645,456.27",
+              "value": "2214645456.27",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业利润—其他",
+              "raw_value": "5,348,635,828.54",
+              "value": "5348635828.54",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分部营业利润—合计",
+              "raw_value": "40,165,451,178.02",
+              "value": "40165451178.02",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F02",
+          "text": "公司通过经纪业务手续费、投资银行业务手续费、资产管理业务手续费、利息净收入、投资收益等科目取得收入，反映证券经纪、投资银行、资产管理及证券投资等业务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0014"
+          ],
+          "metrics": [
+            {
+              "name": "经纪业务手续费净收入",
+              "raw_value": "14,753,461,556.47",
+              "value": "14753461556.47",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资银行业务手续费净收入",
+              "raw_value": "6,336,351,703.46",
+              "value": "6336351703.46",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产管理业务手续费净收入",
+              "raw_value": "12,176,744,500.62",
+              "value": "12176744500.62",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 6815,
+      "output_tokens": 2181,
+      "total_tokens": 8996
+    }
+  },
+  {
+    "request_id": "bp-work-3e4fad3325085755d65b816e:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "34d7bdd5de621425dedd2f5914c3c2933a93793e987b4fd1d4dd9578f7287d9b",
+    "response_hash": "381aba29a0a54fe2198c504459371201ed28a3a71a543b4c8f3474193392a9aa",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F02\"],\"checks\":[{\"fact_id\":\"F02\",\"accepted\":false,\"evidence_ids\":[\"source-0001\",\"source-0014\"],\"explanation\":\"三项手续费净收入的金额、2025年度及本集团合并口径与source-0001一致，候选亦已删除“自营投资”。但正文仍称通过利息净收入、投资收益等科目取得的收入反映证券投资等业务。source-0001只列示利润表科目，并未将利息净收入或投资收益界定为证券投资服务；source-0014的分部原名是经纪业务、资产管理业务、证券投资业务、证券承销业务及其他。科目名称或金额不能建立二者等同，候选仍保留该未证实映射，且“证券经纪”并非来源科目或分部原名，故未实质解决问题。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F02",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0001",
+            "source-0014"
+          ],
+          "explanation": "三项手续费净收入的金额、2025年度及本集团合并口径与source-0001一致，候选亦已删除“自营投资”。但正文仍称通过利息净收入、投资收益等科目取得的收入反映证券投资等业务。source-0001只列示利润表科目，并未将利息净收入或投资收益界定为证券投资服务；source-0014的分部原名是经纪业务、资产管理业务、证券投资业务、证券承销业务及其他。科目名称或金额不能建立二者等同，候选仍保留该未证实映射，且“证券经纪”并非来源科目或分部原名，故未实质解决问题。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 6772,
+      "output_tokens": 187,
+      "total_tokens": 18477
+    }
+  }
+]

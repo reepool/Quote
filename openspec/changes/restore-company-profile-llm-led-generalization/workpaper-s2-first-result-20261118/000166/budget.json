@@ -1,0 +1,46 @@
+{
+  "physical_requests": 1,
+  "charged_tokens": 19801,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": null,
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "eacc800fe346432ba3d4dc1546d8df80",
+      "logical_request_id": "1fc6aaaa613b7980a0e66828b1424fc0c0327e3ad842f0eefd9f2913e40068e9",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 71039,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 19801,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 19403,
+        "output_tokens": 398,
+        "total_tokens": 19801
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 400,
+        "content_fragments": 398,
+        "content_chars": 829,
+        "content_sha256": "6fabd66d234d094aa32d23c967a292e1388fb4a8194f6a07e763968da88d128c",
+        "reasoning_present": false,
+        "reasoning_chars": 0,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    }
+  ]
+}

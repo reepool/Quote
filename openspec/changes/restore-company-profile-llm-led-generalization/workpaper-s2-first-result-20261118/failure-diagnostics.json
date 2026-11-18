@@ -1,0 +1,85 @@
+{
+  "new_model_requests": 0,
+  "original_failure_changed": false,
+  "json_cases": [
+    {
+      "code": "000025",
+      "saved_attempts": [
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000025/failed-model-content/content-002.json",
+          "sha256": "a47708d750161e898b1ee93ecc5119f1af037fa8a632bfb55d8afd21d2a3f710",
+          "length": 17349,
+          "error_position": 17349,
+          "message": "Expecting ',' delimiter: line 1 column 17350 (char 17349)",
+          "diagnostic_only_appending_one_brace_parses": true,
+          "diagnostic_keys": [
+            "schema_version",
+            "elements"
+          ],
+          "accepted_or_repaired": false
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000025/failed-model-content/content-003.json",
+          "sha256": "a47708d750161e898b1ee93ecc5119f1af037fa8a632bfb55d8afd21d2a3f710",
+          "length": 17349,
+          "error_position": 17349,
+          "message": "Expecting ',' delimiter: line 1 column 17350 (char 17349)",
+          "diagnostic_only_appending_one_brace_parses": true,
+          "diagnostic_keys": [
+            "schema_version",
+            "elements"
+          ],
+          "accepted_or_repaired": false
+        }
+      ],
+      "same_content_after_recovery": true,
+      "finish_reason": "stop",
+      "schema_and_semantic_recovery": "not_proven"
+    },
+    {
+      "code": "000001",
+      "saved_attempts": [
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000001/failed-model-content/content-002.json",
+          "sha256": "2ad115b2ac7aaa4979798a2501fc86d43182e5d80d6818776e77ffd5a6b5a8c8",
+          "length": 23014,
+          "error_position": 23014,
+          "message": "Expecting ',' delimiter: line 1 column 23015 (char 23014)",
+          "diagnostic_only_appending_one_brace_parses": true,
+          "diagnostic_keys": [
+            "schema_version",
+            "elements",
+            "supply_chain"
+          ],
+          "accepted_or_repaired": false
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/000001/failed-model-content/content-003.json",
+          "sha256": "2ad115b2ac7aaa4979798a2501fc86d43182e5d80d6818776e77ffd5a6b5a8c8",
+          "length": 23014,
+          "error_position": 23014,
+          "message": "Expecting ',' delimiter: line 1 column 23015 (char 23014)",
+          "diagnostic_only_appending_one_brace_parses": true,
+          "diagnostic_keys": [
+            "schema_version",
+            "elements",
+            "supply_chain"
+          ],
+          "accepted_or_repaired": false
+        }
+      ],
+      "same_content_after_recovery": true,
+      "finish_reason": "stop",
+      "schema_and_semantic_recovery": "not_proven"
+    }
+  ],
+  "native_layout_case": {
+    "code": "000166.SZ",
+    "physical_page": 29,
+    "native_text_characters": 886,
+    "native_text_sha256": "58fba86903458fde6480b347efae5c0e686a341d578dc9ca56d85f6cdeeeecaa",
+    "text_topic": "主要奖项及荣誉",
+    "saved_error": "ValueError: selected page has unreadable native layout: 29",
+    "diagnosis": "原生文本存在但固定宽度layout拒绝，整包未到抽取；未在本轮降级或热修。"
+  }
+}

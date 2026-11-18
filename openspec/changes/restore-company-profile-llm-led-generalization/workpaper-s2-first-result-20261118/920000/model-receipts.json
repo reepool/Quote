@@ -1,0 +1,1105 @@
+[
+  {
+    "request_id": "bp-work-045a9581ec49fc09070faa5d:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "8c33e0d6f887fbcbb87ecb9de2163b98a33c8a3c02f69845c6d1f9653d9a681a",
+    "response_hash": "85583b9e6c9aeed617ac8db834074c15f58816204dac79ee1f166816b70281eb",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0026\",\"section-0027\",\"section-0044\",\"section-0059\",\"section-0805\",\"section-0896\",\"section-0028\",\"section-0030\"],\"rationale\":\"优先选取能完整解释公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0026业务概要说明公司做什么与经营模式；section-0027经营情况回顾（含经营计划与主要工作）覆盖本期经营变化与主要工作；section-0044财务分析及section-0059营业情况分析提供收入、成本与利润驱动；section-0805营业收入和营业成本附注给出分产品/分地区收入构成与主要业务权重，是货币化与收入结构的关键；section-0896母公司营业收入和营业成本补充母公司口径收入构成。未选行业背景与未来展望，因其对公司层面解释力次于经营与收入实质内容。\",\"stop_reason\":\"已覆盖业务概要、经营回顾、财务与营业分析、收入成本附注等核心经营与货币化信息，足以回答产品用途、经营方式、收入来源与主要业务权重；行业背景、治理、股东与会计政策等非经营核心不再扩读。\",\"deferred\":[\"section-0034行业情况及section-0123行业发展趋势：属行业背景，非公司层面经营实质，暂不选\",\"section-0135风险因素：仅作补充，非收入与经营结构核心\",\"section-0379财务会计报告其余附注：仅按需定向补充，不整体扩读\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0026",
+        "section-0027",
+        "section-0044",
+        "section-0059",
+        "section-0805",
+        "section-0896",
+        "section-0028",
+        "section-0030"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式与收入构成的实质子节：section-0026业务概要说明公司做什么与经营模式；section-0027经营情况回顾（含经营计划与主要工作）覆盖本期经营变化与主要工作；section-0044财务分析及section-0059营业情况分析提供收入、成本与利润驱动；section-0805营业收入和营业成本附注给出分产品/分地区收入构成与主要业务权重，是货币化与收入结构的关键；section-0896母公司营业收入和营业成本补充母公司口径收入构成。未选行业背景与未来展望，因其对公司层面解释力次于经营与收入实质内容。",
+      "stop_reason": "已覆盖业务概要、经营回顾、财务与营业分析、收入成本附注等核心经营与货币化信息，足以回答产品用途、经营方式、收入来源与主要业务权重；行业背景、治理、股东与会计政策等非经营核心不再扩读。",
+      "deferred": [
+        "section-0034行业情况及section-0123行业发展趋势：属行业背景，非公司层面经营实质，暂不选",
+        "section-0135风险因素：仅作补充，非收入与经营结构核心",
+        "section-0379财务会计报告其余附注：仅按需定向补充，不整体扩读"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19040,
+      "output_tokens": 331,
+      "total_tokens": 19371
+    }
+  },
+  {
+    "request_id": "bp-work-045a9581ec49fc09070faa5d:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "ed06dff164e9729ec1da3a38ead2e880f68608870c8307eaa822d1de8ab1493a",
+    "response_hash": "433316b112418589538608421336a84bbaf949187bdd1ae1e20ea3f47e8df5d1",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司属于汽车制造业下的汽车零部件及配件制造分类，是汽车滤清器研发与制造企业，为国家级专精特新“小巨人”企业、高新技术企业，设有省认定企业技术中心。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司实施纵向一体化战略，实现无纺布过滤材料与汽车滤清器产品协同的产业链发展模式，并具备多品种、小批量的柔性化生产能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"截至报告期末，公司业务与产品以及商业模式未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"公司主营汽车滤清器及过滤材料的研发、生产和销售，产品涵盖空气滤清器、空调滤清器、机油滤清器和燃油滤清器四大系列9,000多个品种，广泛适用于各类乘用车、商用车和工程机械。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"产品品种数量\",\"raw_value\":\"9,000 多个品种\",\"value\":\"9000\",\"unit\":\"个\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-PS-02\",\"text\":\"公司产品按用途分别应用于汽车进气、润滑、供油及空调系统；纯电动汽车不再需要燃油、空气滤清器，机油滤清器更换频率降低，但空调滤清器需求更为高端，部分车型新增电池冷却剂过滤器、热管理颗粒过滤器。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"公司稳步实施横向拓展战略，积极开拓工程机械、摩托车、农用机械等非道路移动机械应用场景，丰富产品应用场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未获取各产品具体型号、规格及对应客户明细。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司取得收入主要形式为产品销售；境内IAM市场以分销模式为主，境外IAM市场以直销为主，境内OEM、OES市场以直销为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"公司收入按确认时间分类全部为在某一时点确认收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"在某一时点确认收入\",\"raw_value\":\"427,619,121.47\",\"value\":\"427619121.47\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务所对应收入金额为7,229.69万元，预计将于2026年度确认收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"尚未履行履约义务对应收入\",\"raw_value\":\"7,229.69\",\"value\":\"7229.69\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"报告期内公司实现营业收入42,761.91万元，同比下降9.80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"42,761.91\",\"value\":\"42761.91\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"营业收入同比变动\",\"raw_value\":\"-9.80%\",\"value\":\"-9.80\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"公司主营业务收入385,924,337.30元，其他业务收入41,694,784.17元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0010\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"385,924,337.30\",\"value\":\"385924337.30\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"其他业务收入\",\"raw_value\":\"41,694,784.17\",\"value\":\"41694784.17\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"按产品分类，空气滤清器营业收入116,077,437.48元，毛利率28.75%；机油滤清器营业收入113,008,559.53元，毛利率25.86%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0010\"],\"metrics\":[{\"name\":\"空气滤清器营业收入\",\"raw_value\":\"116,077,437.48\",\"value\":\"116077437.48\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"空气滤清器毛利率\",\"raw_value\":\"28.75%\",\"value\":\"28.75\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"机油滤清器营业收入\",\"raw_value\":\"113,008,559.53\",\"value\":\"113008559.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"机油滤清器毛利率\",\"raw_value\":\"25.86%\",\"value\":\"25.86\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"按产品分类，燃油滤清器营业收入80,551,563.03元，毛利率30.10%；空调滤清器营业收入75,974,471.98元，毛利率28.47%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0010\"],\"metrics\":[{\"name\":\"燃油滤清器营业收入\",\"raw_value\":\"80,551,563.03\",\"value\":\"80551563.03\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"燃油滤清器毛利率\",\"raw_value\":\"30.10%\",\"value\":\"30.10\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"空调滤清器营业收入\",\"raw_value\":\"75,974,471.98\",\"value\":\"75974471.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"空调滤清器毛利率\",\"raw_value\":\"28.47%\",\"value\":\"28.47\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-05\",\"text\":\"按产品分类，空调压缩机营业收入312,305.28元，毛利率-317.47%，收入同比下降71.51%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0010\"],\"metrics\":[{\"name\":\"空调压缩机营业收入\",\"raw_value\":\"312,305.28\",\"value\":\"312305.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"空调压缩机毛利率\",\"raw_value\":\"-317.47%\",\"value\":\"-317.47\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"空调压缩机营业收入同比变动\",\"raw_value\":\"-71.51%\",\"value\":\"-71.51\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-SM-06\",\"text\":\"按区域分类，境内营业收入202,399,837.47元，毛利率19.03%；境外营业收入225,219,284.00元，毛利率34.39%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0010\"],\"metrics\":[{\"name\":\"境内营业收入\",\"raw_value\":\"202,399,837.47\",\"value\":\"202399837.47\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"境内毛利率\",\"raw_value\":\"19.03%\",\"value\":\"19.03\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"境外营业收入\",\"raw_value\":\"225,219,284.00\",\"value\":\"225219284.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"境外毛利率\",\"raw_value\":\"34.39%\",\"value\":\"34.39\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-07\",\"text\":\"报告期内公司归属于上市公司股东的净利润6,612.97万元，同比增长2.57%；扣除非经常性损益的净利润6,219.34万元，同比增长1.74%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"6,612.97\",\"value\":\"6612.97\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"归属于上市公司股东的净利润同比变动\",\"raw_value\":\"2.57%\",\"value\":\"2.57\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"2024年度\"},{\"name\":\"扣除非经常性损益的净利润\",\"raw_value\":\"6,219.34\",\"value\":\"6219.34\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"扣除非经常性损益的净利润同比变动\",\"raw_value\":\"1.74%\",\"value\":\"1.74\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"2024年度\"}]}],\"limitations\":[\"母公司口径收入构成（主营业务369,045,680.80元等）与合并口径不同，未在正文中混用。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司通过ISO9001、IATF16949国际质量管理体系认证，ISO14001环境管理体系认证，ISO45001职业健康安全管理体系认证，ISO50001能源管理体系认证及AEO高级海关认证，具备较强的生产流程及综合成本管控能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"公司累计持有各类有效专利共计139项，参与制定滤清器行业国家标准3项、行业标准21项。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"有效专利数量\",\"raw_value\":\"139\",\"value\":\"139\",\"unit\":\"项\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"参与制定国家标准数量\",\"raw_value\":\"3\",\"value\":\"3\",\"unit\":\"项\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"参与制定行业标准数量\",\"raw_value\":\"21\",\"value\":\"21\",\"unit\":\"项\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"报告期内公司研发费用合计1,503.36万元；新增发明专利1项、实用新型专利4项，牵头制定行业标准1项，参与制定国家标准1项、行业标准4项；全年累计完成新产品开发497款。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"研发费用\",\"raw_value\":\"1,503.36\",\"value\":\"1503.36\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"新增发明专利\",\"raw_value\":\"1\",\"value\":\"1\",\"unit\":\"项\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"新增实用新型专利\",\"raw_value\":\"4\",\"value\":\"4\",\"unit\":\"项\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"新产品开发数量\",\"raw_value\":\"497\",\"value\":\"497\",\"unit\":\"款\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"报告期内公司新建年产4500万只高端滤清器项目，根据合同约定收取相应履约保证金250万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"年产4500万只高端滤清器项目履约保证金\",\"raw_value\":\"250\",\"value\":\"250\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取主要原材料具体采购金额及来源明细；供应商表仅列示采购金额前五名。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"公司产品在境内外IAM市场、境内OES市场、境内OEM市场成功打开销路；境内IAM以分销为主，境外IAM以直销为主，境内OEM、OES以直销为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"境外IAM市场方面，公司先后在中东、欧洲、西亚、东北亚、东南亚、非洲、南美等多个重点区域开拓优质合作客户十余家。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-CC-03\",\"text\":\"报告期内前五名客户合计销售金额178,471,662.25元，年度销售占比41.74%；其中Wesfil Australia PTY Ltd.销售56,793,009.91元，占比13.28%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"178,471,662.25\",\"value\":\"178471662.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名客户合计销售占比\",\"raw_value\":\"41.74%\",\"value\":\"41.74\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"Wesfil Australia PTY Ltd.销售金额\",\"raw_value\":\"56,793,009.91\",\"value\":\"56793009.91\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"Wesfil Australia PTY Ltd.销售占比\",\"raw_value\":\"13.28%\",\"value\":\"13.28\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-CC-04\",\"text\":\"报告期内前五名供应商合计采购金额49,777,024.25元，年度采购占比21.80%；其中安徽同丰橡塑工业有限公司采购11,705,102.29元，占比5.13%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"49,777,024.25\",\"value\":\"49777024.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商合计采购占比\",\"raw_value\":\"21.80%\",\"value\":\"21.80\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取客户与公司具体产品对应关系及分渠道收入金额。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"报告期内行业外部环境复杂严峻，全球国际贸易格局波动加剧，叠加国内汽车配件行业同质化竞争持续升温，内外市场承压明显；公司营业收入小幅回落，但凭借经营管控与成本管控，盈利指标实现平稳增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"]},{\"fact_id\":\"F-OD-02\",\"text\":\"报告期内空调压缩机收入同比下降71.51%，主要系该项目2024年开发的某客户其下游终端车企整车销量下滑并进行了重组，本期不再与该客户合作。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F-OD-03\",\"text\":\"报告期内财务费用较上年同期减少808.22万元，同比下降560.18%，主要系本期汇兑收益增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"财务费用同比变动\",\"raw_value\":\"-560.18%\",\"value\":\"-560.18\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-OD-04\",\"text\":\"报告期内资产减值损失较上年同期增加208.14万元，同比增长58.32%，主要系本期长库龄存货增加导致计提存货跌价准备增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"资产减值损失同比变动\",\"raw_value\":\"58.32%\",\"value\":\"58.32\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"2024年度\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司业务与产品以及商业模式未发生重大变化；核心竞争力变化情况为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内公司营业收入同比下降9.80%，归属于上市公司股东的净利润同比增长2.57%，总资产较报告期初增长6.35%，归属于上市公司股东净资产较报告期初增长9.01%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"总资产较期初增长\",\"raw_value\":\"6.35%\",\"value\":\"6.35\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":\"2024年末\"},{\"name\":\"归属于上市公司股东净资产较期初增长\",\"raw_value\":\"9.01%\",\"value\":\"9.01\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":\"2024年末\"}]},{\"fact_id\":\"F-MC-03\",\"text\":\"报告期内公司新建年产4500万只高端滤清器项目，并按合同约定收取履约保证金250万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[\"未获取该新建项目投资总额、建设进度及预计投产时间。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司为汽车滤清器研发与制造企业，主营业务为汽车滤清器及过滤材料的研发、生产和销售，并通过纵向一体化实现无纺布过滤材料与滤清器产品协同的产业链模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"报告期内前五名供应商包括安徽同丰橡塑工业有限公司、山东非尔德过滤科技有限公司、广州禾越环保包装有限公司、安徽省粤隆印刷科技有限公司、上海居方实业有限公司，合计采购金额49,777,024.25元，占年度采购21.80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"49,777,024.25\",\"value\":\"49777024.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商合计采购占比\",\"raw_value\":\"21.80%\",\"value\":\"21.80\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取各供应商所供具体原材料品类及金额明细。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-03\",\"text\":\"公司产品广泛适用于各类乘用车、商用车和工程机械，并积极开拓工程机械、摩托车、农用机械等非道路移动机械应用场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"F-SC-04\",\"text\":\"报告期内前五名客户合计销售金额178,471,662.25元，占年度销售41.74%，客户包括Wesfil Australia PTY Ltd.、Ferdinand Bilstein Group、索特传动设备有限公司、上海滨道滤清器有限公司及TRICO GROUP ACQUIRES FRAM AND AUTOLITE。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"178,471,662.25\",\"value\":\"178471662.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名客户合计销售占比\",\"raw_value\":\"41.74%\",\"value\":\"41.74\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取各客户所购具体产品品类及对应收入金额。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司为国家级专精特新“小巨人”企业、高新技术企业，设有安徽省省级技术中心，技术带头人现任中国汽标委滤清器行业标委会委员等职务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司依托多年积累形成的“一站式”供货能力以及市场快速响应能力，与一批优质客户结成了稳定合作关系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"limitations\":[\"未获取分渠道（IAM/OEM/OES）收入金额及占比明细。\",\"未获取主要原材料采购品类及金额明细。\",\"母公司口径收入构成与合并口径存在差异，本工作底稿以合并口径为主。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司属于汽车制造业下的汽车零部件及配件制造分类，是汽车滤清器研发与制造企业，为国家级专精特新“小巨人”企业、高新技术企业，设有省认定企业技术中心。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "公司实施纵向一体化战略，实现无纺布过滤材料与汽车滤清器产品协同的产业链发展模式，并具备多品种、小批量的柔性化生产能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-03",
+              "text": "截至报告期末，公司业务与产品以及商业模式未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "公司主营汽车滤清器及过滤材料的研发、生产和销售，产品涵盖空气滤清器、空调滤清器、机油滤清器和燃油滤清器四大系列9,000多个品种，广泛适用于各类乘用车、商用车和工程机械。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "产品品种数量",
+                  "raw_value": "9,000 多个品种",
+                  "value": "9000",
+                  "unit": "个",
+                  "qualifier": "greater_than",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "公司产品按用途分别应用于汽车进气、润滑、供油及空调系统；纯电动汽车不再需要燃油、空气滤清器，机油滤清器更换频率降低，但空调滤清器需求更为高端，部分车型新增电池冷却剂过滤器、热管理颗粒过滤器。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "公司稳步实施横向拓展战略，积极开拓工程机械、摩托车、农用机械等非道路移动机械应用场景，丰富产品应用场景。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各产品具体型号、规格及对应客户明细。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司取得收入主要形式为产品销售；境内IAM市场以分销模式为主，境外IAM市场以直销为主，境内OEM、OES市场以直销为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "公司收入按确认时间分类全部为在某一时点确认收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "在某一时点确认收入",
+                  "raw_value": "427,619,121.47",
+                  "value": "427619121.47",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务所对应收入金额为7,229.69万元，预计将于2026年度确认收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "尚未履行履约义务对应收入",
+                  "raw_value": "7,229.69",
+                  "value": "7229.69",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "报告期内公司实现营业收入42,761.91万元，同比下降9.80%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "42,761.91",
+                  "value": "42761.91",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "营业收入同比变动",
+                  "raw_value": "-9.80%",
+                  "value": "-9.80",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "2024年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "公司主营业务收入385,924,337.30元，其他业务收入41,694,784.17元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入",
+                  "raw_value": "385,924,337.30",
+                  "value": "385924337.30",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他业务收入",
+                  "raw_value": "41,694,784.17",
+                  "value": "41694784.17",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "按产品分类，空气滤清器营业收入116,077,437.48元，毛利率28.75%；机油滤清器营业收入113,008,559.53元，毛利率25.86%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "空气滤清器营业收入",
+                  "raw_value": "116,077,437.48",
+                  "value": "116077437.48",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "空气滤清器毛利率",
+                  "raw_value": "28.75%",
+                  "value": "28.75",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "机油滤清器营业收入",
+                  "raw_value": "113,008,559.53",
+                  "value": "113008559.53",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "机油滤清器毛利率",
+                  "raw_value": "25.86%",
+                  "value": "25.86",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "按产品分类，燃油滤清器营业收入80,551,563.03元，毛利率30.10%；空调滤清器营业收入75,974,471.98元，毛利率28.47%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "燃油滤清器营业收入",
+                  "raw_value": "80,551,563.03",
+                  "value": "80551563.03",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "燃油滤清器毛利率",
+                  "raw_value": "30.10%",
+                  "value": "30.10",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "空调滤清器营业收入",
+                  "raw_value": "75,974,471.98",
+                  "value": "75974471.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "空调滤清器毛利率",
+                  "raw_value": "28.47%",
+                  "value": "28.47",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-05",
+              "text": "按产品分类，空调压缩机营业收入312,305.28元，毛利率-317.47%，收入同比下降71.51%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "空调压缩机营业收入",
+                  "raw_value": "312,305.28",
+                  "value": "312305.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "空调压缩机毛利率",
+                  "raw_value": "-317.47%",
+                  "value": "-317.47",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "空调压缩机营业收入同比变动",
+                  "raw_value": "-71.51%",
+                  "value": "-71.51",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "comparison_basis": "2024年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-06",
+              "text": "按区域分类，境内营业收入202,399,837.47元，毛利率19.03%；境外营业收入225,219,284.00元，毛利率34.39%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "境内营业收入",
+                  "raw_value": "202,399,837.47",
+                  "value": "202399837.47",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境内毛利率",
+                  "raw_value": "19.03%",
+                  "value": "19.03",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境外营业收入",
+                  "raw_value": "225,219,284.00",
+                  "value": "225219284.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境外毛利率",
+                  "raw_value": "34.39%",
+                  "value": "34.39",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-07",
+              "text": "报告期内公司归属于上市公司股东的净利润6,612.97万元，同比增长2.57%；扣除非经常性损益的净利润6,219.34万元，同比增长1.74%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "6,612.97",
+                  "value": "6612.97",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比变动",
+                  "raw_value": "2.57%",
+                  "value": "2.57",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "2024年度"
+                },
+                {
+                  "name": "扣除非经常性损益的净利润",
+                  "raw_value": "6,219.34",
+                  "value": "6219.34",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "扣除非经常性损益的净利润同比变动",
+                  "raw_value": "1.74%",
+                  "value": "1.74",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "2024年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "母公司口径收入构成（主营业务369,045,680.80元等）与合并口径不同，未在正文中混用。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司通过ISO9001、IATF16949国际质量管理体系认证，ISO14001环境管理体系认证，ISO45001职业健康安全管理体系认证，ISO50001能源管理体系认证及AEO高级海关认证，具备较强的生产流程及综合成本管控能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "公司累计持有各类有效专利共计139项，参与制定滤清器行业国家标准3项、行业标准21项。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "有效专利数量",
+                  "raw_value": "139",
+                  "value": "139",
+                  "unit": "项",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "参与制定国家标准数量",
+                  "raw_value": "3",
+                  "value": "3",
+                  "unit": "项",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "参与制定行业标准数量",
+                  "raw_value": "21",
+                  "value": "21",
+                  "unit": "项",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "报告期内公司研发费用合计1,503.36万元；新增发明专利1项、实用新型专利4项，牵头制定行业标准1项，参与制定国家标准1项、行业标准4项；全年累计完成新产品开发497款。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "研发费用",
+                  "raw_value": "1,503.36",
+                  "value": "1503.36",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "新增发明专利",
+                  "raw_value": "1",
+                  "value": "1",
+                  "unit": "项",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "新增实用新型专利",
+                  "raw_value": "4",
+                  "value": "4",
+                  "unit": "项",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "新产品开发数量",
+                  "raw_value": "497",
+                  "value": "497",
+                  "unit": "款",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "报告期内公司新建年产4500万只高端滤清器项目，根据合同约定收取相应履约保证金250万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "年产4500万只高端滤清器项目履约保证金",
+                  "raw_value": "250",
+                  "value": "250",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取主要原材料具体采购金额及来源明细；供应商表仅列示采购金额前五名。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "公司产品在境内外IAM市场、境内OES市场、境内OEM市场成功打开销路；境内IAM以分销为主，境外IAM以直销为主，境内OEM、OES以直销为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "境外IAM市场方面，公司先后在中东、欧洲、西亚、东北亚、东南亚、非洲、南美等多个重点区域开拓优质合作客户十余家。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "报告期内前五名客户合计销售金额178,471,662.25元，年度销售占比41.74%；其中Wesfil Australia PTY Ltd.销售56,793,009.91元，占比13.28%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "178,471,662.25",
+                  "value": "178471662.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名客户合计销售占比",
+                  "raw_value": "41.74%",
+                  "value": "41.74",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "Wesfil Australia PTY Ltd.销售金额",
+                  "raw_value": "56,793,009.91",
+                  "value": "56793009.91",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "Wesfil Australia PTY Ltd.销售占比",
+                  "raw_value": "13.28%",
+                  "value": "13.28",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "报告期内前五名供应商合计采购金额49,777,024.25元，年度采购占比21.80%；其中安徽同丰橡塑工业有限公司采购11,705,102.29元，占比5.13%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "49,777,024.25",
+                  "value": "49777024.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名供应商合计采购占比",
+                  "raw_value": "21.80%",
+                  "value": "21.80",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取客户与公司具体产品对应关系及分渠道收入金额。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "报告期内行业外部环境复杂严峻，全球国际贸易格局波动加剧，叠加国内汽车配件行业同质化竞争持续升温，内外市场承压明显；公司营业收入小幅回落，但凭借经营管控与成本管控，盈利指标实现平稳增长。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "报告期内空调压缩机收入同比下降71.51%，主要系该项目2024年开发的某客户其下游终端车企整车销量下滑并进行了重组，本期不再与该客户合作。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "报告期内财务费用较上年同期减少808.22万元，同比下降560.18%，主要系本期汇兑收益增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "财务费用同比变动",
+                  "raw_value": "-560.18%",
+                  "value": "-560.18",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "2024年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "报告期内资产减值损失较上年同期增加208.14万元，同比增长58.32%，主要系本期长库龄存货增加导致计提存货跌价准备增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "资产减值损失同比变动",
+                  "raw_value": "58.32%",
+                  "value": "58.32",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "2024年度"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期内公司业务与产品以及商业模式未发生重大变化；核心竞争力变化情况为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "报告期内公司营业收入同比下降9.80%，归属于上市公司股东的净利润同比增长2.57%，总资产较报告期初增长6.35%，归属于上市公司股东净资产较报告期初增长9.01%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "总资产较期初增长",
+                  "raw_value": "6.35%",
+                  "value": "6.35",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "comparison_basis": "2024年末"
+                },
+                {
+                  "name": "归属于上市公司股东净资产较期初增长",
+                  "raw_value": "9.01%",
+                  "value": "9.01",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "comparison_basis": "2024年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "报告期内公司新建年产4500万只高端滤清器项目，并按合同约定收取履约保证金250万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取该新建项目投资总额、建设进度及预计投产时间。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司为汽车滤清器研发与制造企业，主营业务为汽车滤清器及过滤材料的研发、生产和销售，并通过纵向一体化实现无纺布过滤材料与滤清器产品协同的产业链模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "报告期内前五名供应商包括安徽同丰橡塑工业有限公司、山东非尔德过滤科技有限公司、广州禾越环保包装有限公司、安徽省粤隆印刷科技有限公司、上海居方实业有限公司，合计采购金额49,777,024.25元，占年度采购21.80%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "49,777,024.25",
+                  "value": "49777024.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名供应商合计采购占比",
+                  "raw_value": "21.80%",
+                  "value": "21.80",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各供应商所供具体原材料品类及金额明细。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-03",
+              "text": "公司产品广泛适用于各类乘用车、商用车和工程机械，并积极开拓工程机械、摩托车、农用机械等非道路移动机械应用场景。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-SC-04",
+              "text": "报告期内前五名客户合计销售金额178,471,662.25元，占年度销售41.74%，客户包括Wesfil Australia PTY Ltd.、Ferdinand Bilstein Group、索特传动设备有限公司、上海滨道滤清器有限公司及TRICO GROUP ACQUIRES FRAM AND AUTOLITE。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "178,471,662.25",
+                  "value": "178471662.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名客户合计销售占比",
+                  "raw_value": "41.74%",
+                  "value": "41.74",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各客户所购具体产品品类及对应收入金额。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "公司为国家级专精特新“小巨人”企业、高新技术企业，设有安徽省省级技术中心，技术带头人现任中国汽标委滤清器行业标委会委员等职务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ]
+          },
+          {
+            "fact_id": "F-CF-02",
+            "text": "公司依托多年积累形成的“一站式”供货能力以及市场快速响应能力，与一批优质客户结成了稳定合作关系。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "未获取分渠道（IAM/OEM/OES）收入金额及占比明细。",
+        "未获取主要原材料采购品类及金额明细。",
+        "母公司口径收入构成与合并口径存在差异，本工作底稿以合并口径为主。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 13250,
+      "output_tokens": 5553,
+      "total_tokens": 18803
+    }
+  },
+  {
+    "request_id": "bp-work-045a9581ec49fc09070faa5d:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "d12ac76775fee839337b57e793fa83146bdeb84ab276fa62e79d2535fedd3fa2",
+    "response_hash": "27be47ce6de72a5cd624dcbfe4f75ac183749400287ff7dc7ffdbb9ca914d172",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FR-001\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-PS-02\",\"evidence_ids\":[\"source-0001\",\"source-0003\",\"source-0004\"],\"explanation\":\"F-PS-02以“公司产品”起句，并把主题范围标成业务分部，但依据的是行业需求章节，不是公司产品范围。source-0003、source-0004说明汽车滤清器四大品类分别用于进气、润滑、供油及空调系统，并描述纯电动汽车不再需要燃油滤清器、空气滤清器、机油滤清器更换频率下降，以及部分车型新增电池冷却剂过滤器、热管理颗粒过滤器，属于行业或车型需求，且仅称其为国内厂商的差异化机遇。source-0001只列明公司产品为空气滤清器、空调滤清器、机油滤清器和燃油滤清器四大系列，并未说明公司已生产或销售上述新增过滤器。应保留有来源的行业背景并标明主体为行业情况，删除对公司产品或业务分部的归因，不得把新过滤器写成公司产品。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-PS-02\",\"F-PS-03\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-SM-05\",\"F-SM-06\",\"F-SM-07\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-MC-01\",\"F-MC-02\",\"F-MC-03\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\",\"F-SC-04\",\"F-CF-01\",\"F-CF-02\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FR-001",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-PS-02",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "F-PS-02以“公司产品”起句，并把主题范围标成业务分部，但依据的是行业需求章节，不是公司产品范围。source-0003、source-0004说明汽车滤清器四大品类分别用于进气、润滑、供油及空调系统，并描述纯电动汽车不再需要燃油滤清器、空气滤清器、机油滤清器更换频率下降，以及部分车型新增电池冷却剂过滤器、热管理颗粒过滤器，属于行业或车型需求，且仅称其为国内厂商的差异化机遇。source-0001只列明公司产品为空气滤清器、空调滤清器、机油滤清器和燃油滤清器四大系列，并未说明公司已生产或销售上述新增过滤器。应保留有来源的行业背景并标明主体为行业情况，删除对公司产品或业务分部的归因，不得把新过滤器写成公司产品。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-PS-02",
+        "F-PS-03",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-SM-05",
+        "F-SM-06",
+        "F-SM-07",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03",
+        "F-SC-04",
+        "F-CF-01",
+        "F-CF-02"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20257,
+      "output_tokens": 500,
+      "total_tokens": 56089
+    }
+  },
+  {
+    "request_id": "bp-work-045a9581ec49fc09070faa5d:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "04fa4adfd175ea79de101a372b769a7c30932220c596d2940928b685ced580b6",
+    "response_hash": "5010fbd96a41ae4c139f8bf7e3dde680a135d2da1324a4ee06d9549b2aa1b325",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-PS-02\",\"text\":\"行业情况：汽车滤清器主要涵盖空气、机油、燃油、空调滤清器四大品类，分别应用于汽车进气、润滑、供油及空调系统；纯电动汽车不再需要燃油、空气滤清器，机油滤清器更换频率有所降低，但空调滤清器需求更为高端，部分车型新增电池冷却剂过滤器、热管理颗粒过滤器，为国内厂商提供差异化竞争机遇。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-PS-02",
+          "text": "行业情况：汽车滤清器主要涵盖空气、机油、燃油、空调滤清器四大品类，分别应用于汽车进气、润滑、供油及空调系统；纯电动汽车不再需要燃油、空气滤清器，机油滤清器更换频率有所降低，但空调滤清器需求更为高端，部分车型新增电池冷却剂过滤器、热管理颗粒过滤器，为国内厂商提供差异化竞争机遇。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10328,
+      "output_tokens": 146,
+      "total_tokens": 10474
+    }
+  },
+  {
+    "request_id": "bp-work-045a9581ec49fc09070faa5d:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "9c83ff6d89298452c9b35af9a76128d54bd52f210e32b00dff6b9260b67df5b2",
+    "response_hash": "0f79fad4b3ddde428f02993243bbed85d9e1f279292e1b0d49c9e83c7371a832",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-PS-02\"],\"checks\":[{\"fact_id\":\"F-PS-02\",\"accepted\":false,\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"explanation\":\"正文已改为行业背景且未把新增过滤器写成公司产品，内容与source-0003、source-0004基本相符；但结构化主体仍为business_segment。该内容位于“行业情况/汽车滤清器行业需求情况”，属于行业及车型需求，不是公司指定业务、产品或行业分部。初始问题要求标明行业情况并删除业务分部归因，故未实质纠正错误主体。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-PS-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-PS-02",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "正文已改为行业背景且未把新增过滤器写成公司产品，内容与source-0003、source-0004基本相符；但结构化主体仍为business_segment。该内容位于“行业情况/汽车滤清器行业需求情况”，属于行业及车型需求，不是公司指定业务、产品或行业分部。初始问题要求标明行业情况并删除业务分部归因，故未实质纠正错误主体。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12218,
+      "output_tokens": 141,
+      "total_tokens": 15720
+    }
+  }
+]

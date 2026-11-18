@@ -1,0 +1,199 @@
+{
+  "per_company": [
+    {
+      "instrument_id": "600110.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 146363,
+      "known_supplier_total": 146363,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600111.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 132814,
+      "known_supplier_total": 132814,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000008.SZ",
+      "physical_requests": 3,
+      "recoveries": 0,
+      "ledger": 77319,
+      "known_supplier_total": 77319,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000009.SZ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 139817,
+      "known_supplier_total": 139817,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "920000.BJ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 120457,
+      "known_supplier_total": 120457,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "920001.BJ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 122918,
+      "known_supplier_total": 122918,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600116.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 173401,
+      "known_supplier_total": 173401,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600106.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 122277,
+      "known_supplier_total": 122277,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600113.SH",
+      "physical_requests": 0,
+      "recoveries": 0,
+      "ledger": 0,
+      "known_supplier_total": 0,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000002.SZ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 174568,
+      "known_supplier_total": 174568,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000007.SZ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 105019,
+      "known_supplier_total": 105019,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000010.SZ",
+      "physical_requests": 6,
+      "recoveries": 1,
+      "ledger": 135434,
+      "known_supplier_total": 135434,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600682.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 195434,
+      "known_supplier_total": 195434,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600620.SH",
+      "physical_requests": 6,
+      "recoveries": 1,
+      "ledger": 241643,
+      "known_supplier_total": 132181,
+      "unknown_usage_reservations": 109462,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "physical_requests": 3,
+      "recoveries": 1,
+      "ledger": 60030,
+      "known_supplier_total": 60030,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000421.SZ",
+      "physical_requests": 6,
+      "recoveries": 1,
+      "ledger": 328261,
+      "known_supplier_total": 163909,
+      "unknown_usage_reservations": 164352,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "physical_requests": 3,
+      "recoveries": 1,
+      "ledger": 70301,
+      "known_supplier_total": 70301,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600030.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 75371,
+      "known_supplier_total": 75371,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "physical_requests": 1,
+      "recoveries": 0,
+      "ledger": 19801,
+      "known_supplier_total": 19801,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "601318.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 91138,
+      "known_supplier_total": 91138,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown"
+    }
+  ],
+  "totals": {
+    "physical_requests": 88,
+    "charged_tokens": 2532366,
+    "recoveries": 5,
+    "known_supplier_total": 2258552,
+    "unknown_usage_reservations": 273814,
+    "raw_facts": 475,
+    "profiles_with_content": 16,
+    "visible_facts": 473,
+    "visible_metrics": 672
+  },
+  "group_supervision_wall_seconds": 2962.918,
+  "fee": "unknown",
+  "supplier_total_not_input_plus_output": true,
+  "preparation_and_independent_review_time": "not_completely_measured"
+}

@@ -1,0 +1,1019 @@
+[
+  {
+    "request_id": "bp-work-18bfab7388624a0693d194c7:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "9737bdec81a2f4cb267f9cd225f2bb6839c936bab0b5cead4b5d93b92cb6d2d2",
+    "response_hash": "eef48967109b3dcf33dc636a67f31655e1ce5933938ad3990b93c6840f236daf",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0031\",\"section-0038\",\"section-0045\",\"section-0067\",\"section-0085\",\"section-0086\",\"section-0102\",\"section-0150\"],\"rationale\":\"选择公司业务概要（section-0031）说明偏光片等产品用途与采购、生产、销售、研发模式；经营情况回顾（section-0038）及经营计划（section-0039）说明本期经营举措与变化；财务分析（section-0045）下的营业情况分析（section-0067）提供营业收入、成本、费用及利润的实质分析；按产品类别分析（section-0085）与按区域分类分析（section-0086）给出收入构成与区域分布，满足收入来源与主要业务权重；主要控股参股公司分析（section-0102）补充子公司经营；未来展望（section-0150）保留经营计划与行业趋势的限定性说明。未选纯行业背景章节（第九节）及大量会计政策、附注明细，避免扩读。\",\"deferred\":[\"第九节 行业信息：属行业背景，非公司层面经营实质，且第四节已含行业情况与展望，故不扩读\",\"第十一节 财务会计报告及附注：仅需收入构成与利润表分析，已在第四节取得，不展开全部附注\",\"第五节 重大事件、第六节 股份变动、第八节 董事高管薪酬：与业务经营解释关联弱，不选\"],\"stop_reason\":\"已覆盖业务模式、产品用途、收入构成、区域分布、经营变化与展望等核心经营信息，所选子节完整且信息密度高；剩余缺口属行业背景与财务附注明细，不影响公司经营解释，故停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0031",
+        "section-0038",
+        "section-0045",
+        "section-0067",
+        "section-0085",
+        "section-0086",
+        "section-0102",
+        "section-0150"
+      ],
+      "rationale": "选择公司业务概要（section-0031）说明偏光片等产品用途与采购、生产、销售、研发模式；经营情况回顾（section-0038）及经营计划（section-0039）说明本期经营举措与变化；财务分析（section-0045）下的营业情况分析（section-0067）提供营业收入、成本、费用及利润的实质分析；按产品类别分析（section-0085）与按区域分类分析（section-0086）给出收入构成与区域分布，满足收入来源与主要业务权重；主要控股参股公司分析（section-0102）补充子公司经营；未来展望（section-0150）保留经营计划与行业趋势的限定性说明。未选纯行业背景章节（第九节）及大量会计政策、附注明细，避免扩读。",
+      "deferred": [
+        "第九节 行业信息：属行业背景，非公司层面经营实质，且第四节已含行业情况与展望，故不扩读",
+        "第十一节 财务会计报告及附注：仅需收入构成与利润表分析，已在第四节取得，不展开全部附注",
+        "第五节 重大事件、第六节 股份变动、第八节 董事高管薪酬：与业务经营解释关联弱，不选"
+      ],
+      "stop_reason": "已覆盖业务模式、产品用途、收入构成、区域分布、经营变化与展望等核心经营信息，所选子节完整且信息密度高；剩余缺口属行业背景与财务附注明细，不影响公司经营解释，故停止。"
+    },
+    "usage": {
+      "input_tokens": 17789,
+      "output_tokens": 375,
+      "total_tokens": 18164
+    }
+  },
+  {
+    "request_id": "bp-work-18bfab7388624a0693d194c7:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "fd056c9d665754e0a2c25748430c4d78f0c2e02d135dc20d59130031751cba79",
+    "response_hash": "ec98da7ae77c43c764c3842f3957cbcf253ed13a5e477c39a3acc28248e0cf09",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司是从事液晶显示模组用高性能偏光片和光学薄膜材料研发、生产与销售的专业厂商，拥有22项发明专利、7项实用新型专利，通过国家专精特新“小巨人”企业、高新技术企业等资质认定。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"公司属于电子设备制造业，细分行业为半导体显示技术中液晶显示产业链上游的偏光片行业；报告期内商业模式未发生变化，核心管理团队、关键技术人员未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0004\"]},{\"fact_id\":\"F03\",\"text\":\"公司参股广东立原新材料科技有限公司，持有目的为推动公司业务布局从偏光片研发生产向上游原材料领域延伸。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F04\",\"text\":\"公司主要产品大类包括偏光片、防雾膜，为下游车载显示模组、工控仪表用液晶显示模组及OLED显示、3D眼镜、防雾终端的生产厂商提供偏光片及光学膜产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0011\"]},{\"fact_id\":\"F05\",\"text\":\"公司偏光片产品已覆盖车载仪表盘、车载中控显示、电子后视镜及HUD抬头显示等核心应用场景，并成功开发高耐候性偏光片（如105℃×1000H、105℃×500H产品）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0016\"]},{\"fact_id\":\"F06\",\"text\":\"公司以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F07\",\"text\":\"公司通过直销方式开拓业务，收入来源主要是销售偏光片、防雾膜等产品；偏光片产品主要采取直接销售模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F08\",\"text\":\"公司产品价格制定分为成本定价与竞争定价两种：客户定制型号按成本费用加合理利润形成出厂指导价，充分竞争型号综合评估销售区域、市场竞争、供需关系、客户类型等因素通过投标、商务谈判确定最终价格。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F09\",\"text\":\"公司主要客户销售账期主要为月结30天至月结90天，回款周期约为60—120天，以汇款、承兑汇票等方式结算。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F10\",\"text\":\"2025年公司营业收入212,838,536.28元，较上年同期减少4,957,456.80元，减幅2.28%，主要系国内市场竞争激烈，销量增幅低于售价降幅。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"212,838,536.28\",\"value\":\"212838536.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比变动比例\",\"raw_value\":\"-2.28\",\"value\":\"-2.28\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"按产品分类，偏光片营业收入193,902,115.30元，占营业收入91.10%，同比下降4.02%；防雾膜营业收入17,939,018.45元，占营业收入8.43%，同比上升17.67%；其他业务收入997,402.53元，占营业收入0.47%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0011\"],\"metrics\":[{\"name\":\"偏光片营业收入\",\"raw_value\":\"193,902,115.30\",\"value\":\"193902115.30\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"偏光片营业收入占营业收入比例\",\"raw_value\":\"91.10\",\"value\":\"91.10\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"偏光片营业收入同比变动比例\",\"raw_value\":\"-4.02\",\"value\":\"-4.02\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"防雾膜营业收入\",\"raw_value\":\"17,939,018.45\",\"value\":\"17939018.45\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"防雾膜营业收入占营业收入比例\",\"raw_value\":\"8.43\",\"value\":\"8.43\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"防雾膜营业收入同比变动比例\",\"raw_value\":\"17.67\",\"value\":\"17.67\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"997,402.53\",\"value\":\"997402.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入占营业收入比例\",\"raw_value\":\"0.47\",\"value\":\"0.47\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"按区域分类，国内销售收入154,236,860.23元，同比下降4.76%；国外销售收入58,601,676.05元，同比上升4.93%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0012\"],\"metrics\":[{\"name\":\"国内销售收入\",\"raw_value\":\"154,236,860.23\",\"value\":\"154236860.23\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"国内销售收入同比变动比例\",\"raw_value\":\"-4.76\",\"value\":\"-4.76\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"国外销售收入\",\"raw_value\":\"58,601,676.05\",\"value\":\"58601676.05\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"国外销售收入同比变动比例\",\"raw_value\":\"4.93\",\"value\":\"4.93\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"2025年公司营业成本186,029,685.36元，同比增长19.44%；毛利率12.60%，上年同期为28.49%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"186,029,685.36\",\"value\":\"186029685.36\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比变动比例\",\"raw_value\":\"19.44\",\"value\":\"19.44\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"毛利率\",\"raw_value\":\"12.60\",\"value\":\"12.60\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"毛利率\",\"raw_value\":\"28.49\",\"value\":\"28.49\",\"unit\":\"%\",\"currency\":null,\"period\":\"2024年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"2025年公司净利润-19,607,358.15元，较上年同期减少52,557,740.19元，减幅159.51%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"净利润\",\"raw_value\":\"-19,607,358.15\",\"value\":\"-19607358.15\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"净利润同比变动比例\",\"raw_value\":\"-159.51\",\"value\":\"-159.51\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F15\",\"text\":\"公司生产偏光片所需主要原材料包括PVA膜、TAC膜、位相差补偿膜、保护膜、离型膜、胶水等，已形成完善的采购管理体系并制定《供应商管理程序》《采购管理程序》《不合格品控制程序》。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F16\",\"text\":\"公司总体采用“以销定产”的生产模式，对于成熟和通用型产品也会采用“提前备货、保持适当安全库存”的生产模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F17\",\"text\":\"公司以自主创新为主要研发方式，采用集成产品开发（IPD）的研发管理模式，通过PLM研发管理系统实现平台全项目管理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F18\",\"text\":\"募投项目偏光片三期项目截至报告期末全部产线已完成安装调试并投入使用，全面进入产质量爬坡阶段，公司从项目建设期迈入产能释放期。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F19\",\"text\":\"公司偏光片产品下游客户主要为生产液晶面板模组及终端产品制造等行业客户，客户对产品质量及供应稳定性要求较高，一般采用个性化定制规格产品，认证通过后维持较为稳定的长期合作关系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F20\",\"text\":\"2025年前五大客户合计销售金额77,134,432.74元，年度销售占比36.24%，均不存在关联关系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"前五大客户合计销售金额\",\"raw_value\":\"77,134,432.74\",\"value\":\"77134432.74\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五大客户合计年度销售占比\",\"raw_value\":\"36.24\",\"value\":\"36.24\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F21\",\"text\":\"境外销售收入上升主要系出口到欧洲的防雾膜产品订单增加；境内销售收入下降主要系智能电表产品需求量减少以及产品售价下降影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F22\",\"text\":\"公司集中资源攻关车载显示用、智能家电用、电表用等偏光片产品的迭代升级，加大OLED显示用偏光片、液晶温度补偿型偏光片等战略新产品开发，成功实现厚度60-100μm系列产品开发及稳定生产。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F23\",\"text\":\"受益于偏光片产品在车载显示应用矩阵的持续完善，公司车载显示用偏光片系列产品及防雾膜产品出货量较2024年实现明显增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F24\",\"text\":\"报告期内研发人员数量较2024年同比增长13.5%；研发费用19,730,255.65元，同比增长28.59%，主要系持续加大研发投入所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0008\"],\"metrics\":[{\"name\":\"研发人员数量同比变动比例\",\"raw_value\":\"13.5\",\"value\":\"13.5\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发费用\",\"raw_value\":\"19,730,255.65\",\"value\":\"19730255.65\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发费用同比变动比例\",\"raw_value\":\"28.59\",\"value\":\"28.59\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F25\",\"text\":\"营业利润-24,402,550.44元，较上年同期减少63,847,828.60元，减幅161.86%，主要系三期项目产能爬坡期折旧摊销、人工等成本费用增加，叠加产品售价下降导致毛利率下降、毛利金额减少，以及资产减值损失计提增加和研发费用增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"营业利润\",\"raw_value\":\"-24,402,550.44\",\"value\":\"-24402550.44\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业利润同比变动比例\",\"raw_value\":\"-161.86\",\"value\":\"-161.86\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"偏光片销售收入同比下降4.02%，主要系受市场竞争影响产品售价下降，同时智能电表产品需求量减少；防雾膜销售收入同比上升17.67%，主要系防雾膜工艺改进、性能提升、订单量增长。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F27\",\"text\":\"固定资产期末余额199,534,518.42元，较期初增加120,956,119.51元，增幅153.93%，主要系募投项目设备设施建设完成所致；在建工程期末余额5,205,213.55元，较期初减少25,343,766.49元，减幅82.96%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"固定资产\",\"raw_value\":\"199,534,518.42\",\"value\":\"199534518.42\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"固定资产较期初变动比例\",\"raw_value\":\"153.93\",\"value\":\"153.93\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"在建工程\",\"raw_value\":\"5,205,213.55\",\"value\":\"5205213.55\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"在建工程较期初变动比例\",\"raw_value\":\"-82.96\",\"value\":\"-82.96\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F28\",\"text\":\"资产减值损失-15,376,548.75元，较上年同期增加9,264,316.07元，增幅151.57%，主要系产品售价下降且募投项目尚处于产能爬坡阶段、产品单位成本较高，导致计提存货跌价准备增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"资产减值损失\",\"raw_value\":\"-15,376,548.75\",\"value\":\"-15376548.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"资产减值损失同比变动比例\",\"raw_value\":\"151.57\",\"value\":\"151.57\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F29\",\"text\":\"2025年立原新材亏损同比扩大，主要原因系处于研发攻坚与产能建设期，核心产品尚未量产，营收以原材料销售、代加工及委托开发等非核心业务为主，同时运营与研发费用大幅增长。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]}]},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F30\",\"text\":\"公司聚焦工控电子与车载显示市场，配合车载显示模组、电表模组等核心客户群需求横向拓展防爆膜、增亮膜等其他光学膜产品，以偏光片产品为核心向光学膜全品类延伸。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"]},{\"fact_id\":\"F31\",\"text\":\"公司未来发展战略为围绕“全球领先的光学膜方案解决商”愿景，以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F32\",\"text\":\"公司处于液晶显示产业链上游的偏光片行业，从事偏光片及光学薄膜材料的研发、生产与销售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F33\",\"text\":\"公司生产偏光片所需主要原材料包括PVA膜、TAC膜、位相差补偿膜、保护膜、离型膜、胶水等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F34\",\"text\":\"公司产品下游应用于车载显示模组、工控仪表用液晶显示模组及OLED显示、3D眼镜、防雾终端等领域，客户主要为生产液晶面板模组及终端产品制造等行业客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]}},\"limitations\":[\"主要客户与供应商名称以“客户1—5”“供应商1—5”匿名披露，未获取具体名称。\",\"按区域分类的营业收入构成变动原因原文为空，未获取具体说明。\",\"未获取偏光片、防雾膜的分产品毛利率同比增减的绝对百分点数值，仅保留营业收入与营业成本同比变动比例。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司是从事液晶显示模组用高性能偏光片和光学薄膜材料研发、生产与销售的专业厂商，拥有22项发明专利、7项实用新型专利，通过国家专精特新“小巨人”企业、高新技术企业等资质认定。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司属于电子设备制造业，细分行业为半导体显示技术中液晶显示产业链上游的偏光片行业；报告期内商业模式未发生变化，核心管理团队、关键技术人员未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "公司参股广东立原新材料科技有限公司，持有目的为推动公司业务布局从偏光片研发生产向上游原材料领域延伸。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F04",
+              "text": "公司主要产品大类包括偏光片、防雾膜，为下游车载显示模组、工控仪表用液晶显示模组及OLED显示、3D眼镜、防雾终端的生产厂商提供偏光片及光学膜产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "公司偏光片产品已覆盖车载仪表盘、车载中控显示、电子后视镜及HUD抬头显示等核心应用场景，并成功开发高耐候性偏光片（如105℃×1000H、105℃×500H产品）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0016"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "公司以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F07",
+              "text": "公司通过直销方式开拓业务，收入来源主要是销售偏光片、防雾膜等产品；偏光片产品主要采取直接销售模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "公司产品价格制定分为成本定价与竞争定价两种：客户定制型号按成本费用加合理利润形成出厂指导价，充分竞争型号综合评估销售区域、市场竞争、供需关系、客户类型等因素通过投标、商务谈判确定最终价格。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "公司主要客户销售账期主要为月结30天至月结90天，回款周期约为60—120天，以汇款、承兑汇票等方式结算。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F10",
+              "text": "2025年公司营业收入212,838,536.28元，较上年同期减少4,957,456.80元，减幅2.28%，主要系国内市场竞争激烈，销量增幅低于售价降幅。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "212,838,536.28",
+                  "value": "212838536.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比变动比例",
+                  "raw_value": "-2.28",
+                  "value": "-2.28",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "按产品分类，偏光片营业收入193,902,115.30元，占营业收入91.10%，同比下降4.02%；防雾膜营业收入17,939,018.45元，占营业收入8.43%，同比上升17.67%；其他业务收入997,402.53元，占营业收入0.47%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "偏光片营业收入",
+                  "raw_value": "193,902,115.30",
+                  "value": "193902115.30",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "偏光片营业收入占营业收入比例",
+                  "raw_value": "91.10",
+                  "value": "91.10",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "偏光片营业收入同比变动比例",
+                  "raw_value": "-4.02",
+                  "value": "-4.02",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "防雾膜营业收入",
+                  "raw_value": "17,939,018.45",
+                  "value": "17939018.45",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "防雾膜营业收入占营业收入比例",
+                  "raw_value": "8.43",
+                  "value": "8.43",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "防雾膜营业收入同比变动比例",
+                  "raw_value": "17.67",
+                  "value": "17.67",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务收入",
+                  "raw_value": "997,402.53",
+                  "value": "997402.53",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务收入占营业收入比例",
+                  "raw_value": "0.47",
+                  "value": "0.47",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "按区域分类，国内销售收入154,236,860.23元，同比下降4.76%；国外销售收入58,601,676.05元，同比上升4.93%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "国内销售收入",
+                  "raw_value": "154,236,860.23",
+                  "value": "154236860.23",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国内销售收入同比变动比例",
+                  "raw_value": "-4.76",
+                  "value": "-4.76",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国外销售收入",
+                  "raw_value": "58,601,676.05",
+                  "value": "58601676.05",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国外销售收入同比变动比例",
+                  "raw_value": "4.93",
+                  "value": "4.93",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "2025年公司营业成本186,029,685.36元，同比增长19.44%；毛利率12.60%，上年同期为28.49%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "186,029,685.36",
+                  "value": "186029685.36",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本同比变动比例",
+                  "raw_value": "19.44",
+                  "value": "19.44",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "毛利率",
+                  "raw_value": "12.60",
+                  "value": "12.60",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "毛利率",
+                  "raw_value": "28.49",
+                  "value": "28.49",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2024年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "2025年公司净利润-19,607,358.15元，较上年同期减少52,557,740.19元，减幅159.51%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "净利润",
+                  "raw_value": "-19,607,358.15",
+                  "value": "-19607358.15",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净利润同比变动比例",
+                  "raw_value": "-159.51",
+                  "value": "-159.51",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F15",
+              "text": "公司生产偏光片所需主要原材料包括PVA膜、TAC膜、位相差补偿膜、保护膜、离型膜、胶水等，已形成完善的采购管理体系并制定《供应商管理程序》《采购管理程序》《不合格品控制程序》。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "公司总体采用“以销定产”的生产模式，对于成熟和通用型产品也会采用“提前备货、保持适当安全库存”的生产模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "公司以自主创新为主要研发方式，采用集成产品开发（IPD）的研发管理模式，通过PLM研发管理系统实现平台全项目管理。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "募投项目偏光片三期项目截至报告期末全部产线已完成安装调试并投入使用，全面进入产质量爬坡阶段，公司从项目建设期迈入产能释放期。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F19",
+              "text": "公司偏光片产品下游客户主要为生产液晶面板模组及终端产品制造等行业客户，客户对产品质量及供应稳定性要求较高，一般采用个性化定制规格产品，认证通过后维持较为稳定的长期合作关系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "2025年前五大客户合计销售金额77,134,432.74元，年度销售占比36.24%，均不存在关联关系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "前五大客户合计销售金额",
+                  "raw_value": "77,134,432.74",
+                  "value": "77134432.74",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五大客户合计年度销售占比",
+                  "raw_value": "36.24",
+                  "value": "36.24",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "境外销售收入上升主要系出口到欧洲的防雾膜产品订单增加；境内销售收入下降主要系智能电表产品需求量减少以及产品售价下降影响。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F22",
+              "text": "公司集中资源攻关车载显示用、智能家电用、电表用等偏光片产品的迭代升级，加大OLED显示用偏光片、液晶温度补偿型偏光片等战略新产品开发，成功实现厚度60-100μm系列产品开发及稳定生产。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "受益于偏光片产品在车载显示应用矩阵的持续完善，公司车载显示用偏光片系列产品及防雾膜产品出货量较2024年实现明显增长。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "报告期内研发人员数量较2024年同比增长13.5%；研发费用19,730,255.65元，同比增长28.59%，主要系持续加大研发投入所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "研发人员数量同比变动比例",
+                  "raw_value": "13.5",
+                  "value": "13.5",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发费用",
+                  "raw_value": "19,730,255.65",
+                  "value": "19730255.65",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发费用同比变动比例",
+                  "raw_value": "28.59",
+                  "value": "28.59",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "营业利润-24,402,550.44元，较上年同期减少63,847,828.60元，减幅161.86%，主要系三期项目产能爬坡期折旧摊销、人工等成本费用增加，叠加产品售价下降导致毛利率下降、毛利金额减少，以及资产减值损失计提增加和研发费用增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "营业利润",
+                  "raw_value": "-24,402,550.44",
+                  "value": "-24402550.44",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业利润同比变动比例",
+                  "raw_value": "-161.86",
+                  "value": "-161.86",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F26",
+              "text": "偏光片销售收入同比下降4.02%，主要系受市场竞争影响产品售价下降，同时智能电表产品需求量减少；防雾膜销售收入同比上升17.67%，主要系防雾膜工艺改进、性能提升、订单量增长。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "固定资产期末余额199,534,518.42元，较期初增加120,956,119.51元，增幅153.93%，主要系募投项目设备设施建设完成所致；在建工程期末余额5,205,213.55元，较期初减少25,343,766.49元，减幅82.96%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "固定资产",
+                  "raw_value": "199,534,518.42",
+                  "value": "199534518.42",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "固定资产较期初变动比例",
+                  "raw_value": "153.93",
+                  "value": "153.93",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "在建工程",
+                  "raw_value": "5,205,213.55",
+                  "value": "5205213.55",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "在建工程较期初变动比例",
+                  "raw_value": "-82.96",
+                  "value": "-82.96",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "资产减值损失-15,376,548.75元，较上年同期增加9,264,316.07元，增幅151.57%，主要系产品售价下降且募投项目尚处于产能爬坡阶段、产品单位成本较高，导致计提存货跌价准备增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "资产减值损失",
+                  "raw_value": "-15,376,548.75",
+                  "value": "-15376548.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资产减值损失同比变动比例",
+                  "raw_value": "151.57",
+                  "value": "151.57",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "2025年立原新材亏损同比扩大，主要原因系处于研发攻坚与产能建设期，核心产品尚未量产，营收以原材料销售、代加工及委托开发等非核心业务为主，同时运营与研发费用大幅增长。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            }
+          ]
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F30",
+              "text": "公司聚焦工控电子与车载显示市场，配合车载显示模组、电表模组等核心客户群需求横向拓展防爆膜、增亮膜等其他光学膜产品，以偏光片产品为核心向光学膜全品类延伸。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ]
+            },
+            {
+              "fact_id": "F31",
+              "text": "公司未来发展战略为围绕“全球领先的光学膜方案解决商”愿景，以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F32",
+              "text": "公司处于液晶显示产业链上游的偏光片行业，从事偏光片及光学薄膜材料的研发、生产与销售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F33",
+              "text": "公司生产偏光片所需主要原材料包括PVA膜、TAC膜、位相差补偿膜、保护膜、离型膜、胶水等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F34",
+              "text": "公司产品下游应用于车载显示模组、工控仪表用液晶显示模组及OLED显示、3D眼镜、防雾终端等领域，客户主要为生产液晶面板模组及终端产品制造等行业客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "主要客户与供应商名称以“客户1—5”“供应商1—5”匿名披露，未获取具体名称。",
+        "按区域分类的营业收入构成变动原因原文为空，未获取具体说明。",
+        "未获取偏光片、防雾膜的分产品毛利率同比增减的绝对百分点数值，仅保留营业收入与营业成本同比变动比例。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 16073,
+      "output_tokens": 4774,
+      "total_tokens": 20847
+    }
+  },
+  {
+    "request_id": "bp-work-18bfab7388624a0693d194c7:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "f3b53be84f090a53738bee792486cb122edf215e071275b7ce58af10117cb4e1",
+    "response_hash": "812485780b78bd9964e9478f64e2fff153ff0f25e0d1493b0e56eb705869016d",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"W01\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F06\",\"evidence_ids\":[\"source-0017\",\"source-0016\",\"source-0011\"],\"explanation\":\"F06把未来战略写成2025年度既成事实。source-0017原文为“未来，公司将……以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜”，属于发展战略而非报告期业绩。报告期实际表述见source-0016：聚焦工控电子与车载显示，以偏光片产品为核心，横向拓展的是防爆膜、增亮膜；当期主要产品仍是偏光片和防雾膜（source-0011）。应保留战略方向但标明为未来计划，不得作为2025年核心业务结构。\"},{\"finding_id\":\"W02\",\"element\":\"business_structure\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F03\",\"evidence_ids\":[\"source-0014\",\"source-0015\",\"source-0006\"],\"explanation\":\"F03正文“参股”及持有目的与source-0015一致，但主体被标为named_subsidiary。source-0014公司类型为参股公司，source-0006对长期股权投资按权益法确认对立原新材的投资损失，说明其不是纳入合并的子公司。持有目的属于报告公司的投资安排。应改为参股/权益法被投资企业，不能按子公司归集；正文中的参股事实可保留。\"},{\"finding_id\":\"W03\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F29\",\"evidence_ids\":[\"source-0014\",\"source-0015\",\"source-0009\"],\"explanation\":\"F29关于2025年立原新材亏损同比扩大、核心产品尚未量产、营收以非核心业务为主及运营研发费用增长的表述，与source-0015相符，可以保留。但主体被标为named_subsidiary。source-0014明确为参股公司，source-0009投资收益按权益法核算，不是控股子公司业绩。应把主体改为指定参股公司，不得标为子公司。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F26\",\"F27\",\"F28\",\"F29\",\"F32\",\"F33\",\"F34\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "W01",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F06",
+          "evidence_ids": [
+            "source-0017",
+            "source-0016",
+            "source-0011"
+          ],
+          "explanation": "F06把未来战略写成2025年度既成事实。source-0017原文为“未来，公司将……以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜”，属于发展战略而非报告期业绩。报告期实际表述见source-0016：聚焦工控电子与车载显示，以偏光片产品为核心，横向拓展的是防爆膜、增亮膜；当期主要产品仍是偏光片和防雾膜（source-0011）。应保留战略方向但标明为未来计划，不得作为2025年核心业务结构。"
+        },
+        {
+          "finding_id": "W02",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F03",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015",
+            "source-0006"
+          ],
+          "explanation": "F03正文“参股”及持有目的与source-0015一致，但主体被标为named_subsidiary。source-0014公司类型为参股公司，source-0006对长期股权投资按权益法确认对立原新材的投资损失，说明其不是纳入合并的子公司。持有目的属于报告公司的投资安排。应改为参股/权益法被投资企业，不能按子公司归集；正文中的参股事实可保留。"
+        },
+        {
+          "finding_id": "W03",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F29",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015",
+            "source-0009"
+          ],
+          "explanation": "F29关于2025年立原新材亏损同比扩大、核心产品尚未量产、营收以非核心业务为主及运营研发费用增长的表述，与source-0015相符，可以保留。但主体被标为named_subsidiary。source-0014明确为参股公司，source-0009投资收益按权益法核算，不是控股子公司业绩。应把主体改为指定参股公司，不得标为子公司。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F32",
+        "F33",
+        "F34"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20685,
+      "output_tokens": 649,
+      "total_tokens": 46458
+    }
+  },
+  {
+    "request_id": "bp-work-18bfab7388624a0693d194c7:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "874351a118b13c0e30ed506bc3ebe7067bd3b9df64710fe9c29844dbce25bd55",
+    "response_hash": "07c7bb91d656500d58aa85111e36de35d0ec419918044e4b1cd5100982812eab",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F06\",\"text\":\"未来，公司将紧紧围绕“全球领先的光学膜方案解决商”的发展愿景，以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜。\",\"subject_scope\":\"consolidated_group\",\"period\":\"未来（发展战略）\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F03\",\"text\":\"公司参股广东立原新材料科技有限公司，持有目的为推动公司业务布局从偏光片研发生产向上游原材料领域延伸。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0014\"],\"metrics\":[],\"uncertainty_reason\":\"立原新材为参股公司（按权益法核算），非纳入合并范围的子公司，主体范围无法归入named_subsidiary。\"},{\"fact_id\":\"F29\",\"text\":\"2025年立原新材亏损同比扩大，主要原因系处于研发攻坚与产能建设期，核心产品尚未量产，营收以原材料销售、代加工及委托开发等非核心业务为主，同时运营与研发费用大幅增长。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0014\"],\"metrics\":[],\"uncertainty_reason\":\"立原新材为参股公司（按权益法核算），非控股子公司，主体范围无法归入named_subsidiary。\"}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F06",
+          "text": "未来，公司将紧紧围绕“全球领先的光学膜方案解决商”的发展愿景，以工控偏光片、车载偏光片、OLED偏光片为核心业务，横向扩展防爆膜、防雾片等其他光学膜。",
+          "subject_scope": "consolidated_group",
+          "period": "未来（发展战略）",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F03",
+          "text": "公司参股广东立原新材料科技有限公司，持有目的为推动公司业务布局从偏光片研发生产向上游原材料领域延伸。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015",
+            "source-0014"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "立原新材为参股公司（按权益法核算），非纳入合并范围的子公司，主体范围无法归入named_subsidiary。"
+        },
+        {
+          "fact_id": "F29",
+          "text": "2025年立原新材亏损同比扩大，主要原因系处于研发攻坚与产能建设期，核心产品尚未量产，营收以原材料销售、代加工及委托开发等非核心业务为主，同时运营与研发费用大幅增长。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015",
+            "source-0014"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "立原新材为参股公司（按权益法核算），非控股子公司，主体范围无法归入named_subsidiary。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12864,
+      "output_tokens": 337,
+      "total_tokens": 13201
+    }
+  },
+  {
+    "request_id": "bp-work-18bfab7388624a0693d194c7:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "25947c32dbac628b1f7a5c077bfbb66d3b3f7918817c533788cc6b350889147f",
+    "response_hash": "2fa7a53b3ac8ae093c54bd3ae365d89a55e39816d711ea23351378a1df191384",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F06\",\"F03\",\"F29\"],\"checks\":[{\"fact_id\":\"F06\",\"accepted\":true,\"evidence_ids\":[\"source-0017\",\"source-0016\",\"source-0011\"],\"explanation\":\"候选保留source-0017发展战略原文，以“未来，公司将……”表述工控偏光片、车载偏光片、OLED偏光片为核心业务并横向扩展防爆膜、防雾片，结构化期间亦为未来发展战略，不再写成2025年既成核心业务，纠正了期间错误。source-0016、source-0011显示报告期实际聚焦工控电子与车载显示，当期主要产品仍为偏光片和防雾膜，候选未把未来计划误报为当期结果。正文主体为报告整体经营表述中的公司且无更窄对象，归入consolidated_group符合默认规则；省略优势描述等可选细节不影响核心更正。\"},{\"fact_id\":\"F03\",\"accepted\":true,\"evidence_ids\":[\"source-0015\",\"source-0014\",\"source-0006\"],\"explanation\":\"候选正文与source-0015持有目的一致，并依据source-0014的参股公司分类表述公司参股广东立原新材料科技有限公司，不再标为named_subsidiary。source-0006按权益法确认对立原新材的投资损失，证明其未纳入合并。既有主体标签无法表示参股/权益法被投资企业，候选以unclear保留该范围并明确排除子公司归集，未引入虚假确定性；期间对应2025年报投资安排披露，证据足以支持参股事实及持有目的。\"},{\"fact_id\":\"F29\",\"accepted\":true,\"evidence_ids\":[\"source-0015\",\"source-0014\",\"source-0009\"],\"explanation\":\"候选忠实收窄source-0015：2025年立原新材亏损同比扩大，处于研发攻坚与产能建设期，核心产品尚未量产，营收以原材料销售、代加工及委托开发等非核心业务为主，运营与研发费用大幅增长；省略费用明细不影响核心事实。source-0014列明为参股公司，source-0009按权益法确认对立原新材投资损失，故该亏损不是控股子公司或合并集团业绩。候选将主体改为unclear并说明非控股子公司，纠正了named_subsidiary误标，期间与2025年同比表述一致。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F06",
+        "F03",
+        "F29"
+      ],
+      "checks": [
+        {
+          "fact_id": "F06",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0017",
+            "source-0016",
+            "source-0011"
+          ],
+          "explanation": "候选保留source-0017发展战略原文，以“未来，公司将……”表述工控偏光片、车载偏光片、OLED偏光片为核心业务并横向扩展防爆膜、防雾片，结构化期间亦为未来发展战略，不再写成2025年既成核心业务，纠正了期间错误。source-0016、source-0011显示报告期实际聚焦工控电子与车载显示，当期主要产品仍为偏光片和防雾膜，候选未把未来计划误报为当期结果。正文主体为报告整体经营表述中的公司且无更窄对象，归入consolidated_group符合默认规则；省略优势描述等可选细节不影响核心更正。"
+        },
+        {
+          "fact_id": "F03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015",
+            "source-0014",
+            "source-0006"
+          ],
+          "explanation": "候选正文与source-0015持有目的一致，并依据source-0014的参股公司分类表述公司参股广东立原新材料科技有限公司，不再标为named_subsidiary。source-0006按权益法确认对立原新材的投资损失，证明其未纳入合并。既有主体标签无法表示参股/权益法被投资企业，候选以unclear保留该范围并明确排除子公司归集，未引入虚假确定性；期间对应2025年报投资安排披露，证据足以支持参股事实及持有目的。"
+        },
+        {
+          "fact_id": "F29",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015",
+            "source-0014",
+            "source-0009"
+          ],
+          "explanation": "候选忠实收窄source-0015：2025年立原新材亏损同比扩大，处于研发攻坚与产能建设期，核心产品尚未量产，营收以原材料销售、代加工及委托开发等非核心业务为主，运营与研发费用大幅增长；省略费用明细不影响核心事实。source-0014列明为参股公司，source-0009按权益法确认对立原新材投资损失，故该亏损不是控股子公司或合并集团业绩。候选将主体改为unclear并说明非控股子公司，纠正了named_subsidiary误标，期间与2025年同比表述一致。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 14933,
+      "output_tokens": 535,
+      "total_tokens": 24248
+    }
+  }
+]

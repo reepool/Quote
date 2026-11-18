@@ -1,0 +1,74 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "b4d813f663a089c355dc1d6c5ec214d0e7d2e8877376cbacd256a1ca395120e6",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 26596,
+        "completion_tokens": 420,
+        "total_tokens": 27016
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 2,
+      "content_sha256": "5654e7f7dd8b39368746e48c903414f77cad60f80c5235494b933ebadd52b1c2",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 14569,
+        "completion_tokens": 8108,
+        "total_tokens": 22677
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 3,
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finish_reason": null,
+      "usage": {},
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/600620/failed-model-content/content-003.json"
+    },
+    {
+      "physical_sequence": 4,
+      "content_sha256": "78d75775f2efd628875fe1afebfb010cab42198d13d6316a113b1816b0292e07",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 23336,
+        "completion_tokens": 904,
+        "total_tokens": 40991
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 5,
+      "content_sha256": "da678dbd07a8753582dbd8468dd2616cdeec23e6d881d5e65a3cb4456085d794",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 11981,
+        "completion_tokens": 2181,
+        "total_tokens": 14162
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 6,
+      "content_sha256": "526f1373c517f947c66ba8b31587f2154f82d0dc24c7cc9ab0eb0e517037334f",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 16167,
+        "completion_tokens": 527,
+        "total_tokens": 27335
+      },
+      "retained": false,
+      "retained_path": null
+    }
+  ],
+  "duplicates_not_copied": 5
+}

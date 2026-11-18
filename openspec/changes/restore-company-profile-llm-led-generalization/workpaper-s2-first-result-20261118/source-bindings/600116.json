@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "600116.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-f37c3d5aa206f481c8475fac",
+    "filing_id": "1225150377",
+    "source": "cninfo",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "content_hash": "c2c7bfc3fdd348b9be15aeab6562b761c030d7db605c00f88a9c315854ee1486",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/c2/c2c7bfc3fdd348b9be15aeab6562b761c030d7db605c00f88a9c315854ee1486.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "bp-frontier-f37c3d5aa206f481c8475fac",
+    "source": "cninfo",
+    "announcement_id": "1225150377",
+    "title": "重庆三峡水利电力（集团）股份有限公司2025年年度报告",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-23/1225150377.PDF",
+    "exchange": "SSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}

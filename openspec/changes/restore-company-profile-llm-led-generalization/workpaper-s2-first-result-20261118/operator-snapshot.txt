@@ -1,0 +1,155 @@
+"""Approved 6.DS: reuse the original TaskService operator, new fixed source batch."""
+from pathlib import Path
+import ast
+import json
+import os
+import re
+import sys
+
+ROOT=Path('/home/python/Quote')
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+BASE=CHANGE/'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'
+DESTINATION=CHANGE/'workpaper-s2-first-result-20261118'
+source=BASE.read_text().split('\ndef main():',1)[0]
+replacements=(
+    ('workpaper-twelve-explanatory-core-result-20261116','workpaper-s2-first-result-20261118'),
+    ('6.CT','6.DS'),('20261116','20261118'),('2026-11-16','2026-09-17'),
+    ('v18-explanatory-twelve-','v21-s2-first-'),('workpaper-ct-','workpaper-ds-'),
+    ('token_budget=500000','token_budget=1000000'),('max_tokens=500000','max_tokens=1000000'),
+    ('started+1800','started+6000'),('max_elapsed_seconds=1800','max_elapsed_seconds=6000'),
+    ('started+7200','started+30600'),("totals['physical_requests']>=120","totals['physical_requests']>=200"),
+    ("totals['charged_tokens']>=6000000","totals['charged_tokens']>=20000000"),
+    ('timeout_seconds=620,execution_authorization','timeout_seconds=2450,execution_authorization'),
+    ('identity.update(review_max_output_tokens=16384,repair_profile=EXTRACT)',
+     'identity.update(review_max_output_tokens=16384,repair_profile=EXTRACT,logical_request_timeout_seconds=2450)'),
+    ("'exchange':'SSE'","'exchange':item['exchange']"), ("exchange='SSE'","exchange=item['exchange']"),
+    ("'instrument_id':symbol+'.SH'","'instrument_id':next(i['instrument_id'] for i in items if i['instrument_id'][:6]==symbol)"),
+)
+for old,new in replacements:
+    assert old in source,old
+    source=source.replace(old,new)
+source=source.replace("summary['review_limit_error']=summary.get('review_error')",
+    "summary['review_limit_error']=summary.get('review_error')\n"
+    "        if summary.get('review_status')=='failed' and summary.get('review_error') and not failure:\n"
+    "            failure='source_review_failed:'+summary['review_error']")
+source=source.replace("summary['captured_model_contents']=len(captures)",
+    "retain_writer_records(root,destination)\n        summary['captured_model_contents']=len(captures)")
+source=source.replace("summary={'instrument_id':asset['instrument_id']",
+    "dump(destination/'temporary-root.json',{'root':str(root)})\n    summary={'instrument_id':asset['instrument_id']")
+exec(compile(source,str(BASE),'exec'),globals())
+MANIFEST=DEST/'source-manifest.json'
+ORDER=[i['instrument_id'] for i in json.loads(MANIFEST.read_text())['companies']]
+APPROVAL=json.loads((DEST/'approval.json').read_text())['approval_reference']
+_original_config=config_for_run
+
+
+def config_for_run():
+    config=_original_config(); profiles=dict(config.profiles)
+    profiles[REVIEW]=replace(profiles[REVIEW],timeout_seconds=2450,attempt_timeout_seconds=1200)
+    profiles[EXTRACT]=replace(profiles[EXTRACT],timeout_seconds=2450,attempt_timeout_seconds=600)
+    return replace(config,profiles=profiles)
+
+
+def source_items():
+    items=json.loads(MANIFEST.read_text())['companies']
+    assert len(items)==len(set(i['instrument_id'] for i in items))==20
+    return items
+
+
+def retain_writer_records(root,destination):
+    records=list((root/'output/company_profile_common_core.v1').glob('*.json'))
+    assert len(records)<=1
+    if records:
+        assert not (destination/'runtime.json').exists()
+        shutil.copy2(records[0],destination/'runtime.json')
+
+
+# Reuse the already exercised HTTP/TLS preflight, not a paid model probe.
+prior=CHANGE/'workpaper-eight-long-wait-result-20261118/operator-snapshot.txt'
+tree=ast.parse(prior.read_text())
+node=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='network_preflight')
+exec(compile(ast.get_source_segment(prior.read_text(),node).replace("'6.DN'","'6.DS'"),str(prior),'exec'),globals())
+
+
+def boundary_check():
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.workpaper import WorkpaperReviewResponse,WorkpaperRepairResponse,WorkpaperRepairVerificationResponse
+    calls=[n for n in ast.walk(ast.parse(source)) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='CommonGatewaySemanticProvider']
+    assert len(calls)==1
+    cap=next(ast.literal_eval(k.value) for k in calls[0].keywords if k.arg=='timeout_seconds')
+    assert cap==2450
+    config=config_for_run(); asset=source_items()[0]['asset']
+    report=ReportIdentity(instrument_id=asset['instrument_id'],report_id=asset['filing_id'],document_version=asset['content_hash'],report_period=asset['report_period'],published_at=asset['published_at'])
+    captured=[]
+    class Boundary(BaseException):pass
+    class Client:
+        physical_budget=object()
+        def __init__(self):self.config=config
+        async def complete(self,request):
+            captured.append({'purpose':request.metadata.get('purpose'),'profile':request.profile,'timeout_seconds':request.timeout_seconds})
+            raise Boundary()
+    for purpose,model,profile in [('review_profile_workpaper',WorkpaperReviewResponse,REVIEW),('repair_profile_workpaper',WorkpaperRepairResponse,EXTRACT),('verify_profile_workpaper_repair',WorkpaperRepairVerificationResponse,REVIEW)]:
+        provider=CommonGatewaySemanticProvider(client=Client(),profile=EXTRACT,max_output_tokens=16384,timeout_seconds=cap,execution_authorization={'status':'authorized','document_version':report.document_version,'approval_reference':APPROVAL})
+        try:
+            provider.workpaper_request(request_id='ds-bind:'+purpose,purpose=purpose,report=report,payload={'source_text':'Local parameter boundary; no model call'},instructions='Local boundary only',response_model=model,max_output_tokens=16384,timeout_seconds=2450,profile_override=profile)
+        except Boundary:pass
+    assert [r['timeout_seconds'] for r in captured]==[2450,2450,2450]
+    assert config.profiles[REVIEW].attempt_timeout_seconds==1200
+    assert config.profiles[EXTRACT].attempt_timeout_seconds==600
+    dump(DEST/'binding-check.json',{'provider_cap':cap,'gateway_boundaries':captured,'profile_physical_seconds':{'review':1200,'flash':600},'new_model_requests':0})
+    print('BINDING_CHECK_OK',flush=True)
+
+
+def freeze(directory):
+    assert os.environ['TMPDIR']==str(ROOT/'data/QuoteBak')
+    assert not (DEST/'authorization.json').exists()
+    config=config_for_run();network=json.loads((DEST/'network-preflight.json').read_text())
+    assert network['namespace']==os.readlink('/proc/self/ns/net') and len(network['checks'])==2
+    assert json.loads((DEST/'binding-check.json').read_text())['provider_cap']==2450
+    core=DEST/'source-first-contract.json';reference=json.loads(core.read_text())
+    assert reference['not_model_input'] and reference['new_primary_questions']==60
+    assert len(reference['companies'])==20 and sum(len(c['core_conditions']) for c in reference['companies'])==60
+    pattern=r'"instrument_id"\s*:\s*"(?:'+'|'.join(re.escape(i) for i in ORDER)+r')"'
+    assert re.search(pattern,'"instrument_id": "600110.SH"')
+    history=subprocess.run(['rg','-l',pattern,str(CHANGE),'-g','query.json','-g','runtime.json'],capture_output=True,text=True)
+    assert history.returncode==1 and not history.stdout,history.stdout+history.stderr
+    dump(DEST/'unseen-qualification.json',{'source_manifest_sha256':sha(MANIFEST),'old_exclusions_distinct':True,'saved_model_search_positive_selfcheck':True,'saved_model_output_hits':[],'search_pattern':pattern,'before_first_model':True})
+    companies=[]
+    for item in source_items():
+        prepared=json.loads((directory/(item['instrument_id'][:6]+'.json')).read_text())
+        assert sha(Path(item['asset']['archive_path']))==item['asset']['content_hash']
+        assert len(prepared['pages'])==item['pdf_pages']
+        assert prepared['asset']==item['asset'] and sha(ROOT/item['source_binding'])==item['source_binding_sha256']
+        assert not (ROOT/'data/QuoteBak/s1-attempts'/('workpaper-ds-'+item['instrument_id'][:6]+'-20261118.json')).exists()
+        companies.append({'instrument_id':item['instrument_id'],'name':item['name'],'asset':item['asset'],'exchange':item['exchange'],'prepared_sha256':sha(directory/(item['instrument_id'][:6]+'.json')),'pdf_pages':item['pdf_pages']})
+    selected={name:{'model':p.model,'source_label':p.source_label,'resource':config.resource_for_profile(p).name,'reasoning_effort':p.reasoning_effort,'disable_thinking':p.disable_thinking,'timeout_seconds':p.timeout_seconds,'attempt_timeout_seconds':p.attempt_timeout_seconds,'max_retries':p.max_retries,'max_schema_repair_attempts':p.max_schema_repair_attempts} for name,p in config.profiles.items()}
+    import zipfile
+    with zipfile.ZipFile(DEST/'execution-code-snapshot.zip','x',compression=zipfile.ZIP_DEFLATED) as archive:
+        for path in code_hashes(): archive.write(ROOT/path,arcname=path)
+    frozen={'task':'6.DS','status':'authorized','approval_reference':APPROVAL,'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        'source_first_reference':str(core.relative_to(ROOT)),'source_first_reference_sha256':sha(core),'prepared_root':str(directory),'operator_sha256':sha(Path(__file__)),
+        'base_operator':str(BASE.relative_to(ROOT)),'base_operator_sha256':sha(BASE),'network_context':network,'network_preflight_sha256':sha(DEST/'network-preflight.json'),
+        'code_sha256':code_hashes(),'execution_code_snapshot_sha256':sha(DEST/'execution-code-snapshot.zip'),'shared_config_sha256':sha(ROOT/'config/13_llm.json'),'selected_profiles':selected,'order':ORDER,
+        'each_limits':{'business_seconds':6000,'tokens':1000000,'physical_requests':10,'recoveries':3,'per_logical':1,'known_cost_cny':10},
+        'group_limits':{'tokens':20000000,'physical_requests':200,'recoveries':60,'business_wall_seconds':30600,'max_concurrency':4},
+        'capture_helper_sha256':sha(CAPTURE_HELPER),'production_authorization':'not_authorized','old_semantic_input':False,'human_reference_as_model_input':False,
+        'new_selection_and_extraction':True,'old_S1_status':'not_passed_unchanged','quality_scope':'60 source-led substantive basic questions, all material clauses; original-source unique-object accuracy and optional gaps separately evaluated',
+        'source_manifest_sha256':sha(MANIFEST),'unseen_qualification_sha256':sha(DEST/'unseen-qualification.json')}
+    dump(DEST/'source-contract-freeze.json',{'path':str(core.relative_to(ROOT)),'sha256':sha(core),'full_pool_conditions':60,'this_group_conditions':60,'selected_instruments':ORDER,'not_model_input':True})
+    dump(DEST/'run-plan.json',{'task':'6.DS','status':'authorized','companies':companies,'same_basic_workpaper_contract':True,'optional_missing_not_company_failure':True})
+    dump(DEST/'authorization.json',frozen)
+    shutil.copy2(__file__,DEST/'operator-snapshot.txt')
+    print('FROZEN 20 reports; 60 basic questions; provider 2450 / high-tier 1200 / Flash 600',flush=True)
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['check','prepare','preflight','freeze','run','group'])
+    parser.add_argument('--prepared',type=Path);parser.add_argument('--symbol');parser.add_argument('--group-deadline',type=float);parser.add_argument('--batch',type=int,default=1)
+    args=parser.parse_args()
+    if args.mode=='check':boundary_check()
+    elif args.mode=='prepare':prepare()
+    elif args.mode=='preflight':network_preflight()
+    elif args.mode=='freeze':freeze(args.prepared)
+    elif args.mode=='run':run_one(args.prepared,args.symbol,args.group_deadline)
+    else:group(args.prepared,args.batch)

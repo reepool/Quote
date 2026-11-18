@@ -1,0 +1,2036 @@
+[
+  {
+    "request_id": "bp-work-fb1e124020fc48539e005099:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "14268f280b68d7331945ebc7163a3e0f8104d6111094f71346ad3bc22d91329d",
+    "response_hash": "f2ce1024e1f2d9756c32da463f74fc337a8132d8c223117e888a6de870669969",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0047\",\"section-0049\",\"section-0050\",\"section-0051\",\"section-0052\",\"section-0065\",\"section-0066\",\"section-0087\",\"section-0088\",\"section-0089\",\"section-0113\",\"section-0114\",\"section-0115\",\"section-0116\",\"section-0120\",\"section-0134\"],\"rationale\":\"优先选取能完整解释公司业务结构、经营模式、盈利来源与本期经营变化的实质子节：第三节的业务情况（主营、经营模式、电力生产供应与综合能源服务、业绩驱动因素）说明做什么与怎么经营；经营情况讨论与分析及主要利润构成说明利润来源与本期变化；主营业务分析中的利润表/现金流量表变动分析与收入和成本分析提供公司层面收入、成本与业务权重；行业经营性信息中的电量电价、电量收入成本、装机容量与售电业务经营情况补充运营规模与售电渠道；主要控股参股公司分析补充重要子公司经营。未选纯行业背景、核心竞争力、治理、债券与财务报告附注，以避免与经营综述重复或过度扩张。\",\"deferred\":[\"section-0053 行业情况与 section-0081 核心竞争力：属行业背景与泛化竞争力，非公司层面经营实质，暂不选\",\"section-0108 资产负债分析、section-0127 投资状况分析：偏财务结构与投资明细，非收入来源与经营模式核心，暂不选\",\"section-0142 未来发展讨论：含计划与风险，非本期经营事实，暂不选\",\"第八节财务报告及附注：仅在经营章节存在实质缺口时定向补充，本次不整体展开\"],\"stop_reason\":\"已覆盖业务结构、经营模式、收入与利润构成、电量电价与装机规模、售电渠道及主要子公司经营，足以回答公司经营与盈利问题；行业背景、治理、债券与财务报告附注属次要或重复范围，停止扩展。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0047",
+        "section-0049",
+        "section-0050",
+        "section-0051",
+        "section-0052",
+        "section-0065",
+        "section-0066",
+        "section-0087",
+        "section-0088",
+        "section-0089",
+        "section-0113",
+        "section-0114",
+        "section-0115",
+        "section-0116",
+        "section-0120",
+        "section-0134"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、经营模式、盈利来源与本期经营变化的实质子节：第三节的业务情况（主营、经营模式、电力生产供应与综合能源服务、业绩驱动因素）说明做什么与怎么经营；经营情况讨论与分析及主要利润构成说明利润来源与本期变化；主营业务分析中的利润表/现金流量表变动分析与收入和成本分析提供公司层面收入、成本与业务权重；行业经营性信息中的电量电价、电量收入成本、装机容量与售电业务经营情况补充运营规模与售电渠道；主要控股参股公司分析补充重要子公司经营。未选纯行业背景、核心竞争力、治理、债券与财务报告附注，以避免与经营综述重复或过度扩张。",
+      "deferred": [
+        "section-0053 行业情况与 section-0081 核心竞争力：属行业背景与泛化竞争力，非公司层面经营实质，暂不选",
+        "section-0108 资产负债分析、section-0127 投资状况分析：偏财务结构与投资明细，非收入来源与经营模式核心，暂不选",
+        "section-0142 未来发展讨论：含计划与风险，非本期经营事实，暂不选",
+        "第八节财务报告及附注：仅在经营章节存在实质缺口时定向补充，本次不整体展开"
+      ],
+      "stop_reason": "已覆盖业务结构、经营模式、收入与利润构成、电量电价与装机规模、售电渠道及主要子公司经营，足以回答公司经营与盈利问题；行业背景、治理、债券与财务报告附注属次要或重复范围，停止扩展。"
+    },
+    "usage": {
+      "input_tokens": 23460,
+      "output_tokens": 421,
+      "total_tokens": 23881
+    }
+  },
+  {
+    "request_id": "bp-work-fb1e124020fc48539e005099:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "e1b1fc8eafa8234bda93d5f556b0b35ee74c5bf3f62c889cfd09e043e73f8087",
+    "response_hash": "9196296f2ad4f3bd56e560eb2d805372582da5f30215fbec64fe66b9ae65fcbd",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司主营业务为电力生产、供应及综合能源服务等，其中电力生产、供应为核心业务；报告期内主营业务未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"电力生产方面，公司拥有自有水电装机75万千瓦、统调火电装机（含热电联产机组）133.8万千瓦和新能源装机（主要为网内并网光伏装机）6.2万千瓦，所发电量通过公司配电网络销售给供电区域内电力用户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"自有水电装机\",\"raw_value\":\"75\",\"value\":\"75\",\"unit\":\"万千瓦\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"统调火电装机（含热电联产机组）\",\"raw_value\":\"133.8\",\"value\":\"133.8\",\"unit\":\"万千瓦\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"新能源装机（主要为网内并网光伏装机）\",\"raw_value\":\"6.2\",\"value\":\"6.2\",\"unit\":\"万千瓦\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F03\",\"text\":\"电力供应方面，公司骨干电网覆盖重庆市多个区县，并与重庆市、贵州省、湖南省、湖北省等电网联网运行，供电区域划分明确；除销售自发电力外，还从国家电网、南方电网、网内其他电力生产单位购进电力，通过公司配电网络销售给终端用户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F04\",\"text\":\"综合能源业务立足用户用能特性和低碳降耗需求，投资并运营用户侧分布式能源站（天然气分布式能源站、分布式光伏等）、储能设施，同时从综合供能、节能改造等入手开展合同能源管理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F05\",\"text\":\"公司于2025年9月完成吸收合并全资子公司重庆长电联合能源有限责任公司，属同一控制下吸收合并，其法人资格已注销，全部资产、负债、权益、业务等由公司承继。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F06\",\"text\":\"公司核心产品与服务为电力生产与电力供应，所发及外购电量通过自有配电网络向重庆万州、涪陵、黔江等供电区域内用户销售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F07\",\"text\":\"综合能源服务产品包括用户侧分布式能源站（天然气分布式能源站、分布式光伏等）、储能设施运营以及合同能源管理、综合供能、节能改造等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F08\",\"text\":\"公司开展电解锰生产销售，2025年电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"电解锰生产量\",\"raw_value\":\"5.92\",\"value\":\"5.92\",\"unit\":\"万吨\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电解锰销售量\",\"raw_value\":\"6.53\",\"value\":\"6.53\",\"unit\":\"万吨\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电解锰库存量\",\"raw_value\":\"0.70\",\"value\":\"0.70\",\"unit\":\"万吨\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F09\",\"text\":\"公司存在贸易业务，销售电解锰、锰系合金、金属硅、煤炭等，2025年该贸易业务营业收入48,899.50万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"贸易业务营业收入（销售电解锰、锰系合金、金属硅、煤炭等）\",\"raw_value\":\"48,899.50\",\"value\":\"48899.50\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F10\",\"text\":\"2025年公司实现营业收入101.73亿元，营业成本88.97亿元；营业收入同比减少主要系网内部分用户用电量减少导致售电收入同比减少以及贸易业务收入同比减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"101.73\",\"value\":\"101.73\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"营业成本\",\"raw_value\":\"88.97\",\"value\":\"88.97\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F11\",\"text\":\"主营业务分行业看，电力销售营业收入6,884,147,935.10元、毛利率12.03%；综合能源营业收入1,540,734,152.07元、毛利率17.14%；其他主营业务营业收入1,687,186,424.24元、毛利率9.44%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"电力销售营业收入\",\"raw_value\":\"6,884,147,935.10\",\"value\":\"6884147935.10\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电力销售毛利率\",\"raw_value\":\"12.03\",\"value\":\"12.03\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"综合能源营业收入\",\"raw_value\":\"1,540,734,152.07\",\"value\":\"1540734152.07\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"综合能源毛利率\",\"raw_value\":\"17.14\",\"value\":\"17.14\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"其他主营业务营业收入\",\"raw_value\":\"1,687,186,424.24\",\"value\":\"1687186424.24\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"其他主营业务毛利率\",\"raw_value\":\"9.44\",\"value\":\"9.44\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F12\",\"text\":\"电力销售成本中，外购电成本504,640.01万元，占电力销售总成本83.32%；折旧费41,858.54万元，占6.91%；人工费31,715.53万元，占5.24%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"电力销售-外购电成本\",\"raw_value\":\"504,640.01\",\"value\":\"504640.01\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电力销售-外购电成本占总成本比例\",\"raw_value\":\"83.32\",\"value\":\"83.32\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电力销售-折旧费\",\"raw_value\":\"41,858.54\",\"value\":\"41858.54\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电力销售-人工费\",\"raw_value\":\"31,715.53\",\"value\":\"31715.53\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F13\",\"text\":\"报告期内公司实现营业利润66,277万元，其中电力业务利润39,372万元，占营业利润的59.40%；综合能源业务利润13,591万元，占营业利润的20.51%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"营业利润\",\"raw_value\":\"66,277\",\"value\":\"66277\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电力业务利润\",\"raw_value\":\"39,372\",\"value\":\"39372\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电力业务利润占营业利润比例\",\"raw_value\":\"59.40\",\"value\":\"59.40\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"综合能源业务利润\",\"raw_value\":\"13,591\",\"value\":\"13591\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"综合能源业务利润占营业利润比例\",\"raw_value\":\"20.51\",\"value\":\"20.51\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F14\",\"text\":\"2025年公司实现归属于上市公司股东的净利润4.36亿元，同比上升40.75%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"4.36\",\"value\":\"4.36\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"归属于上市公司股东的净利润同比变动\",\"raw_value\":\"40.75\",\"value\":\"40.75\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\"}]}],\"limitations\":[\"主营业务分行业表未单列电解锰、勘察设计安装等细分行业收入，相关收入包含于“其他主营业务”中，未获取更细拆分。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F15\",\"text\":\"2025年公司发电量23.7069亿千瓦时，同比增长12.66%；上网电量23.4345亿千瓦时，同比增长12.70%；售电量142.7041亿千瓦时，同比增长0.17%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"发电量\",\"raw_value\":\"23.7069\",\"value\":\"23.7069\",\"unit\":\"亿千瓦时\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"发电量同比变动\",\"raw_value\":\"12.66\",\"value\":\"12.66\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\"},{\"name\":\"上网电量\",\"raw_value\":\"23.4345\",\"value\":\"23.4345\",\"unit\":\"亿千瓦时\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"售电量\",\"raw_value\":\"142.7041\",\"value\":\"142.7041\",\"unit\":\"亿千瓦时\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F16\",\"text\":\"截至2025年底，公司自有及控股在运水电机组装机容量共746.2MW，其中接入公司自有电网的机组装机容量为713.3MW，未接入公司自有电网机组装机容量32.9MW。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"自有及控股在运水电机组装机容量\",\"raw_value\":\"746.2\",\"value\":\"746.2\",\"unit\":\"MW\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"接入自有电网水电机组装机容量\",\"raw_value\":\"713.3\",\"value\":\"713.3\",\"unit\":\"MW\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"未接入自有电网水电机组装机容量\",\"raw_value\":\"32.9\",\"value\":\"32.9\",\"unit\":\"MW\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F17\",\"text\":\"2025年公司新型储能规模近1.2吉瓦时，运营光伏项目规模超82兆瓦。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"新型储能规模\",\"raw_value\":\"近1.2\",\"value\":\"1.2\",\"unit\":\"吉瓦时\",\"qualifier\":\"approximate\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"运营光伏项目规模\",\"raw_value\":\"超82\",\"value\":\"82\",\"unit\":\"兆瓦\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F18\",\"text\":\"2025年公司自营市场化交易电量规模65.19亿千瓦时，同比增长43.71%；全年累计完成绿电交易电量3.52亿千瓦时。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"市场化交易总电量\",\"raw_value\":\"65.19\",\"value\":\"65.19\",\"unit\":\"亿千瓦时\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"市场化交易总电量同比变动\",\"raw_value\":\"43.71\",\"value\":\"43.71\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年度\"},{\"name\":\"绿电交易电量\",\"raw_value\":\"3.52\",\"value\":\"3.52\",\"unit\":\"亿千瓦时\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"装机容量表仅列示水电分电站明细，火电与新能源装机未按电站逐项列示。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F19\",\"text\":\"电力生产供应业务的主要投入为外购电力，2025年电力销售成本中外购电成本504,640.01万元，占该业务总成本83.32%；营业成本同比减少主要系自发电量增加导致外购电成本减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0007\"],\"metrics\":[{\"name\":\"电力销售-外购电成本\",\"raw_value\":\"504,640.01\",\"value\":\"504640.01\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F20\",\"text\":\"综合能源业务成本中，采购成本96,494.99万元，占该业务总成本75.59%；折旧费24,880.15万元，占19.49%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"综合能源-采购成本\",\"raw_value\":\"96,494.99\",\"value\":\"96494.99\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"综合能源-采购成本占总成本比例\",\"raw_value\":\"75.59\",\"value\":\"75.59\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"综合能源-折旧费\",\"raw_value\":\"24,880.15\",\"value\":\"24880.15\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F21\",\"text\":\"报告期内涪陵白涛1×49万千瓦热电联产项目及其配套送出工程按期建成，万州武陵（二期）15.6兆瓦分布式光伏并网投运；本钢板材高压作业区2×135兆瓦余气资源综合利用发电项目正式投运。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"涪陵白涛热电联产项目装机\",\"raw_value\":\"1×49\",\"value\":\"49\",\"unit\":\"万千瓦\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"万州武陵（二期）分布式光伏装机\",\"raw_value\":\"15.6\",\"value\":\"15.6\",\"unit\":\"兆瓦\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"本钢板材余气资源综合利用发电项目装机\",\"raw_value\":\"2×135\",\"value\":\"270\",\"unit\":\"兆瓦\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F22\",\"text\":\"2025年公司研发投入合计3,792,859.53元，全部为资本化研发投入，研发投入总额占营业收入比例0.04%；本年度研发人员为0人。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"3,792,859.53\",\"value\":\"3792859.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"0.04\",\"value\":\"0.04\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取主要原材料（如电煤）采购量、采购单价等明细数据。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F23\",\"text\":\"公司供电区域覆盖重庆万州、涪陵、黔江等区域，骨干电网覆盖重庆市多个区县，并与重庆市、贵州省、湖南省、湖北省等电网联网运行，供电区域划分明确。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F24\",\"text\":\"2025年前五名客户销售额292,525.80万元，占年度销售总额28.76%；前五名客户中关联方销售额0万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"292,525.80\",\"value\":\"292525.80\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"28.76\",\"value\":\"28.76\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F25\",\"text\":\"2025年公司自营签约市场化售电用户2,047家，交易电量规模65.19亿千瓦时；绿电交易在重庆、上海、江苏、浙江四地推进。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"自营签约市场化售电用户数\",\"raw_value\":\"2,047\",\"value\":\"2047\",\"unit\":\"家\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F26\",\"text\":\"主营业务分地区看，西南区营业收入10,023,781,084.36元、毛利率12.31%；华东区营业收入56,277,656.23元、毛利率5.39%；华南区营业收入32,009,770.82元、毛利率43.47%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"西南区营业收入\",\"raw_value\":\"10,023,781,084.36\",\"value\":\"10023781084.36\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"西南区毛利率\",\"raw_value\":\"12.31\",\"value\":\"12.31\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"华东区营业收入\",\"raw_value\":\"56,277,656.23\",\"value\":\"56277656.23\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"华南区营业收入\",\"raw_value\":\"32,009,770.82\",\"value\":\"32009770.82\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未披露具体客户名称及分客户销售明细。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"公司电力生产、供应业绩驱动的主要因素包括售电量的增加、自有电源发电量增加、综合购电成本控制等；综合能源服务业绩驱动的主要因素包括项目规模增加以及项目运营期获取的相关收益增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F28\",\"text\":\"2025年公司自发电量同比较大幅提升，主要系重庆区域水电站所处流域来水增加所致；配售电量创同期历史新高。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0009\"]},{\"fact_id\":\"F29\",\"text\":\"综合能源毛利率同比上升，主要系广西平果储能电站项目持续盈利、本钢板材余气资源综合利用发电项目和两江龙盛储能电站二期项目顺利投产实现盈利以及存量储能电站项目调频收入增长所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F30\",\"text\":\"电解锰生产量、销售量同比上升，主要系本期锰矿开采全面恢复正常生产、产能利用率提高以及电解锰市场行情回暖所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]}],\"limitations\":[\"未获取分季度或分月经营数据。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"公司于2025年9月26日经股东大会审议通过吸收合并全资子公司重庆长电联合能源有限责任公司，属同一控制下吸收合并，其法人资格已依法注销，全部资产、负债、权益、业务等由公司承继。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F32\",\"text\":\"报告期内公司处置天泰能源全部股权，取得投资收益16,834万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"处置天泰能源全部股权投资收益\",\"raw_value\":\"16,834\",\"value\":\"16834\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F33\",\"text\":\"报告期内公司资产减值损失14,868万元，主要系对长兴电力、贸易锰业等业务资产组计提商誉减值损失、非商誉资产分摊的剩余减值损失以及存货跌价准备等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"资产减值损失\",\"raw_value\":\"14,868\",\"value\":\"14868\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F34\",\"text\":\"报告期内公司其他业务利润亏损9,355万元，主要系勘察设计安装业务和锰业及贸易业务等亏损。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"其他业务利润亏损\",\"raw_value\":\"9,355\",\"value\":\"9355\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取处置天泰能源的具体交易对价及处置完成日期。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F35\",\"text\":\"公司处于电力生产与供应环节，拥有自有水电、火电及新能源装机，并通过自有配电网络向供电区域内用户销售电力，同时从外部电网及网内其他电力生产单位购进电力转售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F36\",\"text\":\"公司电力供应业务向上游外购电力，2025年外购电量1,204,112万千瓦时，外购电成本504,640.01万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0010\"],\"metrics\":[{\"name\":\"外购电量\",\"raw_value\":\"1,204,112\",\"value\":\"1204112\",\"unit\":\"万千瓦时\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"外购电成本\",\"raw_value\":\"504,640.01\",\"value\":\"504640.01\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F37\",\"text\":\"2025年前五名供应商采购额364,773.85万元，占年度采购总额41.00%；其中关联方采购额0万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"364,773.85\",\"value\":\"364773.85\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"41.00\",\"value\":\"41.00\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未披露具体供应商名称及分供应商采购明细。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F38\",\"text\":\"公司电力下游客户为重庆万州、涪陵、黔江等供电区域内的终端电力用户；综合能源业务服务对象为有用能特性和低碳降耗需求的用户，包括大用户综合能源项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]},\"limitations\":[\"未披露具体下游客户名称及分行业用电结构。\"]}}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司主营业务为电力生产、供应及综合能源服务等，其中电力生产、供应为核心业务；报告期内主营业务未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "电力生产方面，公司拥有自有水电装机75万千瓦、统调火电装机（含热电联产机组）133.8万千瓦和新能源装机（主要为网内并网光伏装机）6.2万千瓦，所发电量通过公司配电网络销售给供电区域内电力用户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "自有水电装机",
+                  "raw_value": "75",
+                  "value": "75",
+                  "unit": "万千瓦",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "统调火电装机（含热电联产机组）",
+                  "raw_value": "133.8",
+                  "value": "133.8",
+                  "unit": "万千瓦",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "新能源装机（主要为网内并网光伏装机）",
+                  "raw_value": "6.2",
+                  "value": "6.2",
+                  "unit": "万千瓦",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "电力供应方面，公司骨干电网覆盖重庆市多个区县，并与重庆市、贵州省、湖南省、湖北省等电网联网运行，供电区域划分明确；除销售自发电力外，还从国家电网、南方电网、网内其他电力生产单位购进电力，通过公司配电网络销售给终端用户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "综合能源业务立足用户用能特性和低碳降耗需求，投资并运营用户侧分布式能源站（天然气分布式能源站、分布式光伏等）、储能设施，同时从综合供能、节能改造等入手开展合同能源管理。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "公司于2025年9月完成吸收合并全资子公司重庆长电联合能源有限责任公司，属同一控制下吸收合并，其法人资格已注销，全部资产、负债、权益、业务等由公司承继。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F06",
+              "text": "公司核心产品与服务为电力生产与电力供应，所发及外购电量通过自有配电网络向重庆万州、涪陵、黔江等供电区域内用户销售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "综合能源服务产品包括用户侧分布式能源站（天然气分布式能源站、分布式光伏等）、储能设施运营以及合同能源管理、综合供能、节能改造等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "公司开展电解锰生产销售，2025年电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "电解锰生产量",
+                  "raw_value": "5.92",
+                  "value": "5.92",
+                  "unit": "万吨",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电解锰销售量",
+                  "raw_value": "6.53",
+                  "value": "6.53",
+                  "unit": "万吨",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电解锰库存量",
+                  "raw_value": "0.70",
+                  "value": "0.70",
+                  "unit": "万吨",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "公司存在贸易业务，销售电解锰、锰系合金、金属硅、煤炭等，2025年该贸易业务营业收入48,899.50万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "贸易业务营业收入（销售电解锰、锰系合金、金属硅、煤炭等）",
+                  "raw_value": "48,899.50",
+                  "value": "48899.50",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F10",
+              "text": "2025年公司实现营业收入101.73亿元，营业成本88.97亿元；营业收入同比减少主要系网内部分用户用电量减少导致售电收入同比减少以及贸易业务收入同比减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "101.73",
+                  "value": "101.73",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "88.97",
+                  "value": "88.97",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "主营业务分行业看，电力销售营业收入6,884,147,935.10元、毛利率12.03%；综合能源营业收入1,540,734,152.07元、毛利率17.14%；其他主营业务营业收入1,687,186,424.24元、毛利率9.44%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "电力销售营业收入",
+                  "raw_value": "6,884,147,935.10",
+                  "value": "6884147935.10",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电力销售毛利率",
+                  "raw_value": "12.03",
+                  "value": "12.03",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "综合能源营业收入",
+                  "raw_value": "1,540,734,152.07",
+                  "value": "1540734152.07",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "综合能源毛利率",
+                  "raw_value": "17.14",
+                  "value": "17.14",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他主营业务营业收入",
+                  "raw_value": "1,687,186,424.24",
+                  "value": "1687186424.24",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他主营业务毛利率",
+                  "raw_value": "9.44",
+                  "value": "9.44",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "电力销售成本中，外购电成本504,640.01万元，占电力销售总成本83.32%；折旧费41,858.54万元，占6.91%；人工费31,715.53万元，占5.24%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "电力销售-外购电成本",
+                  "raw_value": "504,640.01",
+                  "value": "504640.01",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电力销售-外购电成本占总成本比例",
+                  "raw_value": "83.32",
+                  "value": "83.32",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电力销售-折旧费",
+                  "raw_value": "41,858.54",
+                  "value": "41858.54",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电力销售-人工费",
+                  "raw_value": "31,715.53",
+                  "value": "31715.53",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "报告期内公司实现营业利润66,277万元，其中电力业务利润39,372万元，占营业利润的59.40%；综合能源业务利润13,591万元，占营业利润的20.51%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业利润",
+                  "raw_value": "66,277",
+                  "value": "66277",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电力业务利润",
+                  "raw_value": "39,372",
+                  "value": "39372",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "电力业务利润占营业利润比例",
+                  "raw_value": "59.40",
+                  "value": "59.40",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "综合能源业务利润",
+                  "raw_value": "13,591",
+                  "value": "13591",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "综合能源业务利润占营业利润比例",
+                  "raw_value": "20.51",
+                  "value": "20.51",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "2025年公司实现归属于上市公司股东的净利润4.36亿元，同比上升40.75%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "4.36",
+                  "value": "4.36",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比变动",
+                  "raw_value": "40.75",
+                  "value": "40.75",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "主营业务分行业表未单列电解锰、勘察设计安装等细分行业收入，相关收入包含于“其他主营业务”中，未获取更细拆分。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F15",
+              "text": "2025年公司发电量23.7069亿千瓦时，同比增长12.66%；上网电量23.4345亿千瓦时，同比增长12.70%；售电量142.7041亿千瓦时，同比增长0.17%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "发电量",
+                  "raw_value": "23.7069",
+                  "value": "23.7069",
+                  "unit": "亿千瓦时",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "发电量同比变动",
+                  "raw_value": "12.66",
+                  "value": "12.66",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "上年同期"
+                },
+                {
+                  "name": "上网电量",
+                  "raw_value": "23.4345",
+                  "value": "23.4345",
+                  "unit": "亿千瓦时",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "售电量",
+                  "raw_value": "142.7041",
+                  "value": "142.7041",
+                  "unit": "亿千瓦时",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "截至2025年底，公司自有及控股在运水电机组装机容量共746.2MW，其中接入公司自有电网的机组装机容量为713.3MW，未接入公司自有电网机组装机容量32.9MW。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "自有及控股在运水电机组装机容量",
+                  "raw_value": "746.2",
+                  "value": "746.2",
+                  "unit": "MW",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "接入自有电网水电机组装机容量",
+                  "raw_value": "713.3",
+                  "value": "713.3",
+                  "unit": "MW",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "未接入自有电网水电机组装机容量",
+                  "raw_value": "32.9",
+                  "value": "32.9",
+                  "unit": "MW",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "2025年公司新型储能规模近1.2吉瓦时，运营光伏项目规模超82兆瓦。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "新型储能规模",
+                  "raw_value": "近1.2",
+                  "value": "1.2",
+                  "unit": "吉瓦时",
+                  "qualifier": "approximate",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "运营光伏项目规模",
+                  "raw_value": "超82",
+                  "value": "82",
+                  "unit": "兆瓦",
+                  "qualifier": "greater_than",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "2025年公司自营市场化交易电量规模65.19亿千瓦时，同比增长43.71%；全年累计完成绿电交易电量3.52亿千瓦时。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "市场化交易总电量",
+                  "raw_value": "65.19",
+                  "value": "65.19",
+                  "unit": "亿千瓦时",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "市场化交易总电量同比变动",
+                  "raw_value": "43.71",
+                  "value": "43.71",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": "上年度"
+                },
+                {
+                  "name": "绿电交易电量",
+                  "raw_value": "3.52",
+                  "value": "3.52",
+                  "unit": "亿千瓦时",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "装机容量表仅列示水电分电站明细，火电与新能源装机未按电站逐项列示。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F19",
+              "text": "电力生产供应业务的主要投入为外购电力，2025年电力销售成本中外购电成本504,640.01万元，占该业务总成本83.32%；营业成本同比减少主要系自发电量增加导致外购电成本减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "电力销售-外购电成本",
+                  "raw_value": "504,640.01",
+                  "value": "504640.01",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "综合能源业务成本中，采购成本96,494.99万元，占该业务总成本75.59%；折旧费24,880.15万元，占19.49%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "综合能源-采购成本",
+                  "raw_value": "96,494.99",
+                  "value": "96494.99",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "综合能源-采购成本占总成本比例",
+                  "raw_value": "75.59",
+                  "value": "75.59",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "综合能源-折旧费",
+                  "raw_value": "24,880.15",
+                  "value": "24880.15",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "报告期内涪陵白涛1×49万千瓦热电联产项目及其配套送出工程按期建成，万州武陵（二期）15.6兆瓦分布式光伏并网投运；本钢板材高压作业区2×135兆瓦余气资源综合利用发电项目正式投运。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "涪陵白涛热电联产项目装机",
+                  "raw_value": "1×49",
+                  "value": "49",
+                  "unit": "万千瓦",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "万州武陵（二期）分布式光伏装机",
+                  "raw_value": "15.6",
+                  "value": "15.6",
+                  "unit": "兆瓦",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "本钢板材余气资源综合利用发电项目装机",
+                  "raw_value": "2×135",
+                  "value": "270",
+                  "unit": "兆瓦",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "2025年公司研发投入合计3,792,859.53元，全部为资本化研发投入，研发投入总额占营业收入比例0.04%；本年度研发人员为0人。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "3,792,859.53",
+                  "value": "3792859.53",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "0.04",
+                  "value": "0.04",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取主要原材料（如电煤）采购量、采购单价等明细数据。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F23",
+              "text": "公司供电区域覆盖重庆万州、涪陵、黔江等区域，骨干电网覆盖重庆市多个区县，并与重庆市、贵州省、湖南省、湖北省等电网联网运行，供电区域划分明确。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "2025年前五名客户销售额292,525.80万元，占年度销售总额28.76%；前五名客户中关联方销售额0万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "292,525.80",
+                  "value": "292525.80",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "28.76",
+                  "value": "28.76",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "2025年公司自营签约市场化售电用户2,047家，交易电量规模65.19亿千瓦时；绿电交易在重庆、上海、江苏、浙江四地推进。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "自营签约市场化售电用户数",
+                  "raw_value": "2,047",
+                  "value": "2047",
+                  "unit": "家",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "主营业务分地区看，西南区营业收入10,023,781,084.36元、毛利率12.31%；华东区营业收入56,277,656.23元、毛利率5.39%；华南区营业收入32,009,770.82元、毛利率43.47%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "西南区营业收入",
+                  "raw_value": "10,023,781,084.36",
+                  "value": "10023781084.36",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "西南区毛利率",
+                  "raw_value": "12.31",
+                  "value": "12.31",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "华东区营业收入",
+                  "raw_value": "56,277,656.23",
+                  "value": "56277656.23",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "华南区营业收入",
+                  "raw_value": "32,009,770.82",
+                  "value": "32009770.82",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称及分客户销售明细。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F27",
+              "text": "公司电力生产、供应业绩驱动的主要因素包括售电量的增加、自有电源发电量增加、综合购电成本控制等；综合能源服务业绩驱动的主要因素包括项目规模增加以及项目运营期获取的相关收益增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "2025年公司自发电量同比较大幅提升，主要系重庆区域水电站所处流域来水增加所致；配售电量创同期历史新高。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "综合能源毛利率同比上升，主要系广西平果储能电站项目持续盈利、本钢板材余气资源综合利用发电项目和两江龙盛储能电站二期项目顺利投产实现盈利以及存量储能电站项目调频收入增长所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "电解锰生产量、销售量同比上升，主要系本期锰矿开采全面恢复正常生产、产能利用率提高以及电解锰市场行情回暖所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取分季度或分月经营数据。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F31",
+              "text": "公司于2025年9月26日经股东大会审议通过吸收合并全资子公司重庆长电联合能源有限责任公司，属同一控制下吸收合并，其法人资格已依法注销，全部资产、负债、权益、业务等由公司承继。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F32",
+              "text": "报告期内公司处置天泰能源全部股权，取得投资收益16,834万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "处置天泰能源全部股权投资收益",
+                  "raw_value": "16,834",
+                  "value": "16834",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F33",
+              "text": "报告期内公司资产减值损失14,868万元，主要系对长兴电力、贸易锰业等业务资产组计提商誉减值损失、非商誉资产分摊的剩余减值损失以及存货跌价准备等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "资产减值损失",
+                  "raw_value": "14,868",
+                  "value": "14868",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "text": "报告期内公司其他业务利润亏损9,355万元，主要系勘察设计安装业务和锰业及贸易业务等亏损。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "其他业务利润亏损",
+                  "raw_value": "9,355",
+                  "value": "9355",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取处置天泰能源的具体交易对价及处置完成日期。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F35",
+              "text": "公司处于电力生产与供应环节，拥有自有水电、火电及新能源装机，并通过自有配电网络向供电区域内用户销售电力，同时从外部电网及网内其他电力生产单位购进电力转售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F36",
+              "text": "公司电力供应业务向上游外购电力，2025年外购电量1,204,112万千瓦时，外购电成本504,640.01万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "外购电量",
+                  "raw_value": "1,204,112",
+                  "value": "1204112",
+                  "unit": "万千瓦时",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "外购电成本",
+                  "raw_value": "504,640.01",
+                  "value": "504640.01",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F37",
+              "text": "2025年前五名供应商采购额364,773.85万元，占年度采购总额41.00%；其中关联方采购额0万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "364,773.85",
+                  "value": "364773.85",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "41.00",
+                  "value": "41.00",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体供应商名称及分供应商采购明细。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F38",
+              "text": "公司电力下游客户为重庆万州、涪陵、黔江等供电区域内的终端电力用户；综合能源业务服务对象为有用能特性和低碳降耗需求的用户，包括大用户综合能源项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "limitations": [
+          "未披露具体下游客户名称及分行业用电结构。"
+        ]
+      }
+    },
+    "usage": {
+      "input_tokens": 18745,
+      "output_tokens": 6143,
+      "total_tokens": 24888
+    }
+  },
+  {
+    "request_id": "bp-work-fb1e124020fc48539e005099:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "707dc0f7f5c263246747a3ce7aaac8961a23309dfcbd860095376f97e731f00c",
+    "response_hash": "507bf8d85b81532045579e436f4d99d7aab87ae4dc890ff3b29c6efe409900bb",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\",\"F34\"],\"findings\":[{\"finding_id\":\"R01\",\"element\":\"business_structure\",\"affected_fact_id\":\"F05\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"evidence_ids\":[\"source-0010\"],\"explanation\":\"2025年9月26日是临时股东大会审议通过吸收合并重庆长电联合能源的日期，不是完成日。原文另列2025年12月31日披露的工商注销完成公告，并确认法人资格已注销、资产负债权益业务由公司承继。应保留同一控制下吸收合并及承继等已支持内容，删除“于2025年9月完成”的时点，改为9月26日审议通过、报告期内注销已完成且完成公告日为12月31日。\"},{\"finding_id\":\"R02\",\"element\":\"products_services\",\"affected_fact_id\":\"F08\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨与产销量表一致，但该行是主要产品行，不是集团整体口径。三个指标的主体范围不应标为consolidated_group，应改为business_segment并保留产品名称；金额与单位无需改写。\"},{\"finding_id\":\"R03\",\"element\":\"products_services\",\"affected_fact_id\":\"F09\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0011\"],\"explanation\":\"贸易业务本期营业收入48,899.50万元及品类表述与原文一致，但对象是“销售电解锰、锰系合金、金属硅、煤炭等”这一贸易业务行，不是公司营业收入整体。指标主体范围应改为business_segment，不得因表在合并报告中就标成consolidated_group。\"},{\"finding_id\":\"R04\",\"element\":\"revenue_model\",\"affected_fact_id\":\"F11\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"电力销售、综合能源、其他主营业务的营业收入与毛利率数值及毛利率口径与主营业务分行业表一致，但三行都是行业行，不能继承集团整体范围。电力销售6,884,147,935.10元、综合能源1,540,734,152.07元、其他主营业务1,687,186,424.24元均不是公司营业收入101.73亿元。各行业指标主体范围应由consolidated_group改为business_segment，并在指标名称中保留原行业类别；事实中的金额、毛利率和期间可保留。\"},{\"finding_id\":\"R05\",\"element\":\"revenue_model\",\"affected_fact_id\":\"F12\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"外购电504,640.01万元、折旧费41,858.54万元、人工费31,715.53万元及83.32%、6.91%、5.24%与电力销售成本分项一致，分母是该行业成本小计（小计行100%），不是公司总成本。这些指标属于电力销售业务行，主体范围应改为business_segment，比例名称应明确为占电力销售总成本，不能标成集团整体占比。\"},{\"finding_id\":\"R06\",\"element\":\"revenue_model\",\"affected_fact_id\":\"F13\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"explanation\":\"营业利润66,277万元属于集团整体，可保持consolidated_group。电力业务利润39,372万元（占营业利润59.40%）和综合能源业务利润13,591万元（占营业利润20.51%）是业务行，不是营业利润本身，其指标主体范围应改为business_segment。占比分母仍是营业利润，数值无需改。\"},{\"finding_id\":\"R07\",\"element\":\"operations_and_inputs\",\"affected_fact_id\":\"F19\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0010\"],\"explanation\":\"电力销售外购电成本504,640.01万元是电力销售成本构成行，不是集团全部营业成本。该指标主体范围应改为business_segment；83.32%的分母是电力销售总成本。公司营业成本变动原因可另作集团口径表述，但不得把该成本行标成consolidated_group。\"},{\"finding_id\":\"R08\",\"element\":\"operations_and_inputs\",\"affected_fact_id\":\"F19\",\"severity\":\"minor\",\"issue_type\":\"unsupported_causality\",\"action\":\"correct\",\"evidence_ids\":[\"source-0007\",\"source-0010\"],\"explanation\":\"外购电成本金额及占电力销售总成本83.32%有支持。但营业成本同比减少的原文是并列两项主因：自发电量增加导致外购电成本减少，以及子公司博联热电发电量和蒸汽量减少导致外购原材料成本减少。现稿只写前一项并称“主要系”，把并列原因收窄了。应保留外购电成本核心数据，并将博联热电原材料成本原因并列写入或明确前一项只是原因之一。\"},{\"finding_id\":\"R09\",\"element\":\"operations_and_inputs\",\"affected_fact_id\":\"F20\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"综合能源采购成本96,494.99万元（占75.59%）和折旧费24,880.15万元（占19.49%）与分行业成本表一致，分母是综合能源成本小计而非公司总成本。指标主体范围应改为business_segment，比例应限定为占该业务总成本。\"},{\"finding_id\":\"R10\",\"element\":\"customers_channels_markets\",\"affected_fact_id\":\"F26\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"西南区营业收入10,023,781,084.36元、毛利率12.31%，华东区56,277,656.23元、毛利率5.39%，华南区32,009,770.82元、毛利率43.47%，均与分地区表一致。这些是地区行，不是公司整体收入；西南区金额接近但低于公司营业收入10,172,907,704.50元，不能等同。各区指标主体范围应改为business_segment，保留地区名称，不得标为consolidated_group。\"},{\"finding_id\":\"R11\",\"element\":\"operating_drivers\",\"affected_fact_id\":\"F28\",\"severity\":\"minor\",\"issue_type\":\"unsupported_causality\",\"action\":\"correct\",\"evidence_ids\":[\"source-0003\",\"source-0009\"],\"explanation\":\"“自发电量同比较大幅提升”和“配售电量创同期历史新高”分别有原文支持，但来水增加这一原因原文只对应“自发水电量同比上升”，并未赋予不加限定的“自发电量”。不能因增幅同为12.66%就把自发电量与自发水电量视为同一主体。应保留两类已支持表述，将来水原因改挂到自发水电量，或删除该因果连接。\"},{\"finding_id\":\"R12\",\"element\":\"revenue_model\",\"affected_fact_id\":null,\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"explanation\":\"主要利润构成中，投资收益29,897万元、占营业利润45.11%，高于已收录的综合能源业务利润，且包含处置天泰能源16,834万元以外的联营企业投资收益10,778万元等，不能用处置收益单项或营业利润总额代替。同列还缺其他收益7,228万元（占营业利润10.91%）和信用减值损失7,375万元（占营业利润-11.13%）。这三项会改变对盈利机制的理解：收入下降的同时，利润大幅依赖投资收益和补助，并受信用减值抵减。应补入上述来源原口径金额和占营业利润比例；公允价值变动收益4,930万元、资产处置收益2,858万元同属该构成，但不是本项材料性缺口的必要补全范围。已有电力业务利润、综合能源业务利润、资产减值和其他业务亏损应保留。\"},{\"finding_id\":\"R13\",\"element\":\"limitations\",\"affected_fact_id\":null,\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"evidence_ids\":[\"source-0004\",\"source-0009\",\"source-0011\"],\"explanation\":\"分行业表确实只列电力销售、综合能源、其他主营业务，未单列电解锰或勘察设计安装收入，这一点可保留。但原文没有写明这些收入包含于“其他主营业务”；“其他业务利润亏损”与“其他主营业务”不是同一类别，贸易业务也是另行披露。不能用金额大小推断归属。应改为所供章节未明示其是否计入其他主营业务，范围不清，而不是断言已经包含。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34"
+      ],
+      "findings": [
+        {
+          "finding_id": "R01",
+          "element": "business_structure",
+          "affected_fact_id": "F05",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "2025年9月26日是临时股东大会审议通过吸收合并重庆长电联合能源的日期，不是完成日。原文另列2025年12月31日披露的工商注销完成公告，并确认法人资格已注销、资产负债权益业务由公司承继。应保留同一控制下吸收合并及承继等已支持内容，删除“于2025年9月完成”的时点，改为9月26日审议通过、报告期内注销已完成且完成公告日为12月31日。"
+        },
+        {
+          "finding_id": "R02",
+          "element": "products_services",
+          "affected_fact_id": "F08",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨与产销量表一致，但该行是主要产品行，不是集团整体口径。三个指标的主体范围不应标为consolidated_group，应改为business_segment并保留产品名称；金额与单位无需改写。"
+        },
+        {
+          "finding_id": "R03",
+          "element": "products_services",
+          "affected_fact_id": "F09",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "贸易业务本期营业收入48,899.50万元及品类表述与原文一致，但对象是“销售电解锰、锰系合金、金属硅、煤炭等”这一贸易业务行，不是公司营业收入整体。指标主体范围应改为business_segment，不得因表在合并报告中就标成consolidated_group。"
+        },
+        {
+          "finding_id": "R04",
+          "element": "revenue_model",
+          "affected_fact_id": "F11",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "电力销售、综合能源、其他主营业务的营业收入与毛利率数值及毛利率口径与主营业务分行业表一致，但三行都是行业行，不能继承集团整体范围。电力销售6,884,147,935.10元、综合能源1,540,734,152.07元、其他主营业务1,687,186,424.24元均不是公司营业收入101.73亿元。各行业指标主体范围应由consolidated_group改为business_segment，并在指标名称中保留原行业类别；事实中的金额、毛利率和期间可保留。"
+        },
+        {
+          "finding_id": "R05",
+          "element": "revenue_model",
+          "affected_fact_id": "F12",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "外购电504,640.01万元、折旧费41,858.54万元、人工费31,715.53万元及83.32%、6.91%、5.24%与电力销售成本分项一致，分母是该行业成本小计（小计行100%），不是公司总成本。这些指标属于电力销售业务行，主体范围应改为business_segment，比例名称应明确为占电力销售总成本，不能标成集团整体占比。"
+        },
+        {
+          "finding_id": "R06",
+          "element": "revenue_model",
+          "affected_fact_id": "F13",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "营业利润66,277万元属于集团整体，可保持consolidated_group。电力业务利润39,372万元（占营业利润59.40%）和综合能源业务利润13,591万元（占营业利润20.51%）是业务行，不是营业利润本身，其指标主体范围应改为business_segment。占比分母仍是营业利润，数值无需改。"
+        },
+        {
+          "finding_id": "R07",
+          "element": "operations_and_inputs",
+          "affected_fact_id": "F19",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "电力销售外购电成本504,640.01万元是电力销售成本构成行，不是集团全部营业成本。该指标主体范围应改为business_segment；83.32%的分母是电力销售总成本。公司营业成本变动原因可另作集团口径表述，但不得把该成本行标成consolidated_group。"
+        },
+        {
+          "finding_id": "R08",
+          "element": "operations_and_inputs",
+          "affected_fact_id": "F19",
+          "severity": "minor",
+          "issue_type": "unsupported_causality",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0007",
+            "source-0010"
+          ],
+          "explanation": "外购电成本金额及占电力销售总成本83.32%有支持。但营业成本同比减少的原文是并列两项主因：自发电量增加导致外购电成本减少，以及子公司博联热电发电量和蒸汽量减少导致外购原材料成本减少。现稿只写前一项并称“主要系”，把并列原因收窄了。应保留外购电成本核心数据，并将博联热电原材料成本原因并列写入或明确前一项只是原因之一。"
+        },
+        {
+          "finding_id": "R09",
+          "element": "operations_and_inputs",
+          "affected_fact_id": "F20",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "综合能源采购成本96,494.99万元（占75.59%）和折旧费24,880.15万元（占19.49%）与分行业成本表一致，分母是综合能源成本小计而非公司总成本。指标主体范围应改为business_segment，比例应限定为占该业务总成本。"
+        },
+        {
+          "finding_id": "R10",
+          "element": "customers_channels_markets",
+          "affected_fact_id": "F26",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "西南区营业收入10,023,781,084.36元、毛利率12.31%，华东区56,277,656.23元、毛利率5.39%，华南区32,009,770.82元、毛利率43.47%，均与分地区表一致。这些是地区行，不是公司整体收入；西南区金额接近但低于公司营业收入10,172,907,704.50元，不能等同。各区指标主体范围应改为business_segment，保留地区名称，不得标为consolidated_group。"
+        },
+        {
+          "finding_id": "R11",
+          "element": "operating_drivers",
+          "affected_fact_id": "F28",
+          "severity": "minor",
+          "issue_type": "unsupported_causality",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0003",
+            "source-0009"
+          ],
+          "explanation": "“自发电量同比较大幅提升”和“配售电量创同期历史新高”分别有原文支持，但来水增加这一原因原文只对应“自发水电量同比上升”，并未赋予不加限定的“自发电量”。不能因增幅同为12.66%就把自发电量与自发水电量视为同一主体。应保留两类已支持表述，将来水原因改挂到自发水电量，或删除该因果连接。"
+        },
+        {
+          "finding_id": "R12",
+          "element": "revenue_model",
+          "affected_fact_id": null,
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "主要利润构成中，投资收益29,897万元、占营业利润45.11%，高于已收录的综合能源业务利润，且包含处置天泰能源16,834万元以外的联营企业投资收益10,778万元等，不能用处置收益单项或营业利润总额代替。同列还缺其他收益7,228万元（占营业利润10.91%）和信用减值损失7,375万元（占营业利润-11.13%）。这三项会改变对盈利机制的理解：收入下降的同时，利润大幅依赖投资收益和补助，并受信用减值抵减。应补入上述来源原口径金额和占营业利润比例；公允价值变动收益4,930万元、资产处置收益2,858万元同属该构成，但不是本项材料性缺口的必要补全范围。已有电力业务利润、综合能源业务利润、资产减值和其他业务亏损应保留。"
+        },
+        {
+          "finding_id": "R13",
+          "element": "limitations",
+          "affected_fact_id": null,
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0004",
+            "source-0009",
+            "source-0011"
+          ],
+          "explanation": "分行业表确实只列电力销售、综合能源、其他主营业务，未单列电解锰或勘察设计安装收入，这一点可保留。但原文没有写明这些收入包含于“其他主营业务”；“其他业务利润亏损”与“其他主营业务”不是同一类别，贸易业务也是另行披露。不能用金额大小推断归属。应改为所供章节未明示其是否计入其他主营业务，范围不清，而不是断言已经包含。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 27038,
+      "output_tokens": 2249,
+      "total_tokens": 65507
+    }
+  },
+  {
+    "request_id": "bp-work-fb1e124020fc48539e005099:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "c7a7551a313ef089a8b157d1ec5ddb6ba2493c1596ffa866ca8d40ac88c2413e",
+    "response_hash": "11d51c80226baf679dc3b1057285e641172f4d818cb9cee444e0207bc39d65f0",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F05\",\"text\":\"公司于2025年9月26日召开2025年第二次临时股东大会，审议通过《关于公司吸收合并全资子公司重庆长电联合能源有限责任公司的议案》；本次吸收合并属于同一控制下的吸收合并，重庆长电联合能源有限责任公司法人资格已依法注销，其全部资产、负债、权益、业务等已由公司依法承继，公司于2025年12月31日披露《关于吸收合并下属全资子公司完成工商注销登记的公告》。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F08\",\"text\":\"公司开展电解锰生产销售，2025年电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"电解锰生产量\",\"raw_value\":\"5.92\",\"value\":\"5.92\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电解锰销售量\",\"raw_value\":\"6.53\",\"value\":\"6.53\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电解锰库存量\",\"raw_value\":\"0.70\",\"value\":\"0.70\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F09\",\"text\":\"公司存在贸易业务，销售电解锰、锰系合金、金属硅、煤炭等，2025年该贸易业务营业收入48,899.50万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"贸易业务营业收入（销售电解锰、锰系合金、金属硅、煤炭等）\",\"raw_value\":\"48,899.50\",\"value\":\"48899.50\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F11\",\"text\":\"主营业务分行业看，电力销售营业收入6,884,147,935.10元、毛利率12.03%；综合能源营业收入1,540,734,152.07元、毛利率17.14%；其他主营业务营业收入1,687,186,424.24元、毛利率9.44%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"电力销售营业收入\",\"raw_value\":\"6,884,147,935.10\",\"value\":\"6884147935.10\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电力销售毛利率\",\"raw_value\":\"12.03\",\"value\":\"12.03\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合能源营业收入\",\"raw_value\":\"1,540,734,152.07\",\"value\":\"1540734152.07\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合能源毛利率\",\"raw_value\":\"17.14\",\"value\":\"17.14\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他主营业务营业收入\",\"raw_value\":\"1,687,186,424.24\",\"value\":\"1687186424.24\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他主营业务毛利率\",\"raw_value\":\"9.44\",\"value\":\"9.44\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F12\",\"text\":\"电力销售成本中，外购电成本504,640.01万元，占电力销售总成本83.32%；折旧费41,858.54万元，占6.91%；人工费31,715.53万元，占5.24%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"电力销售-外购电成本\",\"raw_value\":\"504,640.01\",\"value\":\"504640.01\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电力销售-外购电成本占电力销售总成本比例\",\"raw_value\":\"83.32\",\"value\":\"83.32\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电力销售-折旧费\",\"raw_value\":\"41,858.54\",\"value\":\"41858.54\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电力销售-人工费\",\"raw_value\":\"31,715.53\",\"value\":\"31715.53\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F13\",\"text\":\"报告期内公司实现营业利润66,277万元，其中电力业务利润39,372万元，占营业利润的59.40%；综合能源业务利润13,591万元，占营业利润的20.51%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"营业利润\",\"raw_value\":\"66,277\",\"value\":\"66277\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电力业务利润\",\"raw_value\":\"39,372\",\"value\":\"39372\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电力业务利润占营业利润比例\",\"raw_value\":\"59.40\",\"value\":\"59.40\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合能源业务利润\",\"raw_value\":\"13,591\",\"value\":\"13591\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合能源业务利润占营业利润比例\",\"raw_value\":\"20.51\",\"value\":\"20.51\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F19\",\"text\":\"电力生产供应业务的主要投入为外购电力，2025年电力销售成本中外购电成本504,640.01万元，占该业务总成本83.32%；营业成本同比减少主要系本期自发电量增加导致外购电成本减少，以及子公司博联热电本期发电量和蒸汽量减少导致外购原材料成本减少所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0007\"],\"metrics\":[{\"name\":\"电力销售-外购电成本\",\"raw_value\":\"504,640.01\",\"value\":\"504640.01\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F20\",\"text\":\"综合能源业务成本中，采购成本96,494.99万元，占该业务总成本75.59%；折旧费24,880.15万元，占19.49%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"综合能源-采购成本\",\"raw_value\":\"96,494.99\",\"value\":\"96494.99\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合能源-采购成本占该业务总成本比例\",\"raw_value\":\"75.59\",\"value\":\"75.59\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合能源-折旧费\",\"raw_value\":\"24,880.15\",\"value\":\"24880.15\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F26\",\"text\":\"主营业务分地区看，西南区营业收入10,023,781,084.36元、毛利率12.31%；华东区营业收入56,277,656.23元、毛利率5.39%；华南区营业收入32,009,770.82元、毛利率43.47%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"西南区营业收入\",\"raw_value\":\"10,023,781,084.36\",\"value\":\"10023781084.36\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"西南区毛利率\",\"raw_value\":\"12.31\",\"value\":\"12.31\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"华东区营业收入\",\"raw_value\":\"56,277,656.23\",\"value\":\"56277656.23\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"华东区毛利率\",\"raw_value\":\"5.39\",\"value\":\"5.39\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"华南区营业收入\",\"raw_value\":\"32,009,770.82\",\"value\":\"32009770.82\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"华南区毛利率\",\"raw_value\":\"43.47\",\"value\":\"43.47\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F28\",\"text\":\"2025年公司自发电量同比较大幅提升，配售电量创同期历史新高；自发水电量同比上升，主要系重庆区域水电站所处流域来水增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:R12\",\"text\":\"报告期内公司实现营业利润66,277万元，主要构成还包括：投资收益29,897万元，占营业利润的45.11%，主要系本期处置天泰能源全部股权取得投资收益16,834万元，本期确认联营企业投资收益10,778万元；其他收益7,228万元，占营业利润的10.91%；信用减值损失7,375万元，占营业利润的-11.13%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"投资收益\",\"raw_value\":\"29,897\",\"value\":\"29897\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占营业利润比例\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资收益占营业利润比例\",\"raw_value\":\"45.11\",\"value\":\"45.11\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他收益\",\"raw_value\":\"7,228\",\"value\":\"7228\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占营业利润比例\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他收益占营业利润比例\",\"raw_value\":\"10.91\",\"value\":\"10.91\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"信用减值损失\",\"raw_value\":\"7,375\",\"value\":\"7375\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占营业利润比例\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"信用减值损失占营业利润比例\",\"raw_value\":\"-11.13\",\"value\":\"-11.13\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F05",
+          "text": "公司于2025年9月26日召开2025年第二次临时股东大会，审议通过《关于公司吸收合并全资子公司重庆长电联合能源有限责任公司的议案》；本次吸收合并属于同一控制下的吸收合并，重庆长电联合能源有限责任公司法人资格已依法注销，其全部资产、负债、权益、业务等已由公司依法承继，公司于2025年12月31日披露《关于吸收合并下属全资子公司完成工商注销登记的公告》。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F08",
+          "text": "公司开展电解锰生产销售，2025年电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "电解锰生产量",
+              "raw_value": "5.92",
+              "value": "5.92",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电解锰销售量",
+              "raw_value": "6.53",
+              "value": "6.53",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电解锰库存量",
+              "raw_value": "0.70",
+              "value": "0.70",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F09",
+          "text": "公司存在贸易业务，销售电解锰、锰系合金、金属硅、煤炭等，2025年该贸易业务营业收入48,899.50万元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "贸易业务营业收入（销售电解锰、锰系合金、金属硅、煤炭等）",
+              "raw_value": "48,899.50",
+              "value": "48899.50",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F11",
+          "text": "主营业务分行业看，电力销售营业收入6,884,147,935.10元、毛利率12.03%；综合能源营业收入1,540,734,152.07元、毛利率17.14%；其他主营业务营业收入1,687,186,424.24元、毛利率9.44%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "电力销售营业收入",
+              "raw_value": "6,884,147,935.10",
+              "value": "6884147935.10",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电力销售毛利率",
+              "raw_value": "12.03",
+              "value": "12.03",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合能源营业收入",
+              "raw_value": "1,540,734,152.07",
+              "value": "1540734152.07",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合能源毛利率",
+              "raw_value": "17.14",
+              "value": "17.14",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他主营业务营业收入",
+              "raw_value": "1,687,186,424.24",
+              "value": "1687186424.24",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他主营业务毛利率",
+              "raw_value": "9.44",
+              "value": "9.44",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F12",
+          "text": "电力销售成本中，外购电成本504,640.01万元，占电力销售总成本83.32%；折旧费41,858.54万元，占6.91%；人工费31,715.53万元，占5.24%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "电力销售-外购电成本",
+              "raw_value": "504,640.01",
+              "value": "504640.01",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电力销售-外购电成本占电力销售总成本比例",
+              "raw_value": "83.32",
+              "value": "83.32",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电力销售-折旧费",
+              "raw_value": "41,858.54",
+              "value": "41858.54",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电力销售-人工费",
+              "raw_value": "31,715.53",
+              "value": "31715.53",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F13",
+          "text": "报告期内公司实现营业利润66,277万元，其中电力业务利润39,372万元，占营业利润的59.40%；综合能源业务利润13,591万元，占营业利润的20.51%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "营业利润",
+              "raw_value": "66,277",
+              "value": "66277",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电力业务利润",
+              "raw_value": "39,372",
+              "value": "39372",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电力业务利润占营业利润比例",
+              "raw_value": "59.40",
+              "value": "59.40",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合能源业务利润",
+              "raw_value": "13,591",
+              "value": "13591",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合能源业务利润占营业利润比例",
+              "raw_value": "20.51",
+              "value": "20.51",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F19",
+          "text": "电力生产供应业务的主要投入为外购电力，2025年电力销售成本中外购电成本504,640.01万元，占该业务总成本83.32%；营业成本同比减少主要系本期自发电量增加导致外购电成本减少，以及子公司博联热电本期发电量和蒸汽量减少导致外购原材料成本减少所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010",
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "电力销售-外购电成本",
+              "raw_value": "504,640.01",
+              "value": "504640.01",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F20",
+          "text": "综合能源业务成本中，采购成本96,494.99万元，占该业务总成本75.59%；折旧费24,880.15万元，占19.49%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "综合能源-采购成本",
+              "raw_value": "96,494.99",
+              "value": "96494.99",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合能源-采购成本占该业务总成本比例",
+              "raw_value": "75.59",
+              "value": "75.59",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合能源-折旧费",
+              "raw_value": "24,880.15",
+              "value": "24880.15",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F26",
+          "text": "主营业务分地区看，西南区营业收入10,023,781,084.36元、毛利率12.31%；华东区营业收入56,277,656.23元、毛利率5.39%；华南区营业收入32,009,770.82元、毛利率43.47%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "西南区营业收入",
+              "raw_value": "10,023,781,084.36",
+              "value": "10023781084.36",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "西南区毛利率",
+              "raw_value": "12.31",
+              "value": "12.31",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "华东区营业收入",
+              "raw_value": "56,277,656.23",
+              "value": "56277656.23",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "华东区毛利率",
+              "raw_value": "5.39",
+              "value": "5.39",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "华南区营业收入",
+              "raw_value": "32,009,770.82",
+              "value": "32009770.82",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "华南区毛利率",
+              "raw_value": "43.47",
+              "value": "43.47",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F28",
+          "text": "2025年公司自发电量同比较大幅提升，配售电量创同期历史新高；自发水电量同比上升，主要系重庆区域水电站所处流域来水增加所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:R12",
+          "text": "报告期内公司实现营业利润66,277万元，主要构成还包括：投资收益29,897万元，占营业利润的45.11%，主要系本期处置天泰能源全部股权取得投资收益16,834万元，本期确认联营企业投资收益10,778万元；其他收益7,228万元，占营业利润的10.91%；信用减值损失7,375万元，占营业利润的-11.13%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "投资收益",
+              "raw_value": "29,897",
+              "value": "29897",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "占营业利润比例",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益占营业利润比例",
+              "raw_value": "45.11",
+              "value": "45.11",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他收益",
+              "raw_value": "7,228",
+              "value": "7228",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "占营业利润比例",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他收益占营业利润比例",
+              "raw_value": "10.91",
+              "value": "10.91",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用减值损失",
+              "raw_value": "7,375",
+              "value": "7375",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "占营业利润比例",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用减值损失占营业利润比例",
+              "raw_value": "-11.13",
+              "value": "-11.13",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 20274,
+      "output_tokens": 3643,
+      "total_tokens": 23917
+    }
+  },
+  {
+    "request_id": "bp-work-fb1e124020fc48539e005099:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "ff46d270edd236d3da20d02a11ba23e6985292587b08fe062d2df624c547a575",
+    "response_hash": "5c4dd8958be73d42b1c52729eb7d0e8d41d67ac139d436278edd4572ecc5f6b9",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F05\",\"F08\",\"F09\",\"F11\",\"F12\",\"F13\",\"F19\",\"F20\",\"F26\",\"F28\",\"review-add:R12\"],\"checks\":[{\"fact_id\":\"F05\",\"accepted\":true,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"已删除“于2025年9月完成”的错误完成时点。9月26日仅表述为临时股东大会审议通过，同一控制下吸收合并、法人资格已注销及资产、负债、权益、业务由公司承继均有原文支持，12月31日明确为工商注销完成公告的披露日，期间与主体未另作错误改写。\"},{\"fact_id\":\"F08\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨与产销量产品行一致。三个指标均改为business_segment并保留电解锰产品名称，未再标成集团整体口径，单位和期间无需改写。\"},{\"fact_id\":\"F09\",\"accepted\":true,\"evidence_ids\":[\"source-0011\"],\"explanation\":\"48,899.50万元对应“销售电解锰、锰系合金、金属硅、煤炭等”贸易业务行的本期营业收入，指标名称保留品类，主体为business_segment，未因位于合并报告中而等同公司营业收入。\"},{\"fact_id\":\"F11\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"电力销售、综合能源、其他主营业务的营业收入和毛利率与主营业务分行业表一致，各指标主体均为business_segment并保留原行业类别，未继承集团口径，也未与公司营业收入混同。\"},{\"fact_id\":\"F12\",\"accepted\":true,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"外购电504,640.01万元、折旧费41,858.54万元、人工费31,715.53万元及83.32%、6.91%、5.24%与电力销售成本分项一致。主体已改为business_segment，比例分母明确为电力销售总成本而非公司总成本。\"},{\"fact_id\":\"F13\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"explanation\":\"营业利润66,277万元保持consolidated_group；电力业务利润39,372万元、综合能源业务利润13,591万元及其占营业利润59.40%、20.51%均改为business_segment。金额、占比分母和期间与原文一致。\"},{\"fact_id\":\"F19\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0010\"],\"explanation\":\"外购电成本504,640.01万元已按电力销售业务行标为business_segment，83.32%限定为该业务总成本。营业成本减少原因并列保留自发电量增加导致外购电成本减少，以及博联热电发电量和蒸汽量减少导致外购原材料成本减少，未再收窄为单一原因。\"},{\"fact_id\":\"F20\",\"accepted\":true,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"综合能源采购成本96,494.99万元、占该业务总成本75.59%，折旧费24,880.15万元、占19.49%，与分行业成本表一致。主体为business_segment，比例分母是综合能源成本小计，不是公司总成本。\"},{\"fact_id\":\"F26\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"西南区、华东区、华南区营业收入和毛利率与分地区表一致，各指标主体改为business_segment并保留地区名称。西南区金额未被等同于公司营业收入。\"},{\"fact_id\":\"F28\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0009\"],\"explanation\":\"分别保留“自发电量同比较大幅提升”和“配售电量创同期历史新高”；来水增加只连接至“自发水电量同比上升”，未因增幅相近把自发电量与自发水电量视为同一主体或延续错误因果。\"},{\"fact_id\":\"review-add:R12\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"explanation\":\"已按营业利润构成原口径补入投资收益29,897万元、占45.11%，并保留处置天泰能源16,834万元和联营企业投资收益10,778万元；同时补入其他收益7,228万元、占10.91%，以及信用减值损失7,375万元、占-11.13%。主体、期间、分母和损失符号与原文一致，未用单项处置收益或营业利润总额代替。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F05",
+        "F08",
+        "F09",
+        "F11",
+        "F12",
+        "F13",
+        "F19",
+        "F20",
+        "F26",
+        "F28",
+        "review-add:R12"
+      ],
+      "checks": [
+        {
+          "fact_id": "F05",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "已删除“于2025年9月完成”的错误完成时点。9月26日仅表述为临时股东大会审议通过，同一控制下吸收合并、法人资格已注销及资产、负债、权益、业务由公司承继均有原文支持，12月31日明确为工商注销完成公告的披露日，期间与主体未另作错误改写。"
+        },
+        {
+          "fact_id": "F08",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "电解锰生产量5.92万吨、销售量6.53万吨、库存量0.70万吨与产销量产品行一致。三个指标均改为business_segment并保留电解锰产品名称，未再标成集团整体口径，单位和期间无需改写。"
+        },
+        {
+          "fact_id": "F09",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "48,899.50万元对应“销售电解锰、锰系合金、金属硅、煤炭等”贸易业务行的本期营业收入，指标名称保留品类，主体为business_segment，未因位于合并报告中而等同公司营业收入。"
+        },
+        {
+          "fact_id": "F11",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "电力销售、综合能源、其他主营业务的营业收入和毛利率与主营业务分行业表一致，各指标主体均为business_segment并保留原行业类别，未继承集团口径，也未与公司营业收入混同。"
+        },
+        {
+          "fact_id": "F12",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "外购电504,640.01万元、折旧费41,858.54万元、人工费31,715.53万元及83.32%、6.91%、5.24%与电力销售成本分项一致。主体已改为business_segment，比例分母明确为电力销售总成本而非公司总成本。"
+        },
+        {
+          "fact_id": "F13",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "营业利润66,277万元保持consolidated_group；电力业务利润39,372万元、综合能源业务利润13,591万元及其占营业利润59.40%、20.51%均改为business_segment。金额、占比分母和期间与原文一致。"
+        },
+        {
+          "fact_id": "F19",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0010"
+          ],
+          "explanation": "外购电成本504,640.01万元已按电力销售业务行标为business_segment，83.32%限定为该业务总成本。营业成本减少原因并列保留自发电量增加导致外购电成本减少，以及博联热电发电量和蒸汽量减少导致外购原材料成本减少，未再收窄为单一原因。"
+        },
+        {
+          "fact_id": "F20",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "综合能源采购成本96,494.99万元、占该业务总成本75.59%，折旧费24,880.15万元、占19.49%，与分行业成本表一致。主体为business_segment，比例分母是综合能源成本小计，不是公司总成本。"
+        },
+        {
+          "fact_id": "F26",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "西南区、华东区、华南区营业收入和毛利率与分地区表一致，各指标主体改为business_segment并保留地区名称。西南区金额未被等同于公司营业收入。"
+        },
+        {
+          "fact_id": "F28",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003",
+            "source-0009"
+          ],
+          "explanation": "分别保留“自发电量同比较大幅提升”和“配售电量创同期历史新高”；来水增加只连接至“自发水电量同比上升”，未因增幅相近把自发电量与自发水电量视为同一主体或延续错误因果。"
+        },
+        {
+          "fact_id": "review-add:R12",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "已按营业利润构成原口径补入投资收益29,897万元、占45.11%，并保留处置天泰能源16,834万元和联营企业投资收益10,778万元；同时补入其他收益7,228万元、占10.91%，以及信用减值损失7,375万元、占-11.13%。主体、期间、分母和损失符号与原文一致，未用单项处置收益或营业利润总额代替。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 24284,
+      "output_tokens": 1068,
+      "total_tokens": 35208
+    }
+  }
+]

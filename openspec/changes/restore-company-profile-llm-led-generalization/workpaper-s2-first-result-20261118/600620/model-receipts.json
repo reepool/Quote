@@ -1,0 +1,1809 @@
+[
+  {
+    "request_id": "bp-work-7f9e3197c520bb2b745f3985:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "2cb05b0e0a255492d14ef1a72bb8a40cde5353099f5a67e4b8ee9f8bcd240312",
+    "response_hash": "b4d813f663a089c355dc1d6c5ec214d0e7d2e8877376cbacd256a1ca395120e6",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0040\",\"section-0052\",\"section-0053\",\"section-0054\",\"section-0087\",\"section-0021\"],\"rationale\":\"优先选取能完整解释公司业务结构、经营模式与收入构成的实质章节：第三节“报告期内公司从事的业务情况”(section-0034)说明健康城开发、物业租赁、装修、储能等业务及用途；“经营情况讨论与分析”(section-0040)给出各业务本期经营进展与变化；“主营业务分析”(section-0052)及其下“利润表及现金流量表相关科目变动分析表”(section-0053)、“收入和成本分析”(section-0054)提供营业收入总额、分业务收入与成本构成，是变现与收入权重的核心来源；“主要控股参股公司分析”(section-0087)补充主要子公司经营规模与角色。另选第二节“近三年主要会计数据和财务指标”(section-0021)作为紧凑的公司层面汇总，承载公司总营业收入与主要财务数据，避免与明细表重叠。未选纯行业背景(section-0039)与泛化核心竞争力(section-0050)，因其对公司层面解释力次要。\",\"deferred\":[\"第四节公司治理、董监高薪酬、内部控制等治理类章节，与业务经营解释无关\",\"第五节重要事项中的诉讼、关联交易、担保等，仅在需要解释重大变化时定向补充，本次不扩读\",\"第八节财务报告中会计政策、附注明细及母公司报表，仅在收入或分部存在实质缺口时定向补充，本次已由主营业务分析与收入成本分析覆盖\",\"第七节债券相关情况，公司无实质债券披露需求\"],\"stop_reason\":\"已覆盖业务结构、经营模式、收入总额与分业务收入成本构成、主要子公司角色及公司层面财务汇总，足以回答做什么、怎么赚钱、收入权重与本期变化；剩余为治理、诉讼、会计政策等非经营解释性内容，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0034",
+        "section-0040",
+        "section-0052",
+        "section-0053",
+        "section-0054",
+        "section-0087",
+        "section-0021"
+      ],
+      "rationale": "优先选取能完整解释公司业务结构、经营模式与收入构成的实质章节：第三节“报告期内公司从事的业务情况”(section-0034)说明健康城开发、物业租赁、装修、储能等业务及用途；“经营情况讨论与分析”(section-0040)给出各业务本期经营进展与变化；“主营业务分析”(section-0052)及其下“利润表及现金流量表相关科目变动分析表”(section-0053)、“收入和成本分析”(section-0054)提供营业收入总额、分业务收入与成本构成，是变现与收入权重的核心来源；“主要控股参股公司分析”(section-0087)补充主要子公司经营规模与角色。另选第二节“近三年主要会计数据和财务指标”(section-0021)作为紧凑的公司层面汇总，承载公司总营业收入与主要财务数据，避免与明细表重叠。未选纯行业背景(section-0039)与泛化核心竞争力(section-0050)，因其对公司层面解释力次要。",
+      "deferred": [
+        "第四节公司治理、董监高薪酬、内部控制等治理类章节，与业务经营解释无关",
+        "第五节重要事项中的诉讼、关联交易、担保等，仅在需要解释重大变化时定向补充，本次不扩读",
+        "第八节财务报告中会计政策、附注明细及母公司报表，仅在收入或分部存在实质缺口时定向补充，本次已由主营业务分析与收入成本分析覆盖",
+        "第七节债券相关情况，公司无实质债券披露需求"
+      ],
+      "stop_reason": "已覆盖业务结构、经营模式、收入总额与分业务收入成本构成、主要子公司角色及公司层面财务汇总，足以回答做什么、怎么赚钱、收入权重与本期变化；剩余为治理、诉讼、会计政策等非经营解释性内容，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 26596,
+      "output_tokens": 420,
+      "total_tokens": 27016
+    }
+  },
+  {
+    "request_id": "bp-work-7f9e3197c520bb2b745f3985:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "9fda3f557115af9df7210b1668ebd153e8f17264a9a0d34c88d7953edae3d831",
+    "response_hash": "5654e7f7dd8b39368746e48c903414f77cad60f80c5235494b933ebadd52b1c2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"报告期内公司运营中的业务主要包括天宸健康城项目开发、物业租赁、装修业务及储能业务等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"天宸健康城项目由子公司上海天宸健康管理有限公司投资建设，东地块1A低层办公用房项目自2022年12月完成竣工备案后历年进行房产销售；东地块1B项目主要建造办公、酒店及商务综合楼，预计2026年内完工。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"储能业务方面，公司于2023年6月与芜湖市繁昌区人民政府签订投资合同，计划投资建设光储一体新能源产业基地；截至2025年末一期一阶段储能智能制造工厂建设已进入收尾阶段。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-BS-04\",\"text\":\"海外储能方面，公司于2025年10月签订日本网侧电站项目投资建设协议，拟在日本岛根县投资建设2MW/8MWh电网侧储能电站，截至2025年末已进入建设阶段，预计2026年年内并网。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"公司房产销售产品为天宸健康城东地块1A低层办公用房，报告期内东地块1A项目总计销售18套房产。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"物业租赁业务主要为对外出租物业，公司位于闵行区银都路2889号的“康复医院”物业自2024年三季度末起对外出租。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"装修业务由子公司上海宸桁建筑装饰工程有限公司承接健康城东地块1A部分购房业主的装修，去年已全部完工并交付，本报告期内无新增整体装饰工程收入，仅有零星装修设备款收入。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0007\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"物业管理业务由全资子公司天之宸酒店管理（上海）有限公司作为天宸健康城东1A期“天宸汇”的物业管理公司开展。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0007\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"储能业务方面，公司引进了pack生产线，兼容1300Ah/1175Ah/587Ah/628Ah/588Ah/314Ah等现有全部电芯规格，为储能业务拓展提供产能支撑。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"报告期内公司实现营业收入29,896.62万元，其中主要系开发的房地产销售收入24,804.04万元，物业租赁收入4,579.77万元，装修收入245.78万元，物业管理等其他收入267.03万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"29,896.62\",\"value\":\"29896.62\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产销售收入\",\"raw_value\":\"24,804.04\",\"value\":\"24804.04\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业租赁收入\",\"raw_value\":\"4,579.77\",\"value\":\"4579.77\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"装修收入\",\"raw_value\":\"245.78\",\"value\":\"245.78\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业管理等其他收入\",\"raw_value\":\"267.03\",\"value\":\"267.03\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"主营业务分行业情况显示，房地产销售收入248,040,447.71元、营业成本148,939,615.57元、毛利率39.95%；装饰装修收入2,457,798.23元、营业成本2,562,733.74元、毛利率-4.27%；物业管理收入1,895,107.89元、营业成本2,653,369.16元、毛利率-40.01%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"房地产销售营业收入\",\"raw_value\":\"248,040,447.71\",\"value\":\"248040447.71\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产销售营业成本\",\"raw_value\":\"148,939,615.57\",\"value\":\"148939615.57\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产销售毛利率\",\"raw_value\":\"39.95\",\"value\":\"39.95\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"装饰装修营业收入\",\"raw_value\":\"2,457,798.23\",\"value\":\"2457798.23\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"装饰装修营业成本\",\"raw_value\":\"2,562,733.74\",\"value\":\"2562733.74\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"装饰装修毛利率\",\"raw_value\":\"-4.27\",\"value\":\"-4.27\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业管理营业收入\",\"raw_value\":\"1,895,107.89\",\"value\":\"1895107.89\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业管理营业成本\",\"raw_value\":\"2,653,369.16\",\"value\":\"2653369.16\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业管理毛利率\",\"raw_value\":\"-40.01\",\"value\":\"-40.01\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"本期房产销售收入24,804.04万元，房产销售实现毛利9,910.08万元；上年同期房产销售收入16,213.43万元，房产销售实现毛利7,595.21万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\"],\"metrics\":[{\"name\":\"房产销售毛利\",\"raw_value\":\"9,910.08\",\"value\":\"9910.08\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房产销售收入（上年同期）\",\"raw_value\":\"16,213.43\",\"value\":\"16213.43\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"房产销售毛利（上年同期）\",\"raw_value\":\"7,595.21\",\"value\":\"7595.21\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"储能业务本期未披露收入金额，收入构成中未单列储能。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"公司2025年营业收入298,966,166.99元，2024年341,870,271.41元，本期比上年同期减少12.55%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"298,966,166.99\",\"value\":\"298966166.99\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入（上年同期）\",\"raw_value\":\"341,870,271.41\",\"value\":\"341870271.41\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"-12.55\",\"value\":\"-12.55\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"公司2025年归属于上市公司股东的净利润18,977,882.08元，2024年32,077,522.61元，本期比上年同期减少40.84%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"18,977,882.08\",\"value\":\"18977882.08\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润（上年同期）\",\"raw_value\":\"32,077,522.61\",\"value\":\"32077522.61\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比增减\",\"raw_value\":\"-40.84\",\"value\":\"-40.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"公司2025年营业成本170,261,622.26元，上年同期191,037,681.11元，同比减少10.88%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"170,261,622.26\",\"value\":\"170261622.26\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本（上年同期）\",\"raw_value\":\"191,037,681.11\",\"value\":\"191037681.11\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比增减\",\"raw_value\":\"-10.88\",\"value\":\"-10.88\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"分地区情况显示，上海地区营业收入252,393,353.83元、营业成本154,155,718.47元、毛利率38.92%，营业收入比上年减少16.90%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"上海地区营业收入\",\"raw_value\":\"252,393,353.83\",\"value\":\"252393353.83\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海地区营业成本\",\"raw_value\":\"154,155,718.47\",\"value\":\"154155718.47\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海地区毛利率\",\"raw_value\":\"38.92\",\"value\":\"38.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海地区营业收入同比增减\",\"raw_value\":\"-16.90\",\"value\":\"-16.90\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分行业表仅列示房地产销售、装饰装修、物业管理三项，物业租赁收入未在分行业表中单列。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"房地产销售成本构成为健康城东1A项目存货成本，本期金额148,939,615.57元，占房地产销售成本100.00%，较上年同期增加72.82%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"健康城东1A项目存货成本\",\"raw_value\":\"148,939,615.57\",\"value\":\"148939615.57\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"健康城东1A项目存货成本同比增减\",\"raw_value\":\"72.82\",\"value\":\"72.82\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"物业管理成本构成包括保安费1,243,082.02元、保洁费394,409.94元、水电费371,042.44元、其他费用644,834.76元，合计2,653,369.16元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"物业管理成本合计\",\"raw_value\":\"2,653,369.16\",\"value\":\"2653369.16\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"本期研发投入合计877,206.90元，全部费用化，研发投入总额占营业收入比例0.29%；公司研发人员数量8人，占公司总人数的6.78%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"877,206.90\",\"value\":\"877206.90\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"0.29\",\"value\":\"0.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量\",\"raw_value\":\"8\",\"value\":\"8\",\"unit\":\"人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"6.78\",\"value\":\"6.78\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"本期经营活动产生的现金流量净额为-466,903,945.02元，比上年同期减少52,579.63万元，减幅892.81%，主要系天宸健康城东1B期工程项目支付的工程款较上年同期增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0010\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"-466,903,945.02\",\"value\":\"-466903945.02\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额同比增减\",\"raw_value\":\"-892.81\",\"value\":\"-892.81\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"储能业务生产线通过融资租赁等方式引进，具体产能与产量未披露。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户销售额9,005.66万元，占年度销售总额30.13%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"9,005.66\",\"value\":\"9005.66\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"30.13\",\"value\":\"30.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"报告期内向单个客户销售比例超过总额50%的情形中，列示客户包括上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"上海天宸康复医院有限公司销售额\",\"raw_value\":\"2,714.29\",\"value\":\"2714.29\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海天宸康复医院有限公司销售额占年度销售总额比例\",\"raw_value\":\"9.08\",\"value\":\"9.08\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"前五名供应商采购额29,305.30万元，占年度采购总额70.11%；其中浙江国丰集团有限公司采购额23,212.58万元，占年度采购总额55.53%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"29,305.30\",\"value\":\"29305.30\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"70.11\",\"value\":\"70.11\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"浙江国丰集团有限公司采购额\",\"raw_value\":\"23,212.58\",\"value\":\"23212.58\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"浙江国丰集团有限公司采购额占年度采购总额比例\",\"raw_value\":\"55.53\",\"value\":\"55.53\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-04\",\"text\":\"分地区情况仅列示上海地区，营业收入252,393,353.83元，占主营业务收入主要部分；海外储能项目尚在建设阶段。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0002\"]}],\"limitations\":[\"客户名称除上海天宸康复医院有限公司外，房产销售客户1至4未具名。\",\"海外市场尚未形成收入。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"本期营业收入较上年同期减少4,290.41万元，减幅12.55%，主要由于装修收入较上年同期减少13,831.68万元（减幅98.25%），房地产销售收入增加8,590.61万元（增幅52.98%），租赁业务收入增加2,186.30万元（增幅91.34%），以及上年处置投资性房地产实现其他业务收入1,414.86万元而本期无此项收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\"],\"metrics\":[{\"name\":\"营业收入同比减少额\",\"raw_value\":\"4,290.41\",\"value\":\"4290.41\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"装修收入同比减少额\",\"raw_value\":\"13,831.68\",\"value\":\"13831.68\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产销售收入同比增加额\",\"raw_value\":\"8,590.61\",\"value\":\"8590.61\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁业务收入同比增加额\",\"raw_value\":\"2,186.30\",\"value\":\"2186.30\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"本期归属于上市公司股东的净利润减少的主要原因为：装修业务毛利较上年同期减少约4,677.87万元，房产销售业务毛利较上年同期增加约2,314.87万元，销售费用/管理费用/财务费用较上年同期共减少约2,552.93万元，以及上年同期处置子公司股权及投资性房地产产生收益而本期无此三项收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\"],\"metrics\":[{\"name\":\"装修业务毛利同比减少额\",\"raw_value\":\"4,677.87\",\"value\":\"4677.87\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"房产销售业务毛利同比增加额\",\"raw_value\":\"2,314.87\",\"value\":\"2314.87\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"销售费用/管理费用/财务费用同比减少额\",\"raw_value\":\"2,552.93\",\"value\":\"2552.93\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"本期房产销售主要通过外部中介渠道实现，自销人员佣金较上年同期减少，销售费用同比减少450.13万元，减幅32.77%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"销售费用同比减少额\",\"raw_value\":\"450.13\",\"value\":\"450.13\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"销售费用同比增减\",\"raw_value\":\"-32.77\",\"value\":\"-32.77\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-04\",\"text\":\"本期财务费用同比减少1,322.62万元，减幅67.67%，主要系天宸健康城东1A项目银行借款已于上年全部偿还，而本期东1B项目银行借款利息符合资本化条件。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"财务费用同比减少额\",\"raw_value\":\"1,322.62\",\"value\":\"1322.62\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财务费用同比增减\",\"raw_value\":\"-67.67\",\"value\":\"-67.67\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"上年同期公司因优化产业结构，处置子公司股权及所持投资性房地产产生相关收益，其中转让全资子公司上海天宸客运有限公司100%股权取得投资收益约1,558万元，转让全资子公司上海天宸康复医院有限公司95%股权取得投资收益（含权益法变动损益）约999.37万元，处置投资性房地产实现其他业务收入1,414.86万元；本期内无此三项收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\"],\"metrics\":[{\"name\":\"转让上海天宸客运有限公司100%股权投资收益\",\"raw_value\":\"1,558\",\"value\":\"1558\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"approximate\"},{\"name\":\"转让上海天宸康复医院有限公司95%股权投资收益\",\"raw_value\":\"999.37\",\"value\":\"999.37\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"approximate\"},{\"name\":\"处置投资性房地产其他业务收入\",\"raw_value\":\"1,414.86\",\"value\":\"1414.86\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内公司设立取得芜湖天宸新能源工程有限公司和天宸绿色能源科技（日本）有限公司，2025年度分别实现净利润人民币-286,903.69元和-174,533.10元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"芜湖天宸新能源工程有限公司净利润\",\"raw_value\":\"-286,903.69\",\"value\":\"-286903.69\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"天宸绿色能源科技（日本）有限公司净利润\",\"raw_value\":\"-174,533.10\",\"value\":\"-174533.10\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-03\",\"text\":\"天宸健康管理公司报告期内净利润5,024.80万元，较上年同期净利润1,067.85万元增加3,956.95万元，主要因为本期天宸健康城东1A项目房产销售收入以及“康复医院”租赁收入两者均较上年增加。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0012\"],\"metrics\":[{\"name\":\"天宸健康管理公司净利润\",\"raw_value\":\"5,024.80\",\"value\":\"5024.80\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"天宸健康管理公司净利润（上年同期）\",\"raw_value\":\"1,067.85\",\"value\":\"1067.85\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2024年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-04\",\"text\":\"天宸绿色能源科技（芜湖）有限公司报告期内净利润-1,263.63万元，比上年同期净利润-1,025.17万元增加亏损238.46万元，主要是本期开展新能源业务增加人员导致管理费用增加。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"天宸绿色能源科技（芜湖）有限公司净利润\",\"raw_value\":\"-1,263.63\",\"value\":\"-1263.63\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"天宸绿色能源科技（芜湖）有限公司净利润（上年同期）\",\"raw_value\":\"-1,025.17\",\"value\":\"-1025.17\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2024年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"处置上海天宸客运有限公司及上海天宸康复医院有限公司股权的具体发生时间未在选定章节中明确。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P1\",\"text\":\"公司业务涵盖房地产开发销售、物业租赁、装修、物业管理及储能智能制造等，其中天宸健康城项目由子公司天宸健康管理公司投资建设，储能业务通过芜湖繁昌新能源产业基地建设储能智能制造工厂。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U1\",\"text\":\"前五名供应商采购额29,305.30万元，占年度采购总额70.11%，其中浙江国丰集团有限公司采购额23,212.58万元、占55.53%，国网上海市电力公司市南供电公司采购额3,383.45万元、占8.10%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"浙江国丰集团有限公司采购额\",\"raw_value\":\"23,212.58\",\"value\":\"23212.58\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国网上海市电力公司市南供电公司采购额\",\"raw_value\":\"3,383.45\",\"value\":\"3383.45\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SC-U2\",\"text\":\"物业管理成本构成包括保安费、保洁费、水电费及其他费用，其中保安费1,243,082.02元、保洁费394,409.94元、水电费371,042.44元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"保安费\",\"raw_value\":\"1,243,082.02\",\"value\":\"1243082.02\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"保洁费\",\"raw_value\":\"394,409.94\",\"value\":\"394409.94\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"水电费\",\"raw_value\":\"371,042.44\",\"value\":\"371042.44\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"供应商名称仅列示前五名，未披露具体采购物资明细。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D1\",\"text\":\"公司房产销售客户包括个人购房业主及外部中介渠道客户，前五名客户中列示上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"上海天宸康复医院有限公司销售额\",\"raw_value\":\"2,714.29\",\"value\":\"2714.29\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SC-D2\",\"text\":\"储能业务方面，公司推进与供应商及客户的合作洽谈，为在新的一年中开展相应储能业务奠定基础；海外日本网侧储能电站项目预计2026年年内并网。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0002\"]}],\"limitations\":[\"储能业务客户尚未具体披露。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司继续按照“固本培新”战略方针，稳步推进存量业务，积极推进增量业务的确定与落实，以求建立可持续性且良性的发展态势。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司主要子公司上海天宸健康管理有限公司注册资本130,500万元，公司所持权益比例100%，报告期末总资产235,658.09万元、净资产108,080.30万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"上海天宸健康管理有限公司注册资本\",\"raw_value\":\"130,500\",\"value\":\"130500\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海天宸健康管理有限公司总资产\",\"raw_value\":\"235,658.09\",\"value\":\"235658.09\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海天宸健康管理有限公司净资产\",\"raw_value\":\"108,080.30\",\"value\":\"108080.30\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"limitations\":[\"储能业务本期未披露收入金额，收入构成中未单列储能。\",\"分行业表仅列示房地产销售、装饰装修、物业管理三项，物业租赁收入未在分行业表中单列。\",\"客户名称除上海天宸康复医院有限公司外，房产销售客户1至4未具名。\",\"处置上海天宸客运有限公司及上海天宸康复医院有限公司股权的具体发生时间未在选定章节中明确。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "报告期内公司运营中的业务主要包括天宸健康城项目开发、物业租赁、装修业务及储能业务等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "天宸健康城项目由子公司上海天宸健康管理有限公司投资建设，东地块1A低层办公用房项目自2022年12月完成竣工备案后历年进行房产销售；东地块1B项目主要建造办公、酒店及商务综合楼，预计2026年内完工。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-BS-03",
+              "text": "储能业务方面，公司于2023年6月与芜湖市繁昌区人民政府签订投资合同，计划投资建设光储一体新能源产业基地；截至2025年末一期一阶段储能智能制造工厂建设已进入收尾阶段。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-BS-04",
+              "text": "海外储能方面，公司于2025年10月签订日本网侧电站项目投资建设协议，拟在日本岛根县投资建设2MW/8MWh电网侧储能电站，截至2025年末已进入建设阶段，预计2026年年内并网。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "公司房产销售产品为天宸健康城东地块1A低层办公用房，报告期内东地块1A项目总计销售18套房产。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "物业租赁业务主要为对外出租物业，公司位于闵行区银都路2889号的“康复医院”物业自2024年三季度末起对外出租。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "装修业务由子公司上海宸桁建筑装饰工程有限公司承接健康城东地块1A部分购房业主的装修，去年已全部完工并交付，本报告期内无新增整体装饰工程收入，仅有零星装修设备款收入。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "物业管理业务由全资子公司天之宸酒店管理（上海）有限公司作为天宸健康城东1A期“天宸汇”的物业管理公司开展。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "储能业务方面，公司引进了pack生产线，兼容1300Ah/1175Ah/587Ah/628Ah/588Ah/314Ah等现有全部电芯规格，为储能业务拓展提供产能支撑。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "报告期内公司实现营业收入29,896.62万元，其中主要系开发的房地产销售收入24,804.04万元，物业租赁收入4,579.77万元，装修收入245.78万元，物业管理等其他收入267.03万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "29,896.62",
+                  "value": "29896.62",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产销售收入",
+                  "raw_value": "24,804.04",
+                  "value": "24804.04",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业租赁收入",
+                  "raw_value": "4,579.77",
+                  "value": "4579.77",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "装修收入",
+                  "raw_value": "245.78",
+                  "value": "245.78",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业管理等其他收入",
+                  "raw_value": "267.03",
+                  "value": "267.03",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "主营业务分行业情况显示，房地产销售收入248,040,447.71元、营业成本148,939,615.57元、毛利率39.95%；装饰装修收入2,457,798.23元、营业成本2,562,733.74元、毛利率-4.27%；物业管理收入1,895,107.89元、营业成本2,653,369.16元、毛利率-40.01%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产销售营业收入",
+                  "raw_value": "248,040,447.71",
+                  "value": "248040447.71",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产销售营业成本",
+                  "raw_value": "148,939,615.57",
+                  "value": "148939615.57",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产销售毛利率",
+                  "raw_value": "39.95",
+                  "value": "39.95",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "装饰装修营业收入",
+                  "raw_value": "2,457,798.23",
+                  "value": "2457798.23",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "装饰装修营业成本",
+                  "raw_value": "2,562,733.74",
+                  "value": "2562733.74",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "装饰装修毛利率",
+                  "raw_value": "-4.27",
+                  "value": "-4.27",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业管理营业收入",
+                  "raw_value": "1,895,107.89",
+                  "value": "1895107.89",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业管理营业成本",
+                  "raw_value": "2,653,369.16",
+                  "value": "2653369.16",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业管理毛利率",
+                  "raw_value": "-40.01",
+                  "value": "-40.01",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "本期房产销售收入24,804.04万元，房产销售实现毛利9,910.08万元；上年同期房产销售收入16,213.43万元，房产销售实现毛利7,595.21万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "房产销售毛利",
+                  "raw_value": "9,910.08",
+                  "value": "9910.08",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产销售收入（上年同期）",
+                  "raw_value": "16,213.43",
+                  "value": "16213.43",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房产销售毛利（上年同期）",
+                  "raw_value": "7,595.21",
+                  "value": "7595.21",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "储能业务本期未披露收入金额，收入构成中未单列储能。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "公司2025年营业收入298,966,166.99元，2024年341,870,271.41元，本期比上年同期减少12.55%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "298,966,166.99",
+                  "value": "298966166.99",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入（上年同期）",
+                  "raw_value": "341,870,271.41",
+                  "value": "341870271.41",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "-12.55",
+                  "value": "-12.55",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "公司2025年归属于上市公司股东的净利润18,977,882.08元，2024年32,077,522.61元，本期比上年同期减少40.84%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "18,977,882.08",
+                  "value": "18977882.08",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润（上年同期）",
+                  "raw_value": "32,077,522.61",
+                  "value": "32077522.61",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比增减",
+                  "raw_value": "-40.84",
+                  "value": "-40.84",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "公司2025年营业成本170,261,622.26元，上年同期191,037,681.11元，同比减少10.88%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "170,261,622.26",
+                  "value": "170261622.26",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本（上年同期）",
+                  "raw_value": "191,037,681.11",
+                  "value": "191037681.11",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本同比增减",
+                  "raw_value": "-10.88",
+                  "value": "-10.88",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "分地区情况显示，上海地区营业收入252,393,353.83元、营业成本154,155,718.47元、毛利率38.92%，营业收入比上年减少16.90%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "上海地区营业收入",
+                  "raw_value": "252,393,353.83",
+                  "value": "252393353.83",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海地区营业成本",
+                  "raw_value": "154,155,718.47",
+                  "value": "154155718.47",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海地区毛利率",
+                  "raw_value": "38.92",
+                  "value": "38.92",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海地区营业收入同比增减",
+                  "raw_value": "-16.90",
+                  "value": "-16.90",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分行业表仅列示房地产销售、装饰装修、物业管理三项，物业租赁收入未在分行业表中单列。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "房地产销售成本构成为健康城东1A项目存货成本，本期金额148,939,615.57元，占房地产销售成本100.00%，较上年同期增加72.82%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "健康城东1A项目存货成本",
+                  "raw_value": "148,939,615.57",
+                  "value": "148939615.57",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "健康城东1A项目存货成本同比增减",
+                  "raw_value": "72.82",
+                  "value": "72.82",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "物业管理成本构成包括保安费1,243,082.02元、保洁费394,409.94元、水电费371,042.44元、其他费用644,834.76元，合计2,653,369.16元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "物业管理成本合计",
+                  "raw_value": "2,653,369.16",
+                  "value": "2653369.16",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "本期研发投入合计877,206.90元，全部费用化，研发投入总额占营业收入比例0.29%；公司研发人员数量8人，占公司总人数的6.78%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "877,206.90",
+                  "value": "877206.90",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "0.29",
+                  "value": "0.29",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "8",
+                  "value": "8",
+                  "unit": "人",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量占公司总人数比例",
+                  "raw_value": "6.78",
+                  "value": "6.78",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "本期经营活动产生的现金流量净额为-466,903,945.02元，比上年同期减少52,579.63万元，减幅892.81%，主要系天宸健康城东1B期工程项目支付的工程款较上年同期增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "-466,903,945.02",
+                  "value": "-466903945.02",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额同比增减",
+                  "raw_value": "-892.81",
+                  "value": "-892.81",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "储能业务生产线通过融资租赁等方式引进，具体产能与产量未披露。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "前五名客户销售额9,005.66万元，占年度销售总额30.13%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "9,005.66",
+                  "value": "9005.66",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "30.13",
+                  "value": "30.13",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "报告期内向单个客户销售比例超过总额50%的情形中，列示客户包括上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "上海天宸康复医院有限公司销售额",
+                  "raw_value": "2,714.29",
+                  "value": "2714.29",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海天宸康复医院有限公司销售额占年度销售总额比例",
+                  "raw_value": "9.08",
+                  "value": "9.08",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "前五名供应商采购额29,305.30万元，占年度采购总额70.11%；其中浙江国丰集团有限公司采购额23,212.58万元，占年度采购总额55.53%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "29,305.30",
+                  "value": "29305.30",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "70.11",
+                  "value": "70.11",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "浙江国丰集团有限公司采购额",
+                  "raw_value": "23,212.58",
+                  "value": "23212.58",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "浙江国丰集团有限公司采购额占年度采购总额比例",
+                  "raw_value": "55.53",
+                  "value": "55.53",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "分地区情况仅列示上海地区，营业收入252,393,353.83元，占主营业务收入主要部分；海外储能项目尚在建设阶段。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": [
+            "客户名称除上海天宸康复医院有限公司外，房产销售客户1至4未具名。",
+            "海外市场尚未形成收入。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "本期营业收入较上年同期减少4,290.41万元，减幅12.55%，主要由于装修收入较上年同期减少13,831.68万元（减幅98.25%），房地产销售收入增加8,590.61万元（增幅52.98%），租赁业务收入增加2,186.30万元（增幅91.34%），以及上年处置投资性房地产实现其他业务收入1,414.86万元而本期无此项收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入同比减少额",
+                  "raw_value": "4,290.41",
+                  "value": "4290.41",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "装修收入同比减少额",
+                  "raw_value": "13,831.68",
+                  "value": "13831.68",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产销售收入同比增加额",
+                  "raw_value": "8,590.61",
+                  "value": "8590.61",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁业务收入同比增加额",
+                  "raw_value": "2,186.30",
+                  "value": "2186.30",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "本期归属于上市公司股东的净利润减少的主要原因为：装修业务毛利较上年同期减少约4,677.87万元，房产销售业务毛利较上年同期增加约2,314.87万元，销售费用/管理费用/财务费用较上年同期共减少约2,552.93万元，以及上年同期处置子公司股权及投资性房地产产生收益而本期无此三项收益。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "装修业务毛利同比减少额",
+                  "raw_value": "4,677.87",
+                  "value": "4677.87",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "房产销售业务毛利同比增加额",
+                  "raw_value": "2,314.87",
+                  "value": "2314.87",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "销售费用/管理费用/财务费用同比减少额",
+                  "raw_value": "2,552.93",
+                  "value": "2552.93",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "本期房产销售主要通过外部中介渠道实现，自销人员佣金较上年同期减少，销售费用同比减少450.13万元，减幅32.77%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "销售费用同比减少额",
+                  "raw_value": "450.13",
+                  "value": "450.13",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "销售费用同比增减",
+                  "raw_value": "-32.77",
+                  "value": "-32.77",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "本期财务费用同比减少1,322.62万元，减幅67.67%，主要系天宸健康城东1A项目银行借款已于上年全部偿还，而本期东1B项目银行借款利息符合资本化条件。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "财务费用同比减少额",
+                  "raw_value": "1,322.62",
+                  "value": "1322.62",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财务费用同比增减",
+                  "raw_value": "-67.67",
+                  "value": "-67.67",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "上年同期公司因优化产业结构，处置子公司股权及所持投资性房地产产生相关收益，其中转让全资子公司上海天宸客运有限公司100%股权取得投资收益约1,558万元，转让全资子公司上海天宸康复医院有限公司95%股权取得投资收益（含权益法变动损益）约999.37万元，处置投资性房地产实现其他业务收入1,414.86万元；本期内无此三项收益。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "转让上海天宸客运有限公司100%股权投资收益",
+                  "raw_value": "1,558",
+                  "value": "1558",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "转让上海天宸康复医院有限公司95%股权投资收益",
+                  "raw_value": "999.37",
+                  "value": "999.37",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "处置投资性房地产其他业务收入",
+                  "raw_value": "1,414.86",
+                  "value": "1414.86",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "报告期内公司设立取得芜湖天宸新能源工程有限公司和天宸绿色能源科技（日本）有限公司，2025年度分别实现净利润人民币-286,903.69元和-174,533.10元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "芜湖天宸新能源工程有限公司净利润",
+                  "raw_value": "-286,903.69",
+                  "value": "-286903.69",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天宸绿色能源科技（日本）有限公司净利润",
+                  "raw_value": "-174,533.10",
+                  "value": "-174533.10",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "天宸健康管理公司报告期内净利润5,024.80万元，较上年同期净利润1,067.85万元增加3,956.95万元，主要因为本期天宸健康城东1A项目房产销售收入以及“康复医院”租赁收入两者均较上年增加。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "天宸健康管理公司净利润",
+                  "raw_value": "5,024.80",
+                  "value": "5024.80",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天宸健康管理公司净利润（上年同期）",
+                  "raw_value": "1,067.85",
+                  "value": "1067.85",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-04",
+              "text": "天宸绿色能源科技（芜湖）有限公司报告期内净利润-1,263.63万元，比上年同期净利润-1,025.17万元增加亏损238.46万元，主要是本期开展新能源业务增加人员导致管理费用增加。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "天宸绿色能源科技（芜湖）有限公司净利润",
+                  "raw_value": "-1,263.63",
+                  "value": "-1263.63",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天宸绿色能源科技（芜湖）有限公司净利润（上年同期）",
+                  "raw_value": "-1,025.17",
+                  "value": "-1025.17",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "处置上海天宸客运有限公司及上海天宸康复医院有限公司股权的具体发生时间未在选定章节中明确。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-P1",
+              "text": "公司业务涵盖房地产开发销售、物业租赁、装修、物业管理及储能智能制造等，其中天宸健康城项目由子公司天宸健康管理公司投资建设，储能业务通过芜湖繁昌新能源产业基地建设储能智能制造工厂。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-U1",
+              "text": "前五名供应商采购额29,305.30万元，占年度采购总额70.11%，其中浙江国丰集团有限公司采购额23,212.58万元、占55.53%，国网上海市电力公司市南供电公司采购额3,383.45万元、占8.10%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "浙江国丰集团有限公司采购额",
+                  "raw_value": "23,212.58",
+                  "value": "23212.58",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国网上海市电力公司市南供电公司采购额",
+                  "raw_value": "3,383.45",
+                  "value": "3383.45",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SC-U2",
+              "text": "物业管理成本构成包括保安费、保洁费、水电费及其他费用，其中保安费1,243,082.02元、保洁费394,409.94元、水电费371,042.44元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "保安费",
+                  "raw_value": "1,243,082.02",
+                  "value": "1243082.02",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "保洁费",
+                  "raw_value": "394,409.94",
+                  "value": "394409.94",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "水电费",
+                  "raw_value": "371,042.44",
+                  "value": "371042.44",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "供应商名称仅列示前五名，未披露具体采购物资明细。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-D1",
+              "text": "公司房产销售客户包括个人购房业主及外部中介渠道客户，前五名客户中列示上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "上海天宸康复医院有限公司销售额",
+                  "raw_value": "2,714.29",
+                  "value": "2714.29",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SC-D2",
+              "text": "储能业务方面，公司推进与供应商及客户的合作洽谈，为在新的一年中开展相应储能业务奠定基础；海外日本网侧储能电站项目预计2026年年内并网。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": [
+            "储能业务客户尚未具体披露。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "公司继续按照“固本培新”战略方针，稳步推进存量业务，积极推进增量业务的确定与落实，以求建立可持续性且良性的发展态势。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ]
+          },
+          {
+            "fact_id": "F-CF-02",
+            "text": "公司主要子公司上海天宸健康管理有限公司注册资本130,500万元，公司所持权益比例100%，报告期末总资产235,658.09万元、净资产108,080.30万元。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "上海天宸健康管理有限公司注册资本",
+                "raw_value": "130,500",
+                "value": "130500",
+                "unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "qualifier": "exact"
+              },
+              {
+                "name": "上海天宸健康管理有限公司总资产",
+                "raw_value": "235,658.09",
+                "value": "235658.09",
+                "unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "qualifier": "exact"
+              },
+              {
+                "name": "上海天宸健康管理有限公司净资产",
+                "raw_value": "108,080.30",
+                "value": "108080.30",
+                "unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "qualifier": "exact"
+              }
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "储能业务本期未披露收入金额，收入构成中未单列储能。",
+        "分行业表仅列示房地产销售、装饰装修、物业管理三项，物业租赁收入未在分行业表中单列。",
+        "客户名称除上海天宸康复医院有限公司外，房产销售客户1至4未具名。",
+        "处置上海天宸客运有限公司及上海天宸康复医院有限公司股权的具体发生时间未在选定章节中明确。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14569,
+      "output_tokens": 8108,
+      "total_tokens": 22677
+    }
+  },
+  {
+    "request_id": "bp-work-7f9e3197c520bb2b745f3985:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "2d7927e16582dca605a2e73efa7cd43fdfa9903962e8000b888c519e6f593a6e",
+    "response_hash": "78d75775f2efd628875fe1afebfb010cab42198d13d6316a113b1816b0292e07",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-BS-04\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-OD-01\",\"F-MC-02\",\"F-MC-03\",\"F-MC-04\",\"F-SC-P1\",\"F-SC-U1\",\"F-SC-U2\",\"F-SC-D1\",\"F-SC-D2\",\"F-CF-01\",\"F-CF-02\"],\"findings\":[{\"finding_id\":\"FND-001\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F-CC-02\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"F-CC-02把“向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户”这一或然式标题，写成已经发生单一客户销售超过年度销售总额50%。同一表格中上海天宸康复医院有限公司仅占9.08%，房产销售客户1至4分别为5.59%、5.31%、5.12%、5.03%，没有任何一行达到50%。应保留已列客户及销售额、占比，并改为该表是在上述或然条件的适用项下披露，不得表述为单一客户销售超过50%。\"},{\"finding_id\":\"FND-002\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-D1\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及未具名的房产销售客户1至4，有来源支持。但“个人购房业主及外部中介渠道客户”并未出现在所引客户表中；外部中介在其他章节是销售渠道，购房业主也未被标明为个人。应删除该客户类型断言，保留已支持的客户名称、销售额和占比。\"},{\"finding_id\":\"FND-003\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"explanation\":\"收入构成和收入下降原因已有支持，但公司已标明适用的利润来源重大变化未被纳入。2025年扣除非经常性损益后归属于上市公司股东的净利润为17,318,992.15元，上年同期2,034,240.31元，增幅751.37%，与归母净利润下降40.84%方向相反。来源列明的主要原因包括：上年装修毛利4,667.38万元、本期装修毛利约减少4,677.87万元；本期房产销售毛利9,910.08万元、较上年增加约2,314.87万元；销售费用、管理费用、财务费用合计较上年减少约2,552.93万元；上年转让上海天宸客运有限公司100%股权投资收益约1,558万元、转让上海天宸康复医院有限公司95%股权投资收益约999.37万元，以及处置投资性房地产其他业务收入1,414.86万元，本期无此三项收益。缺少该组事实会把盈利机制误读为单纯恶化；应补入上述有来源支持的金额和比较，不把未披露项目写成零。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-BS-04",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-OD-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-MC-04",
+        "F-SC-P1",
+        "F-SC-U1",
+        "F-SC-U2",
+        "F-SC-D1",
+        "F-SC-D2",
+        "F-CF-01",
+        "F-CF-02"
+      ],
+      "findings": [
+        {
+          "finding_id": "FND-001",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F-CC-02",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "F-CC-02把“向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户”这一或然式标题，写成已经发生单一客户销售超过年度销售总额50%。同一表格中上海天宸康复医院有限公司仅占9.08%，房产销售客户1至4分别为5.59%、5.31%、5.12%、5.03%，没有任何一行达到50%。应保留已列客户及销售额、占比，并改为该表是在上述或然条件的适用项下披露，不得表述为单一客户销售超过50%。"
+        },
+        {
+          "finding_id": "FND-002",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-SC-D1",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及未具名的房产销售客户1至4，有来源支持。但“个人购房业主及外部中介渠道客户”并未出现在所引客户表中；外部中介在其他章节是销售渠道，购房业主也未被标明为个人。应删除该客户类型断言，保留已支持的客户名称、销售额和占比。"
+        },
+        {
+          "finding_id": "FND-003",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "explanation": "收入构成和收入下降原因已有支持，但公司已标明适用的利润来源重大变化未被纳入。2025年扣除非经常性损益后归属于上市公司股东的净利润为17,318,992.15元，上年同期2,034,240.31元，增幅751.37%，与归母净利润下降40.84%方向相反。来源列明的主要原因包括：上年装修毛利4,667.38万元、本期装修毛利约减少4,677.87万元；本期房产销售毛利9,910.08万元、较上年增加约2,314.87万元；销售费用、管理费用、财务费用合计较上年减少约2,552.93万元；上年转让上海天宸客运有限公司100%股权投资收益约1,558万元、转让上海天宸康复医院有限公司95%股权投资收益约999.37万元，以及处置投资性房地产其他业务收入1,414.86万元，本期无此三项收益。缺少该组事实会把盈利机制误读为单纯恶化；应补入上述有来源支持的金额和比较，不把未披露项目写成零。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 23336,
+      "output_tokens": 904,
+      "total_tokens": 40991
+    }
+  },
+  {
+    "request_id": "bp-work-7f9e3197c520bb2b745f3985:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "873b5879bd3e3f2ef319bec2059c62429c599c986a3ec9617f418a72476758ed",
+    "response_hash": "da678dbd07a8753582dbd8468dd2616cdeec23e6d881d5e65a3cb4456085d794",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-CC-02\",\"text\":\"报告期内在“向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户的情形”适用项下披露的前五名客户为：上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%；房产销售客户1销售额1,670.95万元、占5.59%；房产销售客户2销售额1,588.17万元、占5.31%；房产销售客户3销售额1,529.50万元、占5.12%；房产销售客户4销售额1,502.75万元、占5.03%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"上海天宸康复医院有限公司销售额\",\"raw_value\":\"2,714.29\",\"value\":\"2714.29\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上海天宸康复医院有限公司销售额占年度销售总额比例\",\"raw_value\":\"9.08\",\"value\":\"9.08\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户1销售额\",\"raw_value\":\"1,670.95\",\"value\":\"1670.95\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户1销售额占年度销售总额比例\",\"raw_value\":\"5.59\",\"value\":\"5.59\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户2销售额\",\"raw_value\":\"1,588.17\",\"value\":\"1588.17\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户2销售额占年度销售总额比例\",\"raw_value\":\"5.31\",\"value\":\"5.31\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户3销售额\",\"raw_value\":\"1,529.50\",\"value\":\"1529.50\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户3销售额占年度销售总额比例\",\"raw_value\":\"5.12\",\"value\":\"5.12\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户4销售额\",\"raw_value\":\"1,502.75\",\"value\":\"1502.75\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"房产销售客户4销售额占年度销售总额比例\",\"raw_value\":\"5.03\",\"value\":\"5.03\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-SC-D1\",\"text\":\"前五名客户中列示上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"上海天宸康复医院有限公司销售额\",\"raw_value\":\"2,714.29\",\"value\":\"2714.29\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上海天宸康复医院有限公司销售额占年度销售总额比例\",\"raw_value\":\"9.08\",\"value\":\"9.08\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:FND-003\",\"text\":\"本报告期归属于上市公司股东的净利润为1,897.79万元，较上年同期3,207.75万元减少1,309.96万元，减幅40.84%；归属于上市公司股东的扣除非经常性损益的净利润为1,731.90万元，较上年同期203.42万元增加1,528.48万元，增幅751.37%。主要变化因素包括：上年同期装修收入14,077.46万元、装修业务实现毛利4,667.38万元，本期无新增整体装饰工程收入，装修业务毛利较上年同期减少约4,677.87万元；本期房产销售收入24,804.04万元、房产销售实现毛利9,910.08万元，上年同期房产销售收入16,213.43万元、房产销售实现毛利7,595.21万元，本期房产销售毛利较上年同期增加约2,314.87万元；本期销售费用/管理费用/财务费用较上年同期共减少约2,552.93万元；上年同期转让全资子公司上海天宸客运有限公司100%股权取得投资收益约1,558万元、转让全资子公司上海天宸康复医院有限公司95%股权取得投资收益（含权益法变动损益）约999.37万元、处置投资性房地产实现其他业务收入1,414.86万元，本期内无此三项收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"metrics\":[{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"17,318,992.15\",\"value\":\"17318992.15\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期2,034,240.31元\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润同比增幅\",\"raw_value\":\"751.37\",\"value\":\"751.37\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"装修业务毛利同比减少额\",\"raw_value\":\"约4,677.87万元\",\"value\":null,\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"approximate\",\"uncertainty_reason\":\"原文以“约”表述，未给出精确值。\"},{\"name\":\"房产销售业务毛利同比增加额\",\"raw_value\":\"约2,314.87万元\",\"value\":null,\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"approximate\",\"uncertainty_reason\":\"原文以“约”表述，未给出精确值。\"},{\"name\":\"销售费用/管理费用/财务费用合计同比减少额\",\"raw_value\":\"约2,552.93万元\",\"value\":null,\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"approximate\",\"uncertainty_reason\":\"原文以“约”表述，未给出精确值。\"},{\"name\":\"转让上海天宸客运有限公司100%股权投资收益\",\"raw_value\":\"约1,558万元\",\"value\":null,\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"上年同期\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":\"原文以“约”表述，未给出精确值。\"},{\"name\":\"转让上海天宸康复医院有限公司95%股权投资收益（含权益法变动损益）\",\"raw_value\":\"约999.37万元\",\"value\":null,\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"上年同期\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":\"原文以“约”表述，未给出精确值。\"},{\"name\":\"处置投资性房地产其他业务收入\",\"raw_value\":\"1,414.86\",\"value\":\"1414.86\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"上年同期\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-CC-02",
+          "text": "报告期内在“向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户的情形”适用项下披露的前五名客户为：上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%；房产销售客户1销售额1,670.95万元、占5.59%；房产销售客户2销售额1,588.17万元、占5.31%；房产销售客户3销售额1,529.50万元、占5.12%；房产销售客户4销售额1,502.75万元、占5.03%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "上海天宸康复医院有限公司销售额",
+              "raw_value": "2,714.29",
+              "value": "2714.29",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上海天宸康复医院有限公司销售额占年度销售总额比例",
+              "raw_value": "9.08",
+              "value": "9.08",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户1销售额",
+              "raw_value": "1,670.95",
+              "value": "1670.95",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户1销售额占年度销售总额比例",
+              "raw_value": "5.59",
+              "value": "5.59",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户2销售额",
+              "raw_value": "1,588.17",
+              "value": "1588.17",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户2销售额占年度销售总额比例",
+              "raw_value": "5.31",
+              "value": "5.31",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户3销售额",
+              "raw_value": "1,529.50",
+              "value": "1529.50",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户3销售额占年度销售总额比例",
+              "raw_value": "5.12",
+              "value": "5.12",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户4销售额",
+              "raw_value": "1,502.75",
+              "value": "1502.75",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "房产销售客户4销售额占年度销售总额比例",
+              "raw_value": "5.03",
+              "value": "5.03",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SC-D1",
+          "text": "前五名客户中列示上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "上海天宸康复医院有限公司销售额",
+              "raw_value": "2,714.29",
+              "value": "2714.29",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上海天宸康复医院有限公司销售额占年度销售总额比例",
+              "raw_value": "9.08",
+              "value": "9.08",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:FND-003",
+          "text": "本报告期归属于上市公司股东的净利润为1,897.79万元，较上年同期3,207.75万元减少1,309.96万元，减幅40.84%；归属于上市公司股东的扣除非经常性损益的净利润为1,731.90万元，较上年同期203.42万元增加1,528.48万元，增幅751.37%。主要变化因素包括：上年同期装修收入14,077.46万元、装修业务实现毛利4,667.38万元，本期无新增整体装饰工程收入，装修业务毛利较上年同期减少约4,677.87万元；本期房产销售收入24,804.04万元、房产销售实现毛利9,910.08万元，上年同期房产销售收入16,213.43万元、房产销售实现毛利7,595.21万元，本期房产销售毛利较上年同期增加约2,314.87万元；本期销售费用/管理费用/财务费用较上年同期共减少约2,552.93万元；上年同期转让全资子公司上海天宸客运有限公司100%股权取得投资收益约1,558万元、转让全资子公司上海天宸康复医院有限公司95%股权取得投资收益（含权益法变动损益）约999.37万元、处置投资性房地产实现其他业务收入1,414.86万元，本期内无此三项收益。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+              "raw_value": "17,318,992.15",
+              "value": "17318992.15",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期2,034,240.31元",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的扣除非经常性损益的净利润同比增幅",
+              "raw_value": "751.37",
+              "value": "751.37",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "装修业务毛利同比减少额",
+              "raw_value": "约4,677.87万元",
+              "value": null,
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "approximate",
+              "uncertainty_reason": "原文以“约”表述，未给出精确值。"
+            },
+            {
+              "name": "房产销售业务毛利同比增加额",
+              "raw_value": "约2,314.87万元",
+              "value": null,
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "approximate",
+              "uncertainty_reason": "原文以“约”表述，未给出精确值。"
+            },
+            {
+              "name": "销售费用/管理费用/财务费用合计同比减少额",
+              "raw_value": "约2,552.93万元",
+              "value": null,
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "approximate",
+              "uncertainty_reason": "原文以“约”表述，未给出精确值。"
+            },
+            {
+              "name": "转让上海天宸客运有限公司100%股权投资收益",
+              "raw_value": "约1,558万元",
+              "value": null,
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "named_subsidiary",
+              "period": "上年同期",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": "原文以“约”表述，未给出精确值。"
+            },
+            {
+              "name": "转让上海天宸康复医院有限公司95%股权投资收益（含权益法变动损益）",
+              "raw_value": "约999.37万元",
+              "value": null,
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "named_subsidiary",
+              "period": "上年同期",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": "原文以“约”表述，未给出精确值。"
+            },
+            {
+              "name": "处置投资性房地产其他业务收入",
+              "raw_value": "1,414.86",
+              "value": "1414.86",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "上年同期",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11981,
+      "output_tokens": 2181,
+      "total_tokens": 14162
+    }
+  },
+  {
+    "request_id": "bp-work-7f9e3197c520bb2b745f3985:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "78adedda08bcded01a641efb6ad865aa7dcfd17ed502a89de9b8ee9ef56230d9",
+    "response_hash": "526f1373c517f947c66ba8b31587f2154f82d0dc24c7cc9ab0eb0e517037334f",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-CC-02\",\"F-SC-D1\",\"review-add:FND-003\"],\"checks\":[{\"fact_id\":\"F-CC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"已纠正将或然式标题写成单一客户销售超过年度销售总额50%的问题。source-0009在该标题下勾选适用，并列示上海天宸康复医院有限公司销售额2,714.29万元、占比9.08%，房产销售客户1至4分别为1,670.95万元/5.59%、1,588.17万元/5.31%、1,529.50万元/5.12%、1,502.75万元/5.03%，没有任何一行达到50%。候选仅表述为该适用项下披露的前五名客户，金额、占比、年度销售总额分母、2025年度及公司合并口径均与来源一致，未把或然条件写成已发生事实。\"},{\"fact_id\":\"F-SC-D1\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"已删除客户表未支持的“个人购房业主及外部中介渠道客户”断言。source-0009仅支持上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4的列示；候选保留上述已支持内容，主体为报告期公司销售、期间为2025年度，未新增无依据客户类型。省略客户1至4的明细金额不改变该核心更正。\"},{\"fact_id\":\"review-add:FND-003\",\"accepted\":false,\"evidence_ids\":[\"source-0003\"],\"explanation\":\"正文中的归母净利润、扣非净利润、装修及房产销售毛利、三项费用减少和上年三项收益金额，与source-0003及source-0001相符，也保留了“约”和“本期内无此三项收益”。但“转让上海天宸客运有限公司100%股权投资收益”“转让上海天宸康复医院有限公司95%股权投资收益”被标为named_subsidiary，主体错误。source-0003写明是公司转让所持子公司股权取得的投资收益，收益归属报告公司的合并口径，不是两家被转让子公司自身指标；该主体错误不能通过。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-CC-02",
+        "F-SC-D1",
+        "review-add:FND-003"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-CC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "已纠正将或然式标题写成单一客户销售超过年度销售总额50%的问题。source-0009在该标题下勾选适用，并列示上海天宸康复医院有限公司销售额2,714.29万元、占比9.08%，房产销售客户1至4分别为1,670.95万元/5.59%、1,588.17万元/5.31%、1,529.50万元/5.12%、1,502.75万元/5.03%，没有任何一行达到50%。候选仅表述为该适用项下披露的前五名客户，金额、占比、年度销售总额分母、2025年度及公司合并口径均与来源一致，未把或然条件写成已发生事实。"
+        },
+        {
+          "fact_id": "F-SC-D1",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "已删除客户表未支持的“个人购房业主及外部中介渠道客户”断言。source-0009仅支持上海天宸康复医院有限公司销售额2,714.29万元、占年度销售总额9.08%，以及房产销售客户1至4的列示；候选保留上述已支持内容，主体为报告期公司销售、期间为2025年度，未新增无依据客户类型。省略客户1至4的明细金额不改变该核心更正。"
+        },
+        {
+          "fact_id": "review-add:FND-003",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "正文中的归母净利润、扣非净利润、装修及房产销售毛利、三项费用减少和上年三项收益金额，与source-0003及source-0001相符，也保留了“约”和“本期内无此三项收益”。但“转让上海天宸客运有限公司100%股权投资收益”“转让上海天宸康复医院有限公司95%股权投资收益”被标为named_subsidiary，主体错误。source-0003写明是公司转让所持子公司股权取得的投资收益，收益归属报告公司的合并口径，不是两家被转让子公司自身指标；该主体错误不能通过。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 16167,
+      "output_tokens": 527,
+      "total_tokens": 27335
+    }
+  }
+]

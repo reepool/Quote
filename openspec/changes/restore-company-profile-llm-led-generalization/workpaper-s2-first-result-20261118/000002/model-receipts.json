@@ -1,0 +1,1896 @@
+[
+  {
+    "request_id": "bp-work-2c0eedb2e43196100dd0a54d:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "73a0fb959e5a6b7fa2b7bd2674d9460d61229e4aa0f05f55e5f9f0ff87d7da90",
+    "response_hash": "4665d53d0769af71f0fe77ae6e57bed5f63327a04728af5866d6e1bb59301c1a",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0023\",\"section-0030\",\"section-0041\",\"section-0070\",\"section-0996\",\"section-1190\"],\"rationale\":\"选择董事会报告中的经营情况讨论与分析（section-0023）作为公司经营综述，涵盖市场回顾与主要工作；section-0030提供报告期主营业务收入、成本与毛利率等核心经营数据；section-0041详述各项业务发展情况（房地产开发等），解释产品/服务与经营模式；section-0070为经营和财务状况分析，补充利润、负债、资金等经营因素；section-0996为营业收入和营业成本附注，提供收入构成与主要业务权重；section-1190为分部信息，补充分业务收入与利润结构。以上均为公司层面实质经营与收入讨论，避免纯行业背景、治理与财务报告全文。\",\"deferred\":[\"第五节公司治理报告（董事、薪酬、内控等）与第六节重要事项（担保、关联交易、诉讼）非经营核心，暂不选\",\"第九节财务报告其余会计政策、资产明细与附注篇幅巨大，仅在收入/分部缺口时定向补充，不整体扩读\",\"行业市场回顾（section-0024）为纯行业背景，仅作次要参考，未单独选取\"],\"stop_reason\":\"已覆盖公司业务结构、主要产品与服务、收入总额与构成、各业务板块经营情况、经营因素与本期变化，信息密度足够解释公司经营与盈利来源；剩余治理、合规、财务附注细节不改变公司层面解读，停止扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0023",
+        "section-0030",
+        "section-0041",
+        "section-0070",
+        "section-0996",
+        "section-1190"
+      ],
+      "rationale": "选择董事会报告中的经营情况讨论与分析（section-0023）作为公司经营综述，涵盖市场回顾与主要工作；section-0030提供报告期主营业务收入、成本与毛利率等核心经营数据；section-0041详述各项业务发展情况（房地产开发等），解释产品/服务与经营模式；section-0070为经营和财务状况分析，补充利润、负债、资金等经营因素；section-0996为营业收入和营业成本附注，提供收入构成与主要业务权重；section-1190为分部信息，补充分业务收入与利润结构。以上均为公司层面实质经营与收入讨论，避免纯行业背景、治理与财务报告全文。",
+      "deferred": [
+        "第五节公司治理报告（董事、薪酬、内控等）与第六节重要事项（担保、关联交易、诉讼）非经营核心，暂不选",
+        "第九节财务报告其余会计政策、资产明细与附注篇幅巨大，仅在收入/分部缺口时定向补充，不整体扩读",
+        "行业市场回顾（section-0024）为纯行业背景，仅作次要参考，未单独选取"
+      ],
+      "stop_reason": "已覆盖公司业务结构、主要产品与服务、收入总额与构成、各业务板块经营情况、经营因素与本期变化，信息密度足够解释公司经营与盈利来源；剩余治理、合规、财务附注细节不改变公司层面解读，停止扩读。"
+    },
+    "usage": {
+      "input_tokens": 27818,
+      "output_tokens": 338,
+      "total_tokens": 28156
+    }
+  },
+  {
+    "request_id": "bp-work-2c0eedb2e43196100dd0a54d:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "8cf497659212e14a359bb7e9832833d489a41b2fe83d9bf41edaed808658fc19",
+    "response_hash": "5fac88b35b34b6de5e985a2039b36e1021270efbdf2e84945e4e3778264eeee2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"本集团主营业务包括“房地产开发及相关资产经营”和“物业服务”两大板块；相关资产经营业务主要包括物流、公寓、商业、办公等业务收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0017\"]},{\"fact_id\":\"F02\",\"text\":\"集团根据内部组织结构确定开发经营业务和物业管理业务两大报告分部；开发经营业务分部主要包括以住宅为主的可售型产品的开发与销售业务、代建以及商业等持有物业运营与资产管理业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]},{\"fact_id\":\"F03\",\"text\":\"报告期内集团顺利退出冰雪业务板块，实现战略收敛聚焦和业务组合优化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F04\",\"text\":\"房地产开发业务以住宅为主的可售型产品开发与销售为核心，同时开展代建业务；报告期实现结算面积1,256.7万平方米、结算收入1,701.08亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0017\"]},{\"fact_id\":\"F05\",\"text\":\"相关资产经营业务涵盖物流、公寓、商业、办公等持有物业的运营与资产管理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F06\",\"text\":\"物业服务分部主营包括社区空间居住消费服务、商企和城市空间综合服务及AIoT及BPaaS解决方案服务等业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]},{\"fact_id\":\"F07\",\"text\":\"其他业务收入主要包括养殖业务收入以及向联合营公司收取的运营管理费、品牌管理费、商管相关的附属收费等收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F08\",\"text\":\"集团收入主要来自房地产开发销售结算、持有物业经营与物业服务收费；报告期营业收入2,334.3亿元，同比下降32.0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,334.3\",\"value\":\"2334.3\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"-32.0%\",\"value\":\"-32.0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"按业务类型，房地产开发及相关资产经营业务营业收入1,906.5亿元，占比81.7%；物业服务营业收入355.2亿元，占比15.2%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"房地产开发及相关资产经营业务营业收入\",\"raw_value\":\"1,906.5\",\"value\":\"1906.5\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产开发及相关资产经营业务营业收入占营业收入比重\",\"raw_value\":\"81.7%\",\"value\":\"81.7\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业服务营业收入\",\"raw_value\":\"355.2\",\"value\":\"355.2\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业服务营业收入占营业收入比重\",\"raw_value\":\"15.2%\",\"value\":\"15.2\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F10\",\"text\":\"主营业务分行业表中，房地产开发及相关资产经营业务营业收入19,065,115.35万元、营业成本17,417,881.19万元、毛利率8.64%；物业服务营业收入3,552,451.42万元、营业成本3,113,891.32万元、毛利率12.35%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"房地产开发及相关资产经营业务营业收入\",\"raw_value\":\"19,065,115.35\",\"value\":\"19065115.35\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产开发及相关资产经营业务营业成本\",\"raw_value\":\"17,417,881.19\",\"value\":\"17417881.19\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产开发及相关资产经营业务毛利率\",\"raw_value\":\"8.64%\",\"value\":\"8.64\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业服务营业收入\",\"raw_value\":\"3,552,451.42\",\"value\":\"3552451.42\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业服务营业成本\",\"raw_value\":\"3,113,891.32\",\"value\":\"3113891.32\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物业服务毛利率\",\"raw_value\":\"12.35%\",\"value\":\"12.35\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"主营业务合计营业收入22,617,566.77万元、营业成本20,531,772.51万元、毛利率9.22%；其他业务营业收入725,710.13万元、毛利率16.91%；合计营业收入23,343,276.90万元、毛利率9.46%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"主营业务营业收入\",\"raw_value\":\"22,617,566.77\",\"value\":\"22617566.77\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务毛利率\",\"raw_value\":\"9.22%\",\"value\":\"9.22\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务营业收入\",\"raw_value\":\"725,710.13\",\"value\":\"725710.13\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务毛利率\",\"raw_value\":\"16.91%\",\"value\":\"16.91\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"合计营业收入\",\"raw_value\":\"23,343,276.90\",\"value\":\"23343276.90\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"合计毛利率\",\"raw_value\":\"9.46%\",\"value\":\"9.46\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"财务报表附注显示，主营业务收入226,175,667,729.42元、成本205,317,725,142.15元；其他业务收入7,257,101,231.01元、成本6,029,566,628.73元；合计收入233,432,768,960.43元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"226,175,667,729.42\",\"value\":\"226175667729.42\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"7,257,101,231.01\",\"value\":\"7257101231.01\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入合计\",\"raw_value\":\"233,432,768,960.43\",\"value\":\"233432768960.43\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"2025年集团实现销售面积1,025.0万平方米、销售金额1,340.6亿元，同比分别下降43.4%和45.5%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"销售面积\",\"raw_value\":\"1,025.0\",\"value\":\"1025.0\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"销售金额\",\"raw_value\":\"1,340.6\",\"value\":\"1340.6\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"销售面积同比增减\",\"raw_value\":\"-43.4%\",\"value\":\"-43.4\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"销售金额同比增减\",\"raw_value\":\"-45.5%\",\"value\":\"-45.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"分区域销售中，上海区域销售金额461.6亿元、占比34.4%，南方区域277.8亿元、占比20.7%，北京区域146.3亿元、占比10.9%，其余区域占比均低于10%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"上海区域销售金额\",\"raw_value\":\"461.6\",\"value\":\"461.6\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海区域销售金额占比\",\"raw_value\":\"34.4%\",\"value\":\"34.4\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"南方区域销售金额\",\"raw_value\":\"277.8\",\"value\":\"277.8\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"南方区域销售金额占比\",\"raw_value\":\"20.7%\",\"value\":\"20.7\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"经营服务类业务实现全口径收入580.1亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"经营服务类业务全口径收入\",\"raw_value\":\"580.1\",\"value\":\"580.1\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F16\",\"text\":\"截至报告期末，合并报表范围内已售资源未竣工结算面积1,096.9万平方米，较上年末下降31.1%；合同金额合计约1,135.9亿元，较上年末下降48.6%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"已售未竣工结算面积\",\"raw_value\":\"1,096.9\",\"value\":\"1096.9\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"已售未竣工结算合同金额\",\"raw_value\":\"约1,135.9\",\"value\":\"1135.9\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"approximate\"}]}],\"limitations\":[]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F17\",\"text\":\"2025年开发业务开复工计容面积约591.7万平方米，同比下降42.1%，完成年初计划的88.5%；竣工计容面积约1,291.8万平方米，同比下降45.6%，完成年初计划的91.3%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"开发业务开复工计容面积\",\"raw_value\":\"约591.7\",\"value\":\"591.7\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"开发业务竣工计容面积\",\"raw_value\":\"约1,291.8\",\"value\":\"1291.8\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F18\",\"text\":\"报告期累计获取新项目23个，总规划计容建筑面积186.9万平方米，权益计容规划建筑面积105.3万平方米，权益地价总额约66.9亿元，新增项目平均地价6,357元/平方米；新获取资源均为存量盘活项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"新获取项目数\",\"raw_value\":\"23\",\"value\":\"23\",\"unit\":\"个\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"总规划计容建筑面积\",\"raw_value\":\"186.9\",\"value\":\"186.9\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"权益地价总额\",\"raw_value\":\"约66.9\",\"value\":\"66.9\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"新增项目平均地价\",\"raw_value\":\"6,357\",\"value\":\"6357\",\"unit\":\"元/平方米\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"全年共交付234个项目、494个批次，合计交付房屋11.7万套。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"交付房屋套数\",\"raw_value\":\"11.7\",\"value\":\"11.7\",\"unit\":\"万套\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F20\",\"text\":\"截至报告期末存货金额3,737.4亿元，较2024年底下降28.0%；其中拟开发产品778.8亿元占20.8%，在建开发产品1,788.2亿元占47.8%，已完工开发产品（现房）1,144.5亿元占30.6%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"存货金额\",\"raw_value\":\"3,737.4\",\"value\":\"3737.4\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"拟开发产品\",\"raw_value\":\"778.8\",\"value\":\"778.8\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"在建开发产品\",\"raw_value\":\"1,788.2\",\"value\":\"1788.2\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"已完工开发产品（现房）\",\"raw_value\":\"1,144.5\",\"value\":\"1144.5\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F21\",\"text\":\"报告期内新增计提存货跌价准备208.3亿元，报告期末存货跌价准备余额266.4亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"新增计提存货跌价准备\",\"raw_value\":\"208.3\",\"value\":\"208.3\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"存货跌价准备余额\",\"raw_value\":\"266.4\",\"value\":\"266.4\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各持有物业（物流、公寓、商业、办公）分项收入与面积明细。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F22\",\"text\":\"集团房地产开发及相关配套业务主要布局中国境内7个区域，报告期境内累计营业收入1,781.62亿元；其中上海区域占营业收入比重35.29%，南方区域21.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"境内累计营业收入\",\"raw_value\":\"1,781.62\",\"value\":\"1781.62\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海区域营业收入占营业收入比重\",\"raw_value\":\"35.29%\",\"value\":\"35.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"南方区域营业收入占营业收入比重\",\"raw_value\":\"21.00%\",\"value\":\"21.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F23\",\"text\":\"销售区域中“其他”包括香港、纽约、旧金山、伦敦、西雅图，报告期销售金额81.1亿元、占比6.1%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"其他区域销售金额\",\"raw_value\":\"81.1\",\"value\":\"81.1\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他区域销售金额占比\",\"raw_value\":\"6.1%\",\"value\":\"6.1\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F24\",\"text\":\"营销方面，集团在贝壳、字节、安居客等平台进行总对总获客联动，并组织全民营销、直播、线上投放、AI应用等培训。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[\"未获取按客户类型（个人购房者、企业客户等）划分的收入结构。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F25\",\"text\":\"业绩亏损主要原因包括：房地产开发项目结算规模显著下降且毛利率仍处低位；因业务风险敞口升高新增计提信用减值和资产减值；部分经营性业务扣除折旧摊销后整体亏损及部分非主业财务投资亏损；部分大宗资产交易和股权交易价格低于账面值。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F26\",\"text\":\"报告期结算利润主要对应2023年、2024年销售的项目及2025年消化的现房和准现房库存，这些项目地价获取成本较高，销售情况和毛利率均低于投资预期。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F27\",\"text\":\"融资端全年新增融资和再融资280亿元（不含股东借款），存量融资综合成本3.02%，较上年末下降85个基点；大股东深铁集团截至报告披露日已累计提供股东借款335.2亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0010\"],\"metrics\":[{\"name\":\"新增融资和再融资\",\"raw_value\":\"280\",\"value\":\"280\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"存量融资综合成本\",\"raw_value\":\"3.02%\",\"value\":\"3.02\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"股东借款累计金额\",\"raw_value\":\"335.2\",\"value\":\"335.2\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告披露日\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F28\",\"text\":\"截至2025年底，集团净负债率123.5%，较2024年底提高42.9个百分点；资产负债率76.9%，较2024年底提高3.2个百分点；有息负债合计3,584.8亿元，占总资产35.1%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"净负债率\",\"raw_value\":\"123.5%\",\"value\":\"123.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"净负债率较上年末变动\",\"raw_value\":\"42.9个百分点\",\"value\":\"42.9\",\"unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"资产负债率\",\"raw_value\":\"76.9%\",\"value\":\"76.9\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"有息负债合计\",\"raw_value\":\"3,584.8\",\"value\":\"3584.8\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F29\",\"text\":\"全年经营活动产生的现金流量为净支出9.9亿元；截至报告期末持有货币资金672.4亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"-9.9\",\"value\":\"-9.9\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"货币资金\",\"raw_value\":\"672.4\",\"value\":\"672.4\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F30\",\"text\":\"报告期内集团研发投入金额4.4亿元，占营业收入的比例较小。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"研发投入金额\",\"raw_value\":\"4.4\",\"value\":\"4.4\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"自2025年11月起，公司陆续就“22万科MTN004”和“22万科MTN005”两笔中期票据以及“H1万科02”（原“21万科02”）一笔公司债券启动展期协商程序，截至报告披露日相关展期议案已获债券持有人会议表决通过。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年11月起至报告披露日\",\"evidence_ids\":[\"source-0001\",\"source-0010\"]},{\"fact_id\":\"F32\",\"text\":\"报告期内集团完成332.1亿元公开债务偿付（截至报告披露日）；同时通过存量资源盘活新增和优化产能达338亿元，完成31个项目大宗交易、签约金额113亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"公开债务偿付金额\",\"raw_value\":\"332.1\",\"value\":\"332.1\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告披露日\",\"qualifier\":\"exact\"},{\"name\":\"存量资源盘活新增和优化产能\",\"raw_value\":\"338\",\"value\":\"338\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"大宗交易签约金额\",\"raw_value\":\"113\",\"value\":\"113\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F33\",\"text\":\"报告期内集团归属于上市公司股东的净亏损885.6亿元，同比下降79.0%；基本每股亏损7.45元，同比下降78.4%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净亏损\",\"raw_value\":\"885.6\",\"value\":\"885.6\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"基本每股亏损\",\"raw_value\":\"7.45\",\"value\":\"7.45\",\"unit\":\"元/股\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F34\",\"text\":\"报告期内集团新增计提资产减值损失2,192,930.81万元，上年为716,837.73万元，主要系结合市场形势与项目实际情况计提的存货减值增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"资产减值损失\",\"raw_value\":\"-2,192,930.81\",\"value\":\"-2192930.81\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F35\",\"text\":\"集团在房地产开发链条中承担以住宅为主的可售型产品的开发与销售，并延伸至代建、持有物业运营与资产管理及物业服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F36\",\"text\":\"集团资本承担492.1亿元，主要包括已签订的正在或准备履行的建安合同以及已签订的正在或准备履行的土地合同，反映土地与建安为主要资源投入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"资本承担\",\"raw_value\":\"492.1\",\"value\":\"492.1\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取具体建筑材料供应商或采购金额明细。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F37\",\"text\":\"集团按行业惯例为购房客户的按揭贷款提供阶段性担保，截至报告期末担保总额约934.96亿元，反映购房者为开发产品销售的主要终端客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"为购房客户按揭贷款提供担保总额\",\"raw_value\":\"约934.96\",\"value\":\"934.96\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"approximate\"}]}],\"limitations\":[\"未获取具体客户名单或客户集中度数据。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F38\",\"text\":\"集团年内持续推进项目“兴交付”，从兴品质、兴场景、兴服务、兴体验四个维度升级交付体系，全年保质交付11.7万套房子。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0007\"]},{\"fact_id\":\"F39\",\"text\":\"集团坚持存量资源盘活为主导、精准投资为补充的投资策略，新获取资源均为存量盘活项目，主要分布在广州、杭州、宁波等核心城市。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]}],\"limitations\":[]},\"limitations\":[\"未获取持有物业（物流、公寓、商业、办公）分项收入、面积及出租率明细。\",\"未获取按客户类型划分的收入结构及具体客户集中度信息。\",\"未获取主要建筑材料供应商及采购金额明细。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "本集团主营业务包括“房地产开发及相关资产经营”和“物业服务”两大板块；相关资产经营业务主要包括物流、公寓、商业、办公等业务收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "集团根据内部组织结构确定开发经营业务和物业管理业务两大报告分部；开发经营业务分部主要包括以住宅为主的可售型产品的开发与销售业务、代建以及商业等持有物业运营与资产管理业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "报告期内集团顺利退出冰雪业务板块，实现战略收敛聚焦和业务组合优化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F04",
+              "text": "房地产开发业务以住宅为主的可售型产品开发与销售为核心，同时开展代建业务；报告期实现结算面积1,256.7万平方米、结算收入1,701.08亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "相关资产经营业务涵盖物流、公寓、商业、办公等持有物业的运营与资产管理。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "物业服务分部主营包括社区空间居住消费服务、商企和城市空间综合服务及AIoT及BPaaS解决方案服务等业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "其他业务收入主要包括养殖业务收入以及向联合营公司收取的运营管理费、品牌管理费、商管相关的附属收费等收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F08",
+              "text": "集团收入主要来自房地产开发销售结算、持有物业经营与物业服务收费；报告期营业收入2,334.3亿元，同比下降32.0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "2,334.3",
+                  "value": "2334.3",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "-32.0%",
+                  "value": "-32.0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "按业务类型，房地产开发及相关资产经营业务营业收入1,906.5亿元，占比81.7%；物业服务营业收入355.2亿元，占比15.2%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产开发及相关资产经营业务营业收入",
+                  "raw_value": "1,906.5",
+                  "value": "1906.5",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产开发及相关资产经营业务营业收入占营业收入比重",
+                  "raw_value": "81.7%",
+                  "value": "81.7",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业服务营业收入",
+                  "raw_value": "355.2",
+                  "value": "355.2",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业服务营业收入占营业收入比重",
+                  "raw_value": "15.2%",
+                  "value": "15.2",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "主营业务分行业表中，房地产开发及相关资产经营业务营业收入19,065,115.35万元、营业成本17,417,881.19万元、毛利率8.64%；物业服务营业收入3,552,451.42万元、营业成本3,113,891.32万元、毛利率12.35%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产开发及相关资产经营业务营业收入",
+                  "raw_value": "19,065,115.35",
+                  "value": "19065115.35",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产开发及相关资产经营业务营业成本",
+                  "raw_value": "17,417,881.19",
+                  "value": "17417881.19",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产开发及相关资产经营业务毛利率",
+                  "raw_value": "8.64%",
+                  "value": "8.64",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业服务营业收入",
+                  "raw_value": "3,552,451.42",
+                  "value": "3552451.42",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业服务营业成本",
+                  "raw_value": "3,113,891.32",
+                  "value": "3113891.32",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物业服务毛利率",
+                  "raw_value": "12.35%",
+                  "value": "12.35",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "主营业务合计营业收入22,617,566.77万元、营业成本20,531,772.51万元、毛利率9.22%；其他业务营业收入725,710.13万元、毛利率16.91%；合计营业收入23,343,276.90万元、毛利率9.46%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务营业收入",
+                  "raw_value": "22,617,566.77",
+                  "value": "22617566.77",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务毛利率",
+                  "raw_value": "9.22%",
+                  "value": "9.22",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务营业收入",
+                  "raw_value": "725,710.13",
+                  "value": "725710.13",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务毛利率",
+                  "raw_value": "16.91%",
+                  "value": "16.91",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "合计营业收入",
+                  "raw_value": "23,343,276.90",
+                  "value": "23343276.90",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "合计毛利率",
+                  "raw_value": "9.46%",
+                  "value": "9.46",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "财务报表附注显示，主营业务收入226,175,667,729.42元、成本205,317,725,142.15元；其他业务收入7,257,101,231.01元、成本6,029,566,628.73元；合计收入233,432,768,960.43元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入",
+                  "raw_value": "226,175,667,729.42",
+                  "value": "226175667729.42",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务收入",
+                  "raw_value": "7,257,101,231.01",
+                  "value": "7257101231.01",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "233,432,768,960.43",
+                  "value": "233432768960.43",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F13",
+              "text": "2025年集团实现销售面积1,025.0万平方米、销售金额1,340.6亿元，同比分别下降43.4%和45.5%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "销售面积",
+                  "raw_value": "1,025.0",
+                  "value": "1025.0",
+                  "unit": "万平方米",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "销售金额",
+                  "raw_value": "1,340.6",
+                  "value": "1340.6",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "销售面积同比增减",
+                  "raw_value": "-43.4%",
+                  "value": "-43.4",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "销售金额同比增减",
+                  "raw_value": "-45.5%",
+                  "value": "-45.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "分区域销售中，上海区域销售金额461.6亿元、占比34.4%，南方区域277.8亿元、占比20.7%，北京区域146.3亿元、占比10.9%，其余区域占比均低于10%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "上海区域销售金额",
+                  "raw_value": "461.6",
+                  "value": "461.6",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海区域销售金额占比",
+                  "raw_value": "34.4%",
+                  "value": "34.4",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "南方区域销售金额",
+                  "raw_value": "277.8",
+                  "value": "277.8",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "南方区域销售金额占比",
+                  "raw_value": "20.7%",
+                  "value": "20.7",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "经营服务类业务实现全口径收入580.1亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "经营服务类业务全口径收入",
+                  "raw_value": "580.1",
+                  "value": "580.1",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "截至报告期末，合并报表范围内已售资源未竣工结算面积1,096.9万平方米，较上年末下降31.1%；合同金额合计约1,135.9亿元，较上年末下降48.6%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "已售未竣工结算面积",
+                  "raw_value": "1,096.9",
+                  "value": "1096.9",
+                  "unit": "万平方米",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "已售未竣工结算合同金额",
+                  "raw_value": "约1,135.9",
+                  "value": "1135.9",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "approximate"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F17",
+              "text": "2025年开发业务开复工计容面积约591.7万平方米，同比下降42.1%，完成年初计划的88.5%；竣工计容面积约1,291.8万平方米，同比下降45.6%，完成年初计划的91.3%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "开发业务开复工计容面积",
+                  "raw_value": "约591.7",
+                  "value": "591.7",
+                  "unit": "万平方米",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "开发业务竣工计容面积",
+                  "raw_value": "约1,291.8",
+                  "value": "1291.8",
+                  "unit": "万平方米",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "报告期累计获取新项目23个，总规划计容建筑面积186.9万平方米，权益计容规划建筑面积105.3万平方米，权益地价总额约66.9亿元，新增项目平均地价6,357元/平方米；新获取资源均为存量盘活项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "新获取项目数",
+                  "raw_value": "23",
+                  "value": "23",
+                  "unit": "个",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "总规划计容建筑面积",
+                  "raw_value": "186.9",
+                  "value": "186.9",
+                  "unit": "万平方米",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "权益地价总额",
+                  "raw_value": "约66.9",
+                  "value": "66.9",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "新增项目平均地价",
+                  "raw_value": "6,357",
+                  "value": "6357",
+                  "unit": "元/平方米",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "全年共交付234个项目、494个批次，合计交付房屋11.7万套。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "交付房屋套数",
+                  "raw_value": "11.7",
+                  "value": "11.7",
+                  "unit": "万套",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "截至报告期末存货金额3,737.4亿元，较2024年底下降28.0%；其中拟开发产品778.8亿元占20.8%，在建开发产品1,788.2亿元占47.8%，已完工开发产品（现房）1,144.5亿元占30.6%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "存货金额",
+                  "raw_value": "3,737.4",
+                  "value": "3737.4",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "拟开发产品",
+                  "raw_value": "778.8",
+                  "value": "778.8",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "在建开发产品",
+                  "raw_value": "1,788.2",
+                  "value": "1788.2",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "已完工开发产品（现房）",
+                  "raw_value": "1,144.5",
+                  "value": "1144.5",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "报告期内新增计提存货跌价准备208.3亿元，报告期末存货跌价准备余额266.4亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "新增计提存货跌价准备",
+                  "raw_value": "208.3",
+                  "value": "208.3",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "存货跌价准备余额",
+                  "raw_value": "266.4",
+                  "value": "266.4",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各持有物业（物流、公寓、商业、办公）分项收入与面积明细。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F22",
+              "text": "集团房地产开发及相关配套业务主要布局中国境内7个区域，报告期境内累计营业收入1,781.62亿元；其中上海区域占营业收入比重35.29%，南方区域21.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "境内累计营业收入",
+                  "raw_value": "1,781.62",
+                  "value": "1781.62",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海区域营业收入占营业收入比重",
+                  "raw_value": "35.29%",
+                  "value": "35.29",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "南方区域营业收入占营业收入比重",
+                  "raw_value": "21.00%",
+                  "value": "21.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "销售区域中“其他”包括香港、纽约、旧金山、伦敦、西雅图，报告期销售金额81.1亿元、占比6.1%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "其他区域销售金额",
+                  "raw_value": "81.1",
+                  "value": "81.1",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他区域销售金额占比",
+                  "raw_value": "6.1%",
+                  "value": "6.1",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "营销方面，集团在贝壳、字节、安居客等平台进行总对总获客联动，并组织全民营销、直播、线上投放、AI应用等培训。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取按客户类型（个人购房者、企业客户等）划分的收入结构。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F25",
+              "text": "业绩亏损主要原因包括：房地产开发项目结算规模显著下降且毛利率仍处低位；因业务风险敞口升高新增计提信用减值和资产减值；部分经营性业务扣除折旧摊销后整体亏损及部分非主业财务投资亏损；部分大宗资产交易和股权交易价格低于账面值。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "报告期结算利润主要对应2023年、2024年销售的项目及2025年消化的现房和准现房库存，这些项目地价获取成本较高，销售情况和毛利率均低于投资预期。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "融资端全年新增融资和再融资280亿元（不含股东借款），存量融资综合成本3.02%，较上年末下降85个基点；大股东深铁集团截至报告披露日已累计提供股东借款335.2亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "新增融资和再融资",
+                  "raw_value": "280",
+                  "value": "280",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "存量融资综合成本",
+                  "raw_value": "3.02%",
+                  "value": "3.02",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "股东借款累计金额",
+                  "raw_value": "335.2",
+                  "value": "335.2",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "截至报告披露日",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "截至2025年底，集团净负债率123.5%，较2024年底提高42.9个百分点；资产负债率76.9%，较2024年底提高3.2个百分点；有息负债合计3,584.8亿元，占总资产35.1%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "净负债率",
+                  "raw_value": "123.5%",
+                  "value": "123.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净负债率较上年末变动",
+                  "raw_value": "42.9个百分点",
+                  "value": "42.9",
+                  "unit": "百分点",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资产负债率",
+                  "raw_value": "76.9%",
+                  "value": "76.9",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "有息负债合计",
+                  "raw_value": "3,584.8",
+                  "value": "3584.8",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "全年经营活动产生的现金流量为净支出9.9亿元；截至报告期末持有货币资金672.4亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "-9.9",
+                  "value": "-9.9",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "货币资金",
+                  "raw_value": "672.4",
+                  "value": "672.4",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "报告期内集团研发投入金额4.4亿元，占营业收入的比例较小。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入金额",
+                  "raw_value": "4.4",
+                  "value": "4.4",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F31",
+              "text": "自2025年11月起，公司陆续就“22万科MTN004”和“22万科MTN005”两笔中期票据以及“H1万科02”（原“21万科02”）一笔公司债券启动展期协商程序，截至报告披露日相关展期议案已获债券持有人会议表决通过。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年11月起至报告披露日",
+              "evidence_ids": [
+                "source-0001",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F32",
+              "text": "报告期内集团完成332.1亿元公开债务偿付（截至报告披露日）；同时通过存量资源盘活新增和优化产能达338亿元，完成31个项目大宗交易、签约金额113亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "公开债务偿付金额",
+                  "raw_value": "332.1",
+                  "value": "332.1",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "截至报告披露日",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "存量资源盘活新增和优化产能",
+                  "raw_value": "338",
+                  "value": "338",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "大宗交易签约金额",
+                  "raw_value": "113",
+                  "value": "113",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F33",
+              "text": "报告期内集团归属于上市公司股东的净亏损885.6亿元，同比下降79.0%；基本每股亏损7.45元，同比下降78.4%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净亏损",
+                  "raw_value": "885.6",
+                  "value": "885.6",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "基本每股亏损",
+                  "raw_value": "7.45",
+                  "value": "7.45",
+                  "unit": "元/股",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "text": "报告期内集团新增计提资产减值损失2,192,930.81万元，上年为716,837.73万元，主要系结合市场形势与项目实际情况计提的存货减值增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "资产减值损失",
+                  "raw_value": "-2,192,930.81",
+                  "value": "-2192930.81",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F35",
+              "text": "集团在房地产开发链条中承担以住宅为主的可售型产品的开发与销售，并延伸至代建、持有物业运营与资产管理及物业服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F36",
+              "text": "集团资本承担492.1亿元，主要包括已签订的正在或准备履行的建安合同以及已签订的正在或准备履行的土地合同，反映土地与建安为主要资源投入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "资本承担",
+                  "raw_value": "492.1",
+                  "value": "492.1",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取具体建筑材料供应商或采购金额明细。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F37",
+              "text": "集团按行业惯例为购房客户的按揭贷款提供阶段性担保，截至报告期末担保总额约934.96亿元，反映购房者为开发产品销售的主要终端客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "为购房客户按揭贷款提供担保总额",
+                  "raw_value": "约934.96",
+                  "value": "934.96",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "approximate"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取具体客户名单或客户集中度数据。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F38",
+            "text": "集团年内持续推进项目“兴交付”，从兴品质、兴场景、兴服务、兴体验四个维度升级交付体系，全年保质交付11.7万套房子。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0007"
+            ]
+          },
+          {
+            "fact_id": "F39",
+            "text": "集团坚持存量资源盘活为主导、精准投资为补充的投资策略，新获取资源均为存量盘活项目，主要分布在广州、杭州、宁波等核心城市。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "未获取持有物业（物流、公寓、商业、办公）分项收入、面积及出租率明细。",
+        "未获取按客户类型划分的收入结构及具体客户集中度信息。",
+        "未获取主要建筑材料供应商及采购金额明细。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14824,
+      "output_tokens": 6960,
+      "total_tokens": 21784
+    }
+  },
+  {
+    "request_id": "bp-work-2c0eedb2e43196100dd0a54d:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "9255d96cd332504785accec1309967ce9b9d47f90a7e1b558b76aa5ac0aa2428",
+    "response_hash": "34edde3631400f0acfaa34eff87af6547f7274793b8e0eacb40be57a520883a6",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"REV-001\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0005\",\"source-0006\"],\"explanation\":\"来源明确记载2025年本集团销售面积1,025.0万平方米、销售金额1,340.6亿元，同比分别下降43.4%和45.5%。该销售规模是开发业务当期主经营指标，与结算收入1,701.08亿元、营业收入2,334.3亿元不是同一口径。草稿已写入营业收入、结算收入、经营服务类全口径收入和大宗交易签约额，并单列销售区域“其他”81.1亿元、占比6.1%，但未给出作为销售占比分母的销售金额合计，导致当期销售与结算/收入的关系无法判断。\"},{\"finding_id\":\"REV-002\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F04\",\"evidence_ids\":[\"source-0006\",\"source-0017\",\"source-0015\"],\"explanation\":\"结算面积1,256.7万平方米、结算收入1,701.08亿元出自source-0006“中国境内房地产开发及相关配套业务……累计营业收入1,781.62亿元。其中房地产开发业务实现……”的境内口径，草稿却按无地域限定的合并集团房地产开发业务表述。不得仅因source-0015房地产销售收入170,107,930,138.74元数值接近，就认定与境内结算收入为同一主体。另，“以住宅为主”“代建”属于source-0017开发经营业务分部定义，该分部还包含持有物业运营，不能并入房地产开发业务结算口径。应保留数字，限定为中国境内房地产开发业务，并与分部定义拆开。\"},{\"finding_id\":\"REV-003\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F32\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"source-0001写明截至本报告披露日已完成公开债务偿付332.1亿元，并非报告期内完成。草稿以“报告期内集团完成332.1亿元”起句，括号补注不能消除期间矛盾。存量盘活338亿元和31个项目、签约113亿元属于同一段的报告期事项，应保留；只将332.1亿元改为截至报告披露日。\"},{\"finding_id\":\"REV-004\",\"element\":\"revenue_model\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F11\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"主营业务营业收入22,617,566.77万元、毛利率9.22%，以及其他业务营业收入725,710.13万元、毛利率16.91%，与source-0004业务行一致，但对应metric的subject_scope标成consolidated_group。主营业务、其他业务是业务行，不是集团合计；合计营业收入23,343,276.90万元及合计毛利率才是合并口径。业务行应改为business_segment，合计行维持consolidated_group。数字无需改。\"},{\"finding_id\":\"REV-005\",\"element\":\"revenue_model\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F12\",\"evidence_ids\":[\"source-0015\"],\"explanation\":\"附注金额与source-0015一致，但主营业务收入、其他业务收入的subject_scope标为consolidated_group。二者是分业务行，不是营业收入合计233,432,768,960.43元。应改为business_segment；营业收入合计维持consolidated_group。不要因与董事会报告万元数相近就改金额。\"},{\"finding_id\":\"REV-006\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F15\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"经营服务类业务全口径收入580.1亿元及“全口径”表述与source-0001一致，但metric subject_scope标成consolidated_group。对象是经营服务类业务，不是集团营业收入2,334.3亿元。应改为business_segment，避免与合并营业收入混同。\"},{\"finding_id\":\"REV-007\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F22\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"境内七区域房地产开发及相关配套业务累计营业收入1,781.62亿元与source-0006一致，正文已限定境内及业务范围。上海35.29%、南方21.00%是该表占营业收入比重，分母为七区域合计（表内合计100%），不是集团营业收入。问题是“境内累计营业收入”的metric subject_scope标成consolidated_group，应改为business_segment。区域占比指标已是business_segment，数字可保留。\"},{\"finding_id\":\"REV-008\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_causality\",\"action\":\"correct\",\"affected_fact_id\":\"F37\",\"evidence_ids\":[\"source-0013\"],\"explanation\":\"为购房客户按揭贷款提供阶段性担保、截至报告期末担保总额约934.96亿元，与source-0013一致，应保留。但“反映购房者为开发产品销售的主要终端客户”不是来源表述，担保余额不能证明客户结构中的“主要”。应删除该推断，保留担保事实和金额。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F30\",\"F31\",\"F32\",\"F33\",\"F35\",\"F36\",\"F37\",\"F38\",\"F39\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "REV-001",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0005",
+            "source-0006"
+          ],
+          "explanation": "来源明确记载2025年本集团销售面积1,025.0万平方米、销售金额1,340.6亿元，同比分别下降43.4%和45.5%。该销售规模是开发业务当期主经营指标，与结算收入1,701.08亿元、营业收入2,334.3亿元不是同一口径。草稿已写入营业收入、结算收入、经营服务类全口径收入和大宗交易签约额，并单列销售区域“其他”81.1亿元、占比6.1%，但未给出作为销售占比分母的销售金额合计，导致当期销售与结算/收入的关系无法判断。"
+        },
+        {
+          "finding_id": "REV-002",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F04",
+          "evidence_ids": [
+            "source-0006",
+            "source-0017",
+            "source-0015"
+          ],
+          "explanation": "结算面积1,256.7万平方米、结算收入1,701.08亿元出自source-0006“中国境内房地产开发及相关配套业务……累计营业收入1,781.62亿元。其中房地产开发业务实现……”的境内口径，草稿却按无地域限定的合并集团房地产开发业务表述。不得仅因source-0015房地产销售收入170,107,930,138.74元数值接近，就认定与境内结算收入为同一主体。另，“以住宅为主”“代建”属于source-0017开发经营业务分部定义，该分部还包含持有物业运营，不能并入房地产开发业务结算口径。应保留数字，限定为中国境内房地产开发业务，并与分部定义拆开。"
+        },
+        {
+          "finding_id": "REV-003",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F32",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "source-0001写明截至本报告披露日已完成公开债务偿付332.1亿元，并非报告期内完成。草稿以“报告期内集团完成332.1亿元”起句，括号补注不能消除期间矛盾。存量盘活338亿元和31个项目、签约113亿元属于同一段的报告期事项，应保留；只将332.1亿元改为截至报告披露日。"
+        },
+        {
+          "finding_id": "REV-004",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F11",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "主营业务营业收入22,617,566.77万元、毛利率9.22%，以及其他业务营业收入725,710.13万元、毛利率16.91%，与source-0004业务行一致，但对应metric的subject_scope标成consolidated_group。主营业务、其他业务是业务行，不是集团合计；合计营业收入23,343,276.90万元及合计毛利率才是合并口径。业务行应改为business_segment，合计行维持consolidated_group。数字无需改。"
+        },
+        {
+          "finding_id": "REV-005",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F12",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "附注金额与source-0015一致，但主营业务收入、其他业务收入的subject_scope标为consolidated_group。二者是分业务行，不是营业收入合计233,432,768,960.43元。应改为business_segment；营业收入合计维持consolidated_group。不要因与董事会报告万元数相近就改金额。"
+        },
+        {
+          "finding_id": "REV-006",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F15",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "经营服务类业务全口径收入580.1亿元及“全口径”表述与source-0001一致，但metric subject_scope标成consolidated_group。对象是经营服务类业务，不是集团营业收入2,334.3亿元。应改为business_segment，避免与合并营业收入混同。"
+        },
+        {
+          "finding_id": "REV-007",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F22",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "境内七区域房地产开发及相关配套业务累计营业收入1,781.62亿元与source-0006一致，正文已限定境内及业务范围。上海35.29%、南方21.00%是该表占营业收入比重，分母为七区域合计（表内合计100%），不是集团营业收入。问题是“境内累计营业收入”的metric subject_scope标成consolidated_group，应改为business_segment。区域占比指标已是business_segment，数字可保留。"
+        },
+        {
+          "finding_id": "REV-008",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "unsupported_causality",
+          "action": "correct",
+          "affected_fact_id": "F37",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "为购房客户按揭贷款提供阶段性担保、截至报告期末担保总额约934.96亿元，与source-0013一致，应保留。但“反映购房者为开发产品销售的主要终端客户”不是来源表述，担保余额不能证明客户结构中的“主要”。应删除该推断，保留担保事实和金额。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39"
+      ]
+    },
+    "usage": {
+      "input_tokens": 23180,
+      "output_tokens": 1426,
+      "total_tokens": 66046
+    }
+  },
+  {
+    "request_id": "bp-work-2c0eedb2e43196100dd0a54d:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "12da1547e3a2b4593880895a0a8e2c9d3f14b61c20d6878103d33b2c8d5bc49a",
+    "response_hash": "c98c8bd004362b7adf9e549f41a3aec327d10a9401872e02f5c36388f8d4aed5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:REV-001\",\"text\":\"2025年本集团实现销售面积1,025.0万平方米，销售金额1,340.6亿元，同比分别下降43.4%和45.5%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"销售面积\",\"raw_value\":\"1,025.0\",\"value\":\"1025.0\",\"unit\":\"万平方米\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比下降43.4%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"销售金额\",\"raw_value\":\"1,340.6\",\"value\":\"1340.6\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比下降45.5%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F04\",\"text\":\"中国境内房地产开发及相关配套业务中，房地产开发业务报告期实现结算面积1,256.7万平方米、结算收入1,701.08亿元；开发经营业务分部主要包括以住宅为主的可售型产品开发与销售业务、代建以及商业等持有物业运营与资产管理业务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0017\"],\"metrics\":[{\"name\":\"境内房地产开发业务结算面积\",\"raw_value\":\"1,256.7\",\"value\":\"1256.7\",\"unit\":\"万平方米\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"境内房地产开发业务结算收入\",\"raw_value\":\"1,701.08\",\"value\":\"1701.08\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F32\",\"text\":\"截至报告披露日，集团已完成332.1亿元公开债务偿付；报告期内通过存量资源盘活新增和优化产能达338亿元，完成31个项目大宗交易、签约金额113亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"公开债务偿付金额\",\"raw_value\":\"332.1\",\"value\":\"332.1\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告披露日\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"存量资源盘活新增和优化产能\",\"raw_value\":\"338\",\"value\":\"338\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"大宗交易签约金额\",\"raw_value\":\"113\",\"value\":\"113\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F11\",\"text\":\"主营业务合计营业收入22,617,566.77万元、营业成本20,531,772.51万元、毛利率9.22%；其他业务营业收入725,710.13万元、毛利率16.91%；合计营业收入23,343,276.90万元、毛利率9.46%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"主营业务营业收入\",\"raw_value\":\"22,617,566.77\",\"value\":\"22617566.77\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务毛利率\",\"raw_value\":\"9.22%\",\"value\":\"9.22\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务营业收入\",\"raw_value\":\"725,710.13\",\"value\":\"725710.13\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务毛利率\",\"raw_value\":\"16.91%\",\"value\":\"16.91\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"合计营业收入\",\"raw_value\":\"23,343,276.90\",\"value\":\"23343276.90\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"合计毛利率\",\"raw_value\":\"9.46%\",\"value\":\"9.46\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F12\",\"text\":\"财务报表附注显示，主营业务收入226,175,667,729.42元、成本205,317,725,142.15元；其他业务收入7,257,101,231.01元、成本6,029,566,628.73元；合计收入233,432,768,960.43元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"226,175,667,729.42\",\"value\":\"226175667729.42\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务收入\",\"raw_value\":\"7,257,101,231.01\",\"value\":\"7257101231.01\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业收入合计\",\"raw_value\":\"233,432,768,960.43\",\"value\":\"233432768960.43\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F15\",\"text\":\"经营服务类业务实现全口径收入580.1亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"经营服务类业务全口径收入\",\"raw_value\":\"580.1\",\"value\":\"580.1\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F22\",\"text\":\"集团房地产开发及相关配套业务主要布局中国境内7个区域，报告期境内累计营业收入1,781.62亿元；其中上海区域占营业收入比重35.29%，南方区域21.00%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"境内累计营业收入\",\"raw_value\":\"1,781.62\",\"value\":\"1781.62\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上海区域营业收入占营业收入比重\",\"raw_value\":\"35.29%\",\"value\":\"35.29\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"南方区域营业收入占营业收入比重\",\"raw_value\":\"21.00%\",\"value\":\"21.00\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F37\",\"text\":\"集团按行业惯例为购房客户的按揭贷款提供阶段性担保，截至报告期末担保总额约934.96亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"为购房客户按揭贷款提供担保总额\",\"raw_value\":\"约934.96\",\"value\":\"934.96\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:REV-001",
+          "text": "2025年本集团实现销售面积1,025.0万平方米，销售金额1,340.6亿元，同比分别下降43.4%和45.5%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "销售面积",
+              "raw_value": "1,025.0",
+              "value": "1025.0",
+              "unit": "万平方米",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比下降43.4%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "销售金额",
+              "raw_value": "1,340.6",
+              "value": "1340.6",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比下降45.5%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F04",
+          "text": "中国境内房地产开发及相关配套业务中，房地产开发业务报告期实现结算面积1,256.7万平方米、结算收入1,701.08亿元；开发经营业务分部主要包括以住宅为主的可售型产品开发与销售业务、代建以及商业等持有物业运营与资产管理业务。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0017"
+          ],
+          "metrics": [
+            {
+              "name": "境内房地产开发业务结算面积",
+              "raw_value": "1,256.7",
+              "value": "1256.7",
+              "unit": "万平方米",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内房地产开发业务结算收入",
+              "raw_value": "1,701.08",
+              "value": "1701.08",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F32",
+          "text": "截至报告披露日，集团已完成332.1亿元公开债务偿付；报告期内通过存量资源盘活新增和优化产能达338亿元，完成31个项目大宗交易、签约金额113亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "公开债务偿付金额",
+              "raw_value": "332.1",
+              "value": "332.1",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "截至报告披露日",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "存量资源盘活新增和优化产能",
+              "raw_value": "338",
+              "value": "338",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "大宗交易签约金额",
+              "raw_value": "113",
+              "value": "113",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F11",
+          "text": "主营业务合计营业收入22,617,566.77万元、营业成本20,531,772.51万元、毛利率9.22%；其他业务营业收入725,710.13万元、毛利率16.91%；合计营业收入23,343,276.90万元、毛利率9.46%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务营业收入",
+              "raw_value": "22,617,566.77",
+              "value": "22617566.77",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务毛利率",
+              "raw_value": "9.22%",
+              "value": "9.22",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务营业收入",
+              "raw_value": "725,710.13",
+              "value": "725710.13",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务毛利率",
+              "raw_value": "16.91%",
+              "value": "16.91",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "合计营业收入",
+              "raw_value": "23,343,276.90",
+              "value": "23343276.90",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "合计毛利率",
+              "raw_value": "9.46%",
+              "value": "9.46",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F12",
+          "text": "财务报表附注显示，主营业务收入226,175,667,729.42元、成本205,317,725,142.15元；其他业务收入7,257,101,231.01元、成本6,029,566,628.73元；合计收入233,432,768,960.43元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务收入",
+              "raw_value": "226,175,667,729.42",
+              "value": "226175667729.42",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务收入",
+              "raw_value": "7,257,101,231.01",
+              "value": "7257101231.01",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入合计",
+              "raw_value": "233,432,768,960.43",
+              "value": "233432768960.43",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F15",
+          "text": "经营服务类业务实现全口径收入580.1亿元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "经营服务类业务全口径收入",
+              "raw_value": "580.1",
+              "value": "580.1",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F22",
+          "text": "集团房地产开发及相关配套业务主要布局中国境内7个区域，报告期境内累计营业收入1,781.62亿元；其中上海区域占营业收入比重35.29%，南方区域21.00%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "境内累计营业收入",
+              "raw_value": "1,781.62",
+              "value": "1781.62",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上海区域营业收入占营业收入比重",
+              "raw_value": "35.29%",
+              "value": "35.29",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "南方区域营业收入占营业收入比重",
+              "raw_value": "21.00%",
+              "value": "21.00",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F37",
+          "text": "集团按行业惯例为购房客户的按揭贷款提供阶段性担保，截至报告期末担保总额约934.96亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "metrics": [
+            {
+              "name": "为购房客户按揭贷款提供担保总额",
+              "raw_value": "约934.96",
+              "value": "934.96",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 14904,
+      "output_tokens": 2245,
+      "total_tokens": 17149
+    }
+  },
+  {
+    "request_id": "bp-work-2c0eedb2e43196100dd0a54d:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "5fba95114edd1f303f399649d1bb956cbbd438325c931b8db7853a552e7de83d",
+    "response_hash": "8bc226d60418b5ff41e5a804c1667a64c81e6f8ca21807feda8904942ca84e16",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:REV-001\",\"F04\",\"F32\",\"F11\",\"F12\",\"F15\",\"F22\",\"F37\"],\"checks\":[{\"fact_id\":\"review-add:REV-001\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"explanation\":\"source-0005写明2025年本集团销售面积1,025.0万平方米、销售金额1,340.6亿元，同比分别下降43.4%和45.5%；source-0006分区域表合计同为该金额并构成100%分母。候选补入这一销售规模，主体、期间、单位和分别对应的同比口径均与原文一致，且未把销售金额改写成结算收入或营业收入。\"},{\"fact_id\":\"F04\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0017\"],\"explanation\":\"结算面积1,256.7万平方米和结算收入1,701.08亿元在source-0006中属于中国境内房地产开发及相关配套业务项下的房地产开发业务，候选已按该主体保留数字，并未借助source-0015相近金额认定同一主体。开发经营业务分部定义另按source-0017表述，包含代建及持有物业运营，未写入结算指标名称或口径。\"},{\"fact_id\":\"F32\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"source-0001将332.1亿元公开债务偿付限定为截至本报告披露日，候选文本及对应指标期间均已改为截至报告披露日，不再表述为报告期内完成。338亿元存量盘活、31个项目及113亿元签约仍按同段报告期事项保留，金额和合并主体与原文一致。\"},{\"fact_id\":\"F11\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"source-0004中主营业务营业收入22,617,566.77万元、毛利率9.22%及其他业务725,710.13万元、毛利率16.91%均为业务行，合计23,343,276.90万元、毛利率9.46%才是合并口径。候选按此分别标注主体，金额、万元单位和毛利率列未改，也未把业务行升格为集团合计。\"},{\"fact_id\":\"F12\",\"accepted\":true,\"evidence_ids\":[\"source-0015\"],\"explanation\":\"source-0015本年主营业务收入、其他业务收入是分业务行，233,432,768,960.43元才是收入合计。候选保持人民币元原值并相应区分主体，没有因与董事会报告万元数相近而改写金额或合并口径。\"},{\"fact_id\":\"F15\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"source-0001的580.1亿元明确属于经营服务类业务全口径收入，不是集团营业收入2,334.3亿元。候选保留全口径表述、金额和期间，并将指标主体改为该业务，避免与合并营业收入混同。\"},{\"fact_id\":\"F22\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"source-0006的1,781.62亿元是中国境内七个区域房地产开发及相关配套业务累计营业收入；上海35.29%、南方21.00%的分母是该表合计100%，不是集团营业收入。候选已将该累计收入改为业务口径，并用“其中”衔接区域比重，数字与列名保持一致。\"},{\"fact_id\":\"F37\",\"accepted\":true,\"evidence_ids\":[\"source-0013\"],\"explanation\":\"source-0013支持按行业惯例为购房客户按揭提供阶段性担保，以及截至报告期末担保总额约934.96亿元。候选删除了购房者为主要终端客户的无来源推断，保留约数、报告期末时点和合并主体，没有把担保余额写成客户结构结论。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:REV-001",
+        "F04",
+        "F32",
+        "F11",
+        "F12",
+        "F15",
+        "F22",
+        "F37"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:REV-001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0006"
+          ],
+          "explanation": "source-0005写明2025年本集团销售面积1,025.0万平方米、销售金额1,340.6亿元，同比分别下降43.4%和45.5%；source-0006分区域表合计同为该金额并构成100%分母。候选补入这一销售规模，主体、期间、单位和分别对应的同比口径均与原文一致，且未把销售金额改写成结算收入或营业收入。"
+        },
+        {
+          "fact_id": "F04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0017"
+          ],
+          "explanation": "结算面积1,256.7万平方米和结算收入1,701.08亿元在source-0006中属于中国境内房地产开发及相关配套业务项下的房地产开发业务，候选已按该主体保留数字，并未借助source-0015相近金额认定同一主体。开发经营业务分部定义另按source-0017表述，包含代建及持有物业运营，未写入结算指标名称或口径。"
+        },
+        {
+          "fact_id": "F32",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "source-0001将332.1亿元公开债务偿付限定为截至本报告披露日，候选文本及对应指标期间均已改为截至报告披露日，不再表述为报告期内完成。338亿元存量盘活、31个项目及113亿元签约仍按同段报告期事项保留，金额和合并主体与原文一致。"
+        },
+        {
+          "fact_id": "F11",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "source-0004中主营业务营业收入22,617,566.77万元、毛利率9.22%及其他业务725,710.13万元、毛利率16.91%均为业务行，合计23,343,276.90万元、毛利率9.46%才是合并口径。候选按此分别标注主体，金额、万元单位和毛利率列未改，也未把业务行升格为集团合计。"
+        },
+        {
+          "fact_id": "F12",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "source-0015本年主营业务收入、其他业务收入是分业务行，233,432,768,960.43元才是收入合计。候选保持人民币元原值并相应区分主体，没有因与董事会报告万元数相近而改写金额或合并口径。"
+        },
+        {
+          "fact_id": "F15",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "source-0001的580.1亿元明确属于经营服务类业务全口径收入，不是集团营业收入2,334.3亿元。候选保留全口径表述、金额和期间，并将指标主体改为该业务，避免与合并营业收入混同。"
+        },
+        {
+          "fact_id": "F22",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "source-0006的1,781.62亿元是中国境内七个区域房地产开发及相关配套业务累计营业收入；上海35.29%、南方21.00%的分母是该表合计100%，不是集团营业收入。候选已将该累计收入改为业务口径，并用“其中”衔接区域比重，数字与列名保持一致。"
+        },
+        {
+          "fact_id": "F37",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "source-0013支持按行业惯例为购房客户按揭提供阶段性担保，以及截至报告期末担保总额约934.96亿元。候选删除了购房者为主要终端客户的无来源推断，保留约数、报告期末时点和合并主体，没有把担保余额写成客户结构结论。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 17786,
+      "output_tokens": 872,
+      "total_tokens": 41433
+    }
+  }
+]

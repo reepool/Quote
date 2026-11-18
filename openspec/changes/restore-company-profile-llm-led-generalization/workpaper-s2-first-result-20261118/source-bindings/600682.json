@@ -1,0 +1,24 @@
+{
+  "asset": {
+    "instrument_id": "600682.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-099ba1ee47185a616197405b",
+    "filing_id": "1225265623",
+    "source": "cninfo",
+    "published_at": "2026-04-29T16:00:00+00:00",
+    "content_hash": "d0216e94df98c69b58eeb2bd4268ec53f6a07c418bd08b8eb6f330569f895795",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/d0/d0216e94df98c69b58eeb2bd4268ec53f6a07c418bd08b8eb6f330569f895795.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "frontier_id": "bp-frontier-099ba1ee47185a616197405b",
+    "source": "cninfo",
+    "announcement_id": "1225265623",
+    "title": "南京新百2025年年度报告",
+    "published_at": "2026-04-29T16:00:00+00:00",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-30/1225265623.PDF",
+    "exchange": "SSE"
+  },
+  "source_only": true,
+  "old_execution_or_semantic_data_reused": false
+}
