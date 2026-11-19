@@ -1,0 +1,2310 @@
+[
+  {
+    "request_id": "bp-work-b714e2a56fcb44d188cf3fee:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "e30c6a71d9db1d8fd94c5fc0b0df1ae4a2908c268df285e7e386abaf3a5b538d",
+    "response_hash": "ff77d3ab82cbd90409d9e567727ed8fd127cca8385a985818ec3d41538ea0ad1",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0042\",\"section-0043\",\"section-0044\",\"section-0055\",\"section-0056\",\"section-0057\",\"section-0058\",\"section-0060\",\"section-0061\",\"section-0069\",\"section-0070\",\"section-0071\",\"section-0074\",\"section-0075\",\"section-0076\",\"section-0077\",\"section-0087\",\"section-0091\"],\"rationale\":\"所选章节覆盖公司业务与经营模式、市场地位、各业务板块（饲料及产业链、多晶硅、电池、组件、光伏电站）的经营讨论，以及主营业务分析中的利润表变动、收入成本、分行业/分产品/分地区/分销售模式构成和主要客户供应商情况，能完整解释公司做什么、怎么赚钱、收入规模与业务权重、渠道与市场分布及本期经营变化。行业背景与核心竞争力章节仅作次要参考，未纳入。\",\"deferred\":[\"section-0045 行业情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0062 核心竞争力：偏泛化竞争力描述，信息可由经营讨论覆盖\",\"section-0148 未来发展讨论：含计划性展望与风险，非本期经营事实，暂不选\",\"section-0398 财务报告附注：仅在分部/收入附注出现实质缺口时定向补充，不整体扩读\"],\"stop_reason\":\"已获得公司业务结构、产品用途、经营模式、收入总额与分业务/分地区/分销售模式构成及主要客户供应商等核心信息，足以回答经营与收入问题；行业背景、展望与财务附注属次要或定向补充范围，可在不扩读的情况下停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0042",
+        "section-0043",
+        "section-0044",
+        "section-0055",
+        "section-0056",
+        "section-0057",
+        "section-0058",
+        "section-0060",
+        "section-0061",
+        "section-0069",
+        "section-0070",
+        "section-0071",
+        "section-0074",
+        "section-0075",
+        "section-0076",
+        "section-0077",
+        "section-0087",
+        "section-0091"
+      ],
+      "rationale": "所选章节覆盖公司业务与经营模式、市场地位、各业务板块（饲料及产业链、多晶硅、电池、组件、光伏电站）的经营讨论，以及主营业务分析中的利润表变动、收入成本、分行业/分产品/分地区/分销售模式构成和主要客户供应商情况，能完整解释公司做什么、怎么赚钱、收入规模与业务权重、渠道与市场分布及本期经营变化。行业背景与核心竞争力章节仅作次要参考，未纳入。",
+      "deferred": [
+        "section-0045 行业情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0062 核心竞争力：偏泛化竞争力描述，信息可由经营讨论覆盖",
+        "section-0148 未来发展讨论：含计划性展望与风险，非本期经营事实，暂不选",
+        "section-0398 财务报告附注：仅在分部/收入附注出现实质缺口时定向补充，不整体扩读"
+      ],
+      "stop_reason": "已获得公司业务结构、产品用途、经营模式、收入总额与分业务/分地区/分销售模式构成及主要客户供应商等核心信息，足以回答经营与收入问题；行业背景、展望与财务附注属次要或定向补充范围，可在不扩读的情况下停止。"
+    },
+    "usage": {
+      "input_tokens": 24118,
+      "output_tokens": 368,
+      "total_tokens": 24486
+    }
+  },
+  {
+    "request_id": "bp-work-b714e2a56fcb44d188cf3fee:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "d4f1fb7a23c8fd9f61655bedda36dae525ca340ff990e671b74f6ead18ab1d35",
+    "response_hash": "defe31a85ba6235a2eb047f7003ca260963d2f62f63c42becf58422e02c2a596",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司以农业及新能源为主业，形成“农业（渔业）+光伏”资源整合、协同发展的经营模式；农业方面主营水产饲料、畜禽饲料等产品的研究、生产和销售，新能源方面以高纯晶硅、太阳能电池、组件等产品的研发、生产、销售为主，并在综合应用端聚焦规模化“渔光一体”基地开发建设。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F02\",\"text\":\"公司构建了自上游工业硅到终端光伏电站的全产业链业务布局，主要产业环节具备成本、质量、效率等综合竞争优势。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"农业板块主营水产饲料、畜禽饲料，用于满足水产、畜禽动物养殖过程中的生长和营养所需；水产饲料是公司核心产品，也是农牧板块的主要利润来源。围绕饲料主业还开展育种、养殖、动保、食品加工与贸易等业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F04\",\"text\":\"新能源板块产品包括高纯晶硅、太阳能电池、组件；高纯晶硅产品客户主要为下游硅片企业，太阳能电池除满足自身组件生产需求外也销售给国内外光伏组件企业，组件面向全球集中式、分布式等各类型客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F05\",\"text\":\"综合应用端打造“生态养殖+绿色能源”的“渔光一体”模式，通过在养殖水面建设太阳能发电系统，推动规模化“渔光一体”电站业务；同时布局源网荷储一体化业务，在部分生产基地及电站配套建设储能项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0006\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F06\",\"text\":\"公司2025年实现营业收入841.28亿元，营业成本818.56亿元；营业收入变动主要系光伏产业链价格下降所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"84,128,281,703.14\",\"value\":\"84128281703.14\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业成本\",\"raw_value\":\"81,856,406,510.25\",\"value\":\"81856406510.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F07\",\"text\":\"主营业务分产品中，饲料、食品及相关业务营业收入292.59亿元，营业成本264.88亿元，毛利率9.47%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"饲料、食品及相关业务营业收入\",\"raw_value\":\"29,258,809,444.75\",\"value\":\"29258809444.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"饲料、食品及相关业务营业成本\",\"raw_value\":\"26,487,872,784.29\",\"value\":\"26487872784.29\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"饲料、食品及相关业务毛利率\",\"raw_value\":\"9.47\",\"value\":\"9.47\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F08\",\"text\":\"主营业务分产品中，太阳能电池、组件及相关业务营业收入395.60亿元，营业成本397.12亿元，毛利率-0.38%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"太阳能电池、组件及相关业务营业收入\",\"raw_value\":\"39,560,181,374.11\",\"value\":\"39560181374.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"太阳能电池、组件及相关业务营业成本\",\"raw_value\":\"39,712,257,284.84\",\"value\":\"39712257284.84\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"太阳能电池、组件及相关业务毛利率\",\"raw_value\":\"-0.38\",\"value\":\"-0.38\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F09\",\"text\":\"主营业务分产品中，高纯晶硅、化工及相关业务营业收入159.89亿元，营业成本168.49亿元，毛利率-5.38%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"高纯晶硅、化工及相关业务营业收入\",\"raw_value\":\"15,988,761,991.96\",\"value\":\"15988761991.96\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"高纯晶硅、化工及相关业务营业成本\",\"raw_value\":\"16,848,635,024.84\",\"value\":\"16848635024.84\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"高纯晶硅、化工及相关业务毛利率\",\"raw_value\":\"-5.38\",\"value\":\"-5.38\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F10\",\"text\":\"主营业务分产品中，光伏电力及相关业务营业收入20.21亿元，营业成本10.01亿元，毛利率50.46%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"光伏电力及相关业务营业收入\",\"raw_value\":\"2,021,468,352.16\",\"value\":\"2021468352.16\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"光伏电力及相关业务营业成本\",\"raw_value\":\"1,001,472,628.98\",\"value\":\"1001472628.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"光伏电力及相关业务毛利率\",\"raw_value\":\"50.46\",\"value\":\"50.46\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F11\",\"text\":\"主营业务分产品表中列示“合并抵销”行，营业收入-34.32亿元、营业成本-28.17亿元；该行为合并抵销项，非独立经营业务。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"uncertainty_reason\":\"合并抵销行混合了不同业务间的内部交易抵销，无法归属单一业务或公司整体口径。\",\"metrics\":[{\"name\":\"合并抵销营业收入\",\"raw_value\":\"-3,432,256,597.51\",\"value\":\"-3432256597.51\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"uncertainty_reason\":\"合并抵销行，非独立经营业务\"},{\"name\":\"合并抵销营业成本\",\"raw_value\":\"-2,817,294,697.93\",\"value\":\"-2817294697.93\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"uncertainty_reason\":\"合并抵销行，非独立经营业务\"}]},{\"fact_id\":\"F12\",\"text\":\"主营业务分产品合计营业收入833.97亿元，营业成本812.33亿元，毛利率2.59%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"主营业务分产品合计营业收入\",\"raw_value\":\"83,396,964,565.47\",\"value\":\"83396964565.47\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务分产品合计营业成本\",\"raw_value\":\"81,232,943,025.02\",\"value\":\"81232943025.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务分产品合计毛利率\",\"raw_value\":\"2.59\",\"value\":\"2.59\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F13\",\"text\":\"主营业务分行业看，农牧业务营业收入292.59亿元、毛利率9.47%；光伏业务营业收入541.38亿元、毛利率-1.12%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"农牧业务营业收入\",\"raw_value\":\"29,258,809,444.75\",\"value\":\"29258809444.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"农牧业务毛利率\",\"raw_value\":\"9.47\",\"value\":\"9.47\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"光伏业务营业收入\",\"raw_value\":\"54,138,155,120.72\",\"value\":\"54138155120.72\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"光伏业务毛利率\",\"raw_value\":\"-1.12\",\"value\":\"-1.12\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F14\",\"text\":\"按销售模式划分，直销营业收入621.86亿元、毛利率0.98%；分销营业收入212.11亿元、毛利率7.32%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"直销营业收入\",\"raw_value\":\"62,186,079,292.73\",\"value\":\"62186079292.73\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"直销毛利率\",\"raw_value\":\"0.98\",\"value\":\"0.98\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"分销营业收入\",\"raw_value\":\"21,210,885,272.74\",\"value\":\"21210885272.74\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"分销毛利率\",\"raw_value\":\"7.32\",\"value\":\"7.32\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F15\",\"text\":\"2025年公司饲料总销量653.17万吨，其中自销量651.95万吨，同比增长4.22%，创历史新高。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"饲料总销量\",\"raw_value\":\"653.17\",\"value\":\"653.17\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万吨\"},{\"name\":\"饲料自销量\",\"raw_value\":\"651.95\",\"value\":\"651.95\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万吨\"}]},{\"fact_id\":\"F16\",\"text\":\"2025年公司高纯晶硅销量38.48万吨，同比下降17.71%，国内市占率超30%，同比提升2个百分点，前五大外销客户占比超过60%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"高纯晶硅销量\",\"raw_value\":\"38.48\",\"value\":\"38.48\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万吨\"},{\"name\":\"高纯晶硅国内市占率\",\"raw_value\":\"超30\",\"value\":\"30\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\",\"source_unit\":\"%\"},{\"name\":\"高纯晶硅前五大外销客户占比\",\"raw_value\":\"超过60\",\"value\":\"60\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F17\",\"text\":\"2025年公司电池销量103.03GW，同比增长17.51%，全球市占率约15%，其中海外市场电池销量16.73GW，同比增长73%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"太阳能电池销量\",\"raw_value\":\"103.03\",\"value\":\"103.03\",\"unit\":\"GW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"GW\"},{\"name\":\"太阳能电池全球市占率\",\"raw_value\":\"约15\",\"value\":\"15\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"source_unit\":\"%\"},{\"name\":\"海外市场电池销量\",\"raw_value\":\"16.73\",\"value\":\"16.73\",\"unit\":\"GW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"GW\"}]},{\"fact_id\":\"F18\",\"text\":\"2025年公司组件销量43.25GW，其中海外市场销量9.52GW，同比增长164%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"组件销量\",\"raw_value\":\"43.25\",\"value\":\"43.25\",\"unit\":\"GW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"GW\"},{\"name\":\"组件海外市场销量\",\"raw_value\":\"9.52\",\"value\":\"9.52\",\"unit\":\"GW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"GW\"}]},{\"fact_id\":\"F19\",\"text\":\"截至报告期末，公司累计装机并网规模达5.11GW，全年结算电量49.39亿度，可实现碳减排324.26万吨；报告期新增并网项目合计约440MW。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"累计装机并网规模\",\"raw_value\":\"5.11\",\"value\":\"5.11\",\"unit\":\"GW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"GW\"},{\"name\":\"全年结算电量\",\"raw_value\":\"49.39\",\"value\":\"49.39\",\"unit\":\"亿度\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"亿度\"},{\"name\":\"报告期新增并网规模\",\"raw_value\":\"约440\",\"value\":\"440\",\"unit\":\"MW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"source_unit\":\"MW\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F20\",\"text\":\"农牧方面，公司拥有80余家涉及饲料业务的分子公司，采取就地生产、建立周边销售覆盖的经营模式，年饲料生产能力约1,300万吨。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"metrics\":[{\"name\":\"年饲料生产能力\",\"raw_value\":\"约1,300\",\"value\":\"1300\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"source_unit\":\"万吨\"}]},{\"fact_id\":\"F21\",\"text\":\"高纯晶硅生产基地位于乐山、包头、保山，主要生产要素采取就近采购方式；太阳能电池生产基地位于双流、金堂、眉山等地，根据市场需求结合产线结构安排生产经营。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F22\",\"text\":\"高纯晶硅生产指标方面，全年平均硅耗1.03kg/kg.si，氢耗降至100Nm³/t.si以内，氯耗降至0.05t/t.si以内，冷氢化实际转化率最高达到32.5%，还原电耗控制在40kwh/kg以内。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"高纯晶硅平均硅耗\",\"raw_value\":\"1.03\",\"value\":\"1.03\",\"unit\":\"kg/kg.si\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"kg/kg.si\"},{\"name\":\"高纯晶硅氢耗\",\"raw_value\":\"100以内\",\"value\":\"100\",\"unit\":\"Nm³/t.si\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"Nm³/t.si\",\"uncertainty_reason\":\"原文为“降至100Nm³/t.si以内”，为上限表述\"},{\"name\":\"高纯晶硅氯耗\",\"raw_value\":\"0.05以内\",\"value\":\"0.05\",\"unit\":\"t/t.si\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"t/t.si\",\"uncertainty_reason\":\"原文为“降至0.05t/t.si以内”，为上限表述\"},{\"name\":\"冷氢化实际转化率最高\",\"raw_value\":\"32.5\",\"value\":\"32.5\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"还原电耗\",\"raw_value\":\"40以内\",\"value\":\"40\",\"unit\":\"kwh/kg\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"kwh/kg\",\"uncertainty_reason\":\"原文为“控制在40kwh/kg以内”，为上限表述\"}]},{\"fact_id\":\"F23\",\"text\":\"电池制造方面，截至报告期末公司电池综合电耗降至4.19万度/MW，同比下降13%；综合水耗降至196吨/MW，同比下降23%；剔除白银价格上涨影响，全年平均非硅成本同比下降14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"电池综合电耗\",\"raw_value\":\"4.19\",\"value\":\"4.19\",\"unit\":\"万度/MW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万度/MW\"},{\"name\":\"电池综合水耗\",\"raw_value\":\"196\",\"value\":\"196\",\"unit\":\"吨/MW\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"吨/MW\"}]},{\"fact_id\":\"F24\",\"text\":\"组件业务主流产品A级率达到99.93%，碎片率低至0.12%，单瓦非电池成本同比进一步下降14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"组件主流产品A级率\",\"raw_value\":\"99.93\",\"value\":\"99.93\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"组件碎片率\",\"raw_value\":\"0.12\",\"value\":\"0.12\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F25\",\"text\":\"公司研发投入合计22.07亿元，占营业收入比例2.62%；其中光伏业务研发投入占光伏业务收入比例3.75%。研发人员数量4,404人，占公司总人数9.83%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"2,206,852,631.27\",\"value\":\"2206852631.27\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"2.62\",\"value\":\"2.62\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"光伏业务研发投入占光伏业务收入比例\",\"raw_value\":\"3.75\",\"value\":\"3.75\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"研发人员数量\",\"raw_value\":\"4,404\",\"value\":\"4404\",\"unit\":\"人\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"人\"},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"9.83\",\"value\":\"9.83\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"公司生产、销售网络覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家；组件产品已覆盖国内主要央国企发电集团及海外80余个国家与地区的客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0005\"]},{\"fact_id\":\"F27\",\"text\":\"太阳能电池主要客户覆盖全球前十大光伏组件企业；高纯晶硅产品客户主要为下游硅片企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F28\",\"text\":\"前五名客户销售额1,049,744.12万元，占年度销售总额12.48%；前五名供应商采购额1,518,813.02万元，占年度采购总额11.95%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"1,049,744.12\",\"value\":\"1049744.12\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"12.48\",\"value\":\"12.48\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"1,518,813.02\",\"value\":\"1518813.02\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"11.95\",\"value\":\"11.95\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F29\",\"text\":\"主营业务分地区中，华东地区营业收入377.86亿元、毛利率0.52%；华西地区330.47亿元、毛利率-1.41%；华北地区154.24亿元、毛利率3.84%；海外地区142.48亿元、毛利率2.14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"华东地区营业收入\",\"raw_value\":\"37,785,795,743.38\",\"value\":\"37785795743.38\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"华东地区毛利率\",\"raw_value\":\"0.52\",\"value\":\"0.52\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"华西地区营业收入\",\"raw_value\":\"33,047,375,020.14\",\"value\":\"33047375020.14\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"华西地区毛利率\",\"raw_value\":\"-1.41\",\"value\":\"-1.41\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"华北地区营业收入\",\"raw_value\":\"15,424,449,963.00\",\"value\":\"15424449963.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"华北地区毛利率\",\"raw_value\":\"3.84\",\"value\":\"3.84\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"海外地区营业收入\",\"raw_value\":\"14,247,743,234.45\",\"value\":\"14247743234.45\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"海外地区毛利率\",\"raw_value\":\"2.14\",\"value\":\"2.14\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F30\",\"text\":\"主营业务分地区表中列示合并抵销行，营业收入-325.76亿元、营业成本-331.17亿元；抵销后合计营业收入833.97亿元。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"uncertainty_reason\":\"合并抵销行混合了不同地区间的内部交易抵销，无法归属单一地区或公司整体口径。\",\"metrics\":[{\"name\":\"分地区合并抵销营业收入\",\"raw_value\":\"-32,576,449,790.56\",\"value\":\"-32576449790.56\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"uncertainty_reason\":\"合并抵销行，非独立经营业务\"},{\"name\":\"分地区合并抵销营业成本\",\"raw_value\":\"-33,116,933,225.10\",\"value\":\"-33116933225.10\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"uncertainty_reason\":\"合并抵销行，非独立经营业务\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"2025年光伏行业新增装机规模继续保持上升态势，全球新增光伏装机规模超过600GW，但阶段性供需失衡矛盾仍未根本性缓解，产业链各环节开工率下行，产品价格同比继续下探，白银等部分核心原材料价格持续上涨。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F32\",\"text\":\"饲料行业保持稳健发展，行业总产值小幅增长，总产量在猪饲料大幅增长推动下达到34,225.3万吨，同比增长8.6%，创下历史新高，企业规模化与行业集中度进一步提升。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"饲料行业总产量\",\"raw_value\":\"34,225.3\",\"value\":\"34225.3\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"万吨\",\"uncertainty_reason\":\"为行业统计数据，非公司自身产量\"}]},{\"fact_id\":\"F33\",\"text\":\"公司高纯晶硅业务响应国家“反内卷”倡导，适时调整出货节奏和销售策略；因响应“反内卷”倡导，公司适时调整生产组态、控制出货节奏，高纯晶硅、组件产品库存阶段性增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0015\"]},{\"fact_id\":\"F34\",\"text\":\"公司水产饲料坚持推高推优，推高推优产品销量占比提升至近40%，尖刀产品高端苗种料销量同比增长32%；畜禽饲料高价值产品如教槽料、母猪料、乳猪料、浓缩料、小禽料等销量大幅增长；海外市场销量与利润均创历史新高。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"水产饲料推高推优产品销量占比\",\"raw_value\":\"近40\",\"value\":\"40\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F35\",\"text\":\"组件海外市场开拓成效显著，中东和非洲市场销量总计同比增长370%，亚太市场销量同比增长279%，欧洲市场销量同比增长129%，在波兰、罗马尼亚、爱尔兰等国市占率进入前三，韩国市占率位居第一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F36\",\"text\":\"公司食品业务净资产回报率达到42.57%，净利润同比增长14.16%，均创历史新高，并继续保持美国海关进口罗非鱼排名第一，市占率超过10%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"食品业务净资产回报率\",\"raw_value\":\"42.57\",\"value\":\"42.57\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"食品业务美国海关进口罗非鱼市占率\",\"raw_value\":\"超过10\",\"value\":\"10\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"greater_than\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F37\",\"text\":\"报告期内公司通过市场化电力交易实现电力成本节约2,600万元，带动绿电消费2.2亿千瓦时。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"市场化电力交易节约电力成本\",\"raw_value\":\"2,600\",\"value\":\"2600\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"带动绿电消费\",\"raw_value\":\"2.2\",\"value\":\"2.2\",\"unit\":\"亿千瓦时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"亿千瓦时\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F38\",\"text\":\"2025年公司营业收入841.28亿元，同比下降8.55%，主要系光伏产业链价格下降所致；归属于股东净利润为-95.53亿元，受行业整体经营环境冲击并叠加长期资产减值及报废影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0007\"],\"metrics\":[{\"name\":\"营业收入同比变动\",\"raw_value\":\"-8.55\",\"value\":\"-8.55\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"归属于股东净利润\",\"raw_value\":\"-95.53\",\"value\":\"-95.53\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"}]},{\"fact_id\":\"F39\",\"text\":\"财务费用27.18亿元，同比增长35.72%，主要系融资规模增加所致；研发费用11.06亿元，同比下降26.75%，主要系研发用原材料价格下降所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"财务费用\",\"raw_value\":\"2,717,686,625.59\",\"value\":\"2717686625.59\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"财务费用同比变动\",\"raw_value\":\"35.72\",\"value\":\"35.72\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"研发费用\",\"raw_value\":\"1,106,164,996.59\",\"value\":\"1106164996.59\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"研发费用同比变动\",\"raw_value\":\"-26.75\",\"value\":\"-26.75\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F40\",\"text\":\"经营活动产生的现金流量净额13.79亿元，同比增长20.59%，主要系响应国家“反内卷”倡导，公司主动降低工厂开工率，控制存货规模，存货净增加同比减少所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"1,379,185,344.61\",\"value\":\"1379185344.61\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"经营活动产生的现金流量净额同比变动\",\"raw_value\":\"20.59\",\"value\":\"20.59\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F41\",\"text\":\"报告期内公司业务类型、利润构成或利润来源未发生重大变动；报告期主要子公司股权变动导致合并范围变化不适用；公司报告期内业务、产品或服务未发生重大变化或调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0017\"]}]},\"limitations\":[\"未获取成功：分产品成本构成明细（如饲料、高纯晶硅等分产品的直接材料、人工、制造费用明细）在所选章节中仅见太阳能电池组件及光伏电力部分片段，其余分产品成本结构未完整获取。\",\"未获取成功：主要客户及供应商的具体名称未在所选章节披露，仅有前五名合计金额及占比。\",\"未获取成功：分地区收入中仅摘取部分主要地区，华南、华中地区数据未纳入以控制篇幅，非缺失。\",\"分行业与分产品成本差异系合并报表抵减成本的金额，相关抵销行口径混合，已按不确定处理。\"]},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F42\",\"text\":\"公司光伏业务构建了自上游工业硅到终端光伏电站的全产业链布局，覆盖高纯晶硅、太阳能电池、组件制造及光伏电站运营等环节；农业板块以饲料生产销售为核心并向育种、养殖、动保、食品加工与贸易延伸。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F43\",\"text\":\"高纯晶硅主要生产要素采取就近采购方式；电池生产主要原材料包括白银，报告期内白银价格大幅攀升；饲料业务全年原料采购战略渠道合作比例达76%，吨散比达70%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\",\"source-0004\"],\"metrics\":[{\"name\":\"饲料原料采购战略渠道合作比例\",\"raw_value\":\"76\",\"value\":\"76\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"饲料吨散比\",\"raw_value\":\"70\",\"value\":\"70\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F44\",\"text\":\"高纯晶硅产品客户主要为下游硅片企业；太阳能电池销售给国内外光伏组件企业，主要客户覆盖全球前十大光伏组件企业；组件面向全球集中式、分布式等各类型客户，国内与主要央国企发电集团合作。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]}}}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司以农业及新能源为主业，形成“农业（渔业）+光伏”资源整合、协同发展的经营模式；农业方面主营水产饲料、畜禽饲料等产品的研究、生产和销售，新能源方面以高纯晶硅、太阳能电池、组件等产品的研发、生产、销售为主，并在综合应用端聚焦规模化“渔光一体”基地开发建设。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司构建了自上游工业硅到终端光伏电站的全产业链业务布局，主要产业环节具备成本、质量、效率等综合竞争优势。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "农业板块主营水产饲料、畜禽饲料，用于满足水产、畜禽动物养殖过程中的生长和营养所需；水产饲料是公司核心产品，也是农牧板块的主要利润来源。围绕饲料主业还开展育种、养殖、动保、食品加工与贸易等业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "新能源板块产品包括高纯晶硅、太阳能电池、组件；高纯晶硅产品客户主要为下游硅片企业，太阳能电池除满足自身组件生产需求外也销售给国内外光伏组件企业，组件面向全球集中式、分布式等各类型客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "综合应用端打造“生态养殖+绿色能源”的“渔光一体”模式，通过在养殖水面建设太阳能发电系统，推动规模化“渔光一体”电站业务；同时布局源网荷储一体化业务，在部分生产基地及电站配套建设储能项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0006"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F06",
+              "text": "公司2025年实现营业收入841.28亿元，营业成本818.56亿元；营业收入变动主要系光伏产业链价格下降所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "84,128,281,703.14",
+                  "value": "84128281703.14",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "81,856,406,510.25",
+                  "value": "81856406510.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "主营业务分产品中，饲料、食品及相关业务营业收入292.59亿元，营业成本264.88亿元，毛利率9.47%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "饲料、食品及相关业务营业收入",
+                  "raw_value": "29,258,809,444.75",
+                  "value": "29258809444.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "饲料、食品及相关业务营业成本",
+                  "raw_value": "26,487,872,784.29",
+                  "value": "26487872784.29",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "饲料、食品及相关业务毛利率",
+                  "raw_value": "9.47",
+                  "value": "9.47",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "主营业务分产品中，太阳能电池、组件及相关业务营业收入395.60亿元，营业成本397.12亿元，毛利率-0.38%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "太阳能电池、组件及相关业务营业收入",
+                  "raw_value": "39,560,181,374.11",
+                  "value": "39560181374.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "太阳能电池、组件及相关业务营业成本",
+                  "raw_value": "39,712,257,284.84",
+                  "value": "39712257284.84",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "太阳能电池、组件及相关业务毛利率",
+                  "raw_value": "-0.38",
+                  "value": "-0.38",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "主营业务分产品中，高纯晶硅、化工及相关业务营业收入159.89亿元，营业成本168.49亿元，毛利率-5.38%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "高纯晶硅、化工及相关业务营业收入",
+                  "raw_value": "15,988,761,991.96",
+                  "value": "15988761991.96",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "高纯晶硅、化工及相关业务营业成本",
+                  "raw_value": "16,848,635,024.84",
+                  "value": "16848635024.84",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "高纯晶硅、化工及相关业务毛利率",
+                  "raw_value": "-5.38",
+                  "value": "-5.38",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "主营业务分产品中，光伏电力及相关业务营业收入20.21亿元，营业成本10.01亿元，毛利率50.46%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "光伏电力及相关业务营业收入",
+                  "raw_value": "2,021,468,352.16",
+                  "value": "2021468352.16",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "光伏电力及相关业务营业成本",
+                  "raw_value": "1,001,472,628.98",
+                  "value": "1001472628.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "光伏电力及相关业务毛利率",
+                  "raw_value": "50.46",
+                  "value": "50.46",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "主营业务分产品表中列示“合并抵销”行，营业收入-34.32亿元、营业成本-28.17亿元；该行为合并抵销项，非独立经营业务。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "uncertainty_reason": "合并抵销行混合了不同业务间的内部交易抵销，无法归属单一业务或公司整体口径。",
+              "metrics": [
+                {
+                  "name": "合并抵销营业收入",
+                  "raw_value": "-3,432,256,597.51",
+                  "value": "-3432256597.51",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "元",
+                  "uncertainty_reason": "合并抵销行，非独立经营业务"
+                },
+                {
+                  "name": "合并抵销营业成本",
+                  "raw_value": "-2,817,294,697.93",
+                  "value": "-2817294697.93",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "元",
+                  "uncertainty_reason": "合并抵销行，非独立经营业务"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "主营业务分产品合计营业收入833.97亿元，营业成本812.33亿元，毛利率2.59%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分产品合计营业收入",
+                  "raw_value": "83,396,964,565.47",
+                  "value": "83396964565.47",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务分产品合计营业成本",
+                  "raw_value": "81,232,943,025.02",
+                  "value": "81232943025.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务分产品合计毛利率",
+                  "raw_value": "2.59",
+                  "value": "2.59",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "主营业务分行业看，农牧业务营业收入292.59亿元、毛利率9.47%；光伏业务营业收入541.38亿元、毛利率-1.12%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "农牧业务营业收入",
+                  "raw_value": "29,258,809,444.75",
+                  "value": "29258809444.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "农牧业务毛利率",
+                  "raw_value": "9.47",
+                  "value": "9.47",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "光伏业务营业收入",
+                  "raw_value": "54,138,155,120.72",
+                  "value": "54138155120.72",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "光伏业务毛利率",
+                  "raw_value": "-1.12",
+                  "value": "-1.12",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "按销售模式划分，直销营业收入621.86亿元、毛利率0.98%；分销营业收入212.11亿元、毛利率7.32%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "直销营业收入",
+                  "raw_value": "62,186,079,292.73",
+                  "value": "62186079292.73",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "直销毛利率",
+                  "raw_value": "0.98",
+                  "value": "0.98",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "分销营业收入",
+                  "raw_value": "21,210,885,272.74",
+                  "value": "21210885272.74",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "分销毛利率",
+                  "raw_value": "7.32",
+                  "value": "7.32",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F15",
+              "text": "2025年公司饲料总销量653.17万吨，其中自销量651.95万吨，同比增长4.22%，创历史新高。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "饲料总销量",
+                  "raw_value": "653.17",
+                  "value": "653.17",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万吨"
+                },
+                {
+                  "name": "饲料自销量",
+                  "raw_value": "651.95",
+                  "value": "651.95",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万吨"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "2025年公司高纯晶硅销量38.48万吨，同比下降17.71%，国内市占率超30%，同比提升2个百分点，前五大外销客户占比超过60%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "高纯晶硅销量",
+                  "raw_value": "38.48",
+                  "value": "38.48",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万吨"
+                },
+                {
+                  "name": "高纯晶硅国内市占率",
+                  "raw_value": "超30",
+                  "value": "30",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "高纯晶硅前五大外销客户占比",
+                  "raw_value": "超过60",
+                  "value": "60",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "2025年公司电池销量103.03GW，同比增长17.51%，全球市占率约15%，其中海外市场电池销量16.73GW，同比增长73%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "太阳能电池销量",
+                  "raw_value": "103.03",
+                  "value": "103.03",
+                  "unit": "GW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "GW"
+                },
+                {
+                  "name": "太阳能电池全球市占率",
+                  "raw_value": "约15",
+                  "value": "15",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "海外市场电池销量",
+                  "raw_value": "16.73",
+                  "value": "16.73",
+                  "unit": "GW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "GW"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "2025年公司组件销量43.25GW，其中海外市场销量9.52GW，同比增长164%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "组件销量",
+                  "raw_value": "43.25",
+                  "value": "43.25",
+                  "unit": "GW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "GW"
+                },
+                {
+                  "name": "组件海外市场销量",
+                  "raw_value": "9.52",
+                  "value": "9.52",
+                  "unit": "GW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "GW"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "截至报告期末，公司累计装机并网规模达5.11GW，全年结算电量49.39亿度，可实现碳减排324.26万吨；报告期新增并网项目合计约440MW。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "累计装机并网规模",
+                  "raw_value": "5.11",
+                  "value": "5.11",
+                  "unit": "GW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "GW"
+                },
+                {
+                  "name": "全年结算电量",
+                  "raw_value": "49.39",
+                  "value": "49.39",
+                  "unit": "亿度",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "亿度"
+                },
+                {
+                  "name": "报告期新增并网规模",
+                  "raw_value": "约440",
+                  "value": "440",
+                  "unit": "MW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate",
+                  "source_unit": "MW"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F20",
+              "text": "农牧方面，公司拥有80余家涉及饲料业务的分子公司，采取就地生产、建立周边销售覆盖的经营模式，年饲料生产能力约1,300万吨。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "年饲料生产能力",
+                  "raw_value": "约1,300",
+                  "value": "1300",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate",
+                  "source_unit": "万吨"
+                }
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "高纯晶硅生产基地位于乐山、包头、保山，主要生产要素采取就近采购方式；太阳能电池生产基地位于双流、金堂、眉山等地，根据市场需求结合产线结构安排生产经营。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "高纯晶硅生产指标方面，全年平均硅耗1.03kg/kg.si，氢耗降至100Nm³/t.si以内，氯耗降至0.05t/t.si以内，冷氢化实际转化率最高达到32.5%，还原电耗控制在40kwh/kg以内。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "高纯晶硅平均硅耗",
+                  "raw_value": "1.03",
+                  "value": "1.03",
+                  "unit": "kg/kg.si",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "kg/kg.si"
+                },
+                {
+                  "name": "高纯晶硅氢耗",
+                  "raw_value": "100以内",
+                  "value": "100",
+                  "unit": "Nm³/t.si",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "Nm³/t.si",
+                  "uncertainty_reason": "原文为“降至100Nm³/t.si以内”，为上限表述"
+                },
+                {
+                  "name": "高纯晶硅氯耗",
+                  "raw_value": "0.05以内",
+                  "value": "0.05",
+                  "unit": "t/t.si",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "t/t.si",
+                  "uncertainty_reason": "原文为“降至0.05t/t.si以内”，为上限表述"
+                },
+                {
+                  "name": "冷氢化实际转化率最高",
+                  "raw_value": "32.5",
+                  "value": "32.5",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "还原电耗",
+                  "raw_value": "40以内",
+                  "value": "40",
+                  "unit": "kwh/kg",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "kwh/kg",
+                  "uncertainty_reason": "原文为“控制在40kwh/kg以内”，为上限表述"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "电池制造方面，截至报告期末公司电池综合电耗降至4.19万度/MW，同比下降13%；综合水耗降至196吨/MW，同比下降23%；剔除白银价格上涨影响，全年平均非硅成本同比下降14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "电池综合电耗",
+                  "raw_value": "4.19",
+                  "value": "4.19",
+                  "unit": "万度/MW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万度/MW"
+                },
+                {
+                  "name": "电池综合水耗",
+                  "raw_value": "196",
+                  "value": "196",
+                  "unit": "吨/MW",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "吨/MW"
+                }
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "组件业务主流产品A级率达到99.93%，碎片率低至0.12%，单瓦非电池成本同比进一步下降14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "组件主流产品A级率",
+                  "raw_value": "99.93",
+                  "value": "99.93",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "组件碎片率",
+                  "raw_value": "0.12",
+                  "value": "0.12",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "公司研发投入合计22.07亿元，占营业收入比例2.62%；其中光伏业务研发投入占光伏业务收入比例3.75%。研发人员数量4,404人，占公司总人数9.83%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "2,206,852,631.27",
+                  "value": "2206852631.27",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "2.62",
+                  "value": "2.62",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "光伏业务研发投入占光伏业务收入比例",
+                  "raw_value": "3.75",
+                  "value": "3.75",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "4,404",
+                  "value": "4404",
+                  "unit": "人",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "人"
+                },
+                {
+                  "name": "研发人员数量占公司总人数比例",
+                  "raw_value": "9.83",
+                  "value": "9.83",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F26",
+              "text": "公司生产、销售网络覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家；组件产品已覆盖国内主要央国企发电集团及海外80余个国家与地区的客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "太阳能电池主要客户覆盖全球前十大光伏组件企业；高纯晶硅产品客户主要为下游硅片企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "前五名客户销售额1,049,744.12万元，占年度销售总额12.48%；前五名供应商采购额1,518,813.02万元，占年度采购总额11.95%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "1,049,744.12",
+                  "value": "1049744.12",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "12.48",
+                  "value": "12.48",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "1,518,813.02",
+                  "value": "1518813.02",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "11.95",
+                  "value": "11.95",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F29",
+              "text": "主营业务分地区中，华东地区营业收入377.86亿元、毛利率0.52%；华西地区330.47亿元、毛利率-1.41%；华北地区154.24亿元、毛利率3.84%；海外地区142.48亿元、毛利率2.14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "华东地区营业收入",
+                  "raw_value": "37,785,795,743.38",
+                  "value": "37785795743.38",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "华东地区毛利率",
+                  "raw_value": "0.52",
+                  "value": "0.52",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "华西地区营业收入",
+                  "raw_value": "33,047,375,020.14",
+                  "value": "33047375020.14",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "华西地区毛利率",
+                  "raw_value": "-1.41",
+                  "value": "-1.41",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "华北地区营业收入",
+                  "raw_value": "15,424,449,963.00",
+                  "value": "15424449963.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "华北地区毛利率",
+                  "raw_value": "3.84",
+                  "value": "3.84",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "海外地区营业收入",
+                  "raw_value": "14,247,743,234.45",
+                  "value": "14247743234.45",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "海外地区毛利率",
+                  "raw_value": "2.14",
+                  "value": "2.14",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "主营业务分地区表中列示合并抵销行，营业收入-325.76亿元、营业成本-331.17亿元；抵销后合计营业收入833.97亿元。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "uncertainty_reason": "合并抵销行混合了不同地区间的内部交易抵销，无法归属单一地区或公司整体口径。",
+              "metrics": [
+                {
+                  "name": "分地区合并抵销营业收入",
+                  "raw_value": "-32,576,449,790.56",
+                  "value": "-32576449790.56",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "元",
+                  "uncertainty_reason": "合并抵销行，非独立经营业务"
+                },
+                {
+                  "name": "分地区合并抵销营业成本",
+                  "raw_value": "-33,116,933,225.10",
+                  "value": "-33116933225.10",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "元",
+                  "uncertainty_reason": "合并抵销行，非独立经营业务"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F31",
+              "text": "2025年光伏行业新增装机规模继续保持上升态势，全球新增光伏装机规模超过600GW，但阶段性供需失衡矛盾仍未根本性缓解，产业链各环节开工率下行，产品价格同比继续下探，白银等部分核心原材料价格持续上涨。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F32",
+              "text": "饲料行业保持稳健发展，行业总产值小幅增长，总产量在猪饲料大幅增长推动下达到34,225.3万吨，同比增长8.6%，创下历史新高，企业规模化与行业集中度进一步提升。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "饲料行业总产量",
+                  "raw_value": "34,225.3",
+                  "value": "34225.3",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "万吨",
+                  "uncertainty_reason": "为行业统计数据，非公司自身产量"
+                }
+              ]
+            },
+            {
+              "fact_id": "F33",
+              "text": "公司高纯晶硅业务响应国家“反内卷”倡导，适时调整出货节奏和销售策略；因响应“反内卷”倡导，公司适时调整生产组态、控制出货节奏，高纯晶硅、组件产品库存阶段性增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0015"
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "text": "公司水产饲料坚持推高推优，推高推优产品销量占比提升至近40%，尖刀产品高端苗种料销量同比增长32%；畜禽饲料高价值产品如教槽料、母猪料、乳猪料、浓缩料、小禽料等销量大幅增长；海外市场销量与利润均创历史新高。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "水产饲料推高推优产品销量占比",
+                  "raw_value": "近40",
+                  "value": "40",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "approximate",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F35",
+              "text": "组件海外市场开拓成效显著，中东和非洲市场销量总计同比增长370%，亚太市场销量同比增长279%，欧洲市场销量同比增长129%，在波兰、罗马尼亚、爱尔兰等国市占率进入前三，韩国市占率位居第一。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F36",
+              "text": "公司食品业务净资产回报率达到42.57%，净利润同比增长14.16%，均创历史新高，并继续保持美国海关进口罗非鱼排名第一，市占率超过10%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "食品业务净资产回报率",
+                  "raw_value": "42.57",
+                  "value": "42.57",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "食品业务美国海关进口罗非鱼市占率",
+                  "raw_value": "超过10",
+                  "value": "10",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "greater_than",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F37",
+              "text": "报告期内公司通过市场化电力交易实现电力成本节约2,600万元，带动绿电消费2.2亿千瓦时。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "市场化电力交易节约电力成本",
+                  "raw_value": "2,600",
+                  "value": "2600",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "带动绿电消费",
+                  "raw_value": "2.2",
+                  "value": "2.2",
+                  "unit": "亿千瓦时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "亿千瓦时"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F38",
+              "text": "2025年公司营业收入841.28亿元，同比下降8.55%，主要系光伏产业链价格下降所致；归属于股东净利润为-95.53亿元，受行业整体经营环境冲击并叠加长期资产减值及报废影响。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入同比变动",
+                  "raw_value": "-8.55",
+                  "value": "-8.55",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "归属于股东净利润",
+                  "raw_value": "-95.53",
+                  "value": "-95.53",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "亿元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F39",
+              "text": "财务费用27.18亿元，同比增长35.72%，主要系融资规模增加所致；研发费用11.06亿元，同比下降26.75%，主要系研发用原材料价格下降所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "财务费用",
+                  "raw_value": "2,717,686,625.59",
+                  "value": "2717686625.59",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "财务费用同比变动",
+                  "raw_value": "35.72",
+                  "value": "35.72",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "研发费用",
+                  "raw_value": "1,106,164,996.59",
+                  "value": "1106164996.59",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "研发费用同比变动",
+                  "raw_value": "-26.75",
+                  "value": "-26.75",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F40",
+              "text": "经营活动产生的现金流量净额13.79亿元，同比增长20.59%，主要系响应国家“反内卷”倡导，公司主动降低工厂开工率，控制存货规模，存货净增加同比减少所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "1,379,185,344.61",
+                  "value": "1379185344.61",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额同比变动",
+                  "raw_value": "20.59",
+                  "value": "20.59",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F41",
+              "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动；报告期主要子公司股权变动导致合并范围变化不适用；公司报告期内业务、产品或服务未发生重大变化或调整。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0017"
+              ]
+            }
+          ]
+        },
+        "limitations": [
+          "未获取成功：分产品成本构成明细（如饲料、高纯晶硅等分产品的直接材料、人工、制造费用明细）在所选章节中仅见太阳能电池组件及光伏电力部分片段，其余分产品成本结构未完整获取。",
+          "未获取成功：主要客户及供应商的具体名称未在所选章节披露，仅有前五名合计金额及占比。",
+          "未获取成功：分地区收入中仅摘取部分主要地区，华南、华中地区数据未纳入以控制篇幅，非缺失。",
+          "分行业与分产品成本差异系合并报表抵减成本的金额，相关抵销行口径混合，已按不确定处理。"
+        ]
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F42",
+              "text": "公司光伏业务构建了自上游工业硅到终端光伏电站的全产业链布局，覆盖高纯晶硅、太阳能电池、组件制造及光伏电站运营等环节；农业板块以饲料生产销售为核心并向育种、养殖、动保、食品加工与贸易延伸。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F43",
+              "text": "高纯晶硅主要生产要素采取就近采购方式；电池生产主要原材料包括白银，报告期内白银价格大幅攀升；饲料业务全年原料采购战略渠道合作比例达76%，吨散比达70%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0004",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "饲料原料采购战略渠道合作比例",
+                  "raw_value": "76",
+                  "value": "76",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "饲料吨散比",
+                  "raw_value": "70",
+                  "value": "70",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F44",
+              "text": "高纯晶硅产品客户主要为下游硅片企业；太阳能电池销售给国内外光伏组件企业，主要客户覆盖全球前十大光伏组件企业；组件面向全球集中式、分布式等各类型客户，国内与主要央国企发电集团合作。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 14401,
+      "output_tokens": 9057,
+      "total_tokens": 23458
+    }
+  },
+  {
+    "request_id": "bp-work-b714e2a56fcb44d188cf3fee:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "9e5a6810371c0a39a5b095e69f7b6358b1347708589136c570eb52fb19c5d2d8",
+    "response_hash": "401d63ea8bb95f9abd236bf835e319a92099ab31aceed8d00de4b8786b8d86b5",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"RF01\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0009\",\"source-0011\"],\"explanation\":\"已采纳结论只有利润表营业收入，不能代替主营业务分产品构成。来源表单位为元，抵销前四类为：饲料、食品及相关业务营业收入29,258,809,444.75元、毛利率9.47%；太阳能电池、组件及相关业务39,560,181,374.11元、毛利率-0.38%；高纯晶硅、化工及相关业务15,988,761,991.96元、毛利率-5.38%；光伏电力及相关业务2,021,468,352.16元、毛利率50.46%。光伏制造类毛利率为负、光伏电力毛利率约50.46%，缺失会改变对产品组合和盈利机制的理解。先前按亿元展示值隔离并不表示来源无此金额；恢复时保留来源类别与毛利率，毛利率变动须写百分点，不得改成同比增长率。\"},{\"finding_id\":\"RF02\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"分行业是另一口径，且金额已含抵销，不能由分产品行直接相加得到。来源列示农牧业务营业收入29,258,809,444.75元、毛利率9.47%、收入同比-7.82%、毛利率增加0.09个百分点；光伏业务营业收入54,138,155,120.72元、毛利率-1.12%、收入同比-9.46%、毛利率减少5.79个百分点。该结构显示农牧仍为正毛利、光伏整体毛利为负。不得把光伏业务额与抵销前电池组件、高纯晶硅、光伏电力三行之和混同。\"},{\"finding_id\":\"RF03\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0007\",\"source-0009\",\"source-0011\",\"source-0013\"],\"explanation\":\"分产品表合并抵销营业收入-3,432,256,597.51元、营业成本-2,817,294,697.93元，不是普通业务，也不是公司总额。抵销后主营业务收入合计83,396,964,565.47元、主营业务成本合计81,232,943,025.02元、毛利率2.59%，与利润表营业收入84,128,281,703.14元、营业成本81,856,406,510.25元不是同一口径，不能互相替代。分地区表合并抵销-32,576,449,790.56元是地区间抵销，不得用作产品构成的合并抵销。\"},{\"finding_id\":\"RF04\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0004\",\"source-0015\"],\"explanation\":\"规模部分已有饲料、电池、组件和结算电量，但缺少核心产品高纯晶硅2025年销量。来源载明销量38.48万吨、同比下降17.71%、国内市占率超30%且同比提升2个百分点；产销表销售量38.48万吨、销售量同比-17.71%可印证。这是主业经营规模及下降，不是可选排名。产销表生产量46.54万吨不得替代销量；市占率提升2个百分点不得写成增长2%。\"},{\"finding_id\":\"RF05\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F41\",\"evidence_ids\":[\"source-0008\",\"source-0017\"],\"explanation\":\"来源只是把“业务类型、利润构成或利润来源发生重大变动的详细说明”“主要子公司股权变动导致合并范围变化”“业务、产品或服务发生重大变化或调整有关情况”勾选为不适用。不适用是披露项目标记，不能单独证明未发生重大变动或未发生重大变化。应改为相应披露项选择不适用，不得写成经济事项没有发生。\"},{\"finding_id\":\"RF06\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F26\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家的生产、销售网络，位于农牧段落并紧接饲料产能，不是公司光伏制造基地的覆盖范围。组件覆盖国内主要央国企及海外80余个国家与地区有来源支持，可保留；前半句应限定为饲料或农牧业务网络。\"},{\"finding_id\":\"RF07\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F31\",\"evidence_ids\":[\"source-0003\"],\"explanation\":\"全球新增光伏装机超过600GW、产业链开工率与价格下行，是行业环境而非公司自身装机或收入。事实范围标成consolidated_group会把行业规模误当成集团范围。正文的行业限定可保留，事实范围应改为unclear，不要改写成公司发生额。\"},{\"finding_id\":\"RF08\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F32\",\"evidence_ids\":[\"source-0003\"],\"explanation\":\"饲料行业总产量34,225.3万吨及同比增长8.6%是行业统计，不是公司饲料销量。指标已标unclear并说明非公司产量，但事实级范围仍为consolidated_group，应改为unclear。公司饲料销量见其他已支持事实，不得与该行业产量合并或替换。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\",\"F34\",\"F35\",\"F36\",\"F37\",\"F38\",\"F39\",\"F40\",\"F41\",\"F42\",\"F43\",\"F44\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "RF01",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0009",
+            "source-0011"
+          ],
+          "explanation": "已采纳结论只有利润表营业收入，不能代替主营业务分产品构成。来源表单位为元，抵销前四类为：饲料、食品及相关业务营业收入29,258,809,444.75元、毛利率9.47%；太阳能电池、组件及相关业务39,560,181,374.11元、毛利率-0.38%；高纯晶硅、化工及相关业务15,988,761,991.96元、毛利率-5.38%；光伏电力及相关业务2,021,468,352.16元、毛利率50.46%。光伏制造类毛利率为负、光伏电力毛利率约50.46%，缺失会改变对产品组合和盈利机制的理解。先前按亿元展示值隔离并不表示来源无此金额；恢复时保留来源类别与毛利率，毛利率变动须写百分点，不得改成同比增长率。"
+        },
+        {
+          "finding_id": "RF02",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "分行业是另一口径，且金额已含抵销，不能由分产品行直接相加得到。来源列示农牧业务营业收入29,258,809,444.75元、毛利率9.47%、收入同比-7.82%、毛利率增加0.09个百分点；光伏业务营业收入54,138,155,120.72元、毛利率-1.12%、收入同比-9.46%、毛利率减少5.79个百分点。该结构显示农牧仍为正毛利、光伏整体毛利为负。不得把光伏业务额与抵销前电池组件、高纯晶硅、光伏电力三行之和混同。"
+        },
+        {
+          "finding_id": "RF03",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0007",
+            "source-0009",
+            "source-0011",
+            "source-0013"
+          ],
+          "explanation": "分产品表合并抵销营业收入-3,432,256,597.51元、营业成本-2,817,294,697.93元，不是普通业务，也不是公司总额。抵销后主营业务收入合计83,396,964,565.47元、主营业务成本合计81,232,943,025.02元、毛利率2.59%，与利润表营业收入84,128,281,703.14元、营业成本81,856,406,510.25元不是同一口径，不能互相替代。分地区表合并抵销-32,576,449,790.56元是地区间抵销，不得用作产品构成的合并抵销。"
+        },
+        {
+          "finding_id": "RF04",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0004",
+            "source-0015"
+          ],
+          "explanation": "规模部分已有饲料、电池、组件和结算电量，但缺少核心产品高纯晶硅2025年销量。来源载明销量38.48万吨、同比下降17.71%、国内市占率超30%且同比提升2个百分点；产销表销售量38.48万吨、销售量同比-17.71%可印证。这是主业经营规模及下降，不是可选排名。产销表生产量46.54万吨不得替代销量；市占率提升2个百分点不得写成增长2%。"
+        },
+        {
+          "finding_id": "RF05",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F41",
+          "evidence_ids": [
+            "source-0008",
+            "source-0017"
+          ],
+          "explanation": "来源只是把“业务类型、利润构成或利润来源发生重大变动的详细说明”“主要子公司股权变动导致合并范围变化”“业务、产品或服务发生重大变化或调整有关情况”勾选为不适用。不适用是披露项目标记，不能单独证明未发生重大变动或未发生重大变化。应改为相应披露项选择不适用，不得写成经济事项没有发生。"
+        },
+        {
+          "finding_id": "RF06",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F26",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家的生产、销售网络，位于农牧段落并紧接饲料产能，不是公司光伏制造基地的覆盖范围。组件覆盖国内主要央国企及海外80余个国家与地区有来源支持，可保留；前半句应限定为饲料或农牧业务网络。"
+        },
+        {
+          "finding_id": "RF07",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F31",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "全球新增光伏装机超过600GW、产业链开工率与价格下行，是行业环境而非公司自身装机或收入。事实范围标成consolidated_group会把行业规模误当成集团范围。正文的行业限定可保留，事实范围应改为unclear，不要改写成公司发生额。"
+        },
+        {
+          "finding_id": "RF08",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F32",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "饲料行业总产量34,225.3万吨及同比增长8.6%是行业统计，不是公司饲料销量。指标已标unclear并说明非公司产量，但事实级范围仍为consolidated_group，应改为unclear。公司饲料销量见其他已支持事实，不得与该行业产量合并或替换。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38",
+        "F39",
+        "F40",
+        "F41",
+        "F42",
+        "F43",
+        "F44"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20552,
+      "output_tokens": 1560,
+      "total_tokens": 54597
+    }
+  },
+  {
+    "request_id": "bp-work-b714e2a56fcb44d188cf3fee:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "731f655edbdb604fabf48815d30560aa41a70c991773b7a018f3eaced4013a39",
+    "response_hash": "b408cf4ac1a13ab6151b2a1889c752c419437a4034c36b8cb8671f1e7f28cbf5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:RF01\",\"text\":\"主营业务分产品情况：饲料、食品及相关业务营业收入29,258,809,444.75元，毛利率9.47%；太阳能电池、组件及相关业务营业收入39,560,181,374.11元，毛利率-0.38%；高纯晶硅、化工及相关业务营业收入15,988,761,991.96元，毛利率-5.38%；光伏电力及相关业务营业收入2,021,468,352.16元，毛利率50.46%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0011\"],\"metrics\":[{\"name\":\"饲料、食品及相关业务营业收入\",\"raw_value\":\"29,258,809,444.75\",\"value\":\"29258809444.75\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"饲料、食品及相关业务毛利率\",\"raw_value\":\"9.47\",\"value\":\"9.47\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"太阳能电池、组件及相关业务营业收入\",\"raw_value\":\"39,560,181,374.11\",\"value\":\"39560181374.11\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"太阳能电池、组件及相关业务毛利率\",\"raw_value\":\"-0.38\",\"value\":\"-0.38\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"高纯晶硅、化工及相关业务营业收入\",\"raw_value\":\"15,988,761,991.96\",\"value\":\"15988761991.96\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"高纯晶硅、化工及相关业务毛利率\",\"raw_value\":\"-5.38\",\"value\":\"-5.38\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"光伏电力及相关业务营业收入\",\"raw_value\":\"2,021,468,352.16\",\"value\":\"2021468352.16\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"光伏电力及相关业务毛利率\",\"raw_value\":\"50.46\",\"value\":\"50.46\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:RF02\",\"text\":\"主营业务分行业情况：农牧业务营业收入29,258,809,444.75元，毛利率9.47%，营业收入同比-7.82%，毛利率增加0.09个百分点；光伏业务营业收入54,138,155,120.72元，毛利率-1.12%，营业收入同比-9.46%，毛利率减少5.79个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"农牧业务营业收入\",\"raw_value\":\"29,258,809,444.75\",\"value\":\"29258809444.75\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"农牧业务毛利率\",\"raw_value\":\"9.47\",\"value\":\"9.47\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"农牧业务营业收入同比\",\"raw_value\":\"-7.82\",\"value\":\"-7.82\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"农牧业务毛利率比上年增减\",\"raw_value\":\"增加0.09个百分点\",\"value\":\"0.09\",\"unit\":\"百分点\",\"source_unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"光伏业务营业收入\",\"raw_value\":\"54,138,155,120.72\",\"value\":\"54138155120.72\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"光伏业务毛利率\",\"raw_value\":\"-1.12\",\"value\":\"-1.12\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"光伏业务营业收入同比\",\"raw_value\":\"-9.46\",\"value\":\"-9.46\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"光伏业务毛利率比上年增减\",\"raw_value\":\"减少5.79个百分点\",\"value\":\"-5.79\",\"unit\":\"百分点\",\"source_unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:RF03\",\"text\":\"主营业务分产品表合并抵销营业收入-3,432,256,597.51元、营业成本-2,817,294,697.93元；抵销后主营业务收入合计83,396,964,565.47元、主营业务成本合计81,232,943,025.02元、毛利率2.59%。该合计与利润表营业收入84,128,281,703.14元、营业成本81,856,406,510.25元不是同一口径。分地区表合并抵销-32,576,449,790.56元为地区间抵销。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0009\",\"source-0011\",\"source-0013\"],\"metrics\":[{\"name\":\"分产品表合并抵销营业收入\",\"raw_value\":\"-3,432,256,597.51\",\"value\":\"-3432256597.51\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分产品表合并抵销营业成本\",\"raw_value\":\"-2,817,294,697.93\",\"value\":\"-2817294697.93\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"抵销后主营业务收入合计\",\"raw_value\":\"83,396,964,565.47\",\"value\":\"83396964565.47\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"抵销后主营业务成本合计\",\"raw_value\":\"81,232,943,025.02\",\"value\":\"81232943025.02\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"抵销后主营业务毛利率\",\"raw_value\":\"2.59\",\"value\":\"2.59\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"分地区表合并抵销营业收入\",\"raw_value\":\"-32,576,449,790.56\",\"value\":\"-32576449790.56\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:RF04\",\"text\":\"2025年公司高纯晶硅销量38.48万吨，同比下降17.71%，国内市占率超30%，同比提升2个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0015\"],\"metrics\":[{\"name\":\"高纯晶硅销量\",\"raw_value\":\"38.48\",\"value\":\"38.48\",\"unit\":\"万吨\",\"source_unit\":\"万吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"高纯晶硅销量同比\",\"raw_value\":\"-17.71\",\"value\":\"-17.71\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"高纯晶硅国内市占率\",\"raw_value\":\"超30\",\"value\":null,\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":\"来源表述为超30%，未给出精确值\"},{\"name\":\"高纯晶硅国内市占率同比提升\",\"raw_value\":\"2个百分点\",\"value\":\"2\",\"unit\":\"百分点\",\"source_unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F41\",\"text\":\"报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明披露项选择不适用；报告期主要子公司股权变动导致合并范围变化披露项选择不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况披露项选择不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0017\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F26\",\"text\":\"公司农牧（饲料）业务生产、销售网络覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家；组件产品已覆盖国内主要央国企发电集团及海外80余个国家与地区的客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0005\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F31\",\"text\":\"2025年光伏行业新增装机规模继续保持上升态势，全球新增光伏装机规模超过600GW，但阶段性供需失衡矛盾仍未根本性缓解，产业链各环节开工率下行，产品价格同比继续下探，白银等部分核心原材料价格持续上涨。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[],\"uncertainty_reason\":\"所述为光伏行业整体情况，非公司自身装机或收入\"},{\"fact_id\":\"F32\",\"text\":\"饲料行业保持稳健发展，行业总产值小幅增长，总产量在猪饲料大幅增长推动下达到34,225.3万吨，同比增长8.6%，创下历史新高，企业规模化与行业集中度进一步提升。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"饲料行业总产量\",\"raw_value\":\"34,225.3\",\"value\":\"34225.3\",\"unit\":\"万吨\",\"source_unit\":\"万吨\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"为行业统计数据，非公司自身产量\"}],\"uncertainty_reason\":\"所述为饲料行业整体统计，非公司自身产量\"}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:RF01",
+          "text": "主营业务分产品情况：饲料、食品及相关业务营业收入29,258,809,444.75元，毛利率9.47%；太阳能电池、组件及相关业务营业收入39,560,181,374.11元，毛利率-0.38%；高纯晶硅、化工及相关业务营业收入15,988,761,991.96元，毛利率-5.38%；光伏电力及相关业务营业收入2,021,468,352.16元，毛利率50.46%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009",
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "饲料、食品及相关业务营业收入",
+              "raw_value": "29,258,809,444.75",
+              "value": "29258809444.75",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "饲料、食品及相关业务毛利率",
+              "raw_value": "9.47",
+              "value": "9.47",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "太阳能电池、组件及相关业务营业收入",
+              "raw_value": "39,560,181,374.11",
+              "value": "39560181374.11",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "太阳能电池、组件及相关业务毛利率",
+              "raw_value": "-0.38",
+              "value": "-0.38",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "高纯晶硅、化工及相关业务营业收入",
+              "raw_value": "15,988,761,991.96",
+              "value": "15988761991.96",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "高纯晶硅、化工及相关业务毛利率",
+              "raw_value": "-5.38",
+              "value": "-5.38",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "光伏电力及相关业务营业收入",
+              "raw_value": "2,021,468,352.16",
+              "value": "2021468352.16",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "光伏电力及相关业务毛利率",
+              "raw_value": "50.46",
+              "value": "50.46",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:RF02",
+          "text": "主营业务分行业情况：农牧业务营业收入29,258,809,444.75元，毛利率9.47%，营业收入同比-7.82%，毛利率增加0.09个百分点；光伏业务营业收入54,138,155,120.72元，毛利率-1.12%，营业收入同比-9.46%，毛利率减少5.79个百分点。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "农牧业务营业收入",
+              "raw_value": "29,258,809,444.75",
+              "value": "29258809444.75",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "农牧业务毛利率",
+              "raw_value": "9.47",
+              "value": "9.47",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "农牧业务营业收入同比",
+              "raw_value": "-7.82",
+              "value": "-7.82",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "农牧业务毛利率比上年增减",
+              "raw_value": "增加0.09个百分点",
+              "value": "0.09",
+              "unit": "百分点",
+              "source_unit": "百分点",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "光伏业务营业收入",
+              "raw_value": "54,138,155,120.72",
+              "value": "54138155120.72",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "光伏业务毛利率",
+              "raw_value": "-1.12",
+              "value": "-1.12",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "光伏业务营业收入同比",
+              "raw_value": "-9.46",
+              "value": "-9.46",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "光伏业务毛利率比上年增减",
+              "raw_value": "减少5.79个百分点",
+              "value": "-5.79",
+              "unit": "百分点",
+              "source_unit": "百分点",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:RF03",
+          "text": "主营业务分产品表合并抵销营业收入-3,432,256,597.51元、营业成本-2,817,294,697.93元；抵销后主营业务收入合计83,396,964,565.47元、主营业务成本合计81,232,943,025.02元、毛利率2.59%。该合计与利润表营业收入84,128,281,703.14元、营业成本81,856,406,510.25元不是同一口径。分地区表合并抵销-32,576,449,790.56元为地区间抵销。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0009",
+            "source-0011",
+            "source-0013"
+          ],
+          "metrics": [
+            {
+              "name": "分产品表合并抵销营业收入",
+              "raw_value": "-3,432,256,597.51",
+              "value": "-3432256597.51",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分产品表合并抵销营业成本",
+              "raw_value": "-2,817,294,697.93",
+              "value": "-2817294697.93",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "抵销后主营业务收入合计",
+              "raw_value": "83,396,964,565.47",
+              "value": "83396964565.47",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "抵销后主营业务成本合计",
+              "raw_value": "81,232,943,025.02",
+              "value": "81232943025.02",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "抵销后主营业务毛利率",
+              "raw_value": "2.59",
+              "value": "2.59",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "分地区表合并抵销营业收入",
+              "raw_value": "-32,576,449,790.56",
+              "value": "-32576449790.56",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:RF04",
+          "text": "2025年公司高纯晶硅销量38.48万吨，同比下降17.71%，国内市占率超30%，同比提升2个百分点。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "高纯晶硅销量",
+              "raw_value": "38.48",
+              "value": "38.48",
+              "unit": "万吨",
+              "source_unit": "万吨",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "高纯晶硅销量同比",
+              "raw_value": "-17.71",
+              "value": "-17.71",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "高纯晶硅国内市占率",
+              "raw_value": "超30",
+              "value": null,
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": "来源表述为超30%，未给出精确值"
+            },
+            {
+              "name": "高纯晶硅国内市占率同比提升",
+              "raw_value": "2个百分点",
+              "value": "2",
+              "unit": "百分点",
+              "source_unit": "百分点",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F41",
+          "text": "报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明披露项选择不适用；报告期主要子公司股权变动导致合并范围变化披露项选择不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况披露项选择不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008",
+            "source-0017"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F26",
+          "text": "公司农牧（饲料）业务生产、销售网络覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家；组件产品已覆盖国内主要央国企发电集团及海外80余个国家与地区的客户。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002",
+            "source-0005"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F31",
+          "text": "2025年光伏行业新增装机规模继续保持上升态势，全球新增光伏装机规模超过600GW，但阶段性供需失衡矛盾仍未根本性缓解，产业链各环节开工率下行，产品价格同比继续下探，白银等部分核心原材料价格持续上涨。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "所述为光伏行业整体情况，非公司自身装机或收入"
+        },
+        {
+          "fact_id": "F32",
+          "text": "饲料行业保持稳健发展，行业总产值小幅增长，总产量在猪饲料大幅增长推动下达到34,225.3万吨，同比增长8.6%，创下历史新高，企业规模化与行业集中度进一步提升。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "饲料行业总产量",
+              "raw_value": "34,225.3",
+              "value": "34225.3",
+              "unit": "万吨",
+              "source_unit": "万吨",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "为行业统计数据，非公司自身产量"
+            }
+          ],
+          "uncertainty_reason": "所述为饲料行业整体统计，非公司自身产量"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12306,
+      "output_tokens": 3013,
+      "total_tokens": 15319
+    }
+  },
+  {
+    "request_id": "bp-work-b714e2a56fcb44d188cf3fee:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "d0d40efa058a85d00e9c1f71c98ed2cf6648e119bca090fecf0fb8a12565ec1a",
+    "response_hash": "30ec48dada7adbf1981bd00f10d9b1c73aa6a0bf2a6bb65a2b21583438771305",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:RF01\",\"review-add:RF02\",\"review-add:RF03\",\"review-add:RF04\",\"F41\",\"F26\",\"F31\",\"F32\"],\"checks\":[{\"fact_id\":\"review-add:RF01\",\"accepted\":true,\"evidence_ids\":[\"source-0009\",\"source-0011\"],\"explanation\":\"分产品表单位为元、币种人民币。四类抵销前营业收入及毛利率与来源一致：饲料、食品及相关业务29,258,809,444.75元、9.47%；太阳能电池、组件及相关业务39,560,181,374.11元、-0.38%；高纯晶硅、化工及相关业务15,988,761,991.96元、-5.38%；光伏电力及相关业务2,021,468,352.16元、50.46%。类别保留在指标名称中，主体为业务分部而非合并集团，期间为2025年度。未把毛利率变动改写成同比增长率，省略同比比较不影响核心构成的恢复。\"},{\"fact_id\":\"review-add:RF02\",\"accepted\":true,\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"分行业表列示农牧业务营业收入29,258,809,444.75元、毛利率9.47%、收入同比-7.82%、毛利率增加0.09个百分点，光伏业务营业收入54,138,155,120.72元、毛利率-1.12%、收入同比-9.46%、毛利率减少5.79个百分点，均与来源一致。毛利率变动保留百分点表述。该事实单独采用已含抵销的行业口径，未与抵销前电池组件、高纯晶硅、光伏电力三行相加混同，主体正确限定为业务分部。\"},{\"fact_id\":\"review-add:RF03\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0011\",\"source-0013\"],\"explanation\":\"分产品表合并抵销营业收入-3,432,256,597.51元、营业成本-2,817,294,697.93元，抵销后主营业务收入合计83,396,964,565.47元、成本合计81,232,943,025.02元、毛利率2.59%，与利润表营业收入84,128,281,703.14元、营业成本81,856,406,510.25元分属不同项目且金额不同。分地区表营业收入列合并抵销-32,576,449,790.56元已单独标明，未当作产品构成抵销。负数抵销及净额口径均予保留。\"},{\"fact_id\":\"review-add:RF04\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0015\"],\"explanation\":\"来源载明2025年公司高纯晶硅销量38.48万吨、同比下降17.71%，产销表销售量及销售量同比可印证；未用生产量46.54万吨替代销量。国内市占率保留“超30%”且未赋精确值，同比提升2个百分点未写成增长2%。主体按报告正文中的公司口径，期间为2025年度。\"},{\"fact_id\":\"F41\",\"accepted\":true,\"evidence_ids\":[\"source-0008\",\"source-0017\"],\"explanation\":\"来源仅将业务类型、利润构成或利润来源重大变动的详细说明，主要子公司股权变动导致合并范围变化，以及业务、产品或服务发生重大变化或调整有关情况三项勾选为不适用。修复文本只陈述披露项选择不适用，没有把勾选结果写成经济事项未发生，符合适用性勾选的含义。\"},{\"fact_id\":\"F26\",\"accepted\":true,\"evidence_ids\":[\"source-0002\",\"source-0005\"],\"explanation\":\"覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家的生产、销售网络位于农牧段落并紧接饲料产能，修复已限定为农牧（饲料）业务，不再误作光伏制造基地覆盖范围。组件覆盖国内主要央国企发电集团及海外80余个国家与地区有来源支持，可保留。\"},{\"fact_id\":\"F31\",\"accepted\":true,\"evidence_ids\":[\"source-0003\"],\"explanation\":\"全球新增光伏装机超过600GW及产业链开工率、价格下行出自光伏行业环境表述，不是公司装机或收入。修复将事实范围改为unclear，正文保留行业限定，未改写成公司发生额；2025年度与报告期一致。\"},{\"fact_id\":\"F32\",\"accepted\":true,\"evidence_ids\":[\"source-0003\"],\"explanation\":\"34,225.3万吨及同比增长8.6%是饲料行业总产量，不是公司饲料销量。事实范围和指标范围均已改为unclear，并保留非公司产量的限定，未与公司饲料销量合并或替换。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:RF01",
+        "review-add:RF02",
+        "review-add:RF03",
+        "review-add:RF04",
+        "F41",
+        "F26",
+        "F31",
+        "F32"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:RF01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009",
+            "source-0011"
+          ],
+          "explanation": "分产品表单位为元、币种人民币。四类抵销前营业收入及毛利率与来源一致：饲料、食品及相关业务29,258,809,444.75元、9.47%；太阳能电池、组件及相关业务39,560,181,374.11元、-0.38%；高纯晶硅、化工及相关业务15,988,761,991.96元、-5.38%；光伏电力及相关业务2,021,468,352.16元、50.46%。类别保留在指标名称中，主体为业务分部而非合并集团，期间为2025年度。未把毛利率变动改写成同比增长率，省略同比比较不影响核心构成的恢复。"
+        },
+        {
+          "fact_id": "review-add:RF02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "分行业表列示农牧业务营业收入29,258,809,444.75元、毛利率9.47%、收入同比-7.82%、毛利率增加0.09个百分点，光伏业务营业收入54,138,155,120.72元、毛利率-1.12%、收入同比-9.46%、毛利率减少5.79个百分点，均与来源一致。毛利率变动保留百分点表述。该事实单独采用已含抵销的行业口径，未与抵销前电池组件、高纯晶硅、光伏电力三行相加混同，主体正确限定为业务分部。"
+        },
+        {
+          "fact_id": "review-add:RF03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0011",
+            "source-0013"
+          ],
+          "explanation": "分产品表合并抵销营业收入-3,432,256,597.51元、营业成本-2,817,294,697.93元，抵销后主营业务收入合计83,396,964,565.47元、成本合计81,232,943,025.02元、毛利率2.59%，与利润表营业收入84,128,281,703.14元、营业成本81,856,406,510.25元分属不同项目且金额不同。分地区表营业收入列合并抵销-32,576,449,790.56元已单独标明，未当作产品构成抵销。负数抵销及净额口径均予保留。"
+        },
+        {
+          "fact_id": "review-add:RF04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0015"
+          ],
+          "explanation": "来源载明2025年公司高纯晶硅销量38.48万吨、同比下降17.71%，产销表销售量及销售量同比可印证；未用生产量46.54万吨替代销量。国内市占率保留“超30%”且未赋精确值，同比提升2个百分点未写成增长2%。主体按报告正文中的公司口径，期间为2025年度。"
+        },
+        {
+          "fact_id": "F41",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008",
+            "source-0017"
+          ],
+          "explanation": "来源仅将业务类型、利润构成或利润来源重大变动的详细说明，主要子公司股权变动导致合并范围变化，以及业务、产品或服务发生重大变化或调整有关情况三项勾选为不适用。修复文本只陈述披露项选择不适用，没有把勾选结果写成经济事项未发生，符合适用性勾选的含义。"
+        },
+        {
+          "fact_id": "F26",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002",
+            "source-0005"
+          ],
+          "explanation": "覆盖全国大部分地区及越南、孟加拉、印度尼西亚等东南亚国家的生产、销售网络位于农牧段落并紧接饲料产能，修复已限定为农牧（饲料）业务，不再误作光伏制造基地覆盖范围。组件覆盖国内主要央国企发电集团及海外80余个国家与地区有来源支持，可保留。"
+        },
+        {
+          "fact_id": "F31",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "全球新增光伏装机超过600GW及产业链开工率、价格下行出自光伏行业环境表述，不是公司装机或收入。修复将事实范围改为unclear，正文保留行业限定，未改写成公司发生额；2025年度与报告期一致。"
+        },
+        {
+          "fact_id": "F32",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "34,225.3万吨及同比增长8.6%是饲料行业总产量，不是公司饲料销量。事实范围和指标范围均已改为unclear，并保留非公司产量的限定，未与公司饲料销量合并或替换。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 17065,
+      "output_tokens": 1097,
+      "total_tokens": 27303
+    }
+  }
+]

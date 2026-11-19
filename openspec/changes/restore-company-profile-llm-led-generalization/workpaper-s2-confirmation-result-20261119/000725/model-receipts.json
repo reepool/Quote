@@ -1,0 +1,1073 @@
+[
+  {
+    "request_id": "bp-work-39973bd61a38a0f69bf6e159:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "f5d003c2d4ee05ec830b9067bafbd6d0fcc4c9156f1d441dfedaee48e777744f",
+    "response_hash": "e59a993c6c12abe9f34b06c3e14ffeebbbd1b4bddf6730388077aedc08a571e9",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0015\",\"section-0017\",\"section-0031\",\"section-0039\",\"section-0048\",\"section-0049\",\"section-0051\",\"section-0079\"],\"rationale\":\"选取第三节管理层讨论与分析中的核心经营子节：section-0015（主要业务）与section-0017（主营业务简介，含显示器件、物联网创新、传感、MLED、智慧医工、N业务）说明公司做什么、产品用途与业务结构；section-0031（主营业务分析）及其收入与成本子节section-0039提供公司期间营业收入、成本与主要业务权重，是货币化与收入构成的核心来源；section-0048（主要销售客户）与section-0049（主要供应商）补充客户渠道与供应链输入；section-0051（研发投入）反映经营投入与资源；section-0079（未来发展展望）保留计划限定的经营因素与变化。未选纯行业背景section-0024与泛化核心竞争力section-0025，因其对公司层面解释力较弱。\",\"deferred\":[\"section-0024 行业情况：属行业背景，非公司层面经营实质，暂缓\",\"section-0025 核心竞争力分析：偏泛化竞争力描述，暂缓\",\"section-0058 资产及负债状况分析：属财务结构分析，非收入构成核心，暂缓\",\"section-0308 财务报告及分部附注：仅在收入构成仍有实质缺口时定向补充，暂不整体扩读\"],\"stop_reason\":\"已覆盖业务结构、产品用途、收入与成本构成、客户与供应商、研发投入及经营展望等核心经营信息，可支撑公司经营与货币化解读；行业背景与详细财务附注属次要或定向补充范围，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0015",
+        "section-0017",
+        "section-0031",
+        "section-0039",
+        "section-0048",
+        "section-0049",
+        "section-0051",
+        "section-0079"
+      ],
+      "rationale": "选取第三节管理层讨论与分析中的核心经营子节：section-0015（主要业务）与section-0017（主营业务简介，含显示器件、物联网创新、传感、MLED、智慧医工、N业务）说明公司做什么、产品用途与业务结构；section-0031（主营业务分析）及其收入与成本子节section-0039提供公司期间营业收入、成本与主要业务权重，是货币化与收入构成的核心来源；section-0048（主要销售客户）与section-0049（主要供应商）补充客户渠道与供应链输入；section-0051（研发投入）反映经营投入与资源；section-0079（未来发展展望）保留计划限定的经营因素与变化。未选纯行业背景section-0024与泛化核心竞争力section-0025，因其对公司层面解释力较弱。",
+      "deferred": [
+        "section-0024 行业情况：属行业背景，非公司层面经营实质，暂缓",
+        "section-0025 核心竞争力分析：偏泛化竞争力描述，暂缓",
+        "section-0058 资产及负债状况分析：属财务结构分析，非收入构成核心，暂缓",
+        "section-0308 财务报告及分部附注：仅在收入构成仍有实质缺口时定向补充，暂不整体扩读"
+      ],
+      "stop_reason": "已覆盖业务结构、产品用途、收入与成本构成、客户与供应商、研发投入及经营展望等核心经营信息，可支撑公司经营与货币化解读；行业背景与详细财务附注属次要或定向补充范围，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 18176,
+      "output_tokens": 383,
+      "total_tokens": 18559
+    }
+  },
+  {
+    "request_id": "bp-work-39973bd61a38a0f69bf6e159:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "c1905b0dd042c478cb065b0c67f13e2a877ccf76af30240511cbd1c6c289102d",
+    "response_hash": "9ecb4ab98c2ca18c4c490c068843a0c88183fdd02874298ac240c300b8168c0a",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司构建“1+4+N+生态链”业务发展架构：“1”为显示核心能力，“4”为物联网创新、传感、MLED及智慧医工四条主战线，“N”为物联网细分应用场景，“生态链”为协同赋能平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司在北京、合肥、成都、重庆、福州、绵阳、武汉、昆明、鄂尔多斯、南京等地建设多个智能制造基地，子公司遍布美国、德国、日本、韩国、新加坡、印度、巴西、阿联酋等多个国家和地区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"显示器件业务为器件整合设计制造模式，提供应用TFT-LCD、AMOLED等技术的端口器件，产品覆盖手机、平板电脑、笔记本电脑、显示器、电视、车载等显示器件。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"物联网创新业务为系统解决方案设计整合制造模式，提供平板电脑、笔记本电脑、显示器、电视、低功耗、IoT、3D显示等领域智慧终端产品，并融合AI、大数据功能。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"传感业务聚焦FPXD、智慧视窗、工业传感、MEMS、玻璃基封装载板，提供X-ray平板探测器背板、智能调光视窗及调光系统解决方案、消费电子和工业应用解决方案、先进封装载板等产品和服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"MLED业务聚焦器件与解决方案，为电视、显示器、笔记本电脑、车载等领域提供LED背光产品，并为户外显示、商用显示、透明显示、特殊显示等提供Mini/MicroLED显示产品。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"智慧医工业务为专业服务模式，提供健康医疗、智慧康养、医工融合产品等服务与解决方案，构建以健康管理为核心、医工终端为牵引、数字医院和康养社区为支撑的全周期健康服务闭环。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-06\",\"text\":\"“N”业务为不同行业提供软硬融合、系统整合解决方案，包括智慧车联、智慧能源、工业互联、超高清显示等细分领域。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司营业收入合计204,590,222,888.00元，同比增长3.13%；销售模式为直销，直销收入占营业收入100.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"204,590,222,888.00\",\"value\":\"204590222888.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入合计同比增减\",\"raw_value\":\"3.13%\",\"value\":\"3.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"直销收入占营业收入比重\",\"raw_value\":\"100.00%\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"显示器件业务营业收入166,417,015,418.00元，占营业收入81.34%，同比增长0.86%；营业成本144,918,410,654.00元，毛利率12.92%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\"],\"metrics\":[{\"name\":\"显示器件业务营业收入\",\"raw_value\":\"166,417,015,418.00\",\"value\":\"166417015418.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"显示器件业务占营业收入比重\",\"raw_value\":\"81.34%\",\"value\":\"81.34\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"显示器件业务营业收入同比增减\",\"raw_value\":\"0.86%\",\"value\":\"0.86\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"显示器件业务毛利率\",\"raw_value\":\"12.92%\",\"value\":\"12.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"物联网创新业务营业收入38,949,236,781.00元，占营业收入19.04%，同比增长15.14%；营业成本34,398,776,981.00元，毛利率11.68%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\"],\"metrics\":[{\"name\":\"物联网创新业务营业收入\",\"raw_value\":\"38,949,236,781.00\",\"value\":\"38949236781.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物联网创新业务占营业收入比重\",\"raw_value\":\"19.04%\",\"value\":\"19.04\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物联网创新业务营业收入同比增减\",\"raw_value\":\"15.14%\",\"value\":\"15.14\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物联网创新业务毛利率\",\"raw_value\":\"11.68%\",\"value\":\"11.68\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-04\",\"text\":\"传感业务营业收入587,444,558.00元，占营业收入0.29%，同比增长52.00%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"传感业务营业收入\",\"raw_value\":\"587,444,558.00\",\"value\":\"587444558.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"传感业务占营业收入比重\",\"raw_value\":\"0.29%\",\"value\":\"0.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"传感业务营业收入同比增减\",\"raw_value\":\"52.00%\",\"value\":\"52.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-05\",\"text\":\"MLED业务营业收入9,316,052,632.00元，占营业收入4.55%，同比增长9.81%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"MLED业务营业收入\",\"raw_value\":\"9,316,052,632.00\",\"value\":\"9316052632.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"MLED业务占营业收入比重\",\"raw_value\":\"4.55%\",\"value\":\"4.55\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"MLED业务营业收入同比增减\",\"raw_value\":\"9.81%\",\"value\":\"9.81\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-06\",\"text\":\"智慧医工业务营业收入1,902,021,967.00元，占营业收入0.93%，同比增长3.40%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"智慧医工业务营业收入\",\"raw_value\":\"1,902,021,967.00\",\"value\":\"1902021967.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"智慧医工业务占营业收入比重\",\"raw_value\":\"0.93%\",\"value\":\"0.93\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"智慧医工业务营业收入同比增减\",\"raw_value\":\"3.40%\",\"value\":\"3.40\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-07\",\"text\":\"“其他及抵销”列示金额-12,581,548,468.00元，占营业收入-6.15%，同比增长12.73%；该列为收入构成表中的调整/抵销项，非独立经营业务。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"其他及抵销金额\",\"raw_value\":\"-12,581,548,468.00\",\"value\":\"-12581548468.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"该列为收入构成表中的其他及抵销调整项，混合口径无法安全归入某一业务或公司整体。\"},{\"name\":\"其他及抵销占营业收入比重\",\"raw_value\":\"-6.15%\",\"value\":\"-6.15\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"该列为收入构成表中的其他及抵销调整项，混合口径无法安全归入某一业务或公司整体。\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"按地区划分，中国大陆营业收入102,754,305,370.00元，占营业收入50.22%；其他地区营业收入101,835,917,518.00元，占营业收入49.78%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"中国大陆营业收入\",\"raw_value\":\"102,754,305,370.00\",\"value\":\"102754305370.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中国大陆占营业收入比重\",\"raw_value\":\"50.22%\",\"value\":\"50.22\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他地区营业收入\",\"raw_value\":\"101,835,917,518.00\",\"value\":\"101835917518.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他地区占营业收入比重\",\"raw_value\":\"49.78%\",\"value\":\"49.78\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"TFT-LCD销售量90,032.00K㎡，同比增长8.30%；AMOLED销售量2,264.00K㎡，同比增长8.17%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"TFT-LCD销售量\",\"raw_value\":\"90,032.00\",\"value\":\"90032.00\",\"unit\":\"K㎡\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"TFT-LCD销售量同比增减\",\"raw_value\":\"8.30%\",\"value\":\"8.30\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"AMOLED销售量\",\"raw_value\":\"2,264.00\",\"value\":\"2264.00\",\"unit\":\"K㎡\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"AMOLED销售量同比增减\",\"raw_value\":\"8.17%\",\"value\":\"8.17\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"营业成本主要构成项目包括材料、人工、折旧等；公司为避免商业秘密泄露，仅将营业成本按所属事业板块分拆披露。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"显示器件业务营业成本144,918,410,654.00元，占营业成本比重83.96%，同比增长0.67%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"显示器件业务营业成本\",\"raw_value\":\"144,918,410,654.00\",\"value\":\"144918410654.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"显示器件业务营业成本占营业成本比重\",\"raw_value\":\"83.96%\",\"value\":\"83.96\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"物联网创新业务营业成本34,398,776,981.00元，占营业成本比重19.93%，同比增长13.72%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"物联网创新业务营业成本\",\"raw_value\":\"34,398,776,981.00\",\"value\":\"34398776981.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物联网创新业务营业成本占营业成本比重\",\"raw_value\":\"19.93%\",\"value\":\"19.93\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"研发费用13,836,670,878.00元，同比增长5.44%；主要研发项目包括UB Cell系列升级、Oxide技术升级、自然光显示技术、场序技术、CHPI产品推广、低碳环保、广色域Tandem技术、极致窄边框技术、车载可切换防窥显示技术、NB高刷新技术、直显COB项目、车载MLED背光产品、MiniLED智慧TV等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"研发费用\",\"raw_value\":\"13,836,670,878.00\",\"value\":\"13836670878.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发费用同比增减\",\"raw_value\":\"5.44%\",\"value\":\"5.44\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户合计销售金额74,047,425,003.00元，占年度销售总额比例36.19%；前五名客户销售额中关联方销售额占年度销售总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"74,047,425,003.00\",\"value\":\"74047425003.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"36.19%\",\"value\":\"36.19\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额中关联方销售额占年度销售总额比例\",\"raw_value\":\"0.00%\",\"value\":\"0.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"公司业务网络覆盖欧、美、亚、非等全球主要区域，以完善的全球化市场布局与多元化产品服务体系服务用户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"显示器件业务LCD五大主流及车载应用面板出货量稳居全球第一，柔性OLED器件出货量保持增长；高端LCD解决方案UB Cell技术引领TV产品全线升级，黑晶、黑钻产品实现55至110英寸全系列量产。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OD-02\",\"text\":\"物联网创新业务TV终端海外核心客户营收同比翻倍增长；MNT终端突破多家战略客户中高端系列产品；TPC终端整机轻薄化突破行业极限，实现LCD屏幕平板领域最薄。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OD-03\",\"text\":\"传感业务FPXD产品销量同比大幅提升；智慧视窗智能调光产品搭载重点客户高端旗舰车型如期上市，客户开拓新增多家定点；苏州传感高精度激光位移传感器全面导入激光测量行业头部客户，可编程逻辑控制器PLC产品实现量产。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OD-04\",\"text\":\"MLED业务直显业务Ultra产品实现重点客户旗舰店项目落地；与京东方华灿联合打造MPD P0.6双面海报屏产品；背光器件业务已具备头部品牌客户新品MNT量产条件。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OD-05\",\"text\":\"智慧医工业务数字医院服务量实现明显增长；成都医院顺利完成三甲现场评审；合肥医院成功开展“人工心脏”植入术；苏州医院通过国家胸痛中心、国家房颤中心双认证。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]},{\"fact_id\":\"F-OD-06\",\"text\":\"“N”业务中，京东方精电LTPS出货量同比显著增长，海外战略有效带动欧美营收与出货量提升；京东方能源新能源电站投/建规模、储能投/建规模同比持续增长；京东方华灿Micro LED产品稳定量产交付，GaN器件成功实现客户导入。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务未发生重大变化或调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"展望2026年，公司将持续优化显示器件产品结构，LCD夯实高世代线产能优势、加速低世代线创新应用转型，OLED推动IT、车载等产品开发和上量；物联网创新聚焦软硬融合与系统设计整合能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度展望\",\"evidence_ids\":[\"source-0011\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P1\",\"text\":\"公司以“屏之物联”战略构建“1+4+N+生态链”架构，显示为核心能力与资源，向物联网创新、传感、MLED及智慧医工延伸，并开拓物联网细分应用场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U1\",\"text\":\"前五名供应商合计采购金额26,447,234,903.00元，占年度采购总额比例18.52%；前五名供应商采购额中关联方采购额占年度采购总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"26,447,234,903.00\",\"value\":\"26447234903.00\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"18.52%\",\"value\":\"18.52\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SC-U2\",\"text\":\"营业成本主要构成项目包括材料、人工、折旧等，公司仅按所属事业板块分拆披露营业成本。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D1\",\"text\":\"显示器件产品应用于手机、平板电脑、笔记本电脑、显示器、电视、车载等领域；MLED背光产品应用于电视、显示器、笔记本电脑、车载等领域，Mini/MicroLED显示产品应用于户外显示、商用显示、透明显示、特殊显示等细分领域。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-SC-D2\",\"text\":\"智慧医工以长者和青少年为核心客户，构建分级服务体系，将优质医疗资源、专业连续的服务延伸到社区和家庭。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]}]}},\"limitations\":[\"未获取成功：主要客户与供应商名称以“客户1-5”“供应商1-5”匿名列示，无法识别具体交易对手。\",\"未获取成功：营业成本仅按事业板块分拆披露材料、人工、折旧等合计，未披露具体原材料种类、供应商或采购结构明细。\",\"未获取成功：各业务板块的产能、产量明细及分产品毛利率仅显示器件与物联网创新业务在10%以上表中披露，传感、MLED、智慧医工未披露毛利率。\",\"未获取成功：行业背景（section-0024）与核心竞争力（section-0025）未纳入阅读范围，相关行业趋势与竞争地位描述有限。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司构建“1+4+N+生态链”业务发展架构：“1”为显示核心能力，“4”为物联网创新、传感、MLED及智慧医工四条主战线，“N”为物联网细分应用场景，“生态链”为协同赋能平台。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "公司在北京、合肥、成都、重庆、福州、绵阳、武汉、昆明、鄂尔多斯、南京等地建设多个智能制造基地，子公司遍布美国、德国、日本、韩国、新加坡、印度、巴西、阿联酋等多个国家和地区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "显示器件业务为器件整合设计制造模式，提供应用TFT-LCD、AMOLED等技术的端口器件，产品覆盖手机、平板电脑、笔记本电脑、显示器、电视、车载等显示器件。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "物联网创新业务为系统解决方案设计整合制造模式，提供平板电脑、笔记本电脑、显示器、电视、低功耗、IoT、3D显示等领域智慧终端产品，并融合AI、大数据功能。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "传感业务聚焦FPXD、智慧视窗、工业传感、MEMS、玻璃基封装载板，提供X-ray平板探测器背板、智能调光视窗及调光系统解决方案、消费电子和工业应用解决方案、先进封装载板等产品和服务。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "MLED业务聚焦器件与解决方案，为电视、显示器、笔记本电脑、车载等领域提供LED背光产品，并为户外显示、商用显示、透明显示、特殊显示等提供Mini/MicroLED显示产品。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "智慧医工业务为专业服务模式，提供健康医疗、智慧康养、医工融合产品等服务与解决方案，构建以健康管理为核心、医工终端为牵引、数字医院和康养社区为支撑的全周期健康服务闭环。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-06",
+              "text": "“N”业务为不同行业提供软硬融合、系统整合解决方案，包括智慧车联、智慧能源、工业互联、超高清显示等细分领域。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司营业收入合计204,590,222,888.00元，同比增长3.13%；销售模式为直销，直销收入占营业收入100.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "204,590,222,888.00",
+                  "value": "204590222888.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入合计同比增减",
+                  "raw_value": "3.13%",
+                  "value": "3.13",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "直销收入占营业收入比重",
+                  "raw_value": "100.00%",
+                  "value": "100.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "显示器件业务营业收入166,417,015,418.00元，占营业收入81.34%，同比增长0.86%；营业成本144,918,410,654.00元，毛利率12.92%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "显示器件业务营业收入",
+                  "raw_value": "166,417,015,418.00",
+                  "value": "166417015418.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "显示器件业务占营业收入比重",
+                  "raw_value": "81.34%",
+                  "value": "81.34",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "显示器件业务营业收入同比增减",
+                  "raw_value": "0.86%",
+                  "value": "0.86",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "显示器件业务毛利率",
+                  "raw_value": "12.92%",
+                  "value": "12.92",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "物联网创新业务营业收入38,949,236,781.00元，占营业收入19.04%，同比增长15.14%；营业成本34,398,776,981.00元，毛利率11.68%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "物联网创新业务营业收入",
+                  "raw_value": "38,949,236,781.00",
+                  "value": "38949236781.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物联网创新业务占营业收入比重",
+                  "raw_value": "19.04%",
+                  "value": "19.04",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物联网创新业务营业收入同比增减",
+                  "raw_value": "15.14%",
+                  "value": "15.14",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物联网创新业务毛利率",
+                  "raw_value": "11.68%",
+                  "value": "11.68",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-04",
+              "text": "传感业务营业收入587,444,558.00元，占营业收入0.29%，同比增长52.00%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "传感业务营业收入",
+                  "raw_value": "587,444,558.00",
+                  "value": "587444558.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "传感业务占营业收入比重",
+                  "raw_value": "0.29%",
+                  "value": "0.29",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "传感业务营业收入同比增减",
+                  "raw_value": "52.00%",
+                  "value": "52.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-05",
+              "text": "MLED业务营业收入9,316,052,632.00元，占营业收入4.55%，同比增长9.81%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "MLED业务营业收入",
+                  "raw_value": "9,316,052,632.00",
+                  "value": "9316052632.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "MLED业务占营业收入比重",
+                  "raw_value": "4.55%",
+                  "value": "4.55",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "MLED业务营业收入同比增减",
+                  "raw_value": "9.81%",
+                  "value": "9.81",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-06",
+              "text": "智慧医工业务营业收入1,902,021,967.00元，占营业收入0.93%，同比增长3.40%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "智慧医工业务营业收入",
+                  "raw_value": "1,902,021,967.00",
+                  "value": "1902021967.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "智慧医工业务占营业收入比重",
+                  "raw_value": "0.93%",
+                  "value": "0.93",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "智慧医工业务营业收入同比增减",
+                  "raw_value": "3.40%",
+                  "value": "3.40",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-07",
+              "text": "“其他及抵销”列示金额-12,581,548,468.00元，占营业收入-6.15%，同比增长12.73%；该列为收入构成表中的调整/抵销项，非独立经营业务。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "其他及抵销金额",
+                  "raw_value": "-12,581,548,468.00",
+                  "value": "-12581548468.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "unclear",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "该列为收入构成表中的其他及抵销调整项，混合口径无法安全归入某一业务或公司整体。"
+                },
+                {
+                  "name": "其他及抵销占营业收入比重",
+                  "raw_value": "-6.15%",
+                  "value": "-6.15",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "unclear",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "该列为收入构成表中的其他及抵销调整项，混合口径无法安全归入某一业务或公司整体。"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "按地区划分，中国大陆营业收入102,754,305,370.00元，占营业收入50.22%；其他地区营业收入101,835,917,518.00元，占营业收入49.78%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "中国大陆营业收入",
+                  "raw_value": "102,754,305,370.00",
+                  "value": "102754305370.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中国大陆占营业收入比重",
+                  "raw_value": "50.22%",
+                  "value": "50.22",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他地区营业收入",
+                  "raw_value": "101,835,917,518.00",
+                  "value": "101835917518.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他地区占营业收入比重",
+                  "raw_value": "49.78%",
+                  "value": "49.78",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "TFT-LCD销售量90,032.00K㎡，同比增长8.30%；AMOLED销售量2,264.00K㎡，同比增长8.17%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "TFT-LCD销售量",
+                  "raw_value": "90,032.00",
+                  "value": "90032.00",
+                  "unit": "K㎡",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "TFT-LCD销售量同比增减",
+                  "raw_value": "8.30%",
+                  "value": "8.30",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "AMOLED销售量",
+                  "raw_value": "2,264.00",
+                  "value": "2264.00",
+                  "unit": "K㎡",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "AMOLED销售量同比增减",
+                  "raw_value": "8.17%",
+                  "value": "8.17",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "营业成本主要构成项目包括材料、人工、折旧等；公司为避免商业秘密泄露，仅将营业成本按所属事业板块分拆披露。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "显示器件业务营业成本144,918,410,654.00元，占营业成本比重83.96%，同比增长0.67%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "显示器件业务营业成本",
+                  "raw_value": "144,918,410,654.00",
+                  "value": "144918410654.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "显示器件业务营业成本占营业成本比重",
+                  "raw_value": "83.96%",
+                  "value": "83.96",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "物联网创新业务营业成本34,398,776,981.00元，占营业成本比重19.93%，同比增长13.72%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "物联网创新业务营业成本",
+                  "raw_value": "34,398,776,981.00",
+                  "value": "34398776981.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物联网创新业务营业成本占营业成本比重",
+                  "raw_value": "19.93%",
+                  "value": "19.93",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "研发费用13,836,670,878.00元，同比增长5.44%；主要研发项目包括UB Cell系列升级、Oxide技术升级、自然光显示技术、场序技术、CHPI产品推广、低碳环保、广色域Tandem技术、极致窄边框技术、车载可切换防窥显示技术、NB高刷新技术、直显COB项目、车载MLED背光产品、MiniLED智慧TV等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "研发费用",
+                  "raw_value": "13,836,670,878.00",
+                  "value": "13836670878.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发费用同比增减",
+                  "raw_value": "5.44%",
+                  "value": "5.44",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "前五名客户合计销售金额74,047,425,003.00元，占年度销售总额比例36.19%；前五名客户销售额中关联方销售额占年度销售总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "74,047,425,003.00",
+                  "value": "74047425003.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "36.19%",
+                  "value": "36.19",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额中关联方销售额占年度销售总额比例",
+                  "raw_value": "0.00%",
+                  "value": "0.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "公司业务网络覆盖欧、美、亚、非等全球主要区域，以完善的全球化市场布局与多元化产品服务体系服务用户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "显示器件业务LCD五大主流及车载应用面板出货量稳居全球第一，柔性OLED器件出货量保持增长；高端LCD解决方案UB Cell技术引领TV产品全线升级，黑晶、黑钻产品实现55至110英寸全系列量产。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "物联网创新业务TV终端海外核心客户营收同比翻倍增长；MNT终端突破多家战略客户中高端系列产品；TPC终端整机轻薄化突破行业极限，实现LCD屏幕平板领域最薄。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "传感业务FPXD产品销量同比大幅提升；智慧视窗智能调光产品搭载重点客户高端旗舰车型如期上市，客户开拓新增多家定点；苏州传感高精度激光位移传感器全面导入激光测量行业头部客户，可编程逻辑控制器PLC产品实现量产。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "MLED业务直显业务Ultra产品实现重点客户旗舰店项目落地；与京东方华灿联合打造MPD P0.6双面海报屏产品；背光器件业务已具备头部品牌客户新品MNT量产条件。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-OD-05",
+              "text": "智慧医工业务数字医院服务量实现明显增长；成都医院顺利完成三甲现场评审；合肥医院成功开展“人工心脏”植入术；苏州医院通过国家胸痛中心、国家房颤中心双认证。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-OD-06",
+              "text": "“N”业务中，京东方精电LTPS出货量同比显著增长，海外战略有效带动欧美营收与出货量提升；京东方能源新能源电站投/建规模、储能投/建规模同比持续增长；京东方华灿Micro LED产品稳定量产交付，GaN器件成功实现客户导入。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期内合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务未发生重大变化或调整。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "展望2026年，公司将持续优化显示器件产品结构，LCD夯实高世代线产能优势、加速低世代线创新应用转型，OLED推动IT、车载等产品开发和上量；物联网创新聚焦软硬融合与系统设计整合能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2026年度展望",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-P1",
+              "text": "公司以“屏之物联”战略构建“1+4+N+生态链”架构，显示为核心能力与资源，向物联网创新、传感、MLED及智慧医工延伸，并开拓物联网细分应用场景。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-U1",
+              "text": "前五名供应商合计采购金额26,447,234,903.00元，占年度采购总额比例18.52%；前五名供应商采购额中关联方采购额占年度采购总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "26,447,234,903.00",
+                  "value": "26447234903.00",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "18.52%",
+                  "value": "18.52",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SC-U2",
+              "text": "营业成本主要构成项目包括材料、人工、折旧等，公司仅按所属事业板块分拆披露营业成本。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-D1",
+              "text": "显示器件产品应用于手机、平板电脑、笔记本电脑、显示器、电视、车载等领域；MLED背光产品应用于电视、显示器、笔记本电脑、车载等领域，Mini/MicroLED显示产品应用于户外显示、商用显示、透明显示、特殊显示等细分领域。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-SC-D2",
+              "text": "智慧医工以长者和青少年为核心客户，构建分级服务体系，将优质医疗资源、专业连续的服务延伸到社区和家庭。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "未获取成功：主要客户与供应商名称以“客户1-5”“供应商1-5”匿名列示，无法识别具体交易对手。",
+        "未获取成功：营业成本仅按事业板块分拆披露材料、人工、折旧等合计，未披露具体原材料种类、供应商或采购结构明细。",
+        "未获取成功：各业务板块的产能、产量明细及分产品毛利率仅显示器件与物联网创新业务在10%以上表中披露，传感、MLED、智慧医工未披露毛利率。",
+        "未获取成功：行业背景（section-0024）与核心竞争力（section-0025）未纳入阅读范围，相关行业趋势与竞争地位描述有限。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 13643,
+      "output_tokens": 5572,
+      "total_tokens": 19215
+    }
+  },
+  {
+    "request_id": "bp-work-39973bd61a38a0f69bf6e159:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "c5a3dd2a6726dd74f8daad4f853e83d937228d2d3729373bf321f38a29decc8c",
+    "response_hash": "471c52869840fe16b7c9d0c49a18a57b3ad4367ef14280b5f3630e048d8dc836",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FR-001\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-01\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"“报告期内合并范围发生变动，但对分部数据无显著影响”有原文支持。但“业务、产品或服务发生重大变化或调整有关情况”仅勾选“不适用”，不能据此断言报告期内未发生重大变化或调整。应保留合并范围变动及对分部数据无显著影响的已支持内容，并将后半句改为该披露事项标记为不适用。\"},{\"finding_id\":\"FR-002\",\"element\":\"downstream_customers\",\"severity\":\"material\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-D2\",\"evidence_ids\":[\"source-0011\"],\"explanation\":\"“以长者和青少年为核心客户、构建分级服务体系并延伸至社区和家庭”出自展望2026年的规划，不是2025年已实现事实。2025年智慧医工经营描述并未将长者与青少年确立为当期核心客户。应改为2026年展望或计划口径，不得按2025年已发生的下游客户事实保留。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-PS-06\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-RM-04\",\"F-RM-05\",\"F-RM-06\",\"F-RM-07\",\"F-SM-01\",\"F-SM-02\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-CC-01\",\"F-CC-02\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-OD-05\",\"F-OD-06\",\"F-MC-01\",\"F-MC-02\",\"F-SC-P1\",\"F-SC-U1\",\"F-SC-U2\",\"F-SC-D1\",\"F-SC-D2\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FR-001",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-MC-01",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "“报告期内合并范围发生变动，但对分部数据无显著影响”有原文支持。但“业务、产品或服务发生重大变化或调整有关情况”仅勾选“不适用”，不能据此断言报告期内未发生重大变化或调整。应保留合并范围变动及对分部数据无显著影响的已支持内容，并将后半句改为该披露事项标记为不适用。"
+        },
+        {
+          "finding_id": "FR-002",
+          "element": "downstream_customers",
+          "severity": "material",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F-SC-D2",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "“以长者和青少年为核心客户、构建分级服务体系并延伸至社区和家庭”出自展望2026年的规划，不是2025年已实现事实。2025年智慧医工经营描述并未将长者与青少年确立为当期核心客户。应改为2026年展望或计划口径，不得按2025年已发生的下游客户事实保留。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-PS-06",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-RM-04",
+        "F-RM-05",
+        "F-RM-06",
+        "F-RM-07",
+        "F-SM-01",
+        "F-SM-02",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-CC-01",
+        "F-CC-02",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-OD-05",
+        "F-OD-06",
+        "F-MC-01",
+        "F-MC-02",
+        "F-SC-P1",
+        "F-SC-U1",
+        "F-SC-U2",
+        "F-SC-D1",
+        "F-SC-D2"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20253,
+      "output_tokens": 522,
+      "total_tokens": 38976
+    }
+  },
+  {
+    "request_id": "bp-work-39973bd61a38a0f69bf6e159:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "6f4c3f0c0cbfa48f90bafcb59562dfca28fa133e27be5a2ec8e985e4eff6afa1",
+    "response_hash": "bde7bb45f5cd21e285f6288463c4344d13cedd03177c2609cb0d4c853640318d",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务发生重大变化或调整有关情况标记为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-SC-D2\",\"text\":\"展望2026年，智慧医工计划以长者和青少年为核心客户，构建分级服务体系，通过软硬融合解决方案和专业健康管理工具，将优质医疗资源、专业连续的服务延伸到社区和家庭。\",\"subject_scope\":\"business_segment\",\"period\":\"2026年度展望\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-MC-01",
+          "text": "报告期内合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务发生重大变化或调整有关情况标记为不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SC-D2",
+          "text": "展望2026年，智慧医工计划以长者和青少年为核心客户，构建分级服务体系，通过软硬融合解决方案和专业健康管理工具，将优质医疗资源、专业连续的服务延伸到社区和家庭。",
+          "subject_scope": "business_segment",
+          "period": "2026年度展望",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10582,
+      "output_tokens": 182,
+      "total_tokens": 10764
+    }
+  },
+  {
+    "request_id": "bp-work-39973bd61a38a0f69bf6e159:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "06bcad3668718112bd2feeb5c581792ce5277c0e18a4dd2cd3599ab870238dd0",
+    "response_hash": "1003a90e68921c50af6da4ccfab967cb493dedc962a2b10ab0f84fd6b17b0b57",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-MC-01\",\"F-SC-D2\"],\"checks\":[{\"fact_id\":\"F-MC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"source-0006勾选“报告期内合并范围是否发生变动”为“是”，并载明本年报告期内合并范围变动对分部数据无显著影响；“业务、产品或服务发生重大变化或调整有关情况”仅勾选“不适用”。候选保留前项已支持内容，并将后项限定为披露事项标记为不适用，未断言报告期内未发生重大变化。主体按报告期公司合并口径、期间按2025年度均与原文一致。\"},{\"fact_id\":\"F-SC-D2\",\"accepted\":true,\"evidence_ids\":[\"source-0011\"],\"explanation\":\"source-0011位于“公司未来发展的展望”，开篇为展望2026年；智慧医工段关于以长者和青少年为核心客户、构建分级服务体系并延伸至社区和家庭属于未来规划，并非2025年已实现事实。候选改为2026年度展望及计划口径，主体限定为智慧医工业务分部，未写成当期下游客户结果，也未添加原文没有的确定成果。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-MC-01",
+        "F-SC-D2"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-MC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "source-0006勾选“报告期内合并范围是否发生变动”为“是”，并载明本年报告期内合并范围变动对分部数据无显著影响；“业务、产品或服务发生重大变化或调整有关情况”仅勾选“不适用”。候选保留前项已支持内容，并将后项限定为披露事项标记为不适用，未断言报告期内未发生重大变化。主体按报告期公司合并口径、期间按2025年度均与原文一致。"
+        },
+        {
+          "fact_id": "F-SC-D2",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "source-0011位于“公司未来发展的展望”，开篇为展望2026年；智慧医工段关于以长者和青少年为核心客户、构建分级服务体系并延伸至社区和家庭属于未来规划，并非2025年已实现事实。候选改为2026年度展望及计划口径，主体限定为智慧医工业务分部，未写成当期下游客户结果，也未添加原文没有的确定成果。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12477,
+      "output_tokens": 278,
+      "total_tokens": 14797
+    }
+  }
+]

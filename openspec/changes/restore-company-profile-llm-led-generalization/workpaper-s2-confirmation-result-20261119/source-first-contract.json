@@ -1,0 +1,2128 @@
+{
+  "task": "6.EA",
+  "not_model_input": true,
+  "original_group": "6.DS failed, unchanged",
+  "new_primary_questions": 60,
+  "policy": "v9 basic description and source correctness; optional gaps/uncertainty/supply chain do not reject the whole profile",
+  "sampling_seed": "company-profile-s2-confirmation-20261119.v1",
+  "companies": [
+    {
+      "instrument_id": "600309.SH",
+      "name": "万华化学",
+      "layer": "manufacturing",
+      "document_version": "766717cc1a3b74221d4a20892b28152b3180ef5c63d683623e8a903eebddac95",
+      "core_conditions": [
+        {
+          "condition_id": "600309.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "全球运营的化工新材料研发、生产和销售，聚氨酯、石化、精细化学品及新材料三大板块，电池材料为新材料布局之一。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            12,
+            17,
+            18
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600309.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "MDI/TDI及聚醚、烯烃衍生物、功能化学品及新材料，用于制造、涂料胶黏剂、光伏汽车等；不要求穷尽材料型号。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            12,
+            17,
+            18
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600309.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "生产销售各系列化工材料及解决方案获取收入；聚氨酯、石化、精细新材料各有业务收入，内部抵销独立，不把抵销当普通业务或各板块重复合计。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            12,
+            17,
+            18
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        10,
+        11,
+        12,
+        17,
+        18
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "766717cc1a3b74221d4a20892b28152b3180ef5c63d683623e8a903eebddac95",
+        "section_paths": [
+          "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+          "主营业务分析/收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 10,
+            "native_page_sha256": "d6ed423ba0d5c00e6aacd91711963b3b1a76eec4f55c4a64fd2eaca9dcf576f8"
+          },
+          {
+            "page": 11,
+            "native_page_sha256": "d05330a92dea5b539519e7070f690d064dbde328f8fab589a81b15958df9512f"
+          },
+          {
+            "page": 12,
+            "native_page_sha256": "64afe0bfd2fae7ed58c11d63c6dd5e67f19285dd6fd2ac3c44e6241b653271b2"
+          },
+          {
+            "page": 17,
+            "native_page_sha256": "21875d188cf60c002e0fbcbee25ab3c3be1206a6fb3dc5f5a11a755ea566f560"
+          },
+          {
+            "page": 18,
+            "native_page_sha256": "fef0c3c6891fd7c6cd04924fdc6c712030adff19d631f424365d8d02dcefb9b8"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/76/766717cc1a3b74221d4a20892b28152b3180ef5c63d683623e8a903eebddac95.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "600438.SH",
+      "name": "通威股份",
+      "layer": "manufacturing",
+      "document_version": "f0bd49a42e0cc42ea8766a6a8b10c70b912904788c4e69a03a9051ff29f4c2e0",
+      "core_conditions": [
+        {
+          "condition_id": "600438.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "农业与新能源双主业，以农业（渔业）加光伏协同，饲料农牧及光伏硅料、电池组件和电力。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            12,
+            13,
+            19,
+            20,
+            21,
+            22
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主营业务及经营模式",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600438.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "水产畜禽饲料及食品配套；高纯晶硅、太阳能电池及组件，光伏电站和渔光一体；不把全部组件都写成外销。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            12,
+            13,
+            19,
+            20,
+            21,
+            22
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主营业务及经营模式",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600438.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "饲料食品、高纯晶硅及化工、电池组件的生产销售及光伏电力收入；保农牧/光伏两主线并区分内部抵销。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            12,
+            13,
+            19,
+            20,
+            21,
+            22
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主营业务及经营模式",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        12,
+        13,
+        19,
+        20,
+        21,
+        22
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "f0bd49a42e0cc42ea8766a6a8b10c70b912904788c4e69a03a9051ff29f4c2e0",
+        "section_paths": [
+          "第三节 管理层讨论与分析/主营业务及经营模式",
+          "主营业务分析/收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 12,
+            "native_page_sha256": "b53ba95f1e89422b4c0055ccab8564488e4c331d4f4fee05a1c691d2522e4632"
+          },
+          {
+            "page": 13,
+            "native_page_sha256": "d9d1eb58c4192eecd60b46df738bc5f78152f688faa11b834ad853e2d51a09f5"
+          },
+          {
+            "page": 19,
+            "native_page_sha256": "d16516607ef0f99bfc499285e47788257f56939d749f4fa25103ba09933ff20d"
+          },
+          {
+            "page": 20,
+            "native_page_sha256": "76e555bf6bd1a012667f79d2fe2d56fbb58a210d93321d8e8cfc163f75283076"
+          },
+          {
+            "page": 21,
+            "native_page_sha256": "4aebf79870f5d67f5fbbe840fb0cf67e5aee68e27f08d19edd0f613eb7b00989"
+          },
+          {
+            "page": 22,
+            "native_page_sha256": "93fbf13970a3562028b27cf322b9c368836092f3ef70d5d8eafd097a59f46992"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/f0/f0bd49a42e0cc42ea8766a6a8b10c70b912904788c4e69a03a9051ff29f4c2e0.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "name": "比亚迪",
+      "layer": "manufacturing",
+      "document_version": "710d8b2e08e37ba521f1c4071d2c3e2369d3cadabc21a45073215d9f72138b0b",
+      "core_conditions": [
+        {
+          "condition_id": "002594.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "新能源汽车、手机部件及组装、二次充电电池和光伏，并拓展城市轨道交通。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            13,
+            29,
+            30
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002594.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "新能源汽车及相关产品、电子部件与组装，消费/动力/储能电池、光伏产品，云轨云巴；非要求每车型/电池型号必全。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            13,
+            29,
+            30
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002594.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "汽车及相关产品和手机部件组装等两大报告产品线形成收入，直销与经销并存；不得把手机业务遗漏或只用整车销量说明全部赚钱方式。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            13,
+            29,
+            30
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        13,
+        29,
+        30
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "710d8b2e08e37ba521f1c4071d2c3e2369d3cadabc21a45073215d9f72138b0b",
+        "section_paths": [
+          "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+          "主营业务分析/营业收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 13,
+            "native_page_sha256": "1e37a1dbe81597a97b268a31706446b98322444ac2d615db1d41995d7ce5ddc4"
+          },
+          {
+            "page": 29,
+            "native_page_sha256": "f9577db23ca377a00d211d0511b86ce951a02b682c24cf2e2730f4c6bcb9b735"
+          },
+          {
+            "page": 30,
+            "native_page_sha256": "afd89b1ee65aae83f041f8156239f1111cbe12fe7b9a5026144c402b6bc69e69"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/71/710d8b2e08e37ba521f1c4071d2c3e2369d3cadabc21a45073215d9f72138b0b.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "name": "京东方Ａ",
+      "layer": "manufacturing",
+      "document_version": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+      "core_conditions": [
+        {
+          "condition_id": "000725.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "以显示为核心，物联网创新、传感、MLED、智慧医工及N场景的1+4+N生态布局。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            15,
+            16,
+            18,
+            19,
+            20
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主营业务简介",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "000725.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "显示器件与智慧终端，传感/探测及封装、LED背光与显示解决方案、医疗康养服务及场景整合；不要求每N场景全列。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            15,
+            16,
+            18,
+            19,
+            20
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主营业务简介",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "000725.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "显示器件和物联网创新为主要收入，传感/MLED/智慧医工亦属明示业务，产品与服务销售；其他及抵销不当独立普通主营或另一个集团总额。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            15,
+            16,
+            18,
+            19,
+            20
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主营业务简介",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        15,
+        16,
+        18,
+        19,
+        20
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+        "section_paths": [
+          "第三节 管理层讨论与分析/主营业务简介",
+          "主营业务分析/营业收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 15,
+            "native_page_sha256": "e6a76cbbf700cafab00ded0bc8091fb054dd9180571e44b7f3e6214198ebc5fd"
+          },
+          {
+            "page": 16,
+            "native_page_sha256": "752111c6e33a1cc33e8a5ae7e13354a16e77e7c1dbfbb35d1514dd6e9bab3672"
+          },
+          {
+            "page": 18,
+            "native_page_sha256": "1acb68096f7c745db989316be81bd61a84542a72b68db25f2c14fbd99d04424b"
+          },
+          {
+            "page": 19,
+            "native_page_sha256": "9bbf522b75bce4cbe8c181ab0777efce8683fd9017455f890d748ebeb02e1c79"
+          },
+          {
+            "page": 20,
+            "native_page_sha256": "baee8f5907998cd41d93963c5b23e8854fc8cfc582d0dae6c1d40a133c3b0009"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/34/34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "name": "万达轴承",
+      "layer": "manufacturing",
+      "document_version": "64897a270ddf98208d7856fb929903ac8e8a954b0cd2622ac02bb2533b817579",
+      "core_conditions": [
+        {
+          "condition_id": "920002.BJ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "叉车轴承及回转支承研发生产销售，服务工业车辆并拓展工业机器人。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            16,
+            17,
+            18,
+            24,
+            25
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/业务概要",
+            "财务分析/收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "920002.BJ:products_services",
+          "dimension": "products_services",
+          "required_substance": "叉车门架等专用轴承和回转支承及配件，服务叉车整车/机器人等客户；客户品牌与行业常识不作为新增事实。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            16,
+            17,
+            18,
+            24,
+            25
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/业务概要",
+            "财务分析/收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "920002.BJ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "以轴承和回转支承等产品销售获收入，直销与贸易商买断；直接订单和寄售库存销售区分，寄售按实际领用结算，不等于发出全确认。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            16,
+            17,
+            18,
+            24,
+            25
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/业务概要",
+            "财务分析/收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        16,
+        17,
+        18,
+        24,
+        25
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "64897a270ddf98208d7856fb929903ac8e8a954b0cd2622ac02bb2533b817579",
+        "section_paths": [
+          "第四节 管理层讨论与分析/业务概要",
+          "财务分析/收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 16,
+            "native_page_sha256": "0ce0fc41e501082955869f7f176ef3081ca7a78767fae4cd3187a9194cdc485d"
+          },
+          {
+            "page": 17,
+            "native_page_sha256": "0837e7ba3114b73f4577ccb101c83df524b3643614f9cd6edfd3ede2b8bc44e1"
+          },
+          {
+            "page": 18,
+            "native_page_sha256": "9123b92b03e81e80f06745cc3e4b061436865fa2657796fda9eceba2d3318615"
+          },
+          {
+            "page": 24,
+            "native_page_sha256": "25ac9349779e0be4e5fa3f9c5a704c99012eaee122dcf69cbb890aabdbe607ca"
+          },
+          {
+            "page": 25,
+            "native_page_sha256": "f084c34245e022a9d5ce79b02c5eb536d4167d172725d83ef6cab2a6fce7e9e7"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/64/64897a270ddf98208d7856fb929903ac8e8a954b0cd2622ac02bb2533b817579.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "name": "鼎佳精密",
+      "layer": "manufacturing",
+      "document_version": "31cb2c3709b934ac76094a5683a013d21a0f2375c908f302798343ddc6937653",
+      "core_conditions": [
+        {
+          "condition_id": "920005.BJ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "消费电子功能性及防护性产品研发、定制生产销售。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            12,
+            13,
+            15,
+            16
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/业务概要",
+            "财务分析/收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "920005.BJ:products_services",
+          "dimension": "products_services",
+          "required_substance": "电磁屏蔽、粘贴组装、绝缘精密、纸质/EPE/MIM等产品，功能与防护两类用于消费电子品牌供应链。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            12,
+            13,
+            15,
+            16
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/业务概要",
+            "财务分析/收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "920005.BJ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "按订单自主生产并用OEM/委托加工补产能，直接对客户销售功能性和防护性产品；直接制造服务商客户不等于终端品牌直接购买。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            12,
+            13,
+            15,
+            16
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/业务概要",
+            "财务分析/收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        12,
+        13,
+        15,
+        16
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "31cb2c3709b934ac76094a5683a013d21a0f2375c908f302798343ddc6937653",
+        "section_paths": [
+          "第四节 管理层讨论与分析/业务概要",
+          "财务分析/收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 12,
+            "native_page_sha256": "ba360a85bdafd9c112099a4e63ee71e529948355294f0348808775c571efc870"
+          },
+          {
+            "page": 13,
+            "native_page_sha256": "4e20e073832ac99dba389e36fe5302c23dc25e22ff57aca73f93b2ee35a78ccd"
+          },
+          {
+            "page": 15,
+            "native_page_sha256": "8c7eba65757c15948834714a435b8285008a0d72b7d5f1cf9e0cddcedb720ff0"
+          },
+          {
+            "page": 16,
+            "native_page_sha256": "457f8334048f124770db4988cc4613076aa1dfa60053827519b1f6d77e8b815c"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/31/31cb2c3709b934ac76094a5683a013d21a0f2375c908f302798343ddc6937653.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "601021.SH",
+      "name": "春秋航空",
+      "layer": "services",
+      "document_version": "d865b40eeccba86f465d98282989d8aacc410806f021c126cfc56de3a4f176d3",
+      "core_conditions": [
+        {
+          "condition_id": "601021.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "低成本航空，国内、国际及港澳台客货运输及相关服务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            22,
+            23,
+            25,
+            26
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601021.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "以低成本航空客运为主，兼航空货运及航空相关服务，价格敏感自费及性价比商务客群。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            22,
+            23,
+            25,
+            26
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601021.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "航空客运票价、货运与相关服务收入，主营客运为主兼货运，国内/国际/港澳台区分；行业收入不可当公司收入。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            22,
+            23,
+            25,
+            26
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        11,
+        22,
+        23,
+        25,
+        26
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "d865b40eeccba86f465d98282989d8aacc410806f021c126cfc56de3a4f176d3",
+        "section_paths": [
+          "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+          "主营业务分析/收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 11,
+            "native_page_sha256": "08d3ae2487a5e7befebc7af79e214cc50369c1d4c59a7613cb1dded0d9d228e7"
+          },
+          {
+            "page": 22,
+            "native_page_sha256": "845cf5eb96982aa0fc212b4527a27bbc2bc8820893bc9f152ea3706b064bc4d0"
+          },
+          {
+            "page": 23,
+            "native_page_sha256": "be2f02de740999283f17570a2bcfd300d9694b496d48e2694d1482eefaea52e3"
+          },
+          {
+            "page": 25,
+            "native_page_sha256": "876312dc63a0d0d3aaa2e30d0558aa2f1caca877053c15c9b048a5c4dc27c6c7"
+          },
+          {
+            "page": 26,
+            "native_page_sha256": "fd223ba47808eb2130cbe00ab0e9337c1dcf238b5e1eeca302265eecca2abbc7"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/d8/d865b40eeccba86f465d98282989d8aacc410806f021c126cfc56de3a4f176d3.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "601888.SH",
+      "name": "中国中免",
+      "layer": "services",
+      "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+      "core_conditions": [
+        {
+          "condition_id": "601888.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "以免税为主的旅游零售，并开展免税核心商业综合体投资开发。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            13,
+            14,
+            16
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601888.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "烟酒、香化、腕表珠宝、服饰箱包等免税/有税商品，机场口岸市内及海南离岛渠道，线下与线上并存。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            13,
+            14,
+            16
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601888.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "依托免税资质与供应链进行商品零售，免税与有税销售两种收入；商业综合体不推断为全部租赁，行业海南购物金额不当本公司收入。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            13,
+            14,
+            16
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        11,
+        13,
+        14,
+        16
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_paths": [
+          "第四节 管理层讨论与分析/报告期内公司从事的业务情况",
+          "主营业务分析/收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 11,
+            "native_page_sha256": "bdb127840e45a2f29e9eb574542769a6ba30ae84ea09ee00333e2564ca79a365"
+          },
+          {
+            "page": 13,
+            "native_page_sha256": "205bd3745409871cd8ec6e106e2ec2b496294fb5a7089065836944dbf453b962"
+          },
+          {
+            "page": 14,
+            "native_page_sha256": "415979653b97934f420a8d28c1a7fa6dfb05d3431c34cfaf31ee7b9e129b3f30"
+          },
+          {
+            "page": 16,
+            "native_page_sha256": "3bd8e8ca7151848025340ba8abfccbb3a4d324374558ef4102a6245ce3ee9327"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/29/295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "name": "顺丰控股",
+      "layer": "services",
+      "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+      "core_conditions": [
+        {
+          "condition_id": "002352.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "综合物流服务，速运大件、同城即时配送、供应链及国际三经营分部。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            23,
+            24,
+            25,
+            59,
+            60
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/公司业务发展情况",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002352.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "时效/经济快递、快运、冷运及医药、同城配送、供应链及国际物流，国内外端到端物流服务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            23,
+            24,
+            25,
+            59,
+            60
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/公司业务发展情况",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002352.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "快递运输、快运冷链、即时配送及供应链国际物流服务收费；其他商品购销/租赁技术服务按源限定，子业务和分部不能重复加总。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            23,
+            24,
+            25,
+            59,
+            60
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/公司业务发展情况",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        11,
+        23,
+        24,
+        25,
+        59,
+        60
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+        "section_paths": [
+          "第四节 管理层讨论与分析/公司业务发展情况",
+          "主营业务分析/营业收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 11,
+            "native_page_sha256": "f5dd5435cab28eaf441982a39e35ba038180fe8a4799b9d1ea5cb9228ffb0e8d"
+          },
+          {
+            "page": 23,
+            "native_page_sha256": "fb7954d647e4ddde88010d4e618d700c84be21fb89f389ac80eb240ac18f4441"
+          },
+          {
+            "page": 24,
+            "native_page_sha256": "167e16c681484c4176dcb29a10be16596fa69d4f7ce3770ba0fb1d7073e6f7bc"
+          },
+          {
+            "page": 25,
+            "native_page_sha256": "367bc09f9686278117ea715fe5ac57be6f29fea1b08e4b5ee13c863acc75f512"
+          },
+          {
+            "page": 59,
+            "native_page_sha256": "5d268f514227b17694de48e44738aa6866ae8ba023dd4e2f14dad1589b0e86c6"
+          },
+          {
+            "page": 60,
+            "native_page_sha256": "eb545d1662c0f87eb9638cbf619c5a678ef0701282fd077e6ef78c681100caa8"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/24/240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "name": "分众传媒",
+      "layer": "services",
+      "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+      "core_conditions": [
+        {
+          "condition_id": "002027.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "生活圈户外广告媒体开发运营，以楼宇媒体与影院银幕媒体构成网络。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            15
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002027.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "电梯电视、海报及影院广告等，为广告主覆盖城市生活消费场景；网络覆盖时点不可从2026年3月错作2025年末。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            15
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002027.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "通过楼宇和影院等媒体广告投放服务取得收入，日用消费品/互联网等为广告客户行业，不是自营商品销售或互联网主营新板块。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            15
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        10,
+        11,
+        15
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+        "section_paths": [
+          "第三节 管理层讨论与分析/报告期内公司从事的主要业务",
+          "主营业务分析/营业收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 10,
+            "native_page_sha256": "8d2858417c0b05f38a7a11673c9040bd8dae479b816cb163938850f5dfefa98c"
+          },
+          {
+            "page": 11,
+            "native_page_sha256": "8287b30239173a4e652a9e96fb852a3d0d254d5906130a104d4856568cea77c1"
+          },
+          {
+            "page": 15,
+            "native_page_sha256": "aa279743de71457113f47ea27f34a266fd988911c302cc80c1b4037191a33a11"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/2c/2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "name": "宋城演艺",
+      "layer": "services",
+      "document_version": "4b7ab7551e2c3066f01257afcf18c9a10a020b9410c5c6bc97a67c328a45cbeb",
+      "core_conditions": [
+        {
+          "condition_id": "300144.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "主题公园加文化演艺模式，现场演艺与旅游服务双轮。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            9,
+            12,
+            13
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "300144.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "千古情等现场演艺和主题景区体验，旅游服务包括轻资产输出及网络票务；不强求每一景区清单。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            9,
+            12,
+            13
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "300144.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "现场演艺/景区门票，品牌授权设计编创托管的服务及管理费，网络票务销售/电商手续费等；不能只剩现场演艺而漏整块旅游服务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            9,
+            12,
+            13
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        9,
+        12,
+        13
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "4b7ab7551e2c3066f01257afcf18c9a10a020b9410c5c6bc97a67c328a45cbeb",
+        "section_paths": [
+          "第三节 管理层讨论与分析/主要业务",
+          "主营业务分析/营业收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 9,
+            "native_page_sha256": "ef193672d3003647e055a095866569eb477c64378738793dabc3c7752314c238"
+          },
+          {
+            "page": 12,
+            "native_page_sha256": "854386f9524cc81233c4330454901ac712c21bbed59522d4f8cb3fa8c135d14c"
+          },
+          {
+            "page": 13,
+            "native_page_sha256": "76c7738152fd99e481ebca66da04e40c70eb058c67d43ce9668725a7fcadab52"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/4b/4b7ab7551e2c3066f01257afcf18c9a10a020b9410c5c6bc97a67c328a45cbeb.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "601111.SH",
+      "name": "中国国航",
+      "layer": "services",
+      "document_version": "cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec",
+      "core_conditions": [
+        {
+          "condition_id": "601111.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "载旗航空集团的航空客货邮运输及航空相关服务，以客运为主要收入。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            12,
+            16,
+            18,
+            27
+          ],
+          "section_paths": [
+            "第三章 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601111.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "国内国际及地区航线客运、航空货邮和相关附加服务；相关维修等按源保范围，不把行业客流作公司。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            12,
+            16,
+            18,
+            27
+          ],
+          "section_paths": [
+            "第三章 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601111.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "客运、货运邮运和其他航空相关服务收入，其他主营维修等按源，不只用客流或航线规模替代收入机制。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            11,
+            12,
+            16,
+            18,
+            27
+          ],
+          "section_paths": [
+            "第三章 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务分析/收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        11,
+        12,
+        16,
+        18,
+        27
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec",
+        "section_paths": [
+          "第三章 管理层讨论与分析/报告期内公司从事的业务情况",
+          "主营业务分析/收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 11,
+            "native_page_sha256": "a20befd2c6cff8ac1f2178126fbc6569e916c6d9f2ee4f5838d5e748ca4dcb10"
+          },
+          {
+            "page": 12,
+            "native_page_sha256": "788f2cfc9ba28f3cac0281c116d657d98c2f800f34376f5e9fc5203ba718f889"
+          },
+          {
+            "page": 16,
+            "native_page_sha256": "42cfd777628be9f54463c5eca2d705706d7e2a96508cd2088dc18a6354c2eab3"
+          },
+          {
+            "page": 18,
+            "native_page_sha256": "d34270e1ee4a719e0be7d89d35894585e4854c66a6a114c5e8104fac4e54de72"
+          },
+          {
+            "page": 27,
+            "native_page_sha256": "317c37b7a7b5a481cdf5651b520cdd114b548046fcb4a63aa2680ac2b414990a"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/cb/cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "601601.SH",
+      "name": "中国太保",
+      "layer": "financial",
+      "document_version": "3787b6a6ec1bf480be2092e7bae156bd0f1d1b7f9f28bd9226d038951c788dee",
+      "core_conditions": [
+        {
+          "condition_id": "601601.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "以保险为主的金融集团，寿险、财险、健康险及保险资金运用/第三方资产管理等。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            35,
+            36,
+            37,
+            43,
+            44
+          ],
+          "section_paths": [
+            "经营业绩/经营业绩回顾与分析/公司业务概要",
+            "业绩概述",
+            "人身保险业务",
+            "财产保险业务"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601601.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "人身保险、财产保险、健康保障与健康管理；资管养老金融及相关基金服务等按主营概述保留，不逐子公司全清单强制。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            35,
+            36,
+            37,
+            43,
+            44
+          ],
+          "section_paths": [
+            "经营业绩/经营业绩回顾与分析/公司业务概要",
+            "业绩概述",
+            "人身保险业务",
+            "财产保险业务"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601601.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "保险合同保障服务和保险资金投资，以及第三方资产管理/相关服务收入；保费、保险服务收入、投资收益及管理资产存量不混作同一收入。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            35,
+            36,
+            37,
+            43,
+            44
+          ],
+          "section_paths": [
+            "经营业绩/经营业绩回顾与分析/公司业务概要",
+            "业绩概述",
+            "人身保险业务",
+            "财产保险业务"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        35,
+        36,
+        37,
+        43,
+        44
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "3787b6a6ec1bf480be2092e7bae156bd0f1d1b7f9f28bd9226d038951c788dee",
+        "section_paths": [
+          "经营业绩/经营业绩回顾与分析/公司业务概要",
+          "业绩概述",
+          "人身保险业务",
+          "财产保险业务"
+        ],
+        "physical_pages": [
+          {
+            "page": 35,
+            "native_page_sha256": "65f0578f469cf671a409d81c9820ac5efcc03f97a15ed6d998152d60418e2741"
+          },
+          {
+            "page": 36,
+            "native_page_sha256": "817d6948e8a79078c05e63f14bee0520b8fca04f8d2d9f7f054d55b53b5b56ef"
+          },
+          {
+            "page": 37,
+            "native_page_sha256": "07d36a6936f156cf98d93aed2d645c45aaa6d1221e26f0d0f3445f82667f844e"
+          },
+          {
+            "page": 43,
+            "native_page_sha256": "bb77c60d35d91d25c48a54ba768c6b979b63a8b9b9ae77b8ecabdcfd0e56ae87"
+          },
+          {
+            "page": 44,
+            "native_page_sha256": "79e67ef0ff66127e4f39362385f339cf582ae03efa402e0883b655830fb6e8f2"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/37/3787b6a6ec1bf480be2092e7bae156bd0f1d1b7f9f28bd9226d038951c788dee.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "601881.SH",
+      "name": "中国银河",
+      "layer": "financial",
+      "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+      "core_conditions": [
+        {
+          "condition_id": "601881.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "证券综合金融服务，财富管理、投行、机构、国际、投资交易及母子公司一体化。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            23,
+            24,
+            34,
+            35
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务经营情况分析",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601881.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "经纪投顾及融资融券、股债承销顾问、机构托管研究做市等、国际业务、自营投资及子公司期货/资管等。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            23,
+            24,
+            34,
+            35
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务经营情况分析",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601881.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "财富管理/经纪与融资服务、投行/机构服务、国际与投资交易收益，母子公司一体化按源区分；各业务收入不同于交易额或市场成交额。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            23,
+            24,
+            34,
+            35
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "主营业务经营情况分析",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        23,
+        24,
+        34,
+        35
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+        "section_paths": [
+          "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+          "主营业务经营情况分析",
+          "收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 23,
+            "native_page_sha256": "c5f984dc4a8f00846c13df4cb8f0c83cfed53a68ae1a8352fc2431f4e2d19652"
+          },
+          {
+            "page": 24,
+            "native_page_sha256": "83844287a527ff51a2a77ce319281514b1a97d0bd9b5c828b749fcde56d05f8a"
+          },
+          {
+            "page": 34,
+            "native_page_sha256": "b1eb24cff70d3d3defe6bd9a34a8a85a3cf02195a65d5f8ec11a771e5b047c05"
+          },
+          {
+            "page": 35,
+            "native_page_sha256": "8f983ffd525a5631fa0cc97698502e274444e79fe6de07802a4d019f7e5e1c32"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/56/56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "name": "宁波银行",
+      "layer": "financial",
+      "document_version": "6610078eb1d109465781dbd47d3256d4abbbe2f4ff1f8017e1724b3fadb35558",
+      "core_conditions": [
+        {
+          "condition_id": "002142.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "区域综合商业银行，企业、零售/财富消费及金融市场等，并有基金金租理财消金业务载体。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            16,
+            17,
+            18,
+            43,
+            44
+          ],
+          "section_paths": [
+            "第六节 管理层讨论与分析/主营业务及核心竞争力",
+            "利润表项目分析",
+            "业务回顾"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002142.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "存贷款、结算、财富/理财、信用卡、金融市场投行及托管等金融服务；不把经营许可清单当每项已开展证明。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            16,
+            17,
+            18,
+            43,
+            44
+          ],
+          "section_paths": [
+            "第六节 管理层讨论与分析/主营业务及核心竞争力",
+            "利润表项目分析",
+            "业务回顾"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "002142.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "存贷及债券同业等资金运用的净利息，手续费佣金及其他非利息收益，区分收入总额、净利息和非利息；客户AUM不是收入。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            16,
+            17,
+            18,
+            43,
+            44
+          ],
+          "section_paths": [
+            "第六节 管理层讨论与分析/主营业务及核心竞争力",
+            "利润表项目分析",
+            "业务回顾"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        16,
+        17,
+        18,
+        43,
+        44
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "6610078eb1d109465781dbd47d3256d4abbbe2f4ff1f8017e1724b3fadb35558",
+        "section_paths": [
+          "第六节 管理层讨论与分析/主营业务及核心竞争力",
+          "利润表项目分析",
+          "业务回顾"
+        ],
+        "physical_pages": [
+          {
+            "page": 16,
+            "native_page_sha256": "9ace2733b3b6e663ea193fc6c7a4351784458e26f8b8739e76387abfd8aa15bb"
+          },
+          {
+            "page": 17,
+            "native_page_sha256": "053d712c96e5248a1389c87d72be8c6b8bec8ec6e65ca5130e3689700103d307"
+          },
+          {
+            "page": 18,
+            "native_page_sha256": "78483de2cf620b7d2f1eb0a054adaefedef03589411500c00811a6b894f25ea9"
+          },
+          {
+            "page": 43,
+            "native_page_sha256": "3b4116a6c56bf2254887810b16617670307c55e3e31872018b8f3fb107e5847e"
+          },
+          {
+            "page": 44,
+            "native_page_sha256": "c3d3230a4fa90108fbaef043e5d604fd3d65df2a1b5b4a1d3a6b7c827930c119"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/66/6610078eb1d109465781dbd47d3256d4abbbe2f4ff1f8017e1724b3fadb35558.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "601009.SH",
+      "name": "南京银行",
+      "layer": "financial",
+      "document_version": "b7ed7b82689963ca038d635086d5a979e4fc35f5abfa9917dbf272361a554651",
+      "core_conditions": [
+        {
+          "condition_id": "601009.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "立足江苏并服务长三角和北京的商业银行，公司、个人、资金等业务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            21,
+            23,
+            25
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/主要业务、经营模式",
+            "利润表分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601009.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "公司及个人存贷款、结算支付、银行卡、债券与同业等服务；零售和公司、金融市场口径区分。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            21,
+            23,
+            25
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/主要业务、经营模式",
+            "利润表分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "601009.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "净利息与非利息净收入共同构成营业收入，包括信贷/债券等资金运用及中间业务等；利息收入未扣成本不可当净利息或公司总收入。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            21,
+            23,
+            25
+          ],
+          "section_paths": [
+            "第四节 管理层讨论与分析/主要业务、经营模式",
+            "利润表分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        21,
+        23,
+        25
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "b7ed7b82689963ca038d635086d5a979e4fc35f5abfa9917dbf272361a554651",
+        "section_paths": [
+          "第四节 管理层讨论与分析/主要业务、经营模式",
+          "利润表分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 21,
+            "native_page_sha256": "542ad8d44db6432818afa17c1f6c8371c479c9659af0e1c753ee6bf5fc580ffb"
+          },
+          {
+            "page": 23,
+            "native_page_sha256": "4a0c7072f606d5c8de5154983be19626fab597a8508c5026ad1a6382656f1684"
+          },
+          {
+            "page": 25,
+            "native_page_sha256": "8a604ba4ef253ad9ef46301280037c46c77306f096042744e82aafb3be839ccf"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/b7/b7ed7b82689963ca038d635086d5a979e4fc35f5abfa9917dbf272361a554651.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "000027.SZ",
+      "name": "深圳能源",
+      "layer": "other",
+      "document_version": "f44dd074f730046eb6775e90b183ebc5b625de3aa6a34ef6f78f35fbef7780ba",
+      "core_conditions": [
+        {
+          "condition_id": "000027.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "能源与环境综合服务，低碳电力、生态环保、天然气及数智服务四核布局。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            15
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务概述",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "000027.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "燃煤/燃机/水风光等发电、固废和废水处理、城市燃气及天然气产业链服务，数智按实际披露。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            15
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务概述",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "000027.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "电力销售、环保处理及相关运营、燃气销售等形成收入；利润分项或装机不当收入，环保兼垃圾发电保持原分类避免重复。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            15
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务概述",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        10,
+        11,
+        15
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "f44dd074f730046eb6775e90b183ebc5b625de3aa6a34ef6f78f35fbef7780ba",
+        "section_paths": [
+          "第三节 管理层讨论与分析/主要业务概述",
+          "主营业务分析/营业收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 10,
+            "native_page_sha256": "ae16682bb8cabc821b8952db95153fbd68ac1ff69b6f1128a4f5c86ed3111eb2"
+          },
+          {
+            "page": 11,
+            "native_page_sha256": "de96b95c8f8e9d16c4b8e8e4567cea3c8e66f5f20e349f98808fb3688388a31b"
+          },
+          {
+            "page": 15,
+            "native_page_sha256": "d177e53f69ca3e5ef61fb1f51ff660f638d01227213b2f78e79694b2d8122174"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/f4/f44dd074f730046eb6775e90b183ebc5b625de3aa6a34ef6f78f35fbef7780ba.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "000090.SZ",
+      "name": "天健集团",
+      "layer": "other",
+      "document_version": "64ecdad2e6395d1f9f94137ad4a13619e823c05150b87fe9d50f55d9040e33d6",
+      "core_conditions": [
+        {
+          "condition_id": "000090.SZ:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "城市建设、综合开发、城市服务三大板块。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            18,
+            19
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务概述",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "000090.SZ:products_services",
+          "dimension": "products_services",
+          "required_substance": "市政基建及房建工程、住宅办公等房地产开发、设施管养/土地整备/商业物业等城市服务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            18,
+            19
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务概述",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "000090.SZ:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "EPC/施工总承包等工程合同，房地产销售，物业租赁/商业运营及城市服务收入；建设和地产两主线及服务不能混成单一地产商。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            10,
+            11,
+            18,
+            19
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/主要业务概述",
+            "主营业务分析/营业收入构成"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        10,
+        11,
+        18,
+        19
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "64ecdad2e6395d1f9f94137ad4a13619e823c05150b87fe9d50f55d9040e33d6",
+        "section_paths": [
+          "第三节 管理层讨论与分析/主要业务概述",
+          "主营业务分析/营业收入构成"
+        ],
+        "physical_pages": [
+          {
+            "page": 10,
+            "native_page_sha256": "0974fd3c7a2792783cbb8dc338ca7cf5a5fcc03207332270fdb85407ed601903"
+          },
+          {
+            "page": 11,
+            "native_page_sha256": "55369403262fdebc25cb2cce32291ba0ef02f9bb3c500f0fa1e12ffa070059ab"
+          },
+          {
+            "page": 18,
+            "native_page_sha256": "f06ea988a73028bf36796a1c67f6532938d5e7cbf845a47e47dc8195213e1edd"
+          },
+          {
+            "page": 19,
+            "native_page_sha256": "bcafe5cbfa0627f9c134ac800f22f24da14f89aba64689be883a2403bc0de80b"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/64/64ecdad2e6395d1f9f94137ad4a13619e823c05150b87fe9d50f55d9040e33d6.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "600663.SH",
+      "name": "陆家嘴",
+      "layer": "other",
+      "document_version": "cd49c377554ab867a40c351f6f445474b3fe212408b2d36e98bf63b723233c4c",
+      "core_conditions": [
+        {
+          "condition_id": "600663.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "城市综合开发与服务、特色金融、商旅服务三大主业。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            24,
+            26,
+            27,
+            32
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600663.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "房地产开发销售和长期资产租赁、物业管理、持牌金融、商业酒店等服务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            24,
+            26,
+            27,
+            32
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600663.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "物业销售/租赁、物业服务收费、金融业务及酒店商旅等收入并存；不只写卖房或用租金单项代替全业务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            24,
+            26,
+            27,
+            32
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        24,
+        26,
+        27,
+        32
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "cd49c377554ab867a40c351f6f445474b3fe212408b2d36e98bf63b723233c4c",
+        "section_paths": [
+          "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+          "收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 24,
+            "native_page_sha256": "aec6ef73b9464ac59fa61d2ef7455e168dc34625799b435d4a7687fc935fddbf"
+          },
+          {
+            "page": 26,
+            "native_page_sha256": "ce3824321b8d92894adb6008eb2a07633892c5827fb5851f992f1308a847c23f"
+          },
+          {
+            "page": 27,
+            "native_page_sha256": "201ef00ef688e3776b8bf175f8215784426a98cdcbd5820cd61d52e0cf3b8306"
+          },
+          {
+            "page": 32,
+            "native_page_sha256": "dff4bb78b49532c85df54ac406ad2c9d4c626f971a5f304fe99a9a85d625113b"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/cd/cd49c377554ab867a40c351f6f445474b3fe212408b2d36e98bf63b723233c4c.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    },
+    {
+      "instrument_id": "600655.SH",
+      "name": "豫园股份",
+      "layer": "other",
+      "document_version": "6b75b21b5d6bd23c0b2e83683a3d38cca396e4392233c22267575196c13593fb",
+      "core_conditions": [
+        {
+          "condition_id": "600655.SH:principal_business",
+          "dimension": "principal_business",
+          "required_substance": "面向家庭消费的珠宝时尚、文化饮食、国潮腕表、美丽健康，以及地产开发运营等集团业务。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            13,
+            14,
+            18,
+            19,
+            20
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "各业务板块主要经营情况",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600655.SH:products_services",
+          "dimension": "products_services",
+          "required_substance": "黄金珠宝、餐饮食品、腕表、美妆健康及相关消费品牌，商业物业运营及开发；不把少数参股酒企全部营收计入集团。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            13,
+            14,
+            18,
+            19,
+            20
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "各业务板块主要经营情况",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        },
+        {
+          "condition_id": "600655.SH:revenue_model",
+          "dimension": "revenue_model",
+          "required_substance": "产业运营的商品零售批发/餐饮服务、商业综合和物业服务、物业开发销售形成多类收入；主表产业运营及其中子类不重复相加。",
+          "all_material_business_clauses_required": true,
+          "source_pages": [
+            13,
+            14,
+            18,
+            19,
+            20
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+            "各业务板块主要经营情况",
+            "收入和成本分析"
+          ],
+          "not_lexical_or_field_presence_check": true,
+          "scoring": "independent semantic source judgment: supported substantive answer=1, partial/missing/unknown=0; optional details not a mandatory checklist"
+        }
+      ],
+      "read_source_scope": [
+        13,
+        14,
+        18,
+        19,
+        20
+      ],
+      "source_reference": {
+        "method": "Codex independent reading of original report-local business/income sections before tested-model output",
+        "document_version": "6b75b21b5d6bd23c0b2e83683a3d38cca396e4392233c22267575196c13593fb",
+        "section_paths": [
+          "第三节 管理层讨论与分析/报告期内公司从事的业务情况",
+          "各业务板块主要经营情况",
+          "收入和成本分析"
+        ],
+        "physical_pages": [
+          {
+            "page": 13,
+            "native_page_sha256": "cce76266012c0fffddb83cc6e482cf8808c86c23d6d09e86f84d5de3453d93ea"
+          },
+          {
+            "page": 14,
+            "native_page_sha256": "cc5b02d51809fc45c53a9cb76bfc1fb2f76bfed05ea0ff20447738c0012f2e8b"
+          },
+          {
+            "page": 18,
+            "native_page_sha256": "c977e24f0e5925793c857ab66e432dc21d41e66a5097f474e5bf675683460dc8"
+          },
+          {
+            "page": 19,
+            "native_page_sha256": "e830903c859de465100ee6875454ab178f7c8fd88c429af4d14275b6228aed23"
+          },
+          {
+            "page": 20,
+            "native_page_sha256": "89d4e3c532276856272cc51aba7a255cdf9a0f306e5e7f3e52db5204058b3234"
+          }
+        ],
+        "original_pdf": "/home/python/Quote/data/filings/announcements/blobs/6b/6b75b21b5d6bd23c0b2e83683a3d38cca396e4392233c22267575196c13593fb.pdf",
+        "native_cache": "official shared PDFium artifact; exact page hashes above",
+        "output_used": false
+      },
+      "optional_reference_policy": "Company totals/weights, important inputs, channels, drivers and features checked if asserted; not every exact amount/product subclass required for basic completion",
+      "source_limitations": [
+        "Reference covers concentrated high-value chapters, not full-report completeness.",
+        "Public source claims are attributed disclosures, not independent business due diligence."
+      ]
+    }
+  ],
+  "no_model_output_seen": true,
+  "source_manifest_sha256": "64a8cb486bcc1205b561fc45752a2818223c7c791486b4b4f05f4b60bddb2ee0"
+}

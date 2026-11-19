@@ -1,0 +1,35 @@
+{
+  "task": "6.EA",
+  "production_code_changed": false,
+  "frozen_source_code_unchanged": true,
+  "reused_effective_engineering_checks": 133,
+  "reused_reference": "../workpaper-general-closure-20261119/verification.json",
+  "current_checks": [
+    "all 15 raw runtime hashes unchanged",
+    "all source coordinates equal",
+    "per-company budget and recovery caps",
+    "query/export/fresh/API equality",
+    "254 finite source decisions; all 48 adopted revisions included",
+    "15 API200 and five unstarted404",
+    "OpenSpec strict",
+    "git diff --check"
+  ],
+  "api_external_connections_forbidden": true,
+  "finalization_new_model_requests": 0,
+  "strict_command": "OPENSPEC_TELEMETRY=0 DO_NOT_TRACK=1 openspec validate restore-company-profile-llm-led-generalization --strict",
+  "receipt_files": [
+    "strict.log",
+    "diff-check.log"
+  ],
+  "review": {
+    "blocking": [
+      "stop adapter missed incomplete final-review failure; batch stopped independently, original defect not claimed fixed"
+    ],
+    "business_misuse_avoided": "six objects source_only, no manual business rewriting",
+    "nonblocking": "optional details, supply chain precision, style not expanded",
+    "unrelated": "pre-existing config/core/market changes untouched"
+  },
+  "full_profile_accuracy": "not_assessed",
+  "S2": "not_passed",
+  "production_authorization": "not_authorized"
+}

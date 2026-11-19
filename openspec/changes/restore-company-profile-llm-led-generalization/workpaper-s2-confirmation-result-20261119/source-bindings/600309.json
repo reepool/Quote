@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "600309.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_4402e9ef2f680375231ee59b2bdeca0f",
+    "filing_id": "1225130793",
+    "source": "cninfo",
+    "published_at": "2026-04-20T16:00:00+00:00",
+    "content_hash": "766717cc1a3b74221d4a20892b28152b3180ef5c63d683623e8a903eebddac95",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/76/766717cc1a3b74221d4a20892b28152b3180ef5c63d683623e8a903eebddac95.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "万华化学2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-21/1225130793.PDF"
+  }
+}

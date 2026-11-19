@@ -1,0 +1,74 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "40f3e7e5e73c5cb7c9e2bc3a653eea676e304fbf796959e3bfbb2e0f163e71ba",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 18841,
+        "completion_tokens": 415,
+        "total_tokens": 19256
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 2,
+      "content_sha256": "c18e741923771cfb41d615eada05fc7e618746da6208c57e1a70d44c51f8657c",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 19913,
+        "completion_tokens": 7993,
+        "total_tokens": 27906
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 3,
+      "content_sha256": "1ceae32a5e7366cf9d0fbb629b4480bfb2ada826a0a691747bf907401143f7b0",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 26810,
+        "completion_tokens": 1902,
+        "total_tokens": 57657
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 4,
+      "content_sha256": "7dc42bda530ad8885ea219c023abe859f1abe7a9ebe75f406b15e38e91463831",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 19552,
+        "completion_tokens": 3391,
+        "total_tokens": 22943
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 5,
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finish_reason": null,
+      "usage": {},
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002142/failed-model-content/content-005.json"
+    },
+    {
+      "physical_sequence": 6,
+      "content_sha256": "b63da7eaa6e9dd37defe38a1a6f89cc8ca77856453498bb76a012e286fd61f56",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 24838,
+        "completion_tokens": 1268,
+        "total_tokens": 32108
+      },
+      "retained": false,
+      "retained_path": null
+    }
+  ],
+  "duplicates_not_copied": 5
+}

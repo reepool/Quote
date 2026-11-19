@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "601111.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_ed29ac483fa4026146d4bf9e1a619229",
+    "filing_id": "1225039287",
+    "source": "cninfo",
+    "published_at": "2026-03-26T16:00:00+00:00",
+    "content_hash": "cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/cb/cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "中国国际航空股份有限公司2025年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225039287.PDF"
+  }
+}

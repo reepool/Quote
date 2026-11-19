@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "600438.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_8bfac153c634d42dcc4248808f00ab32",
+    "filing_id": "1225259224",
+    "source": "cninfo",
+    "published_at": "2026-04-29T16:00:00+00:00",
+    "content_hash": "f0bd49a42e0cc42ea8766a6a8b10c70b912904788c4e69a03a9051ff29f4c2e0",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/f0/f0bd49a42e0cc42ea8766a6a8b10c70b912904788c4e69a03a9051ff29f4c2e0.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "通威股份有限公司2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-30/1225259224.PDF"
+  }
+}

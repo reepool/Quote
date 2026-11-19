@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "300144.SZ",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_21996de9298ca924c376282171666a1f",
+    "filing_id": "1225164604",
+    "source": "cninfo",
+    "published_at": "2026-04-23T16:00:00+00:00",
+    "content_hash": "4b7ab7551e2c3066f01257afcf18c9a10a020b9410c5c6bc97a67c328a45cbeb",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/4b/4b7ab7551e2c3066f01257afcf18c9a10a020b9410c5c6bc97a67c328a45cbeb.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-24/1225164604.PDF"
+  }
+}

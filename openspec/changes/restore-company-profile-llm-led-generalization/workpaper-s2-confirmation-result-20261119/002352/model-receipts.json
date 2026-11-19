@@ -1,0 +1,1707 @@
+[
+  {
+    "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "542bdbe09bca73aaca2cd5b95b04c674f1a9fed5ccbadd75876fd9f6008b45cd",
+    "response_hash": "a6f4d0accf7b96f310946cadcaa0896a7d9ca36bb73c22e26480618780cae2fd",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0032\",\"section-0039\",\"section-0075\",\"section-0077\",\"section-0093\",\"section-0095\",\"section-0145\",\"section-0064\"],\"rationale\":\"本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。\",\"deferred\":[\"第九节财务报告中的分部信息与营业收入附注：仅在主营业务分析的收入构成存在实质缺口时定向补充，当前已选主营业务分析，暂不扩读\",\"第五节公司治理、员工、股权激励等：与经营解释关联弱，不纳入\",\"第六节重要事项中的担保、关联交易、募集资金等：非本次经营解释核心，暂缓\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入总额与构成、规模驱动、利润与现金流及展望等公司层面经营解释要点，所选子节互不重叠且信息密度高；行业背景与财务报告附注属次要或定向补充范围，可在不扩读全报告的前提下停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0032",
+        "section-0039",
+        "section-0075",
+        "section-0077",
+        "section-0093",
+        "section-0095",
+        "section-0145",
+        "section-0064"
+      ],
+      "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。",
+      "deferred": [
+        "第九节财务报告中的分部信息与营业收入附注：仅在主营业务分析的收入构成存在实质缺口时定向补充，当前已选主营业务分析，暂不扩读",
+        "第五节公司治理、员工、股权激励等：与经营解释关联弱，不纳入",
+        "第六节重要事项中的担保、关联交易、募集资金等：非本次经营解释核心，暂缓"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入总额与构成、规模驱动、利润与现金流及展望等公司层面经营解释要点，所选子节互不重叠且信息密度高；行业背景与财务报告附注属次要或定向补充范围，可在不扩读全报告的前提下停止。"
+    },
+    "usage": {
+      "input_tokens": 13442,
+      "output_tokens": 404,
+      "total_tokens": 13846
+    }
+  },
+  {
+    "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "d5438e5378ea7ab74d572ee1876c2b939ac5e6896aff6826182dccdcef39a593",
+    "response_hash": "6cdefd13d108fb648c7b342fbdd41fec3f64223ace855b67b525e7062beefe03",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司按经营分部划分为速运及大件分部、同城即时配送分部、供应链及国际分部，另有未分配部分；速运及大件分部内含时效快递、经济快递、快运、冷运及医药等业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"按行业划分，公司营业收入主要来自物流及货运代理业务，另有其他非物流业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"物理页59布局未恢复，分部与业务行之间的层级关系依据原文文字表述整理，未据表格列位置推断。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"公司速运物流业务主要包括时效快递、经济快递、快运、冷运及医药、同城即时配送业务；供应链及国际业务和其他非物流业务不计入速运物流板块的业务量与票均收入统计。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"公司提供国际快递、货运及供应链业务，国际小包服务触达全球200个国家和地区；服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"公司掌握陆运、铁运、海运网络资源并与航空网络协同，可为客户提供国内及跨境多式联运服务，按客户时效与成本需求定制运输解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[\"所选章节未逐项展开各产品子类的服务内容与客户类型，产品用途细节有限。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"2025年集团总营业收入为人民币3,082.3亿元，较2024年同期增长8.37%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"308,226,647\",\"value\":\"308226647\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入合计同比变动\",\"raw_value\":\"8.37%\",\"value\":\"8.37\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"按行业划分，物流及货运代理业务收入为人民币301,499,641千元，占营业收入97.82%；其他非物流业务收入为人民币6,727,006千元，占2.18%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"物流及货运代理营业收入\",\"raw_value\":\"301,499,641\",\"value\":\"301499641\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"物流及货运代理占营业收入比\",\"raw_value\":\"97.82%\",\"value\":\"97.82\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他非物流业务营业收入\",\"raw_value\":\"6,727,006\",\"value\":\"6727006\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他非物流业务占营业收入比\",\"raw_value\":\"2.18%\",\"value\":\"2.18\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"按经营分部划分，速运及大件分部营业收入为人民币217,553,282千元，占70.58%；同城即时配送分部为人民币12,869,890千元，占4.18%；供应链及国际分部为人民币76,345,732千元，占24.77%；未分配部分为人民币1,457,743千元，占0.47%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"速运及大件分部营业收入\",\"raw_value\":\"217,553,282\",\"value\":\"217553282\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"速运及大件分部占营业收入比\",\"raw_value\":\"70.58%\",\"value\":\"70.58\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"同城即时配送分部营业收入\",\"raw_value\":\"12,869,890\",\"value\":\"12869890\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"同城即时配送分部占营业收入比\",\"raw_value\":\"4.18%\",\"value\":\"4.18\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应链及国际分部营业收入\",\"raw_value\":\"76,345,732\",\"value\":\"76345732\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应链及国际分部占营业收入比\",\"raw_value\":\"24.77%\",\"value\":\"24.77\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"未分配部分营业收入\",\"raw_value\":\"1,457,743\",\"value\":\"1457743\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"未分配部分非正常经营业务，原文未说明其具体构成。\"},{\"name\":\"未分配部分占营业收入比\",\"raw_value\":\"0.47%\",\"value\":\"0.47\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"未分配部分非正常经营业务，原文未说明其具体构成。\"}]},{\"fact_id\":\"F-RM-04\",\"text\":\"速运及大件分部内，时效快递收入为人民币131,048,153千元，占42.52%；经济快递为人民币32,052,891千元，占10.40%；快运为人民币42,134,091千元，占13.67%；冷运及医药为人民币10,605,560千元，占3.44%；其他为人民币1,712,587千元，占0.56%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"时效快递营业收入\",\"raw_value\":\"131,048,153\",\"value\":\"131048153\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"时效快递占营业收入比\",\"raw_value\":\"42.52%\",\"value\":\"42.52\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经济快递营业收入\",\"raw_value\":\"32,052,891\",\"value\":\"32052891\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经济快递占营业收入比\",\"raw_value\":\"10.40%\",\"value\":\"10.40\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"快运营业收入\",\"raw_value\":\"42,134,091\",\"value\":\"42134091\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"快运占营业收入比\",\"raw_value\":\"13.67%\",\"value\":\"13.67\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"冷运及医药营业收入\",\"raw_value\":\"10,605,560\",\"value\":\"10605560\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"冷运及医药占营业收入比\",\"raw_value\":\"3.44%\",\"value\":\"3.44\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"速运及大件分部其他营业收入\",\"raw_value\":\"1,712,587\",\"value\":\"1712587\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"速运及大件分部其他占营业收入比\",\"raw_value\":\"0.56%\",\"value\":\"0.56\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-05\",\"text\":\"同城即时配送分部内，同城即时配送收入为人民币12,719,470千元，占4.13%；其他为人民币150,420千元，占0.05%。供应链及国际分部内，供应链及国际收入为人民币72,939,476千元，占23.66%；其他为人民币3,406,256千元，占1.11%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"同城即时配送营业收入\",\"raw_value\":\"12,719,470\",\"value\":\"12719470\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"同城即时配送占营业收入比\",\"raw_value\":\"4.13%\",\"value\":\"4.13\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"同城即时配送分部其他营业收入\",\"raw_value\":\"150,420\",\"value\":\"150420\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应链及国际营业收入\",\"raw_value\":\"72,939,476\",\"value\":\"72939476\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应链及国际占营业收入比\",\"raw_value\":\"23.66%\",\"value\":\"23.66\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应链及国际分部其他营业收入\",\"raw_value\":\"3,406,256\",\"value\":\"3406256\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-06\",\"text\":\"按地区划分，中国内地收入为人民币266,818,257千元，占86.57%；中国港澳台为人民币9,862,009千元，占3.20%；海外为人民币31,546,381千元，占10.23%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"中国内地营业收入\",\"raw_value\":\"266,818,257\",\"value\":\"266818257\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中国内地占营业收入比\",\"raw_value\":\"86.57%\",\"value\":\"86.57\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中国港澳台营业收入\",\"raw_value\":\"9,862,009\",\"value\":\"9862009\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"海外营业收入\",\"raw_value\":\"31,546,381\",\"value\":\"31546381\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"海外占营业收入比\",\"raw_value\":\"10.23%\",\"value\":\"10.23\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"收入构成表按行业、经营分部、地区三种口径分别列示，各口径内部合计为100%，不同口径之间不可直接相加。\",\"物理页59布局未恢复，金额与占比依据原文文字顺序对应，未据表格列位置推断。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年速运物流业务量为166.3亿票，同比增长25.4%；票均收入为人民币13.7元，同比下降11.4%。该统计不包括供应链及国际业务和其他非物流业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"速运物流业务量\",\"raw_value\":\"166.3\",\"value\":\"166.3\",\"unit\":\"亿票\",\"currency\":null,\"source_unit\":\"亿票\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"速运物流业务量同比变动\",\"raw_value\":\"25.4%\",\"value\":\"25.4\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年\"},{\"name\":\"速运物流票均收入\",\"raw_value\":\"13.7\",\"value\":\"13.7\",\"unit\":\"人民币元\",\"currency\":\"CNY\",\"source_unit\":\"人民币元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"速运物流票均收入同比变动\",\"raw_value\":\"-11.4%\",\"value\":\"-11.4\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"2025年公司全球航空货运总量近280万吨，同比增长15%；其中国内航空货量超过190万吨，占中国国内航空货邮运输量的33.1%；国际航空货量近89万吨，同比增长18%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"全球航空货运总量\",\"raw_value\":\"近280万吨\",\"value\":\"280\",\"unit\":\"万吨\",\"currency\":null,\"source_unit\":\"万吨\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"全球航空货运总量同比变动\",\"raw_value\":\"15%\",\"value\":\"15\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年\"},{\"name\":\"国内航空货量\",\"raw_value\":\"超过190万吨\",\"value\":\"190\",\"unit\":\"万吨\",\"currency\":null,\"source_unit\":\"万吨\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"国内航空货量占中国国内航空货邮运输量比\",\"raw_value\":\"33.1%\",\"value\":\"33.1\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国际航空货量\",\"raw_value\":\"近89万吨\",\"value\":\"89\",\"unit\":\"万吨\",\"currency\":null,\"source_unit\":\"万吨\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"国际航空货量同比变动\",\"raw_value\":\"18%\",\"value\":\"18\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年\"}]}],\"limitations\":[\"业务量与票均收入仅覆盖速运物流板块，不含供应链及国际业务和其他非物流业务。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"截至报告期末，公司共运营管理111架全货机，其中顺丰航空自有机队规模达90架；顺丰航空拥有852名飞行员及357对航权时刻资源。2025年度全货机全球累计执飞228条航线、超过6万次航班，触达74个国内站点和63个国际及地区站点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"运营管理全货机数量\",\"raw_value\":\"111\",\"value\":\"111\",\"unit\":\"架\",\"currency\":null,\"source_unit\":\"架\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\"},{\"name\":\"顺丰航空自有机队规模\",\"raw_value\":\"90\",\"value\":\"90\",\"unit\":\"架\",\"currency\":null,\"source_unit\":\"架\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"鄂州货运枢纽转运中心拥有全长52公里的智能分拣线，每小时峰值能处理28万件快递，并配有14条海关智能查验线；2025年度公司全货机在鄂州货运枢纽起降超3万个航班架次，同比增长11%，国际货运吞吐量较2024年同期增长85%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"鄂州枢纽智能分拣线长度\",\"raw_value\":\"52\",\"value\":\"52\",\"unit\":\"公里\",\"currency\":null,\"source_unit\":\"公里\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\"},{\"name\":\"鄂州枢纽每小时峰值处理快递量\",\"raw_value\":\"28\",\"value\":\"28\",\"unit\":\"万件\",\"currency\":null,\"source_unit\":\"万件\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"鄂州枢纽全货机起降架次同比变动\",\"raw_value\":\"11%\",\"value\":\"11\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年\"},{\"name\":\"鄂州枢纽国际货运吞吐量同比变动\",\"raw_value\":\"85%\",\"value\":\"85\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"2025年公司营业成本为人民币2,671.8亿元，较2024年同期增长9.14%；其中物流及货运代理业务成本中，人工成本为人民币129,779,584千元，占营业成本48.57%；运力成本为人民币98,899,597千元，占37.02%；其他经营成本为人民币33,237,811千元，占12.44%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"营业成本合计\",\"raw_value\":\"267,178,276\",\"value\":\"267178276\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本合计同比变动\",\"raw_value\":\"9.14%\",\"value\":\"9.14\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"},{\"name\":\"人工成本\",\"raw_value\":\"129,779,584\",\"value\":\"129779584\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"人工成本占营业成本比\",\"raw_value\":\"48.57%\",\"value\":\"48.57\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"运力成本\",\"raw_value\":\"98,899,597\",\"value\":\"98899597\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"运力成本占营业成本比\",\"raw_value\":\"37.02%\",\"value\":\"37.02\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"成本构成中人工成本与运力成本为物流及货运代理业务口径，且已将外包成本拆分并入，与集团营业成本合计口径不同。\",\"未逐项列示仓储、运输设备等具体资源投入明细。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"公司服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区，国际小包服务触达全球200个国家和地区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"按地区划分，公司收入以中国内地为主，占86.57%；中国港澳台占3.20%，海外占10.23%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"中国内地占营业收入比\",\"raw_value\":\"86.57%\",\"value\":\"86.57\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"海外占营业收入比\",\"raw_value\":\"10.23%\",\"value\":\"10.23\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"公司业务量增长主要得益于持续完善产品矩阵及强化服务竞争力，不断渗透国内生产制造及生活消费领域客户的端到端物流场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]}],\"limitations\":[\"所选章节未披露具体客户名称、客户集中度或渠道结构明细。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"2025年公司净利润为人民币116.8亿元，同比增长14.35%；归属于上市公司股东的净利润为人民币111.2亿元，同比增长9.31%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"净利润\",\"raw_value\":\"116.8\",\"value\":\"116.8\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"source_unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"净利润同比变动\",\"raw_value\":\"14.35%\",\"value\":\"14.35\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"111.2\",\"value\":\"111.2\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"source_unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比变动\",\"raw_value\":\"9.31%\",\"value\":\"9.31\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"速运及大件分部2025年净利润约人民币106.0亿元，同比下降3.46%，主要由于主动市场拓展策略与长期战略投入，包括深化“激活经营”机制、将成本节降效益反哺前端业务拓展，以及强化高品质时效服务的运营保障投入；第四季度盈利能力环比第三季度回升。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"速运及大件分部净利润\",\"raw_value\":\"10,600,973\",\"value\":\"10600973\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"速运及大件分部净利润同比变动\",\"raw_value\":\"-3.46%\",\"value\":\"-3.46\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"同城即时配送分部2025年净利润约人民币2.8亿元，同比增长109.66%，主要得益于即时配送行业需求增加带来业务快速增长、业务结构更加健康，以及精益管理与科技赋能推动运营提质增效。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"同城即时配送分部净利润\",\"raw_value\":\"277,718\",\"value\":\"277718\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"同城即时配送分部净利润同比变动\",\"raw_value\":\"109.66%\",\"value\":\"109.66\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"}]},{\"fact_id\":\"F-OD-04\",\"text\":\"供应链及国际分部2025年净利润约人民币1.9亿元，实现扭亏为盈，较2024年同期增加人民币9.5亿元，主要由于海外子公司KEX通过业务结构调优与精益经营降本实现同比大幅减亏；若不考虑KEX因素，该分部净利润同比增长53.50%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"供应链及国际分部净利润\",\"raw_value\":\"187,640\",\"value\":\"187640\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应链及国际分部净利润同比变动\",\"raw_value\":\"124.63%\",\"value\":\"124.63\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"},{\"name\":\"供应链及国际分部净利润同比增加额\",\"raw_value\":\"9.5\",\"value\":\"9.5\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"source_unit\":\"亿元\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"},{\"name\":\"供应链及国际分部净利润同比变动（不考虑KEX）\",\"raw_value\":\"53.50%\",\"value\":\"53.50\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期，不考虑KEX因素\"}]},{\"fact_id\":\"F-OD-05\",\"text\":\"2025年公司经营活动产生的现金流量净额为人民币275.6亿元，较2024年同期减少14.39%，主要受支付的各项税费及业务结构变化带来经营性往来结算节奏变化的综合影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"27,555,275\",\"value\":\"27555275\",\"unit\":\"人民币千元\",\"currency\":\"CNY\",\"source_unit\":\"人民币千元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额同比变动\",\"raw_value\":\"-14.39%\",\"value\":\"-14.39\",\"unit\":\"%\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较2024年同期\"}]}],\"limitations\":[\"未分配部分净利润约人民币6.5亿元主要含转让三家持有物业的全资子公司至南方顺丰物流REIT的股权处置收益（税后人民币5.9亿元），属非经常性事项，未单独列示为经营驱动。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"票均收入同比下降11.4%，主要由于产品结构变化导致；公司逐步调优市场策略与业务结构，自2025年9月份起月度票均收入的同比降幅呈现持续收窄趋势。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"公司于2025年将并购KLN相关的融资利息费用人民币5.6亿元划分至未分配部分，并重述比较期间数据，将2024年同项费用人民币5.6亿元划分至未分配部分。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"并购KLN相关融资利息费用\",\"raw_value\":\"5.6\",\"value\":\"5.6\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"source_unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-03\",\"text\":\"报告期内公司将三家持有物业的全资子公司转让至南方顺丰物流REIT，产生股权处置收益（税后金额为人民币5.9亿元），计入未分配部分。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"股权处置收益（税后）\",\"raw_value\":\"5.9\",\"value\":\"5.9\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"source_unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-04\",\"text\":\"公司战略以“亚洲唯一”为核心，标准产品业务坚持小件与大件双轮驱动，供应链业务聚焦重点行业端到端解决方案，国际业务瞄准亚太市场并强化关键航线航空货运资源及海运、陆运、铁路、清关等环节协同。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]}],\"limitations\":[\"未来展望中的战略方向属计划性表述，不代表已实现的经营结果。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P1\",\"text\":\"公司为综合物流服务商，业务涵盖快递、快运、冷运及医药、同城即时配送、供应链及国际业务，并提供国内及跨境多式联运服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0009\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U1\",\"text\":\"公司物流网络运营中部分环节采用外包资源，营业成本中人工成本与运力成本合计占比较高，其中运力成本包含运输成本及外包运力拆分。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-SC-U2\",\"text\":\"公司掌握陆运、铁运、海运网络资源，并与国内国际多家客运航空公司合作使用客机腹仓资源作为航空运力补充；2025年通过全球超过206万次客运航班资源累计发货超过137万吨。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"通过客运航班资源累计发货量\",\"raw_value\":\"超过137万吨\",\"value\":\"137\",\"unit\":\"万吨\",\"currency\":null,\"source_unit\":\"万吨\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]}],\"limitations\":[\"未披露具体外包供应商名称或单一材料供应商信息。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D1\",\"text\":\"公司客户覆盖国内生产制造及生活消费领域，提供端到端物流场景服务；国际业务服务海外95个国家及地区，国际小包服务触达全球200个国家和地区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0009\"]}],\"limitations\":[\"未披露具体客户名称或客户集中度。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司拥有中国最大、全球前列的货运航空公司，为中国航空货运最大货主；鄂州货运枢纽为亚洲第一、全球第四座以航空货运为主的物流枢纽，具有战略价值和稀缺性。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司战略愿景为“成为备受尊重全球领先的数智物流解决方案服务商”，通过标准产品、供应链、国际三大板块深度协同，释放“1+1+1>3”的战略红利。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]}],\"limitations\":[\"战略愿景与协同效应属计划性表述，非当前经营结果。\"]},\"limitations\":[\"物理页21、22、26、27、49、50、59、60、61、67、68、69、80、81布局未恢复，表格列关系未核定，金额与占比依据原文文字顺序对应，未据表格列位置推断。\",\"所选章节未逐项展开各产品子类的服务内容、客户类型及渠道结构明细。\",\"未分配部分及分部间调整的具体构成未在所选章节详细说明。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司按经营分部划分为速运及大件分部、同城即时配送分部、供应链及国际分部，另有未分配部分；速运及大件分部内含时效快递、经济快递、快运、冷运及医药等业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "按行业划分，公司营业收入主要来自物流及货运代理业务，另有其他非物流业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": [
+            "物理页59布局未恢复，分部与业务行之间的层级关系依据原文文字表述整理，未据表格列位置推断。"
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "公司速运物流业务主要包括时效快递、经济快递、快运、冷运及医药、同城即时配送业务；供应链及国际业务和其他非物流业务不计入速运物流板块的业务量与票均收入统计。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "公司提供国际快递、货运及供应链业务，国际小包服务触达全球200个国家和地区；服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "公司掌握陆运、铁运、海运网络资源并与航空网络协同，可为客户提供国内及跨境多式联运服务，按客户时效与成本需求定制运输解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": [
+            "所选章节未逐项展开各产品子类的服务内容与客户类型，产品用途细节有限。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "2025年集团总营业收入为人民币3,082.3亿元，较2024年同期增长8.37%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "308,226,647",
+                  "value": "308226647",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入合计同比变动",
+                  "raw_value": "8.37%",
+                  "value": "8.37",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "按行业划分，物流及货运代理业务收入为人民币301,499,641千元，占营业收入97.82%；其他非物流业务收入为人民币6,727,006千元，占2.18%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "物流及货运代理营业收入",
+                  "raw_value": "301,499,641",
+                  "value": "301499641",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "物流及货运代理占营业收入比",
+                  "raw_value": "97.82%",
+                  "value": "97.82",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他非物流业务营业收入",
+                  "raw_value": "6,727,006",
+                  "value": "6727006",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他非物流业务占营业收入比",
+                  "raw_value": "2.18%",
+                  "value": "2.18",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "按经营分部划分，速运及大件分部营业收入为人民币217,553,282千元，占70.58%；同城即时配送分部为人民币12,869,890千元，占4.18%；供应链及国际分部为人民币76,345,732千元，占24.77%；未分配部分为人民币1,457,743千元，占0.47%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "速运及大件分部营业收入",
+                  "raw_value": "217,553,282",
+                  "value": "217553282",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "速运及大件分部占营业收入比",
+                  "raw_value": "70.58%",
+                  "value": "70.58",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "同城即时配送分部营业收入",
+                  "raw_value": "12,869,890",
+                  "value": "12869890",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "同城即时配送分部占营业收入比",
+                  "raw_value": "4.18%",
+                  "value": "4.18",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "供应链及国际分部营业收入",
+                  "raw_value": "76,345,732",
+                  "value": "76345732",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "供应链及国际分部占营业收入比",
+                  "raw_value": "24.77%",
+                  "value": "24.77",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "未分配部分营业收入",
+                  "raw_value": "1,457,743",
+                  "value": "1457743",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "unclear",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "未分配部分非正常经营业务，原文未说明其具体构成。"
+                },
+                {
+                  "name": "未分配部分占营业收入比",
+                  "raw_value": "0.47%",
+                  "value": "0.47",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "unclear",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "未分配部分非正常经营业务，原文未说明其具体构成。"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-04",
+              "text": "速运及大件分部内，时效快递收入为人民币131,048,153千元，占42.52%；经济快递为人民币32,052,891千元，占10.40%；快运为人民币42,134,091千元，占13.67%；冷运及医药为人民币10,605,560千元，占3.44%；其他为人民币1,712,587千元，占0.56%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "时效快递营业收入",
+                  "raw_value": "131,048,153",
+                  "value": "131048153",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "时效快递占营业收入比",
+                  "raw_value": "42.52%",
+                  "value": "42.52",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经济快递营业收入",
+                  "raw_value": "32,052,891",
+                  "value": "32052891",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经济快递占营业收入比",
+                  "raw_value": "10.40%",
+                  "value": "10.40",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "快运营业收入",
+                  "raw_value": "42,134,091",
+                  "value": "42134091",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "快运占营业收入比",
+                  "raw_value": "13.67%",
+                  "value": "13.67",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "冷运及医药营业收入",
+                  "raw_value": "10,605,560",
+                  "value": "10605560",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "冷运及医药占营业收入比",
+                  "raw_value": "3.44%",
+                  "value": "3.44",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "速运及大件分部其他营业收入",
+                  "raw_value": "1,712,587",
+                  "value": "1712587",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "速运及大件分部其他占营业收入比",
+                  "raw_value": "0.56%",
+                  "value": "0.56",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-05",
+              "text": "同城即时配送分部内，同城即时配送收入为人民币12,719,470千元，占4.13%；其他为人民币150,420千元，占0.05%。供应链及国际分部内，供应链及国际收入为人民币72,939,476千元，占23.66%；其他为人民币3,406,256千元，占1.11%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "同城即时配送营业收入",
+                  "raw_value": "12,719,470",
+                  "value": "12719470",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "同城即时配送占营业收入比",
+                  "raw_value": "4.13%",
+                  "value": "4.13",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "同城即时配送分部其他营业收入",
+                  "raw_value": "150,420",
+                  "value": "150420",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "供应链及国际营业收入",
+                  "raw_value": "72,939,476",
+                  "value": "72939476",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "供应链及国际占营业收入比",
+                  "raw_value": "23.66%",
+                  "value": "23.66",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "供应链及国际分部其他营业收入",
+                  "raw_value": "3,406,256",
+                  "value": "3406256",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-06",
+              "text": "按地区划分，中国内地收入为人民币266,818,257千元，占86.57%；中国港澳台为人民币9,862,009千元，占3.20%；海外为人民币31,546,381千元，占10.23%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "中国内地营业收入",
+                  "raw_value": "266,818,257",
+                  "value": "266818257",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中国内地占营业收入比",
+                  "raw_value": "86.57%",
+                  "value": "86.57",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中国港澳台营业收入",
+                  "raw_value": "9,862,009",
+                  "value": "9862009",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海外营业收入",
+                  "raw_value": "31,546,381",
+                  "value": "31546381",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海外占营业收入比",
+                  "raw_value": "10.23%",
+                  "value": "10.23",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "收入构成表按行业、经营分部、地区三种口径分别列示，各口径内部合计为100%，不同口径之间不可直接相加。",
+            "物理页59布局未恢复，金额与占比依据原文文字顺序对应，未据表格列位置推断。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年速运物流业务量为166.3亿票，同比增长25.4%；票均收入为人民币13.7元，同比下降11.4%。该统计不包括供应链及国际业务和其他非物流业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "速运物流业务量",
+                  "raw_value": "166.3",
+                  "value": "166.3",
+                  "unit": "亿票",
+                  "currency": null,
+                  "source_unit": "亿票",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "速运物流业务量同比变动",
+                  "raw_value": "25.4%",
+                  "value": "25.4",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年"
+                },
+                {
+                  "name": "速运物流票均收入",
+                  "raw_value": "13.7",
+                  "value": "13.7",
+                  "unit": "人民币元",
+                  "currency": "CNY",
+                  "source_unit": "人民币元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "速运物流票均收入同比变动",
+                  "raw_value": "-11.4%",
+                  "value": "-11.4",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "2025年公司全球航空货运总量近280万吨，同比增长15%；其中国内航空货量超过190万吨，占中国国内航空货邮运输量的33.1%；国际航空货量近89万吨，同比增长18%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "全球航空货运总量",
+                  "raw_value": "近280万吨",
+                  "value": "280",
+                  "unit": "万吨",
+                  "currency": null,
+                  "source_unit": "万吨",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "全球航空货运总量同比变动",
+                  "raw_value": "15%",
+                  "value": "15",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年"
+                },
+                {
+                  "name": "国内航空货量",
+                  "raw_value": "超过190万吨",
+                  "value": "190",
+                  "unit": "万吨",
+                  "currency": null,
+                  "source_unit": "万吨",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "国内航空货量占中国国内航空货邮运输量比",
+                  "raw_value": "33.1%",
+                  "value": "33.1",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国际航空货量",
+                  "raw_value": "近89万吨",
+                  "value": "89",
+                  "unit": "万吨",
+                  "currency": null,
+                  "source_unit": "万吨",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "国际航空货量同比变动",
+                  "raw_value": "18%",
+                  "value": "18",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "业务量与票均收入仅覆盖速运物流板块，不含供应链及国际业务和其他非物流业务。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "截至报告期末，公司共运营管理111架全货机，其中顺丰航空自有机队规模达90架；顺丰航空拥有852名飞行员及357对航权时刻资源。2025年度全货机全球累计执飞228条航线、超过6万次航班，触达74个国内站点和63个国际及地区站点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "运营管理全货机数量",
+                  "raw_value": "111",
+                  "value": "111",
+                  "unit": "架",
+                  "currency": null,
+                  "source_unit": "架",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025-12-31",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "顺丰航空自有机队规模",
+                  "raw_value": "90",
+                  "value": "90",
+                  "unit": "架",
+                  "currency": null,
+                  "source_unit": "架",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025-12-31",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "鄂州货运枢纽转运中心拥有全长52公里的智能分拣线，每小时峰值能处理28万件快递，并配有14条海关智能查验线；2025年度公司全货机在鄂州货运枢纽起降超3万个航班架次，同比增长11%，国际货运吞吐量较2024年同期增长85%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "鄂州枢纽智能分拣线长度",
+                  "raw_value": "52",
+                  "value": "52",
+                  "unit": "公里",
+                  "currency": null,
+                  "source_unit": "公里",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025-12-31",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鄂州枢纽每小时峰值处理快递量",
+                  "raw_value": "28",
+                  "value": "28",
+                  "unit": "万件",
+                  "currency": null,
+                  "source_unit": "万件",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鄂州枢纽全货机起降架次同比变动",
+                  "raw_value": "11%",
+                  "value": "11",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年"
+                },
+                {
+                  "name": "鄂州枢纽国际货运吞吐量同比变动",
+                  "raw_value": "85%",
+                  "value": "85",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "2025年公司营业成本为人民币2,671.8亿元，较2024年同期增长9.14%；其中物流及货运代理业务成本中，人工成本为人民币129,779,584千元，占营业成本48.57%；运力成本为人民币98,899,597千元，占37.02%；其他经营成本为人民币33,237,811千元，占12.44%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本合计",
+                  "raw_value": "267,178,276",
+                  "value": "267178276",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本合计同比变动",
+                  "raw_value": "9.14%",
+                  "value": "9.14",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                },
+                {
+                  "name": "人工成本",
+                  "raw_value": "129,779,584",
+                  "value": "129779584",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "人工成本占营业成本比",
+                  "raw_value": "48.57%",
+                  "value": "48.57",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "运力成本",
+                  "raw_value": "98,899,597",
+                  "value": "98899597",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "运力成本占营业成本比",
+                  "raw_value": "37.02%",
+                  "value": "37.02",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "成本构成中人工成本与运力成本为物流及货运代理业务口径，且已将外包成本拆分并入，与集团营业成本合计口径不同。",
+            "未逐项列示仓储、运输设备等具体资源投入明细。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "公司服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区，国际小包服务触达全球200个国家和地区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "按地区划分，公司收入以中国内地为主，占86.57%；中国港澳台占3.20%，海外占10.23%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "中国内地占营业收入比",
+                  "raw_value": "86.57%",
+                  "value": "86.57",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海外占营业收入比",
+                  "raw_value": "10.23%",
+                  "value": "10.23",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "公司业务量增长主要得益于持续完善产品矩阵及强化服务竞争力，不断渗透国内生产制造及生活消费领域客户的端到端物流场景。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "所选章节未披露具体客户名称、客户集中度或渠道结构明细。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "2025年公司净利润为人民币116.8亿元，同比增长14.35%；归属于上市公司股东的净利润为人民币111.2亿元，同比增长9.31%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "净利润",
+                  "raw_value": "116.8",
+                  "value": "116.8",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "source_unit": "亿元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净利润同比变动",
+                  "raw_value": "14.35%",
+                  "value": "14.35",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "111.2",
+                  "value": "111.2",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "source_unit": "亿元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比变动",
+                  "raw_value": "9.31%",
+                  "value": "9.31",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "速运及大件分部2025年净利润约人民币106.0亿元，同比下降3.46%，主要由于主动市场拓展策略与长期战略投入，包括深化“激活经营”机制、将成本节降效益反哺前端业务拓展，以及强化高品质时效服务的运营保障投入；第四季度盈利能力环比第三季度回升。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "速运及大件分部净利润",
+                  "raw_value": "10,600,973",
+                  "value": "10600973",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "速运及大件分部净利润同比变动",
+                  "raw_value": "-3.46%",
+                  "value": "-3.46",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "同城即时配送分部2025年净利润约人民币2.8亿元，同比增长109.66%，主要得益于即时配送行业需求增加带来业务快速增长、业务结构更加健康，以及精益管理与科技赋能推动运营提质增效。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "同城即时配送分部净利润",
+                  "raw_value": "277,718",
+                  "value": "277718",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "同城即时配送分部净利润同比变动",
+                  "raw_value": "109.66%",
+                  "value": "109.66",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "供应链及国际分部2025年净利润约人民币1.9亿元，实现扭亏为盈，较2024年同期增加人民币9.5亿元，主要由于海外子公司KEX通过业务结构调优与精益经营降本实现同比大幅减亏；若不考虑KEX因素，该分部净利润同比增长53.50%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "供应链及国际分部净利润",
+                  "raw_value": "187,640",
+                  "value": "187640",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "供应链及国际分部净利润同比变动",
+                  "raw_value": "124.63%",
+                  "value": "124.63",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                },
+                {
+                  "name": "供应链及国际分部净利润同比增加额",
+                  "raw_value": "9.5",
+                  "value": "9.5",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "source_unit": "亿元",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                },
+                {
+                  "name": "供应链及国际分部净利润同比变动（不考虑KEX）",
+                  "raw_value": "53.50%",
+                  "value": "53.50",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期，不考虑KEX因素"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-05",
+              "text": "2025年公司经营活动产生的现金流量净额为人民币275.6亿元，较2024年同期减少14.39%，主要受支付的各项税费及业务结构变化带来经营性往来结算节奏变化的综合影响。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "27,555,275",
+                  "value": "27555275",
+                  "unit": "人民币千元",
+                  "currency": "CNY",
+                  "source_unit": "人民币千元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额同比变动",
+                  "raw_value": "-14.39%",
+                  "value": "-14.39",
+                  "unit": "%",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较2024年同期"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未分配部分净利润约人民币6.5亿元主要含转让三家持有物业的全资子公司至南方顺丰物流REIT的股权处置收益（税后人民币5.9亿元），属非经常性事项，未单独列示为经营驱动。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "票均收入同比下降11.4%，主要由于产品结构变化导致；公司逐步调优市场策略与业务结构，自2025年9月份起月度票均收入的同比降幅呈现持续收窄趋势。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "公司于2025年将并购KLN相关的融资利息费用人民币5.6亿元划分至未分配部分，并重述比较期间数据，将2024年同项费用人民币5.6亿元划分至未分配部分。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "并购KLN相关融资利息费用",
+                  "raw_value": "5.6",
+                  "value": "5.6",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "source_unit": "亿元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "报告期内公司将三家持有物业的全资子公司转让至南方顺丰物流REIT，产生股权处置收益（税后金额为人民币5.9亿元），计入未分配部分。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "股权处置收益（税后）",
+                  "raw_value": "5.9",
+                  "value": "5.9",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "source_unit": "亿元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-04",
+              "text": "公司战略以“亚洲唯一”为核心，标准产品业务坚持小件与大件双轮驱动，供应链业务聚焦重点行业端到端解决方案，国际业务瞄准亚太市场并强化关键航线航空货运资源及海运、陆运、铁路、清关等环节协同。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            }
+          ],
+          "limitations": [
+            "未来展望中的战略方向属计划性表述，不代表已实现的经营结果。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-P1",
+              "text": "公司为综合物流服务商，业务涵盖快递、快运、冷运及医药、同城即时配送、供应链及国际业务，并提供国内及跨境多式联运服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-U1",
+              "text": "公司物流网络运营中部分环节采用外包资源，营业成本中人工成本与运力成本合计占比较高，其中运力成本包含运输成本及外包运力拆分。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-SC-U2",
+              "text": "公司掌握陆运、铁运、海运网络资源，并与国内国际多家客运航空公司合作使用客机腹仓资源作为航空运力补充；2025年通过全球超过206万次客运航班资源累计发货超过137万吨。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "通过客运航班资源累计发货量",
+                  "raw_value": "超过137万吨",
+                  "value": "137",
+                  "unit": "万吨",
+                  "currency": null,
+                  "source_unit": "万吨",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体外包供应商名称或单一材料供应商信息。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-D1",
+              "text": "公司客户覆盖国内生产制造及生活消费领域，提供端到端物流场景服务；国际业务服务海外95个国家及地区，国际小包服务触达全球200个国家和地区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称或客户集中度。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "公司拥有中国最大、全球前列的货运航空公司，为中国航空货运最大货主；鄂州货运枢纽为亚洲第一、全球第四座以航空货运为主的物流枢纽，具有战略价值和稀缺性。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ]
+          },
+          {
+            "fact_id": "F-CF-02",
+            "text": "公司战略愿景为“成为备受尊重全球领先的数智物流解决方案服务商”，通过标准产品、供应链、国际三大板块深度协同，释放“1+1+1>3”的战略红利。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0015"
+            ]
+          }
+        ],
+        "limitations": [
+          "战略愿景与协同效应属计划性表述，非当前经营结果。"
+        ]
+      },
+      "limitations": [
+        "物理页21、22、26、27、49、50、59、60、61、67、68、69、80、81布局未恢复，表格列关系未核定，金额与占比依据原文文字顺序对应，未据表格列位置推断。",
+        "所选章节未逐项展开各产品子类的服务内容、客户类型及渠道结构明细。",
+        "未分配部分及分部间调整的具体构成未在所选章节详细说明。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 12270,
+      "output_tokens": 8399,
+      "total_tokens": 20669
+    }
+  },
+  {
+    "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "75ad4ff1b13a8374f7c654e9e259376864d60b63ecf40c30e04e2a23383279cf",
+    "response_hash": "58f7498a52e666dd7233a615ea023c0f153bd1b761ac527de93ea7ddf35c775d",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"WR-001\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-RM-02\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"按行业划分的物流及货运代理、其他非物流业务是行业行，不是集团整体。来源列示物流及货运代理收入301,499,641千元、占营业收入97.82%，其他非物流业务6,727,006千元、占2.18%，集团营业收入合计另为308,226,647千元。事实正文按行业描述集团收入构成可以保留，但四项指标的subject_scope均标为consolidated_group，把行业行金额继承成了集团口径。应改为business_segment，并在指标名称中保留原行业类别；不得把任一行业行改标成集团营业收入合计。\"},{\"finding_id\":\"WR-002\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-SM-01\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"来源注1明确，速运物流业务量及票均收入只包括时效快递、经济快递、快运、冷运及医药、同城即时配送，不包括供应链及国际业务和其他非物流业务。166.3亿票、同比25.4%、票均收入13.7元、同比-11.4%都属于该较窄口径。事实正文已写明排除范围，但事实及四项指标的subject_scope仍为consolidated_group，与来源给出的更窄对象矛盾，会使件量和票均收入被当成集团整体指标。应改为business_segment，并保留排除供应链及国际、其他非物流的限定。\"},{\"finding_id\":\"WR-003\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-01\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"票均收入同比下降11.4%，以及自2025年9月起月度同比降幅持续收窄，均位于“速运物流业务的业务量及票均收入情况”之下，统计不含供应链及国际业务和其他非物流业务。事实未写明速运物流，且subject_scope为consolidated_group，会把该降幅理解成公司整体票均收入变化。应限定为速运物流业务票均收入，subject_scope改为business_segment；公司调优市场策略的表述可保留，但不得把票均收入主体扩成集团。\"},{\"finding_id\":\"WR-004\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F-OD-04\",\"evidence_ids\":[\"source-0011\"],\"explanation\":\"利润分析附注载明，2025年将并购KLN相关融资利息费用人民币5.6亿元划分至未分配部分，并对2024年比较期按同一金额重述。比较期已同步重述，各分部净利润同比变动可继续沿用表格数字，不必改已列金额。但供应链及国际分部2025年净利润约1.9亿元（187,640千元）已不含该项利息；该分部占营业收入24.77%，缺少这一重分类说明会改变对其盈利水平的理解。应补充该利息划出及比较期重述，金额采用正文“人民币5.6亿”，不要按千元利润表猜测换算。此为口径补充，不否定已列示的分部利润。\"},{\"finding_id\":\"WR-005\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-CC-03\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"来源原句主语是速运物流业务的业务量增长，原因是渗透国内生产制造及生活消费客户的端到端场景。事实改成“公司业务量增长”，把主体扩到集团，覆盖了并不计入该业务量的供应链及国际等业务。应改回速运物流业务量，subject_scope改为business_segment。因果表述本身有来源支持，不必删除。\"},{\"finding_id\":\"WR-006\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F-PS-02\",\"evidence_ids\":[\"source-0005\"],\"explanation\":\"服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区，国际小包触达200个国家和地区，来源均限定为截至报告期末，不是2025年全年发生额。事实period标为2025年度，正文也未保留“截至报告期末”。应改为2025-12-31或截至报告期末，覆盖范围本身不必改。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-RM-04\",\"F-RM-05\",\"F-RM-06\",\"F-SM-01\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-OD-05\",\"F-MC-01\",\"F-MC-03\",\"F-MC-04\",\"F-CF-01\",\"F-CF-02\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "WR-001",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-RM-02",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "按行业划分的物流及货运代理、其他非物流业务是行业行，不是集团整体。来源列示物流及货运代理收入301,499,641千元、占营业收入97.82%，其他非物流业务6,727,006千元、占2.18%，集团营业收入合计另为308,226,647千元。事实正文按行业描述集团收入构成可以保留，但四项指标的subject_scope均标为consolidated_group，把行业行金额继承成了集团口径。应改为business_segment，并在指标名称中保留原行业类别；不得把任一行业行改标成集团营业收入合计。"
+        },
+        {
+          "finding_id": "WR-002",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-SM-01",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "来源注1明确，速运物流业务量及票均收入只包括时效快递、经济快递、快运、冷运及医药、同城即时配送，不包括供应链及国际业务和其他非物流业务。166.3亿票、同比25.4%、票均收入13.7元、同比-11.4%都属于该较窄口径。事实正文已写明排除范围，但事实及四项指标的subject_scope仍为consolidated_group，与来源给出的更窄对象矛盾，会使件量和票均收入被当成集团整体指标。应改为business_segment，并保留排除供应链及国际、其他非物流的限定。"
+        },
+        {
+          "finding_id": "WR-003",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-MC-01",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "票均收入同比下降11.4%，以及自2025年9月起月度同比降幅持续收窄，均位于“速运物流业务的业务量及票均收入情况”之下，统计不含供应链及国际业务和其他非物流业务。事实未写明速运物流，且subject_scope为consolidated_group，会把该降幅理解成公司整体票均收入变化。应限定为速运物流业务票均收入，subject_scope改为business_segment；公司调优市场策略的表述可保留，但不得把票均收入主体扩成集团。"
+        },
+        {
+          "finding_id": "WR-004",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F-OD-04",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "利润分析附注载明，2025年将并购KLN相关融资利息费用人民币5.6亿元划分至未分配部分，并对2024年比较期按同一金额重述。比较期已同步重述，各分部净利润同比变动可继续沿用表格数字，不必改已列金额。但供应链及国际分部2025年净利润约1.9亿元（187,640千元）已不含该项利息；该分部占营业收入24.77%，缺少这一重分类说明会改变对其盈利水平的理解。应补充该利息划出及比较期重述，金额采用正文“人民币5.6亿”，不要按千元利润表猜测换算。此为口径补充，不否定已列示的分部利润。"
+        },
+        {
+          "finding_id": "WR-005",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-CC-03",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "来源原句主语是速运物流业务的业务量增长，原因是渗透国内生产制造及生活消费客户的端到端场景。事实改成“公司业务量增长”，把主体扩到集团，覆盖了并不计入该业务量的供应链及国际等业务。应改回速运物流业务量，subject_scope改为business_segment。因果表述本身有来源支持，不必删除。"
+        },
+        {
+          "finding_id": "WR-006",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F-PS-02",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区，国际小包触达200个国家和地区，来源均限定为截至报告期末，不是2025年全年发生额。事实period标为2025年度，正文也未保留“截至报告期末”。应改为2025-12-31或截至报告期末，覆盖范围本身不必改。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-RM-04",
+        "F-RM-05",
+        "F-RM-06",
+        "F-SM-01",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-OD-05",
+        "F-MC-01",
+        "F-MC-03",
+        "F-MC-04",
+        "F-CF-01",
+        "F-CF-02"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19072,
+      "output_tokens": 1313,
+      "total_tokens": 53541
+    }
+  },
+  {
+    "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "0b21049d3720830400b86f256e8eb352dc679ce02fc240596309f2637c2e9ff2",
+    "response_hash": "1ed0cf33ddac9a849a7fe56fd5b4eb8dc0e5fe492a9d572222071dd8af757cf8",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-RM-02\",\"text\":\"按行业划分，物流及货运代理业务收入为人民币301,499,641千元，占营业收入97.82%；其他非物流业务收入为人民币6,727,006千元，占2.18%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"物流及货运代理营业收入\",\"raw_value\":\"301,499,641\",\"value\":\"301499641\",\"unit\":\"人民币千元\",\"source_unit\":\"人民币千元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"物流及货运代理占营业收入比\",\"raw_value\":\"97.82%\",\"value\":\"97.82\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他非物流业务营业收入\",\"raw_value\":\"6,727,006\",\"value\":\"6727006\",\"unit\":\"人民币千元\",\"source_unit\":\"人民币千元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他非物流业务占营业收入比\",\"raw_value\":\"2.18%\",\"value\":\"2.18\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-SM-01\",\"text\":\"2025年速运物流业务量为166.3亿票，同比增长25.4%；票均收入为人民币13.7元，同比下降11.4%。该统计不包括供应链及国际业务和其他非物流业务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"速运物流业务量\",\"raw_value\":\"166.3\",\"value\":\"166.3\",\"unit\":\"亿票\",\"source_unit\":\"亿票\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"速运物流业务量同比变动\",\"raw_value\":\"25.4%\",\"value\":\"25.4\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"较2024年\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"速运物流票均收入\",\"raw_value\":\"13.7\",\"value\":\"13.7\",\"unit\":\"人民币元\",\"source_unit\":\"人民币元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"速运物流票均收入同比变动\",\"raw_value\":\"-11.4%\",\"value\":\"-11.4\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"较2024年\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-MC-01\",\"text\":\"速运物流业务票均收入同比下降11.4%，主要由于产品结构变化导致；公司逐步调优市场策略与业务结构，自2025年9月份起月度票均收入的同比降幅呈现持续收窄趋势。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:WR-004\",\"text\":\"本集团于2025年将并购KLN相关的融资利息费用人民币5.6亿元划分至未分配部分，并重述比较期间的数据，将2024年并购KLN相关的融资利息费用人民币5.6亿元划分至未分配部分。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"并购KLN相关融资利息费用划分至未分配部分金额\",\"raw_value\":\"人民币5.6亿\",\"value\":null,\"unit\":\"亿元\",\"source_unit\":\"人民币\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"来源正文以“人民币5.6亿”表述，未给出精确到千元的金额，不按利润表换算。\"}],\"uncertainty_reason\":\"金额采用正文“人民币5.6亿”表述，未换算为千元。\"},{\"fact_id\":\"F-CC-03\",\"text\":\"速运物流业务量增长主要得益于持续完善产品矩阵及强化服务竞争力，不断渗透国内生产制造及生活消费领域客户的端到端物流场景。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-PS-02\",\"text\":\"截至报告期末，公司提供国际快递、货运及供应链业务，国际小包服务触达全球200个国家和地区；服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告期末（2025-12-31）\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-RM-02",
+          "text": "按行业划分，物流及货运代理业务收入为人民币301,499,641千元，占营业收入97.82%；其他非物流业务收入为人民币6,727,006千元，占2.18%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "物流及货运代理营业收入",
+              "raw_value": "301,499,641",
+              "value": "301499641",
+              "unit": "人民币千元",
+              "source_unit": "人民币千元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "物流及货运代理占营业收入比",
+              "raw_value": "97.82%",
+              "value": "97.82",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他非物流业务营业收入",
+              "raw_value": "6,727,006",
+              "value": "6727006",
+              "unit": "人民币千元",
+              "source_unit": "人民币千元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他非物流业务占营业收入比",
+              "raw_value": "2.18%",
+              "value": "2.18",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SM-01",
+          "text": "2025年速运物流业务量为166.3亿票，同比增长25.4%；票均收入为人民币13.7元，同比下降11.4%。该统计不包括供应链及国际业务和其他非物流业务。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "速运物流业务量",
+              "raw_value": "166.3",
+              "value": "166.3",
+              "unit": "亿票",
+              "source_unit": "亿票",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "速运物流业务量同比变动",
+              "raw_value": "25.4%",
+              "value": "25.4",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "较2024年",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "速运物流票均收入",
+              "raw_value": "13.7",
+              "value": "13.7",
+              "unit": "人民币元",
+              "source_unit": "人民币元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "速运物流票均收入同比变动",
+              "raw_value": "-11.4%",
+              "value": "-11.4",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "较2024年",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-MC-01",
+          "text": "速运物流业务票均收入同比下降11.4%，主要由于产品结构变化导致；公司逐步调优市场策略与业务结构，自2025年9月份起月度票均收入的同比降幅呈现持续收窄趋势。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:WR-004",
+          "text": "本集团于2025年将并购KLN相关的融资利息费用人民币5.6亿元划分至未分配部分，并重述比较期间的数据，将2024年并购KLN相关的融资利息费用人民币5.6亿元划分至未分配部分。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "并购KLN相关融资利息费用划分至未分配部分金额",
+              "raw_value": "人民币5.6亿",
+              "value": null,
+              "unit": "亿元",
+              "source_unit": "人民币",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "来源正文以“人民币5.6亿”表述，未给出精确到千元的金额，不按利润表换算。"
+            }
+          ],
+          "uncertainty_reason": "金额采用正文“人民币5.6亿”表述，未换算为千元。"
+        },
+        {
+          "fact_id": "F-CC-03",
+          "text": "速运物流业务量增长主要得益于持续完善产品矩阵及强化服务竞争力，不断渗透国内生产制造及生活消费领域客户的端到端物流场景。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-PS-02",
+          "text": "截至报告期末，公司提供国际快递、货运及供应链业务，国际小包服务触达全球200个国家和地区；服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区。",
+          "subject_scope": "consolidated_group",
+          "period": "截至报告期末（2025-12-31）",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10154,
+      "output_tokens": 1296,
+      "total_tokens": 11450
+    }
+  }
+]

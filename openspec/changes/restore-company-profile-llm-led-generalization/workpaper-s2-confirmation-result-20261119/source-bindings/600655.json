@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "600655.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_7c9b31ef2339ccaccdaadeea1a334ce2",
+    "filing_id": "1225026779",
+    "source": "cninfo",
+    "published_at": "2026-03-23T16:00:00+00:00",
+    "content_hash": "6b75b21b5d6bd23c0b2e83683a3d38cca396e4392233c22267575196c13593fb",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/6b/6b75b21b5d6bd23c0b2e83683a3d38cca396e4392233c22267575196c13593fb.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "上海豫园旅游商城（集团）股份有限公司2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-03-24/1225026779.PDF"
+  }
+}

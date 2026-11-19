@@ -1,0 +1,10 @@
+{
+  "task": "6.EA",
+  "reason": "consecutive_same_core_provider_empty_response",
+  "companies": ["002352.SZ", "002027.SZ"],
+  "detail": "顺丰后段verification incomplete与紧随其后的分众review failed均为message content empty/finish_reason missing；冻结operator只自动计failed，未计incomplete。独立确认后只SIGSTOP派发父进程，保正常在途原预算收尾。全部在途现已退出，再启用既有外部停止钩子收集结果，不派剩余五家。",
+  "production_contamination_claim": false,
+  "all_inflight_children_exited_before_marker": true,
+  "no_business_code_hotfix": true,
+  "no_additional_window_or_company": true
+}

@@ -1,0 +1,868 @@
+[
+  {
+    "request_id": "bp-work-35b3e51d85531e58dbebe54e:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "4985970d2fa0166dfd5cee8827ee305e80e58a4c09b200812624e12406a98910",
+    "response_hash": "26550ed3abaa05bbad1977c9ae12e4f4afe9457a310b5885e9d14e7c21581801",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0026\",\"section-0032\",\"section-0038\",\"section-0085\",\"section-0806\",\"section-0807\",\"section-0808\",\"section-0118\"],\"rationale\":\"选择公司业务概要（含研发、采购、生产、销售模式）以说明产品用途与经营方式；经营情况回顾与财务分析提供本期经营变化与资产负债结构；研发情况补充技术投入；营业收入和营业成本及其分解信息提供收入构成与主要业务权重；风险因素说明本期重要经营风险。行业背景章节仅作次要参考，未纳入。\",\"deferred\":[\"section-0037 轴承行业情况：属行业背景，非公司层面经营实质，暂不纳入\",\"section-0056 境外资产占比较高的情况：标题与内容疑似错位，且多为财务明细，暂不纳入\",\"section-0333 财务会计报告：范围过大，仅按需取收入附注，不整体纳入\"],\"stop_reason\":\"已覆盖业务模式、产品用途、收入构成、经营变化与风险等核心经营信息，行业背景与完整财报非必要，可在当前范围停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0026",
+        "section-0032",
+        "section-0038",
+        "section-0085",
+        "section-0806",
+        "section-0807",
+        "section-0808",
+        "section-0118"
+      ],
+      "rationale": "选择公司业务概要（含研发、采购、生产、销售模式）以说明产品用途与经营方式；经营情况回顾与财务分析提供本期经营变化与资产负债结构；研发情况补充技术投入；营业收入和营业成本及其分解信息提供收入构成与主要业务权重；风险因素说明本期重要经营风险。行业背景章节仅作次要参考，未纳入。",
+      "deferred": [
+        "section-0037 轴承行业情况：属行业背景，非公司层面经营实质，暂不纳入",
+        "section-0056 境外资产占比较高的情况：标题与内容疑似错位，且多为财务明细，暂不纳入",
+        "section-0333 财务会计报告：范围过大，仅按需取收入附注，不整体纳入"
+      ],
+      "stop_reason": "已覆盖业务模式、产品用途、收入构成、经营变化与风险等核心经营信息，行业背景与完整财报非必要，可在当前范围停止。"
+    },
+    "usage": {
+      "input_tokens": 21480,
+      "output_tokens": 245,
+      "total_tokens": 21725
+    }
+  },
+  {
+    "request_id": "bp-work-35b3e51d85531e58dbebe54e:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "6464254aee5b1b1be5a518ad1e74bbf9dbda2b8acfcdfb33d6fe101e08ed91dc",
+    "response_hash": "798b6c9e1c657f43dac6f9ce7a98cf0de2aed1c927d948da3d06e3504422fc65",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司属于通用设备制造业的轴承生产企业，主要从事叉车轴承及回转支承的研发、生产和销售，是全国首批专精特新“小巨人”企业和国家级制造业单项冠军企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"公司采用备货生产及订单生产结合的生产模式；销售模式分为直销模式和贸易商模式，直销模式下游客户为整车厂商，并可进一步分为“直接订单销售”和“寄售库存销售”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"公司产品可分为叉车门架轴承和回转支承；叉车门架轴承市场可进一步分为前装市场和后市场，回转支承目前主要应用于叉车转向系统及AGV/AMR智能搬运车。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]},{\"fact_id\":\"F04\",\"text\":\"公司所开发的叉车门架滚动轴承具有高负荷、长寿命、轻量化、高可靠性等关键特性，满足国内外叉车行业对门架滚动轴承的需求，实现进口替代。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"公司营业收入按业务类型分为叉车轴承、回转支承、材料及下脚料收入和其他，本期合计353,159,911.10元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"353,159,911.10\",\"value\":\"353159911.10\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F06\",\"text\":\"叉车轴承业务本期营业收入309,187,649.61元，营业成本209,651,007.49元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"叉车轴承营业收入\",\"raw_value\":\"309,187,649.61\",\"value\":\"309187649.61\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"叉车轴承营业成本\",\"raw_value\":\"209,651,007.49\",\"value\":\"209651007.49\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F07\",\"text\":\"回转支承业务本期营业收入31,775,179.61元，营业成本16,959,564.92元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"回转支承营业收入\",\"raw_value\":\"31,775,179.61\",\"value\":\"31775179.61\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"回转支承营业成本\",\"raw_value\":\"16,959,564.92\",\"value\":\"16959564.92\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F08\",\"text\":\"材料及下脚料收入本期5,113,135.26元，营业成本5,104,090.22元；其他业务收入7,083,946.62元，营业成本6,017,390.11元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"材料及下脚料收入\",\"raw_value\":\"5,113,135.26\",\"value\":\"5113135.26\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"7,083,946.62\",\"value\":\"7083946.62\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"按收入确认时点分类，本期在某一时点确认收入352,971,231.85元，在某一时段内确认收入188,679.25元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"在某一时点确认收入\",\"raw_value\":\"352,971,231.85\",\"value\":\"352971231.85\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"在某一时段内确认收入\",\"raw_value\":\"188,679.25\",\"value\":\"188679.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F10\",\"text\":\"主营业务本期收入347,811,409.86元、成本232,603,366.79元；其他业务收入5,348,501.24元、成本5,128,685.95元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"347,811,409.86\",\"value\":\"347811409.86\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"5,348,501.24\",\"value\":\"5348501.24\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F11\",\"text\":\"报告期内公司实现营业收入353,159,911.10元，较上年同期增长2.16%；净利润62,676,195.15元，较上年同期增长8.87%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"353,159,911.10\",\"value\":\"353159911.10\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"2.16\",\"value\":\"2.16\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"},{\"name\":\"净利润\",\"raw_value\":\"62,676,195.15\",\"value\":\"62676195.15\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"净利润同比增长率\",\"raw_value\":\"8.87\",\"value\":\"8.87\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年同期\"}]},{\"fact_id\":\"F12\",\"text\":\"截至2025年底，公司总资产818,247,259.99元，较期初增长10.00%；净资产737,543,583.41元，较期初增长8.77%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"总资产\",\"raw_value\":\"818,247,259.99\",\"value\":\"818247259.99\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"净资产\",\"raw_value\":\"737,543,583.41\",\"value\":\"737543583.41\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"从收入构成看，叉车轴承为第一大业务，本期收入309,187,649.61元；回转支承收入31,775,179.61元；材料及下脚料收入5,113,135.26元；其他收入7,083,946.62元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F14\",\"text\":\"公司采购的原材料主要包括钢材、滚动体、内外圈、保持架等，现有产品所用原材料及配件主要来自国内供应商。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F15\",\"text\":\"报告期内公司主营业务成本中直接材料占比为68.41%，主要原材料为钢材、外圈、内圈、侧滚轮组、滚动体、轴头，上述原材料占直接材料的比例为77.94%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"直接材料占主营业务成本比例\",\"raw_value\":\"68.41\",\"value\":\"68.41\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主要原材料占直接材料比例\",\"raw_value\":\"77.94\",\"value\":\"77.94\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F16\",\"text\":\"公司研发支出本期金额10,976,964.05元，占营业收入的比例为3.11%，本期无资本化研发支出。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"研发支出金额\",\"raw_value\":\"10,976,964.05\",\"value\":\"10976964.05\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发支出占营业收入比例\",\"raw_value\":\"3.11\",\"value\":\"3.11\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"截至报告期末，公司共拥有国内外有效专利126项，其中发明专利51项，实用新型专利74项，外观设计1项；研发人员总计67人，占员工总量的14.14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\",\"source-0009\"],\"metrics\":[{\"name\":\"有效专利数量\",\"raw_value\":\"126\",\"value\":\"126\",\"unit\":\"项\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"研发人员占员工总量比例\",\"raw_value\":\"14.14\",\"value\":\"14.14\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F18\",\"text\":\"公司主要客户包括安徽合力、杭叉集团、中力股份、中国龙工、丰田叉车、凯傲集团等国内外知名叉车企业，并长期为全球工业车辆20强厂商配套。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"F19\",\"text\":\"公司设有销售部和国际贸易部，分别负责境内和境外市场；与主要客户签署框架性协议，再以订单形式确定具体产品种类、价格、交付等条款。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F20\",\"text\":\"报告期内，公司前五大客户的销售占比为51.97%，客户集中度较高。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"前五大客户销售占比\",\"raw_value\":\"51.97\",\"value\":\"51.97\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F21\",\"text\":\"报告期内，公司主营业务收入中外销收入占比为8.53%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"外销收入占主营业务收入比例\",\"raw_value\":\"8.53\",\"value\":\"8.53\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F22\",\"text\":\"除叉车领域客户外，公司积极拓展工业机器人领域客户，目前已积累海康机器人、三一机器人、库卡机器人、国自机器人、欧米麦克等客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F23\",\"text\":\"公司持续强化研发投入，报告期内新增授权专利13项，其中发明专利8项，实用新型专利5项；新增软件著作权登记证书1项。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F24\",\"text\":\"公司研发项目覆盖多源数据驱动回转支承轻量化、机器人减速器专用精密轴承、轻量化汽车电驱桥专用精密轴承、高温环境专用免维护吊轮轴承、高端重卡变速箱专用精密轴承、智慧物流装备用包胶与尼龙类低噪音滚轮等方向。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\",\"source-0011\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F25\",\"text\":\"报告期内，公司商业模式未发生重大变化，未对公司的经营情况产生影响；核心竞争力变化情况为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"F26\",\"text\":\"本期重大风险未发生重大变化，报告期内无新增风险因素。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0016\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"公司为轴承生产企业，主要从事叉车轴承及回转支承的研发、生产和销售，采用备货生产及订单生产结合的模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F28\",\"text\":\"公司采购的原材料主要包括钢材、滚动体、内外圈、保持架等，主要来自国内供应商，付款期限一般为开票后30天。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"公司产品下游主要为叉车整车厂商，叉车门架轴承用于叉车门架，回转支承主要应用于叉车转向系统及AGV/AMR智能搬运车，并拓展至工业机器人领域客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0015\"]}]}},\"limitations\":[\"未获取叉车轴承前装市场与后市场的具体收入拆分数据。\",\"未获取各产品按境内/境外市场的完整收入明细，仅有外销收入占比8.53%。\",\"未获取主要原材料的具体采购金额或供应商名称。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司属于通用设备制造业的轴承生产企业，主要从事叉车轴承及回转支承的研发、生产和销售，是全国首批专精特新“小巨人”企业和国家级制造业单项冠军企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司采用备货生产及订单生产结合的生产模式；销售模式分为直销模式和贸易商模式，直销模式下游客户为整车厂商，并可进一步分为“直接订单销售”和“寄售库存销售”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "公司产品可分为叉车门架轴承和回转支承；叉车门架轴承市场可进一步分为前装市场和后市场，回转支承目前主要应用于叉车转向系统及AGV/AMR智能搬运车。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "公司所开发的叉车门架滚动轴承具有高负荷、长寿命、轻量化、高可靠性等关键特性，满足国内外叉车行业对门架滚动轴承的需求，实现进口替代。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F05",
+              "text": "公司营业收入按业务类型分为叉车轴承、回转支承、材料及下脚料收入和其他，本期合计353,159,911.10元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "353,159,911.10",
+                  "value": "353159911.10",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "叉车轴承业务本期营业收入309,187,649.61元，营业成本209,651,007.49元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "叉车轴承营业收入",
+                  "raw_value": "309,187,649.61",
+                  "value": "309187649.61",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "叉车轴承营业成本",
+                  "raw_value": "209,651,007.49",
+                  "value": "209651007.49",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "回转支承业务本期营业收入31,775,179.61元，营业成本16,959,564.92元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "回转支承营业收入",
+                  "raw_value": "31,775,179.61",
+                  "value": "31775179.61",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "回转支承营业成本",
+                  "raw_value": "16,959,564.92",
+                  "value": "16959564.92",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "材料及下脚料收入本期5,113,135.26元，营业成本5,104,090.22元；其他业务收入7,083,946.62元，营业成本6,017,390.11元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "材料及下脚料收入",
+                  "raw_value": "5,113,135.26",
+                  "value": "5113135.26",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务收入",
+                  "raw_value": "7,083,946.62",
+                  "value": "7083946.62",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "按收入确认时点分类，本期在某一时点确认收入352,971,231.85元，在某一时段内确认收入188,679.25元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "在某一时点确认收入",
+                  "raw_value": "352,971,231.85",
+                  "value": "352971231.85",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "在某一时段内确认收入",
+                  "raw_value": "188,679.25",
+                  "value": "188679.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "主营业务本期收入347,811,409.86元、成本232,603,366.79元；其他业务收入5,348,501.24元、成本5,128,685.95元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入",
+                  "raw_value": "347,811,409.86",
+                  "value": "347811409.86",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务收入",
+                  "raw_value": "5,348,501.24",
+                  "value": "5348501.24",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F11",
+              "text": "报告期内公司实现营业收入353,159,911.10元，较上年同期增长2.16%；净利润62,676,195.15元，较上年同期增长8.87%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "353,159,911.10",
+                  "value": "353159911.10",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增长率",
+                  "raw_value": "2.16",
+                  "value": "2.16",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                },
+                {
+                  "name": "净利润",
+                  "raw_value": "62,676,195.15",
+                  "value": "62676195.15",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净利润同比增长率",
+                  "raw_value": "8.87",
+                  "value": "8.87",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "截至2025年底，公司总资产818,247,259.99元，较期初增长10.00%；净资产737,543,583.41元，较期初增长8.77%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "总资产",
+                  "raw_value": "818,247,259.99",
+                  "value": "818247259.99",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净资产",
+                  "raw_value": "737,543,583.41",
+                  "value": "737543583.41",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "从收入构成看，叉车轴承为第一大业务，本期收入309,187,649.61元；回转支承收入31,775,179.61元；材料及下脚料收入5,113,135.26元；其他收入7,083,946.62元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F14",
+              "text": "公司采购的原材料主要包括钢材、滚动体、内外圈、保持架等，现有产品所用原材料及配件主要来自国内供应商。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "报告期内公司主营业务成本中直接材料占比为68.41%，主要原材料为钢材、外圈、内圈、侧滚轮组、滚动体、轴头，上述原材料占直接材料的比例为77.94%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "直接材料占主营业务成本比例",
+                  "raw_value": "68.41",
+                  "value": "68.41",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主要原材料占直接材料比例",
+                  "raw_value": "77.94",
+                  "value": "77.94",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "公司研发支出本期金额10,976,964.05元，占营业收入的比例为3.11%，本期无资本化研发支出。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "研发支出金额",
+                  "raw_value": "10,976,964.05",
+                  "value": "10976964.05",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发支出占营业收入比例",
+                  "raw_value": "3.11",
+                  "value": "3.11",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "截至报告期末，公司共拥有国内外有效专利126项，其中发明专利51项，实用新型专利74项，外观设计1项；研发人员总计67人，占员工总量的14.14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "有效专利数量",
+                  "raw_value": "126",
+                  "value": "126",
+                  "unit": "项",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员占员工总量比例",
+                  "raw_value": "14.14",
+                  "value": "14.14",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F18",
+              "text": "公司主要客户包括安徽合力、杭叉集团、中力股份、中国龙工、丰田叉车、凯傲集团等国内外知名叉车企业，并长期为全球工业车辆20强厂商配套。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "公司设有销售部和国际贸易部，分别负责境内和境外市场；与主要客户签署框架性协议，再以订单形式确定具体产品种类、价格、交付等条款。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "报告期内，公司前五大客户的销售占比为51.97%，客户集中度较高。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "前五大客户销售占比",
+                  "raw_value": "51.97",
+                  "value": "51.97",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "报告期内，公司主营业务收入中外销收入占比为8.53%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "外销收入占主营业务收入比例",
+                  "raw_value": "8.53",
+                  "value": "8.53",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "除叉车领域客户外，公司积极拓展工业机器人领域客户，目前已积累海康机器人、三一机器人、库卡机器人、国自机器人、欧米麦克等客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F23",
+              "text": "公司持续强化研发投入，报告期内新增授权专利13项，其中发明专利8项，实用新型专利5项；新增软件著作权登记证书1项。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "公司研发项目覆盖多源数据驱动回转支承轻量化、机器人减速器专用精密轴承、轻量化汽车电驱桥专用精密轴承、高温环境专用免维护吊轮轴承、高端重卡变速箱专用精密轴承、智慧物流装备用包胶与尼龙类低噪音滚轮等方向。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010",
+                "source-0011"
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F25",
+              "text": "报告期内，公司商业模式未发生重大变化，未对公司的经营情况产生影响；核心竞争力变化情况为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "本期重大风险未发生重大变化，报告期内无新增风险因素。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015",
+                "source-0016"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F27",
+              "text": "公司为轴承生产企业，主要从事叉车轴承及回转支承的研发、生产和销售，采用备货生产及订单生产结合的模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F28",
+              "text": "公司采购的原材料主要包括钢材、滚动体、内外圈、保持架等，主要来自国内供应商，付款期限一般为开票后30天。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F29",
+              "text": "公司产品下游主要为叉车整车厂商，叉车门架轴承用于叉车门架，回转支承主要应用于叉车转向系统及AGV/AMR智能搬运车，并拓展至工业机器人领域客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0015"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "未获取叉车轴承前装市场与后市场的具体收入拆分数据。",
+        "未获取各产品按境内/境外市场的完整收入明细，仅有外销收入占比8.53%。",
+        "未获取主要原材料的具体采购金额或供应商名称。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 13556,
+      "output_tokens": 3732,
+      "total_tokens": 17288
+    }
+  },
+  {
+    "request_id": "bp-work-35b3e51d85531e58dbebe54e:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "fbd17b5bc46f66b09c3c3ed93243d7768b519595b8f22addbc4ec4baabf2753c",
+    "response_hash": "4392ad6a474e0d0670b5bfdf785ec948badceeedb95c096622ba995b356e2517",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\",\"F29\"],\"findings\":[{\"finding_id\":\"REV-001\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F08\",\"evidence_ids\":[\"source-0018\",\"source-0019\"],\"explanation\":\"F08将业务类型分解中“其他”行的营业收入7,083,946.62元、营业成本6,017,390.11元写成“其他业务收入”。source-0019该行类别为“其他”，不是“其他业务”。source-0018的其他业务本期收入为5,348,501.24元、成本为5,128,685.95元，金额和会计口径均不同；两类来源不能因同属收入附注或金额接近而等同。材料及下脚料收入5,113,135.26元及其成本5,104,090.22元有来源支持，应保留；后半段应改回业务类型“其他”的营业收入和营业成本，不得沿用其他业务收入这一科目名。F10已正确记载其他业务收入，不应被本项覆盖或合并。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29"
+      ],
+      "findings": [
+        {
+          "finding_id": "REV-001",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F08",
+          "evidence_ids": [
+            "source-0018",
+            "source-0019"
+          ],
+          "explanation": "F08将业务类型分解中“其他”行的营业收入7,083,946.62元、营业成本6,017,390.11元写成“其他业务收入”。source-0019该行类别为“其他”，不是“其他业务”。source-0018的其他业务本期收入为5,348,501.24元、成本为5,128,685.95元，金额和会计口径均不同；两类来源不能因同属收入附注或金额接近而等同。材料及下脚料收入5,113,135.26元及其成本5,104,090.22元有来源支持，应保留；后半段应改回业务类型“其他”的营业收入和营业成本，不得沿用其他业务收入这一科目名。F10已正确记载其他业务收入，不应被本项覆盖或合并。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 18634,
+      "output_tokens": 348,
+      "total_tokens": 38577
+    }
+  },
+  {
+    "request_id": "bp-work-35b3e51d85531e58dbebe54e:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "8a28278b84f21bde82b732c3cfbecfcab13b4759e3018c1519fe2367f376bc69",
+    "response_hash": "3657864be7c769cd4f9a6db66bbb11fac78c388b0d294b6655da0c7c082de669",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F08\",\"text\":\"材料及下脚料收入本期5,113,135.26元，营业成本5,104,090.22元；业务类型“其他”营业收入7,083,946.62元，营业成本6,017,390.11元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"材料及下脚料收入\",\"raw_value\":\"5,113,135.26\",\"value\":\"5113135.26\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"材料及下脚料收入营业成本\",\"raw_value\":\"5,104,090.22\",\"value\":\"5104090.22\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他（业务类型）营业收入\",\"raw_value\":\"7,083,946.62\",\"value\":\"7083946.62\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他（业务类型）营业成本\",\"raw_value\":\"6,017,390.11\",\"value\":\"6017390.11\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F08",
+          "text": "材料及下脚料收入本期5,113,135.26元，营业成本5,104,090.22元；业务类型“其他”营业收入7,083,946.62元，营业成本6,017,390.11元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0019"
+          ],
+          "metrics": [
+            {
+              "name": "材料及下脚料收入",
+              "raw_value": "5,113,135.26",
+              "value": "5113135.26",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "材料及下脚料收入营业成本",
+              "raw_value": "5,104,090.22",
+              "value": "5104090.22",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他（业务类型）营业收入",
+              "raw_value": "7,083,946.62",
+              "value": "7083946.62",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他（业务类型）营业成本",
+              "raw_value": "6,017,390.11",
+              "value": "6017390.11",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11028,
+      "output_tokens": 417,
+      "total_tokens": 11445
+    }
+  },
+  {
+    "request_id": "bp-work-35b3e51d85531e58dbebe54e:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "8f53700845d3cdd993669e44c1402b3a5c4886a03f8c09c4e2de0b3f66ef236b",
+    "response_hash": "5c242c47a315fc3bca3f37702449fbbc3f97540bb4f7ce26b9094e173d46ffe5",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F08\"],\"checks\":[{\"fact_id\":\"F08\",\"accepted\":true,\"evidence_ids\":[\"source-0019\",\"source-0018\"],\"explanation\":\"候选已纠正原错误口径。source-0019“本期客户合同产生的收入情况”业务类型分解中，材料及下脚料收入本期营业收入为5,113,135.26元、营业成本为5,104,090.22元；同行类别“其他”的营业收入为7,083,946.62元、营业成本为6,017,390.11元。候选保留材料及下脚料收入，并将后半段改回业务类型“其他”的营业收入和营业成本，未再称为其他业务收入，也未与其他业务科目合并。source-0018其他业务本期收入5,348,501.24元、成本5,128,685.95元与该行金额及科目均不同，候选未混用。期间为本期即2025年度，列次、单位（元）及业务类型行口径均与来源一致。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F08"
+      ],
+      "checks": [
+        {
+          "fact_id": "F08",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0019",
+            "source-0018"
+          ],
+          "explanation": "候选已纠正原错误口径。source-0019“本期客户合同产生的收入情况”业务类型分解中，材料及下脚料收入本期营业收入为5,113,135.26元、营业成本为5,104,090.22元；同行类别“其他”的营业收入为7,083,946.62元、营业成本为6,017,390.11元。候选保留材料及下脚料收入，并将后半段改回业务类型“其他”的营业收入和营业成本，未再称为其他业务收入，也未与其他业务科目合并。source-0018其他业务本期收入5,348,501.24元、成本5,128,685.95元与该行金额及科目均不同，候选未混用。期间为本期即2025年度，列次、单位（元）及业务类型行口径均与来源一致。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 13398,
+      "output_tokens": 238,
+      "total_tokens": 16071
+    }
+  }
+]

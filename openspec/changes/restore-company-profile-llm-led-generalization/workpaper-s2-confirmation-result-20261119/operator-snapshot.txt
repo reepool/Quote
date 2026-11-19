@@ -1,0 +1,130 @@
+"""6.EA approved single S2 confirmation: existing TaskService operator adaptation."""
+from pathlib import Path
+import ast
+import hashlib
+import json
+import os
+import re
+import runpy
+import shutil
+import sqlite3
+import subprocess
+import sys
+import time
+import zipfile
+from concurrent.futures import ThreadPoolExecutor
+
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DESTINATION=CHANGE/'workpaper-s2-confirmation-result-20261119'
+TEMP=Path(__file__).parent
+PLAN=CHANGE/'workpaper-general-closure-20261119/confirmation-source-plan.json'
+DU=CHANGE/'workpaper-six-issue-regression-20261119/operator-snapshot.txt'
+BASE=CHANGE/'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'
+
+# Reuse the previously exercised adapter/stop supervision, no business loop copy.
+adapter=DU.read_text().split("\nif __name__ == '__main__':",1)[0]
+for old,new in [
+ ('workpaper-six-issue-regression-20261119','workpaper-s2-confirmation-result-20261119'),
+ ('6.DU','6.EA'),('v22-six-issue-','v26-s2-confirm-'),('workpaper-du-','workpaper-ea-'),
+ ("ORDERED = ['600113.SH', '000166.SZ', '000025.SZ', '000001.SZ', '600030.SH', '601318.SH']", "ORDERED = json.loads(PLAN.read_text())['order']"),
+ ("assert len(items) == 6", "assert len(items) == 20"),
+ ("('started+7200', 'started+12600')", "('started+7200', 'started+30600')"),
+ ("\"totals['physical_requests']>=60\"", "\"totals['physical_requests']>=200\""),
+]:
+ if old.startswith('assert len(items)'):
+  adapter=adapter.replace(old,new)
+ else:
+  assert old in adapter,old
+  adapter=adapter.replace(old,new)
+# The DU adapter assigns DESTINATION itself after the mechanical replacement.
+# It needs approval.json already persisted by initialize() before import.
+
+def initialize():
+ assert not (DESTINATION/'approval.json').exists()
+ plan=json.loads(PLAN.read_text())
+ DESTINATION.mkdir(parents=True,exist_ok=True)
+ approval=dict(task='6.EA',status='explicitly_approved',instruments=plan['order'],
+  approval_reference='用户call_ed4cf8881a7643b8aee6b64c1b85f2e3明确回复“批准这20家一次限定确认”。仅既有公开2025年报与所选公开派生稿，原TaskService各一次全新、DeepSeek选章/抽取/至多一次修订，既有Scorpio/Grok grok-4.7 high初核/必要再核。每家6000秒/1000000保守账本/10物理含3恢复每逻辑1，高阶物理1200/逻辑2450、Flash600、抽取12000；并发4，组30600秒/20000000/200。仅获准联网环境、先独立源参考且不给模型、冻结不热修、同核心根因两连败停未启动/核心不可隔离封发送；不载旧语义、不追加窗/公司/充值/共享配置修改/生产；无价unknown、有价每家10元、不承诺人民币总额；旧失败保留，确认失败结束S2不加第41家，整卡执行及清垃圾。',
+  source_plan=str(PLAN.relative_to(ROOT)),source_plan_sha256=hashlib.sha256(PLAN.read_bytes()).hexdigest(),
+  each_limits=dict(business_seconds=6000,tokens=1000000,physical_requests=10,recoveries=3,per_logical=1,known_cost_cny=10),
+  group_limits=dict(tokens=20000000,physical_requests=200,recoveries=60,business_wall_seconds=30600,max_concurrency=4),
+  production_authorization='not_authorized')
+ (DESTINATION/'approval.json').write_text(json.dumps(approval,ensure_ascii=False,indent=2)+'\n')
+
+if not (DESTINATION/'approval.json').exists():initialize()
+exec(compile(adapter,str(DU),'exec'),globals())
+source=source.replace("totals['charged_tokens']>=6000000","totals['charged_tokens']>=20000000")
+source=source.replace("knowledge_cutoff='2026-09-17'","knowledge_cutoff='2026-11-19'")
+exec(compile(source[source.index('\ndef run_one('):source.index('\ndef group(')],str(BASE),'exec'),globals())
+exec(compile(source[source.index('\ndef group('):],str(BASE),'exec'),globals())
+
+def source_items():
+ items=json.loads((DEST/'source-manifest.json').read_text())['companies']
+ assert [i['instrument_id'] for i in items]==ORDER and len(items)==20
+ return items
+
+def prepare_all(directory):
+ assert os.environ['TMPDIR']==str(ROOT/'data/QuoteBak')
+ assert not (DEST/'source-manifest.json').exists()
+ original=json.loads(PLAN.read_text());items=[]
+ conn=sqlite3.connect('file:'+str(ROOT/'data/research.db')+'?mode=ro',uri=True);conn.row_factory=sqlite3.Row
+ for i in original['companies']:
+  asset=i['asset'];symbol=i['instrument_id'][:6]
+  assert sha(Path(asset['archive_path']))==asset['content_hash']
+  row=conn.execute('select a.title,v.final_url from effective_annual_reports e join official_announcements a on a.announcement_id=e.announcement_id join official_attachment_versions v on v.version_id=e.version_id where e.instrument_id=? and e.fiscal_year=2025 and e.visibility_state="production" and e.document_family="annual_report"',(i['instrument_id'],)).fetchone()
+  assert row and row['title']==i['official_title'] and row['final_url']
+  path=DEST/'source-bindings'/(symbol+'.json')
+  dump(path,dict(asset=asset,announcement=dict(title=row['title'],source_url=row['final_url'])))
+  items.append({**i,'source_binding':str(path.relative_to(ROOT)),'source_binding_sha256':sha(path)})
+ conn.close();dump(DEST/'source-manifest.json',dict(task='6.EA',companies=items,old_semantic_inputs=False,human_reference_as_model_input=False))
+ directory.mkdir(parents=True,exist_ok=True)
+ with ThreadPoolExecutor(max_workers=4) as pool:list(pool.map(lambda item:prepare_one(item,directory),items))
+ dump(DEST/'preparation.json',dict(task='6.EA',companies=20,source_only_preparation=True,new_model_requests=0,
+    each_prepared_sha256={i['instrument_id']:sha(directory/(i['instrument_id'][:6]+'.json')) for i in items}))
+ print('PREPARED20',flush=True)
+
+def freeze(directory):
+ assert not (DEST/'authorization.json').exists()
+ prepared=json.loads((DEST/'preparation.json').read_text());network=json.loads((DEST/'network-preflight.json').read_text())
+ assert network['namespace']==os.readlink('/proc/self/ns/net')
+ assert json.loads((DEST/'binding-check.json').read_text())['provider_cap']==2450
+ core=DEST/'source-first-contract.json';reference=json.loads(core.read_text())
+ assert reference['not_model_input'] and len(reference['companies'])==20
+ assert sum(len(c['core_conditions']) for c in reference['companies'])==60
+ assert [c['instrument_id'] for c in reference['companies']]==ORDER
+ cfg=config_for_run();items=source_items()
+ for item in items:
+  assert sha(directory/(item['instrument_id'][:6]+'.json'))==prepared['each_prepared_sha256'][item['instrument_id']]
+  assert sha(ROOT/item['source_binding'])==item['source_binding_sha256']
+  assert not (ROOT/'data/QuoteBak/s1-attempts'/('workpaper-ea-'+item['instrument_id'][:6]+'-20261119.json')).exists()
+ hashes=code_hashes()
+ with zipfile.ZipFile(DEST/'execution-code-snapshot.zip','x',compression=zipfile.ZIP_DEFLATED) as archive:
+  for p in hashes:archive.write(ROOT/p,arcname=p)
+ profiles={n:dict(model=p.model,source_label=p.source_label,reasoning_effort=p.reasoning_effort,
+      timeout_seconds=p.timeout_seconds,attempt_timeout_seconds=p.attempt_timeout_seconds,
+      disable_thinking=p.disable_thinking,max_retries=p.max_retries,max_schema_repair_attempts=p.max_schema_repair_attempts)
+      for n,p in cfg.profiles.items()}
+ authorization=dict(task='6.EA',status='authorized',approval_reference=APPROVAL,
+    approval_sha256=sha(DEST/'approval.json'),base_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+    operator_sha256=sha(Path(__file__)),base_operator_sha256=sha(BASE),prior_operator_sha256=sha(DU),
+    code_sha256=hashes,shared_config_sha256=sha(ROOT/'config/13_llm.json'),selected_profiles=profiles,
+    network_context=network,network_preflight_sha256=sha(DEST/'network-preflight.json'),capture_helper_sha256=sha(CAPTURE_HELPER),
+    source_manifest_sha256=sha(DEST/'source-manifest.json'),source_first_reference_sha256=sha(core),
+    order=ORDER,prepared_root=str(directory),each_limits=approval['each_limits'],group_limits=approval['group_limits'],
+    production_authorization='not_authorized',old_semantic_input=False,human_reference_as_model_input=False,
+    quality_scope='60 source-led substantive basic questions; all material businesses and earning mechanisms; core/high-risk source check and 20 supplemental objects per company or all if fewer, no invented denominator',
+    sampling_seed='company-profile-s2-confirmation-20261119.v1',engineering_validation='4239a4cb:131 current checks plus2 fresh controlled full TaskService entries, old12 source/read regression397/603; no live quality score')
+ dump(DEST/'authorization.json',authorization);shutil.copy2(__file__,DEST/'operator-snapshot.txt')
+ print('FROZEN20_V21_V12',flush=True)
+
+if __name__=='__main__':
+ parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','check','preflight','freeze','run','group'])
+ parser.add_argument('--prepared',type=Path);parser.add_argument('--symbol');parser.add_argument('--group-deadline',type=float);parser.add_argument('--batch',type=int,default=1)
+ args=parser.parse_args()
+ if args.mode=='prepare':prepare_all(args.prepared)
+ elif args.mode=='check':boundary_check()
+ elif args.mode=='preflight':network_preflight()
+ elif args.mode=='freeze':freeze(args.prepared)
+ elif args.mode=='run':run_one(args.prepared,args.symbol,args.group_deadline)
+ else:group(args.prepared,args.batch)

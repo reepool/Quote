@@ -1,0 +1,191 @@
+{
+  "task": "6.EA",
+  "development_start": "prior DZ owned temporary root confirmed absent; no broad historical deletion",
+  "exact_owned_temporary_root": "/home/python/Quote/data/QuoteBak/workpaper-ea-HHDld9",
+  "active_task_workers": [],
+  "already_removed_company_execution_bytes": 28661582,
+  "redundant_evidence_exports": [
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/600309/export",
+      "bytes": 530484,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/600438/export",
+      "bytes": 753959,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002594/export",
+      "bytes": 584149,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/000725/export",
+      "bytes": 514122,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/920002/export",
+      "bytes": 458487,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/920005/export",
+      "bytes": 541058,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601021/export",
+      "bytes": 569270,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601888/export",
+      "bytes": 523727,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002352/export",
+      "bytes": 571162,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002027/export",
+      "bytes": 794698,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/300144/export",
+      "bytes": 508744,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601111/export",
+      "bytes": 426592,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601601/export",
+      "bytes": 659809,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601881/export",
+      "bytes": 353596,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002142/export",
+      "bytes": 810209,
+      "reason": "raw export equals retained query; one final human/API delivery retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/000725.SZ_2025-12-31.json",
+      "bytes": 357677,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/002027.SZ_2025-12-31.json",
+      "bytes": 481622,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/002142.SZ_2025-12-31.json",
+      "bytes": 548111,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/002352.SZ_2025-12-31.json",
+      "bytes": 392794,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/002594.SZ_2025-12-31.json",
+      "bytes": 396359,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/300144.SZ_2025-12-31.json",
+      "bytes": 337087,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/600309.SH_2025-12-31.json",
+      "bytes": 366026,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/600438.SH_2025-12-31.json",
+      "bytes": 542558,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/601021.SH_2025-12-31.json",
+      "bytes": 365169,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/601111.SH_2025-12-31.json",
+      "bytes": 254744,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/601601.SH_2025-12-31.json",
+      "bytes": 465664,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/601881.SH_2025-12-31.json",
+      "bytes": 231521,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/601888.SH_2025-12-31.json",
+      "bytes": 350315,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/920002.BJ_2025-12-31.json",
+      "bytes": 288781,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/920005.BJ_2025-12-31.json",
+      "bytes": 358388,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/export_manifest.json",
+      "bytes": 7961,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/profiles.csv",
+      "bytes": 11749,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/profiles.md",
+      "bytes": 14208,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/delivery/research_profiles.json",
+      "bytes": 2193511,
+      "reason": "duplicate final export; query/export/fresh equality already persisted"
+    }
+  ],
+  "redundant_evidence_bytes": 16564311,
+  "closing_owned_temporary_bytes": 21313300,
+  "total_removed_file_bytes": 66539193,
+  "kept": [
+    "formal 2025 PDFs and reusable PDF owner cache",
+    "all original query/runtime/model receipts/failures/budgets",
+    "one independent reference/audit and one human/API delivery",
+    "15 original writer research outputs needed by API",
+    "attempt markers, old source/result/API roots and parallel changes"
+  ],
+  "recoverability": "removed preparation/exports are rebuildable from retained sources, runtime and script snapshots",
+  "no_live_task_or_database_retained": true
+}

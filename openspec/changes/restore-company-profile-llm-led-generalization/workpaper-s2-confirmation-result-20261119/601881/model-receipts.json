@@ -1,0 +1,815 @@
+[
+  {
+    "request_id": "bp-work-522acd73d4816c9de549211a:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "a0ef37b30a281a89c81b207260e4d65886b5d3cb1cb6d63b4ebd6ed022a34f6e",
+    "response_hash": "9b0b1b905ff1c8de755e754e5e1eecfa57afc993713b9033d442981b9b5b582e",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0077\",\"section-0080\",\"section-0082\",\"section-0083\",\"section-0090\",\"section-0093\",\"section-0101\",\"section-0105\",\"section-0109\",\"section-0124\",\"section-0125\",\"section-0129\",\"section-0131\",\"section-0057\",\"section-0058\"],\"rationale\":\"优先选取第三节管理层讨论与分析中实质性的经营讨论：section-0077说明公司业务范围与经营模式；section-0080为经营情况讨论总述，其下section-0082主营业务经营情况分析及财富管理、投行、机构、国际、投资交易、母子公司一体化各业务子节完整覆盖产品/服务、经营方式与各板块变化；section-0124主营业务分析及section-0125利润表相关科目变动分析提供收入与成本口径的经营结果；section-0129主营业务分行业情况与section-0131分地区情况给出收入构成与地区权重，满足收入来源与主要业务权重问题。另选第二节section-0057近三年主要会计数据及section-0058主要会计数据，作为紧凑的公司层面营收与利润总量摘要，与详细分析互补而不重叠。未选纯行业背景、核心竞争力泛述及治理、债券、财务报告附注等非经营主体内容。\",\"deferred\":[\"section-0078报告期内公司所处行业情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0117核心竞争力分析：偏泛化竞争优势描述，经营实质已由业务板块子节覆盖\",\"section-0186未来发展的讨论与分析：前瞻性计划，非本期经营事实，暂不选\",\"第八节财务报告及第九节证券公司信息披露中的分部报告、收入附注：仅在业务板块与主营分析存在实质缺口时定向补充，当前无需扩读\"],\"stop_reason\":\"已获得公司业务结构、各业务板块经营方式与变化、收入成本分析、分行业与分地区收入构成及公司层面主要财务数据摘要，足以回答业务、产品用途、盈利来源与规模结构问题；行业背景、治理、债券与财务报告附注属次要或重复范围，停止扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0077",
+        "section-0080",
+        "section-0082",
+        "section-0083",
+        "section-0090",
+        "section-0093",
+        "section-0101",
+        "section-0105",
+        "section-0109",
+        "section-0124",
+        "section-0125",
+        "section-0129",
+        "section-0131",
+        "section-0057",
+        "section-0058"
+      ],
+      "rationale": "优先选取第三节管理层讨论与分析中实质性的经营讨论：section-0077说明公司业务范围与经营模式；section-0080为经营情况讨论总述，其下section-0082主营业务经营情况分析及财富管理、投行、机构、国际、投资交易、母子公司一体化各业务子节完整覆盖产品/服务、经营方式与各板块变化；section-0124主营业务分析及section-0125利润表相关科目变动分析提供收入与成本口径的经营结果；section-0129主营业务分行业情况与section-0131分地区情况给出收入构成与地区权重，满足收入来源与主要业务权重问题。另选第二节section-0057近三年主要会计数据及section-0058主要会计数据，作为紧凑的公司层面营收与利润总量摘要，与详细分析互补而不重叠。未选纯行业背景、核心竞争力泛述及治理、债券、财务报告附注等非经营主体内容。",
+      "deferred": [
+        "section-0078报告期内公司所处行业情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0117核心竞争力分析：偏泛化竞争优势描述，经营实质已由业务板块子节覆盖",
+        "section-0186未来发展的讨论与分析：前瞻性计划，非本期经营事实，暂不选",
+        "第八节财务报告及第九节证券公司信息披露中的分部报告、收入附注：仅在业务板块与主营分析存在实质缺口时定向补充，当前无需扩读"
+      ],
+      "stop_reason": "已获得公司业务结构、各业务板块经营方式与变化、收入成本分析、分行业与分地区收入构成及公司层面主要财务数据摘要，足以回答业务、产品用途、盈利来源与规模结构问题；行业背景、治理、债券与财务报告附注属次要或重复范围，停止扩读。"
+    },
+    "usage": {
+      "input_tokens": 28570,
+      "output_tokens": 468,
+      "total_tokens": 29038
+    }
+  },
+  {
+    "request_id": "bp-work-522acd73d4816c9de549211a:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "e6555f714a809ea561a7eb3f928805c8916381b1359a45a844860012b7957a2a",
+    "response_hash": "220ee4d9f190223a546d9704de4d7b12ca247490bfee35f50e43fa79fa7990ee",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司以市场化、平台化、数字化和全面协同为导向，持续打造“五位一体”业务模式，提供财富管理业务、投资银行业务、机构业务、国际业务、投资交易业务及母子公司一体化的综合金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"母子公司一体化业务将从事期货业务、私募股权基金管理业务、另类投资业务、资产管理业务的子公司平台与前述五大业务线融合，强化业务协同、资源对接。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"财富管理业务为客户提供代理买卖股票、基金、债券、衍生金融工具等服务，提供投资咨询、投资组合建议、金融产品销售和资产配置等金融服务，并向客户提供融资融券、股票质押式回购及约定购回交易等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"投资银行业务为各类型企业和政府客户提供一站式投资银行服务，包括股权融资、债券融资、结构化融资、财务顾问及多样化融资解决方案等金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"机构业务提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"国际业务通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投资银行、研究和资产管理、融资和金融产品等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"投资交易业务从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融资及风险管理提供综合金融解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司通过财富管理、投资银行、机构、国际、投资交易及母子公司一体化等业务线向客户提供综合金融服务并取得收入，各业务线分别对应经纪、承销、托管、投资交易等不同收费或收益方式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"本次选定章节未提供按业务线拆分的收入金额明细，收入构成主要依据分行业与分地区披露。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司投资银行业务完成1单IPO项目、7单再融资项目，股权承销规模为人民币86.97亿元，行业排名第12；完成3单上市公司发行股份购买资产/重大资产重组项目，交易金额为人民币194.66亿元，行业排名第7；另完成2单新三板定向发行项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"股权承销规模\",\"raw_value\":\"86.97\",\"value\":\"86.97\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"发行股份购买资产/重大资产重组交易金额\",\"raw_value\":\"194.66\",\"value\":\"194.66\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"2025年公司债券承销规模为人民币6,825.75亿元，同比增长37.3%，行业排名第6；其中地方政府债承销规模4,333.31亿元、金融债1,458.81亿元、中期票据300.00亿元、定向债务融资工具100.92亿元、短期融资券91.44亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"债券承销规模\",\"raw_value\":\"6,825.75\",\"value\":\"6825.75\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"债券承销规模同比增长率\",\"raw_value\":\"37.3\",\"value\":\"37.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"地方政府债承销规模\",\"raw_value\":\"4,333.31\",\"value\":\"4333.31\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"金融债承销规模\",\"raw_value\":\"1,458.81\",\"value\":\"1458.81\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"中期票据承销规模\",\"raw_value\":\"300.00\",\"value\":\"300.00\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"定向债务融资工具承销规模\",\"raw_value\":\"100.92\",\"value\":\"100.92\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"短期融资券承销规模\",\"raw_value\":\"91.44\",\"value\":\"91.44\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"本次选定章节未提供公司层面营业收入总额及分业务线收入占比的完整表格，规模与结构以投行业务承销规模等经营指标补充说明。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司投资银行业务紧密围绕打造“企业家信任的投资银行专家”的关键业务战略，践行“三化一同”体制机制，向纵深推进专业化改革，优化团队设置、补充专业人员，完善项目管理、协同拓展业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"公司积极开展业务协同，进一步发掘地方政府债、金融债、中期票据、定向债务融资工具等业务机会，债券承销规模增速高于行业平均增速。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"本次选定章节未披露公司具体原材料、能源等实物投入，作为金融机构其经营投入以人力、资本与业务平台为主。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"财富管理业务面向客户提供代理买卖、投资咨询、金融产品销售与资产配置及融资融券等服务；投资银行业务面向各类型企业和政府客户；机构业务面向机构客户提供主经纪商、托管与基金服务等；国际业务面向全球机构客户、企业客户和零售客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"本次选定章节未提供分地区收入金额及占比明细，客户与市场范围以业务描述为主。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"2025年A股股权融资规模（含可转债，不含可交债及发行股份购买资产）为人民币9,415.85亿元，同比增长274.2%；其中IPO规模1,317.71亿元，同比增长95.6%；再融资规模8,098.14亿元，同比增长339.5%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"A股股权融资规模（含可转债）\",\"raw_value\":\"9,415.85\",\"value\":\"9415.85\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"A股股权融资规模同比增长率\",\"raw_value\":\"274.2\",\"value\":\"274.2\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"IPO规模\",\"raw_value\":\"1,317.71\",\"value\":\"1317.71\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"IPO规模同比增长率\",\"raw_value\":\"95.6\",\"value\":\"95.6\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"再融资规模\",\"raw_value\":\"8,098.14\",\"value\":\"8098.14\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"再融资规模同比增长率\",\"raw_value\":\"339.5\",\"value\":\"339.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"2025年境内债券新发行规模（不含可转债）为人民币89.08万亿元，同比增长11.5%；境内并购市场整体交易规模为人民币6,850.00亿元，同比增长758.4%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"境内债券新发行规模（不含可转债）\",\"raw_value\":\"89.08\",\"value\":\"89.08\",\"unit\":\"万亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境内债券新发行规模同比增长率\",\"raw_value\":\"11.5\",\"value\":\"11.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境内并购市场整体交易规模\",\"raw_value\":\"6,850.00\",\"value\":\"6850.00\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境内并购市场整体交易规模同比增长率\",\"raw_value\":\"758.4\",\"value\":\"758.4\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"上述为行业市场环境数据，非公司自身经营结果。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司新增重要非主营业务的说明为“不适用”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"本次选定章节未提供其他重大经营变化的具体说明。\"]}},\"supply_chain\":null,\"company_features\":null,\"limitations\":[\"本次选定章节未提供公司层面营业收入总额、净利润及分业务线收入占比的完整表格，规模与结构以投行业务承销规模等经营指标补充说明。\",\"分地区收入金额及占比明细未在选定章节中获取。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司以市场化、平台化、数字化和全面协同为导向，持续打造“五位一体”业务模式，提供财富管理业务、投资银行业务、机构业务、国际业务、投资交易业务及母子公司一体化的综合金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "母子公司一体化业务将从事期货业务、私募股权基金管理业务、另类投资业务、资产管理业务的子公司平台与前述五大业务线融合，强化业务协同、资源对接。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "财富管理业务为客户提供代理买卖股票、基金、债券、衍生金融工具等服务，提供投资咨询、投资组合建议、金融产品销售和资产配置等金融服务，并向客户提供融资融券、股票质押式回购及约定购回交易等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "投资银行业务为各类型企业和政府客户提供一站式投资银行服务，包括股权融资、债券融资、结构化融资、财务顾问及多样化融资解决方案等金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "机构业务提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "国际业务通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投资银行、研究和资产管理、融资和金融产品等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "投资交易业务从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融资及风险管理提供综合金融解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司通过财富管理、投资银行、机构、国际、投资交易及母子公司一体化等业务线向客户提供综合金融服务并取得收入，各业务线分别对应经纪、承销、托管、投资交易等不同收费或收益方式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "本次选定章节未提供按业务线拆分的收入金额明细，收入构成主要依据分行业与分地区披露。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年公司投资银行业务完成1单IPO项目、7单再融资项目，股权承销规模为人民币86.97亿元，行业排名第12；完成3单上市公司发行股份购买资产/重大资产重组项目，交易金额为人民币194.66亿元，行业排名第7；另完成2单新三板定向发行项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "股权承销规模",
+                  "raw_value": "86.97",
+                  "value": "86.97",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "发行股份购买资产/重大资产重组交易金额",
+                  "raw_value": "194.66",
+                  "value": "194.66",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "2025年公司债券承销规模为人民币6,825.75亿元，同比增长37.3%，行业排名第6；其中地方政府债承销规模4,333.31亿元、金融债1,458.81亿元、中期票据300.00亿元、定向债务融资工具100.92亿元、短期融资券91.44亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "债券承销规模",
+                  "raw_value": "6,825.75",
+                  "value": "6825.75",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "债券承销规模同比增长率",
+                  "raw_value": "37.3",
+                  "value": "37.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "地方政府债承销规模",
+                  "raw_value": "4,333.31",
+                  "value": "4333.31",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "金融债承销规模",
+                  "raw_value": "1,458.81",
+                  "value": "1458.81",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中期票据承销规模",
+                  "raw_value": "300.00",
+                  "value": "300.00",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "定向债务融资工具承销规模",
+                  "raw_value": "100.92",
+                  "value": "100.92",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "短期融资券承销规模",
+                  "raw_value": "91.44",
+                  "value": "91.44",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "本次选定章节未提供公司层面营业收入总额及分业务线收入占比的完整表格，规模与结构以投行业务承销规模等经营指标补充说明。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司投资银行业务紧密围绕打造“企业家信任的投资银行专家”的关键业务战略，践行“三化一同”体制机制，向纵深推进专业化改革，优化团队设置、补充专业人员，完善项目管理、协同拓展业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "公司积极开展业务协同，进一步发掘地方政府债、金融债、中期票据、定向债务融资工具等业务机会，债券承销规模增速高于行业平均增速。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": [
+            "本次选定章节未披露公司具体原材料、能源等实物投入，作为金融机构其经营投入以人力、资本与业务平台为主。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "财富管理业务面向客户提供代理买卖、投资咨询、金融产品销售与资产配置及融资融券等服务；投资银行业务面向各类型企业和政府客户；机构业务面向机构客户提供主经纪商、托管与基金服务等；国际业务面向全球机构客户、企业客户和零售客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "本次选定章节未提供分地区收入金额及占比明细，客户与市场范围以业务描述为主。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "2025年A股股权融资规模（含可转债，不含可交债及发行股份购买资产）为人民币9,415.85亿元，同比增长274.2%；其中IPO规模1,317.71亿元，同比增长95.6%；再融资规模8,098.14亿元，同比增长339.5%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "A股股权融资规模（含可转债）",
+                  "raw_value": "9,415.85",
+                  "value": "9415.85",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "A股股权融资规模同比增长率",
+                  "raw_value": "274.2",
+                  "value": "274.2",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "IPO规模",
+                  "raw_value": "1,317.71",
+                  "value": "1317.71",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "IPO规模同比增长率",
+                  "raw_value": "95.6",
+                  "value": "95.6",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "再融资规模",
+                  "raw_value": "8,098.14",
+                  "value": "8098.14",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "再融资规模同比增长率",
+                  "raw_value": "339.5",
+                  "value": "339.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "2025年境内债券新发行规模（不含可转债）为人民币89.08万亿元，同比增长11.5%；境内并购市场整体交易规模为人民币6,850.00亿元，同比增长758.4%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "境内债券新发行规模（不含可转债）",
+                  "raw_value": "89.08",
+                  "value": "89.08",
+                  "unit": "万亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境内债券新发行规模同比增长率",
+                  "raw_value": "11.5",
+                  "value": "11.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境内并购市场整体交易规模",
+                  "raw_value": "6,850.00",
+                  "value": "6850.00",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境内并购市场整体交易规模同比增长率",
+                  "raw_value": "758.4",
+                  "value": "758.4",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "上述为行业市场环境数据，非公司自身经营结果。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期内公司新增重要非主营业务的说明为“不适用”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "本次选定章节未提供其他重大经营变化的具体说明。"
+          ]
+        }
+      },
+      "supply_chain": null,
+      "company_features": null,
+      "limitations": [
+        "本次选定章节未提供公司层面营业收入总额、净利润及分业务线收入占比的完整表格，规模与结构以投行业务承销规模等经营指标补充说明。",
+        "分地区收入金额及占比明细未在选定章节中获取。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 8064,
+      "output_tokens": 2724,
+      "total_tokens": 10788
+    }
+  },
+  {
+    "request_id": "bp-work-522acd73d4816c9de549211a:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "4a5bd7a868eaf87c1627a90ead409b21731be49ecc249124a3e70db64bc4135c",
+    "response_hash": "3f212518f31dcb00f1695cbf1c35f59ab515e398c163e535734db365135091d5",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FR-001\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-RM-01\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"来源只列明财富管理、投资银行、机构、国际、投资交易及母子公司一体化所提供的服务，并未说明各业务线分别对应经纪、承销、托管、投资交易等收费或收益方式，也未披露收入实现机制。该对应关系会改变对盈利方式的理解，应删除不受支持的收费映射及“取得收入”的具体化表述，仅保留来源支持的综合金融服务范围；选定章节未披露的收费方式不得补写。\"},{\"finding_id\":\"FR-002\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-01\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"9,415.85亿元及IPO 1,317.71亿元、再融资8,098.14亿元均为Wind统计的A股市场股权融资规模，不是公司或其投资银行业务分部的经营结果。事实正文的市场口径基本正确，但事实和全部指标的subject_scope标成business_segment，会与公司股权承销规模86.97亿元混淆。应改为unclear或明确的全市场口径，不得标为公司业务分部。指标名“A股股权融资规模（含可转债）”还漏掉来源中的“不含可交债及发行股份购买资产”，应保留该排除项。金额和274.2%、95.6%、339.5%同比增速与来源一致，不必改数。\"},{\"finding_id\":\"FR-003\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-02\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"境内债券新发行规模89.08万亿元和境内并购市场交易规模6,850.00亿元是市场环境数据，不是公司债券承销或并购业务金额。公司自身债券承销规模为6,825.75亿元，二者不可等同。事实及指标subject_scope标为business_segment属于主体错误，应改为unclear或市场口径，并继续标明非公司自身经营结果。金额、万亿元/亿元单位及11.5%、758.4%同比增速与来源一致，应保留。\"},{\"finding_id\":\"FR-004\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"explanation\":\"收入模型局限中“收入构成主要依据分行业与分地区披露”没有来源依据；所供章节没有分行业或分地区收入构成，草稿另处也写明未取得分地区收入。该句应删除，只保留选定章节未提供分业务线收入金额这一限定。这不是要求补造公司营业收入或收入占比。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-RM-01\",\"F-SM-01\",\"F-SM-02\",\"F-OI-01\",\"F-OI-02\",\"F-CC-01\",\"F-OD-01\",\"F-OD-02\",\"F-MC-01\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FR-001",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-RM-01",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "来源只列明财富管理、投资银行、机构、国际、投资交易及母子公司一体化所提供的服务，并未说明各业务线分别对应经纪、承销、托管、投资交易等收费或收益方式，也未披露收入实现机制。该对应关系会改变对盈利方式的理解，应删除不受支持的收费映射及“取得收入”的具体化表述，仅保留来源支持的综合金融服务范围；选定章节未披露的收费方式不得补写。"
+        },
+        {
+          "finding_id": "FR-002",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OD-01",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "9,415.85亿元及IPO 1,317.71亿元、再融资8,098.14亿元均为Wind统计的A股市场股权融资规模，不是公司或其投资银行业务分部的经营结果。事实正文的市场口径基本正确，但事实和全部指标的subject_scope标成business_segment，会与公司股权承销规模86.97亿元混淆。应改为unclear或明确的全市场口径，不得标为公司业务分部。指标名“A股股权融资规模（含可转债）”还漏掉来源中的“不含可交债及发行股份购买资产”，应保留该排除项。金额和274.2%、95.6%、339.5%同比增速与来源一致，不必改数。"
+        },
+        {
+          "finding_id": "FR-003",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OD-02",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "境内债券新发行规模89.08万亿元和境内并购市场交易规模6,850.00亿元是市场环境数据，不是公司债券承销或并购业务金额。公司自身债券承销规模为6,825.75亿元，二者不可等同。事实及指标subject_scope标为business_segment属于主体错误，应改为unclear或市场口径，并继续标明非公司自身经营结果。金额、万亿元/亿元单位及11.5%、758.4%同比增速与来源一致，应保留。"
+        },
+        {
+          "finding_id": "FR-004",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "explanation": "收入模型局限中“收入构成主要依据分行业与分地区披露”没有来源依据；所供章节没有分行业或分地区收入构成，草稿另处也写明未取得分地区收入。该句应删除，只保留选定章节未提供分业务线收入金额这一限定。这不是要求补造公司营业收入或收入占比。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-01",
+        "F-SM-01",
+        "F-SM-02",
+        "F-OI-01",
+        "F-OI-02",
+        "F-CC-01",
+        "F-OD-01",
+        "F-OD-02",
+        "F-MC-01"
+      ]
+    },
+    "usage": {
+      "input_tokens": 8101,
+      "output_tokens": 819,
+      "total_tokens": 25047
+    }
+  },
+  {
+    "request_id": "bp-work-522acd73d4816c9de549211a:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "f9197b7b3af815351c85d9e61b74a41976943ff5f3b1a3aa21d706baaa993a14",
+    "response_hash": "3e02642eb015c60c1b47f616df774f0463af43c678b50e9b8b38243f4107ec82",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司通过财富管理、投资银行、机构、国际、投资交易及母子公司一体化等业务线向客户提供综合金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-OD-01\",\"text\":\"2025年A股股权融资规模（含可转债，不含可交债及发行股份购买资产）为人民币9,415.85亿元，同比增长274.2%；其中IPO规模1,317.71亿元，同比增长95.6%；再融资规模8,098.14亿元，同比增长339.5%。上述数据为Wind统计的全市场数据，非公司自身经营结果。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"A股股权融资规模（含可转债，不含可交债及发行股份购买资产）\",\"raw_value\":\"9,415.85\",\"value\":\"9415.85\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"A股股权融资规模同比增长率\",\"raw_value\":\"274.2\",\"value\":\"274.2\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"IPO规模\",\"raw_value\":\"1,317.71\",\"value\":\"1317.71\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"IPO规模同比增长率\",\"raw_value\":\"95.6\",\"value\":\"95.6\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"再融资规模\",\"raw_value\":\"8,098.14\",\"value\":\"8098.14\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"再融资规模同比增长率\",\"raw_value\":\"339.5\",\"value\":\"339.5\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"上述规模及增速为Wind统计的全市场数据，非公司自身经营结果，主体范围无法归入公司业务分部。\"},{\"fact_id\":\"F-OD-02\",\"text\":\"2025年境内债券新发行规模（不含可转债）为人民币89.08万亿元，同比增长11.5%；境内并购市场整体交易规模为人民币6,850.00亿元，同比增长758.4%。上述数据为市场环境数据，非公司自身经营结果。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"境内债券新发行规模（不含可转债）\",\"raw_value\":\"89.08\",\"value\":\"89.08\",\"unit\":\"万亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"境内债券新发行规模同比增长率\",\"raw_value\":\"11.5\",\"value\":\"11.5\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"境内并购市场整体交易规模\",\"raw_value\":\"6,850.00\",\"value\":\"6850.00\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"境内并购市场整体交易规模同比增长率\",\"raw_value\":\"758.4\",\"value\":\"758.4\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"上述规模及增速为市场环境数据，非公司自身经营结果，主体范围无法归入公司业务分部。\"}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-RM-01",
+          "text": "公司通过财富管理、投资银行、机构、国际、投资交易及母子公司一体化等业务线向客户提供综合金融服务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-OD-01",
+          "text": "2025年A股股权融资规模（含可转债，不含可交债及发行股份购买资产）为人民币9,415.85亿元，同比增长274.2%；其中IPO规模1,317.71亿元，同比增长95.6%；再融资规模8,098.14亿元，同比增长339.5%。上述数据为Wind统计的全市场数据，非公司自身经营结果。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "A股股权融资规模（含可转债，不含可交债及发行股份购买资产）",
+              "raw_value": "9,415.85",
+              "value": "9415.85",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "A股股权融资规模同比增长率",
+              "raw_value": "274.2",
+              "value": "274.2",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "IPO规模",
+              "raw_value": "1,317.71",
+              "value": "1317.71",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "IPO规模同比增长率",
+              "raw_value": "95.6",
+              "value": "95.6",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "再融资规模",
+              "raw_value": "8,098.14",
+              "value": "8098.14",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "再融资规模同比增长率",
+              "raw_value": "339.5",
+              "value": "339.5",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "上述规模及增速为Wind统计的全市场数据，非公司自身经营结果，主体范围无法归入公司业务分部。"
+        },
+        {
+          "fact_id": "F-OD-02",
+          "text": "2025年境内债券新发行规模（不含可转债）为人民币89.08万亿元，同比增长11.5%；境内并购市场整体交易规模为人民币6,850.00亿元，同比增长758.4%。上述数据为市场环境数据，非公司自身经营结果。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "境内债券新发行规模（不含可转债）",
+              "raw_value": "89.08",
+              "value": "89.08",
+              "unit": "万亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内债券新发行规模同比增长率",
+              "raw_value": "11.5",
+              "value": "11.5",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内并购市场整体交易规模",
+              "raw_value": "6,850.00",
+              "value": "6850.00",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内并购市场整体交易规模同比增长率",
+              "raw_value": "758.4",
+              "value": "758.4",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "上述规模及增速为市场环境数据，非公司自身经营结果，主体范围无法归入公司业务分部。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 4566,
+      "output_tokens": 1080,
+      "total_tokens": 5646
+    }
+  },
+  {
+    "request_id": "bp-work-522acd73d4816c9de549211a:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "5b4c595acae888afa4c84c2a52b7833c0af09f56d2b15189777e22930583cda1",
+    "response_hash": "07988f668167e85201a0047a0345cc8ae60bef43e610938a7a7a299c135a269b",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-RM-01\",\"F-OD-01\",\"F-OD-02\"],\"checks\":[{\"fact_id\":\"F-RM-01\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"原文仅列明财富管理、投资银行、机构、国际、投资交易及母子公司一体化所构成的综合金融服务范围，并未披露各业务线的收费或收入实现机制。修复后删除了不受支持的收费映射和收入具体化表述，主体按报告期经营文本中的公司口径归为合并集团，期间与证据匹配。\"},{\"fact_id\":\"F-OD-01\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"9,415.85亿元、IPO 1,317.71亿元、再融资8,098.14亿元及274.2%、95.6%、339.5%均与Wind统计的2025年A股市场数据一致，并保留了不含可交债及发行股份购买资产的排除项。事实和各指标均改为unclear且明确非公司经营结果，未再误标为公司业务分部。\"},{\"fact_id\":\"F-OD-02\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"境内债券新发行规模89.08万亿元、并购市场整体交易规模6,850.00亿元及11.5%、758.4%同比增速与市场环境原文一致，单位分别保持万亿元和亿元。修复后明确其为市场数据而非公司债券承销或并购经营结果，主体未再标为business_segment。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-RM-01",
+        "F-OD-01",
+        "F-OD-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-RM-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "原文仅列明财富管理、投资银行、机构、国际、投资交易及母子公司一体化所构成的综合金融服务范围，并未披露各业务线的收费或收入实现机制。修复后删除了不受支持的收费映射和收入具体化表述，主体按报告期经营文本中的公司口径归为合并集团，期间与证据匹配。"
+        },
+        {
+          "fact_id": "F-OD-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "9,415.85亿元、IPO 1,317.71亿元、再融资8,098.14亿元及274.2%、95.6%、339.5%均与Wind统计的2025年A股市场数据一致，并保留了不含可交债及发行股份购买资产的排除项。事实和各指标均改为unclear且明确非公司经营结果，未再误标为公司业务分部。"
+        },
+        {
+          "fact_id": "F-OD-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "境内债券新发行规模89.08万亿元、并购市场整体交易规模6,850.00亿元及11.5%、758.4%同比增速与市场环境原文一致，单位分别保持万亿元和亿元。修复后明确其为市场数据而非公司债券承销或并购经营结果，主体未再标为business_segment。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 5302,
+      "output_tokens": 359,
+      "total_tokens": 8834
+    }
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "representation": "model_message_content_string_not_http_bytes",
+  "physical_sequence": 3,
+  "status_code": 200,
+  "model": null,
+  "provider_request_id": "37e21844-e1c5-4f87-98ea-eebeb7a22bd9, 7101d6b9-8c82-954d-be34-b79247d75031",
+  "finish_reason": null,
+  "usage": {},
+  "content": "",
+  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,45 @@
+{
+  "task": "6.EA",
+  "status": "explicitly_approved",
+  "instruments": [
+    "600309.SH",
+    "600438.SH",
+    "002594.SZ",
+    "000725.SZ",
+    "920002.BJ",
+    "920005.BJ",
+    "601021.SH",
+    "601888.SH",
+    "002352.SZ",
+    "002027.SZ",
+    "300144.SZ",
+    "601111.SH",
+    "601601.SH",
+    "601881.SH",
+    "002142.SZ",
+    "601009.SH",
+    "000027.SZ",
+    "000090.SZ",
+    "600663.SH",
+    "600655.SH"
+  ],
+  "approval_reference": "用户call_ed4cf8881a7643b8aee6b64c1b85f2e3明确回复“批准这20家一次限定确认”。仅既有公开2025年报与所选公开派生稿，原TaskService各一次全新、DeepSeek选章/抽取/至多一次修订，既有Scorpio/Grok grok-4.7 high初核/必要再核。每家6000秒/1000000保守账本/10物理含3恢复每逻辑1，高阶物理1200/逻辑2450、Flash600、抽取12000；并发4，组30600秒/20000000/200。仅获准联网环境、先独立源参考且不给模型、冻结不热修、同核心根因两连败停未启动/核心不可隔离封发送；不载旧语义、不追加窗/公司/充值/共享配置修改/生产；无价unknown、有价每家10元、不承诺人民币总额；旧失败保留，确认失败结束S2不加第41家，整卡执行及清垃圾。",
+  "source_plan": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-general-closure-20261119/confirmation-source-plan.json",
+  "source_plan_sha256": "1019410132ae6e262e051e37e7b67eaaee2083bb9b125f9b8566226781da27cf",
+  "each_limits": {
+    "business_seconds": 6000,
+    "tokens": 1000000,
+    "physical_requests": 10,
+    "recoveries": 3,
+    "per_logical": 1,
+    "known_cost_cny": 10
+  },
+  "group_limits": {
+    "tokens": 20000000,
+    "physical_requests": 200,
+    "recoveries": 60,
+    "business_wall_seconds": 30600,
+    "max_concurrency": 4
+  },
+  "production_authorization": "not_authorized"
+}

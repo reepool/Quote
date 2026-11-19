@@ -1,0 +1,70 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "a6f4d0accf7b96f310946cadcaa0896a7d9ca36bb73c22e26480618780cae2fd",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 13442,
+        "completion_tokens": 404,
+        "total_tokens": 13846
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 2,
+      "content_sha256": "6cdefd13d108fb648c7b342fbdd41fec3f64223ace855b67b525e7062beefe03",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 12270,
+        "completion_tokens": 8399,
+        "total_tokens": 20669
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 3,
+      "content_sha256": "58f7498a52e666dd7233a615ea023c0f153bd1b761ac527de93ea7ddf35c775d",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 19072,
+        "completion_tokens": 1313,
+        "total_tokens": 53541
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 4,
+      "content_sha256": "1ed0cf33ddac9a849a7fe56fd5b4eb8dc0e5fe492a9d572222071dd8af757cf8",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 10154,
+        "completion_tokens": 1296,
+        "total_tokens": 11450
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 5,
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finish_reason": null,
+      "usage": {},
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002352/failed-model-content/content-005.json"
+    },
+    {
+      "physical_sequence": 6,
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finish_reason": null,
+      "usage": {},
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002352/failed-model-content/content-006.json"
+    }
+  ],
+  "duplicates_not_copied": 4
+}

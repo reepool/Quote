@@ -1,0 +1,9 @@
+{
+  "task": "6.EA",
+  "group_pid": 3054144,
+  "at_monotonic": 10300729.569330009,
+  "action": "SIGSTOP_dispatch_parent_only; in-flight child budgets untouched",
+  "reason": "consecutive companies 002352.SZ (final review incomplete) and 002027.SZ (review failed) share missing message content/finish_reason; operator only auto-normalizes fully failed reviews, so enforce approved same-core-root stop outside frozen business code",
+  "do_not_dispatch_remaining": true,
+  "resume_only_after_inflight_exit_with_existing_stop_marker": true
+}

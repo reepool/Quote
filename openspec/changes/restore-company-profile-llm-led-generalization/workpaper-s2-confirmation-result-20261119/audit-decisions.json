@@ -1,0 +1,212 @@
+{
+  "task": "6.EA",
+  "method": "Codex independent original-source judgment of final retained facts; before-control errors/limits kept separate from delivery",
+  "companies": {
+    "002352.SZ": {
+      "checked_fact_ids": ["F-BS-01", "F-BS-02", "F-PS-01", "F-PS-03", "F-RM-01", "F-RM-03", "F-RM-04", "F-RM-05", "F-RM-06"],
+      "basis": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "主要物流产品/三分部及运输服务收入有实质内容；初核后的坏对象未获再核，不把它们复活为通过。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F-RM-01": "人民币3082.3亿元为原文显示精度，不当额外精确总额。", "F-RM-04": "速运及大件内部各产品金额保层级，不与分部父项重复。", "F-RM-05": "其他含商品购销；供应链及国际与其分部口径不同，按原表保层级。"},
+      "adopted_revisions_independently_checked": [],
+      "remaining": ["最终核验两次空响应，原修订未获采纳，保verification_failed及局部撤回；不是完整自动纠错闭环。"],
+      "sampling_scope": "9 retained core/support objects; remaining objects retain actual model status, no full-sample score", "full_report_accuracy": "not_claimed"
+    },
+    "002027.SZ": {
+      "checked_fact_ids": ["F-BS-01", "F-BS-02", "F-PS-01", "F-PS-02", "F-RM-01", "F-RM-02", "F-RM-03"],
+      "basis": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "户外广告媒体开发运营、楼宇/影院产品及广告发布主责/时段收费收入可理解；该有限独核不能冒充失败的高阶初核已完成。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F-BS-02": "源时点为2026-03-31，不写2025年末；约数和自营/加盟/参股分开。", "F-RM-03": "毛利率增减原表以百分号显示，标准化为百分点保原来源单位；不当相对增长率。"},
+      "adopted_revisions_independently_checked": [],
+      "remaining": ["高阶初核两次空响应，无语义复核结果；其余补充事实仅抽取/待核，不称全稿可信。"],
+      "sampling_scope": "7 core/support objects only; no whole-profile independent score", "full_report_accuracy": "not_claimed"
+    },
+    "300144.SZ": {
+      "checked_fact_ids": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09", "F10", "F15", "F19"],
+      "basis": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "演艺与旅游服务双轮及门票、授权设计托管和票务手续费等收入有实质答案，不是只列宣传口号。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F08": "景区分项不与行业父项重复加总。", "F09": "电子商务手续费和设计策划费与景区收入分别保原类别。", "F10": "毛利率增减按百分点，不当相对百分比增长。", "F15": "收购动作与后续将实施事项区分，非全部已达成。"},
+      "adopted_revisions_independently_checked": ["F15", "F19"],
+      "revision_basis": "p12后续将统领中央厨房赋能安排；各项目经营表现归业务分部而非集团总业绩。",
+      "sampling_scope": "12 core/support objects plus both actual adopted revisions; no full supplemental sample", "full_report_accuracy": "not_claimed"
+    },
+    "601111.SH": {
+      "checked_fact_ids": ["F01", "F02", "F03", "F04", "F05", "F06"],
+      "basis": "p11—12附加产品/客货运营，p16—17集团客运/货邮及地区分解，p22集团运营表和p27主要附属载体。核货币单位千元与亿元显示，货邮与客运分开。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "航空运输主要客货产品及对应收费收入成立，其他航服细分仍建议展开，不据此拒已有航空画像。",
+      "errors": {},
+      "source_only": {"F02": "客运和地区金额可核，但地区明细结构化subject_scope标business_segment，不能作经营分部精确消费；整条含这些指标，保原文参考，不手工拆取正确主金额。", "F03": "货邮与各地区金额可核，但地区数据被标business_segment，保源参考避免错误分类，未猜改数值或主体。"},
+      "limitations": {"F05": "保主营、其他业务与公司总额的原披露区别；不表示其他航服/维修细项已抽全。"},
+      "adopted_revisions_independently_checked": [],
+      "remaining": ["高阶初核两次空响应，主体范围等其他补充未经模型复核；未再核对象不能称闭环成功。"],
+      "sampling_scope": "6 retained core/support objects, no full-profile score", "full_report_accuracy": "not_claimed"
+    },
+    "601881.SH": {
+      "checked_fact_ids": ["F-BS-01", "F-BS-02", "F-PS-01", "F-PS-02", "F-PS-03", "F-PS-04", "F-PS-05", "F-RM-01", "F-OD-01", "F-OD-02"],
+      "basis": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": false},
+      "core_basis": "服务线和产品完整，但F-RM-01修订后仅重复提供综合金融服务，缺独立赚钱机制/本公司收入构成，不能用市场融资规模或行业常识填补。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F-OD-01": "A股全市场股权融资非本公司股权承销规模，不供集团经营数据计算。", "F-OD-02": "境内市场债券和并购规模非公司收入或承销规模。"},
+      "adopted_revisions_independently_checked": ["F-RM-01", "F-OD-01", "F-OD-02"],
+      "revision_basis": "删除无源收费映射，不把正确服务范围冒充盈利机制；市场数据收窄为unclear并补排除条件，仍非公司业绩。",
+      "remaining": ["公司收入/主要业务变现需定向补读经营收入分析；本卡停止不再补窗口。"],
+      "sampling_scope": "10 core/support and all three actual adopted revisions", "full_report_accuracy": "not_claimed"
+    },
+    "601601.SH": {
+      "checked_fact_ids": ["F-BS-01", "F-BS-02", "F-PS-01", "F-PS-02", "F-PS-03", "F-RM-01", "F-RM-02", "F-RM-03", "F-SM-03", "F-OD-01", "F-OD-02", "F-MC-02"],
+      "basis": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "人身/财产/健康及资管养老等业务、保险服务及资金运用和第三方管理费已有实质描述；不强求所有保险收入尾项。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F-PS-01": "太保寿险专节注1包括其香港子公司，比较期重述；规模保费、新业务价值与服务收入不等同。", "F-RM-01": "营业总收入与保险服务收入不同，不互当同科目。", "F-OD-02": "97.6等为财产险业务，不替换成太保产险单体97.5等。", "F-SM-03": "归母范围结合原报告p37注1核，不改成母公司单体issuer。"},
+      "adopted_revisions_independently_checked": ["F-SM-03", "F-OD-01", "F-OD-02", "F-MC-02"],
+      "revision_basis": "净利/营运利润归母，寿险和财产险业务范围分别保板块而非单一子公司；车险/非车险定性表述不虚构法律实体。",
+      "sampling_scope": "12 core/support and all four actual adopted revisions; remaining supplemental objects not independently scored", "full_report_accuracy": "not_claimed"
+    },
+    "002142.SZ": {
+      "checked_fact_ids": ["F-BS-01", "F-PS-01", "F-PS-02", "F-PS-03", "F-PS-04", "F-PS-05", "F-RM-04", "review-add:WF-01", "review-add:WF-02", "review-add:WF-03", "F-CC-01", "F-CC-04", "review-add:WF-04", "F-CF-02"],
+      "basis": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "企业/小微/财富消费和金融市场等业务及净利息/非利息收入恢复后可理解，不用客户存款利息成本代替收入。",
+      "errors": {}, "source_only": {},
+      "limitations": {"review-add:WF-02": "公司贷款指对公类别，不是本公司全部客户贷款；本金与净额不同。", "review-add:WF-03": "证券投资为期末资产存量，不是当期收入；亿元与百万元展示不重复计数。", "review-add:WF-04": "贷款减值大于合计因其他项目含转回负额，不猜改为正数或删去。", "F-CC-04": "投诉地区分布不推断收入/贷款/客户地区占比。", "F-CF-02": "各具名主体保自身规模利润及未确定关系，不并入集团相加；此处不补控股关系。"},
+      "adopted_revisions_independently_checked": ["F-BS-01", "F-PS-03", "F-PS-05", "review-add:WF-01", "review-add:WF-02", "review-add:WF-03", "F-CC-01", "F-CC-04", "review-add:WF-04", "F-CF-02"],
+      "revision_basis": "收入两主类、信贷/投资/减值补充按原表和期末日期核；投诉不推经营地域，结算新产品不改贴现，具名基金/金租/理财/消金关系不确定原文保留。",
+      "sampling_scope": "14 core/support objects and all ten actual adopted revisions; other supplemental facts not independently scored", "full_report_accuracy": "not_claimed"
+    },
+    "920002.BJ": {
+      "checked_fact_ids": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09", "F10"],
+      "basis": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "叉车轴承与回转支承研发制造销售、产品用途及直销/贸易商模式和主收入均有实质说明。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F08": "业务类型其他与其他业务收入不同，不相互覆盖。", "F09": "确认时点的少量时段收入保原表，不据空成本列推零。"},
+      "adopted_revisions_independently_checked": ["F08"],
+      "revision_basis": "将业务类型其他7,083,946.62/6,017,390.11与会计其他业务5,348,501.24/5,128,685.95区分；材料下脚料独立保留，核原两页而非金额接近。",
+      "sampling_scope": "10 core/support objects plus all one actual adopted revision; other facts not independently scored", "full_report_accuracy": "not_claimed"
+    },
+    "920005.BJ": {
+      "checked_fact_ids": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09", "F26"],
+      "basis": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "两类产品及制造/外协和直销业务有实质回答，产品金额可读；两条毛利率修订被原owner拒绝未复活，不因此清空整稿。",
+      "errors": {},
+      "source_only": {"F08": "内外销是经营地区而非业务分部，金额/毛利有原表支持但结构化指标标business_segment；保原文参考，不供经营分部精确消费。"},
+      "limitations": {"F06": "原文营业总收入万元精度保留，不改挂另一科目。", "F26": "对全资子公司投资款来源未明示母公司单体，保unclear，不作集团外部投资。"},
+      "adopted_revisions_independently_checked": ["F04", "F26"],
+      "revision_basis": "六产品分类与功能/防护分类不擅自映射；投资款表及注记支持范围收窄/不确定主体。",
+      "sampling_scope": "10 core/support objects and both actual adopted revisions; unreviewed supplemental facts stay model graded", "full_report_accuracy": "not_claimed"
+    },
+    "601021.SH": {
+      "checked_fact_ids": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09", "F10", "F15", "F28"],
+      "basis": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "低成本航空、国内国际港澳台客货和辅助服务及票价/服务收入可理解，不能把行业民航量当公司。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F10": "单位成本和非油成本保原文元及其章节口径，不自动跨公司/跨行业比较。", "F15": "座位布局97/25架保原数及不明确机型归属，不靠97+25=47+75自行定对象。"},
+      "adopted_revisions_independently_checked": ["F04", "F15", "F28"],
+      "revision_basis": "南昌建设只为服务创造机遇，布局数量不归到75架子集，经济未变化改回披露栏不适用。",
+      "sampling_scope": "12 core/support and all three actual adopted revisions; not a full supplemental audit", "full_report_accuracy": "not_claimed"
+    },
+    "601888.SH": {
+      "checked_fact_ids": ["F01", "F02", "F04", "F05", "F06", "F11", "F15", "F20", "F25"],
+      "basis": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "免税/有税旅游零售及商业开发的实质产品/渠道和销售机制已可读。免税有税具体金额修订未获采纳仍缺，不把补充金额未满当没有画像。",
+      "errors": {}, "source_only": {},
+      "limitations": {"F11": "海口项目金额与累计收益按源且主体unclear，不当集团本期利润。", "F15": "DFS交易另属2026年1月且为将收购，不由本条新店和供货推成2025已交割。", "F20": "近100款为自有品牌及相关品类，不缩成中免健康单品牌精确数量。", "F25": "采购授权已建立，后续集中/多元采购保计划，非已实现效果。"},
+      "adopted_revisions_independently_checked": ["F11", "F15", "F20", "F25"],
+      "revision_basis": "四条实际采纳逐核原段/表及期别，不把另两条本地拒绝收入候选当最终通过或手动补回。",
+      "remaining": ["主营收入构成两候选仍本地拒绝，图中未可靠采纳免税/有税具体金额；保建议获取。"],
+      "sampling_scope": "9 core/support objects and all four actual adopted revisions; not a whole report or full supplemental score", "full_report_accuracy": "not_claimed"
+    },
+    "600309.SH": {
+      "checked_fact_ids": ["F-BS-01", "F-BS-02", "F-PS-01", "F-PS-02", "F-PS-03", "F-PS-04", "F-PS-05", "F-PS-06", "F-PS-07", "F-RM-01", "F-RM-02", "F-SM-01", "F-SM-02", "F-SM-03", "F-OI-01", "F-OI-02", "F-OI-03", "F-OI-04", "F-CC-01", "F-CC-02", "F-CC-03", "F-CC-04", "F-OD-01", "F-OD-02", "F-OD-03", "F-MC-01", "F-MC-02", "F-MC-03", "F-MC-04", "F-SC-P-01", "F-SC-U-01", "F-SC-U-02", "F-SC-D-01", "F-SC-D-02", "F-CF-01", "F-CF-02", "F-CF-03"],
+      "basis": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "三板块及材料/用途、B2B生产与直经销、主系列收入和公司规模均可实质理解。",
+      "errors": {},
+      "source_only": {},
+      "limitations": {
+        "F-SM-02": "本事实为原细分行业表中的系列收入/毛利，不与其他系列机械相加冒充集团抵销后总额。",
+        "F-SM-03": "其他系列按原表保留；原p18另有内部抵销，不能把这几行当集团可相加净收入。",
+        "F-SM-01": "叙述销售收入和利润保原显示精度；修订后销售收入科目不改挂另一指标。",
+        "F-OI-04": "烟台基地分期装置口径/unclear，不是集团乙烯总产能。",
+        "F-CF-03": "ROC异地装置自主运行率，非园区整体经营指标或法律子公司确定数。"
+      },
+      "adopted_revisions_independently_checked": ["F-OI-04", "F-CF-03", "F-OD-02", "F-OD-03", "F-SM-01"],
+      "revision_basis": "五修订均对原文复核：基地与ROC保不确定主体，行业MDI/TDI及石化环境不归集团产销，销售收入保其原科目；不是强求源不确定变精确。",
+      "sampling_scope": "all 37 final retained objects",
+      "full_report_accuracy": "not_claimed"
+    },
+    "600438.SH": {
+      "checked_fact_ids": ["F01", "F02", "F03", "F04", "F05", "F06", "review-add:RF01", "review-add:RF02", "review-add:RF03", "F15", "F17", "F18", "F19", "review-add:RF04", "F20", "F21", "F23", "F24", "F25", "F26", "F27", "F28", "F31", "F32", "F33", "F34", "F35", "F37", "F38", "F39", "F40", "F41", "F42", "F43", "F44"],
+      "basis": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "农业与新能源主线、硅料/电池组件/电站及饲料食品、收入产生方式和负毛利差异有实质内容。",
+      "errors": {},
+      "source_only": {},
+      "limitations": {
+        "review-add:RF03": "分产品与分地区内部抵销是不同表轴；负额只作本表调节，不当普通经营板块或集团收入。主营合计与利润表收入不相同，不跨轴叠加。",
+        "review-add:RF02": "百分点变动保原方向和null标准值，不作确定符号数运算。",
+        "F06": "亿元正文为元原表舍入显示，不据舍入值精确加总。",
+        "F25": "研发投入含研发活动形成产品对应成本，不等同利润表研发费用。",
+        "F31": "全球新增光伏装机为行业背景，非公司装机。",
+        "F32": "行业饲料总产量非本公司产量。"
+      },
+      "adopted_revisions_independently_checked": ["review-add:RF01", "review-add:RF02", "review-add:RF03", "review-add:RF04", "F41", "F26", "F31", "F32"],
+      "revision_basis": "恢复的主收入/负毛利/两种抵销及硅料销量分别核原表；F41保披露不适用而非经济否定，F26网络范围收窄饲料，行业背景不归集团。",
+      "sampling_scope": "all 35 final retained objects",
+      "full_report_accuracy": "not_claimed"
+    },
+    "002594.SZ": {
+      "checked_fact_ids": ["F-BS-01", "F-BS-02", "F-BS-03", "F-PS-01", "F-PS-02", "F-PS-03", "F-PS-04", "F-PS-05", "F-RM-02", "F-RM-03", "F-RM-04", "F-RM-05", "review-add:WF-002", "F-SM-01", "F-SM-02", "F-SM-03", "F-SM-04", "F-OI-01", "F-OI-02", "F-OI-03", "F-OI-04", "F-CC-01", "F-CC-02", "F-CC-03", "F-OD-01", "F-OD-02", "F-OD-03", "F-OD-04", "F-MC-01", "F-MC-03", "F-MC-04", "F-SC-01", "F-SC-02", "F-SC-03", "F-SC-04"],
+      "basis": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "汽车、手机部件组装、电池光伏及轨交均有实质业务/用途描述，两大收入产品线与公司总额成立。",
+      "errors": {},
+      "source_only": {
+        "F-RM-03": "金额和比例可定位，正文已按地区限定；但结构化指标subject_scope为business_segment，实际是地区分类而非经营业务分部。仅原文参考，避免API下游按经营分部使用；不猜改标签或撤回其他收入。",
+        "F-RM-04": "金额和比例有原表支持，直销/经销为销售渠道而非经营分部；结构化指标标business_segment不能作分部精确消费，保源参考。其他F-CC-02保渠道定性比例，基础画像不因此清空。"
+      },
+      "limitations": {
+        "review-add:WF-002": "精确元金额与约百万元叙述并列；后者value=null，不精确相加。",
+        "F-RM-05": "毛利率变动按百分点保源，非相对同比率。",
+        "F-OI-01": "约634亿投入与超2400亿累计投入保约/超；不当利润表费用。",
+        "F-SM-04": "保有量超256万辆是下界，不当精确值。",
+        "F-OD-01": "行业数据保unclear/非公司自身产销。"
+      },
+      "adopted_revisions_independently_checked": ["F-SC-01", "review-add:WF-002", "F-PS-01", "F-CC-02"],
+      "revision_basis": "删无据中游定位、补独立集团总额且保约数，第五代DM为再进化而非本年发布；40.05%明确指境外收入金额增幅。未补归母净利等建议项不拒整稿。",
+      "sampling_scope": "all 35 final retained objects; two dimension-labelled metrics restricted to source reference",
+      "full_report_accuracy": "not_claimed"
+    },
+    "000725.SZ": {
+      "checked_fact_ids": ["F-BS-01", "F-BS-02", "F-PS-01", "F-PS-02", "F-PS-03", "F-PS-04", "F-PS-05", "F-PS-06", "F-RM-01", "F-RM-02", "F-RM-03", "F-RM-04", "F-RM-05", "F-RM-06", "F-RM-07", "F-SM-01", "F-SM-02", "F-OI-01", "F-OI-02", "F-OI-03", "F-OI-04", "F-CC-01", "F-CC-02", "F-OD-01", "F-OD-02", "F-OD-03", "F-OD-04", "F-OD-05", "F-OD-06", "F-MC-01", "F-MC-02", "F-SC-P1", "F-SC-U1", "F-SC-U2", "F-SC-D1", "F-SC-D2"],
+      "basis": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "core": {"principal_business": true, "products_services": true, "revenue_model": true},
+      "core_basis": "1+4+N框架、六类产品/服务及相应设计制造/服务模式、显示与物联网等主收入及单列其他抵销都有实质答案，不以原core_complete=false反推没有基础内容。",
+      "errors": {},
+      "source_only": {
+        "F-OI-04": "研发费用13,836,670,878元/5.44%及前几项研发名在所引p22有据；但后半低碳环保、Tandem、极致窄边框、车载/MLED等项目延续在p23，当前事实仅引用source-0009(p22)，没有引用同包source-0010(p23)。不是证明原文无项目或金额错，而是该复合对象引用覆盖不全。保源参考，不手工追加引用或拆取正确金额，不让它清空其他事实。"
+      },
+      "limitations": {
+        "F-RM-07": "其他及抵销保持原文混合口径/unclear，不能视为集团总收入或普通经营板块，不要求确定化。",
+        "F-OD-02": "海外核心客户营收增长保年报原句和业务语境，不据此推断客户公司整体收入。",
+        "F-MC-02": "2026展望而非2025已发生事实。",
+        "F-SC-D2": "本次真实修订后为2026展望客群，非2025实际客群结论。"
+      },
+      "adopted_revisions_independently_checked": ["F-MC-01", "F-SC-D2"],
+      "revision_basis": "p21的披露事项不适用不推成经济未变化；p31医工客群为下一年计划，修订文本和period均保2026展望。",
+      "full_report_accuracy": "not_claimed",
+      "sampling_scope": "all 36 final retained objects; one citation-incomplete object source-only, no invented supplemental objects"
+    }
+  }
+}

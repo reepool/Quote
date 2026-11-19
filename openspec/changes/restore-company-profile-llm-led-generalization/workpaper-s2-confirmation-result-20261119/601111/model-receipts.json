@@ -1,0 +1,970 @@
+[
+  {
+    "request_id": "bp-work-d017ef9ea557d599dc731599:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "ddee9ad2c783065cada6e48be17b9b2f35ce65310d5eac66c3c02965d683a15f",
+    "response_hash": "d0530f976472a363789351d290b81cc0ac0ded734f7165dc37803aeb5bf6564e",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0037\",\"section-0044\",\"section-0045\",\"section-0046\",\"section-0049\",\"section-0050\",\"section-0081\",\"section-0082\",\"section-0083\",\"section-0098\"],\"rationale\":\"选择公司业务情况（section-0037）说明主营业务与经营模式；主要经营情况及其主营业务分析、利润表变动分析、分行业分产品与分地区收入（section-0044/0045/0046/0049/0050）覆盖收入构成与主要业务权重；行业经营性信息分析中的运营数据表与机队情况（section-0081/0082/0083）提供运力、客座率等经营规模与投入资源；维修业务（section-0098）补充特色业务。均为公司层面实质经营讨论，避免纯行业背景与治理章节。\",\"deferred\":[\"section-0042 提质增效重回报回顾：偏股东回报与治理性叙述，非核心经营结构\",\"section-0043 核心竞争力分析：泛化竞争力描述，经营数据已由前述章节覆盖\",\"section-0099 未来发展讨论与分析：前瞻性计划，非本期经营事实\",\"section-0275 债券相关情况及财务报表附注：篇幅巨大，收入附注仅在必要时定向补充\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成与主要业务权重、运营规模与机队资源等核心经营信息，剩余为治理、前瞻计划与财务附注细节，可在不扩读全报告的前提下停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0037",
+        "section-0044",
+        "section-0045",
+        "section-0046",
+        "section-0049",
+        "section-0050",
+        "section-0081",
+        "section-0082",
+        "section-0083",
+        "section-0098"
+      ],
+      "rationale": "选择公司业务情况（section-0037）说明主营业务与经营模式；主要经营情况及其主营业务分析、利润表变动分析、分行业分产品与分地区收入（section-0044/0045/0046/0049/0050）覆盖收入构成与主要业务权重；行业经营性信息分析中的运营数据表与机队情况（section-0081/0082/0083）提供运力、客座率等经营规模与投入资源；维修业务（section-0098）补充特色业务。均为公司层面实质经营讨论，避免纯行业背景与治理章节。",
+      "deferred": [
+        "section-0042 提质增效重回报回顾：偏股东回报与治理性叙述，非核心经营结构",
+        "section-0043 核心竞争力分析：泛化竞争力描述，经营数据已由前述章节覆盖",
+        "section-0099 未来发展讨论与分析：前瞻性计划，非本期经营事实",
+        "section-0275 债券相关情况及财务报表附注：篇幅巨大，收入附注仅在必要时定向补充"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成与主要业务权重、运营规模与机队资源等核心经营信息，剩余为治理、前瞻计划与财务附注细节，可在不扩读全报告的前提下停止。"
+    },
+    "usage": {
+      "input_tokens": 17644,
+      "output_tokens": 333,
+      "total_tokens": 17977
+    }
+  },
+  {
+    "request_id": "bp-work-d017ef9ea557d599dc731599:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "5c8ec91388e2b5658b0dcb4a22606a23db9bdaa135e84f791b56b65e8807823e",
+    "response_hash": "de91855080eaff2e77689cda98c870dfa18fc98dfe70fbcd90f11ea7497cd06a",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"本集团以航空运输为主业，业务涵盖航空客运、航空货运及邮运，并通过主要附属公司（深圳航空、山东航空、澳门航空、北京航空、大连航空、内蒙航空等）开展运营；报告期内公司新增重要非主营业务说明为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0008\",\"source-0011\"]}],\"limitations\":[\"未获取成功：报告未在选定章节披露完整的集团股权层级与各业务板块的组织架构细节。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F02\",\"text\":\"航空客运是公司核心产品，2025年实现客运收入1,548.56亿元，同比增加30.67亿元；分地区看中国内地客运收入1,070.36亿元、国际426.69亿元、中国香港澳门及台湾51.51亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"航空客运营业收入\",\"raw_value\":\"154,855,779\",\"value\":\"154855779\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客运收入-中国内地\",\"raw_value\":\"107,036,024\",\"value\":\"107036024\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客运收入-国际\",\"raw_value\":\"42,668,978\",\"value\":\"42668978\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客运收入-中国香港、澳门及台湾\",\"raw_value\":\"5,150,777\",\"value\":\"5150777\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F03\",\"text\":\"航空货运及邮运业务2025年实现收入77.78亿元，同比增加3.64亿元；其中分地区国际货邮收入59.85亿元、中国内地15.71亿元、中国香港澳门及台湾2.23亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"航空货运及邮运营业收入\",\"raw_value\":\"7,778,380\",\"value\":\"7778380\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"货邮运输收入-国际\",\"raw_value\":\"5,984,503\",\"value\":\"5984503\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"货邮运输收入-中国内地\",\"raw_value\":\"1,571,017\",\"value\":\"1571017\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"货邮运输收入-中国香港、澳门及台湾\",\"raw_value\":\"222,860\",\"value\":\"222860\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F04\",\"text\":\"公司升级航空附加产品，2025年航空附加产品销售收入同比提升超40%；同时深化客货联动，腹舱经营收入同比增长4.92%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"航空附加产品销售收入同比增幅\",\"raw_value\":\"超40%\",\"value\":\"40\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"腹舱经营收入同比增幅\",\"raw_value\":\"4.92%\",\"value\":\"4.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：报告未在选定章节披露航空附加产品的具体品类构成与单项收入金额。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"公司收入主要来自航空客运与航空货运及邮运的运输服务收费，2025年营业收入1,714.85亿元，其中主营业务收入1,690.64亿元、其他业务收入24.21亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"171,484,646\",\"value\":\"171484646\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入\",\"raw_value\":\"1,690.64\",\"value\":\"1690.64\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"24.21\",\"value\":\"24.21\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F06\",\"text\":\"客运收入变动可分解为：因运力投入上升增加收入49.18亿元、因客座率上升增加收入39.78亿元、因收益水平下降减少收入58.29亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"客运收入变动-运力投入上升影响\",\"raw_value\":\"49.18\",\"value\":\"49.18\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客运收入变动-客座率上升影响\",\"raw_value\":\"39.78\",\"value\":\"39.78\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客运收入变动-收益水平下降影响\",\"raw_value\":\"58.29\",\"value\":\"58.29\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：报告未在选定章节披露客运票价体系、舱位分级定价等具体定价机制细节。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F07\",\"text\":\"按产品划分，2025年航空客运营业收入1,548.56亿元、航空货运及邮运77.78亿元、其他88.50亿元，合计1,714.85亿元；航空客运毛利率3.97%、航空货运及邮运3.88%、其他26.97%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"其他营业收入\",\"raw_value\":\"8,850,487\",\"value\":\"8850487\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入合计\",\"raw_value\":\"171,484,646\",\"value\":\"171484646\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"航空客运毛利率\",\"raw_value\":\"3.97%\",\"value\":\"3.97\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"航空货运及邮运毛利率\",\"raw_value\":\"3.88%\",\"value\":\"3.88\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务毛利率\",\"raw_value\":\"26.97%\",\"value\":\"26.97\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F08\",\"text\":\"按地区划分，2025年中国内地营业收入1,174.58亿元、同比下降0.87%；其他国家和中国香港、澳门及台湾营业收入540.27亿元、同比增长12.07%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业收入-中国内地\",\"raw_value\":\"117,457,528\",\"value\":\"117457528\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入-其他国家和中国香港、澳门及台湾\",\"raw_value\":\"54,027,118\",\"value\":\"54027118\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"2025年本集团投入可用座位公里3,676.41亿座公里、同比增长3.24%，客座率81.88%、同比提升2.03个百分点，每客公里收益0.5144元、同比下降3.63%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"可用座位公里\",\"raw_value\":\"367,641.22\",\"value\":\"367641.22\",\"unit\":\"百万\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客座率\",\"raw_value\":\"81.88%\",\"value\":\"81.88\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"每客公里收益\",\"raw_value\":\"0.5144\",\"value\":\"0.5144\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：报告未在选定章节披露各产品板块的资产占用或资本回报结构。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F10\",\"text\":\"截至2025年末，本集团机队共有飞机964架、平均机龄10.36年；其中自有418架、融资租赁252架、经营租赁294架。本公司机队共有飞机533架、平均机龄9.85年。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"机队规模\",\"raw_value\":\"964\",\"value\":\"964\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"平均机龄\",\"raw_value\":\"10.36\",\"value\":\"10.36\",\"unit\":\"年\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"本公司机队规模\",\"raw_value\":\"533\",\"value\":\"533\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"2025年本集团共引进飞机45架（含25架A320系列、12架B737系列、6架C919、2架C909），退出飞机11架；机队构成为空客系列449架、波音系列468架、商飞系列44架、公务机3架。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"引进飞机\",\"raw_value\":\"45\",\"value\":\"45\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"退出飞机\",\"raw_value\":\"11\",\"value\":\"11\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"空客系列机队\",\"raw_value\":\"449\",\"value\":\"449\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"波音系列机队\",\"raw_value\":\"468\",\"value\":\"468\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"商飞系列机队\",\"raw_value\":\"44\",\"value\":\"44\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"2025年本集团营业成本1,626.47亿元、同比增加44.58亿元、增幅2.82%；每可用座位公里的营业成本0.4424元、同比下降0.41%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0009\"],\"metrics\":[{\"name\":\"营业成本\",\"raw_value\":\"162,647,280\",\"value\":\"162647280\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"每可用座位公里营业成本\",\"raw_value\":\"0.4424\",\"value\":\"0.4424\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：成本分析表具体构成明细在选定章节中未完整呈现，航油、起降等分项金额未获取。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"公司航线网络覆盖六大洲，2025年新开复航12条国际航线，“一带一路”航线达74条、覆盖32个国家；国际可用座位公里1,070.65亿、同比增长11.96%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"metrics\":[{\"name\":\"新开复航国际航线\",\"raw_value\":\"12\",\"value\":\"12\",\"unit\":\"条\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"“一带一路”航线\",\"raw_value\":\"74\",\"value\":\"74\",\"unit\":\"条\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"可用座位公里-国际\",\"raw_value\":\"107,065.14\",\"value\":\"107065.14\",\"unit\":\"百万\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"2025年本集团旅客人次160,596.53千人次、同比增长3.40%，其中中国内地136,880.24千人次、国际18,817.99千人次、中国香港澳门及台湾4,898.30千人次。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"旅客人次\",\"raw_value\":\"160,596.53\",\"value\":\"160596.53\",\"unit\":\"千人次\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅客人次-国际\",\"raw_value\":\"18,817.99\",\"value\":\"18817.99\",\"unit\":\"千人次\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"“凤凰知音”常旅客会员规模2025年突破1亿人，旅客满意度达88.1分；公司推广通程登机业务、空铁联运产品，打造“航空+”生态圈。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"“凤凰知音”常旅客会员规模\",\"raw_value\":\"突破1亿人\",\"value\":\"1\",\"unit\":\"亿人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"旅客满意度\",\"raw_value\":\"88.1\",\"value\":\"88.1\",\"unit\":\"分\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：报告未在选定章节披露具体客户结构（如商务/休闲旅客占比）或直销/分销渠道占比。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F16\",\"text\":\"2025年本集团收入客公里301,015.56百万、同比增长5.86%，收入货运吨公里5,051.12百万、同比增长6.73%，综合载运率68.54%、同比提升2.04个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"收入客公里\",\"raw_value\":\"301,015.56\",\"value\":\"301015.56\",\"unit\":\"百万\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"收入货运吨公里\",\"raw_value\":\"5,051.12\",\"value\":\"5051.12\",\"unit\":\"百万\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"综合载运率\",\"raw_value\":\"68.54%\",\"value\":\"68.54\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"2025年本集团飞机日利用率8.89小时、同比减少0.02小时；货物及邮件载运率39.05%、同比提升1.58个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"飞机日利用率\",\"raw_value\":\"8.89\",\"value\":\"8.89\",\"unit\":\"小时\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"货物及邮件载运率\",\"raw_value\":\"39.05%\",\"value\":\"39.05\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：报告未在选定章节披露航油价格、汇率等外部驱动因素的量化敏感性分析。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F18\",\"text\":\"2025年公司新开复航12条国际航线，国际客运收入426.69亿元、同比增长14.13%；国际旅客18,817.99千人次、同比增长15.31%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0006\",\"source-0008\"],\"metrics\":[{\"name\":\"客运收入-国际同比增幅\",\"raw_value\":\"14.13%\",\"value\":\"14.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅客人次-国际同比增幅\",\"raw_value\":\"15.31%\",\"value\":\"15.31\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"2025年公司累计引进35架C909、9架C919飞机并安全运营，参与C929飞机研发；报告期内引进6架C919、2架C909。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0009\"],\"metrics\":[{\"name\":\"累计引进C909\",\"raw_value\":\"35\",\"value\":\"35\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"累计引进C919\",\"raw_value\":\"9\",\"value\":\"9\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F20\",\"text\":\"2025年财务费用48.54亿元、同比下降28.27%；经营活动产生的现金流量净额420.45亿元、同比增长21.71%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"财务费用\",\"raw_value\":\"4,853,956\",\"value\":\"4853956\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"42,045,213\",\"value\":\"42045213\",\"unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：报告未在选定章节披露重大资产处置或并购等结构性变化的完整说明。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"公司处于航空运输服务环节，以自有、融资租赁和经营租赁方式持有并运营机队，向旅客和货主提供客运与货邮运输服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0004\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F22\",\"text\":\"公司成本管控聚焦航油、起降、飞机等关键领域；机队由空客、波音及商飞系列飞机组成，2025年共引进飞机45架。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0009\"]}],\"limitations\":[\"未获取成功：报告未在选定章节披露具体航油供应商或采购金额。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F23\",\"text\":\"公司下游服务对象为航空旅客与货邮客户，2025年运送旅客人次160,596.53千人次、货物及邮件1,537,855.39吨。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"货物及邮件运输量\",\"raw_value\":\"1,537,855.39\",\"value\":\"1537855.39\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取成功：报告未在选定章节披露具体客户名称或客户集中度。\"]}},\"limitations\":[\"选定章节未完整呈现成本分析表分项明细，航油、起降等成本构成金额未获取。\",\"未获取成功：航空附加产品具体品类构成与单项收入金额未在选定章节披露。\",\"未获取成功：具体客户结构、直销/分销渠道占比及客户集中度未在选定章节披露。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "本集团以航空运输为主业，业务涵盖航空客运、航空货运及邮运，并通过主要附属公司（深圳航空、山东航空、澳门航空、北京航空、大连航空、内蒙航空等）开展运营；报告期内公司新增重要非主营业务说明为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0008",
+                "source-0011"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露完整的集团股权层级与各业务板块的组织架构细节。"
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F02",
+              "text": "航空客运是公司核心产品，2025年实现客运收入1,548.56亿元，同比增加30.67亿元；分地区看中国内地客运收入1,070.36亿元、国际426.69亿元、中国香港澳门及台湾51.51亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "航空客运营业收入",
+                  "raw_value": "154,855,779",
+                  "value": "154855779",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客运收入-中国内地",
+                  "raw_value": "107,036,024",
+                  "value": "107036024",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客运收入-国际",
+                  "raw_value": "42,668,978",
+                  "value": "42668978",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客运收入-中国香港、澳门及台湾",
+                  "raw_value": "5,150,777",
+                  "value": "5150777",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "航空货运及邮运业务2025年实现收入77.78亿元，同比增加3.64亿元；其中分地区国际货邮收入59.85亿元、中国内地15.71亿元、中国香港澳门及台湾2.23亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "航空货运及邮运营业收入",
+                  "raw_value": "7,778,380",
+                  "value": "7778380",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "货邮运输收入-国际",
+                  "raw_value": "5,984,503",
+                  "value": "5984503",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "货邮运输收入-中国内地",
+                  "raw_value": "1,571,017",
+                  "value": "1571017",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "货邮运输收入-中国香港、澳门及台湾",
+                  "raw_value": "222,860",
+                  "value": "222860",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "公司升级航空附加产品，2025年航空附加产品销售收入同比提升超40%；同时深化客货联动，腹舱经营收入同比增长4.92%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "航空附加产品销售收入同比增幅",
+                  "raw_value": "超40%",
+                  "value": "40",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "腹舱经营收入同比增幅",
+                  "raw_value": "4.92%",
+                  "value": "4.92",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露航空附加产品的具体品类构成与单项收入金额。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F05",
+              "text": "公司收入主要来自航空客运与航空货运及邮运的运输服务收费，2025年营业收入1,714.85亿元，其中主营业务收入1,690.64亿元、其他业务收入24.21亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "171,484,646",
+                  "value": "171484646",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入",
+                  "raw_value": "1,690.64",
+                  "value": "1690.64",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务收入",
+                  "raw_value": "24.21",
+                  "value": "24.21",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "客运收入变动可分解为：因运力投入上升增加收入49.18亿元、因客座率上升增加收入39.78亿元、因收益水平下降减少收入58.29亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "客运收入变动-运力投入上升影响",
+                  "raw_value": "49.18",
+                  "value": "49.18",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客运收入变动-客座率上升影响",
+                  "raw_value": "39.78",
+                  "value": "39.78",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客运收入变动-收益水平下降影响",
+                  "raw_value": "58.29",
+                  "value": "58.29",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露客运票价体系、舱位分级定价等具体定价机制细节。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F07",
+              "text": "按产品划分，2025年航空客运营业收入1,548.56亿元、航空货运及邮运77.78亿元、其他88.50亿元，合计1,714.85亿元；航空客运毛利率3.97%、航空货运及邮运3.88%、其他26.97%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "其他营业收入",
+                  "raw_value": "8,850,487",
+                  "value": "8850487",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "171,484,646",
+                  "value": "171484646",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "航空客运毛利率",
+                  "raw_value": "3.97%",
+                  "value": "3.97",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "航空货运及邮运毛利率",
+                  "raw_value": "3.88%",
+                  "value": "3.88",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务毛利率",
+                  "raw_value": "26.97%",
+                  "value": "26.97",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "按地区划分，2025年中国内地营业收入1,174.58亿元、同比下降0.87%；其他国家和中国香港、澳门及台湾营业收入540.27亿元、同比增长12.07%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入-中国内地",
+                  "raw_value": "117,457,528",
+                  "value": "117457528",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入-其他国家和中国香港、澳门及台湾",
+                  "raw_value": "54,027,118",
+                  "value": "54027118",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "2025年本集团投入可用座位公里3,676.41亿座公里、同比增长3.24%，客座率81.88%、同比提升2.03个百分点，每客公里收益0.5144元、同比下降3.63%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "可用座位公里",
+                  "raw_value": "367,641.22",
+                  "value": "367641.22",
+                  "unit": "百万",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客座率",
+                  "raw_value": "81.88%",
+                  "value": "81.88",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "每客公里收益",
+                  "raw_value": "0.5144",
+                  "value": "0.5144",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露各产品板块的资产占用或资本回报结构。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F10",
+              "text": "截至2025年末，本集团机队共有飞机964架、平均机龄10.36年；其中自有418架、融资租赁252架、经营租赁294架。本公司机队共有飞机533架、平均机龄9.85年。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "机队规模",
+                  "raw_value": "964",
+                  "value": "964",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "平均机龄",
+                  "raw_value": "10.36",
+                  "value": "10.36",
+                  "unit": "年",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本公司机队规模",
+                  "raw_value": "533",
+                  "value": "533",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "issuer",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "2025年本集团共引进飞机45架（含25架A320系列、12架B737系列、6架C919、2架C909），退出飞机11架；机队构成为空客系列449架、波音系列468架、商飞系列44架、公务机3架。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "引进飞机",
+                  "raw_value": "45",
+                  "value": "45",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "退出飞机",
+                  "raw_value": "11",
+                  "value": "11",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "空客系列机队",
+                  "raw_value": "449",
+                  "value": "449",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "波音系列机队",
+                  "raw_value": "468",
+                  "value": "468",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "商飞系列机队",
+                  "raw_value": "44",
+                  "value": "44",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "2025年本集团营业成本1,626.47亿元、同比增加44.58亿元、增幅2.82%；每可用座位公里的营业成本0.4424元、同比下降0.41%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "营业成本",
+                  "raw_value": "162,647,280",
+                  "value": "162647280",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "每可用座位公里营业成本",
+                  "raw_value": "0.4424",
+                  "value": "0.4424",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：成本分析表具体构成明细在选定章节中未完整呈现，航油、起降等分项金额未获取。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F13",
+              "text": "公司航线网络覆盖六大洲，2025年新开复航12条国际航线，“一带一路”航线达74条、覆盖32个国家；国际可用座位公里1,070.65亿、同比增长11.96%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "新开复航国际航线",
+                  "raw_value": "12",
+                  "value": "12",
+                  "unit": "条",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "“一带一路”航线",
+                  "raw_value": "74",
+                  "value": "74",
+                  "unit": "条",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "可用座位公里-国际",
+                  "raw_value": "107,065.14",
+                  "value": "107065.14",
+                  "unit": "百万",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "2025年本集团旅客人次160,596.53千人次、同比增长3.40%，其中中国内地136,880.24千人次、国际18,817.99千人次、中国香港澳门及台湾4,898.30千人次。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "旅客人次",
+                  "raw_value": "160,596.53",
+                  "value": "160596.53",
+                  "unit": "千人次",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅客人次-国际",
+                  "raw_value": "18,817.99",
+                  "value": "18817.99",
+                  "unit": "千人次",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "“凤凰知音”常旅客会员规模2025年突破1亿人，旅客满意度达88.1分；公司推广通程登机业务、空铁联运产品，打造“航空+”生态圈。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "“凤凰知音”常旅客会员规模",
+                  "raw_value": "突破1亿人",
+                  "value": "1",
+                  "unit": "亿人",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "旅客满意度",
+                  "raw_value": "88.1",
+                  "value": "88.1",
+                  "unit": "分",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露具体客户结构（如商务/休闲旅客占比）或直销/分销渠道占比。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F16",
+              "text": "2025年本集团收入客公里301,015.56百万、同比增长5.86%，收入货运吨公里5,051.12百万、同比增长6.73%，综合载运率68.54%、同比提升2.04个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "收入客公里",
+                  "raw_value": "301,015.56",
+                  "value": "301015.56",
+                  "unit": "百万",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "收入货运吨公里",
+                  "raw_value": "5,051.12",
+                  "value": "5051.12",
+                  "unit": "百万",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "综合载运率",
+                  "raw_value": "68.54%",
+                  "value": "68.54",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "2025年本集团飞机日利用率8.89小时、同比减少0.02小时；货物及邮件载运率39.05%、同比提升1.58个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "飞机日利用率",
+                  "raw_value": "8.89",
+                  "value": "8.89",
+                  "unit": "小时",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "货物及邮件载运率",
+                  "raw_value": "39.05%",
+                  "value": "39.05",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露航油价格、汇率等外部驱动因素的量化敏感性分析。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F18",
+              "text": "2025年公司新开复航12条国际航线，国际客运收入426.69亿元、同比增长14.13%；国际旅客18,817.99千人次、同比增长15.31%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0006",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "客运收入-国际同比增幅",
+                  "raw_value": "14.13%",
+                  "value": "14.13",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅客人次-国际同比增幅",
+                  "raw_value": "15.31%",
+                  "value": "15.31",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "2025年公司累计引进35架C909、9架C919飞机并安全运营，参与C929飞机研发；报告期内引进6架C919、2架C909。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "累计引进C909",
+                  "raw_value": "35",
+                  "value": "35",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "累计引进C919",
+                  "raw_value": "9",
+                  "value": "9",
+                  "unit": "架",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "2025年财务费用48.54亿元、同比下降28.27%；经营活动产生的现金流量净额420.45亿元、同比增长21.71%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "财务费用",
+                  "raw_value": "4,853,956",
+                  "value": "4853956",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "42,045,213",
+                  "value": "42045213",
+                  "unit": "千元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露重大资产处置或并购等结构性变化的完整说明。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F21",
+              "text": "公司处于航空运输服务环节，以自有、融资租赁和经营租赁方式持有并运营机队，向旅客和货主提供客运与货邮运输服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F22",
+              "text": "公司成本管控聚焦航油、起降、飞机等关键领域；机队由空客、波音及商飞系列飞机组成，2025年共引进飞机45架。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露具体航油供应商或采购金额。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F23",
+              "text": "公司下游服务对象为航空旅客与货邮客户，2025年运送旅客人次160,596.53千人次、货物及邮件1,537,855.39吨。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "货物及邮件运输量",
+                  "raw_value": "1,537,855.39",
+                  "value": "1537855.39",
+                  "unit": "吨",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取成功：报告未在选定章节披露具体客户名称或客户集中度。"
+          ]
+        }
+      },
+      "limitations": [
+        "选定章节未完整呈现成本分析表分项明细，航油、起降等成本构成金额未获取。",
+        "未获取成功：航空附加产品具体品类构成与单项收入金额未在选定章节披露。",
+        "未获取成功：具体客户结构、直销/分销渠道占比及客户集中度未在选定章节披露。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 10958,
+      "output_tokens": 5327,
+      "total_tokens": 16285
+    }
+  }
+]

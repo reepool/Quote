@@ -1,0 +1,1057 @@
+[
+  {
+    "request_id": "bp-work-2829fcbafb318d193e68b256:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "0531d47c26ce9ff73147185b28f0f2e188e9fc9e5f098b35c731921423130889",
+    "response_hash": "5551c4338a912b70baeb6780b1d0913904125f88a837110f444c8e84edd6fada",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0038\",\"section-0040\",\"section-0059\",\"section-0060\",\"section-0061\",\"section-0072\",\"section-0094\",\"section-0114\"],\"rationale\":\"选取公司业务介绍（section-0038）说明产品与服务用途；经营情况讨论与分析（section-0040）及其市场营销、生产运营子节说明经营模式、产能布局与运营角色；主要经营情况（section-0059）与主营业务分析（section-0060）、利润表及现金流量表变动分析（section-0061）提供公司层面收入总额与盈利驱动；分产品情况（section-0072）给出主要产品收入权重与结构；化工行业经营性信息分析（section-0094）与产品销售情况（section-0114）补充原材料、生产与销售渠道等经营输入。以上均为信息密集的经营/业务子节，避免选取纯治理、债券与财务报告附注。\",\"deferred\":[\"section-0037（管理层讨论与分析整章）因已选其核心子节而不再整章选取\",\"section-0054（核心竞争力分析）属泛化竞争力，非本期经营实质，暂不选\",\"section-0135（未来发展讨论）含计划性展望，非本期经营事实，暂不选\",\"section-0354（财务报告整章）及分部信息附注仅在收入结构出现实质缺口时定向补充\"],\"stop_reason\":\"已覆盖业务结构、产品用途、经营模式、收入总额与产品结构、生产与销售等核心经营信息，足以回答主要问题；其余为治理、债券、会计政策与附注细节，超出本次经营阅读范围，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0038",
+        "section-0040",
+        "section-0059",
+        "section-0060",
+        "section-0061",
+        "section-0072",
+        "section-0094",
+        "section-0114"
+      ],
+      "rationale": "选取公司业务介绍（section-0038）说明产品与服务用途；经营情况讨论与分析（section-0040）及其市场营销、生产运营子节说明经营模式、产能布局与运营角色；主要经营情况（section-0059）与主营业务分析（section-0060）、利润表及现金流量表变动分析（section-0061）提供公司层面收入总额与盈利驱动；分产品情况（section-0072）给出主要产品收入权重与结构；化工行业经营性信息分析（section-0094）与产品销售情况（section-0114）补充原材料、生产与销售渠道等经营输入。以上均为信息密集的经营/业务子节，避免选取纯治理、债券与财务报告附注。",
+      "deferred": [
+        "section-0037（管理层讨论与分析整章）因已选其核心子节而不再整章选取",
+        "section-0054（核心竞争力分析）属泛化竞争力，非本期经营实质，暂不选",
+        "section-0135（未来发展讨论）含计划性展望，非本期经营事实，暂不选",
+        "section-0354（财务报告整章）及分部信息附注仅在收入结构出现实质缺口时定向补充"
+      ],
+      "stop_reason": "已覆盖业务结构、产品用途、经营模式、收入总额与产品结构、生产与销售等核心经营信息，足以回答主要问题；其余为治理、债券、会计政策与附注细节，超出本次经营阅读范围，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 22202,
+      "output_tokens": 360,
+      "total_tokens": 22562
+    }
+  },
+  {
+    "request_id": "bp-work-2829fcbafb318d193e68b256:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "376a412e9358400040e656a1675b56ce6dfc07a9deb98061590d7188c87f4cf5",
+    "response_hash": "fa13778de176d54c94194dcf2cb95255326cae9269052ddd7ebd60415a9d5505",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司主要从事聚氨酯、石化、精细化学品及新材料产品的研发、生产和销售，业务划分为聚氨酯、石化、精细化学品及新材料三大板块。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"聚氨酯业务板块包括异氰酸酯和聚醚多元醇两部分；石化业务板块聚焦C2、C3及C4烯烃衍生物；精细化学品及新材料板块包括功能化学品分公司、新材料事业部、表面材料事业部、高性能聚合物事业部、氯产品事业部、营养科技有限公司、电池科技有限公司等业务单元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"聚氨酯具有橡胶、塑料的双重优点，广泛应用于化工、轻工、纺织、建筑、家电、建材、交通运输等领域；大宗异氰酸酯分为MDI和TDI两类。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"新材料事业部主要产品包括热塑性聚氨酯弹性体（TPU）、聚烯烃弹性体（POE）、聚甲基丙烯酸甲酯（PMMA）、水处理膜、高吸水树脂（SAP）、尼龙弹性体（PEBA）、超高压电缆料（XLPE）、甲基丙烯酸甲酯-苯乙烯共聚物（MS树脂）等，广泛应用于光伏、汽车、鞋服等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"表面材料事业部致力于环保型涂料&粘合剂原材料、有机硅中间体及终端胶粘剂的研发、生产、销售和服务，下游市场涵盖建筑和工业涂料、汽车涂料、水性粘合剂、织物涂层和合成革、个人和家庭护理、电子胶粘剂、液体硅橡胶、压敏胶、离型剂以及生物基化学品等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"高性能聚合物事业部业务主要包括聚碳酸酯（PC）、尼龙12、改性塑料、砜聚合物、生物降解材料等高端聚合物以及产业链相关化学品，产品广泛应用于汽车、电子电器、医疗健康、高端光学、绿色包装、日用消费品等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"氯产品事业部业务涵盖PVC、烧碱、特种PVC及其他氯产品，主要应用于建筑材料、工业制品、日用品等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-06\",\"text\":\"营养科技公司产品主要包括香料、营养品及高端中间体，下游应用覆盖营养与健康、日化香精、食品香精、个人护理、医药中间体等多个领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-07\",\"text\":\"电池科技有限公司专注于电池材料及相关化学品领域，产品涵盖磷酸铁锂、石墨负极、电池级硫酸盐、N-甲基吡咯烷酮（NMP）、聚丙烯酸（PAA）等，广泛应用于新能源汽车、储能、消费电子等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司主要开展B2B型业务；主要产品通过市场化运作，以直销和经销两种形式销售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"按销售渠道划分，公司主营业务收入中直销为157,659,342,215.08元，经销为44,723,169,786.83元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"主营业务收入-直销\",\"raw_value\":\"157,659,342,215.08\",\"value\":\"157659342215.08\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入-经销\",\"raw_value\":\"44,723,169,786.83\",\"value\":\"44723169786.83\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司实现销售收入2,032.35亿元，同比增加11.62%；实现归属于上市公司股东的净利润125.27亿元，同比下降3.88%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,032.35\",\"value\":\"2032.35\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比增加11.62%\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"125.27\",\"value\":\"125.27\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降3.88%\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"按细分行业划分，聚氨酯系列营业收入75,058,224,395.81元，毛利率26.88%；石化系列营业收入84,203,810,499.10元，毛利率0.58%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"聚氨酯系列营业收入\",\"raw_value\":\"75,058,224,395.81\",\"value\":\"75058224395.81\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"聚氨酯系列毛利率\",\"raw_value\":\"26.88\",\"value\":\"26.88\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"石化系列营业收入\",\"raw_value\":\"84,203,810,499.10\",\"value\":\"84203810499.10\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"石化系列毛利率\",\"raw_value\":\"0.58\",\"value\":\"0.58\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"按细分行业划分，精细化学品及新材料系列营业收入33,189,129,642.70元，毛利率10.53%；其他营业收入26,217,908,965.20元，毛利率12.51%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"精细化学品及新材料系列营业收入\",\"raw_value\":\"33,189,129,642.70\",\"value\":\"33189129642.70\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"精细化学品及新材料系列毛利率\",\"raw_value\":\"10.53\",\"value\":\"10.53\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他营业收入\",\"raw_value\":\"26,217,908,965.20\",\"value\":\"26217908965.20\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他毛利率\",\"raw_value\":\"12.51\",\"value\":\"12.51\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分产品情况表仅提供各系列成本构成，未提供分产品收入占比明细；收入结构以按细分行业划分的主营业务基本情况表为准。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司生产所需的主要原料为纯苯、LPG、乙烷、石脑油、煤炭、盐等大宗原料，通过积极开拓国内外供应渠道，综合采用固定价、浮动价、合同价等多种采购模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"公司采取总部统筹、属地生产的管理运营模式，根据年度生产经营计划制定每月生产目标，依据市场需求及装置状况进行动态调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"F-OI-03\",\"text\":\"截至2025年末，公司拥有380万吨/年MDI、147万吨/年TDI装置；2025年公司聚醚业务总产能达到232万吨/年。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"MDI产能\",\"raw_value\":\"380\",\"value\":\"380\",\"unit\":\"万吨/年\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"TDI产能\",\"raw_value\":\"147\",\"value\":\"147\",\"unit\":\"万吨/年\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"聚醚业务总产能\",\"raw_value\":\"232\",\"value\":\"232\",\"unit\":\"万吨/年\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"烟台基地一期100万吨/年乙烯装置原料多元化改造全面完成，实现全乙烷进料，产能提升至120万吨/年；二期120万吨/年乙烯及下游高端装置顺利实现全面开车并稳定运行。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"乙烯产能（一期改造后）\",\"raw_value\":\"120\",\"value\":\"120\",\"unit\":\"万吨/年\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"乙烯产能（二期）\",\"raw_value\":\"120\",\"value\":\"120\",\"unit\":\"万吨/年\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"聚氨酯业务加快新兴市场开拓步伐，通过持续打造行业标杆级的海外业务平台，稳步扩张全球销售网络。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"石化业务在海外深化与终端客户合作，市场份额稳步提升；石化材料类业务攻坚下游头部客户，打造聚烯烃品牌影响力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-CC-03\",\"text\":\"电池材料磷酸铁锂与主流电芯客户实现全链接，在头部客户实现批量供货；钠电正极材料在头部客户验证通过。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-CC-04\",\"text\":\"公司主要产品通过市场化运作，以直销和经销两种形式销售；按销售渠道划分，直销收入157,659,342,215.08元，经销收入44,723,169,786.83元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0016\"]}],\"limitations\":[\"未获取主要客户名称及前五大客户集中度明细。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"报告期内主要原料及能源价格下降，但产品销量同比增加，导致2025年成本较上年同期增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-OD-02\",\"text\":\"2025年全球聚氨酯及其原料产品市场消费量增速放缓，全球MDI、TDI消费量同2024年消费量基本持平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F-OD-03\",\"text\":\"石化产业仍处于行业周期底部运行，国内面临产能集中释放、有效需求不足的局面。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F-OD-04\",\"text\":\"2025年公司申请国内外发明专利1230余件，新获得授权715余件。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"申请国内外发明专利\",\"raw_value\":\"1230余件\",\"value\":\"1230\",\"unit\":\"件\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"新获得授权专利\",\"raw_value\":\"715余件\",\"value\":\"715\",\"unit\":\"件\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"公司成功引入科威特石化工业公司作为长期战略投资者，为石化业务的全球资源整合与可持续发展注入新动能。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"2025年公司在特种异氰酸酯领域完成法国康睿公司收购，并和韩国爱敬集团成立合资公司。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"万华福建36万吨/年的TDI二期项目一次开车成功；万华四川成功实现磷酸铁锂等项目快速建成，并推进磷酸铁锂新建、改造扩能、石墨负极新建等多个电池材料项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-MC-04\",\"text\":\"VA全产业链投产，公司成功进入营养健康领域；MS装置投产，助力公司切入高端光学材料市场；XLPE、薄荷醇等装置均实现一次性开车成功并稳定运行。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P-01\",\"text\":\"公司是一家以技术创新见长、全球化运营的化工新材料公司，主要从事聚氨酯、石化、精细化学品及新材料产品的研发、生产和销售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U-01\",\"text\":\"公司生产所需的主要原料为纯苯、LPG、乙烷、石脑油、煤炭、盐等大宗原料。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"F-SC-U-02\",\"text\":\"电池材料锁定上游绿电、磷矿资源。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"未获取具体供应商名称及采购金额明细。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D-01\",\"text\":\"聚氨酯产品广泛应用于化工、轻工、纺织、建筑、家电、建材、交通运输等领域；新材料产品广泛应用于光伏、汽车、鞋服等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-SC-D-02\",\"text\":\"电池材料产品广泛应用于新能源汽车、储能、消费电子等领域，与多家头部电芯企业达成战略合作并进入其核心供应链体系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0014\"]}],\"limitations\":[]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司以“变革年”为2025年管理主题，在观念变革、组织变革、预算管理变革和激励体系变革等方面不断深化，推动投资思维向经营思维转变。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司开辟电池材料业务第二主业，打造“风-光-储-网-产”一体化发展新模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-CF-03\",\"text\":\"烟台产业园成功实现烟台远程操作控制（ROC）宁夏等异地装置，自主运行率跃升至98.5%（L4级）。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"烟台产业园自主运行率\",\"raw_value\":\"98.5\",\"value\":\"98.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"limitations\":[\"分产品情况表仅提供成本构成，未提供分产品收入占比明细；收入结构以按细分行业划分的主营业务基本情况表为准。\",\"未获取主要客户名称及前五大客户集中度明细。\",\"未获取具体供应商名称及采购金额明细。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司主要从事聚氨酯、石化、精细化学品及新材料产品的研发、生产和销售，业务划分为聚氨酯、石化、精细化学品及新材料三大板块。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "聚氨酯业务板块包括异氰酸酯和聚醚多元醇两部分；石化业务板块聚焦C2、C3及C4烯烃衍生物；精细化学品及新材料板块包括功能化学品分公司、新材料事业部、表面材料事业部、高性能聚合物事业部、氯产品事业部、营养科技有限公司、电池科技有限公司等业务单元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "聚氨酯具有橡胶、塑料的双重优点，广泛应用于化工、轻工、纺织、建筑、家电、建材、交通运输等领域；大宗异氰酸酯分为MDI和TDI两类。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "新材料事业部主要产品包括热塑性聚氨酯弹性体（TPU）、聚烯烃弹性体（POE）、聚甲基丙烯酸甲酯（PMMA）、水处理膜、高吸水树脂（SAP）、尼龙弹性体（PEBA）、超高压电缆料（XLPE）、甲基丙烯酸甲酯-苯乙烯共聚物（MS树脂）等，广泛应用于光伏、汽车、鞋服等领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "表面材料事业部致力于环保型涂料&粘合剂原材料、有机硅中间体及终端胶粘剂的研发、生产、销售和服务，下游市场涵盖建筑和工业涂料、汽车涂料、水性粘合剂、织物涂层和合成革、个人和家庭护理、电子胶粘剂、液体硅橡胶、压敏胶、离型剂以及生物基化学品等领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "高性能聚合物事业部业务主要包括聚碳酸酯（PC）、尼龙12、改性塑料、砜聚合物、生物降解材料等高端聚合物以及产业链相关化学品，产品广泛应用于汽车、电子电器、医疗健康、高端光学、绿色包装、日用消费品等领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "氯产品事业部业务涵盖PVC、烧碱、特种PVC及其他氯产品，主要应用于建筑材料、工业制品、日用品等领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-06",
+              "text": "营养科技公司产品主要包括香料、营养品及高端中间体，下游应用覆盖营养与健康、日化香精、食品香精、个人护理、医药中间体等多个领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-07",
+              "text": "电池科技有限公司专注于电池材料及相关化学品领域，产品涵盖磷酸铁锂、石墨负极、电池级硫酸盐、N-甲基吡咯烷酮（NMP）、聚丙烯酸（PAA）等，广泛应用于新能源汽车、储能、消费电子等领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司主要开展B2B型业务；主要产品通过市场化运作，以直销和经销两种形式销售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "按销售渠道划分，公司主营业务收入中直销为157,659,342,215.08元，经销为44,723,169,786.83元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务收入-直销",
+                  "raw_value": "157,659,342,215.08",
+                  "value": "157659342215.08",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入-经销",
+                  "raw_value": "44,723,169,786.83",
+                  "value": "44723169786.83",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年公司实现销售收入2,032.35亿元，同比增加11.62%；实现归属于上市公司股东的净利润125.27亿元，同比下降3.88%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "2,032.35",
+                  "value": "2032.35",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比增加11.62%"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "125.27",
+                  "value": "125.27",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比下降3.88%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "按细分行业划分，聚氨酯系列营业收入75,058,224,395.81元，毛利率26.88%；石化系列营业收入84,203,810,499.10元，毛利率0.58%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "聚氨酯系列营业收入",
+                  "raw_value": "75,058,224,395.81",
+                  "value": "75058224395.81",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "聚氨酯系列毛利率",
+                  "raw_value": "26.88",
+                  "value": "26.88",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "石化系列营业收入",
+                  "raw_value": "84,203,810,499.10",
+                  "value": "84203810499.10",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "石化系列毛利率",
+                  "raw_value": "0.58",
+                  "value": "0.58",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "按细分行业划分，精细化学品及新材料系列营业收入33,189,129,642.70元，毛利率10.53%；其他营业收入26,217,908,965.20元，毛利率12.51%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "精细化学品及新材料系列营业收入",
+                  "raw_value": "33,189,129,642.70",
+                  "value": "33189129642.70",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "精细化学品及新材料系列毛利率",
+                  "raw_value": "10.53",
+                  "value": "10.53",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他营业收入",
+                  "raw_value": "26,217,908,965.20",
+                  "value": "26217908965.20",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他毛利率",
+                  "raw_value": "12.51",
+                  "value": "12.51",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分产品情况表仅提供各系列成本构成，未提供分产品收入占比明细；收入结构以按细分行业划分的主营业务基本情况表为准。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司生产所需的主要原料为纯苯、LPG、乙烷、石脑油、煤炭、盐等大宗原料，通过积极开拓国内外供应渠道，综合采用固定价、浮动价、合同价等多种采购模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "公司采取总部统筹、属地生产的管理运营模式，根据年度生产经营计划制定每月生产目标，依据市场需求及装置状况进行动态调整。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "截至2025年末，公司拥有380万吨/年MDI、147万吨/年TDI装置；2025年公司聚醚业务总产能达到232万吨/年。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "MDI产能",
+                  "raw_value": "380",
+                  "value": "380",
+                  "unit": "万吨/年",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "TDI产能",
+                  "raw_value": "147",
+                  "value": "147",
+                  "unit": "万吨/年",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "聚醚业务总产能",
+                  "raw_value": "232",
+                  "value": "232",
+                  "unit": "万吨/年",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "烟台基地一期100万吨/年乙烯装置原料多元化改造全面完成，实现全乙烷进料，产能提升至120万吨/年；二期120万吨/年乙烯及下游高端装置顺利实现全面开车并稳定运行。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "乙烯产能（一期改造后）",
+                  "raw_value": "120",
+                  "value": "120",
+                  "unit": "万吨/年",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "乙烯产能（二期）",
+                  "raw_value": "120",
+                  "value": "120",
+                  "unit": "万吨/年",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "聚氨酯业务加快新兴市场开拓步伐，通过持续打造行业标杆级的海外业务平台，稳步扩张全球销售网络。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "石化业务在海外深化与终端客户合作，市场份额稳步提升；石化材料类业务攻坚下游头部客户，打造聚烯烃品牌影响力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "电池材料磷酸铁锂与主流电芯客户实现全链接，在头部客户实现批量供货；钠电正极材料在头部客户验证通过。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "公司主要产品通过市场化运作，以直销和经销两种形式销售；按销售渠道划分，直销收入157,659,342,215.08元，经销收入44,723,169,786.83元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014",
+                "source-0016"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取主要客户名称及前五大客户集中度明细。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "报告期内主要原料及能源价格下降，但产品销量同比增加，导致2025年成本较上年同期增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "2025年全球聚氨酯及其原料产品市场消费量增速放缓，全球MDI、TDI消费量同2024年消费量基本持平。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "石化产业仍处于行业周期底部运行，国内面临产能集中释放、有效需求不足的局面。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "2025年公司申请国内外发明专利1230余件，新获得授权715余件。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "申请国内外发明专利",
+                  "raw_value": "1230余件",
+                  "value": "1230",
+                  "unit": "件",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "新获得授权专利",
+                  "raw_value": "715余件",
+                  "value": "715",
+                  "unit": "件",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "公司成功引入科威特石化工业公司作为长期战略投资者，为石化业务的全球资源整合与可持续发展注入新动能。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "2025年公司在特种异氰酸酯领域完成法国康睿公司收购，并和韩国爱敬集团成立合资公司。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "万华福建36万吨/年的TDI二期项目一次开车成功；万华四川成功实现磷酸铁锂等项目快速建成，并推进磷酸铁锂新建、改造扩能、石墨负极新建等多个电池材料项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-MC-04",
+              "text": "VA全产业链投产，公司成功进入营养健康领域；MS装置投产，助力公司切入高端光学材料市场；XLPE、薄荷醇等装置均实现一次性开车成功并稳定运行。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-P-01",
+              "text": "公司是一家以技术创新见长、全球化运营的化工新材料公司，主要从事聚氨酯、石化、精细化学品及新材料产品的研发、生产和销售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-U-01",
+              "text": "公司生产所需的主要原料为纯苯、LPG、乙烷、石脑油、煤炭、盐等大宗原料。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F-SC-U-02",
+              "text": "电池材料锁定上游绿电、磷矿资源。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取具体供应商名称及采购金额明细。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-D-01",
+              "text": "聚氨酯产品广泛应用于化工、轻工、纺织、建筑、家电、建材、交通运输等领域；新材料产品广泛应用于光伏、汽车、鞋服等领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-SC-D-02",
+              "text": "电池材料产品广泛应用于新能源汽车、储能、消费电子等领域，与多家头部电芯企业达成战略合作并进入其核心供应链体系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0014"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "公司以“变革年”为2025年管理主题，在观念变革、组织变革、预算管理变革和激励体系变革等方面不断深化，推动投资思维向经营思维转变。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ]
+          },
+          {
+            "fact_id": "F-CF-02",
+            "text": "公司开辟电池材料业务第二主业，打造“风-光-储-网-产”一体化发展新模式。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ]
+          },
+          {
+            "fact_id": "F-CF-03",
+            "text": "烟台产业园成功实现烟台远程操作控制（ROC）宁夏等异地装置，自主运行率跃升至98.5%（L4级）。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "烟台产业园自主运行率",
+                "raw_value": "98.5",
+                "value": "98.5",
+                "unit": "%",
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "qualifier": "exact"
+              }
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "分产品情况表仅提供成本构成，未提供分产品收入占比明细；收入结构以按细分行业划分的主营业务基本情况表为准。",
+        "未获取主要客户名称及前五大客户集中度明细。",
+        "未获取具体供应商名称及采购金额明细。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14554,
+      "output_tokens": 4306,
+      "total_tokens": 18860
+    }
+  },
+  {
+    "request_id": "bp-work-2829fcbafb318d193e68b256:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "04cc9196e2c1dcc43088a33be981ce58e9f892411296ede06498918ea1296f5f",
+    "response_hash": "83f89e5ad956ccea03d9c2c1b0deca142dd94706e54b27a525a17eb12754371d",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"WR-001\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OI-04\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"正文已写明烟台基地一期乙烯装置由100万吨/年改造至120万吨/年、二期为120万吨/年，但两项指标主体标为consolidated_group，且指标名称未保留烟台基地。来源对象是烟台基地分期装置，不是公司乙烯总产能；来源只说总产能跃上新台阶，未给出集团合计。应保留基地分期产能，把指标主体改为来源可识别的烟台基地口径；法律实体未明示则标unclear，不得当成合并集团乙烯总产能。\"},{\"finding_id\":\"WR-002\",\"element\":\"company_features\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-CF-03\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"98.5%（L4级）出自烟台产业园远程操作控制宁夏等异地装置的自主运行率，来源未把该园区界定为子公司。事实及指标标为named_subsidiary缺乏依据；指标名「烟台产业园自主运行率」也弱化了ROC与L4级限定。应保留该发现，主体改为unclear或以园区及ROC口径限定，不得虚构子公司，也不得把该比率写成园区整体经营指标。\"},{\"finding_id\":\"WR-003\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-02\",\"evidence_ids\":[\"source-0013\"],\"explanation\":\"全球MDI、TDI消费量与2024年基本持平，说的是全球市场消费，不是公司产销或消费。正文有「全球」限定，但主体标为consolidated_group，会把行业数据误归到合并集团。应保留为行业背景，取消公司主体归属；不能据此写成公司消费或销量持平。\"},{\"finding_id\":\"WR-004\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-03\",\"evidence_ids\":[\"source-0013\"],\"explanation\":\"「石化产业仍处于行业周期底部、国内产能集中释放、有效需求不足」描述的是行业环境，不是公司石化业务已实现业绩或公司自身周期位置。主体标为consolidated_group扩大了归属。可保留为行业背景，但不得作为合并集团经营结果。\"},{\"finding_id\":\"WR-005\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"wrong_column\",\"action\":\"correct\",\"affected_fact_id\":\"F-SM-01\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"叙述科目是销售收入2,032.35亿元、同比增加11.62%，指标名称却改为营业收入。同页利润表行为营业收入203,234,573,814.42元、变动比例11.62%。金额和增幅相近不能单独证明两个科目口径相同。应保留销售收入这一来源科目，或在同时引用两处时明确对应关系，不能把销售收入数值直接改挂到营业收入科目。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-PS-06\",\"F-PS-07\",\"F-RM-01\",\"F-RM-02\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-MC-01\",\"F-MC-02\",\"F-MC-03\",\"F-MC-04\",\"F-SC-P-01\",\"F-SC-U-01\",\"F-SC-U-02\",\"F-SC-D-01\",\"F-SC-D-02\",\"F-CF-01\",\"F-CF-02\",\"F-CF-03\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "WR-001",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OI-04",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "正文已写明烟台基地一期乙烯装置由100万吨/年改造至120万吨/年、二期为120万吨/年，但两项指标主体标为consolidated_group，且指标名称未保留烟台基地。来源对象是烟台基地分期装置，不是公司乙烯总产能；来源只说总产能跃上新台阶，未给出集团合计。应保留基地分期产能，把指标主体改为来源可识别的烟台基地口径；法律实体未明示则标unclear，不得当成合并集团乙烯总产能。"
+        },
+        {
+          "finding_id": "WR-002",
+          "element": "company_features",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-CF-03",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "98.5%（L4级）出自烟台产业园远程操作控制宁夏等异地装置的自主运行率，来源未把该园区界定为子公司。事实及指标标为named_subsidiary缺乏依据；指标名「烟台产业园自主运行率」也弱化了ROC与L4级限定。应保留该发现，主体改为unclear或以园区及ROC口径限定，不得虚构子公司，也不得把该比率写成园区整体经营指标。"
+        },
+        {
+          "finding_id": "WR-003",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OD-02",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "全球MDI、TDI消费量与2024年基本持平，说的是全球市场消费，不是公司产销或消费。正文有「全球」限定，但主体标为consolidated_group，会把行业数据误归到合并集团。应保留为行业背景，取消公司主体归属；不能据此写成公司消费或销量持平。"
+        },
+        {
+          "finding_id": "WR-004",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OD-03",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "「石化产业仍处于行业周期底部、国内产能集中释放、有效需求不足」描述的是行业环境，不是公司石化业务已实现业绩或公司自身周期位置。主体标为consolidated_group扩大了归属。可保留为行业背景，但不得作为合并集团经营结果。"
+        },
+        {
+          "finding_id": "WR-005",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_column",
+          "action": "correct",
+          "affected_fact_id": "F-SM-01",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "叙述科目是销售收入2,032.35亿元、同比增加11.62%，指标名称却改为营业收入。同页利润表行为营业收入203,234,573,814.42元、变动比例11.62%。金额和增幅相近不能单独证明两个科目口径相同。应保留销售收入这一来源科目，或在同时引用两处时明确对应关系，不能把销售收入数值直接改挂到营业收入科目。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-PS-06",
+        "F-PS-07",
+        "F-RM-01",
+        "F-RM-02",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-MC-04",
+        "F-SC-P-01",
+        "F-SC-U-01",
+        "F-SC-U-02",
+        "F-SC-D-01",
+        "F-SC-D-02",
+        "F-CF-01",
+        "F-CF-02",
+        "F-CF-03"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19145,
+      "output_tokens": 1017,
+      "total_tokens": 45337
+    }
+  },
+  {
+    "request_id": "bp-work-2829fcbafb318d193e68b256:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "27b9753e135267f23a10e28ebf004db861a5548cfbc86ce751163e40d7fae12e",
+    "response_hash": "676de6e6bdc2ff779e9ae90205e5c4897df640391f3b28e7ec000686e9c6b3e7",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-OI-04\",\"text\":\"烟台基地一期100万吨/年乙烯装置原料多元化改造全面完成，实现全乙烷进料，产能提升至120万吨/年；二期120万吨/年乙烯及下游高端装置顺利实现全面开车并稳定运行。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"烟台基地乙烯产能（一期改造后）\",\"raw_value\":\"120\",\"value\":\"120\",\"unit\":\"万吨/年\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"来源为烟台基地一期装置口径，未明示法律实体，不能认定为合并集团乙烯总产能\"},{\"name\":\"烟台基地乙烯产能（二期）\",\"raw_value\":\"120\",\"value\":\"120\",\"unit\":\"万吨/年\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"来源为烟台基地二期装置口径，未明示法律实体，不能认定为合并集团乙烯总产能\"}],\"uncertainty_reason\":\"来源对象为烟台基地分期装置，未明示法律实体，不能认定为合并集团乙烯总产能\"},{\"fact_id\":\"F-CF-03\",\"text\":\"烟台产业园成功实现烟台远程操作控制（ROC）宁夏等异地装置，自主运行率跃升至98.5%（L4级）。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"烟台产业园远程操作控制（ROC）自主运行率（L4级）\",\"raw_value\":\"98.5\",\"value\":\"98.5\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"来源为烟台产业园ROC异地装置自主运行率，未界定为子公司，也非园区整体经营指标\"}],\"uncertainty_reason\":\"来源未将烟台产业园界定为子公司，该比率为ROC异地装置自主运行率\"},{\"fact_id\":\"F-OD-02\",\"text\":\"2025年全球聚氨酯及其原料产品市场消费量增速放缓，全球MDI、TDI消费量同2024年消费量基本持平。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[],\"uncertainty_reason\":\"来源为全球行业市场消费量背景，非公司产销或消费数据\"},{\"fact_id\":\"F-OD-03\",\"text\":\"石化产业仍处于行业周期底部运行，国内面临产能集中释放、有效需求不足的局面。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[],\"uncertainty_reason\":\"来源描述石化行业环境，非公司石化业务经营结果\"},{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司实现销售收入2,032.35亿元，同比增加11.62%；实现归属于上市公司股东的净利润125.27亿元，同比下降3.88%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"销售收入\",\"raw_value\":\"2,032.35\",\"value\":\"2032.35\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增加11.62%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"125.27\",\"value\":\"125.27\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比下降3.88%\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-OI-04",
+          "text": "烟台基地一期100万吨/年乙烯装置原料多元化改造全面完成，实现全乙烷进料，产能提升至120万吨/年；二期120万吨/年乙烯及下游高端装置顺利实现全面开车并稳定运行。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "烟台基地乙烯产能（一期改造后）",
+              "raw_value": "120",
+              "value": "120",
+              "unit": "万吨/年",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "来源为烟台基地一期装置口径，未明示法律实体，不能认定为合并集团乙烯总产能"
+            },
+            {
+              "name": "烟台基地乙烯产能（二期）",
+              "raw_value": "120",
+              "value": "120",
+              "unit": "万吨/年",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "来源为烟台基地二期装置口径，未明示法律实体，不能认定为合并集团乙烯总产能"
+            }
+          ],
+          "uncertainty_reason": "来源对象为烟台基地分期装置，未明示法律实体，不能认定为合并集团乙烯总产能"
+        },
+        {
+          "fact_id": "F-CF-03",
+          "text": "烟台产业园成功实现烟台远程操作控制（ROC）宁夏等异地装置，自主运行率跃升至98.5%（L4级）。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "烟台产业园远程操作控制（ROC）自主运行率（L4级）",
+              "raw_value": "98.5",
+              "value": "98.5",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "来源为烟台产业园ROC异地装置自主运行率，未界定为子公司，也非园区整体经营指标"
+            }
+          ],
+          "uncertainty_reason": "来源未将烟台产业园界定为子公司，该比率为ROC异地装置自主运行率"
+        },
+        {
+          "fact_id": "F-OD-02",
+          "text": "2025年全球聚氨酯及其原料产品市场消费量增速放缓，全球MDI、TDI消费量同2024年消费量基本持平。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "来源为全球行业市场消费量背景，非公司产销或消费数据"
+        },
+        {
+          "fact_id": "F-OD-03",
+          "text": "石化产业仍处于行业周期底部运行，国内面临产能集中释放、有效需求不足的局面。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "来源描述石化行业环境，非公司石化业务经营结果"
+        },
+        {
+          "fact_id": "F-SM-01",
+          "text": "2025年公司实现销售收入2,032.35亿元，同比增加11.62%；实现归属于上市公司股东的净利润125.27亿元，同比下降3.88%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "销售收入",
+              "raw_value": "2,032.35",
+              "value": "2032.35",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增加11.62%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的净利润",
+              "raw_value": "125.27",
+              "value": "125.27",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比下降3.88%",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12534,
+      "output_tokens": 903,
+      "total_tokens": 13437
+    }
+  },
+  {
+    "request_id": "bp-work-2829fcbafb318d193e68b256:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "d2951b760ae5f6dac8f4f562c0eb072216960a27ab386bcf9919bcb3b318ffb9",
+    "response_hash": "34aeb0637765c2ab06712c0068491e6172c4c38bad49a879a179f7e6db771a95",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-OI-04\",\"F-CF-03\",\"F-OD-02\",\"F-OD-03\",\"F-SM-01\"],\"checks\":[{\"fact_id\":\"F-OI-04\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"source-0001写明烟台基地一期乙烯装置由100万吨/年完成原料多元化改造并提升至120万吨/年，二期为120万吨/年，仅称公司乙烯总产能跃上新台阶而未给出集团合计。候选保留基地分期产能、万吨/年及改造完成事实，指标名称含烟台基地，主体标unclear并说明法律实体未明示、不能认定为合并集团总产能，纠正了原consolidated_group错挂。\"},{\"fact_id\":\"F-CF-03\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"source-0004载明烟台产业园实现烟台远程操作控制（ROC）宁夏等异地装置，自主运行率跃升至98.5%（L4级），未将该园区界定为子公司，也未表述为园区整体经营指标。候选保留98.5%、ROC与L4级限定，主体改为unclear并明示非子公司口径，实质性纠正了named_subsidiary错标。\"},{\"fact_id\":\"F-OD-02\",\"accepted\":true,\"evidence_ids\":[\"source-0013\"],\"explanation\":\"source-0013明确是全球聚氨酯及其原料市场消费量增速放缓，全球MDI、TDI消费量同2024年基本持平，属于行业背景而非公司产销或消费。候选保留全球与基本持平表述，取消合并集团归属，主体标unclear并说明非公司数据，未把行业持平写成公司结果。\"},{\"fact_id\":\"F-OD-03\",\"accepted\":true,\"evidence_ids\":[\"source-0013\"],\"explanation\":\"source-0013表述的是石化产业仍处于行业周期底部、国内产能集中释放且有效需求不足，属于行业环境，不是公司石化业务业绩。候选忠实保留该行业表述，未写成合并集团经营结果，并以unclear及不确定性说明取消了原公司主体归属。\"},{\"fact_id\":\"F-SM-01\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"source-0009叙述科目为销售收入2032.35亿元、同比增加11.62%，以及归属于上市公司股东的净利润125.27亿元、同比下降3.88%。候选保留销售收入科目、金额、增幅、期间和合并口径，未把该数值改挂营业收入；同页营业收入金额相近不能单独证明科目相同，候选亦未作此等同。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-OI-04",
+        "F-CF-03",
+        "F-OD-02",
+        "F-OD-03",
+        "F-SM-01"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-OI-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "source-0001写明烟台基地一期乙烯装置由100万吨/年完成原料多元化改造并提升至120万吨/年，二期为120万吨/年，仅称公司乙烯总产能跃上新台阶而未给出集团合计。候选保留基地分期产能、万吨/年及改造完成事实，指标名称含烟台基地，主体标unclear并说明法律实体未明示、不能认定为合并集团总产能，纠正了原consolidated_group错挂。"
+        },
+        {
+          "fact_id": "F-CF-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "source-0004载明烟台产业园实现烟台远程操作控制（ROC）宁夏等异地装置，自主运行率跃升至98.5%（L4级），未将该园区界定为子公司，也未表述为园区整体经营指标。候选保留98.5%、ROC与L4级限定，主体改为unclear并明示非子公司口径，实质性纠正了named_subsidiary错标。"
+        },
+        {
+          "fact_id": "F-OD-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "source-0013明确是全球聚氨酯及其原料市场消费量增速放缓，全球MDI、TDI消费量同2024年基本持平，属于行业背景而非公司产销或消费。候选保留全球与基本持平表述，取消合并集团归属，主体标unclear并说明非公司数据，未把行业持平写成公司结果。"
+        },
+        {
+          "fact_id": "F-OD-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "source-0013表述的是石化产业仍处于行业周期底部、国内产能集中释放且有效需求不足，属于行业环境，不是公司石化业务业绩。候选忠实保留该行业表述，未写成合并集团经营结果，并以unclear及不确定性说明取消了原公司主体归属。"
+        },
+        {
+          "fact_id": "F-SM-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "source-0009叙述科目为销售收入2032.35亿元、同比增加11.62%，以及归属于上市公司股东的净利润125.27亿元、同比下降3.88%。候选保留销售收入科目、金额、增幅、期间和合并口径，未把该数值改挂营业收入；同页营业收入金额相近不能单独证明科目相同，候选亦未作此等同。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 14548,
+      "output_tokens": 604,
+      "total_tokens": 21643
+    }
+  }
+]

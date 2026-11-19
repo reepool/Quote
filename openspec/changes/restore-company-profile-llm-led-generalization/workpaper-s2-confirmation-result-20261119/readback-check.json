@@ -1,0 +1,2884 @@
+{
+  "query_export_fresh_equal": true,
+  "api_fresh_equal": true,
+  "profiles": 15,
+  "missing": [
+    "601009.SH",
+    "000027.SZ",
+    "000090.SZ",
+    "600663.SH",
+    "600655.SH"
+  ],
+  "original_raw_runtime_sha256": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/600309/runtime.json": "168eda26f8ef62de3c8479bc0f46c5c8f354c24360527c4152d28ce3dbd9a56d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/600438/runtime.json": "643f24878248fc3f136eb28a0440e0825c1040e6645aba70e42b86a79ad1e0b1",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002594/runtime.json": "3b82ff38da7024b24ff1a10721019d490651aff6b7f4d0f4d0b36b4c1a69585a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/000725/runtime.json": "88a0869c58d773679c0a8133fe93f7e2c52a84a1a22456ed0a28d1bd4b955da9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/920002/runtime.json": "feb7a4a4dfd1f713cdbfbe23c43bbf5f99b0b451c75c4d98ffe97da407bac33d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/920005/runtime.json": "d35902adf9a6b41f9f3d04e28dc62a94f169770b84dddb9285c53d8b8d1c1e4d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601021/runtime.json": "43785e0156fc611f33c97ced54da531c608ef0b198cdba990b74bccbcde77eea",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601888/runtime.json": "50ea9071f5cdfc34c90b47f7d79fb43d90156a7af82a5c57bb74b282d431058c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002352/runtime.json": "0bb1f048eb553bdae5dc8c27629edb864b2501bc2078c967cd77c20a07ff8bdf",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002027/runtime.json": "a69624d4a0307e707fe9d1e917df84c9807356c27561416acb62784b02ba3605",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/300144/runtime.json": "52849b7b923d83490a0ded2dcaa0f2aeec887cab328db4ae9b38c3d54861e36c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601111/runtime.json": "c1f4d4db4578db758b5c12d4da9f76305a8e2e7d503c8fd3f0b9840edb8e92bf",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601601/runtime.json": "ea3d8a31e7f2094e371c7525b6898a94132540f6c9760b194f61036d8e1a5d7e",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601881/runtime.json": "a9c701be3c46f18d3f48122c26c42866241b61efaa887768659b04c7a7dc1d0c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/002142/runtime.json": "18f78541ef4c93c067d60688dcfb0e973fe9aa0e8341b92f590048e9754a548c"
+  },
+  "all_actual_adopted_revisions_independently_checked": true,
+  "independent_decisions": [
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "92de5518e7cdc3c00b7d80f8ab01a6e1b3f6b20f4c83f357921de6ab4c059a0d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-BS-02",
+      "fact_sha256": "33374b81f2d4f9f01b94fa898a326bac249d275cbded563a1260c949c4b0416b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "8f94c72efd5a6da8a2e0061600f5ccc10ca66441693e987ba5efb4c61bcc85b1",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-PS-02",
+      "fact_sha256": "8117b90abf3d2f7cb2f9d5de0b8601108e1ef2448a57cd908bad8a46b2627cf0",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "77a76e961117af62548c42b4d718a367a6370a55dec7844d5ba96b6094b57a14",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-PS-04",
+      "fact_sha256": "b1fc18655d5e81e03af37b174298b4470232fbdf2e5314f2e0fb71b06a455877",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-PS-05",
+      "fact_sha256": "5f1a309fce685868fe64db69603c5d1c19a94af5b68b2f5cf48a2e8bde58f06c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-PS-06",
+      "fact_sha256": "f09e051c51082a2581767f4cdd3732fb00ee5f59dd53156b7a4c3fe238b37b4e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-PS-07",
+      "fact_sha256": "2b00a57014962e00890026f919b48e241437f5863b125280287876e80d032f00",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-RM-01",
+      "fact_sha256": "316ca6a69b9aa618bdc519d70700cc18a68ebbefae94da7943d2e30e6004a516",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-RM-02",
+      "fact_sha256": "5ac2f5e2e6a3d777779e996e89eb08dbf59e6845e72d9b2b8c6222f7910415c8",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SM-01",
+      "fact_sha256": "e2e48e6f99ba88f939b659bf3e0efdfada3757543dd83aa29a95845976740975",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": "叙述销售收入和利润保原显示精度；修订后销售收入科目不改挂另一指标。"
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SM-02",
+      "fact_sha256": "3ad47c94e314a4ce8eccdd7fff9114e7a7d0060e7177b1bebd81c7f2dd28a624",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": "本事实为原细分行业表中的系列收入/毛利，不与其他系列机械相加冒充集团抵销后总额。"
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SM-03",
+      "fact_sha256": "57a99baa4b12b063067420ec5be574beba5b0faa6d4d6ab116770923791f1dbf",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": "其他系列按原表保留；原p18另有内部抵销，不能把这几行当集团可相加净收入。"
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-OI-01",
+      "fact_sha256": "9915bb577fb1216d6c9c4c79f17cf8f739c73e54aaf1b122b86202ec06811051",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-OI-02",
+      "fact_sha256": "9ba7e39f6b006e8bfca24c00aad74bc47b1dbd1fa727462a1dd0d0d6f3469665",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-OI-03",
+      "fact_sha256": "f74e22b08b93d48df19b23c40b0c310a0c1b25bcbcd23fdf9085174477af21ad",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-OI-04",
+      "fact_sha256": "2715d5f243592a86a5607c02a3c21ab47b990fe5ef4245006b64c3e8206c60fc",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": "烟台基地分期装置口径/unclear，不是集团乙烯总产能。"
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-CC-01",
+      "fact_sha256": "1821667e16d9136ebd282223df407f448aad7731d3b4eabe24536356422a1a46",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-CC-02",
+      "fact_sha256": "7b1b721494223b96498031ffc8559734a1450e747dc369b738bc2cdd284606fc",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-CC-03",
+      "fact_sha256": "211937a8f6fd15e8c95f0b47e4bcb94a28c6655f8a1b0d120c4033b0786f48fa",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-CC-04",
+      "fact_sha256": "6809f660b726677fbc3bb3c17de53b50b7adf6721eddefbe19f1be4921031fe0",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014",
+        "source-0016"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-OD-01",
+      "fact_sha256": "25b0f393b8189315413cf92b32d06c6f044cabc92b1491f4ffc9dee43f073875",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-OD-02",
+      "fact_sha256": "69c9c656f7ec6c41dcbba3574346f6b3bc5698fa3088dd9b5c2df839fe66f195",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-OD-03",
+      "fact_sha256": "51d5cad3c81b943b0ff7d80801b9d66b3e2c6844fa49d14562e1f1b7ff35c4ac",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-MC-01",
+      "fact_sha256": "99e8467ad5c0e9b88d1a623695abbae188d185f3551d2dbdcf53c6dc6c7ae9a7",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-MC-02",
+      "fact_sha256": "08cb88307f0ab042895c77679a70836c00c9a5bcf44d4d2de6f8a6a761543754",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-MC-03",
+      "fact_sha256": "55c770b264d3592b87c4631989fdcd3aad90c21be8d81e67eaccc3c8f650b070",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-MC-04",
+      "fact_sha256": "4f2d0aaf2dc59329b60ebe16f20eda45d748e25aa839780075cd4759cb9bb94d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SC-P-01",
+      "fact_sha256": "b405f9272cb09e54c6e78ecabd7136fe3a374b6eb8193265c068b5cbbca3c104",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SC-U-01",
+      "fact_sha256": "08061a373ac4b786011cbff351482e817571fcb0f3bce322b294c6168f371aed",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SC-U-02",
+      "fact_sha256": "a1ca6ef741ca73a0e023c49e5dafdc8de176efbdfd23ccd6a32a37c4110d6b55",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SC-D-01",
+      "fact_sha256": "8b5e23e4930203a9d5d0827c9284ea04b3952f0998161fe0a15ce5c45e8c172e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-SC-D-02",
+      "fact_sha256": "0ffe1f74fdc658ab34a8a9899edaa9d3a49fe4c1e2e547d246aefbd0599bc0dc",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002",
+        "source-0014"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-CF-01",
+      "fact_sha256": "4af47cad023fae8f6bbdeb00eb008356c5caa4c5438d35648f08feca4014500d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003",
+        "source-0004"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-CF-02",
+      "fact_sha256": "8835a1a7f1df6dc038f947c934675728f74f142c80a8a95cba11d92460d850d3",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600309.SH",
+      "fact_id": "F-CF-03",
+      "fact_sha256": "12af72ac5f4765207c81b251d4ae8264815c35f3a08da93d79bba69dc8e33f94",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象对照p10—14业务/产品/营销与园区、p17销售收入及净利、p20成本原因、p25—26行业与采购生产销售/收购、p29细分行业收入毛利及p30渠道表。37个对象的各项主张/数值及来源轴向已核，未以数量或model accepted替代。",
+      "limitation": "ROC异地装置自主运行率，非园区整体经营指标或法律子公司确定数。"
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F01",
+      "fact_sha256": "cb2f405be4268110c3d864db74a3cb1de6c577914a94ff8e893b04edf03e2881",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F02",
+      "fact_sha256": "3bd86a96b3d625d25ab65bce3675f92340107b1cdf13220d9266efd8b0b6340c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F03",
+      "fact_sha256": "fedcec5d28b7a2c733b219caa539b4514ef3a53e1a8d7597c64075be09135c5d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F04",
+      "fact_sha256": "c5e7f5b3ffa650f4cd9993219191ddeeff4b5a72d4aab5e8c849078bdf53a591",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F05",
+      "fact_sha256": "4325eff107d935239efb91756666db3774c56d47b71b216a7a5e7796d0edc416",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0006"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F06",
+      "fact_sha256": "6c3e79abe9d8a2ef63541fe3707d7398e3a35eea1f46a85ebf4c1ccb00c15dd9",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003",
+        "source-0007"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": "亿元正文为元原表舍入显示，不据舍入值精确加总。"
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "review-add:RF01",
+      "fact_sha256": "6806ed05fa5e4109e994777c31da2a9edc4ca6536dbf0c5c29c4c1546899756b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009",
+        "source-0011"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "review-add:RF02",
+      "fact_sha256": "1536afcd479a5f76ac1c33f1af687eb085450c32f00d49a1130897bb99f0d053",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": "百分点变动保原方向和null标准值，不作确定符号数运算。"
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "review-add:RF03",
+      "fact_sha256": "be42671bfd7fc9c5959879a27eb5c1bee1e16e5f0a0f0f3e0f6403b1bc96e833",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007",
+        "source-0009",
+        "source-0011",
+        "source-0013"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": "分产品与分地区内部抵销是不同表轴；负额只作本表调节，不当普通经营板块或集团收入。主营合计与利润表收入不相同，不跨轴叠加。"
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F15",
+      "fact_sha256": "2a5bb01b15b842b53485cf99cb83c2fcddbc368390ed767ffeb02359709ad071",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F17",
+      "fact_sha256": "8fea1a5da20e5947da0aeb72b1f34169404f7ee1562cf2bdc1e64abc96708e2b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F18",
+      "fact_sha256": "5604f91e7a12c8724702f469f4203d18315b27fa2705f5d184a2ceae3a50ae9d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F19",
+      "fact_sha256": "d0566a28adb841232c54133d4a97c5ba4fd45c80269f1f3b7a2d58c512289e07",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "review-add:RF04",
+      "fact_sha256": "c0b0f1fdcef62c421e8995319b41e3addc71d0dd5411643eb5bc7775dfed344b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004",
+        "source-0015"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F20",
+      "fact_sha256": "4069d71e8fa0ca1432b2ec2ea197f57dde75c3c41a840d5573c1346b0c14f616",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F21",
+      "fact_sha256": "cc94b0218430a8ade7880b2cad72a6a20b98ea016be517c7057d93ded17a471c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F23",
+      "fact_sha256": "f9ddbd1c5e49557be7f3d8c208a386f0ee82de3a1815db56f129c928b8a8dd93",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F24",
+      "fact_sha256": "d044eb6639ff34a2d280847a18813f331c9cf954d925409bd076fba962f4e8de",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F25",
+      "fact_sha256": "fdeb95deac9523928c483d8d88bbb9d9b63555da585890b274e45107b2824b0f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": "研发投入含研发活动形成产品对应成本，不等同利润表研发费用。"
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F26",
+      "fact_sha256": "16e86f6925fbf3a4af897ca0783bac14e6e368bf724dd932a5a8acca5d16f047",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002",
+        "source-0005"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F27",
+      "fact_sha256": "c408ce23ad094b45ceaf5d276690d27d96f158cff63f5f6f4f03bc811bc2d180",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F28",
+      "fact_sha256": "ae8fdbe332428e687c0d060985ff83cf65a8e8364d8470f0d003a37703f68162",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0018"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F31",
+      "fact_sha256": "81ea86dc0bde3842b70c929411edf5a92c60ea7ad0bec00ed51271f87851f941",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": "全球新增光伏装机为行业背景，非公司装机。"
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F32",
+      "fact_sha256": "c4b8476123034bce4615e052bb8330190c76d872a7843b55f69e53f3c99d8131",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": "行业饲料总产量非本公司产量。"
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F33",
+      "fact_sha256": "8a704f8062ca6108bd6bb814b28f4baf699a3e54f95dbcf367a061ff7da76d7d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004",
+        "source-0015"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F34",
+      "fact_sha256": "c70a9852ee11970412d746b1bfa53374428bc547f49fa3fcd7a4d0011b2c52b7",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F35",
+      "fact_sha256": "6b7079486c301b8ea6e410be3d29fde2767d2849f87f7881aa459fd2ffaa5ac1",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F37",
+      "fact_sha256": "1b44178ded6351d4746747f2c264908b123bc33c8e1ec67d4c8cf7c75c29fc45",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F38",
+      "fact_sha256": "31cb7966de6058750051289d3d9952722959a37d1fe9bc4491eb955af61ac3da",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003",
+        "source-0007"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F39",
+      "fact_sha256": "379e7d91f88f97f99dda868c4d1143e994496f29a729df7376df91989dea2715",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F40",
+      "fact_sha256": "dac89631942d0cfca8795a4cdb5585de0baa5ef236f11fa8dbb5c960995d52cc",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F41",
+      "fact_sha256": "03d861f771698d197af55bac35a59f4973b6cb3db0ee40fefbe4f24b463be95a",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008",
+        "source-0017"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F42",
+      "fact_sha256": "e0ccf5dcf511c427170ff547b5bb48d25a801667168fd1466b2a543b45f9398c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F43",
+      "fact_sha256": "cbb3bec0d71bd8ddb09c743546d339faeba099909e5e2dcd1c3b0d9750aabcb3",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0004",
+        "source-0004"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "600438.SH",
+      "fact_id": "F44",
+      "fact_sha256": "bafcc0645baca27a123e8a96b2a8c218bd31bd58e9bc89bcd13c0447c93ce816",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "reason": "逐对象核p12—13双主业/产品/客户/经营模式，p15—17饲料、硅料、电池组件、电站的销量及约/超限定、投入与经营环境，p19—20财务和现金流原因，p21—22产品/行业及地区抵销，p23产销量，p25客户供应商，p26研发投入/费用区别。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "328bcfa4434f388793c355d18d5a76c5233470f3efb7f1b6df559ac0daff3f50",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0007"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-BS-02",
+      "fact_sha256": "db0fd9772af64b020a83493af440be50d7b9d24ce80171ab528c5b3f7bacf229",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-BS-03",
+      "fact_sha256": "bd091469b724b06e5f38cb9e9ed40eebf51c8b9f6d98771cfd0f19787454af5c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "64f0705a571a2397335ed20673560f74c9401eb2e18885bab679e284616c65d3",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-PS-02",
+      "fact_sha256": "41d76183f4fd539123e63870db2f249a5c0a589930b799077ff654190634b8b0",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "3cc99842b6ea447aa75a5bcb5f4dfb427f04a653b3280ac88653c5ca737bd8c7",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-PS-04",
+      "fact_sha256": "4f4153314b3ba55e06c10c37d9994778091c5d269ea462a933260de142574542",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-PS-05",
+      "fact_sha256": "160b2138686aa49ff791de77f08afa5a8776322f142a23978dcb27493dafb72b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-RM-02",
+      "fact_sha256": "29b32763c1e17f733311be74e9a3b3905a4b60f2c1febdb4c7f062fd0b553ab2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-RM-03",
+      "fact_sha256": "daab04dfb94e459e13caa5e8fc65e66a23cd11835c581164212dac2974c6c429",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "金额和比例可定位，正文已按地区限定；但结构化指标subject_scope为business_segment，实际是地区分类而非经营业务分部。仅原文参考，避免API下游按经营分部使用；不猜改标签或撤回其他收入。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-RM-04",
+      "fact_sha256": "9abf8d0f6f301a26c99e16e780ef470e07f04da1906200c7d65d1e777cb54ee6",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "金额和比例有原表支持，直销/经销为销售渠道而非经营分部；结构化指标标business_segment不能作分部精确消费，保源参考。其他F-CC-02保渠道定性比例，基础画像不因此清空。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-RM-05",
+      "fact_sha256": "6c712a906606f4de043aa3d4a2fc9a4ac280b89c5113263969b757932f62abb4",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": "毛利率变动按百分点保源，非相对同比率。"
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "review-add:WF-002",
+      "fact_sha256": "e7a05b25898ea5ee93d71d43fea3f0cfd0a8b300136ddeaa542717a89d75dae2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013",
+        "source-0007"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": "精确元金额与约百万元叙述并列；后者value=null，不精确相加。"
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SM-01",
+      "fact_sha256": "22c8bfaa234ec81c832d090dfdde2373e51ed4e7118eb8aa33322c8ac6d6e4de",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SM-02",
+      "fact_sha256": "a30224bd4f61ab5d78cf256282150829a1d632565a33b24d3e05010a4c80f424",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SM-03",
+      "fact_sha256": "974223c8f3736f9f17cfd528291952f251fc0a1f214856a35fc966f044a70468",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SM-04",
+      "fact_sha256": "f01f665cda7fe8464a559f462639c81bb078b022a2e40a2ea441e6f014a744f9",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": "保有量超256万辆是下界，不当精确值。"
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OI-01",
+      "fact_sha256": "cca73bee456cd8e8c0865d1131c0854aa6d96abac20344b034ef5f480084d23d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": "约634亿投入与超2400亿累计投入保约/超；不当利润表费用。"
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OI-02",
+      "fact_sha256": "8bb70a6ad47766d56f71de8060e70d39151a7880f7b4ae87164cf9695f9a0c7b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0018"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OI-03",
+      "fact_sha256": "da6ee2931f1201a87193db3f98674a0946be343efbc77ea62b7ecc567ef22994",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OI-04",
+      "fact_sha256": "fea1f40b0e0711433bb14247b67d3b1215b4d652c1703a2e2ba84de768071eb6",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0017"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-CC-01",
+      "fact_sha256": "69d0638a889005129c9c67028d818bc239c08ffac49762789916da575735c7b6",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-CC-02",
+      "fact_sha256": "268b64a6931ebf717827f306d9d7eeb4de7514b6502b87a24ac1d0c1a194dfaf",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-CC-03",
+      "fact_sha256": "495a9996b9df73ee48995bcfc98c8a12e8c87747253c09742bafb55f3ecaf53f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OD-01",
+      "fact_sha256": "e54e763f5a25beb0e66e3bb6323de9f3b728ee8e11f5135945eec0fd1c6adc72",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": "行业数据保unclear/非公司自身产销。"
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OD-02",
+      "fact_sha256": "f19fb40d261f69bb94b1070b2d6a0746a81682613417d3c47a05c7d5caa7b221",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OD-03",
+      "fact_sha256": "66e63ecd9dda58b809398f7e5d70afefdd599c1ac4f6d89cf79d50a9f810c4a3",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-OD-04",
+      "fact_sha256": "78f4782960c06050d7230bcf82a85d96bc7d5237cc4ec03dce5c794693575dad",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-MC-01",
+      "fact_sha256": "83c1d63c6dc16cd377355bf08880daed543fb6d1bcad743cd85de33a3f52c8c2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-MC-03",
+      "fact_sha256": "bf1f2652cff862d4f5645229972245734ad290e89eb5b3d80878fb741e871d88",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-MC-04",
+      "fact_sha256": "49caa194746daac160dfda1c4c165830f8825789f6e5ece6ab92fce9fee8d6c9",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SC-01",
+      "fact_sha256": "b57332ecd796c78acdd0190db39888a0c83b0f6356b007c8f3a5078cc5b06e17",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0009"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SC-02",
+      "fact_sha256": "2bb1d420ceb0d63bc7322ac042937b5e8e0eb826e6565c10574d9943f1324427",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SC-03",
+      "fact_sha256": "e19c4e48a2879be5ccfc56ac2a3fa6f32d9b90a2079846d833572194e6de3c76",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0017"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "fact_id": "F-SC-04",
+      "fact_sha256": "d899eda8cd98ea450ad990ee17ec9a5508ec2e96573d281ab27c9bd8e3640134",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0012"
+      ],
+      "reason": "逐对象核p13—14业务/电池光伏轨交与车型快报，p15行业，p16—18技术研发/资本/品牌/出口，p28手机组装及AI业务，p29—30收入产品地区渠道与毛利，p31客户供应商，p32研发费用。表内元金额与叙述约百万元/亿元保不同精度，研发投入和费用不混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "5f2835bb32da3339a10abafbb30c8edc4bd1baa421850c7050439244af57bc67",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-BS-02",
+      "fact_sha256": "186544844812dd4ed1610c4d181089cd2e2e266d89178804b1f190cd47bce0a3",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "b6891df1c3f9bd3885e159103f3533706f0a75f71180e93e17cfd7b32d549a10",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-PS-02",
+      "fact_sha256": "d5d518d0a96fc252c80f4a5d4c946e0909c87f54de1d3426583e885a0427b2d9",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "ae964d9d72f6182dff73531fff9f98a6a3e37a38944d75783b8b198ca779fd96",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-PS-04",
+      "fact_sha256": "5eea9e0feb6edd92fd76e8b747a8ea99c4ab74ec2fbbc0f7453e0d683d5b1abd",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-PS-05",
+      "fact_sha256": "0cc68026ec6ab7b77ad2312e49da6e0ea836f3afb63f4d9e084cae724535f541",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-PS-06",
+      "fact_sha256": "f3c7c0a17b6e48e707b724fb9d04f60f220c9d12afd8b091af6eac750ecad651",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-RM-01",
+      "fact_sha256": "460e1d118059d6de1ee789610cc1c31a9183a7e46694b7af5200962739a99e63",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-RM-02",
+      "fact_sha256": "cd10def4a0d20b03845854da1cc9e1e16742dd2624f10262a8b77b08b9c2b620",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004",
+        "source-0005"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-RM-03",
+      "fact_sha256": "5ebba9e79b81ae0964b0e1db3496937a6c45c0e5358d25a0aa6b238ecb1e499b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004",
+        "source-0005"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-RM-04",
+      "fact_sha256": "5b917fc15a0473b8d349e1504ff1f671a5f512cbe89d34adbdecc28f961c110b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-RM-05",
+      "fact_sha256": "18ee5238ae82be1aafc27990128f5bb540ca5080aea9ce58458dadf399f06023",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-RM-06",
+      "fact_sha256": "bf3f17aa4f7d788540020358b3757929d99f64b0b718227ca6a7984af628edc9",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-RM-07",
+      "fact_sha256": "0c6c6ae8840116c9b5bfb46924e7a2884a61fdfffab20c76ab2752ca08c57978",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": "其他及抵销保持原文混合口径/unclear，不能视为集团总收入或普通经营板块，不要求确定化。"
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-SM-01",
+      "fact_sha256": "bb75d690230cd8369d58354dbe246684b82d1c29bd62c0ef4e92a32ae42e8609",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-SM-02",
+      "fact_sha256": "a23346c62c80520e499e8abae730d1b88a5f7c1a975de3402c2fb4e0339b3ef0",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OI-01",
+      "fact_sha256": "202268e24111efce054716a9c8341732e319de740eb1eccf1387e103913d0972",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OI-02",
+      "fact_sha256": "58e19be38f5b97a864f8ff6fe797b94619c814b9ebf287ea93a5eb099f74afa5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OI-03",
+      "fact_sha256": "7fbca81d9183fc977608c84d1be1fa3e9133426a05b7a91b339e1c0ec472fb64",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OI-04",
+      "fact_sha256": "991d021efa8c403ae1775a2455c981680c0a867f6cabf8a7593eba0648ba7e24",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "研发费用13,836,670,878元/5.44%及前几项研发名在所引p22有据；但后半低碳环保、Tandem、极致窄边框、车载/MLED等项目延续在p23，当前事实仅引用source-0009(p22)，没有引用同包source-0010(p23)。不是证明原文无项目或金额错，而是该复合对象引用覆盖不全。保源参考，不手工追加引用或拆取正确金额，不让它清空其他事实。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-CC-01",
+      "fact_sha256": "8520badf440edaa22088e4af5008211e4c26738113c973bef6b50894fbf751da",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-CC-02",
+      "fact_sha256": "05e2bd323c52fe2f0ad4d0eb9dae14681c28fbf93e669b120a73fc8d41382ea2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OD-01",
+      "fact_sha256": "ac7fefd4466e7544fea5a494d7c7a668330b30a11bd6e2b509d6b6bbe942d753",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OD-02",
+      "fact_sha256": "28e75d363a75130bfa8b994920c72249b81e85c5013cb9614e163e5dff98c0ae",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": "海外核心客户营收增长保年报原句和业务语境，不据此推断客户公司整体收入。"
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OD-03",
+      "fact_sha256": "16b89b0a31d97135c6599595beeb14f35d1f021d2f417f06799a4c37b36310f0",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OD-04",
+      "fact_sha256": "931d258d0dd0e0efbe4dbf523de70c63c0d89ba5b3ffc541c3f4700bc5569e3e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OD-05",
+      "fact_sha256": "800339ea52c505f4e52f4dd6d3c1165140d958073b76c685632c4ca47fd0d02c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003",
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-OD-06",
+      "fact_sha256": "c4b1b5c91cd4fd0e4405d4dd06e40500b698e9ee35fab5d3b6dab10d09192982",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-MC-01",
+      "fact_sha256": "e9434fe6477c02ce099499453f0ab24691f35df5b45b8e1c8584916989196604",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-MC-02",
+      "fact_sha256": "ab7b042dc408732de09e8aac5c09231563e78096a28a25508d551416eb0894b2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": "2026展望而非2025已发生事实。"
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-SC-P1",
+      "fact_sha256": "9d5ef773145c095cd778155845e1c0bad8b428ae25e310be74b7087922f34f85",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-SC-U1",
+      "fact_sha256": "4a7bec57777668e9b812fb74894630c054b2a0111101160af827154f82036f2f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-SC-U2",
+      "fact_sha256": "438d76874a42521a0e0ada98517653d781e8eb9ab96d93eb53ea122620d5ad21",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-SC-D1",
+      "fact_sha256": "087be527dcd48863669c5ad8647ecbdeed7284c9e588075e6975c6b777821655",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "000725.SZ",
+      "fact_id": "F-SC-D2",
+      "fact_sha256": "b464604f9e35a990bd2230192ac39b44cfdb1ba0d5e393514b5f0ec4003ae1ac",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "已逐对象对照本轮source-0001—0012原文：p15—16公司业务/产品与模式；p18—19分业务经营；p19收入与分部/地区/直销表；p20产销与成本；p21—23成本、客户供应商及研发续表；p31—32下一年展望。核主体/期间/列/单位与限定，非用相同匹配器复算或模型一致作真值。",
+      "limitation": "本次真实修订后为2026展望客群，非2025实际客群结论。"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F01",
+      "fact_sha256": "48d161471ed395614f783c06cacdefa617bb47fe712cd4169dee4558fb973e59",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F02",
+      "fact_sha256": "96ff5f9e7f17a59567d63011736f07e3a501338d4783d18b7ddfdf585d9993f6",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F03",
+      "fact_sha256": "b90952a24d9c376da7f693a25b3816b6f563951264ab3b65820da73c641fd127",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F04",
+      "fact_sha256": "994b6730a2c25e97c372516168bd326dc0ff1a03d5dd61263bd2ae0597518953",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F05",
+      "fact_sha256": "925dbc14429d78b132cc9bb9078584644af3acc21c8395dda8f6b5c7ff4acec8",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F06",
+      "fact_sha256": "b819608c1d0471debc2caa0d6364be56947d18bd92ad1f723079ac4f56cb879f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F07",
+      "fact_sha256": "115519a52d9868b454324889edb46efa8b0e147ebbfd8b562ef871d6e1a3dd6d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F08",
+      "fact_sha256": "62008cd94e9107be89604e7d59d575399d56422bb00ffa5de49dc4f3b7997022",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": "业务类型其他与其他业务收入不同，不相互覆盖。"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F09",
+      "fact_sha256": "0e005f182d3d77a9318b369c1378e6c87d72fe53e392c9502d7a5ffd0e177b29",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": "确认时点的少量时段收入保原表，不据空成本列推零。"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "fact_id": "F10",
+      "fact_sha256": "06fb86ccaa397e4e58a130d2381f43f1d3c6921b4ec8d1efc4a5ab0588595f2b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0018"
+      ],
+      "reason": "独立核p16—18业务/订单及备货生产/直销和寄售与贸易商，p38风险章节中当期产品分类及用途，p160—161收入附注本期/上期、收入/成本列与业务类型/确认时点轴；另与先读p24—25主营表对照。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F01",
+      "fact_sha256": "724ae49f1fed6800b98ac89f808fa8f57c5bad6c999dcbec9e50c0e8d5a85b9e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F02",
+      "fact_sha256": "70ae69af6ff53e8d22559a2843838b6ae5c3eeac644a2ecdee9d6ddf9c26b429",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F03",
+      "fact_sha256": "dcd241c6d7b0750333b8d0e74c6ce13e76f6e26a56513953816db13c289c4fda",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F04",
+      "fact_sha256": "094f19eb189798590b8b4b77dac51983d81909d21e92d7ff9e7dac14805252a7",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F05",
+      "fact_sha256": "d09feaa3246d6c74a6b3242b9632e470a26d3a0487612e5cfa51a00f3fc1f27b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F06",
+      "fact_sha256": "87418774121f38d6b345d1665187e446333a3eddf0cf26987318196df2b246c8",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": "原文营业总收入万元精度保留，不改挂另一科目。"
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F07",
+      "fact_sha256": "7f15c766a07f15bb1f026d1acc4187ed2fc0f76c4d6119b319575627808ed6e2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F08",
+      "fact_sha256": "f3b42dfd4038596987f844ba37d0fa89ae30e24d7341965e52327ba5a395c49d",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "内外销是经营地区而非业务分部，金额/毛利有原表支持但结构化指标标business_segment；保原文参考，不供经营分部精确消费。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F09",
+      "fact_sha256": "97069ffcbf71a5278eb6d606fc171362605f06cce0e11ffcdd9ad899c91b362f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "fact_id": "F26",
+      "fact_sha256": "89c3cb9846bc257191397b1771e28a2ed4e4279cfa2b6339a7a21529a203b681",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "reason": "p12—13明确功能/防护与六类核心产品、订单直销和自主/OEM/委托加工，原经营回顾营业总收入/净利；p15—16产品和内外销表，p17对子公司投资款，p143主营渠道分解。",
+      "limitation": "对全资子公司投资款来源未明示母公司单体，保unclear，不作集团外部投资。"
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F01",
+      "fact_sha256": "55b85061b33733d8d535e625ee2747e8b489c2c173fcd085cafe62cd6ca48d18",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F02",
+      "fact_sha256": "ab0720152b281810968eb2a4c2c327e92b6f6935b3f91d02d70277573b584515",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F03",
+      "fact_sha256": "8f6ade47dcb4e7b3f3e77f5fc3d28ea21524f2d5294dce8af80b0c362ed6b998",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0006"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F04",
+      "fact_sha256": "c895926052ad16126b89ce5bf18b5598575dc887c6cc40f639b55db16ccf148c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F05",
+      "fact_sha256": "46e9391b55fe31a211d5150efa6a0a9aa78e420bc136bc25ff0b95159b612a00",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F06",
+      "fact_sha256": "ef709970d5a0b93976440016ac83d0f462f81ab950cdf9b7342a585810c638c2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F07",
+      "fact_sha256": "5177840160cc16386d0dca4cbb0ae89a1a21b24255577b51475677c9df74ed4a",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F08",
+      "fact_sha256": "3a48d0d77f46cbd3447a5ef6ecc6620fc3233dfeb48a25a45a91a85a4a76d88e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F09",
+      "fact_sha256": "5392a3c30c338eb2275cb4bb2cace694847d51dce9fc51a228efdaed666b6356",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F10",
+      "fact_sha256": "7ba8208b250eda0846ebb99f535682ed75aa2b3b2261ceee936b68193bd8448f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": "单位成本和非油成本保原文元及其章节口径，不自动跨公司/跨行业比较。"
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F15",
+      "fact_sha256": "6fc2d27c7ca5520745b9da8acbedae3c8b1261a21af58172253b051454de995e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": "座位布局97/25架保原数及不明确机型归属，不靠97+25=47+75自行定对象。"
+    },
+    {
+      "instrument_id": "601021.SH",
+      "fact_id": "F28",
+      "fact_sha256": "5fc4852172176ccb6b630caf5e96c3f653ebe9c90cfd921f45edaa23045359a0",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "reason": "p11主要业务及低成本客群；p15运营表的公司旅客/客座率/客公里收益；p18—19机队座位与基地；p20辅助收入和增值服务；p21单位成本，p24—25财务及主营分项/适用性。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F01",
+      "fact_sha256": "ddec7bc4350ca2a0130c0c83b5358a9da5d94a1cf694358a902e3b56fcd95e25",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F02",
+      "fact_sha256": "16b9d20f9bc43679a91333ec25c72932954867ffde9662476f042ba5da55b873",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F04",
+      "fact_sha256": "559039dea2e2c60afdfc434b4c262cc56f8ec31005831e08b58674c52b15aaae",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F05",
+      "fact_sha256": "f825f11bb7dd06ef9edad48f158571b874bbef084e80b050ca5d0349b08917a6",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F06",
+      "fact_sha256": "c1a44ace0a4720eeceaf2c47416ef9df68620aa6ad8739c31932438c0b89cfed",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F11",
+      "fact_sha256": "a819f54dc265322fad7963612b95d09957857b9dbb9fb9e0df758c220ef77455",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": "海口项目金额与累计收益按源且主体unclear，不当集团本期利润。"
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F15",
+      "fact_sha256": "77cabcc3a667f9747dfcb33e4835edac27f3077fe90cc902e99ec30963e2fa3d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": "DFS交易另属2026年1月且为将收购，不由本条新店和供货推成2025已交割。"
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F20",
+      "fact_sha256": "d326c3613cbe012a5b4329d80a8578541acf9846b960bd308366a1fbc0517000",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": "近100款为自有品牌及相关品类，不缩成中免健康单品牌精确数量。"
+    },
+    {
+      "instrument_id": "601888.SH",
+      "fact_id": "F25",
+      "fact_sha256": "689ab54ea1171cd1e4473e84e1cbf8dd0a66123ed698f639687b82622e3d9481",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003",
+        "source-0014"
+      ],
+      "reason": "p11免税为主的旅游零售、商业综合体与线上完税；p13—14门店供货/新品/采购实际与计划；p15—16公司财务及免税/有税表；p21海口项目及p27风险应对。",
+      "limitation": "采购授权已建立，后续集中/多元采购保计划，非已实现效果。"
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "8f6733eec428dd0b90ca74ee78496bfb2e0f44eaa8a326f1aa657279b3735b43",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-BS-02",
+      "fact_sha256": "6e0aec60be8256bfdc5048e33a92308a7187891ffdefa93a1a8246e70e31f342",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "a6150c3d9704427a088e93fbb214960c0f76398bc4791497078be801076cbbfd",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "5d8dea1213c8e18bf494a88bec4474ca55050860daea1d44cde4c97b884beac9",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-RM-01",
+      "fact_sha256": "cc271b868d2c50dfdde6b765780106b61a89187d404df7c192b4bc23c2f18a8f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": "人民币3082.3亿元为原文显示精度，不当额外精确总额。"
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-RM-03",
+      "fact_sha256": "2ab1c6c08c6665bf3535bbeb17b79f25731cff1375c47658d0fe9aff21915954",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-RM-04",
+      "fact_sha256": "ff4e295be4cbd56e2b387ad19cc01196f5c416689f6d921173e2e9f6f83603e5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": "速运及大件内部各产品金额保层级，不与分部父项重复。"
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-RM-05",
+      "fact_sha256": "361b0be8dd0c86738f5305c36b25d6af7a7d49294a2af7f16db30b8e8450551c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": "其他含商品购销；供应链及国际与其分部口径不同，按原表保层级。"
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "fact_id": "F-RM-06",
+      "fact_sha256": "3b8eb3f4da7803cfe88d7d0a241193f2b16449df25de08fba2e950119b58912d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "cbdd22aef04f4ed5a33246a1e86f116edfc16a8b139b438c23e0cea37542d71c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "fact_id": "F-BS-02",
+      "fact_sha256": "50c9cb6d61004941187142b1bf4d891ad7d3d5860f46d1d7142c0be8ea91346a",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "limitation": "源时点为2026-03-31，不写2025年末；约数和自营/加盟/参股分开。"
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "8e56da4f2aaf2f02a8425f0634d65a39f0bcc035c523d83250d41c3084c5c04d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002",
+        "source-0012"
+      ],
+      "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "fact_id": "F-PS-02",
+      "fact_sha256": "696ce4b149a5a536c8afad0f9633dbf3afadafb1c390e734c4a4fbe4f5334067",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "fact_id": "F-RM-01",
+      "fact_sha256": "21bb1bec626ec376f7191e0518761e379539ce9293a95cad4524bb463abc1827",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "fact_id": "F-RM-02",
+      "fact_sha256": "acc77dd7bc5e12fa7da05fe7f8f4f8edfe1f5691fbba3acc4b12da491a6a63cf",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "fact_id": "F-RM-03",
+      "fact_sha256": "b1de36f0ec75bf48c58a01b875a65f67580d3bbeb56e8fd5c57d526414f96611",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+      "limitation": "毛利率增减原表以百分号显示，标准化为百分点保原来源单位；不当相对增长率。"
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F01",
+      "fact_sha256": "506fd3748b84ae1a55596354e4dd0cd568b142468f19e42c7d0a1a65a8e25ee5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F02",
+      "fact_sha256": "c8805ca088559bbec38f42442ba3644f31d95424f5e3d014b2ac25dd600bd1c8",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F03",
+      "fact_sha256": "153f8327f0b30577f26e4172a3bfc9e2fc859aa2606235bdb1b2a6b1126c7804",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F04",
+      "fact_sha256": "6cab78a18f4c3a09bd33b5199c53609efa13d4bf3862f5db1311743bf6192cf6",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F05",
+      "fact_sha256": "375448e80c5e1df4dd533b87a1fac614334ad76900cf7e68a4ac7e1b32266468",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F06",
+      "fact_sha256": "21fe04119f039ad0f9f2c2fb63252dbde1d485e5f292f074345beef17ba02516",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F07",
+      "fact_sha256": "f39ebf1547d619206fabcf74197e174caa6ad6afb8c35060deacdc7681434958",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F08",
+      "fact_sha256": "569c2b57e2f6d4ad1ba3d45396fee0d45b847daf9da4054c8bc563d8c51a8332",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": "景区分项不与行业父项重复加总。"
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F09",
+      "fact_sha256": "4fd6a205c63d77497bcc0308a9f9090fd0e3920cf7890c620f6f9111d7ff4202",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": "电子商务手续费和设计策划费与景区收入分别保原类别。"
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F10",
+      "fact_sha256": "8d9c8a9e463c26233b3602c024e9fee067587286e31093f48753be74f6abd650",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": "毛利率增减按百分点，不当相对百分比增长。"
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F15",
+      "fact_sha256": "eacd68d89eec38c103e7930b5b26e9e709e7f782049ca9172d2bd1bb6d18e3f7",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": "收购动作与后续将实施事项区分，非全部已达成。"
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "fact_id": "F19",
+      "fact_sha256": "5838b213cc9d28f7aace082d8cecc28d0b0ef821d2229c4f646a28ed2cf113ba",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "reason": "p9现场演艺/旅游服务与轻资产收费模式，p12收购/后续安排，p13主收入及景区/票务/策划子项，p14毛利率和源同比列。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601111.SH",
+      "fact_id": "F01",
+      "fact_sha256": "368d127e6cf478395951e92ca147a22c7a9a8685d78b95df3b55153241208d09",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002",
+        "source-0008",
+        "source-0011"
+      ],
+      "reason": "p11—12附加产品/客货运营，p16—17集团客运/货邮及地区分解，p22集团运营表和p27主要附属载体。核货币单位千元与亿元显示，货邮与客运分开。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601111.SH",
+      "fact_id": "F02",
+      "fact_sha256": "f484da279e6446e2f2347c651ec4941a295aa53d7a8b83e94f8a99b1c4938f3b",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0005",
+        "source-0006"
+      ],
+      "reason": "客运和地区金额可核，但地区明细结构化subject_scope标business_segment，不能作经营分部精确消费；整条含这些指标，保原文参考，不手工拆取正确主金额。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601111.SH",
+      "fact_id": "F03",
+      "fact_sha256": "b474a13cb0fd6340bccde883749235df82ed985ff7c160116af465d69593754b",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "货邮与各地区金额可核，但地区数据被标business_segment，保源参考避免错误分类，未猜改数值或主体。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601111.SH",
+      "fact_id": "F04",
+      "fact_sha256": "73fa8d3cf1d9f600cbb570848a0875fc6328df65ec7b0db4947ca84fd7c999b5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p11—12附加产品/客货运营，p16—17集团客运/货邮及地区分解，p22集团运营表和p27主要附属载体。核货币单位千元与亿元显示，货邮与客运分开。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601111.SH",
+      "fact_id": "F05",
+      "fact_sha256": "f4a83e687d7d37957266cf33337ce96545c9bc875ea7bcc32bd3ea936ec5ace5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "reason": "p11—12附加产品/客货运营，p16—17集团客运/货邮及地区分解，p22集团运营表和p27主要附属载体。核货币单位千元与亿元显示，货邮与客运分开。",
+      "limitation": "保主营、其他业务与公司总额的原披露区别；不表示其他航服/维修细项已抽全。"
+    },
+    {
+      "instrument_id": "601111.SH",
+      "fact_id": "F06",
+      "fact_sha256": "17555c5e46d76ac90ddfa312f0e630446d26bc734fcd654b95db5655cf7602e4",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "p11—12附加产品/客货运营，p16—17集团客运/货邮及地区分解，p22集团运营表和p27主要附属载体。核货币单位千元与亿元显示，货邮与客运分开。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "1b37b1ef6856ad9a186678de99590e1c7e5f626aaaa171930c7cb445fe92b0c2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-BS-02",
+      "fact_sha256": "6042c6f48aaa030480552810302df65a46e802533c551bcd231ec64579b09c0d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "cb21b7caf0af02bb7d7b498f705436a4bc48eb6ff8fe58d89248fcc415ffd370",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0017"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": "太保寿险专节注1包括其香港子公司，比较期重述；规模保费、新业务价值与服务收入不等同。"
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-PS-02",
+      "fact_sha256": "0660be53d507300e004185f5129fd88049a34831ee3fc8b3c0a310acffbd7093",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0017"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "03f6bfb9aa69ed120a67b8c886b9b18e5e73c01373857e0d3409b17ac8df80ee",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-RM-01",
+      "fact_sha256": "1d5f2b1fa83d30ec33705d6b781653ce852542489d59dee077586f015b8331c5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": "营业总收入与保险服务收入不同，不互当同科目。"
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-RM-02",
+      "fact_sha256": "1c0f5343ac6648374998f45f9f14673a924c89f3cd52ecb63681969a1485a196",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0021"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-RM-03",
+      "fact_sha256": "ae2ad75ac88b0cb545e9f5a8f94bf918b836d452f982e6f41568bf53f2359fe5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-SM-03",
+      "fact_sha256": "da76d7a32486adad7000d2eb5e8af57b141e8f61d6deda2aa5e12deaed803ee8",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": "归母范围结合原报告p37注1核，不改成母公司单体issuer。"
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-OD-01",
+      "fact_sha256": "8a66ea1d321899ff4f3d642cdb0ed51ae139e4703f00bc998fd63dd3eac789fd",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-OD-02",
+      "fact_sha256": "fc55d62fb7fa403cc27f72478f85dee80f6a2c4d49ef99204c3b04c1c14115c4",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": "97.6等为财产险业务，不替换成太保产险单体97.5等。"
+    },
+    {
+      "instrument_id": "601601.SH",
+      "fact_id": "F-MC-02",
+      "fact_sha256": "1a910eecce2fba7fdc69a0e4859e20cd345fe8b2130c3d2a81afb7c306a9f2ab",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "reason": "独立核p35业务概要、p36—37经营综述及注脚、p39太保寿险含香港及分红险，p44太保产险险种/97.5单体比率，p47集团资管及第三方管理费。归母和分部/子公司不可混。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "92372ca6d5eaa016bee6abd8ba8e87a1d402b9542244d8e69da23af80186357a",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-BS-02",
+      "fact_sha256": "c2f43f57a6bed491d10657189cf9c232df302f59260eecf17ebc97196fb7631f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "adaaaf89f21c12044747fb7764dbe6d070449caa92b395d74387a8a22eed2136",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-PS-02",
+      "fact_sha256": "1e63cdea635c6707b22a3b0c27222c973ff67940029a2ed6e0b0ba4f06ef5f9a",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "d8a035c692e63dc72bae6584e743fad0e97582788a74a12b15990f81ed161ee1",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-PS-04",
+      "fact_sha256": "5af83431ba133001fe9c2fdd334223495cb7a36c5ba6b6f98c997c0c03180dd5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-PS-05",
+      "fact_sha256": "ceecbc78908340a03dbb0115d8445a5f4f80058f4b7e027bd60b31cf454a2c28",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-RM-01",
+      "fact_sha256": "7d3cc3eaf922fd78500cf433fe336b48ee7aadaa82c11b4c08d29846231c5445",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-OD-01",
+      "fact_sha256": "cf329d83c5cb7fb72af96c1a11555330ce8a2ad1c4f621b71e36f03e22fbd2cf",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": "A股全市场股权融资非本公司股权承销规模，不供集团经营数据计算。"
+    },
+    {
+      "instrument_id": "601881.SH",
+      "fact_id": "F-OD-02",
+      "fact_sha256": "c5bc7a881bf4ec3748cc2f7398e99ae8d089a9e12fd966dc2ddfc992a602f281",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "p23业务和服务线、p26投行业务中明确的全市场融资/发行/并购规模及公司自身承销区分。选章未读到先冻参考p35公司收入表，不手工补进模型画像。",
+      "limitation": "境内市场债券和并购规模非公司收入或承销规模。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "108f2acab1053a81e5fc1ea59c0fa1381665908381517e9953fa826fb8b65397",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0016",
+        "source-0017",
+        "source-0018",
+        "source-0019",
+        "source-0020"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-PS-01",
+      "fact_sha256": "8c8427088b48217baa11756ef7aa121ec9253c9d3dc6febb7d598f12b0768d80",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0016",
+        "source-0017"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-PS-02",
+      "fact_sha256": "e8b0b17c2045c4c709ca0132803f79ada87f4ff4e33fabf504faa242c132761a",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0017"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "c6ca9471e74eae83a77768dfac6b46d4a46f0ad7c0078aa5c55a9c4b594bd29d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0017",
+        "source-0018"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-PS-04",
+      "fact_sha256": "be7c6aa5b4f70d45b320056d32bfaa4c7a00452489d5ec0984f3cb641cc76d50",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0018",
+        "source-0019"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-PS-05",
+      "fact_sha256": "b89765fe50bc85c0a17663697fdfc7b9dc17955d87e6930222534d2157e694ef",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019",
+        "source-0020"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-RM-04",
+      "fact_sha256": "4de719396abd40cd47c40b5655aa99bca63e465f2221fdf660a659c5d1c70f9d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "review-add:WF-01",
+      "fact_sha256": "69b772dab18210f367427052f45429c6f38836d293529fe4b72f6fc4655c1147",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008",
+        "source-0012"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "review-add:WF-02",
+      "fact_sha256": "acd16797950aa82e3095aa685002ab13b3751b4c0536c36771f025e9685f3e86",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001",
+        "source-0014"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": "公司贷款指对公类别，不是本公司全部客户贷款；本金与净额不同。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "review-add:WF-03",
+      "fact_sha256": "cfba1a5b76ceeab8ce00dfc8cc1764d5c794c821598d6a096d544eefbe79a156",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013",
+        "source-0015"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": "证券投资为期末资产存量，不是当期收入；亿元与百万元展示不重复计数。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-CC-01",
+      "fact_sha256": "3c7bbe0f551a1cb940f12200140d9dd59598397e8d88d54cd0020a426c071ff3",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0016",
+        "source-0017"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": null
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-CC-04",
+      "fact_sha256": "2afae70260b31795e3a5a61767d5034da3e1b6661c88716579ade98af0080090",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0022"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": "投诉地区分布不推断收入/贷款/客户地区占比。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "review-add:WF-04",
+      "fact_sha256": "45c3db07e623679c9115f90762523b0af1c8fa5b6ed1da91222b79391ff2b00b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": "贷款减值大于合计因其他项目含转回负额，不猜改为正数或删去。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "fact_id": "F-CF-02",
+      "fact_sha256": "1883d36f937db49815add55bf357902541510c8a5b181166d791c557d2f5ac47",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0019",
+        "source-0020"
+      ],
+      "reason": "p9主要数据、p18利润表、p21利息支出、p22非息构成、p23减值和资产、p24—25对公/个人贷款及证券投资，p43—47各业务回顾与明确主体数据，p49投诉分布。核所有10实际采纳对象，未把同字段或同金额当语义证明。",
+      "limitation": "各具名主体保自身规模利润及未确定关系，不并入集团相加；此处不补控股关系。"
+    }
+  ],
+  "new_model_requests": 0
+}

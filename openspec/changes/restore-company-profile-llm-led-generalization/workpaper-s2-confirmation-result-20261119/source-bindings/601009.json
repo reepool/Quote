@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "601009.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_e5529203942ee8eeea7eb0dd504a9a03",
+    "filing_id": "1225157414",
+    "source": "cninfo",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "content_hash": "b7ed7b82689963ca038d635086d5a979e4fc35f5abfa9917dbf272361a554651",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/b7/b7ed7b82689963ca038d635086d5a979e4fc35f5abfa9917dbf272361a554651.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "南京银行股份有限公司2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-23/1225157414.PDF"
+  }
+}

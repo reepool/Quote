@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "601888.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_f9abc0044eeb6b72493e7166b0f71406",
+    "filing_id": "1225063442",
+    "source": "cninfo",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "content_hash": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/29/295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "中国旅游集团中免股份有限公司2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-03-31/1225063442.PDF"
+  }
+}

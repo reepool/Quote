@@ -1,0 +1,1176 @@
+[
+  {
+    "request_id": "bp-work-b94386f72fa9b8008e18090c:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "7193c5c0dfdbe00ba2d42c6fc2937fe921b943905fcb74a20c27ab6653f5509d",
+    "response_hash": "82cc58cd2ee50df3fefc45028803536af09fa8f8e079db2dd778ea69169bf8a1",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0020\",\"section-0022\",\"section-0030\",\"section-0031\",\"section-0033\",\"section-0035\",\"section-0037\",\"section-0039\",\"section-0048\",\"section-0049\"],\"rationale\":\"选取第三节管理层讨论与分析中公司主要业务、整车产销、汽车及电池与手机部件组装业务回顾、主营业务分析（概述、收入与成本）、主要客户与供应商等实质经营子节，覆盖业务结构、产品用途、收入构成与规模、客户渠道及供应链投入，能解释公司本期经营与收入来源。\",\"deferred\":[\"section-0036 核心竞争力分析：偏泛化竞争力，非收入与经营实质\",\"section-0091 未来发展展望：计划性内容，非本期经营事实\",\"section-0067 资产及负债状况分析：财务结构细节，非收入来源\",\"第八节财务报告分部报告与收入附注：仅在主营业务分析存在缺口时定向补充\"],\"stop_reason\":\"已覆盖业务、产品、收入构成、客户与供应链等核心经营信息，其余为治理、财务附注或计划性内容，无需扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0020",
+        "section-0022",
+        "section-0030",
+        "section-0031",
+        "section-0033",
+        "section-0035",
+        "section-0037",
+        "section-0039",
+        "section-0048",
+        "section-0049"
+      ],
+      "rationale": "选取第三节管理层讨论与分析中公司主要业务、整车产销、汽车及电池与手机部件组装业务回顾、主营业务分析（概述、收入与成本）、主要客户与供应商等实质经营子节，覆盖业务结构、产品用途、收入构成与规模、客户渠道及供应链投入，能解释公司本期经营与收入来源。",
+      "deferred": [
+        "section-0036 核心竞争力分析：偏泛化竞争力，非收入与经营实质",
+        "section-0091 未来发展展望：计划性内容，非本期经营事实",
+        "section-0067 资产及负债状况分析：财务结构细节，非收入来源",
+        "第八节财务报告分部报告与收入附注：仅在主营业务分析存在缺口时定向补充"
+      ],
+      "stop_reason": "已覆盖业务、产品、收入构成、客户与供应链等核心经营信息，其余为治理、财务附注或计划性内容，无需扩读。"
+    },
+    "usage": {
+      "input_tokens": 17714,
+      "output_tokens": 249,
+      "total_tokens": 17963
+    }
+  },
+  {
+    "request_id": "bp-work-b94386f72fa9b8008e18090c:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "fddb8448dce65c7de9a26328cdfda1ca8130e4d6e9640a41cd6d27cdf1d1da36",
+    "response_hash": "77f63b6631f45abbf567a3d8833ee6fbffcf693175072222313dcf4602195d42",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"本集团主要从事新能源汽车业务、手机部件及组装业务、二次充电电池及光伏业务，并利用自身技术优势拓展城市轨道交通业务领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0007\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"新能源乘用车领域形成由「比亚迪」「方程豹」「腾势」及「仰望」构筑的多品牌矩阵，覆盖从家用到豪华、从大众到个性化的全场景市场；「比亚迪」品牌由「王朝」与「海洋」两大产品系列构成。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"城市轨道交通领域研发出中运量「云轨」和低运量「云巴」产品，配合新能源汽车实现对城市公共交通的立体化覆盖。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"新能源汽车业务覆盖纯电平台、插电混动平台与智能底盘三大核心技术领域，发布量产乘用车全域千伏高压架构「超级e平台」及「第五代DM技术」，并推进「天神之眼」辅助驾驶技术矩阵。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"二次充电电池业务：消费类锂离子电池应用于各类消费类电子产品及新型智能产品；动力电池开发磷酸铁锂「刀片电池」；储能电池覆盖电源侧储能、电网储能、工商业储能、家庭储能等应用领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"光伏业务拥有硅片、电池片、光伏组件、光伏系统应用等全产业链布局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"手机部件及组装业务涵盖智能手机、电脑、AI算力基础设施、智能家居、游戏硬件、无人机、3D打印机、物联网、通信设备等多元化市场领域，为全球客户提供一站式产品解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"AI算力基础设施业务围绕核心产品打造涵盖服务器、液冷、电源及高速互联的一体化解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}],\"limitations\":[\"未逐一列示各车型的具体配置与售价明细，仅保留品牌与代表性车型信息。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"本集团2025年实现收入约人民币803,965百万元，同比增长3.46%；其中汽车、汽车相关产品及其他产品业务收入约人民币648,646百万元，同比增长5.06%；手机部件、组装及其他产品业务收入约人民币155,237百万元，同比减少2.74%；两者占本集团总收入的比例分别为80.68%和19.31%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"803,965\",\"value\":\"803965\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"汽车、汽车相关产品及其他产品业务收入\",\"raw_value\":\"648,646\",\"value\":\"648646\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"手机部件、组装及其他产品业务收入\",\"raw_value\":\"155,237\",\"value\":\"155237\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"按产品划分，2025年手机部件、组装及其他产品营业收入155,236,528,000.00元，占营业收入比重19.31%，同比减少2.74%；汽车、汽车相关产品及其他产品营业收入648,645,636,000.00元，占营业收入比重80.68%，同比增长5.06%；其他营业收入82,794,000.00元，占比0.01%，同比减少26.04%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"手机部件、组装及其他产品营业收入\",\"raw_value\":\"155,236,528,000.00\",\"value\":\"155236528000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"汽车、汽车相关产品及其他产品营业收入\",\"raw_value\":\"648,645,636,000.00\",\"value\":\"648645636000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"其他营业收入\",\"raw_value\":\"82,794,000.00\",\"value\":\"82794000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"按地区划分，2025年中国（包括港澳台地区）营业收入493,223,970,000.00元，占营业收入比重61.35%，同比减少11.17%；境外营业收入310,740,988,000.00元，占比38.65%，同比增长40.05%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"中国（包括港澳台地区）营业收入\",\"raw_value\":\"493,223,970,000.00\",\"value\":\"493223970000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"境外营业收入\",\"raw_value\":\"310,740,988,000.00\",\"value\":\"310740988000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-RM-04\",\"text\":\"按销售模式划分，2025年直销营业收入367,210,862,000.00元，占营业收入比重45.67%，同比减少1.59%；经销营业收入436,754,096,000.00元，占比54.33%，同比增长8.12%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"直销营业收入\",\"raw_value\":\"367,210,862,000.00\",\"value\":\"367210862000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"经销营业收入\",\"raw_value\":\"436,754,096,000.00\",\"value\":\"436754096000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-RM-05\",\"text\":\"分行业毛利率：日用电子器件制造业毛利率6.29%，同比减少2.06个百分点；交通运输设备及电气制造业毛利率20.49%，同比减少1.82个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"日用电子器件制造业毛利率\",\"raw_value\":\"6.29%\",\"value\":\"6.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"日用电子器件制造业毛利率同比增减\",\"raw_value\":\"-2.06%\",\"value\":\"-2.06\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"交通运输设备及电气制造业毛利率\",\"raw_value\":\"20.49%\",\"value\":\"20.49\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"交通运输设备及电气制造业毛利率同比增减\",\"raw_value\":\"-1.82%\",\"value\":\"-1.82\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取按车型或品牌细分的收入金额，仅披露汽车业务整体收入。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年整车合计快报产量4,537,356辆，同比增长5.42%；快报销量4,602,436辆，同比增长7.73%。其中乘用车销量4,545,423辆，同比增长6.94%；商用车销量57,013辆，同比增长161.83%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"],\"metrics\":[{\"name\":\"整车合计快报产量\",\"raw_value\":\"4,537,356\",\"value\":\"4537356\",\"unit\":\"辆\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"整车合计快报销量\",\"raw_value\":\"4,602,436\",\"value\":\"4602436\",\"unit\":\"辆\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"乘用车快报销量\",\"raw_value\":\"4,545,423\",\"value\":\"4545423\",\"unit\":\"辆\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"商用车快报销量\",\"raw_value\":\"57,013\",\"value\":\"57013\",\"unit\":\"辆\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"按车型类别，2025年轿车快报销量2,290,292辆，同比减少2.87%；SUV快报销量2,080,625辆，同比增长16.31%；MPV快报销量174,506辆，同比增长68.52%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"轿车快报销量\",\"raw_value\":\"2,290,292\",\"value\":\"2290292\",\"unit\":\"辆\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"SUV快报销量\",\"raw_value\":\"2,080,625\",\"value\":\"2080625\",\"unit\":\"辆\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"MPV快报销量\",\"raw_value\":\"174,506\",\"value\":\"174506\",\"unit\":\"辆\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"本集团2025年整车出口突破百万辆，同比增长1.4倍，位列中国新能源汽车出口榜首；「方程豹」「腾势」和「仰望」等品牌合计销量实现同比翻倍增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-SM-04\",\"text\":\"截至2025年年底，本集团辅助驾驶车型保有量超256万辆，每天生成辅助驾驶数据超1.6亿公里。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"辅助驾驶车型保有量\",\"raw_value\":\"超256\",\"value\":\"256\",\"unit\":\"万辆\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]}],\"limitations\":[\"未获取分品牌或分车型的收入与毛利数据。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"本集团依托由超12万名工程师、超7.1万项申请专利及超4.2万项授权专利构筑的研发体系；2025年研发投入约人民币634亿元，同比上升17%，累计研发投入超人民币2,400亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"研发投入\",\"raw_value\":\"约634\",\"value\":\"634\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"研发投入同比增减\",\"raw_value\":\"17%\",\"value\":\"17\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"累计研发投入\",\"raw_value\":\"超2,400\",\"value\":\"2400\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"2025年研发费用57,978,105,000.00元，同比增长8.99%，主要因折旧及摊销、检测费、物料消耗增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"研发费用\",\"raw_value\":\"57,978,105,000.00\",\"value\":\"57978105000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"本集团作为新能源汽车产业链「链主」企业，持续深化产业链上下游协同，优化账期管理与渠道管理；应付账款及应付票据周转天数处于汽车行业较低水平并持续改善。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-OI-04\",\"text\":\"2025年前五名供应商合计采购金额98,700,166,000.00元，占年度采购总额比例15.31%；其中关联方采购额占年度采购总额比例1.15%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"98,700,166,000.00\",\"value\":\"98700166000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"15.31%\",\"value\":\"15.31\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未获取主要原材料的具体品类、采购量及来源明细。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"2025年前五名客户合计销售金额145,648,095,000.00元，占年度销售总额比例18.12%；其中关联方销售额占年度销售总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"145,648,095,000.00\",\"value\":\"145648095000\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"18.12%\",\"value\":\"18.12\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"销售渠道方面，2025年经销模式收入占比54.33%，直销模式收入占比45.67%；境外收入占比38.65%，同比增长40.05%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F-CC-03\",\"text\":\"手机部件及组装业务方面，本集团保持在海内外客户高端旗舰手机的供应链领导地位，并持续扩大在可穿戴、智能家居等智能终端领域的合作；组装业务受益于海外大客户整机组装份额进一步提升。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}],\"limitations\":[\"未披露具体客户名称，仅以客户一至客户五列示。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"2025年中国新能源汽车产销分别达1,662.6万辆和1,649万辆，同比分别增长29%和28.2%，国内渗透率突破50%；中国自主品牌乘用车市场份额达69.5%，较去年同期增长4.3个百分点。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"中国新能源汽车产量\",\"raw_value\":\"1,662.6\",\"value\":\"1662.6\",\"unit\":\"万辆\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\"},{\"name\":\"中国新能源汽车销量\",\"raw_value\":\"1,649\",\"value\":\"1649\",\"unit\":\"万辆\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\"},{\"name\":\"中国自主品牌乘用车市场份额\",\"raw_value\":\"69.5%\",\"value\":\"69.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\"}],\"uncertainty_reason\":\"行业统计数据，非公司自身经营数据。\"},{\"fact_id\":\"F-OD-02\",\"text\":\"报告期内分车型类别产销量数据发生变化，主要是公司业务增长以及产品结构变化所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OD-03\",\"text\":\"手机部件及组装业务中，零部件收入同比减少主要受大客户个别机型需求变化影响；组装业务规模同比微增。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-OD-04\",\"text\":\"AI算力基础设施业务年内导入多家服务器新客户，服务器出货量同比增长，多款液冷产品通过认证并开始小批量试产，多款电源产品在积极研发中。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}],\"limitations\":[\"未获取公司自身销量增长与行业增长之间的量化归因。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"2025年3月，本集团完成规模达56亿美元的H股闪电配售，创下全球汽车行业有史以来最大规模闪电配售记录。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"H股闪电配售规模\",\"raw_value\":\"56\",\"value\":\"56\",\"unit\":\"亿美元\",\"currency\":\"USD\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-MC-02\",\"text\":\"2025年4月，本集团股东会审议通过《2025年员工持股计划》，计划涉及不超过2.5万名员工，资金总额不超过41亿人民币，分三期解锁。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"员工持股计划资金总额上限\",\"raw_value\":\"不超过41\",\"value\":\"41\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F-MC-03\",\"text\":\"2025年12月，本集团达成第1,500万辆新能源汽车下线的新里程碑，成为全球首家达成这一成就的车企。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"新能源汽车累计下线量\",\"raw_value\":\"1,500\",\"value\":\"1500\",\"unit\":\"万辆\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-MC-04\",\"text\":\"报告期内合并范围发生变动，具体参见「第八节财务报告-九、合并范围的变更」。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]}],\"limitations\":[\"未获取合并范围变动的具体标的与影响金额。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"本集团业务覆盖新能源汽车整车研发制造、二次充电电池及光伏产品制造、手机部件及组装，并拓展城市轨道交通车辆产品，处于产业链中游制造与组装环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0007\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"本集团作为新能源汽车产业链「链主」企业，持续深化产业链上下游协同，优化账期管理与渠道管理，与供应商及经销商共建合作生态。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-SC-03\",\"text\":\"2025年前五名供应商合计采购金额98,700,166,000.00元，占年度采购总额比例15.31%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]}],\"limitations\":[\"未披露具体原材料品类、供应商名称及采购结构。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-04\",\"text\":\"新能源汽车产品面向大众市场及豪华、个性化市场，通过「比亚迪」「方程豹」「腾势」「仰望」多品牌覆盖；手机部件及组装业务为全球客户提供一站式产品解决方案，AI算力基础设施面向服务器及数据中心客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0012\"]}],\"limitations\":[\"未披露具体下游客户名称及行业分布比例。\"]}}}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "本集团主要从事新能源汽车业务、手机部件及组装业务、二次充电电池及光伏业务，并利用自身技术优势拓展城市轨道交通业务领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "新能源乘用车领域形成由「比亚迪」「方程豹」「腾势」及「仰望」构筑的多品牌矩阵，覆盖从家用到豪华、从大众到个性化的全场景市场；「比亚迪」品牌由「王朝」与「海洋」两大产品系列构成。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F-BS-03",
+              "text": "城市轨道交通领域研发出中运量「云轨」和低运量「云巴」产品，配合新能源汽车实现对城市公共交通的立体化覆盖。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "新能源汽车业务覆盖纯电平台、插电混动平台与智能底盘三大核心技术领域，发布量产乘用车全域千伏高压架构「超级e平台」及「第五代DM技术」，并推进「天神之眼」辅助驾驶技术矩阵。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "二次充电电池业务：消费类锂离子电池应用于各类消费类电子产品及新型智能产品；动力电池开发磷酸铁锂「刀片电池」；储能电池覆盖电源侧储能、电网储能、工商业储能、家庭储能等应用领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "光伏业务拥有硅片、电池片、光伏组件、光伏系统应用等全产业链布局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "手机部件及组装业务涵盖智能手机、电脑、AI算力基础设施、智能家居、游戏硬件、无人机、3D打印机、物联网、通信设备等多元化市场领域，为全球客户提供一站式产品解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "AI算力基础设施业务围绕核心产品打造涵盖服务器、液冷、电源及高速互联的一体化解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ],
+          "limitations": [
+            "未逐一列示各车型的具体配置与售价明细，仅保留品牌与代表性车型信息。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "本集团2025年实现收入约人民币803,965百万元，同比增长3.46%；其中汽车、汽车相关产品及其他产品业务收入约人民币648,646百万元，同比增长5.06%；手机部件、组装及其他产品业务收入约人民币155,237百万元，同比减少2.74%；两者占本集团总收入的比例分别为80.68%和19.31%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "803,965",
+                  "value": "803965",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "汽车、汽车相关产品及其他产品业务收入",
+                  "raw_value": "648,646",
+                  "value": "648646",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "手机部件、组装及其他产品业务收入",
+                  "raw_value": "155,237",
+                  "value": "155237",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "按产品划分，2025年手机部件、组装及其他产品营业收入155,236,528,000.00元，占营业收入比重19.31%，同比减少2.74%；汽车、汽车相关产品及其他产品营业收入648,645,636,000.00元，占营业收入比重80.68%，同比增长5.06%；其他营业收入82,794,000.00元，占比0.01%，同比减少26.04%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "手机部件、组装及其他产品营业收入",
+                  "raw_value": "155,236,528,000.00",
+                  "value": "155236528000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "汽车、汽车相关产品及其他产品营业收入",
+                  "raw_value": "648,645,636,000.00",
+                  "value": "648645636000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他营业收入",
+                  "raw_value": "82,794,000.00",
+                  "value": "82794000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "按地区划分，2025年中国（包括港澳台地区）营业收入493,223,970,000.00元，占营业收入比重61.35%，同比减少11.17%；境外营业收入310,740,988,000.00元，占比38.65%，同比增长40.05%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "中国（包括港澳台地区）营业收入",
+                  "raw_value": "493,223,970,000.00",
+                  "value": "493223970000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境外营业收入",
+                  "raw_value": "310,740,988,000.00",
+                  "value": "310740988000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-04",
+              "text": "按销售模式划分，2025年直销营业收入367,210,862,000.00元，占营业收入比重45.67%，同比减少1.59%；经销营业收入436,754,096,000.00元，占比54.33%，同比增长8.12%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "直销营业收入",
+                  "raw_value": "367,210,862,000.00",
+                  "value": "367210862000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "经销营业收入",
+                  "raw_value": "436,754,096,000.00",
+                  "value": "436754096000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-05",
+              "text": "分行业毛利率：日用电子器件制造业毛利率6.29%，同比减少2.06个百分点；交通运输设备及电气制造业毛利率20.49%，同比减少1.82个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "日用电子器件制造业毛利率",
+                  "raw_value": "6.29%",
+                  "value": "6.29",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "日用电子器件制造业毛利率同比增减",
+                  "raw_value": "-2.06%",
+                  "value": "-2.06",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "交通运输设备及电气制造业毛利率",
+                  "raw_value": "20.49%",
+                  "value": "20.49",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "交通运输设备及电气制造业毛利率同比增减",
+                  "raw_value": "-1.82%",
+                  "value": "-1.82",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取按车型或品牌细分的收入金额，仅披露汽车业务整体收入。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年整车合计快报产量4,537,356辆，同比增长5.42%；快报销量4,602,436辆，同比增长7.73%。其中乘用车销量4,545,423辆，同比增长6.94%；商用车销量57,013辆，同比增长161.83%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "整车合计快报产量",
+                  "raw_value": "4,537,356",
+                  "value": "4537356",
+                  "unit": "辆",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "整车合计快报销量",
+                  "raw_value": "4,602,436",
+                  "value": "4602436",
+                  "unit": "辆",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "乘用车快报销量",
+                  "raw_value": "4,545,423",
+                  "value": "4545423",
+                  "unit": "辆",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "商用车快报销量",
+                  "raw_value": "57,013",
+                  "value": "57013",
+                  "unit": "辆",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "按车型类别，2025年轿车快报销量2,290,292辆，同比减少2.87%；SUV快报销量2,080,625辆，同比增长16.31%；MPV快报销量174,506辆，同比增长68.52%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "轿车快报销量",
+                  "raw_value": "2,290,292",
+                  "value": "2290292",
+                  "unit": "辆",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "SUV快报销量",
+                  "raw_value": "2,080,625",
+                  "value": "2080625",
+                  "unit": "辆",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "MPV快报销量",
+                  "raw_value": "174,506",
+                  "value": "174506",
+                  "unit": "辆",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "本集团2025年整车出口突破百万辆，同比增长1.4倍，位列中国新能源汽车出口榜首；「方程豹」「腾势」和「仰望」等品牌合计销量实现同比翻倍增长。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "截至2025年年底，本集团辅助驾驶车型保有量超256万辆，每天生成辅助驾驶数据超1.6亿公里。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "辅助驾驶车型保有量",
+                  "raw_value": "超256",
+                  "value": "256",
+                  "unit": "万辆",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取分品牌或分车型的收入与毛利数据。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "本集团依托由超12万名工程师、超7.1万项申请专利及超4.2万项授权专利构筑的研发体系；2025年研发投入约人民币634亿元，同比上升17%，累计研发投入超人民币2,400亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入",
+                  "raw_value": "约634",
+                  "value": "634",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "研发投入同比增减",
+                  "raw_value": "17%",
+                  "value": "17",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "累计研发投入",
+                  "raw_value": "超2,400",
+                  "value": "2400",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "2025年研发费用57,978,105,000.00元，同比增长8.99%，主要因折旧及摊销、检测费、物料消耗增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "研发费用",
+                  "raw_value": "57,978,105,000.00",
+                  "value": "57978105000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "本集团作为新能源汽车产业链「链主」企业，持续深化产业链上下游协同，优化账期管理与渠道管理；应付账款及应付票据周转天数处于汽车行业较低水平并持续改善。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "2025年前五名供应商合计采购金额98,700,166,000.00元，占年度采购总额比例15.31%；其中关联方采购额占年度采购总额比例1.15%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "98,700,166,000.00",
+                  "value": "98700166000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "15.31%",
+                  "value": "15.31",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取主要原材料的具体品类、采购量及来源明细。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "2025年前五名客户合计销售金额145,648,095,000.00元，占年度销售总额比例18.12%；其中关联方销售额占年度销售总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "145,648,095,000.00",
+                  "value": "145648095000",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "18.12%",
+                  "value": "18.12",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "销售渠道方面，2025年经销模式收入占比54.33%，直销模式收入占比45.67%；境外收入占比38.65%，同比增长40.05%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "手机部件及组装业务方面，本集团保持在海内外客户高端旗舰手机的供应链领导地位，并持续扩大在可穿戴、智能家居等智能终端领域的合作；组装业务受益于海外大客户整机组装份额进一步提升。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称，仅以客户一至客户五列示。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "2025年中国新能源汽车产销分别达1,662.6万辆和1,649万辆，同比分别增长29%和28.2%，国内渗透率突破50%；中国自主品牌乘用车市场份额达69.5%，较去年同期增长4.3个百分点。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "中国新能源汽车产量",
+                  "raw_value": "1,662.6",
+                  "value": "1662.6",
+                  "unit": "万辆",
+                  "currency": null,
+                  "subject_scope": "unclear",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "中国新能源汽车销量",
+                  "raw_value": "1,649",
+                  "value": "1649",
+                  "unit": "万辆",
+                  "currency": null,
+                  "subject_scope": "unclear",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "中国自主品牌乘用车市场份额",
+                  "raw_value": "69.5%",
+                  "value": "69.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "unclear",
+                  "period": "2025年度"
+                }
+              ],
+              "uncertainty_reason": "行业统计数据，非公司自身经营数据。"
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "报告期内分车型类别产销量数据发生变化，主要是公司业务增长以及产品结构变化所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "手机部件及组装业务中，零部件收入同比减少主要受大客户个别机型需求变化影响；组装业务规模同比微增。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "AI算力基础设施业务年内导入多家服务器新客户，服务器出货量同比增长，多款液冷产品通过认证并开始小批量试产，多款电源产品在积极研发中。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取公司自身销量增长与行业增长之间的量化归因。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "2025年3月，本集团完成规模达56亿美元的H股闪电配售，创下全球汽车行业有史以来最大规模闪电配售记录。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "H股闪电配售规模",
+                  "raw_value": "56",
+                  "value": "56",
+                  "unit": "亿美元",
+                  "currency": "USD",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "2025年4月，本集团股东会审议通过《2025年员工持股计划》，计划涉及不超过2.5万名员工，资金总额不超过41亿人民币，分三期解锁。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "员工持股计划资金总额上限",
+                  "raw_value": "不超过41",
+                  "value": "41",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "2025年12月，本集团达成第1,500万辆新能源汽车下线的新里程碑，成为全球首家达成这一成就的车企。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "新能源汽车累计下线量",
+                  "raw_value": "1,500",
+                  "value": "1500",
+                  "unit": "万辆",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-04",
+              "text": "报告期内合并范围发生变动，具体参见「第八节财务报告-九、合并范围的变更」。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取合并范围变动的具体标的与影响金额。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "本集团业务覆盖新能源汽车整车研发制造、二次充电电池及光伏产品制造、手机部件及组装，并拓展城市轨道交通车辆产品，处于产业链中游制造与组装环节。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0007"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "本集团作为新能源汽车产业链「链主」企业，持续深化产业链上下游协同，优化账期管理与渠道管理，与供应商及经销商共建合作生态。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-SC-03",
+              "text": "2025年前五名供应商合计采购金额98,700,166,000.00元，占年度采购总额比例15.31%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体原材料品类、供应商名称及采购结构。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-04",
+              "text": "新能源汽车产品面向大众市场及豪华、个性化市场，通过「比亚迪」「方程豹」「腾势」「仰望」多品牌覆盖；手机部件及组装业务为全球客户提供一站式产品解决方案，AI算力基础设施面向服务器及数据中心客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0012"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体下游客户名称及行业分布比例。"
+          ]
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 15315,
+      "output_tokens": 5082,
+      "total_tokens": 20397
+    }
+  },
+  {
+    "request_id": "bp-work-b94386f72fa9b8008e18090c:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "a3868e0841f826ec3c42b871508f87df09443c62a5339ee0b5f3f0913e7a364b",
+    "response_hash": "f261fa1660f3ec851db5ddd665f9a8d54c097bab583bb6fe48a9a5e087ed462c",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"WF-001\",\"element\":\"position\",\"severity\":\"material\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-01\",\"evidence_ids\":[\"source-0001\",\"source-0009\"],\"explanation\":\"F-SC-01前半关于新能源汽车、二次充电电池及光伏、手机部件及组装、城市轨道交通的业务范围有原文支持，但“处于产业链中游制造与组装环节”并无依据，且与source-0001光伏“硅片、电池片、光伏组件、光伏系统应用等全产业链布局”及source-0009新能源汽车产业链“链主”相冲突。应删除该中游定位，保留已支持的业务范围；不要另造精确产业链环节或主体。\"},{\"finding_id\":\"WF-002\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0013\",\"source-0007\"],\"explanation\":\"已采纳收入事实只有分产品、分地区、分销售模式的分部金额，指标主体均为业务分部，缺少合并口径营业收入合计。source-0013营业收入合计为803,964,958,000.00元、同比增减3.46%；source-0007叙述为本集团收入约人民币803,965百万元、同比增长3.46%。该合计与分部科目主体不同，不能用最大分部或分部加总代替。应单独补记合并营业收入及相对同比增幅；精确值采用表内元金额，叙述口径须保留“约”，二者不得混为同一个精确数。分产品主要类别及占比已经覆盖，不必重复。\"},{\"finding_id\":\"WF-003\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-PS-01\",\"evidence_ids\":[\"source-0009\",\"source-0011\"],\"explanation\":\"source-0009对量产乘用车全域千伏高压架构“超级e平台”使用“发布”，对“第五代DM技术”使用“再进化”；source-0011亦称第五代DM技术为持续升级、应用，而非报告期内发布。F-PS-01将“发布”同时套到两项技术，超出原文。应保留超级e平台发布这一核心表述，把第五代DM技术改为再进化或持续升级，不要删除其余已支持的平台与辅助驾驶表述。\"},{\"finding_id\":\"WF-004\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_unit_or_denominator\",\"action\":\"correct\",\"affected_fact_id\":\"F-CC-02\",\"evidence_ids\":[\"source-0013\"],\"explanation\":\"source-0013中40.05%是境外营业收入金额的同比增幅，不是占比增幅。境外收入占比为38.65%，上年为28.55%，占比变动是10.10个百分点。F-CC-02省略金额后写成“境外收入占比38.65%，同比增长40.05%”，容易把金额增幅误读为占比增幅。直销45.67%、经销54.33%及境外占比38.65%可保留；40.05%应明确为境外收入金额的相对增长，或删除该比较并沿用F-RM-03已正确列示的金额、占比与同比。\"},{\"finding_id\":\"WF-005\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007写明2025年归属于上市公司股东的净利润约人民币32,619百万元，同比下降18.97%。该盈利结果与营业收入合计科目不同，也不能由已列示的分部收入或毛利率百分点变动推得。现有规模事实主要为整车产销。建议单独补记并保留“约”和下降口径，作为补充，不据此否定已支持的产销与收入事实。\"},{\"finding_id\":\"WF-006\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0016\",\"source-0017\",\"source-0013\"],\"explanation\":\"选定章节对客户、供应商使用“客户一至客户五”“供应商一至供应商五”，收入表只列到汽车及相关产品等合计，只能说明本节未见具体名称或更细金额，不能支持“未披露具体客户名称”“未披露具体原材料品类、供应商名称”或“仅披露汽车业务整体收入”等全文否定结论。未选入文本属于未知，不是未披露。应改为选定文本未获取或未见，并保留与已支持事实不冲突的其他限制说明。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-RM-02\",\"F-RM-03\",\"F-RM-04\",\"F-RM-05\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-MC-01\",\"F-MC-03\",\"F-MC-04\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\",\"F-SC-04\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "WF-001",
+          "element": "position",
+          "severity": "material",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F-SC-01",
+          "evidence_ids": [
+            "source-0001",
+            "source-0009"
+          ],
+          "explanation": "F-SC-01前半关于新能源汽车、二次充电电池及光伏、手机部件及组装、城市轨道交通的业务范围有原文支持，但“处于产业链中游制造与组装环节”并无依据，且与source-0001光伏“硅片、电池片、光伏组件、光伏系统应用等全产业链布局”及source-0009新能源汽车产业链“链主”相冲突。应删除该中游定位，保留已支持的业务范围；不要另造精确产业链环节或主体。"
+        },
+        {
+          "finding_id": "WF-002",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0013",
+            "source-0007"
+          ],
+          "explanation": "已采纳收入事实只有分产品、分地区、分销售模式的分部金额，指标主体均为业务分部，缺少合并口径营业收入合计。source-0013营业收入合计为803,964,958,000.00元、同比增减3.46%；source-0007叙述为本集团收入约人民币803,965百万元、同比增长3.46%。该合计与分部科目主体不同，不能用最大分部或分部加总代替。应单独补记合并营业收入及相对同比增幅；精确值采用表内元金额，叙述口径须保留“约”，二者不得混为同一个精确数。分产品主要类别及占比已经覆盖，不必重复。"
+        },
+        {
+          "finding_id": "WF-003",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-PS-01",
+          "evidence_ids": [
+            "source-0009",
+            "source-0011"
+          ],
+          "explanation": "source-0009对量产乘用车全域千伏高压架构“超级e平台”使用“发布”，对“第五代DM技术”使用“再进化”；source-0011亦称第五代DM技术为持续升级、应用，而非报告期内发布。F-PS-01将“发布”同时套到两项技术，超出原文。应保留超级e平台发布这一核心表述，把第五代DM技术改为再进化或持续升级，不要删除其余已支持的平台与辅助驾驶表述。"
+        },
+        {
+          "finding_id": "WF-004",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_unit_or_denominator",
+          "action": "correct",
+          "affected_fact_id": "F-CC-02",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "source-0013中40.05%是境外营业收入金额的同比增幅，不是占比增幅。境外收入占比为38.65%，上年为28.55%，占比变动是10.10个百分点。F-CC-02省略金额后写成“境外收入占比38.65%，同比增长40.05%”，容易把金额增幅误读为占比增幅。直销45.67%、经销54.33%及境外占比38.65%可保留；40.05%应明确为境外收入金额的相对增长，或删除该比较并沿用F-RM-03已正确列示的金额、占比与同比。"
+        },
+        {
+          "finding_id": "WF-005",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007写明2025年归属于上市公司股东的净利润约人民币32,619百万元，同比下降18.97%。该盈利结果与营业收入合计科目不同，也不能由已列示的分部收入或毛利率百分点变动推得。现有规模事实主要为整车产销。建议单独补记并保留“约”和下降口径，作为补充，不据此否定已支持的产销与收入事实。"
+        },
+        {
+          "finding_id": "WF-006",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0016",
+            "source-0017",
+            "source-0013"
+          ],
+          "explanation": "选定章节对客户、供应商使用“客户一至客户五”“供应商一至供应商五”，收入表只列到汽车及相关产品等合计，只能说明本节未见具体名称或更细金额，不能支持“未披露具体客户名称”“未披露具体原材料品类、供应商名称”或“仅披露汽车业务整体收入”等全文否定结论。未选入文本属于未知，不是未披露。应改为选定文本未获取或未见，并保留与已支持事实不冲突的其他限制说明。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-02",
+        "F-RM-03",
+        "F-RM-04",
+        "F-RM-05",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-MC-01",
+        "F-MC-03",
+        "F-MC-04",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03",
+        "F-SC-04"
+      ]
+    },
+    "usage": {
+      "input_tokens": 21766,
+      "output_tokens": 1318,
+      "total_tokens": 54848
+    }
+  },
+  {
+    "request_id": "bp-work-b94386f72fa9b8008e18090c:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "d634355fa82071c8bb5ff1df0a7e7b0dad195a5ff17d7c71e9996a3e3c1bb88b",
+    "response_hash": "5a52242c59e73b0f76b170582d6f3090b90e7ae32f4788681f8aa97339420323",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"本集团主要从事新能源汽车业务、手机部件及组装业务、二次充电电池及光伏业务，并利用自身技术优势拓展城市轨道交通业务领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:WF-002\",\"text\":\"2025年度，本集团营业收入合计803,964,958,000.00元，同比增长3.46%；叙述口径下本集团实现收入约人民币803,965百万元，同比增长3.46%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0007\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"803,964,958,000.00\",\"value\":\"803964958000.00\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"营业收入合计同比增减\",\"raw_value\":\"3.46%\",\"value\":\"3.46\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\",\"uncertainty_reason\":null},{\"name\":\"营业收入（叙述口径）\",\"raw_value\":\"约人民币803,965百万元\",\"value\":null,\"unit\":\"百万元\",\"source_unit\":\"百万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"comparison_basis\":null,\"uncertainty_reason\":\"叙述口径为约数，与表内精确元金额并列保留，不混为同一精确数。\"},{\"name\":\"营业收入同比增长（叙述口径）\",\"raw_value\":\"3.46%\",\"value\":\"3.46\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-PS-01\",\"text\":\"新能源汽车业务覆盖纯电平台、插电混动平台与智能底盘三大核心技术领域，发布量产乘用车全域千伏高压架构「超级e平台」，「第五代DM技术」再进化，并推进「天神之眼」辅助驾驶技术矩阵。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-CC-02\",\"text\":\"销售渠道方面，2025年经销模式收入占比54.33%，直销模式收入占比45.67%；境外收入占比38.65%，境外收入金额同比增长40.05%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-SC-01",
+          "text": "本集团主要从事新能源汽车业务、手机部件及组装业务、二次充电电池及光伏业务，并利用自身技术优势拓展城市轨道交通业务领域。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:WF-002",
+          "text": "2025年度，本集团营业收入合计803,964,958,000.00元，同比增长3.46%；叙述口径下本集团实现收入约人民币803,965百万元，同比增长3.46%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013",
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入合计",
+              "raw_value": "803,964,958,000.00",
+              "value": "803964958000.00",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "period": "2025年度",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入合计同比增减",
+              "raw_value": "3.46%",
+              "value": "3.46",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "period": "2025年度",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "comparison_basis": "上年同期",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入（叙述口径）",
+              "raw_value": "约人民币803,965百万元",
+              "value": null,
+              "unit": "百万元",
+              "source_unit": "百万元",
+              "currency": "人民币",
+              "period": "2025年度",
+              "subject_scope": "consolidated_group",
+              "qualifier": "approximate",
+              "comparison_basis": null,
+              "uncertainty_reason": "叙述口径为约数，与表内精确元金额并列保留，不混为同一精确数。"
+            },
+            {
+              "name": "营业收入同比增长（叙述口径）",
+              "raw_value": "3.46%",
+              "value": "3.46",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "period": "2025年度",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "comparison_basis": "上年同期",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-PS-01",
+          "text": "新能源汽车业务覆盖纯电平台、插电混动平台与智能底盘三大核心技术领域，发布量产乘用车全域千伏高压架构「超级e平台」，「第五代DM技术」再进化，并推进「天神之眼」辅助驾驶技术矩阵。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-CC-02",
+          "text": "销售渠道方面，2025年经销模式收入占比54.33%，直销模式收入占比45.67%；境外收入占比38.65%，境外收入金额同比增长40.05%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 13108,
+      "output_tokens": 700,
+      "total_tokens": 13808
+    }
+  },
+  {
+    "request_id": "bp-work-b94386f72fa9b8008e18090c:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "f7a09ccfc6c3e7396b668fce584442866ac61f6205e53acc1fc117ce61d01ad7",
+    "response_hash": "974b48cd4e79fc0a6b9e6e2c1ea80cfdfc27b85d26e6238a93c97acb44a33c3f",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-SC-01\",\"review-add:WF-002\",\"F-PS-01\",\"F-CC-02\"],\"checks\":[{\"fact_id\":\"F-SC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0009\"],\"explanation\":\"候选删除了无依据且与source-0001光伏全产业链布局、source-0009新能源汽车产业链“链主”相冲突的中游制造与组装定位，仅保留本集团已支持的业务范围：新能源汽车、手机部件及组装、二次充电电池及光伏，并利用技术优势拓展城市轨道交通。主体为本集团，期间为报告期，未另造产业链环节或主体。\"},{\"fact_id\":\"review-add:WF-002\",\"accepted\":true,\"evidence_ids\":[\"source-0013\",\"source-0007\"],\"explanation\":\"该事实单独补记合并营业收入，未用分部金额代替。source-0013营业收入合计为803,964,958,000.00元、同比增减3.46%；source-0007叙述为本集团收入约人民币803,965百万元、同比增长3.46%。精确元金额与约数分列，叙述金额保留“约”且未混为同一精确数，主体、期间、单位和上年同期比较基准正确。\"},{\"fact_id\":\"F-PS-01\",\"accepted\":true,\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"source-0009对量产乘用车全域千伏高压架构“超级e平台”使用“发布”，对“第五代DM技术”使用“再进化”。候选已按此区分，不再把“发布”同时套到两项技术；纯电、插混与智能底盘三大领域及“天神之眼”辅助驾驶表述分别有source-0009、source-0010支持，主体为本集团，期间为2025年度。\"},{\"fact_id\":\"F-CC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0013\"],\"explanation\":\"source-0013中40.05%是境外营业收入金额的同比增减，不是占比增幅。候选保留经销54.33%、直销45.67%和境外收入占比38.65%，并明确40.05%为境外收入金额同比增长，消除了占比增幅误读。口径为合并营业收入构成，期间对应2025年列。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-SC-01",
+        "review-add:WF-002",
+        "F-PS-01",
+        "F-CC-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-SC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0009"
+          ],
+          "explanation": "候选删除了无依据且与source-0001光伏全产业链布局、source-0009新能源汽车产业链“链主”相冲突的中游制造与组装定位，仅保留本集团已支持的业务范围：新能源汽车、手机部件及组装、二次充电电池及光伏，并利用技术优势拓展城市轨道交通。主体为本集团，期间为报告期，未另造产业链环节或主体。"
+        },
+        {
+          "fact_id": "review-add:WF-002",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0013",
+            "source-0007"
+          ],
+          "explanation": "该事实单独补记合并营业收入，未用分部金额代替。source-0013营业收入合计为803,964,958,000.00元、同比增减3.46%；source-0007叙述为本集团收入约人民币803,965百万元、同比增长3.46%。精确元金额与约数分列，叙述金额保留“约”且未混为同一精确数，主体、期间、单位和上年同期比较基准正确。"
+        },
+        {
+          "fact_id": "F-PS-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "source-0009对量产乘用车全域千伏高压架构“超级e平台”使用“发布”，对“第五代DM技术”使用“再进化”。候选已按此区分，不再把“发布”同时套到两项技术；纯电、插混与智能底盘三大领域及“天神之眼”辅助驾驶表述分别有source-0009、source-0010支持，主体为本集团，期间为2025年度。"
+        },
+        {
+          "fact_id": "F-CC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "source-0013中40.05%是境外营业收入金额的同比增减，不是占比增幅。候选保留经销54.33%、直销45.67%和境外收入占比38.65%，并明确40.05%为境外收入金额同比增长，消除了占比增幅误读。口径为合并营业收入构成，期间对应2025年列。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15942,
+      "output_tokens": 529,
+      "total_tokens": 22461
+    }
+  }
+]

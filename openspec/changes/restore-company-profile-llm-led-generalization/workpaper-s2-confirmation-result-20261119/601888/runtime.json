@@ -1,0 +1,4319 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-245e7049d39a49cac0cd6996",
+  "report": {
+    "instrument_id": "601888.SH",
+    "report_id": "1225063442",
+    "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "601888.SH",
+      "report_id": "1225063442",
+      "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper",
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "601888.SH",
+      "report_id": "1225063442",
+      "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_max_output_tokens": 16384,
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.punctuated-numbers.v7",
+        "workpaper_format_recovery": "validation_feedback.v2.syntax-diagnosis",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_review_policy": "company_profile_workpaper_review.v12"
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 111198,
+      "tokens_remaining": 888802
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "601888.SH",
+      "report_id": "1225063442",
+      "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0037",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 11,
+          "end_page": 11,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        },
+        {
+          "section_id": "section-0047",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 13,
+          "end_page": 14,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        },
+        {
+          "section_id": "section-0062",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "start_page": 15,
+          "end_page": 16,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        },
+        {
+          "section_id": "section-0067",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "主营业务分行业情况"
+          ],
+          "start_page": 16,
+          "end_page": 16,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        },
+        {
+          "section_id": "section-0068",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "主营业务分产品情况"
+          ],
+          "start_page": 16,
+          "end_page": 16,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        },
+        {
+          "section_id": "section-0069",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "主营业务分地区情况"
+          ],
+          "start_page": 16,
+          "end_page": 17,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        },
+        {
+          "section_id": "section-0099",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "128.6 亿元用于海口国际免税城项目建设"
+          ],
+          "start_page": 21,
+          "end_page": 22,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        },
+        {
+          "section_id": "section-0110",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "六、公司关于公司未来发展的讨论与分析"
+          ],
+          "start_page": 25,
+          "end_page": 27,
+          "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0038 行业情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0055 核心竞争力：偏泛化竞争优势，经营实质已由经营讨论覆盖",
+        "section-0331 财务报告及附注：仅在收入构成有缺口时定向补充，当前主营业务分行业/产品/地区已覆盖",
+        "section-0078 主要客户及供应商：供应链与客户为可选范围，非核心收入结构解释，暂不展开"
+      ],
+      "selection_rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。",
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成与主要业务权重、经营变化与展望等核心问题；行业背景与财务附注属次要或定向补充范围，可在不扩读全报告的前提下停止。",
+      "transcription_version": "shared-pdf-pypdf-layout.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F01",
+            "text": "公司主要从事以免税为主的旅游零售业务，经营品类包括烟酒、香化、腕表珠宝、服饰箱包、电子产品、食品等；此外还从事以免税业务为核心的商业综合体投资开发业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F02",
+            "text": "经营模式为线下聚焦机场、口岸、市内等租赁或自建物业，依托特许经营资质与全球供应链开展以免税商品销售为主的旅游零售，服务出入境、海南离岛等旅客；线上通过自营电商平台及第三方平台销售完税商品。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F04",
+            "text": "公司大力发展首发经济，全年引进首发新品超140款，落地27家品牌首店，引入迪士尼等30余个热门IP；并加大3C数码、户外运动、黄金、文创等高潜品类引进力度，全年引入超400个新品牌。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "全年引进首发新品数量",
+                "raw_value": "超140",
+                "value": "140",
+                "unit": "款",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "greater_than",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "落地品牌首店数量",
+                "raw_value": "27",
+                "value": "27",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "全年引入新品牌数量",
+                "raw_value": "超400",
+                "value": "400",
+                "unit": "个",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "greater_than",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F05",
+            "text": "2025年公司实现营业收入536.94亿元，同比下降4.92%；实现归属于上市公司股东的净利润35.86亿元，同比下降15.96%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "536.94",
+                "value": "536.94",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比增减",
+                "raw_value": "-4.92",
+                "value": "-4.92",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润",
+                "raw_value": "35.86",
+                "value": "35.86",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润同比增减",
+                "raw_value": "-15.96",
+                "value": "-15.96",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F06",
+            "text": "利润表科目显示，本期营业收入53,693,579,201.52元，营业成本36,108,717,474.33元，销售费用8,683,829,728.14元，管理费用2,204,251,712.50元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "53,693,579,201.52",
+                "value": "53693579201.52",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本",
+                "raw_value": "36,108,717,474.33",
+                "value": "36108717474.33",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "销售费用",
+                "raw_value": "8,683,829,728.14",
+                "value": "8683829728.14",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "管理费用",
+                "raw_value": "2,204,251,712.50",
+                "value": "2204251712.50",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "scale_and_mix": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F10",
+            "text": "公司深化产品运营，建立分级采购授权体系，打造中免大采购格局；搭建精细化订分货体系，改善畅销品供给并缓解长尾品滞销，推动存货周转率持续提升；同时优化供应链履约流程，整合仓储物流资源。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F11",
+            "text": "海口国际免税城项目规划投入128.6亿元，报告期内投入资金4.13亿元，自建设以来累计投入85.11亿元，资金来源为公司自筹资金及国拨资金；截至报告期末累计产生收益24.97亿元，地块五海口国际免税城已于2022年10月28日开业运营。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "海口国际免税城项目报告期投入资金",
+                "raw_value": "4.13",
+                "value": "4.13",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计投入资金",
+                "raw_value": "85.11",
+                "value": "85.11",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计产生收益",
+                "raw_value": "24.97",
+                "value": "24.97",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "原文仅写海口国际免税城项目并提及全资子公司对外投资公告，未给出可核验的子公司名称，主体范围无法确定。"
+          },
+          {
+            "fact_id": "F12",
+            "text": "三亚国际免税城一期2号地项目报告期内投入资金4.67亿元，自建设以来累计投入23.13亿元，资金来源为公司自筹资金；截至报告期末累计产生收益5.90亿元，商业部分三亚国际免税城C区已于2023年12月28日开业运营。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "三亚国际免税城一期2号地项目报告期投入资金",
+                "raw_value": "4.67",
+                "value": "4.67",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "三亚国际免税城一期2号地项目累计投入资金",
+                "raw_value": "23.13",
+                "value": "23.13",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "named_subsidiary",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "三亚国际免税城一期2号地项目累计产生收益",
+                "raw_value": "5.90",
+                "value": "5.90",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "named_subsidiary",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F13",
+            "text": "线下渠道聚焦机场、口岸、市内等租赁或自建物业，服务出入境、海南离岛等旅客；线上通过自营电商平台及第三方平台向消费者销售完税商品。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F14",
+            "text": "公司系统推进免税经营权投标，成功中标上海浦东国际机场T2航站楼及S2卫星厅、上海虹桥国际机场、北京首都国际机场T3航站楼、广州白云机场T3航站楼出境店等16个免税店经营权项目；13家取得经营权的市内免税店均已实现开业或运营。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "中标免税店经营权项目数量",
+                "raw_value": "16",
+                "value": "16",
+                "unit": "个",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "已开业或运营的市内免税店数量",
+                "raw_value": "13",
+                "value": "13",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F15",
+            "text": "公司持续深耕港澳市场，新设3家门店，首次进入越南市场，斩获越南河内、富国机场10年供货协议。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "港澳市场新设门店数量",
+                "raw_value": "3",
+                "value": "3",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F16",
+            "text": "公司深化近5,300万会员分层分级运营，连续2年发布会员白皮书，提升客户粘性。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "会员数量",
+                "raw_value": "近5,300万",
+                "value": "5300",
+                "unit": "万",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F18",
+            "text": "公司推动海南与前海线上平台整合，通过团队重构、流程梳理、资源聚合、规则统一促进平台间运营策略及效率连通，两大平台整合初见成效。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F19",
+            "text": "研发费用本期89,978,391.76元，同比增长352.74%，主要系报告期内加快数字化建设、各项软件系统研发投入增加所致。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "研发费用",
+                "raw_value": "89,978,391.76",
+                "value": "89978391.76",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "研发费用同比增减",
+                "raw_value": "352.74",
+                "value": "352.74",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F20",
+            "text": "公司探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式；并探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类产品开发与孵化，推出新品近100款。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "自有品牌及相关品类推出新品数量",
+                "raw_value": "近100",
+                "value": "100",
+                "unit": "款",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F21",
+            "text": "2026年1月，公司发布公告，与DFS达成协议，公司全资子公司将收购DFS大中华区零售业务，公司与LVMH签订战略合作备忘录，有利于快速建立在港澳市场的优势并实现国际化能力跃升。",
+            "subject_scope": "consolidated_group",
+            "period": "2026年1月",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F22",
+            "text": "公司首次进入越南市场，斩获越南河内、富国机场10年供货协议；并成功签署多个头部国潮品牌海外代理权，在港澳、东南亚、日本等区域实现业务突破。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F23",
+            "text": "公司成功打造三亚国际免税城成为全国首个以免税商业为核心载体的国家级AAAA旅游景区，并通过ISO三项管理体系认证。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 745,
+            "end": 1073,
+            "quote": "一、报告期内公司从事的业务情况\n\n    报告期内，公司主要从事以免税为主的旅游零售业务，经营品类主要包括烟酒、香化、腕表\n珠宝、服饰箱包、电子产品、食品等。此外，公司还从事以免税业务为核心的商业综合体投资开\n发业务。\n    报告期内，公司的经营模式为：线下聚焦机场、口岸、市内等租赁或自建物业，依托特许经\n营资质与全球供应链优势，开展以免税商品销售为主的旅游零售业务，服务出入境、海南离岛等\n旅客。线上通过自营电商平台及第三方平台向消费者销售完税商品，突破时空限制，满足日常消\n费需求。同步打通会员体系与数据链路，形成以免税牌照为根基、供应链为核心、数字化为引擎\n的全渠道服务生态。\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 445,
+            "end": 1830,
+            "quote": "三、经营情况讨论与分析\n\n    2025年公司坚决落实发展战略，持续深耕主业、锤炼核心竞争力，全力推动企业高质量发展，\n实现了业务发展的稳健运行。\n    （一）持续深耕海南，全力稳固离岛免税业务\n    公司紧抓海南全岛封关运作历史机遇，从场景创新、服务升级、供应链保障三大维度精准发\n力，为海南国际旅游消费中心和自贸港建设展现担当、贡献力量。深化“免税+文旅”融合，打造\n沉浸式体验，积极引入新品、首店，合作泡泡玛特、迪士尼等                             10余个流量     IP，联合酒店、新媒\n体、文娱赛事等渠道引流转化，叠加政府消费券协同发力，推动海南区域销售额企稳回升，离岛\n免税市场份额实现增长。持续践行“诚信经营、优质服务”理念，推进服务标准化建设，通过                                         ISO\n三项管理体系认证，增配多语种服务、智能结算，成功打造三亚国际免税城成为全国首个以免税\n商业为核心载体的国家级           AAAA   旅游景区。\n    （二）稳固渠道优势，完善运营提升服务品质\n    紧紧围绕促进消费回流与吸引外来消费的目标，公司不断完善口岸及市内店渠道网络布局，\n并在实际经营中持续完善运营、提升服务品质。系统推进免税经营权投标工作，成功中标上海浦\n东国际机场     T2 航站楼及     S2卫星厅进出境免税店、上海虹桥国际机场进出境免税店、北京首都国\n际机场   T3 航站楼进出境免税店、广州白云机场                 T3 航站楼出境店等        16 个免税店经营权项目。市\n内免税店方面，13       家取得经营权的市内免税店均已实现开业或运营，创新打造“免税+有税”“线\n下+线上”“进口+国产”三位一体运营模式，构建沉浸式体验消费新场景，并积极引入各地特色\n国产优质商品，开展“离境退税商店”资质申请及“即买即退”模式的落地，构建“语言无障碍、\n支付无阻碍、服务无死角”的消费环境，提升外籍旅客购物体验。\n    （三）把握行业机遇，稳步推动海外业务拓展\n    公司顺利推进海外并购、实现历史性突破。2026                    年 1 月，公司发布公告，与           DFS 达成协议，\n公司全资子公司将收购           DFS 大中华区零售业务，公司与             LVMH   签订战略合作备忘录。这是公司\n落实发展战略，把握行业整合浪潮的重要战略举措，有利于公司快速建立在港澳市场的优势，实\n现国际化能力跃升，有利于公司实现产业升级、商品结构优化、服务水平提升，具有较强的产业\n协同效应，可进一步增强公司核心竞争力。此外，公司持续深耕港澳市场，新设                                     3家门店，首次\n进入越南市场，斩获越南河内、富国机场                  10 年供货协议，境外业务持续扩大。公司还积极推动国\n潮出海，成功签署多个头部国潮品牌海外代理权，在港澳、东南亚、日本等区域实现业务突破。\n\n                                        12/195"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 1489,
+            "quote": "                        中国旅游集团中免股份有限公司2025          年年度报告\n\n\n    （四）统筹线上运营，推动线上与线下高效联动\n    加强线上平台的运营，围绕新老客分层触达、用户转化漏斗优化等关键任务，深度推进数据\n价值挖掘与应用创新，精准洞察市场需求、优化销售转化路径，系统性提升数据产品的场景化服\n务能力。围绕提升平台生态力、赋能品质零售，推动海南与前海线上平台整合，通过团队重构、\n流程梳理、资源聚合、规则统一，促进平台间运营策略及效率的连通，两大平台整合初见成效。\n打造线上威士忌博物馆特色            IP，开展“威你干杯”主题活动，带动威士忌销量增长，实现线上直\n播、线下活动相互引流，激活线上线下协同发展新活力。\n    （五）创新商业模式，激发业务发展新动能\n    积极探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式，\n通过丰富的商业品牌、特色的地方美食、精美的文创产品、创新的体验空间打造“高端零售+地域\n文化”的独特氛围，销售额在同级次机场有税业务中位列前茅，并形成可复制、可推广的运营模\n式。探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类产品开发与孵化，推出新\n品近  100 款，并与华熙生物等品牌商联合打造多款联名产品。\n    （六）聚焦产品创新，满足消费者多元化需求\n    大力发展首发经济，公司成功打造顶流首店集群，包括全球最大迪奥香氛美妆“新风貌”旗\n舰店、全国最大华为甄选店等，全年引进首发新品超                       140 款，落地    27 家品牌首店，重磅引入迪士\n尼等  30 余个热门    IP，全面覆盖不同客群消费需求，构建起特色鲜明的首发消费生态。紧跟国人\n消费趋势，加大       3C 数码、户外运动、黄金、文创等高潜品类引进力度，全年引入超                              400 个新品\n牌。敏锐布局银发经济，加大摄影数码、健康保健等银龄商品推广力度，贡献销售增量。\n    （七）升级运营能力，稳步增强发展动能\n    深化产品运营，构建产品运营指标体系，开发核心运营看板，支持采购决策和库存调配效率\n的提升；建立分级采购授权体系，打造中免大采购格局，赋予前端业务单元更大的灵活性和快速\n响应能力；搭建精细化订分货体系，显著改善畅销品供给，缓解长尾品滞销难题，推动存货周转\n率持续提升。加强营销推广、全面提升品牌价值，打造蛇年生肖                             IP、腕表节、中免全球悦享季、\n“海南免税购物节”及“年终盛典”等营销活动，充分联动政府消费券、国补等政策有效激发消\n费者购物热情。成功举办首届全球品牌商大会，吸引全球                          224 个品牌参会，彰显中免与多元主体\n共创价值的生态服务能力。持续提升客户运营能力，连续                          2 年发布会员白皮书，率先引领行业迈\n入“精准触达、深度运营”的圈层精耕新阶段。深化近                         5,300万会员分层分级运营，有效提升客\n户粘性，持续夯实品牌价值。加强数字化建设，以星云项目数据赋能线上平台推荐算法优化，并\n构建客户动态行为追踪与客户分群体系，为精准营销提供数据支撑。优化供应链履约流程，整合\n仓储物流资源，推动创新模式落地，显著提升供应链效率。\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 1175,
+            "end": 1390,
+            "quote": "五、报告期内主要经营情况\n\n    2025年，本公司紧抓提质增效，深化创新发展，努力推动经营业绩企稳。报告期内，公司实\n现营业收入     536.94 亿元，同比下降        4.92%；实现归属于上市公司股东的净利润                  35.86亿元，同比\n下降  15.96%。\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                        14 /195"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 1754,
+            "quote": "                                 中国旅游集团中免股份有限公司2025                      年年度报告\n\n\n(一)    主营业务分析\n\n1.   利润表及现金流量表相关科目变动分析表\n                                                                                        单位：元          币种：人民币\n                  科目                              本期数                      上年同期数                   变动比例（%）\n营业收入                                           53,693,579,201.52           56,473,848,287.07                        -4.92\n营业成本                                           36,108,717,474.33           38,385,153,803.33                        -5.93\n销售费用                                            8,683,829,728.14             9,062,899,142.58                       -4.18\n管理费用                                            2,204,251,712.50             1,989,486,383.42                      10.80\n财务费用                                              -776,820,677.03             -923,101,236.18                    不适用\n研发费用                                                89,978,391.76               19,874,237.28                     352.74\n经营活动产生的现金流量净额                                   6,058,560,224.26             7,939,327,277.01                     -23.69\n投资活动产生的现金流量净额                                  -3,480,344,870.63              -454,304,775.30                    不适用\n筹资活动产生的现金流量净额                                  -3,181,978,131.64            -4,367,067,335.08                    不适用\n\n研发费用变动原因说明：主要是本报告期内加快数字化建设，各项软件系统研发投入增加所致。\n投资活动产生的现金流量净额变动原因说明：主要是报告期内定期存款增加所致。\n\n本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n□适用      √不适用\n\n2.   收入和成本分析\n√适用      □不适用\n\n(1).主营业务分行业、分产品、分地区、分销售模式情况\n                                                                                        单位：元          币种：人民币\n                                              "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "主营业务分行业情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 1754,
+            "end": 2247,
+            "quote": "主营业务分行业情况\n分行业          营业收入                  营业成本              毛利率        营业收入比上             营业成本比上            毛利率比上年\n                                                     （%）        年增减（%）             年增减（%）              增减（%）\n商品销      52,552,697,083.9135,779,710,755.06              31.92              -5.75              -6.31增加     0.41  个百\n售业                                                                                                   分点\n                                              "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "主营业务分产品情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 2247,
+            "end": 2960,
+            "quote": "主营业务分产品情况\n分产品          营业收入                  营业成本              毛利率        营业收入比上             营业成本比上            毛利率比上年\n                                                     （%）        年增减（%）             年增减（%）              增减（%）\n免税商      39,164,825,169.5424,685,574,028.95              36.97               1.29               5.53减少     2.53  个百\n品销售                                                                                                  分点\n有税商      13,387,871,914.3711,094,136,726.11              17.13             -21.69             -25.02增加     3.68  个百\n品销售                                                                                                  分点\n                                              "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "主营业务分地区情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 2960,
+            "end": 3723,
+            "quote": "主营业务分地区情况\n分地区          营业收入                  营业成本              毛利率        营业收入比上             营业成本比上            毛利率比上年\n                                                     （%）        年增减（%）             年增减（%）              增减（%）\n海南地      28,537,114,003.7121,998,054,389.27              22.91              -1.23              -0.17减少     0.82  个百\n区                                                                                                    分点\n上海地      12,009,924,717.77     8,817,457,100.02          26.58             -25.10             -25.89增加     0.78  个百\n区                                                                                                    分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明：\n无。\n\n\n\n                                                       15 /195"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "主营业务分地区情况"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 291,
+            "quote": "                             中国旅游集团中免股份有限公司2025                 年年度报告\n\n\n(2).产销量情况分析表\n\n□适用     √不适用\n\n(3).重大采购合同、重大销售合同的履行情况\n\n□适用     √不适用\n\n(4).成本分析表\n                                                                              单位：元        币种：人民币\n                                              "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "128.6 亿元用于海口国际免税城项目建设"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 466,
+            "end": 1569,
+            "quote": "128.6亿元用于海口国际免税城项目建设。具体内容详见公司于                              2019 年 7 月  17日在《中国证券报》、\n上海证券交易所网站（www.sse.com.cn）披露的《关于全资子公司对外投资公告》（临                                     2019-023）。\n    报告期内，该项目共投入资金                 4.13亿元。自项目建设以来，累计投入资金                     85.11 亿元，资金\n来源为公司自筹资金及国拨资金。截至报告期末，该项目累计产生的收益为                                         24.97 亿元。目前该\n项目处于中期阶段，其中地块五海口国际免税城已于                            2022 年  10月  28 日开业运营；地块二悦领湾\n项目、地块三悦斓庭项目已完工并推进产品销售；地块一甲级写字楼                                   A  座办公区域第一批已交付，\n第二批装修施工完成           80%；地块四洲际、逸衡酒店主体结构已封顶，二次结构砌筑完成。\n    （2）三亚国际免税城一期              2 号地项目\n    2021 年，经公司董事会审议通过，同意公司全资孙公司中免（海南）投资发展有限公司投资\n人民币    36.9亿元用于三亚国际免税城一期                 2号地项目建设。具体内容详见公司于                     2021 年 3 月  19\n日在《证券日报》、上海证券交易所网站（www.sse.com.cn）披露的《关于全资孙公司对外投资\n的公告》（临       2021-007）。\n    2024 年  2月，随着项目的开发推进，为进一步提高项目的综合竞争力，综合考虑项目产品定\n位、市场条件及实际推进情况等多方面因素后，经公司董事会审议通过，对该项目追加投资人民\n币 10.7 亿元。具体内容详见公司于               2024 年  2月  28 日在《证券日报》《上海证券报》、上海证券\n交易所网站（www.sse.com.cn）披露的《第五届董事会第八次会议（现场结合通讯方式）决议公\n告》（临     2024-004）。\n\n                                           20 /195"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "128.6 亿元用于海口国际免税城项目建设"
+        ],
+        "physical_pages": [
+          22
+        ],
+        "source_spans": [
+          {
+            "page": 22,
+            "start": 0,
+            "end": 409,
+            "quote": "                         中国旅游集团中免股份有限公司2025            年年度报告\n\n\n    报告期内，该项目共投入资金               4.67 亿元。自项目建设以来，累计投入资金                    23.13 亿元，资金\n来源为公司自筹资金。截至报告期末，该项目累计产生的收益为                                5.90 亿元。目前该项目处于中期\n阶段，其中商业部分三亚国际免税城                   C 区已于    2023 年  12月  28 日开业运营；酒店部分主体结构\n已封顶，二次结构砌筑已完成，幕墙工程完成约                        70%，全面推进机电工程、精装修工程、园林工\n程施工。\n\n\n3.  以公允价值计量的金融资产\n\n□适用     √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析"
+        ],
+        "physical_pages": [
+          25
+        ],
+        "source_spans": [
+          {
+            "page": 25,
+            "start": 63,
+            "end": 2025,
+            "quote": "六、公司关于公司未来发展的讨论与分析\n\n(一)行业格局和趋势\n\n√适用     □不适用\n    （一）消费趋势\n    受政策支持和需求释放双重驱动，我国消费市场规模稳步扩大。根据国家统计局，2025                                         年，\n社会消费品零售总额           50.1万亿元人民币，同比增长             3.7%，增速比上年加快           0.2个百分点。2025\n年，商品零售额比上年增长             3.8%，比上年加快        0.6个百分点。2025      年，升级类商品消费需求旺盛。\n升级类商品中，限额以上单位体育娱乐用品零售额增长                            15.7%，增速比上年加快          4.6个百分点；\n化妆品零售额增长         5.1%，东方美学引领美妆消费潮流；金银珠宝零售额增长                           12.8%，融合传统文\n化元素与现代设计理念的产品备受消费者青睐。同时，银发经济、冰雪经济、首发经济等都在持\n续升温，日益成为新的消费增长点。国货潮品广受欢迎，一批老字号与新消费品牌跨界联动，创\n新打造新产品、新场景，受到消费者追捧。此外，2025                         年，我国消费市场的另一大显著亮点是服\n务消费占比稳步上升。随着人民生活水平提升，居民消费正从商品消费为主向商品和服务消费并\n重转变。随着扩大服务消费政策持续多点发力，服务供给更加优质多元，服务供需适配性上升，\n服务消费潜力加速释放。\n    高端消费方面，中国高端消费呈现复苏趋势，得益于宏观环境改善（如股市财富效应）、消\n费回流。根据要客研究院《2025              中国奢侈品报告》，2025           年中国人奢侈品消费增长             3%，规模达\n10,410亿元人民币，占全球市场份额的                36%，延续全球核心消费引擎地位。其中境内市场同步增\n长 3%，规模增至       5,195 亿元人民币，全球占比提升至               19%。同期全球奢侈品市场整体增长                 5%，\n达 28,451 亿元人民币。2025       年中国人奢侈品境内外消费分别占比                   51%、49%，与      2024 年持平，\n消费外流态势趋于稳定，未出现进一步扩大，预计未来                          3 至 5 年境内消费占比将稳步提升至               70%。\n基于当前市场复苏态势，要客研究院预计                    2026 年中国奢侈品市场有望加速增长，中国人奢侈品消\n费比  2025 年增长    5%，其中中国奢侈品增幅有望达                7%-9%，驱动因素包括消费信心持续回升、品\n牌本土化运营深化。\n    （二）行业格局\n    2024-2025 年全球免税及旅游零售市场呈现激烈竞争态势，主要集中于亚太、欧洲及北美三\n大核心区域。市场主导企业包括                Avolta、中国中免、Lagardere       TravelRetail、乐天免税等。\n    中国免税及旅游零售市场集中度高，呈现“一超多强”格局，中国中免凭借全渠道布局、供\n应链优势、会员价值等优势占据领先地位。\n    免税行业正经历从商品导向到体验导向的深刻转型。在消费端呈现出三大核心趋势：消费动\n机从物质需求转向意义追求，表现为品类多元化延伸和对稀缺性商品的价值认同；国潮品牌通过\n创新突破实现溢价能力提升，重塑市场格局；消费场景向内容化、体验式升级，推动运营商向生\n活方式服务商转型。渠道端则显现线上线下深度融合特征，数字技术正重构购物全流程体验。当\n前市场格局要求运营商在商品组合、渠道建设、体验创新等多维度实现系统升级，以应对日益复\n杂的竞争环境。\n    短期看全球经济波动可能抑制消费信心，但中国                         GDP5%的增速预期与出境游回暖、外籍入\n境游热度、政策红利释放将为市场托底。短期波动难掩长期潜力，行业复苏态势将持续，长期竞\n争将聚焦供应链深度、数字化效率和体验化差异三大核心能力，未来结构性机会与挑战并存。\n                                         24 /195"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析"
+        ],
+        "physical_pages": [
+          26
+        ],
+        "source_spans": [
+          {
+            "page": 26,
+            "start": 0,
+            "end": 1320,
+            "quote": "                        中国旅游集团中免股份有限公司2025          年年度报告\n\n\n(二)公司发展战略\n\n√适用     □不适用\n    聚焦旅游零售业务，以免税业务为核心提升价值链，以旅游零售为延伸升级产业链，提升国\n际化水平与市场竞争能力，打造全球领先的数智化旅游零售运营商。\n\n\n(三)经营计划\n\n√适用     □不适用\n    1.聚焦发展战略，巩固重点市场优势\n\n    一是持续深耕海南市场。积极把握海南自由贸易港封关运作机遇，推动“免税+文旅”深度融合，\n从品类拓展、运营优化、全域营销、服务升级等多维度发力，构建多层次、强体验的消费新生态，\n\n激发区域消费活力。依托离岛免税新政、岛民免税等政策机遇，积极拓展国产品牌及运动户外、\n健康保健等新品类，优化商品结构。持续引入热门                       IP联名、情绪主题快闪、限量首发商品等，打\n\n造差异化消费场景。\n    二是推进渠道融合升级。扎实推进上海、北京等重点机场免税店顺利运营，并稳步推动品牌\n招商与布局调整，实现核心枢纽业务升级。主动参与机场商业整体规划，积极寻求机场渠道拓展\n\n机遇。深度洞察目标客群需求，不断优化产品组合，提升市内店运营能力。\n    三是深化线上业务运营。深化平台整合，实现重点区域平台业财一体化管理，提升运营效能。\n\n推动线上线下融合，打造优质直播场景，深耕中小城市引流。强化技术赋能与供应链优化，保障\n重点商品供应，扩充高增长品类，培育新的业务增长点。\n    四是稳步拓展海外业务。有序推进               DFS  大中华区零售业务整合计划实施，确保整合目标高效\n\n落地，吸收培育国际化能力，建强海外运营平台。持续关注海外市场拓展与并购机会，深耕港澳、\n东南亚等现有市场，提升门店竞争力。集合品牌商力量推动国潮出海，构建国际化发展新格局。\n\n    2.增强核心能力，夯实高质量发展根基\n    一是提升产品与供应链能力。以客户洞察为基础，运用大数据、AI                             赋能需求分析，优化产品\n\n结构与库存管理。深化供应链全链条管理，提升货品调配与流转效率，保障商品供给精准度。\n    二是提升数智化运营能力。持续增强数据平台全域能力，整合全渠道数据资源，优化算法模\n型，提升精准触达能力与数据驱动运营效能，全面赋能业务发展。\n\n    三是提升会员运营能力。升级会员体系，推进私域体系建设，构建圈层化社群。举办全球合\n作伙伴大会及会员活动，挖掘会员多元需求，实现资源协同共享，进一步提升品牌形象。\n\n\n(四)可能面对的风险\n\n√适用     □不适用\n    1．政策风险。随着免税经营资质的放开，口岸进出境免税店通过招标方式确定经营主体，海\n南离岛免税店通过竞争性磋商等方式确定经营主体，市内免税店通过竞争方式确定经营主体，中\n国免税行业进入有序竞争阶段。面对日益激烈的市场竞争，公司将紧紧围绕免税主业，着力抓好\n\n                                       25 /195"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析"
+        ],
+        "physical_pages": [
+          27
+        ],
+        "source_spans": [
+          {
+            "page": 27,
+            "start": 0,
+            "end": 1168,
+            "quote": "                       中国旅游集团中免股份有限公司2025           年年度报告\n\n\n重大项目和关键市场，着力提升核心业务能力，着力强化精细化管理，不断增强内生外延发展动\n力，全面开创旅游零售发展新局面。\n    2．投资风险。战略项目投资未达预期的风险。公司将围绕战略目标，加强中长期规划和年度\n投资计划管理，从整体和宏观上控制投资规模和投资节奏，保持对投资风险的整体客观认识和警\n觉；继续加强项目投资估算、概算审查，科学控制项目总投资；做好项目立项、审批、科学的可\n行性研究、档案管理等工作，保持与各级政府、合作方的良好沟通，争取项目按期推进。强化具\n备旅游零售商业综合体项目的开发能力和复合产业的综合运营能力的团队建设，提高投资管理、\n风险控制、招商管理、项目运作等能力。\n    3．财务风险。由于国际业务多以外币结算，人民币对外币汇率波动加大、汇兑差异等因素，\n可能导致汇兑损失，影响公司经营目标的实现。公司将持续关注汇率波动并加强研究，梳理分析\n资产、负债、收入、支出等外币业务的风险敞口，结合相关货币汇率、利率等走势的变化，按照\n境内外不同货币资产负债统筹配置的原则做好系统性管理方案，兼顾收益与风险，促进实现汇利\n率管控目标。密切关注所持币种汇率、利率变动趋势，综合考虑利率因素对财务资源配置的影响\n后，努力提升资产、负债币种匹配度。\n    4．市场风险。市场竞争日趋激烈，同时消费需求呈现多元化趋势，传统门店面临客流与复购\n率压力。公司将充分深化现有优势，打造线上线下一体化的竞争优势；继续推进集中采购，提高\n产品采购议价能力。利用现有优势，积极开拓新产品线，形成新的驱动核，巩固、提升竞争优势。\n利用品牌优势，发挥落地服务专长，增强市场竞争力。进一步加强跨行业合作纵深布局，开放互\n助、合作互利，以加强市场变化时的适应能力。\n    5．项目管理风险。重大工程项目，在招投标、工程预决算、工程建设过程、工程验收等出现\n偏差，可能导致工程项目工期延误、成本失控、存在质量与安全隐患。公司将按照有关工程项目\n的管理规定，从项目源头进行管理，做好立项审批、招投标管理；做好工程建设过程管理，及时\n召开进度研讨会，落实进度推进；严格控制建设预算；做好工程决算管理，保证工程安全、可靠\n交付使用。\n    6．地缘政治、国际贸易争端与供应链风险。国际形势持续复杂演变，地区冲突、制裁政策及\n贸易环境波动可能对全球供应链稳定性构成挑战，尤其在商品采购、品牌授权及跨境物流等方面\n带来不确定性。公司将持续关注全球供应链变化趋势，推进采购渠道多元化，强化与品牌方的战\n略协同，积极构建稳定、高效、可控的供应保障体系，提升整体供应链的安全性和抗压能力。\n\n\n(五)其他\n□适用     √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F24",
+            "text": "公司以免税商品销售为主的旅游零售业务为核心，依托特许经营资质与全球供应链优势开展经营，并延伸以免税业务为核心的商业综合体投资开发。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "upstream_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F25",
+            "text": "公司建立分级采购授权体系，打造中免大采购格局；公司计划继续推进集中采购以提高产品采购议价能力，并推进采购渠道多元化、强化与品牌方的战略协同。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F26",
+            "text": "公司线下门店服务出入境、海南离岛等旅客，线上平台面向消费者销售完税商品；市内免税店积极引入各地特色国产优质商品并开展“离境退税商店”资质申请及“即买即退”模式落地，提升外籍旅客购物体验。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:sections",
+        "request_hash": "a9164a0ec65746d44197f1df3349b1a705b1ec5374cbe9b2b7f8f29425013310",
+        "response_hash": "254af3050c09f23bbe5cad48a0717ab04b7512d0ed94cf187d1ff51bc37e8849",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 23041,
+          "output_tokens": 414,
+          "total_tokens": 23455
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 862,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0073",
+          "section-0074",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0099",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0272",
+          "section-0274",
+          "section-0276",
+          "section-0278",
+          "section-0280",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0366",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0537",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0562",
+          "section-0564",
+          "section-0567",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0571",
+          "section-0574",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0606",
+          "section-0607",
+          "section-0608",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0625",
+          "section-0628",
+          "section-0629",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0640",
+          "section-0645",
+          "section-0647",
+          "section-0653",
+          "section-0654",
+          "section-0661",
+          "section-0664",
+          "section-0667",
+          "section-0674",
+          "section-0681",
+          "section-0689",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0700",
+          "section-0704",
+          "section-0705",
+          "section-0707",
+          "section-0711",
+          "section-0712",
+          "section-0718",
+          "section-0719",
+          "section-0721",
+          "section-0722",
+          "section-0724",
+          "section-0727",
+          "section-0728",
+          "section-0730",
+          "section-0731",
+          "section-0732",
+          "section-0735",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0745",
+          "section-0748",
+          "section-0749",
+          "section-0750",
+          "section-0751",
+          "section-0753",
+          "section-0756",
+          "section-0757",
+          "section-0758",
+          "section-0759",
+          "section-0762",
+          "section-0764",
+          "section-0765",
+          "section-0766",
+          "section-0771",
+          "section-0775",
+          "section-0776",
+          "section-0777",
+          "section-0778",
+          "section-0781",
+          "section-0785",
+          "section-0786",
+          "section-0787",
+          "section-0788",
+          "section-0790",
+          "section-0792",
+          "section-0793",
+          "section-0794",
+          "section-0795",
+          "section-0800",
+          "section-0806",
+          "section-0810",
+          "section-0813",
+          "section-0815",
+          "section-0816",
+          "section-0817",
+          "section-0820",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0826",
+          "section-0828",
+          "section-0831",
+          "section-0832",
+          "section-0833",
+          "section-0834",
+          "section-0836",
+          "section-0838",
+          "section-0839",
+          "section-0840",
+          "section-0841",
+          "section-0843",
+          "section-0845",
+          "section-0846",
+          "section-0847",
+          "section-0851",
+          "section-0856",
+          "section-0857",
+          "section-0858",
+          "section-0859",
+          "section-0862",
+          "section-0867",
+          "section-0868",
+          "section-0869",
+          "section-0870",
+          "section-0872",
+          "section-0874",
+          "section-0875",
+          "section-0876",
+          "section-0877",
+          "section-0881",
+          "section-0884",
+          "section-0886",
+          "section-0889",
+          "section-0890",
+          "section-0896",
+          "section-0897",
+          "section-0898",
+          "section-0899",
+          "section-0902",
+          "section-0903",
+          "section-0904",
+          "section-0906",
+          "section-0909",
+          "section-0913",
+          "section-0917",
+          "section-0919",
+          "section-0920",
+          "section-0921",
+          "section-0922",
+          "section-0923",
+          "section-0925",
+          "section-0926",
+          "section-0927",
+          "section-0928",
+          "section-0929",
+          "section-0930",
+          "section-0931",
+          "section-0932",
+          "section-0934",
+          "section-0935",
+          "section-0936",
+          "section-0937",
+          "section-0938",
+          "section-0943",
+          "section-0944",
+          "section-0945",
+          "section-0946",
+          "section-0947",
+          "section-0949",
+          "section-0954",
+          "section-0955",
+          "section-0956",
+          "section-0959",
+          "section-0961",
+          "section-0962",
+          "section-0963",
+          "section-0965",
+          "section-0966",
+          "section-0967",
+          "section-0968",
+          "section-0969",
+          "section-0970",
+          "section-0973",
+          "section-0974",
+          "section-0975",
+          "section-0976",
+          "section-0977",
+          "section-0978",
+          "section-0979",
+          "section-0980",
+          "section-0981",
+          "section-0982",
+          "section-0983",
+          "section-0984",
+          "section-0985",
+          "section-0986",
+          "section-0992",
+          "section-0993",
+          "section-0994",
+          "section-0995",
+          "section-0996",
+          "section-0997",
+          "section-0998",
+          "section-0999",
+          "section-1000",
+          "section-1001",
+          "section-1002",
+          "section-1003",
+          "section-1004",
+          "section-1005",
+          "section-1006",
+          "section-1007",
+          "section-1008",
+          "section-1009",
+          "section-1010",
+          "section-1011",
+          "section-1012",
+          "section-1013",
+          "section-1014",
+          "section-1015",
+          "section-1016",
+          "section-1017",
+          "section-1018",
+          "section-1019",
+          "section-1022",
+          "section-1023",
+          "section-1027",
+          "section-1030",
+          "section-1032",
+          "section-1033",
+          "section-1034",
+          "section-1038",
+          "section-1039",
+          "section-1040",
+          "section-1043",
+          "section-1044",
+          "section-1047",
+          "section-1051",
+          "section-1052",
+          "section-1053",
+          "section-1054",
+          "section-1055",
+          "section-1056",
+          "section-1057",
+          "section-1058",
+          "section-1065",
+          "section-1066",
+          "section-1067",
+          "section-1068",
+          "section-1069",
+          "section-1070",
+          "section-1071",
+          "section-1077",
+          "section-1078",
+          "section-1087",
+          "section-1088",
+          "section-1089",
+          "section-1090",
+          "section-1091",
+          "section-1092",
+          "section-1093",
+          "section-1094",
+          "section-1095",
+          "section-1096",
+          "section-1097",
+          "section-1098",
+          "section-1099",
+          "section-1100",
+          "section-1101",
+          "section-1105",
+          "section-1109",
+          "section-1110",
+          "section-1111",
+          "section-1112",
+          "section-1113",
+          "section-1117",
+          "section-1120",
+          "section-1121",
+          "section-1122",
+          "section-1123",
+          "section-1124",
+          "section-1125",
+          "section-1126",
+          "section-1127",
+          "section-1128",
+          "section-1129",
+          "section-1130",
+          "section-1131",
+          "section-1132",
+          "section-1133",
+          "section-1134",
+          "section-1135",
+          "section-1136",
+          "section-1137",
+          "section-1138",
+          "section-1139",
+          "section-1140",
+          "section-1141",
+          "section-1142",
+          "section-1143",
+          "section-1144",
+          "section-1145",
+          "section-1146",
+          "section-1147",
+          "section-1156",
+          "section-1160",
+          "section-1161",
+          "section-1162",
+          "section-1163",
+          "section-1166",
+          "section-1167",
+          "section-1168",
+          "section-1169",
+          "section-1170",
+          "section-1171",
+          "section-1172",
+          "section-1173",
+          "section-1176",
+          "section-1177",
+          "section-1178",
+          "section-1179",
+          "section-1180",
+          "section-1181",
+          "section-1182",
+          "section-1183",
+          "section-1184",
+          "section-1185",
+          "section-1188",
+          "section-1189",
+          "section-1190",
+          "section-1193",
+          "section-1196",
+          "section-1197",
+          "section-1198",
+          "section-1199",
+          "section-1204",
+          "section-1206",
+          "section-1213",
+          "section-1220",
+          "section-1228",
+          "section-1231",
+          "section-1232",
+          "section-1234",
+          "section-1240",
+          "section-1241",
+          "section-1242",
+          "section-1243",
+          "section-1244",
+          "section-1245",
+          "section-1249"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:extract",
+        "request_hash": "bacd40b11826d7cf774fd9effb98c1a5f68d71a83fa3659774de1c469f8e4af2",
+        "response_hash": "2aec79de15b51d827f404acb088cdc149bb15de0942b413dd6a6fc272b40355d",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 12066,
+          "output_tokens": 4819,
+          "total_tokens": 16885
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0037",
+          "section-0047",
+          "section-0062",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0099",
+          "section-0110"
+        ],
+        "physical_pages": [
+          11,
+          13,
+          14,
+          15,
+          16,
+          17,
+          21,
+          22,
+          25,
+          26,
+          27
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v12",
+      "original_draft_hash": "4219b5bda661ffee7d5acad43ae714ce3e9cfb732ded893b783e5b47d56e6f99",
+      "findings": [
+        {
+          "finding_id": "RF-01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0007",
+            "source-0004"
+          ],
+          "explanation": "主营业务分产品构成未进入定稿，且局限项称免税商品销售收入数字不在来源中（F03、F08被隔离），与原文矛盾。source-0007列明：免税商品销售营业收入39,164,825,169.54元、营业成本24,685,574,028.95元、毛利率36.97%、营业收入同比增加1.29%、营业成本同比增加5.53%、毛利率减少2.53个百分点；有税商品销售营业收入13,387,871,914.37元、营业成本11,094,136,726.11元、毛利率17.13%、营业收入同比下降21.69%、营业成本同比下降25.02%、毛利率增加3.68个百分点。公司营业收入536.94亿元不能代替该构成，两类不得互相替代，也不得与线上完税商品叙述等同。恢复时主体应为business_segment，指标名保留来源类别；毛利率变动是百分点，不是相对增长率。烟酒、香化等子类收入来源未列，不要求补造。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": {
+            "fact_id": "review-add:RF-01",
+            "text": "主营业务分产品情况：免税商品销售营业收入39,164,825,169.54元，营业成本24,685,574,028.95元，毛利率36.97%，营业收入比上年增加1.29%，营业成本比上年增加5.53%，毛利率比上年减少2.53个百分点；有税商品销售营业收入13,387,871,914.37元，营业成本11,094,136,726.11元，毛利率17.13%，营业收入比上年下降21.69%，营业成本比上年下降25.02%，毛利率比上年增加3.68个百分点。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "免税商品销售营业收入",
+                "raw_value": "39,164,825,169.54",
+                "value": "39164825169.54",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售营业成本",
+                "raw_value": "24,685,574,028.95",
+                "value": "24685574028.95",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售毛利率",
+                "raw_value": "36.97",
+                "value": "36.97",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售营业收入比上年增减",
+                "raw_value": "1.29",
+                "value": "1.29",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售营业成本比上年增减",
+                "raw_value": "5.53",
+                "value": "5.53",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售毛利率比上年增减",
+                "raw_value": "减少2.53个百分点",
+                "value": null,
+                "unit": "百分点",
+                "source_unit": "百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+              },
+              {
+                "name": "有税商品销售营业收入",
+                "raw_value": "13,387,871,914.37",
+                "value": "13387871914.37",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售营业成本",
+                "raw_value": "11,094,136,726.11",
+                "value": "11094136726.11",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售毛利率",
+                "raw_value": "17.13",
+                "value": "17.13",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售营业收入比上年增减",
+                "raw_value": "-21.69",
+                "value": "-21.69",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售营业成本比上年增减",
+                "raw_value": "-25.02",
+                "value": "-25.02",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售毛利率比上年增减",
+                "raw_value": "增加3.68个百分点",
+                "value": null,
+                "unit": "百分点",
+                "source_unit": "百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "RF-02",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0006",
+            "source-0005"
+          ],
+          "explanation": "主营业务分行业的商品销售业与公司利润表营业收入、分产品行口径不同，不能用公司总额或分产品加总代替。source-0006列明商品销售业营业收入52,552,697,083.91元、营业成本35,779,710,755.06元、毛利率31.92%、营业收入同比下降5.75%、营业成本同比下降6.31%、毛利率增加0.41个百分点。局限项称该营业收入不在来源中（F07）与原文矛盾。F06的利润表营业成本36,108,717,474.33元也不是该行营业成本。应单独恢复，主体标business_segment，毛利率变动按个百分点。所选片段未见其他业务或抵销行，不得编造调节项。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": {
+            "fact_id": "review-add:RF-02",
+            "text": "主营业务分行业情况：商品销售业营业收入52,552,697,083.91元，营业成本35,779,710,755.06元，毛利率31.92%，营业收入比上年下降5.75%，营业成本比上年下降6.31%，毛利率比上年增加0.41个百分点。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "商品销售业营业收入",
+                "raw_value": "52,552,697,083.91",
+                "value": "52552697083.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业营业成本",
+                "raw_value": "35,779,710,755.06",
+                "value": "35779710755.06",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业毛利率",
+                "raw_value": "31.92",
+                "value": "31.92",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业营业收入比上年增减",
+                "raw_value": "-5.75",
+                "value": "-5.75",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业营业成本比上年增减",
+                "raw_value": "-6.31",
+                "value": "-6.31",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业毛利率比上年增减",
+                "raw_value": "增加0.41个百分点",
+                "value": null,
+                "unit": "百分点",
+                "source_unit": "百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "RF-03",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "局限项称海南地区营业收入数字不在引用来源中（F09已隔离），但source-0008已列海南地区营业收入28,537,114,003.71元、营业成本21,998,054,389.27元、毛利率22.91%、收入同比下降1.23%、成本同比下降0.17%、毛利率减少0.82个百分点，以及上海地区营业收入12,009,924,717.77元、营业成本8,817,457,100.02元、毛利率26.58%、收入同比下降25.10%、成本同比下降25.89%、毛利率增加0.78个百分点。应更正来源无此数的说法。分地区明细属于可选补充，不要求据此补全全部地区或升格为重大遗漏；若保留，主体为business_segment，毛利率变动按个百分点。",
+          "resolution": "unresolved",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "RF-04",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F11",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "F11的项目金额与开业日期有来源支持：报告期投入4.13亿元、累计投入85.11亿元、累计收益24.97亿元，地块五于2022年10月28日开业。但指标subject_scope标为named_subsidiary不成立。可见原文只写海口国际免税城项目，并提及全资子公司对外投资公告，未给出可核验的子公司名称。应保留项目金额，将主体改为unclear，不得改标为consolidated_group或编造主体名称。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F11",
+            "text": "海口国际免税城项目规划投入128.6亿元，报告期内投入资金4.13亿元，自建设以来累计投入85.11亿元，资金来源为公司自筹资金及国拨资金；截至报告期末累计产生收益24.97亿元，地块五海口国际免税城已于2022年10月28日开业运营。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "海口国际免税城项目报告期投入资金",
+                "raw_value": "4.13",
+                "value": "4.13",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计投入资金",
+                "raw_value": "85.11",
+                "value": "85.11",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "named_subsidiary",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计产生收益",
+                "raw_value": "24.97",
+                "value": "24.97",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "named_subsidiary",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F11",
+            "text": "海口国际免税城项目规划投入128.6亿元，报告期内投入资金4.13亿元，自建设以来累计投入85.11亿元，资金来源为公司自筹资金及国拨资金；截至报告期末累计产生收益24.97亿元，地块五海口国际免税城已于2022年10月28日开业运营。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "海口国际免税城项目报告期投入资金",
+                "raw_value": "4.13",
+                "value": "4.13",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计投入资金",
+                "raw_value": "85.11",
+                "value": "85.11",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计产生收益",
+                "raw_value": "24.97",
+                "value": "24.97",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "原文仅写海口国际免税城项目并提及全资子公司对外投资公告，未给出可核验的子公司名称，主体范围无法确定。"
+          }
+        },
+        {
+          "finding_id": "RF-05",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "affected_fact_id": "F15",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "港澳新设3家门店、首次进入越南并取得河内及富国机场10年供货协议，可按报告期叙述保留。同条却把2026年1月与DFS达成协议、全资子公司将收购DFS大中华区零售业务、与LVMH签订战略合作备忘录放入period为2025年度的事实。原文时点是2026年1月，且为将收购而非已完成。应从2025年度事实中剔除或单独限定为期后事项；F21已按2026年1月记载，避免当作2025年已完成交易。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F15",
+            "text": "公司持续深耕港澳市场，新设3家门店，首次进入越南市场，斩获越南河内、富国机场10年供货协议；2026年1月公告与DFS达成协议，全资子公司将收购DFS大中华区零售业务，并与LVMH签订战略合作备忘录。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "港澳市场新设门店数量",
+                "raw_value": "3",
+                "value": "3",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F15",
+            "text": "公司持续深耕港澳市场，新设3家门店，首次进入越南市场，斩获越南河内、富国机场10年供货协议。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "港澳市场新设门店数量",
+                "raw_value": "3",
+                "value": "3",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "RF-06",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F20",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "兰州机场有税商业采用低保底加阶梯分成，以及探索自有品牌的叙述与来源相符。但指标名中免健康推出新品数量，把近100款 exclusive 归为中免健康单品牌。原文是探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类并推出新品近100款。应保留近似值近100款，指标名称改回自有品牌及相关品类新品，正文亦勿缩成中免健康单独推出。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F20",
+            "text": "公司探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式；并探索自有品牌业务，以中免健康为切入点，推出新品近100款。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "中免健康推出新品数量",
+                "raw_value": "近100",
+                "value": "100",
+                "unit": "款",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F20",
+            "text": "公司探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式；并探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类产品开发与孵化，推出新品近100款。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "自有品牌及相关品类推出新品数量",
+                "raw_value": "近100",
+                "value": "100",
+                "unit": "款",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "RF-07",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "affected_fact_id": "F25",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0003",
+            "source-0014"
+          ],
+          "explanation": "建立分级采购授权体系、打造中免大采购格局见于报告期经营讨论，可保留为2025年事实。推进集中采购以提高议价能力，以及推进采购渠道多元化、强化与品牌方战略协同，出自风险应对中的公司将计划表述，不是已完成的本期实绩。应保留已发生的采购授权事实，将后两项限定为计划或风险应对，不得作为2025年已实现经营结果。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F25",
+            "text": "公司建立分级采购授权体系，打造中免大采购格局，并推进集中采购以提高产品采购议价能力；同时推进采购渠道多元化，强化与品牌方的战略协同。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F25",
+            "text": "公司建立分级采购授权体系，打造中免大采购格局；公司计划继续推进集中采购以提高产品采购议价能力，并推进采购渠道多元化、强化与品牌方的战略协同。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        }
+      ],
+      "checked_fact_ids": [
+        "F01",
+        "F02",
+        "F04",
+        "F05",
+        "F06",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:review",
+          "request_hash": "648ffe1298a8c3e930e74791e86e66bc2bb5d0c59b30147c45846b3b65629758",
+          "response_hash": "7125e431d4de64bf9ce5850dc7b80c32fae30dfc57386e0eb7292c7e3328f5ea",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14895,
+            "output_tokens": 1570,
+            "total_tokens": 41411
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0047",
+            "section-0062",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0099",
+            "section-0110"
+          ],
+          "physical_pages": [
+            11,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            25,
+            26,
+            27
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:repair",
+          "request_hash": "58d6f62dd3a2f432581c6e605cda24f22468258009bce86efc9088d90ef20e2b",
+          "response_hash": "5e8a8bbf0264c88ceecfc60f4761c40797abdab18e3d74570e155359ca065798",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 9712,
+            "output_tokens": 2385,
+            "total_tokens": 12097
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0047",
+            "section-0062",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0099",
+            "section-0110"
+          ],
+          "physical_pages": [
+            11,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            25,
+            26,
+            27
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:repair-verify",
+          "request_hash": "394fc52e43661ca72d4f782a56ce3cfbc192c585fb8f8758670ef2f141bf148a",
+          "response_hash": "d7d012adc749e31e4cac0c0d843fc93f595150e49840471e4585d8657e84dd47",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10620,
+            "output_tokens": 465,
+            "total_tokens": 17350
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0047",
+            "section-0062",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0099",
+            "section-0110"
+          ],
+          "physical_pages": [
+            11,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            25,
+            26,
+            27
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "F01": "ddec7bc4350ca2a0130c0c83b5358a9da5d94a1cf694358a902e3b56fcd95e25",
+        "F02": "16b9d20f9bc43679a91333ec25c72932954867ffde9662476f042ba5da55b873",
+        "F04": "559039dea2e2c60afdfc434b4c262cc56f8ec31005831e08b58674c52b15aaae",
+        "F05": "f825f11bb7dd06ef9edad48f158571b874bbef084e80b050ca5d0349b08917a6",
+        "F06": "c1a44ace0a4720eeceaf2c47416ef9df68620aa6ad8739c31932438c0b89cfed",
+        "F10": "4a78045d2e59f0c59beead86a7d3556a2890b3a460298a00b7213e599e8c1d9c",
+        "F11": "e3b5c18965dca0efbd6e0a829363a0400abb5d14c7dd85a26ce6b8dc24db3412",
+        "F12": "820fd4c5a7e1517145097137295050fefb96dd60fbdbdfa71aab1ad199c9ce05",
+        "F13": "b458c85335a93c0b80d684e95c70ab314a6c8785b3d838806498808771470c01",
+        "F14": "065e25db09f92ade9d1420276d52c255307373f8f0a2d055391566a25a10ae99",
+        "F15": "6727e09c1ef2c3081d1dfe09099fbbddfcbbe102cf7215c1a9c4fc13f9bacfaa",
+        "F16": "560f5914fd7dc51692750baaa8a7848114ce10e64b86939697f30113424a365a",
+        "F18": "7b2105b6c3e0641e94f7d3f419335a21d803e901e5f1d7e35f95850ad7b9bb4e",
+        "F19": "fe862dbad36619060c3bff47da52436e88813caaa58aad56e30d601a7fa2ba7a",
+        "F20": "d076ce601f4b27f105953b3e9ab9eb08546afd608ee2a1f0edf934a113846ff3",
+        "F21": "4358fbec87576622e5f79ddd339b1201f9fded5af6b4dd5410e3616410f51300",
+        "F22": "88b1b4a55d7e26c549525630c415c13b2e0b6fadbc23e8f1ca8263fc83059f05",
+        "F23": "cfba288e417b941a95ab357e35939be6895c05a6a4f1173192c51d4dc9976aeb",
+        "F24": "f40ee23d9998e701740db78b61ab917b412f473a924aab2664aeb0b5ee974b04",
+        "F25": "c2a3f45979ea2ba00f858e528a4fdd285d35cda55a6c824f3bed3e3fb708b995",
+        "F26": "720aa0c5ddbc443df9e8fcd781ea8e232bd0e7b8bdb3e7da0ce0c79be7aeb3de",
+        "F27": "44a5eefb91aaec1ea798821bfa6a2ecc07e6233647095e7a71a6fe00e235962b",
+        "F28": "bbd287b849aa894f28f43ea9d5304faff2f350257b5aefb7e726aa7280f6bd59"
+      }
+    },
+    "standardization_notes": [
+      "指标格式隔离：事实F17未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+      "事实F03已隔离，未作为结论采用：metric number is absent from cited source: 免税商品销售收入",
+      "事实F07已隔离，未作为结论采用：metric number is absent from cited source: 商品销售业营业收入",
+      "事实F08已隔离，未作为结论采用：narrative number is absent from cited source: 39,164,825,169.54元",
+      "事实F09已隔离，未作为结论采用：metric number is absent from cited source: 海南地区营业收入",
+      "修订源检查隔离：review-add:RF-01未进入最终再核或正文；ValueError: metric number is absent from cited source: 免税商品销售营业收入",
+      "修订源检查隔离：review-add:RF-02未进入最终再核或正文；ValueError: metric number is absent from cited source: 商品销售业营业收入"
+    ],
+    "company_features": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "F27",
+          "text": "公司以免税业务为核心提升价值链，以旅游零售为延伸升级产业链，战略目标为打造全球领先的数智化旅游零售运营商。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F28",
+          "text": "中国免税及旅游零售市场集中度高，呈现“一超多强”格局，公司凭借全渠道布局、供应链优势、会员价值等占据领先地位。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ],
+      "limitations": []
+    }
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "a9164a0ec65746d44197f1df3349b1a705b1ec5374cbe9b2b7f8f29425013310",
+      "response_hash": "254af3050c09f23bbe5cad48a0717ab04b7512d0ed94cf187d1ff51bc37e8849",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0037\",\"section-0047\",\"section-0062\",\"section-0063\",\"section-0064\",\"section-0067\",\"section-0068\",\"section-0069\",\"section-0099\",\"section-0110\"],\"rationale\":\"选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。\",\"deferred\":[\"section-0038 行业情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0055 核心竞争力：偏泛化竞争优势，经营实质已由经营讨论覆盖\",\"section-0331 财务报告及附注：仅在收入构成有缺口时定向补充，当前主营业务分行业/产品/地区已覆盖\",\"section-0078 主要客户及供应商：供应链与客户为可选范围，非核心收入结构解释，暂不展开\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成与主要业务权重、经营变化与展望等核心问题；行业背景与财务附注属次要或定向补充范围，可在不扩读全报告的前提下停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0037",
+          "section-0047",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0099",
+          "section-0110"
+        ],
+        "rationale": "选择公司业务概述（section-0037）说明主营免税及旅游零售业务与经营模式；经营情况讨论与分析（section-0047）及其子节覆盖海南离岛免税、渠道、线上、产品创新等经营实质；主要经营情况（section-0062）与主营业务分析（section-0063）、利润表及现金流量表变动分析（section-0064）提供收入、成本、利润的期间变化；主营业务分行业/分产品/分地区（section-0067、0068、0069）给出收入构成与主要业务权重，满足收入来源与结构分析；section-0099补充海口国际免税城重大非股权投资这一特色经营资源；section-0110未来讨论含消费趋势、行业格局与经营计划，用于经营因素与展望。未选纯行业背景（section-0038系列）与核心竞争力（section-0055）以避免泛化，也未展开财务报告附注。",
+        "deferred": [
+          "section-0038 行业情况：属行业背景，非公司层面经营解释，暂不选",
+          "section-0055 核心竞争力：偏泛化竞争优势，经营实质已由经营讨论覆盖",
+          "section-0331 财务报告及附注：仅在收入构成有缺口时定向补充，当前主营业务分行业/产品/地区已覆盖",
+          "section-0078 主要客户及供应商：供应链与客户为可选范围，非核心收入结构解释，暂不展开"
+        ],
+        "stop_reason": "已覆盖业务结构、产品服务、收入构成与主要业务权重、经营变化与展望等核心问题；行业背景与财务附注属次要或定向补充范围，可在不扩读全报告的前提下停止。"
+      },
+      "usage": {
+        "input_tokens": 23041,
+        "output_tokens": 414,
+        "total_tokens": 23455
+      }
+    },
+    {
+      "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "bacd40b11826d7cf774fd9effb98c1a5f68d71a83fa3659774de1c469f8e4af2",
+      "response_hash": "2aec79de15b51d827f404acb088cdc149bb15de0942b413dd6a6fc272b40355d",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司主要从事以免税为主的旅游零售业务，经营品类包括烟酒、香化、腕表珠宝、服饰箱包、电子产品、食品等；此外还从事以免税业务为核心的商业综合体投资开发业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"经营模式为线下聚焦机场、口岸、市内等租赁或自建物业，依托特许经营资质与全球供应链开展以免税商品销售为主的旅游零售，服务出入境、海南离岛等旅客；线上通过自营电商平台及第三方平台销售完税商品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"按产品划分，免税商品销售与有税商品销售构成主营业务的两大产品类别。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"免税商品销售收入\",\"raw_value\":\"39,164,825,169.54\",\"value\":\"39164825169.54\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"有税商品销售收入\",\"raw_value\":\"13,387,871,914.37\",\"value\":\"13387871914.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F04\",\"text\":\"公司大力发展首发经济，全年引进首发新品超140款，落地27家品牌首店，引入迪士尼等30余个热门IP；并加大3C数码、户外运动、黄金、文创等高潜品类引进力度，全年引入超400个新品牌。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"全年引进首发新品数量\",\"raw_value\":\"超140\",\"value\":\"140\",\"unit\":\"款\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"落地品牌首店数量\",\"raw_value\":\"27\",\"value\":\"27\",\"unit\":\"家\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"全年引入新品牌数量\",\"raw_value\":\"超400\",\"value\":\"400\",\"unit\":\"个\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]}],\"limitations\":[\"未获取各具体商品品类（烟酒、香化等）的分项收入金额。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"2025年公司实现营业收入536.94亿元，同比下降4.92%；实现归属于上市公司股东的净利润35.86亿元，同比下降15.96%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"536.94\",\"value\":\"536.94\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"-4.92\",\"value\":\"-4.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"35.86\",\"value\":\"35.86\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"归属于上市公司股东的净利润同比增减\",\"raw_value\":\"-15.96\",\"value\":\"-15.96\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F06\",\"text\":\"利润表科目显示，本期营业收入53,693,579,201.52元，营业成本36,108,717,474.33元，销售费用8,683,829,728.14元，管理费用2,204,251,712.50元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"53,693,579,201.52\",\"value\":\"53693579201.52\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业成本\",\"raw_value\":\"36,108,717,474.33\",\"value\":\"36108717474.33\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"销售费用\",\"raw_value\":\"8,683,829,728.14\",\"value\":\"8683829728.14\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"管理费用\",\"raw_value\":\"2,204,251,712.50\",\"value\":\"2204251712.50\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F07\",\"text\":\"按行业划分，商品销售业营业收入52,552,697,083.91元，营业成本35,779,710,755.06元，毛利率31.92%，营业收入同比下降5.75%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"商品销售业营业收入\",\"raw_value\":\"52,552,697,083.91\",\"value\":\"52552697083.91\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"商品销售业毛利率\",\"raw_value\":\"31.92\",\"value\":\"31.92\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F08\",\"text\":\"按产品划分，免税商品销售收入39,164,825,169.54元，毛利率36.97%，收入同比增长1.29%；有税商品销售收入13,387,871,914.37元，毛利率17.13%，收入同比下降21.69%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"免税商品销售毛利率\",\"raw_value\":\"36.97\",\"value\":\"36.97\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"免税商品销售收入同比增减\",\"raw_value\":\"1.29\",\"value\":\"1.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"有税商品销售毛利率\",\"raw_value\":\"17.13\",\"value\":\"17.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"有税商品销售收入同比增减\",\"raw_value\":\"-21.69\",\"value\":\"-21.69\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F09\",\"text\":\"按地区划分，海南地区营业收入28,537,114,003.71元，毛利率22.91%，收入同比下降1.23%；上海地区营业收入12,009,924,717.77元，毛利率26.58%，收入同比下降25.10%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"海南地区营业收入\",\"raw_value\":\"28,537,114,003.71\",\"value\":\"28537114003.71\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"海南地区毛利率\",\"raw_value\":\"22.91\",\"value\":\"22.91\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"上海地区营业收入\",\"raw_value\":\"12,009,924,717.77\",\"value\":\"12009924717.77\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"上海地区毛利率\",\"raw_value\":\"26.58\",\"value\":\"26.58\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}],\"limitations\":[\"分地区表仅列示海南、上海两地，其他地区收入未在所选章节披露。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F10\",\"text\":\"公司深化产品运营，建立分级采购授权体系，打造中免大采购格局；搭建精细化订分货体系，改善畅销品供给并缓解长尾品滞销，推动存货周转率持续提升；同时优化供应链履约流程，整合仓储物流资源。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F11\",\"text\":\"海口国际免税城项目规划投入128.6亿元，报告期内投入资金4.13亿元，自建设以来累计投入85.11亿元，资金来源为公司自筹资金及国拨资金；截至报告期末累计产生收益24.97亿元，地块五海口国际免税城已于2022年10月28日开业运营。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"海口国际免税城项目报告期投入资金\",\"raw_value\":\"4.13\",\"value\":\"4.13\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"海口国际免税城项目累计投入资金\",\"raw_value\":\"85.11\",\"value\":\"85.11\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"截至2025年末\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"海口国际免税城项目累计产生收益\",\"raw_value\":\"24.97\",\"value\":\"24.97\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"截至2025年末\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"}]},{\"fact_id\":\"F12\",\"text\":\"三亚国际免税城一期2号地项目报告期内投入资金4.67亿元，自建设以来累计投入23.13亿元，资金来源为公司自筹资金；截至报告期末累计产生收益5.90亿元，商业部分三亚国际免税城C区已于2023年12月28日开业运营。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"三亚国际免税城一期2号地项目报告期投入资金\",\"raw_value\":\"4.67\",\"value\":\"4.67\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"三亚国际免税城一期2号地项目累计投入资金\",\"raw_value\":\"23.13\",\"value\":\"23.13\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"截至2025年末\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"三亚国际免税城一期2号地项目累计产生收益\",\"raw_value\":\"5.90\",\"value\":\"5.90\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"截至2025年末\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"}]}],\"limitations\":[\"未获取具体采购金额、供应商名称及主要原材料构成。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"线下渠道聚焦机场、口岸、市内等租赁或自建物业，服务出入境、海南离岛等旅客；线上通过自营电商平台及第三方平台向消费者销售完税商品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F14\",\"text\":\"公司系统推进免税经营权投标，成功中标上海浦东国际机场T2航站楼及S2卫星厅、上海虹桥国际机场、北京首都国际机场T3航站楼、广州白云机场T3航站楼出境店等16个免税店经营权项目；13家取得经营权的市内免税店均已实现开业或运营。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"中标免税店经营权项目数量\",\"raw_value\":\"16\",\"value\":\"16\",\"unit\":\"个\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"已开业或运营的市内免税店数量\",\"raw_value\":\"13\",\"value\":\"13\",\"unit\":\"家\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"公司持续深耕港澳市场，新设3家门店，首次进入越南市场，斩获越南河内、富国机场10年供货协议；2026年1月公告与DFS达成协议，全资子公司将收购DFS大中华区零售业务，并与LVMH签订战略合作备忘录。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"港澳市场新设门店数量\",\"raw_value\":\"3\",\"value\":\"3\",\"unit\":\"家\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F16\",\"text\":\"公司深化近5,300万会员分层分级运营，连续2年发布会员白皮书，提升客户粘性。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"会员数量\",\"raw_value\":\"近5,300万\",\"value\":\"5300\",\"unit\":\"万\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]}],\"limitations\":[\"未获取具体客户名称、客户集中度及分渠道收入金额。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F17\",\"text\":\"公司紧抓海南全岛封关运作机遇，深化“免税+文旅”融合，引入新品、首店，合作泡泡玛特、迪士尼等10余个流量IP，叠加政府消费券协同发力，推动海南区域销售额企稳回升，离岛免税市场份额实现增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"合作流量IP数量\",\"raw_value\":\"10余个\",\"value\":\"10\",\"unit\":\"个\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F18\",\"text\":\"公司推动海南与前海线上平台整合，通过团队重构、流程梳理、资源聚合、规则统一促进平台间运营策略及效率连通，两大平台整合初见成效。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F19\",\"text\":\"研发费用本期89,978,391.76元，同比增长352.74%，主要系报告期内加快数字化建设、各项软件系统研发投入增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"研发费用\",\"raw_value\":\"89,978,391.76\",\"value\":\"89978391.76\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"研发费用同比增减\",\"raw_value\":\"352.74\",\"value\":\"352.74\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F20\",\"text\":\"公司探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式；并探索自有品牌业务，以中免健康为切入点，推出新品近100款。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"中免健康推出新品数量\",\"raw_value\":\"近100\",\"value\":\"100\",\"unit\":\"款\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"2026年1月，公司发布公告，与DFS达成协议，公司全资子公司将收购DFS大中华区零售业务，公司与LVMH签订战略合作备忘录，有利于快速建立在港澳市场的优势并实现国际化能力跃升。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年1月\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F22\",\"text\":\"公司首次进入越南市场，斩获越南河内、富国机场10年供货协议；并成功签署多个头部国潮品牌海外代理权，在港澳、东南亚、日本等区域实现业务突破。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F23\",\"text\":\"公司成功打造三亚国际免税城成为全国首个以免税商业为核心载体的国家级AAAA旅游景区，并通过ISO三项管理体系认证。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"DFS大中华区零售业务收购的具体交易金额及完成时间未在所选章节披露。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"公司以免税商品销售为主的旅游零售业务为核心，依托特许经营资质与全球供应链优势开展经营，并延伸以免税业务为核心的商业综合体投资开发。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F25\",\"text\":\"公司建立分级采购授权体系，打造中免大采购格局，并推进集中采购以提高产品采购议价能力；同时推进采购渠道多元化，强化与品牌方的战略协同。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0014\"]}],\"limitations\":[\"未获取具体供应商名称及采购金额。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"公司线下门店服务出入境、海南离岛等旅客，线上平台面向消费者销售完税商品；市内免税店积极引入各地特色国产优质商品并开展“离境退税商店”资质申请及“即买即退”模式落地，提升外籍旅客购物体验。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}],\"limitations\":[\"未获取具体客户名称及客户集中度。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"公司以免税业务为核心提升价值链，以旅游零售为延伸升级产业链，战略目标为打造全球领先的数智化旅游零售运营商。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F28\",\"text\":\"中国免税及旅游零售市场集中度高，呈现“一超多强”格局，公司凭借全渠道布局、供应链优势、会员价值等占据领先地位。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}],\"limitations\":[]},\"limitations\":[\"未获取各具体商品品类的分项收入金额。\",\"分地区表仅列示海南、上海两地，其他地区收入未在所选章节披露。\",\"未获取具体采购金额、供应商名称及主要原材料构成。\",\"未获取具体客户名称、客户集中度及分渠道收入金额。\",\"DFS大中华区零售业务收购的具体交易金额及完成时间未在所选章节披露。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F01",
+                "text": "公司主要从事以免税为主的旅游零售业务，经营品类包括烟酒、香化、腕表珠宝、服饰箱包、电子产品、食品等；此外还从事以免税业务为核心的商业综合体投资开发业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F02",
+                "text": "经营模式为线下聚焦机场、口岸、市内等租赁或自建物业，依托特许经营资质与全球供应链开展以免税商品销售为主的旅游零售，服务出入境、海南离岛等旅客；线上通过自营电商平台及第三方平台销售完税商品。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F03",
+                "text": "按产品划分，免税商品销售与有税商品销售构成主营业务的两大产品类别。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "免税商品销售收入",
+                    "raw_value": "39,164,825,169.54",
+                    "value": "39164825169.54",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "有税商品销售收入",
+                    "raw_value": "13,387,871,914.37",
+                    "value": "13387871914.37",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F04",
+                "text": "公司大力发展首发经济，全年引进首发新品超140款，落地27家品牌首店，引入迪士尼等30余个热门IP；并加大3C数码、户外运动、黄金、文创等高潜品类引进力度，全年引入超400个新品牌。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "全年引进首发新品数量",
+                    "raw_value": "超140",
+                    "value": "140",
+                    "unit": "款",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "greater_than"
+                  },
+                  {
+                    "name": "落地品牌首店数量",
+                    "raw_value": "27",
+                    "value": "27",
+                    "unit": "家",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "全年引入新品牌数量",
+                    "raw_value": "超400",
+                    "value": "400",
+                    "unit": "个",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "greater_than"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各具体商品品类（烟酒、香化等）的分项收入金额。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F05",
+                "text": "2025年公司实现营业收入536.94亿元，同比下降4.92%；实现归属于上市公司股东的净利润35.86亿元，同比下降15.96%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "536.94",
+                    "value": "536.94",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "营业收入同比增减",
+                    "raw_value": "-4.92",
+                    "value": "-4.92",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润",
+                    "raw_value": "35.86",
+                    "value": "35.86",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润同比增减",
+                    "raw_value": "-15.96",
+                    "value": "-15.96",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F06",
+                "text": "利润表科目显示，本期营业收入53,693,579,201.52元，营业成本36,108,717,474.33元，销售费用8,683,829,728.14元，管理费用2,204,251,712.50元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "53,693,579,201.52",
+                    "value": "53693579201.52",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "36,108,717,474.33",
+                    "value": "36108717474.33",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "销售费用",
+                    "raw_value": "8,683,829,728.14",
+                    "value": "8683829728.14",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "管理费用",
+                    "raw_value": "2,204,251,712.50",
+                    "value": "2204251712.50",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  }
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F07",
+                "text": "按行业划分，商品销售业营业收入52,552,697,083.91元，营业成本35,779,710,755.06元，毛利率31.92%，营业收入同比下降5.75%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "商品销售业营业收入",
+                    "raw_value": "52,552,697,083.91",
+                    "value": "52552697083.91",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "商品销售业毛利率",
+                    "raw_value": "31.92",
+                    "value": "31.92",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F08",
+                "text": "按产品划分，免税商品销售收入39,164,825,169.54元，毛利率36.97%，收入同比增长1.29%；有税商品销售收入13,387,871,914.37元，毛利率17.13%，收入同比下降21.69%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "免税商品销售毛利率",
+                    "raw_value": "36.97",
+                    "value": "36.97",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "免税商品销售收入同比增减",
+                    "raw_value": "1.29",
+                    "value": "1.29",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "有税商品销售毛利率",
+                    "raw_value": "17.13",
+                    "value": "17.13",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "有税商品销售收入同比增减",
+                    "raw_value": "-21.69",
+                    "value": "-21.69",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F09",
+                "text": "按地区划分，海南地区营业收入28,537,114,003.71元，毛利率22.91%，收入同比下降1.23%；上海地区营业收入12,009,924,717.77元，毛利率26.58%，收入同比下降25.10%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "海南地区营业收入",
+                    "raw_value": "28,537,114,003.71",
+                    "value": "28537114003.71",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "海南地区毛利率",
+                    "raw_value": "22.91",
+                    "value": "22.91",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "上海地区营业收入",
+                    "raw_value": "12,009,924,717.77",
+                    "value": "12009924717.77",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "上海地区毛利率",
+                    "raw_value": "26.58",
+                    "value": "26.58",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分地区表仅列示海南、上海两地，其他地区收入未在所选章节披露。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F10",
+                "text": "公司深化产品运营，建立分级采购授权体系，打造中免大采购格局；搭建精细化订分货体系，改善畅销品供给并缓解长尾品滞销，推动存货周转率持续提升；同时优化供应链履约流程，整合仓储物流资源。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F11",
+                "text": "海口国际免税城项目规划投入128.6亿元，报告期内投入资金4.13亿元，自建设以来累计投入85.11亿元，资金来源为公司自筹资金及国拨资金；截至报告期末累计产生收益24.97亿元，地块五海口国际免税城已于2022年10月28日开业运营。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "海口国际免税城项目报告期投入资金",
+                    "raw_value": "4.13",
+                    "value": "4.13",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "海口国际免税城项目累计投入资金",
+                    "raw_value": "85.11",
+                    "value": "85.11",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "named_subsidiary",
+                    "period": "截至2025年末",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "海口国际免税城项目累计产生收益",
+                    "raw_value": "24.97",
+                    "value": "24.97",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "named_subsidiary",
+                    "period": "截至2025年末",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F12",
+                "text": "三亚国际免税城一期2号地项目报告期内投入资金4.67亿元，自建设以来累计投入23.13亿元，资金来源为公司自筹资金；截至报告期末累计产生收益5.90亿元，商业部分三亚国际免税城C区已于2023年12月28日开业运营。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "三亚国际免税城一期2号地项目报告期投入资金",
+                    "raw_value": "4.67",
+                    "value": "4.67",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "三亚国际免税城一期2号地项目累计投入资金",
+                    "raw_value": "23.13",
+                    "value": "23.13",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "named_subsidiary",
+                    "period": "截至2025年末",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "三亚国际免税城一期2号地项目累计产生收益",
+                    "raw_value": "5.90",
+                    "value": "5.90",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "named_subsidiary",
+                    "period": "截至2025年末",
+                    "qualifier": "exact",
+                    "source_unit": "亿元"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体采购金额、供应商名称及主要原材料构成。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F13",
+                "text": "线下渠道聚焦机场、口岸、市内等租赁或自建物业，服务出入境、海南离岛等旅客；线上通过自营电商平台及第三方平台向消费者销售完税商品。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F14",
+                "text": "公司系统推进免税经营权投标，成功中标上海浦东国际机场T2航站楼及S2卫星厅、上海虹桥国际机场、北京首都国际机场T3航站楼、广州白云机场T3航站楼出境店等16个免税店经营权项目；13家取得经营权的市内免税店均已实现开业或运营。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "中标免税店经营权项目数量",
+                    "raw_value": "16",
+                    "value": "16",
+                    "unit": "个",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "已开业或运营的市内免税店数量",
+                    "raw_value": "13",
+                    "value": "13",
+                    "unit": "家",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F15",
+                "text": "公司持续深耕港澳市场，新设3家门店，首次进入越南市场，斩获越南河内、富国机场10年供货协议；2026年1月公告与DFS达成协议，全资子公司将收购DFS大中华区零售业务，并与LVMH签订战略合作备忘录。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "港澳市场新设门店数量",
+                    "raw_value": "3",
+                    "value": "3",
+                    "unit": "家",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F16",
+                "text": "公司深化近5,300万会员分层分级运营，连续2年发布会员白皮书，提升客户粘性。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "会员数量",
+                    "raw_value": "近5,300万",
+                    "value": "5300",
+                    "unit": "万",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "approximate"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体客户名称、客户集中度及分渠道收入金额。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F17",
+                "text": "公司紧抓海南全岛封关运作机遇，深化“免税+文旅”融合，引入新品、首店，合作泡泡玛特、迪士尼等10余个流量IP，叠加政府消费券协同发力，推动海南区域销售额企稳回升，离岛免税市场份额实现增长。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "合作流量IP数量",
+                    "raw_value": "10余个",
+                    "value": "10",
+                    "unit": "个",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "greater_than"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F18",
+                "text": "公司推动海南与前海线上平台整合，通过团队重构、流程梳理、资源聚合、规则统一促进平台间运营策略及效率连通，两大平台整合初见成效。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F19",
+                "text": "研发费用本期89,978,391.76元，同比增长352.74%，主要系报告期内加快数字化建设、各项软件系统研发投入增加所致。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发费用",
+                    "raw_value": "89,978,391.76",
+                    "value": "89978391.76",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "研发费用同比增减",
+                    "raw_value": "352.74",
+                    "value": "352.74",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F20",
+                "text": "公司探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式；并探索自有品牌业务，以中免健康为切入点，推出新品近100款。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "中免健康推出新品数量",
+                    "raw_value": "近100",
+                    "value": "100",
+                    "unit": "款",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "approximate"
+                  }
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F21",
+                "text": "2026年1月，公司发布公告，与DFS达成协议，公司全资子公司将收购DFS大中华区零售业务，公司与LVMH签订战略合作备忘录，有利于快速建立在港澳市场的优势并实现国际化能力跃升。",
+                "subject_scope": "consolidated_group",
+                "period": "2026年1月",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F22",
+                "text": "公司首次进入越南市场，斩获越南河内、富国机场10年供货协议；并成功签署多个头部国潮品牌海外代理权，在港澳、东南亚、日本等区域实现业务突破。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F23",
+                "text": "公司成功打造三亚国际免税城成为全国首个以免税商业为核心载体的国家级AAAA旅游景区，并通过ISO三项管理体系认证。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "DFS大中华区零售业务收购的具体交易金额及完成时间未在所选章节披露。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F24",
+                "text": "公司以免税商品销售为主的旅游零售业务为核心，依托特许经营资质与全球供应链优势开展经营，并延伸以免税业务为核心的商业综合体投资开发。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F25",
+                "text": "公司建立分级采购授权体系，打造中免大采购格局，并推进集中采购以提高产品采购议价能力；同时推进采购渠道多元化，强化与品牌方的战略协同。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0014"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体供应商名称及采购金额。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F26",
+                "text": "公司线下门店服务出入境、海南离岛等旅客，线上平台面向消费者销售完税商品；市内免税店积极引入各地特色国产优质商品并开展“离境退税商店”资质申请及“即买即退”模式落地，提升外籍旅客购物体验。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体客户名称及客户集中度。"
+            ]
+          }
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F27",
+              "text": "公司以免税业务为核心提升价值链，以旅游零售为延伸升级产业链，战略目标为打造全球领先的数智化旅游零售运营商。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "中国免税及旅游零售市场集中度高，呈现“一超多强”格局，公司凭借全渠道布局、供应链优势、会员价值等占据领先地位。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "limitations": [
+          "未获取各具体商品品类的分项收入金额。",
+          "分地区表仅列示海南、上海两地，其他地区收入未在所选章节披露。",
+          "未获取具体采购金额、供应商名称及主要原材料构成。",
+          "未获取具体客户名称、客户集中度及分渠道收入金额。",
+          "DFS大中华区零售业务收购的具体交易金额及完成时间未在所选章节披露。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 12066,
+        "output_tokens": 4819,
+        "total_tokens": 16885
+      }
+    },
+    {
+      "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "648ffe1298a8c3e930e74791e86e66bc2bb5d0c59b30147c45846b3b65629758",
+      "response_hash": "7125e431d4de64bf9ce5850dc7b80c32fae30dfc57386e0eb7292c7e3328f5ea",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F04\",\"F05\",\"F06\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F26\",\"F27\",\"F28\"],\"findings\":[{\"finding_id\":\"RF-01\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0007\",\"source-0004\"],\"explanation\":\"主营业务分产品构成未进入定稿，且局限项称免税商品销售收入数字不在来源中（F03、F08被隔离），与原文矛盾。source-0007列明：免税商品销售营业收入39,164,825,169.54元、营业成本24,685,574,028.95元、毛利率36.97%、营业收入同比增加1.29%、营业成本同比增加5.53%、毛利率减少2.53个百分点；有税商品销售营业收入13,387,871,914.37元、营业成本11,094,136,726.11元、毛利率17.13%、营业收入同比下降21.69%、营业成本同比下降25.02%、毛利率增加3.68个百分点。公司营业收入536.94亿元不能代替该构成，两类不得互相替代，也不得与线上完税商品叙述等同。恢复时主体应为business_segment，指标名保留来源类别；毛利率变动是百分点，不是相对增长率。烟酒、香化等子类收入来源未列，不要求补造。\"},{\"finding_id\":\"RF-02\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\",\"source-0005\"],\"explanation\":\"主营业务分行业的商品销售业与公司利润表营业收入、分产品行口径不同，不能用公司总额或分产品加总代替。source-0006列明商品销售业营业收入52,552,697,083.91元、营业成本35,779,710,755.06元、毛利率31.92%、营业收入同比下降5.75%、营业成本同比下降6.31%、毛利率增加0.41个百分点。局限项称该营业收入不在来源中（F07）与原文矛盾。F06的利润表营业成本36,108,717,474.33元也不是该行营业成本。应单独恢复，主体标business_segment，毛利率变动按个百分点。所选片段未见其他业务或抵销行，不得编造调节项。\"},{\"finding_id\":\"RF-03\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0008\"],\"explanation\":\"局限项称海南地区营业收入数字不在引用来源中（F09已隔离），但source-0008已列海南地区营业收入28,537,114,003.71元、营业成本21,998,054,389.27元、毛利率22.91%、收入同比下降1.23%、成本同比下降0.17%、毛利率减少0.82个百分点，以及上海地区营业收入12,009,924,717.77元、营业成本8,817,457,100.02元、毛利率26.58%、收入同比下降25.10%、成本同比下降25.89%、毛利率增加0.78个百分点。应更正来源无此数的说法。分地区明细属于可选补充，不要求据此补全全部地区或升格为重大遗漏；若保留，主体为business_segment，毛利率变动按个百分点。\"},{\"finding_id\":\"RF-04\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F11\",\"evidence_ids\":[\"source-0010\"],\"explanation\":\"F11的项目金额与开业日期有来源支持：报告期投入4.13亿元、累计投入85.11亿元、累计收益24.97亿元，地块五于2022年10月28日开业。但指标subject_scope标为named_subsidiary不成立。可见原文只写海口国际免税城项目，并提及全资子公司对外投资公告，未给出可核验的子公司名称。应保留项目金额，将主体改为unclear，不得改标为consolidated_group或编造主体名称。\"},{\"finding_id\":\"RF-05\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F15\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"港澳新设3家门店、首次进入越南并取得河内及富国机场10年供货协议，可按报告期叙述保留。同条却把2026年1月与DFS达成协议、全资子公司将收购DFS大中华区零售业务、与LVMH签订战略合作备忘录放入period为2025年度的事实。原文时点是2026年1月，且为将收购而非已完成。应从2025年度事实中剔除或单独限定为期后事项；F21已按2026年1月记载，避免当作2025年已完成交易。\"},{\"finding_id\":\"RF-06\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F20\",\"evidence_ids\":[\"source-0003\"],\"explanation\":\"兰州机场有税商业采用低保底加阶梯分成，以及探索自有品牌的叙述与来源相符。但指标名中免健康推出新品数量，把近100款 exclusive 归为中免健康单品牌。原文是探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类并推出新品近100款。应保留近似值近100款，指标名称改回自有品牌及相关品类新品，正文亦勿缩成中免健康单独推出。\"},{\"finding_id\":\"RF-07\",\"element\":\"upstream_inputs\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F25\",\"evidence_ids\":[\"source-0003\",\"source-0014\"],\"explanation\":\"建立分级采购授权体系、打造中免大采购格局见于报告期经营讨论，可保留为2025年事实。推进集中采购以提高议价能力，以及推进采购渠道多元化、强化与品牌方战略协同，出自风险应对中的公司将计划表述，不是已完成的本期实绩。应保留已发生的采购授权事实，将后两项限定为计划或风险应对，不得作为2025年已实现经营结果。\"}]}",
+      "response_payload": {
+        "reviewed_fact_ids": [
+          "F01",
+          "F02",
+          "F04",
+          "F05",
+          "F06",
+          "F10",
+          "F11",
+          "F12",
+          "F13",
+          "F14",
+          "F15",
+          "F16",
+          "F18",
+          "F19",
+          "F20",
+          "F21",
+          "F22",
+          "F23",
+          "F24",
+          "F25",
+          "F26",
+          "F27",
+          "F28"
+        ],
+        "findings": [
+          {
+            "finding_id": "RF-01",
+            "element": "scale_and_mix",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0007",
+              "source-0004"
+            ],
+            "explanation": "主营业务分产品构成未进入定稿，且局限项称免税商品销售收入数字不在来源中（F03、F08被隔离），与原文矛盾。source-0007列明：免税商品销售营业收入39,164,825,169.54元、营业成本24,685,574,028.95元、毛利率36.97%、营业收入同比增加1.29%、营业成本同比增加5.53%、毛利率减少2.53个百分点；有税商品销售营业收入13,387,871,914.37元、营业成本11,094,136,726.11元、毛利率17.13%、营业收入同比下降21.69%、营业成本同比下降25.02%、毛利率增加3.68个百分点。公司营业收入536.94亿元不能代替该构成，两类不得互相替代，也不得与线上完税商品叙述等同。恢复时主体应为business_segment，指标名保留来源类别；毛利率变动是百分点，不是相对增长率。烟酒、香化等子类收入来源未列，不要求补造。"
+          },
+          {
+            "finding_id": "RF-02",
+            "element": "scale_and_mix",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0006",
+              "source-0005"
+            ],
+            "explanation": "主营业务分行业的商品销售业与公司利润表营业收入、分产品行口径不同，不能用公司总额或分产品加总代替。source-0006列明商品销售业营业收入52,552,697,083.91元、营业成本35,779,710,755.06元、毛利率31.92%、营业收入同比下降5.75%、营业成本同比下降6.31%、毛利率增加0.41个百分点。局限项称该营业收入不在来源中（F07）与原文矛盾。F06的利润表营业成本36,108,717,474.33元也不是该行营业成本。应单独恢复，主体标business_segment，毛利率变动按个百分点。所选片段未见其他业务或抵销行，不得编造调节项。"
+          },
+          {
+            "finding_id": "RF-03",
+            "element": "limitations",
+            "severity": "minor",
+            "issue_type": "contradicts_source",
+            "action": "correct",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "explanation": "局限项称海南地区营业收入数字不在引用来源中（F09已隔离），但source-0008已列海南地区营业收入28,537,114,003.71元、营业成本21,998,054,389.27元、毛利率22.91%、收入同比下降1.23%、成本同比下降0.17%、毛利率减少0.82个百分点，以及上海地区营业收入12,009,924,717.77元、营业成本8,817,457,100.02元、毛利率26.58%、收入同比下降25.10%、成本同比下降25.89%、毛利率增加0.78个百分点。应更正来源无此数的说法。分地区明细属于可选补充，不要求据此补全全部地区或升格为重大遗漏；若保留，主体为business_segment，毛利率变动按个百分点。"
+          },
+          {
+            "finding_id": "RF-04",
+            "element": "operations_and_inputs",
+            "severity": "minor",
+            "issue_type": "wrong_subject",
+            "action": "correct",
+            "affected_fact_id": "F11",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "explanation": "F11的项目金额与开业日期有来源支持：报告期投入4.13亿元、累计投入85.11亿元、累计收益24.97亿元，地块五于2022年10月28日开业。但指标subject_scope标为named_subsidiary不成立。可见原文只写海口国际免税城项目，并提及全资子公司对外投资公告，未给出可核验的子公司名称。应保留项目金额，将主体改为unclear，不得改标为consolidated_group或编造主体名称。"
+          },
+          {
+            "finding_id": "RF-05",
+            "element": "customers_channels_markets",
+            "severity": "minor",
+            "issue_type": "wrong_period",
+            "action": "correct",
+            "affected_fact_id": "F15",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "explanation": "港澳新设3家门店、首次进入越南并取得河内及富国机场10年供货协议，可按报告期叙述保留。同条却把2026年1月与DFS达成协议、全资子公司将收购DFS大中华区零售业务、与LVMH签订战略合作备忘录放入period为2025年度的事实。原文时点是2026年1月，且为将收购而非已完成。应从2025年度事实中剔除或单独限定为期后事项；F21已按2026年1月记载，避免当作2025年已完成交易。"
+          },
+          {
+            "finding_id": "RF-06",
+            "element": "operating_drivers",
+            "severity": "minor",
+            "issue_type": "wrong_subject",
+            "action": "correct",
+            "affected_fact_id": "F20",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "explanation": "兰州机场有税商业采用低保底加阶梯分成，以及探索自有品牌的叙述与来源相符。但指标名中免健康推出新品数量，把近100款 exclusive 归为中免健康单品牌。原文是探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类并推出新品近100款。应保留近似值近100款，指标名称改回自有品牌及相关品类新品，正文亦勿缩成中免健康单独推出。"
+          },
+          {
+            "finding_id": "RF-07",
+            "element": "upstream_inputs",
+            "severity": "minor",
+            "issue_type": "unsupported_claim",
+            "action": "correct",
+            "affected_fact_id": "F25",
+            "evidence_ids": [
+              "source-0003",
+              "source-0014"
+            ],
+            "explanation": "建立分级采购授权体系、打造中免大采购格局见于报告期经营讨论，可保留为2025年事实。推进集中采购以提高议价能力，以及推进采购渠道多元化、强化与品牌方战略协同，出自风险应对中的公司将计划表述，不是已完成的本期实绩。应保留已发生的采购授权事实，将后两项限定为计划或风险应对，不得作为2025年已实现经营结果。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 14895,
+        "output_tokens": 1570,
+        "total_tokens": 41411
+      }
+    },
+    {
+      "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "58d6f62dd3a2f432581c6e605cda24f22468258009bce86efc9088d90ef20e2b",
+      "response_hash": "5e8a8bbf0264c88ceecfc60f4761c40797abdab18e3d74570e155359ca065798",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:RF-01\",\"text\":\"主营业务分产品情况：免税商品销售营业收入39,164,825,169.54元，营业成本24,685,574,028.95元，毛利率36.97%，营业收入比上年增加1.29%，营业成本比上年增加5.53%，毛利率比上年减少2.53个百分点；有税商品销售营业收入13,387,871,914.37元，营业成本11,094,136,726.11元，毛利率17.13%，营业收入比上年下降21.69%，营业成本比上年下降25.02%，毛利率比上年增加3.68个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"免税商品销售营业收入\",\"raw_value\":\"39,164,825,169.54\",\"value\":\"39164825169.54\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"免税商品销售营业成本\",\"raw_value\":\"24,685,574,028.95\",\"value\":\"24685574028.95\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"免税商品销售毛利率\",\"raw_value\":\"36.97\",\"value\":\"36.97\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"免税商品销售营业收入比上年增减\",\"raw_value\":\"1.29\",\"value\":\"1.29\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"免税商品销售营业成本比上年增减\",\"raw_value\":\"5.53\",\"value\":\"5.53\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"免税商品销售毛利率比上年增减\",\"raw_value\":\"减少2.53个百分点\",\"value\":\"-2.53\",\"unit\":\"百分点\",\"source_unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"有税商品销售营业收入\",\"raw_value\":\"13,387,871,914.37\",\"value\":\"13387871914.37\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"有税商品销售营业成本\",\"raw_value\":\"11,094,136,726.11\",\"value\":\"11094136726.11\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"有税商品销售毛利率\",\"raw_value\":\"17.13\",\"value\":\"17.13\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"有税商品销售营业收入比上年增减\",\"raw_value\":\"-21.69\",\"value\":\"-21.69\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"有税商品销售营业成本比上年增减\",\"raw_value\":\"-25.02\",\"value\":\"-25.02\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"有税商品销售毛利率比上年增减\",\"raw_value\":\"增加3.68个百分点\",\"value\":\"3.68\",\"unit\":\"百分点\",\"source_unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:RF-02\",\"text\":\"主营业务分行业情况：商品销售业营业收入52,552,697,083.91元，营业成本35,779,710,755.06元，毛利率31.92%，营业收入比上年下降5.75%，营业成本比上年下降6.31%，毛利率比上年增加0.41个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"商品销售业营业收入\",\"raw_value\":\"52,552,697,083.91\",\"value\":\"52552697083.91\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"商品销售业营业成本\",\"raw_value\":\"35,779,710,755.06\",\"value\":\"35779710755.06\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"商品销售业毛利率\",\"raw_value\":\"31.92\",\"value\":\"31.92\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"商品销售业营业收入比上年增减\",\"raw_value\":\"-5.75\",\"value\":\"-5.75\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"商品销售业营业成本比上年增减\",\"raw_value\":\"-6.31\",\"value\":\"-6.31\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"商品销售业毛利率比上年增减\",\"raw_value\":\"增加0.41个百分点\",\"value\":\"0.41\",\"unit\":\"百分点\",\"source_unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F11\",\"text\":\"海口国际免税城项目规划投入128.6亿元，报告期内投入资金4.13亿元，自建设以来累计投入85.11亿元，资金来源为公司自筹资金及国拨资金；截至报告期末累计产生收益24.97亿元，地块五海口国际免税城已于2022年10月28日开业运营。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"海口国际免税城项目报告期投入资金\",\"raw_value\":\"4.13\",\"value\":\"4.13\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"海口国际免税城项目累计投入资金\",\"raw_value\":\"85.11\",\"value\":\"85.11\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"unclear\",\"period\":\"截至2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"海口国际免税城项目累计产生收益\",\"raw_value\":\"24.97\",\"value\":\"24.97\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"unclear\",\"period\":\"截至2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"原文仅写海口国际免税城项目并提及全资子公司对外投资公告，未给出可核验的子公司名称，主体范围无法确定。\"},{\"fact_id\":\"F15\",\"text\":\"公司持续深耕港澳市场，新设3家门店，首次进入越南市场，斩获越南河内、富国机场10年供货协议。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"港澳市场新设门店数量\",\"raw_value\":\"3\",\"value\":\"3\",\"unit\":\"家\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F20\",\"text\":\"公司探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式；并探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类产品开发与孵化，推出新品近100款。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"自有品牌及相关品类推出新品数量\",\"raw_value\":\"近100\",\"value\":\"100\",\"unit\":\"款\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F25\",\"text\":\"公司建立分级采购授权体系，打造中免大采购格局；公司计划继续推进集中采购以提高产品采购议价能力，并推进采购渠道多元化、强化与品牌方的战略协同。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0014\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "review-add:RF-01",
+            "text": "主营业务分产品情况：免税商品销售营业收入39,164,825,169.54元，营业成本24,685,574,028.95元，毛利率36.97%，营业收入比上年增加1.29%，营业成本比上年增加5.53%，毛利率比上年减少2.53个百分点；有税商品销售营业收入13,387,871,914.37元，营业成本11,094,136,726.11元，毛利率17.13%，营业收入比上年下降21.69%，营业成本比上年下降25.02%，毛利率比上年增加3.68个百分点。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "免税商品销售营业收入",
+                "raw_value": "39,164,825,169.54",
+                "value": "39164825169.54",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售营业成本",
+                "raw_value": "24,685,574,028.95",
+                "value": "24685574028.95",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售毛利率",
+                "raw_value": "36.97",
+                "value": "36.97",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售营业收入比上年增减",
+                "raw_value": "1.29",
+                "value": "1.29",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售营业成本比上年增减",
+                "raw_value": "5.53",
+                "value": "5.53",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "免税商品销售毛利率比上年增减",
+                "raw_value": "减少2.53个百分点",
+                "value": "-2.53",
+                "unit": "百分点",
+                "source_unit": "百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售营业收入",
+                "raw_value": "13,387,871,914.37",
+                "value": "13387871914.37",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售营业成本",
+                "raw_value": "11,094,136,726.11",
+                "value": "11094136726.11",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售毛利率",
+                "raw_value": "17.13",
+                "value": "17.13",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售营业收入比上年增减",
+                "raw_value": "-21.69",
+                "value": "-21.69",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售营业成本比上年增减",
+                "raw_value": "-25.02",
+                "value": "-25.02",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "有税商品销售毛利率比上年增减",
+                "raw_value": "增加3.68个百分点",
+                "value": "3.68",
+                "unit": "百分点",
+                "source_unit": "百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "review-add:RF-02",
+            "text": "主营业务分行业情况：商品销售业营业收入52,552,697,083.91元，营业成本35,779,710,755.06元，毛利率31.92%，营业收入比上年下降5.75%，营业成本比上年下降6.31%，毛利率比上年增加0.41个百分点。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "商品销售业营业收入",
+                "raw_value": "52,552,697,083.91",
+                "value": "52552697083.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业营业成本",
+                "raw_value": "35,779,710,755.06",
+                "value": "35779710755.06",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业毛利率",
+                "raw_value": "31.92",
+                "value": "31.92",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业营业收入比上年增减",
+                "raw_value": "-5.75",
+                "value": "-5.75",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业营业成本比上年增减",
+                "raw_value": "-6.31",
+                "value": "-6.31",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "商品销售业毛利率比上年增减",
+                "raw_value": "增加0.41个百分点",
+                "value": "0.41",
+                "unit": "百分点",
+                "source_unit": "百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F11",
+            "text": "海口国际免税城项目规划投入128.6亿元，报告期内投入资金4.13亿元，自建设以来累计投入85.11亿元，资金来源为公司自筹资金及国拨资金；截至报告期末累计产生收益24.97亿元，地块五海口国际免税城已于2022年10月28日开业运营。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "海口国际免税城项目报告期投入资金",
+                "raw_value": "4.13",
+                "value": "4.13",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计投入资金",
+                "raw_value": "85.11",
+                "value": "85.11",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海口国际免税城项目累计产生收益",
+                "raw_value": "24.97",
+                "value": "24.97",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "截至2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "原文仅写海口国际免税城项目并提及全资子公司对外投资公告，未给出可核验的子公司名称，主体范围无法确定。"
+          },
+          {
+            "fact_id": "F15",
+            "text": "公司持续深耕港澳市场，新设3家门店，首次进入越南市场，斩获越南河内、富国机场10年供货协议。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "港澳市场新设门店数量",
+                "raw_value": "3",
+                "value": "3",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F20",
+            "text": "公司探索机场商业新模式，兰州机场项目有税商业创新采用“低保底+阶梯分成”的收益模式；并探索自有品牌业务，以中免健康为切入点，拓展香化、文创等品类产品开发与孵化，推出新品近100款。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "自有品牌及相关品类推出新品数量",
+                "raw_value": "近100",
+                "value": "100",
+                "unit": "款",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F25",
+            "text": "公司建立分级采购授权体系，打造中免大采购格局；公司计划继续推进集中采购以提高产品采购议价能力，并推进采购渠道多元化、强化与品牌方的战略协同。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 9712,
+        "output_tokens": 2385,
+        "total_tokens": 12097
+      }
+    },
+    {
+      "request_id": "bp-work-245e7049d39a49cac0cd6996:workpaper:repair-verify",
+      "purpose": "verify_profile_workpaper_repair",
+      "request_hash": "394fc52e43661ca72d4f782a56ce3cfbc192c585fb8f8758670ef2f141bf148a",
+      "response_hash": "d7d012adc749e31e4cac0c0d843fc93f595150e49840471e4585d8657e84dd47",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"checked_fact_ids\":[\"F11\",\"F15\",\"F20\",\"F25\"],\"checks\":[{\"fact_id\":\"F11\",\"accepted\":true,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"候选已将主体改为unclear，并保留无法核验子公司名称的不确定性，未改标为consolidated_group或编造主体。报告期投入4.13亿元、累计投入85.11亿元、累计收益24.97亿元、地块五2022年10月28日开业及128.6亿元项目建设金额均见于source-0010；指标期间分别对应报告期和截至报告期末，解决了原主体错误。\"},{\"fact_id\":\"F15\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"候选已剔除2026年1月与DFS达成协议、将收购DFS大中华区业务及与LVMH签订备忘录等期后且尚未完成事项，仅保留报告期叙述中的港澳新设3家门店、首次进入越南及河内、富国机场10年供货协议。公司在报告整体经营文本中对应consolidated_group，数量和期间正确。\"},{\"fact_id\":\"F20\",\"accepted\":true,\"evidence_ids\":[\"source-0003\"],\"explanation\":\"候选将近100款新品恢复为自有品牌及相关品类，正文明确以中免健康为切入点并拓展香化、文创等品类，未再归为中免健康单品牌；近似值亦予保留。兰州机场有税商业采用低保底加阶梯分成与source-0003一致，主体和期间正确。\"},{\"fact_id\":\"F25\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0014\"],\"explanation\":\"分级采购授权体系及中免大采购格局见于报告期经营讨论，可保留为2025年事实。集中采购、采购渠道多元化和品牌方战略协同均出自风险应对中的“公司将”表述，候选已明确限定为计划，未将其写成2025年已实现经营结果。\"}]}",
+      "response_payload": {
+        "checked_fact_ids": [
+          "F11",
+          "F15",
+          "F20",
+          "F25"
+        ],
+        "checks": [
+          {
+            "fact_id": "F11",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "explanation": "候选已将主体改为unclear，并保留无法核验子公司名称的不确定性，未改标为consolidated_group或编造主体。报告期投入4.13亿元、累计投入85.11亿元、累计收益24.97亿元、地块五2022年10月28日开业及128.6亿元项目建设金额均见于source-0010；指标期间分别对应报告期和截至报告期末，解决了原主体错误。"
+          },
+          {
+            "fact_id": "F15",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "explanation": "候选已剔除2026年1月与DFS达成协议、将收购DFS大中华区业务及与LVMH签订备忘录等期后且尚未完成事项，仅保留报告期叙述中的港澳新设3家门店、首次进入越南及河内、富国机场10年供货协议。公司在报告整体经营文本中对应consolidated_group，数量和期间正确。"
+          },
+          {
+            "fact_id": "F20",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "explanation": "候选将近100款新品恢复为自有品牌及相关品类，正文明确以中免健康为切入点并拓展香化、文创等品类，未再归为中免健康单品牌；近似值亦予保留。兰州机场有税商业采用低保底加阶梯分成与source-0003一致，主体和期间正确。"
+          },
+          {
+            "fact_id": "F25",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0003",
+              "source-0014"
+            ],
+            "explanation": "分级采购授权体系及中免大采购格局见于报告期经营讨论，可保留为2025年事实。集中采购、采购渠道多元化和品牌方战略协同均出自风险应对中的“公司将”表述，候选已明确限定为计划，未将其写成2025年已实现经营结果。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 10620,
+        "output_tokens": 465,
+        "total_tokens": 17350
+      }
+    }
+  ]
+}

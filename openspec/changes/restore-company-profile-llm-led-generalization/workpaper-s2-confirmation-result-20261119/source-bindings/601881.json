@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "instrument_id": "601881.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "asset_023fb3804de2d32787a4debe93105b56",
+    "filing_id": "1225051623",
+    "source": "cninfo",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "content_hash": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/56/56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "title": "中国银河：2025年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-03-31/1225051623.PDF"
+  }
+}

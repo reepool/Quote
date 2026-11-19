@@ -1,0 +1,142 @@
+"""Finalize bounded 6.EA saved results through original writer/read owner, no calls."""
+import asyncio
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import sys
+from unittest.mock import patch
+
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import workpaper_elements,workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=C/'workpaper-s2-confirmation-result-20261119'
+RESEARCH=ROOT/'data/research/company_profile_s2_confirmation_20261119'
+TEMP=Path(__file__).parent
+def read(p):return json.loads(p.read_text())
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def dump(p,x):
+ p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(x,ensure_ascii=False,indent=2,default=str)+'\n')
+
+async def verify_api(reader,saved):
+ import httpx
+ from fastapi import FastAPI
+ from api.company_profile_routes import annual_profile_reader,router
+ app=FastAPI();app.include_router(router,prefix='/api/v1');app.dependency_overrides[annual_profile_reader]=lambda:reader
+ statuses={};by_id={p['instrument_id']:p for p in saved['profiles']}
+ with patch('socket.create_connection',side_effect=AssertionError('external connections forbidden')):
+  async with asyncio.timeout(180):
+   async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://local') as client:
+    catalog=await client.get('/api/v1/research/company/annual-profiles')
+    assert catalog.status_code==200 and catalog.json()==saved['catalog']
+    for code in saved['requested_instrument_ids']:
+     result=await client.get(f'/api/v1/research/company/{code}/annual-profile')
+     assert result.status_code==(200 if code in by_id else 404)
+     if code in by_id:assert result.json()==by_id[code]
+     statuses[code]=result.status_code
+ return dict(catalog_http_status=200,detail_statuses=statuses,equal_read_owner=True,external_connections_forbidden=True,new_model_requests=0)
+
+def main():
+ group=read(DEST/'group-execution.json');manifest=read(DEST/'source-manifest.json')['companies']
+ audit_path=DEST/'audit-decisions.json';audit=read(audit_path)
+ assert group['executed']==15 and len(group['not_started'])==5 and group['source_code_unchanged']
+ assert len(manifest)==20
+ writer=CompanyProfileResearchWriter(RESEARCH);rows=[];budgets=[];all_checks=[];raw_hashes={};total=Counter();times=[]
+ for item in manifest:
+  code=item['instrument_id'];folder=DEST/code[:6]
+  row=dict(instrument_id=code,name=item['name'],layer=item['layer'],status='not_started_due_consecutive_provider_failure',raw_fact_count=0)
+  if code in group['not_started']:
+   rows.append(row);continue
+  summary=read(folder/'summary.json');budget=read(folder/'budget.json');attempts=budget['attempts']
+  counts=Counter(a['logical_request_id']for a in attempts);recoveries=sum(n-1 for n in counts.values())
+  assert len(attempts)==budget['physical_requests']<=10 and recoveries<=3 and max(counts.values(),default=0)<=2
+  known=sum((a.get('usage')or{}).get('total_tokens',0)for a in attempts)
+  unknown=sum(a['charged_tokens']for a in attempts if (a.get('usage')or{}).get('total_tokens')is None)
+  assert known+unknown==budget['charged_tokens']==sum(a['charged_tokens']for a in attempts)<=1000000
+  b=dict(instrument_id=code,physical_requests=len(attempts),recoveries=recoveries,ledger=budget['charged_tokens'],
+      known_supplier_total=known,unknown_usage_reservations=unknown,fee=budget['charged_cost_cny'],
+      business_seconds=summary['business_seconds'],preparation_seconds=summary['preparation_seconds'])
+  budgets.append(b);total.update({k:b[k]for k in ['physical_requests','recoveries','ledger','known_supplier_total','unknown_usage_reservations']})
+  times.append((summary['business_started_monotonic'],summary['business_ended_monotonic']))
+  path=folder/'runtime.json';raw_hashes[str(path.relative_to(ROOT))]=sha(path)
+  record=CompanyProfileRuntimeRecordV3.model_validate_json(path.read_bytes());paper=record.workpaper
+  facts={f.fact_id:f for e in workpaper_elements(paper).values()for f in e.facts}
+  assert len(facts)==summary['total_facts_with_optional']
+  company=audit['companies'][code];ids=company['checked_fact_ids']
+  assert len(ids)==len(set(ids)) and set(ids)<=facts.keys()
+  adopted={f.revised_fact.fact_id for f in paper.quality_review.findings if f.resolution=='corrected_pending_trust' and f.revised_fact}
+  assert adopted==set(company['adopted_revisions_independently_checked']) and adopted<=set(ids)
+  decisions=[]
+  for fid in ids:
+   fact=facts[fid];disposition='source_checked';reason=company['basis']
+   if fid in company.get('errors',{}):disposition='withheld';reason=company['errors'][fid]
+   if fid in company.get('source_only',{}):disposition='source_only';reason=company['source_only'][fid]
+   decision=dict(fact_id=fid,fact_sha256=workpaper_fact_hash(fact),disposition=disposition,
+      evidence_ids=list(fact.evidence_ids),reason=reason,limitation=company.get('limitations',{}).get(fid))
+   decisions.append(decision);all_checks.append(dict(instrument_id=code,**decision))
+  original=paper.model_dump(mode='json');original.pop('use_review',None)
+  paper=bind_workpaper_use_review(paper,dict(report=record.report.model_dump(mode='json'),
+      reviewer='Codex finite independent core/adopted-revision source check 6.EA; not full sample accuracy',
+      reference=str(audit_path.relative_to(ROOT)),reference_sha256=sha(audit_path),decisions=decisions))
+  updated=paper.model_dump(mode='json');updated.pop('use_review',None);assert updated==original
+  record=record.model_copy(update={'workpaper':paper});target=writer.output_root/(record.work_id+'.json')
+  if target.exists():assert target.read_text()==record.model_dump_json(indent=2)
+  else:writer.persist(record)
+  total.update(raw_facts=len(facts),profiles_with_content=1,independent_checked=len(ids),actual_adopted_objects=len(adopted))
+  total['independent_source_only']+=len(company.get('source_only',{}))
+  total['independent_wrong_withheld']+=len(company.get('errors',{}))
+  row.update(status='basic_description_source_supported'if all(company['core'].values())else'basic_description_incomplete',
+      basic_source_answers=company['core'],basic_source_reason=company['core_basis'],raw_fact_count=len(facts),
+      review_status=summary['review_status'],review_error=summary['review_error'],core_complete_raw=summary['core_complete'],
+      independent_checked_objects=len(ids),actual_adopted_objects=len(adopted),business_seconds=summary['business_seconds'],
+      full_profile_accuracy='not_assessed')
+  rows.append(row)
+ reader=CompanyProfileReadService(RESEARCH);codes=[i['instrument_id']for i in manifest]
+ q=reader.query(codes)
+ assert q['delivered']==15 and set(q['missing_instrument_ids'])==set(group['not_started'])
+ delivery=DEST/'delivery';saved=delivery/'research_profiles.json'
+ if saved.exists():
+  for p in q['profiles']:assert read(delivery/(p['instrument_id']+'_2025-12-31.json'))==p
+ else:
+  exported=reader.export(codes,export_directory=delivery);assert exported['profiles']==q['profiles']
+ assert q['profiles']==CompanyProfileReadService(RESEARCH).query(codes)['profiles']
+ api=[];states=Counter()
+ for row in rows:
+  if not row['raw_fact_count']:continue
+  detail=reader.research_profile(row['instrument_id'])
+  assert detail==CompanyProfileReadService(RESEARCH).research_profile(row['instrument_id'])
+  visible=[f for f in detail['facts']if f['fact']is not None]
+  row.update(visible_facts=len(visible),visible_metrics=sum(len(f['fact']['metrics'])for f in visible),
+      information_gaps=len(detail['information_gaps']),suggested_acquisitions=len(detail['suggested_acquisitions']))
+  total.update(visible_facts=row['visible_facts'],visible_metrics=row['visible_metrics']);states.update(f['state']for f in detail['facts']);api.append(detail)
+ bundle=dict(catalog=reader.research_profile_catalog(),profiles=api,requested_instrument_ids=codes,missing_instrument_ids=q['missing_instrument_ids'])
+ dump(delivery/'annual-api.json',bundle);dump(DEST/'api-check.json',asyncio.run(verify_api(reader,bundle)))
+ assert all(sha(ROOT/p)==h for p,h in raw_hashes.items())
+ basic_supported=sum(row['status']=='basic_description_source_supported'for row in rows)
+ dump(DEST/'resource-audit.json',dict(task='6.EA',per_company=budgets,totals=dict(total),fee='unknown',
+      group_supervision_wall_seconds=group['supervision_wall_seconds'],
+      actual_business_span_seconds=round(max(t[1]for t in times)-min(t[0]for t in times),3),
+      preparations_and_human_review_active_time='not_completely_measured',supplier_total_not_input_plus_output=True,
+      dispatch_parent_stop=read(DEST/'dispatch-stop-enforcement.json'),remaining_not_started=group['not_started']))
+ dump(DEST/'batch-assessment.json',dict(task='6.EA',phase='S2_sole_confirmation',status='not_passed',
+      approved_companies=20,executed=15,not_started=group['not_started'],nonempty_profiles=15,
+      finite_basic_description_supported=basic_supported,finite_basic_incomplete=[r['instrument_id']for r in rows if r['status']=='basic_description_incomplete'],
+      formal_usable_count='not_assessed_not_replaced_by_basic_readability',
+      required_first_usable=18,basic_macro_recall_best_possible_upper_bound=0.75,required_core_macro_recall=0.95,
+      required_audited_accuracy=0.99,formal_audited_accuracy='not_assessed',formal_400_supplemental_sample='not_completed_after_irrevocable_group_failure',
+      finite_independent_objects=total['independent_checked'],finite_source_only_objects=total['independent_source_only'],
+      known_false_objects_withheld=total['independent_wrong_withheld'],actual_adopted_revisions_independently_checked=total['actual_adopted_objects'],
+      finite_checked_objects_do_not_estimate_unchecked_accuracy=True,delivery_states=dict(states),rows=rows,
+      research_output_root=str(RESEARCH),stop_reason=group['stop_reason'],
+      stop_enforcement_deviation='frozen adapter auto-counted failed reviews but not incomplete final failures; independent observer paused only dispatch parent, allowed in-flight completion, then used original external stop hook',
+      old_S2_result_unchanged=True,confirmation_scheme_ended=True,no_company41=True,S3_authorized=False,production_authorization='not_authorized'))
+ dump(DEST/'readback-check.json',dict(query_export_fresh_equal=True,api_fresh_equal=True,profiles=15,
+      missing=group['not_started'],original_raw_runtime_sha256=raw_hashes,all_actual_adopted_revisions_independently_checked=True,
+      independent_decisions=all_checks,new_model_requests=0))
+ print(json.dumps(dict(totals=dict(total),basic_supported=basic_supported,states=dict(states)),ensure_ascii=False),flush=True)
+
+if __name__=='__main__':main()

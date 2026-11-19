@@ -1,0 +1,11 @@
+{
+  "representation": "model_message_content_string_not_http_bytes",
+  "physical_sequence": 6,
+  "status_code": 200,
+  "model": null,
+  "provider_request_id": "13bacc26-7031-4287-badc-b61d337a3163, 260dffac-9d5f-9329-84bc-e666f8776fcc",
+  "finish_reason": null,
+  "usage": {},
+  "content": "",
+  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,169 @@
+"""Close the exhausted EA batch: verify saved delivery, retain one evidence set."""
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+
+ROOT = Path('/home/python/Quote')
+TEMP = ROOT / 'data/QuoteBak/workpaper-ea-HHDld9'
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119'
+RESEARCH = ROOT / 'data/research/company_profile_s2_confirmation_20261119'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def measure(path):
+    return sum(f.stat().st_size for f in path.rglob('*') if f.is_file())
+
+
+def main():
+    assert TEMP.is_dir() and TEMP.parent == ROOT / 'data/QuoteBak'
+    assessment = read(DEST / 'batch-assessment.json')
+    group = read(DEST / 'group-execution.json')
+    resources = read(DEST / 'resource-audit.json')
+    readback = read(DEST / 'readback-check.json')
+    api = read(DEST / 'api-check.json')
+    annual = read(DEST / 'delivery/annual-api.json')
+    assert assessment['status'] == 'not_passed' and assessment['confirmation_scheme_ended']
+    assert group['source_code_unchanged'] and group['executed'] == 15
+    assert len(group['not_started']) == 5 and len(annual['profiles']) == 15
+    assert api['equal_read_owner'] and api['external_connections_forbidden']
+    assert Counter(api['detail_statuses'].values()) == {200: 15, 404: 5}
+    assert resources['totals']['actual_adopted_objects'] == 48
+    assert resources['totals']['independent_checked'] == 254
+    assert readback['query_export_fresh_equal'] and readback['api_fresh_equal']
+    assert len(readback['independent_decisions']) == 254
+    for path, expected in readback['original_raw_runtime_sha256'].items():
+        assert sha(ROOT / path) == expected
+
+    for name in ['freeze_reference.py', 'deliver_ea.py', 'close_ea.py']:
+        shutil.copyfile(TEMP / name, DEST / (Path(name).stem + '-snapshot.txt'))
+    assert sha(TEMP / 'run_ea.py') == sha(DEST / 'operator-snapshot.txt')
+    copied_receipts = []
+    for name in ['strict.log', 'diff-check.log']:
+        source = TEMP / name
+        assert source.is_file()
+        shutil.copyfile(source, DEST / name)
+        copied_receipts.append(name)
+    assert 'is valid' in (TEMP / 'strict.log').read_text()
+    assert not (TEMP / 'diff-check.log').read_text().strip()
+
+    states = {
+        'completed': '模型复核完成',
+        'completed_with_open_findings': '模型复核完成／仍有发现',
+        'incomplete': '模型复核未完整',
+        'failed': '模型复核失败／保留部分稿',
+    }
+    table = [
+        '# 6.EA实际画像与缺项对照', '',
+        '以下“可读”包括研究已核、保真限用和待核，不是正确数或正式可用数。'
+        '供应链/特色为可选；API缺项数由当前读取实际返回，不代表已穷尽所有遗漏。', '',
+        '| 公司与原文底稿 | 可读事实／指标 | API缺项 | 原模型复核状态 | 业务秒 |',
+        '| :--- | ---: | ---: | :--- | ---: |',
+    ]
+    for row in assessment['rows']:
+        code = row['instrument_id']
+        if row['raw_fact_count']:
+            link = f"[{row['name']} {code}](delivery/{code}_2025-12-31.md)"
+            table.append(f"| {link} | {row['visible_facts']}／{row['visible_metrics']} | "
+                         f"{row['information_gaps']} | {states[row['review_status']]} | {row['business_seconds']:.3f} |")
+        else:
+            table.append(f"| {row['name']} {code} | — | 未启动 | 连续同根因失败后停派／API404 | — |")
+    table.extend(['', '中国银河尚缺自身收入/赚钱方式的实质说明；通威原复核覆盖限制保留，'
+                  '顺丰终核和分众/国航初核空返回不改绿。其余公司也不宣称全稿无遗漏。', '',
+                  '[机器API快照](delivery/annual-api.json) · [独立核查及限制](audit-decisions.json) · '
+                  '[精确资源](resource-audit.json) · [阶段结论](result.md)', ''])
+    (DEST / 'comparison.md').write_text('\n'.join(table))
+
+    # Raw per-company exports duplicate their immutable query. The post-audit
+    # aggregate export duplicates the retained final reader/API and Markdown.
+    removals = []
+    for row in assessment['rows']:
+        if not row['raw_fact_count']:
+            continue
+        folder = DEST / row['instrument_id'][:6]
+        query = read(folder / 'query.json')
+        exported = folder / 'export'
+        assert read(exported / f"{row['instrument_id']}_2025-12-31.json") == query['profiles'][0]
+        assert read(folder / 'source-check.json')['all_retained_evidence_coordinates_equal']
+        assert not Path(read(folder / 'temporary-root.json')['root']).exists()
+        removals.append(dict(path=str(exported.relative_to(ROOT)), bytes=measure(exported),
+                             reason='raw export equals retained query; one final human/API delivery retained'))
+    for path in sorted((DEST / 'delivery').iterdir()):
+        if path.name == 'annual-api.json' or path.suffix == '.md' and path.name != 'profiles.md':
+            continue
+        assert path.is_file() and path.name in {
+            'research_profiles.json', 'profiles.csv', 'profiles.md', 'export_manifest.json',
+            *[f"{r['instrument_id']}_2025-12-31.json" for r in assessment['rows'] if r['raw_fact_count']],
+        }
+        removals.append(dict(path=str(path.relative_to(ROOT)), bytes=path.stat().st_size,
+                             reason='duplicate final export; query/export/fresh equality already persisted'))
+
+    # No active business workers may refer to this task's exact script/root.
+    active = []
+    for line in subprocess.check_output(['ps', '-eo', 'pid,args'], text=True).splitlines():
+        tokens = line.split()
+        if any(str(TEMP / name) in tokens for name in ['run_ea.py', 'deliver_ea.py', 'freeze_reference.py']):
+            active.append(int(tokens[0]))
+    assert not active, active
+    for item in removals:
+        path = ROOT / item['path']
+        assert path.is_relative_to(DEST) and not path.is_symlink()
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+    run_bytes = sum(row.get('cleanup_bytes', 0) for row in group['results'])
+    remaining_temp_bytes = measure(TEMP)
+    dump(DEST / 'verification.json', dict(
+        task='6.EA', production_code_changed=False, frozen_source_code_unchanged=True,
+        reused_effective_engineering_checks=133,
+        reused_reference='../workpaper-general-closure-20261119/verification.json',
+        current_checks=['all 15 raw runtime hashes unchanged', 'all source coordinates equal',
+                        'per-company budget and recovery caps', 'query/export/fresh/API equality',
+                        '254 finite source decisions; all 48 adopted revisions included',
+                        '15 API200 and five unstarted404', 'OpenSpec strict', 'git diff --check'],
+        api_external_connections_forbidden=True, finalization_new_model_requests=0,
+        strict_command='OPENSPEC_TELEMETRY=0 DO_NOT_TRACK=1 openspec validate restore-company-profile-llm-led-generalization --strict',
+        receipt_files=copied_receipts, review=dict(
+            blocking=['stop adapter missed incomplete final-review failure; batch stopped independently, original defect not claimed fixed'],
+            business_misuse_avoided='six objects source_only, no manual business rewriting',
+            nonblocking='optional details, supply chain precision, style not expanded',
+            unrelated='pre-existing config/core/market changes untouched'),
+        full_profile_accuracy='not_assessed', S2='not_passed', production_authorization='not_authorized'))
+    dump(DEST / 'cleanup.json', dict(
+        task='6.EA', development_start='prior DZ owned temporary root confirmed absent; no broad historical deletion',
+        exact_owned_temporary_root=str(TEMP), active_task_workers=[],
+        already_removed_company_execution_bytes=run_bytes,
+        redundant_evidence_exports=removals,
+        redundant_evidence_bytes=sum(x['bytes'] for x in removals),
+        closing_owned_temporary_bytes=remaining_temp_bytes,
+        total_removed_file_bytes=run_bytes + sum(x['bytes'] for x in removals) + remaining_temp_bytes,
+        kept=['formal 2025 PDFs and reusable PDF owner cache', 'all original query/runtime/model receipts/failures/budgets',
+              'one independent reference/audit and one human/API delivery', '15 original writer research outputs needed by API',
+              'attempt markers, old source/result/API roots and parallel changes'],
+        recoverability='removed preparation/exports are rebuildable from retained sources, runtime and script snapshots',
+        no_live_task_or_database_retained=True))
+    shutil.rmtree(TEMP)
+    assert not TEMP.exists()
+    index = {str(p.relative_to(DEST)): dict(sha256=sha(p), bytes=p.stat().st_size)
+             for p in sorted(DEST.rglob('*')) if p.is_file() and p.name != 'index.json'}
+    dump(DEST / 'index.json', dict(task='6.EA', files=index,
+                                 research_runtime_files={str(p.relative_to(ROOT)): sha(p) for p in sorted(RESEARCH.rglob('*.json'))}))
+    print(json.dumps(dict(files=len(index), research_profiles=15, cleanup=read(DEST / 'cleanup.json')['total_removed_file_bytes']), ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()

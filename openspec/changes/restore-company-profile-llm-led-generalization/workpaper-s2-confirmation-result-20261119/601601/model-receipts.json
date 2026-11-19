@@ -1,0 +1,1200 @@
+[
+  {
+    "request_id": "bp-work-e27361c6f6d02924c70764e2:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "02c8ab8802dec1e3cfdcd654b255c0febd563bf802492dbd6dff934e7374792b",
+    "response_hash": "1f8663c72642b730eb6b727f2e0a717a2f2f6172d12302a78d06727d6eebf7c2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0016\",\"section-0017\",\"section-0026\",\"section-0029\",\"section-0045\",\"section-0046\",\"section-0066\",\"section-0067\",\"section-0084\",\"section-0085\",\"section-0097\"],\"rationale\":\"优先选取经营概览与经营业绩回顾中的实质经营子节：section-0016为经营概览主体（含主要财务与业务规模），section-0017为经营业绩回顾与分析总述，section-0026为主要业务（产品/服务与经营结构），section-0029为经营业绩（收入与利润口径），section-0045/0046为太保寿险业务分析（寿险收入、渠道与产品结构），section-0066/0067为太保产险业务分析（险种与承保结构），section-0084/0085为集团管理资产与投资资产（资产端经营），section-0097为第三方管理资产（资管业务收入来源）。这些子节共同覆盖业务结构、产品服务、收入来源与主要权重、经营规模与渠道，且避免同时选父子节点。\",\"deferred\":[\"section-0038（主要指标）与section-0029部分重叠，暂不重复选取\",\"section-0050/0055/0057/0058（寿险渠道、业务类型、继续率、地区保费）为细分明细，若需更细渠道拆分可后续定向补充\",\"section-0076（产险利源分析）与section-0067存在口径重叠，暂缓\",\"section-0090（集团合并投资收益）属投资端明细，非主营收入构成，暂缓\",\"财务报表附注（section-0831保险服务收入等）仅在收入构成仍有缺口时定向补充\"],\"stop_reason\":\"已覆盖公司经营概览、主要业务、寿险与产险业务分析、资产与第三方资管等核心经营与收入来源章节，足以解释业务结构、产品服务、赚钱方式与规模；剩余为治理、股东、薪酬、会计政策及财务附注明细，超出本次经营阅读范围，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0016",
+        "section-0017",
+        "section-0026",
+        "section-0029",
+        "section-0045",
+        "section-0046",
+        "section-0066",
+        "section-0067",
+        "section-0084",
+        "section-0085",
+        "section-0097"
+      ],
+      "rationale": "优先选取经营概览与经营业绩回顾中的实质经营子节：section-0016为经营概览主体（含主要财务与业务规模），section-0017为经营业绩回顾与分析总述，section-0026为主要业务（产品/服务与经营结构），section-0029为经营业绩（收入与利润口径），section-0045/0046为太保寿险业务分析（寿险收入、渠道与产品结构），section-0066/0067为太保产险业务分析（险种与承保结构），section-0084/0085为集团管理资产与投资资产（资产端经营），section-0097为第三方管理资产（资管业务收入来源）。这些子节共同覆盖业务结构、产品服务、收入来源与主要权重、经营规模与渠道，且避免同时选父子节点。",
+      "deferred": [
+        "section-0038（主要指标）与section-0029部分重叠，暂不重复选取",
+        "section-0050/0055/0057/0058（寿险渠道、业务类型、继续率、地区保费）为细分明细，若需更细渠道拆分可后续定向补充",
+        "section-0076（产险利源分析）与section-0067存在口径重叠，暂缓",
+        "section-0090（集团合并投资收益）属投资端明细，非主营收入构成，暂缓",
+        "财务报表附注（section-0831保险服务收入等）仅在收入构成仍有缺口时定向补充"
+      ],
+      "stop_reason": "已覆盖公司经营概览、主要业务、寿险与产险业务分析、资产与第三方资管等核心经营与收入来源章节，足以解释业务结构、产品服务、赚钱方式与规模；剩余为治理、股东、薪酬、会计政策及财务附注明细，超出本次经营阅读范围，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 21653,
+      "output_tokens": 457,
+      "total_tokens": 22110
+    }
+  },
+  {
+    "request_id": "bp-work-e27361c6f6d02924c70764e2:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "02d3d619200550bf4644849f2b83ba6e79ad1e40deba2d6ce44d7ffff71603c4",
+    "response_hash": "2cfeed5222aefebb4762606e2ddea566967656841ea22eaba200ff1e407c1b57",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司通过旗下子公司提供风险保障、财富规划及资产管理等产品和服务：太保寿险提供人身保险，太保产险与太平洋安信农险提供财产保险，太平洋健康险提供健康险及健康管理服务，太保资产开展保险资金运用及第三方资产管理，长江养老开展养老金融服务及相关资产管理，太保资本开展私募基金管理及咨询，国联安基金开展公募基金管理，太保科技提供市场化科技赋能支持和服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"按原保险保费收入计算，太保寿险、太保产险分别为中国第三大人寿保险公司和第三大财产保险公司。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0014\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"太保寿险2025年规模保费2,958.55亿元，同比增长12.7%；新业务价值186.09亿元，同比增长40.1%；新业务价值率19.8%，同比提升3.2个百分点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"太保寿险规模保费\",\"raw_value\":\"2,958.55\",\"value\":\"2958.55\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保寿险新业务价值\",\"raw_value\":\"186.09\",\"value\":\"186.09\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保寿险新业务价值率\",\"raw_value\":\"19.8\",\"value\":\"19.8\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-PS-02\",\"text\":\"太保寿险产品结构持续优化，2025年分红险新保期缴规模保费大幅增长，新保期缴中分红险占比提升至50.0%，其中代理人渠道新保期缴中分红险占比达61.4%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"太保寿险新保期缴中分红险占比\",\"raw_value\":\"50.0\",\"value\":\"50.0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保寿险代理人渠道新保期缴中分红险占比\",\"raw_value\":\"61.4\",\"value\":\"61.4\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-PS-03\",\"text\":\"太保产险按险种的原保险保费收入：机动车辆险1,105.11亿元（其中交强险294.75亿元、商业险810.36亿元），非机动车辆险909.88亿元，其中责任险230.75亿元、健康险202.98亿元、农业险199.39亿元、企财险79.62亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"太保产险机动车辆险原保险保费收入\",\"raw_value\":\"110,511\",\"value\":\"110511\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险交强险原保险保费收入\",\"raw_value\":\"29,475\",\"value\":\"29475\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险商业险原保险保费收入\",\"raw_value\":\"81,036\",\"value\":\"81036\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险非机动车辆险原保险保费收入\",\"raw_value\":\"90,988\",\"value\":\"90988\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险责任险原保险保费收入\",\"raw_value\":\"23,075\",\"value\":\"23075\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险健康险原保险保费收入\",\"raw_value\":\"20,298\",\"value\":\"20298\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险农业险原保险保费收入\",\"raw_value\":\"19,939\",\"value\":\"19939\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险企财险原保险保费收入\",\"raw_value\":\"7,962\",\"value\":\"7962\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-PS-04\",\"text\":\"太保产险其他险种原保险保费收入197.14亿元，同比下降19.0%，其中个人信用保证保险为-16.91亿元，其余为214.05亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"太保产险其他险种原保险保费收入\",\"raw_value\":\"19,714\",\"value\":\"19714\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险个人信用保证保险原保险保费收入\",\"raw_value\":\"(1,691)\",\"value\":\"-1691\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险其他险种中其余原保险保费收入\",\"raw_value\":\"21,405\",\"value\":\"21405\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"2025年集团实现营业总收入4,351.56亿元，同比增长7.7%，其中保险服务收入2,889.10亿元，同比增长3.4%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"集团营业总收入\",\"raw_value\":\"4,351.56\",\"value\":\"4351.56\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"集团保险服务收入\",\"raw_value\":\"2,889.10\",\"value\":\"2889.10\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"2025年集团第三方管理费收入为30.57亿元，同比增长41.1%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"],\"metrics\":[{\"name\":\"集团第三方管理费收入\",\"raw_value\":\"30.57\",\"value\":\"30.57\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"太保产险2025年实现原保险保费收入2,014.99亿元，同比增长0.1%，保险服务收入1,971.91亿元，同比增长3.0%；承保利润48.36亿元，同比增长81.0%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"太保产险原保险保费收入\",\"raw_value\":\"2,014.99\",\"value\":\"2014.99\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险保险服务收入\",\"raw_value\":\"1,971.91\",\"value\":\"1971.91\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保产险承保利润\",\"raw_value\":\"48.36\",\"value\":\"48.36\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"截至2025年末，集团管理资产达38,910.33亿元，较上年末增长9.8%，其中集团投资资产30,399.87亿元，较上年末增长11.2%；第三方管理资产8,510.46亿元，较上年末增长5.3%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0021\"],\"metrics\":[{\"name\":\"集团管理资产\",\"raw_value\":\"3,891,033\",\"value\":\"3891033\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"集团投资资产\",\"raw_value\":\"3,039,987\",\"value\":\"3039987\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"第三方管理资产\",\"raw_value\":\"851,046\",\"value\":\"851046\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"集团第三方管理资产中，太保资产管理规模2,453.95亿元，占比28.8%；长江养老管理规模4,768.67亿元，占比56.0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0024\"],\"metrics\":[{\"name\":\"太保资产第三方管理资产规模\",\"raw_value\":\"2,453.95\",\"value\":\"2453.95\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"},{\"name\":\"太保资产第三方管理资产占比\",\"raw_value\":\"28.8\",\"value\":\"28.8\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"},{\"name\":\"长江养老第三方管理资产规模\",\"raw_value\":\"4,768.67\",\"value\":\"4768.67\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"},{\"name\":\"长江养老第三方管理资产占比\",\"raw_value\":\"56.0\",\"value\":\"56.0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"2025年集团净利润535.05亿元，同比增长19.0%；集团营运利润365.23亿元，同比增长6.1%；集团内含价值6,133.65亿元，较上年末增长9.1%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"集团净利润\",\"raw_value\":\"535.05\",\"value\":\"535.05\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"集团营运利润\",\"raw_value\":\"365.23\",\"value\":\"365.23\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"集团内含价值\",\"raw_value\":\"6,133.65\",\"value\":\"6133.65\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司基于对宏观环境长期趋势的展望，落实精细化的哑铃型资产配置策略：持续加强长期利率债配置以延展固定收益资产久期，适当增加公开市场权益类资产及未上市股权等另类投资配置，同时持续管控信用类资产配置比例。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"太保资产围绕保险资金OCI投资策略、“固收+”策略及股息价值策略三大方向拓展组合类资产管理产品业务和第三方受托专户业务；2025年末第三方组合类资产管理产品与外部专户委托资产规模合计2,144.80亿元，较上年末有所下降。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0024\"],\"metrics\":[{\"name\":\"太保资产第三方组合类资产管理产品与外部专户委托资产规模合计\",\"raw_value\":\"2,144.80\",\"value\":\"2144.80\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"长江养老第三方受托管理资产规模合计5,767.88亿元，较上年末增长19.8%；第三方投资管理资产规模4,768.67亿元，较上年末增长17.3%；整体养老金业务新增管理规模超1,700亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0024\"],\"metrics\":[{\"name\":\"长江养老第三方受托管理资产规模\",\"raw_value\":\"5,767.88\",\"value\":\"5767.88\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"},{\"name\":\"长江养老第三方投资管理资产规模\",\"raw_value\":\"4,768.67\",\"value\":\"4768.67\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"},{\"name\":\"长江养老整体养老金业务新增管理规模\",\"raw_value\":\"超1,700\",\"value\":\"1700\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"qualifier\":\"greater_than\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"太保寿险推进“2+N”多元渠道模式升级，代理人渠道队伍规模基本企稳、核心人力产能同比提升，银保渠道、团政渠道职域业务价值大幅增长。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"太保寿险2025年中客及以上客户占比28.1%，同比提升5.4个百分点，其中代理人渠道26.6%，同比提升5.1个百分点；银保渠道中客及以上客户占比41.0%，同比提升1.8个百分点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"太保寿险中客及以上客户占比\",\"raw_value\":\"28.1\",\"value\":\"28.1\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保寿险代理人渠道中客及以上客户占比\",\"raw_value\":\"26.6\",\"value\":\"26.6\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"太保寿险银保渠道中客及以上客户占比\",\"raw_value\":\"41.0\",\"value\":\"41.0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"截至2025年末，集团客户总数近1.9亿，持有两张及以上保单的客户数、客均保单件数均实现两位数以上增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"寿险业务坚持价值增长主线，新业务价值186.09亿元，同比增长40.1%；新业务价值率19.8%，同比提升3.2个百分点；寿险营运利润289.16亿元，同比增长4.8%；合同服务边际余额3,529.81亿元，较上年末增长3.2%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"寿险营运利润\",\"raw_value\":\"289.16\",\"value\":\"289.16\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"寿险合同服务边际余额\",\"raw_value\":\"3,529.81\",\"value\":\"3529.81\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"财产险业务承保综合成本率97.6%，同比下降1.0个百分点，其中承保综合赔付率70.6%，同比下降0.4个百分点；承保综合费用率27.0%，同比下降0.6个百分点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"财产险业务承保综合成本率\",\"raw_value\":\"97.6\",\"value\":\"97.6\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"财产险业务承保综合赔付率\",\"raw_value\":\"70.6\",\"value\":\"70.6\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"财产险业务承保综合费用率\",\"raw_value\":\"27.0\",\"value\":\"27.0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"集团投资资产综合投资收益率为6.1%，同比上升0.1个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"集团投资资产综合投资收益率\",\"raw_value\":\"6.1\",\"value\":\"6.1\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"太保产险非车险主动压降高风险、低效益业务，2025年非机动车辆险原保险保费收入909.88亿元，同比下降3.1%，其中个人信用保证保险为-16.91亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"太保产险非机动车辆险原保险保费收入同比\",\"raw_value\":\"(3.1)\",\"value\":\"-3.1\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-MC-02\",\"text\":\"太保产险车险深化新能源车经营，加强精细化管控；非车险着力优化业务结构，全面构建一体化风险减量管理体系。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]}]},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司发布“太保优护2.0”数智赋能方案，将AI嵌入基金测算和失能评估等环节；成功发布300亿元战新并购基金和200亿元私募证券基金。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-CF-02\",\"text\":\"“太保家园”布局13城15园，在住长者逾3,000人；“源申康复”医院厦门、济南两地开业，康养服务累计覆盖客户超1,200万。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0004\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司为综合性保险金融服务集团，通过寿险、产险、健康险等子公司承担风险保障职能，并通过太保资产、长江养老、太保资本、国联安基金等开展保险资金运用及第三方资产管理业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]}]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"limitations\":[\"所选章节未披露保险业务的具体原材料、能源等上游投入信息；作为金融保险集团，其经营投入主要为资本、人力与投资资产，未获取具体采购或供应商披露。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"集团客户总数近1.9亿；太保寿险按客户分层经营，中客及以上客户占比28.1%；长江养老服务企业年金等养老金客户，2025年整体养老金业务新增管理规模超1,700亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0017\",\"source-0024\"]}]}},\"limitations\":[\"物理页23、29、35、36、37、39、40、44、45、47、48、49、51布局未恢复或原生文本不可读，表格列关系未核定，相关金额与表头对应关系存在不确定性。\",\"太保寿险分渠道规模保费明细（代理人、银保、团政、其他渠道）因表格列关系未核定，未逐项列示。\",\"集团营业总收入与保险服务收入的口径差异（如投资收益等非保险服务收入构成）未在所选章节中完整拆分。\",\"太保产险分险种承保利润、综合成本率等明细未在所选章节中按险种披露。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司通过旗下子公司提供风险保障、财富规划及资产管理等产品和服务：太保寿险提供人身保险，太保产险与太平洋安信农险提供财产保险，太平洋健康险提供健康险及健康管理服务，太保资产开展保险资金运用及第三方资产管理，长江养老开展养老金融服务及相关资产管理，太保资本开展私募基金管理及咨询，国联安基金开展公募基金管理，太保科技提供市场化科技赋能支持和服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "按原保险保费收入计算，太保寿险、太保产险分别为中国第三大人寿保险公司和第三大财产保险公司。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "太保寿险2025年规模保费2,958.55亿元，同比增长12.7%；新业务价值186.09亿元，同比增长40.1%；新业务价值率19.8%，同比提升3.2个百分点。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "太保寿险规模保费",
+                  "raw_value": "2,958.55",
+                  "value": "2958.55",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保寿险新业务价值",
+                  "raw_value": "186.09",
+                  "value": "186.09",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保寿险新业务价值率",
+                  "raw_value": "19.8",
+                  "value": "19.8",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "太保寿险产品结构持续优化，2025年分红险新保期缴规模保费大幅增长，新保期缴中分红险占比提升至50.0%，其中代理人渠道新保期缴中分红险占比达61.4%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "太保寿险新保期缴中分红险占比",
+                  "raw_value": "50.0",
+                  "value": "50.0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保寿险代理人渠道新保期缴中分红险占比",
+                  "raw_value": "61.4",
+                  "value": "61.4",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "太保产险按险种的原保险保费收入：机动车辆险1,105.11亿元（其中交强险294.75亿元、商业险810.36亿元），非机动车辆险909.88亿元，其中责任险230.75亿元、健康险202.98亿元、农业险199.39亿元、企财险79.62亿元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "太保产险机动车辆险原保险保费收入",
+                  "raw_value": "110,511",
+                  "value": "110511",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险交强险原保险保费收入",
+                  "raw_value": "29,475",
+                  "value": "29475",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险商业险原保险保费收入",
+                  "raw_value": "81,036",
+                  "value": "81036",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险非机动车辆险原保险保费收入",
+                  "raw_value": "90,988",
+                  "value": "90988",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险责任险原保险保费收入",
+                  "raw_value": "23,075",
+                  "value": "23075",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险健康险原保险保费收入",
+                  "raw_value": "20,298",
+                  "value": "20298",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险农业险原保险保费收入",
+                  "raw_value": "19,939",
+                  "value": "19939",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险企财险原保险保费收入",
+                  "raw_value": "7,962",
+                  "value": "7962",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "太保产险其他险种原保险保费收入197.14亿元，同比下降19.0%，其中个人信用保证保险为-16.91亿元，其余为214.05亿元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "太保产险其他险种原保险保费收入",
+                  "raw_value": "19,714",
+                  "value": "19714",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险个人信用保证保险原保险保费收入",
+                  "raw_value": "(1,691)",
+                  "value": "-1691",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险其他险种中其余原保险保费收入",
+                  "raw_value": "21,405",
+                  "value": "21405",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "2025年集团实现营业总收入4,351.56亿元，同比增长7.7%，其中保险服务收入2,889.10亿元，同比增长3.4%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "集团营业总收入",
+                  "raw_value": "4,351.56",
+                  "value": "4351.56",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "集团保险服务收入",
+                  "raw_value": "2,889.10",
+                  "value": "2889.10",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "2025年集团第三方管理费收入为30.57亿元，同比增长41.1%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ],
+              "metrics": [
+                {
+                  "name": "集团第三方管理费收入",
+                  "raw_value": "30.57",
+                  "value": "30.57",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "太保产险2025年实现原保险保费收入2,014.99亿元，同比增长0.1%，保险服务收入1,971.91亿元，同比增长3.0%；承保利润48.36亿元，同比增长81.0%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "太保产险原保险保费收入",
+                  "raw_value": "2,014.99",
+                  "value": "2014.99",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险保险服务收入",
+                  "raw_value": "1,971.91",
+                  "value": "1971.91",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保产险承保利润",
+                  "raw_value": "48.36",
+                  "value": "48.36",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "截至2025年末，集团管理资产达38,910.33亿元，较上年末增长9.8%，其中集团投资资产30,399.87亿元，较上年末增长11.2%；第三方管理资产8,510.46亿元，较上年末增长5.3%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0021"
+              ],
+              "metrics": [
+                {
+                  "name": "集团管理资产",
+                  "raw_value": "3,891,033",
+                  "value": "3891033",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "集团投资资产",
+                  "raw_value": "3,039,987",
+                  "value": "3039987",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "第三方管理资产",
+                  "raw_value": "851,046",
+                  "value": "851046",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "集团第三方管理资产中，太保资产管理规模2,453.95亿元，占比28.8%；长江养老管理规模4,768.67亿元，占比56.0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0024"
+              ],
+              "metrics": [
+                {
+                  "name": "太保资产第三方管理资产规模",
+                  "raw_value": "2,453.95",
+                  "value": "2453.95",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "太保资产第三方管理资产占比",
+                  "raw_value": "28.8",
+                  "value": "28.8",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "长江养老第三方管理资产规模",
+                  "raw_value": "4,768.67",
+                  "value": "4768.67",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "长江养老第三方管理资产占比",
+                  "raw_value": "56.0",
+                  "value": "56.0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "2025年集团净利润535.05亿元，同比增长19.0%；集团营运利润365.23亿元，同比增长6.1%；集团内含价值6,133.65亿元，较上年末增长9.1%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "集团净利润",
+                  "raw_value": "535.05",
+                  "value": "535.05",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "集团营运利润",
+                  "raw_value": "365.23",
+                  "value": "365.23",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "集团内含价值",
+                  "raw_value": "6,133.65",
+                  "value": "6133.65",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司基于对宏观环境长期趋势的展望，落实精细化的哑铃型资产配置策略：持续加强长期利率债配置以延展固定收益资产久期，适当增加公开市场权益类资产及未上市股权等另类投资配置，同时持续管控信用类资产配置比例。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0022"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "太保资产围绕保险资金OCI投资策略、“固收+”策略及股息价值策略三大方向拓展组合类资产管理产品业务和第三方受托专户业务；2025年末第三方组合类资产管理产品与外部专户委托资产规模合计2,144.80亿元，较上年末有所下降。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0024"
+              ],
+              "metrics": [
+                {
+                  "name": "太保资产第三方组合类资产管理产品与外部专户委托资产规模合计",
+                  "raw_value": "2,144.80",
+                  "value": "2144.80",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "长江养老第三方受托管理资产规模合计5,767.88亿元，较上年末增长19.8%；第三方投资管理资产规模4,768.67亿元，较上年末增长17.3%；整体养老金业务新增管理规模超1,700亿元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0024"
+              ],
+              "metrics": [
+                {
+                  "name": "长江养老第三方受托管理资产规模",
+                  "raw_value": "5,767.88",
+                  "value": "5767.88",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "长江养老第三方投资管理资产规模",
+                  "raw_value": "4,768.67",
+                  "value": "4768.67",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "长江养老整体养老金业务新增管理规模",
+                  "raw_value": "超1,700",
+                  "value": "1700",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "qualifier": "greater_than",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "太保寿险推进“2+N”多元渠道模式升级，代理人渠道队伍规模基本企稳、核心人力产能同比提升，银保渠道、团政渠道职域业务价值大幅增长。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "太保寿险2025年中客及以上客户占比28.1%，同比提升5.4个百分点，其中代理人渠道26.6%，同比提升5.1个百分点；银保渠道中客及以上客户占比41.0%，同比提升1.8个百分点。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "太保寿险中客及以上客户占比",
+                  "raw_value": "28.1",
+                  "value": "28.1",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保寿险代理人渠道中客及以上客户占比",
+                  "raw_value": "26.6",
+                  "value": "26.6",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "太保寿险银保渠道中客及以上客户占比",
+                  "raw_value": "41.0",
+                  "value": "41.0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "截至2025年末，集团客户总数近1.9亿，持有两张及以上保单的客户数、客均保单件数均实现两位数以上增长。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "寿险业务坚持价值增长主线，新业务价值186.09亿元，同比增长40.1%；新业务价值率19.8%，同比提升3.2个百分点；寿险营运利润289.16亿元，同比增长4.8%；合同服务边际余额3,529.81亿元，较上年末增长3.2%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "寿险营运利润",
+                  "raw_value": "289.16",
+                  "value": "289.16",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "寿险合同服务边际余额",
+                  "raw_value": "3,529.81",
+                  "value": "3529.81",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "财产险业务承保综合成本率97.6%，同比下降1.0个百分点，其中承保综合赔付率70.6%，同比下降0.4个百分点；承保综合费用率27.0%，同比下降0.6个百分点。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "财产险业务承保综合成本率",
+                  "raw_value": "97.6",
+                  "value": "97.6",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "财产险业务承保综合赔付率",
+                  "raw_value": "70.6",
+                  "value": "70.6",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "财产险业务承保综合费用率",
+                  "raw_value": "27.0",
+                  "value": "27.0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "集团投资资产综合投资收益率为6.1%，同比上升0.1个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "集团投资资产综合投资收益率",
+                  "raw_value": "6.1",
+                  "value": "6.1",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "太保产险非车险主动压降高风险、低效益业务，2025年非机动车辆险原保险保费收入909.88亿元，同比下降3.1%，其中个人信用保证保险为-16.91亿元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "太保产险非机动车辆险原保险保费收入同比",
+                  "raw_value": "(3.1)",
+                  "value": "-3.1",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "太保产险车险深化新能源车经营，加强精细化管控；非车险着力优化业务结构，全面构建一体化风险减量管理体系。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            }
+          ]
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CF-01",
+              "text": "公司发布“太保优护2.0”数智赋能方案，将AI嵌入基金测算和失能评估等环节；成功发布300亿元战新并购基金和200亿元私募证券基金。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-CF-02",
+              "text": "“太保家园”布局13城15园，在住长者逾3,000人；“源申康复”医院厦门、济南两地开业，康养服务累计覆盖客户超1,200万。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司为综合性保险金融服务集团，通过寿险、产险、健康险等子公司承担风险保障职能，并通过太保资产、长江养老、太保资本、国联安基金等开展保险资金运用及第三方资产管理业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "not_disclosed",
+          "limitations": [
+            "所选章节未披露保险业务的具体原材料、能源等上游投入信息；作为金融保险集团，其经营投入主要为资本、人力与投资资产，未获取具体采购或供应商披露。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "集团客户总数近1.9亿；太保寿险按客户分层经营，中客及以上客户占比28.1%；长江养老服务企业年金等养老金客户，2025年整体养老金业务新增管理规模超1,700亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0017",
+                "source-0024"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "物理页23、29、35、36、37、39、40、44、45、47、48、49、51布局未恢复或原生文本不可读，表格列关系未核定，相关金额与表头对应关系存在不确定性。",
+        "太保寿险分渠道规模保费明细（代理人、银保、团政、其他渠道）因表格列关系未核定，未逐项列示。",
+        "集团营业总收入与保险服务收入的口径差异（如投资收益等非保险服务收入构成）未在所选章节中完整拆分。",
+        "太保产险分险种承保利润、综合成本率等明细未在所选章节中按险种披露。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 17794,
+      "output_tokens": 5069,
+      "total_tokens": 22863
+    }
+  },
+  {
+    "request_id": "bp-work-e27361c6f6d02924c70764e2:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "db55fcf69084527a4e89e6e5c1abb6a2de8c6a0cffea6e0265e9a96295011ebc",
+    "response_hash": "1cfa1b48082aef6b6fee209783fe1867fb6cd0ab871f78e9e8a5ca9b183c6cff",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-MC-02\",\"F-SC-01\",\"F-SC-02\"],\"findings\":[{\"finding_id\":\"FR-01\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-SM-03\",\"evidence_ids\":[\"source-0003\",\"source-0005\",\"source-0011\"],\"explanation\":\"535.05亿元和365.23亿元在董事长致辞、归母净利润图、归母营运利润图中均写明为集团归母净利润、集团归母营运利润；会计摘要净利润53,505百万元即535.05亿元，注记为以归属于本公司股东的数据填列。草稿写成未加限定的集团净利润、集团营运利润，归属过宽。应保留金额与增速，并将这两项改为归母/归属于母公司股东；主体仍是合并口径，不得改成母公司单体issuer。集团内含价值6,133.65亿元来源即为集团内含价值，不必改称归母。\"},{\"finding_id\":\"FR-02\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-02\",\"evidence_ids\":[\"source-0015\",\"source-0019\"],\"explanation\":\"97.6%、70.6%、27.0%出自财产险业务，不是太保产险单体。太保产险专节对应为承保综合成本率97.5%、赔付率70.4%、费用率27.1%。草稿正文虽写财产险业务，却把事实及指标subject_scope标成named_subsidiary，会把板块比率安到单一子公司。应改为business_segment，保留财产险业务名称和原比率，不得改用太保产险比率，也不得仅因金额接近认定二者等同，或虚构板块的法律实体构成。\"},{\"finding_id\":\"FR-03\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-01\",\"evidence_ids\":[\"source-0015\"],\"explanation\":\"所引综述对象是寿险业务，属于业务板块，不是已点名的单一子公司。草稿正文写寿险业务，subject_scope却为named_subsidiary。金额相同不能单独证明寿险业务等于太保寿险。应改为business_segment，保留新业务价值186.09亿元、价值率19.8%、营运利润289.16亿元和合同服务边际3,529.81亿元；不要靠改标签混同主体。\"},{\"finding_id\":\"FR-04\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-02\",\"evidence_ids\":[\"source-0015\"],\"explanation\":\"车险深化新能源车经营、非车险优化结构并构建一体化风险减量体系，位于财产险业务综述，原文未点名太保产险。草稿将主体写成太保产险并标为named_subsidiary，窄于来源。应改回财产险业务，subject_scope为business_segment；定性内容可保留，不要补写来源没有的保费或利润变动。\"},{\"finding_id\":\"FR-05\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F-PS-03\",\"evidence_ids\":[\"source-0019\"],\"explanation\":\"太保产险险种构成已列车险、非车险及责任险、健康险、农业险、企财险，但同一按险种分析还有其他原保险保费19,714百万元，大于已收录的企财险7,962百万元，且与非车险合计及已列子项可勾稽；其中个人信用保证保险为(1,691)百万元。该残余类别影响对非车险结构的理解，建议按来源类别补充，不要求补完全部尾项。该页列关系未经布局恢复核定，补充时保持来源类别，不要另造精确主体。已列示项目不必删除。\"},{\"finding_id\":\"FR-06\",\"element\":\"revenue_model\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0015\"],\"explanation\":\"经营业绩综述另列财产险业务原保险保费收入2,038.67亿元、同比增长0.2%，与已收录的太保产险原保险保费2,014.99亿元不是同一主体。寿险规模保费已有，这条财产险板块主业保费未收录。差异有限，不否定太保产险数据，但应单独补充，不要并入子公司事实，也不要用差额虚构安信农险金额。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-MC-02",
+        "F-SC-01",
+        "F-SC-02"
+      ],
+      "findings": [
+        {
+          "finding_id": "FR-01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-SM-03",
+          "evidence_ids": [
+            "source-0003",
+            "source-0005",
+            "source-0011"
+          ],
+          "explanation": "535.05亿元和365.23亿元在董事长致辞、归母净利润图、归母营运利润图中均写明为集团归母净利润、集团归母营运利润；会计摘要净利润53,505百万元即535.05亿元，注记为以归属于本公司股东的数据填列。草稿写成未加限定的集团净利润、集团营运利润，归属过宽。应保留金额与增速，并将这两项改为归母/归属于母公司股东；主体仍是合并口径，不得改成母公司单体issuer。集团内含价值6,133.65亿元来源即为集团内含价值，不必改称归母。"
+        },
+        {
+          "finding_id": "FR-02",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OD-02",
+          "evidence_ids": [
+            "source-0015",
+            "source-0019"
+          ],
+          "explanation": "97.6%、70.6%、27.0%出自财产险业务，不是太保产险单体。太保产险专节对应为承保综合成本率97.5%、赔付率70.4%、费用率27.1%。草稿正文虽写财产险业务，却把事实及指标subject_scope标成named_subsidiary，会把板块比率安到单一子公司。应改为business_segment，保留财产险业务名称和原比率，不得改用太保产险比率，也不得仅因金额接近认定二者等同，或虚构板块的法律实体构成。"
+        },
+        {
+          "finding_id": "FR-03",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OD-01",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "所引综述对象是寿险业务，属于业务板块，不是已点名的单一子公司。草稿正文写寿险业务，subject_scope却为named_subsidiary。金额相同不能单独证明寿险业务等于太保寿险。应改为business_segment，保留新业务价值186.09亿元、价值率19.8%、营运利润289.16亿元和合同服务边际3,529.81亿元；不要靠改标签混同主体。"
+        },
+        {
+          "finding_id": "FR-04",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-MC-02",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "车险深化新能源车经营、非车险优化结构并构建一体化风险减量体系，位于财产险业务综述，原文未点名太保产险。草稿将主体写成太保产险并标为named_subsidiary，窄于来源。应改回财产险业务，subject_scope为business_segment；定性内容可保留，不要补写来源没有的保费或利润变动。"
+        },
+        {
+          "finding_id": "FR-05",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F-PS-03",
+          "evidence_ids": [
+            "source-0019"
+          ],
+          "explanation": "太保产险险种构成已列车险、非车险及责任险、健康险、农业险、企财险，但同一按险种分析还有其他原保险保费19,714百万元，大于已收录的企财险7,962百万元，且与非车险合计及已列子项可勾稽；其中个人信用保证保险为(1,691)百万元。该残余类别影响对非车险结构的理解，建议按来源类别补充，不要求补完全部尾项。该页列关系未经布局恢复核定，补充时保持来源类别，不要另造精确主体。已列示项目不必删除。"
+        },
+        {
+          "finding_id": "FR-06",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "经营业绩综述另列财产险业务原保险保费收入2,038.67亿元、同比增长0.2%，与已收录的太保产险原保险保费2,014.99亿元不是同一主体。寿险规模保费已有，这条财产险板块主业保费未收录。差异有限，不否定太保产险数据，但应单独补充，不要并入子公司事实，也不要用差额虚构安信农险金额。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 23485,
+      "output_tokens": 1251,
+      "total_tokens": 71667
+    }
+  },
+  {
+    "request_id": "bp-work-e27361c6f6d02924c70764e2:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "1a4ef49bf177efe639e0b471cee776aa50641c407ddcd95b406095c36c27db95",
+    "response_hash": "a4910afeef267e78b36a8c60cb6c002bf96de411837e8d02d876d8938a995457",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-SM-03\",\"text\":\"2025年集团归母净利润535.05亿元，同比增长19.0%；集团归母营运利润365.23亿元，同比增长6.1%；集团内含价值6,133.65亿元，较上年末增长9.1%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"集团归母净利润\",\"raw_value\":\"535.05\",\"value\":\"535.05\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"集团归母营运利润\",\"raw_value\":\"365.23\",\"value\":\"365.23\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"集团内含价值\",\"raw_value\":\"6,133.65\",\"value\":\"6133.65\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-OD-02\",\"text\":\"财产险业务承保综合成本率97.6%，同比下降1.0个百分点，其中承保综合赔付率70.6%，同比下降0.4个百分点；承保综合费用率27.0%，同比下降0.6个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"财产险业务承保综合成本率\",\"raw_value\":\"97.6\",\"value\":\"97.6\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"财产险业务承保综合赔付率\",\"raw_value\":\"70.6\",\"value\":\"70.6\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"财产险业务承保综合费用率\",\"raw_value\":\"27.0\",\"value\":\"27.0\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-OD-01\",\"text\":\"寿险业务坚持价值增长主线，新业务价值186.09亿元，同比增长40.1%；新业务价值率19.8%，同比提升3.2个百分点；寿险营运利润289.16亿元，同比增长4.8%；合同服务边际余额3,529.81亿元，较上年末增长3.2%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"寿险营运利润\",\"raw_value\":\"289.16\",\"value\":\"289.16\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"寿险合同服务边际余额\",\"raw_value\":\"3,529.81\",\"value\":\"3529.81\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-MC-02\",\"text\":\"财产险业务车险深化新能源车经营，加强精细化管控；非车险着力优化业务结构，全面构建一体化风险减量管理体系。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-SM-03",
+          "text": "2025年集团归母净利润535.05亿元，同比增长19.0%；集团归母营运利润365.23亿元，同比增长6.1%；集团内含价值6,133.65亿元，较上年末增长9.1%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "集团归母净利润",
+              "raw_value": "535.05",
+              "value": "535.05",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "集团归母营运利润",
+              "raw_value": "365.23",
+              "value": "365.23",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "集团内含价值",
+              "raw_value": "6,133.65",
+              "value": "6133.65",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-OD-02",
+          "text": "财产险业务承保综合成本率97.6%，同比下降1.0个百分点，其中承保综合赔付率70.6%，同比下降0.4个百分点；承保综合费用率27.0%，同比下降0.6个百分点。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "财产险业务承保综合成本率",
+              "raw_value": "97.6",
+              "value": "97.6",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "财产险业务承保综合赔付率",
+              "raw_value": "70.6",
+              "value": "70.6",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "财产险业务承保综合费用率",
+              "raw_value": "27.0",
+              "value": "27.0",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-OD-01",
+          "text": "寿险业务坚持价值增长主线，新业务价值186.09亿元，同比增长40.1%；新业务价值率19.8%，同比提升3.2个百分点；寿险营运利润289.16亿元，同比增长4.8%；合同服务边际余额3,529.81亿元，较上年末增长3.2%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "寿险营运利润",
+              "raw_value": "289.16",
+              "value": "289.16",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "寿险合同服务边际余额",
+              "raw_value": "3,529.81",
+              "value": "3529.81",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-MC-02",
+          "text": "财产险业务车险深化新能源车经营，加强精细化管控；非车险着力优化业务结构，全面构建一体化风险减量管理体系。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 14722,
+      "output_tokens": 966,
+      "total_tokens": 15688
+    }
+  },
+  {
+    "request_id": "bp-work-e27361c6f6d02924c70764e2:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "14d4a79b1375562fc9f90c566391b84d5dc6979684816cf65482003c66d762dc",
+    "response_hash": "bbdc9355f46d9b38022805219b4b3b7a02184d8510d612b9ffb1a1192283edc5",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-SM-03\",\"F-OD-02\",\"F-OD-01\",\"F-MC-02\"],\"checks\":[{\"fact_id\":\"F-SM-03\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0005\",\"source-0011\",\"source-0015\"],\"explanation\":\"董事长致辞及归母净利润、归母营运利润图明确535.05亿元、365.23亿元分别为集团归母净利润、集团归母营运利润，增速分别为19.0%、6.1%；会计摘要净利润53,505百万元注记以归属于本公司股东的数据填列。候选保留金额、增速和合并口径，未改成母公司单体，集团内含价值仍为6,133.65亿元、较上年末增长9.1%，未误称归母。\"},{\"fact_id\":\"F-OD-02\",\"accepted\":true,\"evidence_ids\":[\"source-0015\",\"source-0019\"],\"explanation\":\"财产险业务综述载明承保综合成本率97.6%、同比下降1.0个百分点，赔付率70.6%、同比下降0.4个百分点，费用率27.0%、同比下降0.6个百分点。候选主体为财产险业务且范围为business_segment，未改用太保产险专节的97.5%、70.4%、27.1%，也未因比率接近认定二者等同。\"},{\"fact_id\":\"F-OD-01\",\"accepted\":true,\"evidence_ids\":[\"source-0015\",\"source-0003\"],\"explanation\":\"寿险业务项下新业务价值186.09亿元、同比增长40.1%，价值率19.8%、同比提升3.2个百分点，寿险营运利润289.16亿元、同比增长4.8%，合同服务边际余额3,529.81亿元、较上年末增长3.2%，均与来源一致。候选改为business_segment并保留寿险业务类别，未因金额接近太保寿险而改标为named_subsidiary。\"},{\"fact_id\":\"F-MC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0015\"],\"explanation\":\"车险深化新能源车经营、加强精细化管控，以及非车险优化业务结构、构建一体化风险减量体系，位于财产险业务综述，原文未点名太保产险。候选改回财产险业务、business_segment，仅保留定性内容，未补写来源没有的保费或利润变动。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-SM-03",
+        "F-OD-02",
+        "F-OD-01",
+        "F-MC-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-SM-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003",
+            "source-0005",
+            "source-0011",
+            "source-0015"
+          ],
+          "explanation": "董事长致辞及归母净利润、归母营运利润图明确535.05亿元、365.23亿元分别为集团归母净利润、集团归母营运利润，增速分别为19.0%、6.1%；会计摘要净利润53,505百万元注记以归属于本公司股东的数据填列。候选保留金额、增速和合并口径，未改成母公司单体，集团内含价值仍为6,133.65亿元、较上年末增长9.1%，未误称归母。"
+        },
+        {
+          "fact_id": "F-OD-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015",
+            "source-0019"
+          ],
+          "explanation": "财产险业务综述载明承保综合成本率97.6%、同比下降1.0个百分点，赔付率70.6%、同比下降0.4个百分点，费用率27.0%、同比下降0.6个百分点。候选主体为财产险业务且范围为business_segment，未改用太保产险专节的97.5%、70.4%、27.1%，也未因比率接近认定二者等同。"
+        },
+        {
+          "fact_id": "F-OD-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015",
+            "source-0003"
+          ],
+          "explanation": "寿险业务项下新业务价值186.09亿元、同比增长40.1%，价值率19.8%、同比提升3.2个百分点，寿险营运利润289.16亿元、同比增长4.8%，合同服务边际余额3,529.81亿元、较上年末增长3.2%，均与来源一致。候选改为business_segment并保留寿险业务类别，未因金额接近太保寿险而改标为named_subsidiary。"
+        },
+        {
+          "fact_id": "F-MC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "车险深化新能源车经营、加强精细化管控，以及非车险优化业务结构、构建一体化风险减量体系，位于财产险业务综述，原文未点名太保产险。候选改回财产险业务、business_segment，仅保留定性内容，未补写来源没有的保费或利润变动。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 17389,
+      "output_tokens": 553,
+      "total_tokens": 24537
+    }
+  }
+]

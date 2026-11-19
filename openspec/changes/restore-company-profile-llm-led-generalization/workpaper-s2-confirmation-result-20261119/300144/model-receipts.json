@@ -1,0 +1,1258 @@
+[
+  {
+    "request_id": "bp-work-8a47bdc6129671bc9ca0fca1:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "53de25534c3717c8a19bd8fc6490b8cd76fb6e0dd235b2ad2b94f8ab0d03c99a",
+    "response_hash": "5213812624aadfc9d23491ef8526505f9bb146bb5b3951f9a8ca474653ed5af9",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0016\",\"section-0018\",\"section-0030\",\"section-0031\",\"section-0037\",\"section-0080\",\"section-0081\",\"section-0105\"],\"rationale\":\"选择公司主要业务与经营模式（section-0016及其子节0018）说明产品/服务与经营方式；主营业务分析概述（0030、0031）提供经营综述与本期变化；营业收入整体情况（0037）为收入构成与分景区/分业务权重核心表；主要销售客户与供应商（0080、0081）补充客户渠道与资源投入；主要控股参股公司分析（0105）补充经营主体结构。均为公司层面实质经营讨论，避免纯行业背景与治理章节。\",\"deferred\":[\"section-0019行业情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0023核心竞争力：偏泛化竞争力描述，信息密度低于经营分析\",\"section-0083研发投入、0085现金流：非本次业务结构与收入构成核心，暂缓\",\"section-0305财务报告及附注：仅在收入构成有缺口时定向补充，不整体展开\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成与主要经营主体，足以回答经营与赚钱方式；行业背景与详细财务附注属次要或定向补充范围，可在不扩读全报告的前提下停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0016",
+        "section-0018",
+        "section-0030",
+        "section-0031",
+        "section-0037",
+        "section-0080",
+        "section-0081",
+        "section-0105"
+      ],
+      "rationale": "选择公司主要业务与经营模式（section-0016及其子节0018）说明产品/服务与经营方式；主营业务分析概述（0030、0031）提供经营综述与本期变化；营业收入整体情况（0037）为收入构成与分景区/分业务权重核心表；主要销售客户与供应商（0080、0081）补充客户渠道与资源投入；主要控股参股公司分析（0105）补充经营主体结构。均为公司层面实质经营讨论，避免纯行业背景与治理章节。",
+      "deferred": [
+        "section-0019行业情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0023核心竞争力：偏泛化竞争力描述，信息密度低于经营分析",
+        "section-0083研发投入、0085现金流：非本次业务结构与收入构成核心，暂缓",
+        "section-0305财务报告及附注：仅在收入构成有缺口时定向补充，不整体展开"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成与主要经营主体，足以回答经营与赚钱方式；行业背景与详细财务附注属次要或定向补充范围，可在不扩读全报告的前提下停止。"
+    },
+    "usage": {
+      "input_tokens": 17239,
+      "output_tokens": 303,
+      "total_tokens": 17542
+    }
+  },
+  {
+    "request_id": "bp-work-8a47bdc6129671bc9ca0fca1:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "ca0052c48a6c56613c407d02a5ef5cdf8763acecb291462f53f228ee5f3dc084",
+    "response_hash": "1a21c78c0f235ce32fdbb2cdce9f081eae465d33611d693b341524708a104ec6",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司以“主题公园+文化演艺”独创模式为根基，依托“宋城”“千古情”两大品牌，构建现场演艺、旅游服务双轮驱动的文旅生态；报告期内主要从事现场演艺业务和旅游服务业务，主营业务未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"现场演艺以主题公园等特定场景为载体，为客户提供以现场演艺为核心、集互动体验等内容于一体的综合性文旅产品；截至报告期末开业运营项目包括杭州宋城旅游区、三亚千古情景区、丽江千古情景区、九寨千古情景区、桂林千古情景区、张家界千古情景区、西安千古情景区、上海千古情景区、广东千古情景区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F03\",\"text\":\"旅游服务包括轻资产输出业务和网络票务销售业务；轻资产输出由公司向合作方提供品牌授权、规划设计、导演编创、托管运营等服务，收取一揽子服务费用及受托经营管理费，截至报告期末已开业运营的轻资产输出项目有长沙炭河古城、宜春明月千古情景区、三峡千古情景区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F04\",\"text\":\"网络票务销售业务主要指对公司运营项目的门票、演出票进行线上直销和分销，以及在此基础上叠加第三方供应商形成的联票和套票销售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F05\",\"text\":\"分行业收入构成中，文化艺术业-现场演艺与旅游服务业为两大行业类别；分产品收入构成中，除各千古情景区外，还包括电子商务手续费和设计策划费。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F06\",\"text\":\"公司2025年营业收入合计2,257,598,020.98元，占营业收入比重100%，同比下降6.61%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"2,257,598,020.98\",\"value\":\"2257598020.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入合计同比增减\",\"raw_value\":\"-6.61%\",\"value\":\"-6.61\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F07\",\"text\":\"分行业看，文化艺术业-现场演艺营业收入1,890,841,594.92元，占营业收入比重83.75%，同比下降3.47%；旅游服务业营业收入366,756,426.06元，占营业收入比重16.25%，同比下降20.02%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"文化艺术业-现场演艺营业收入\",\"raw_value\":\"1,890,841,594.92\",\"value\":\"1890841594.92\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"文化艺术业-现场演艺占营业收入比重\",\"raw_value\":\"83.75%\",\"value\":\"83.75\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业营业收入\",\"raw_value\":\"366,756,426.06\",\"value\":\"366756426.06\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业占营业收入比重\",\"raw_value\":\"16.25%\",\"value\":\"16.25\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F08\",\"text\":\"分产品看，杭州宋城旅游区营业收入633,702,354.28元，占28.07%；三亚千古情景区151,673,318.44元，占6.72%；丽江千古情景区246,929,504.98元，占10.94%；九寨千古情景区103,353,136.89元，占4.58%；桂林千古情景区214,133,272.97元，占9.49%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"杭州宋城旅游区营业收入\",\"raw_value\":\"633,702,354.28\",\"value\":\"633702354.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"杭州宋城旅游区占营业收入比重\",\"raw_value\":\"28.07%\",\"value\":\"28.07\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"三亚千古情景区营业收入\",\"raw_value\":\"151,673,318.44\",\"value\":\"151673318.44\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"三亚千古情景区占营业收入比重\",\"raw_value\":\"6.72%\",\"value\":\"6.72\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"丽江千古情景区营业收入\",\"raw_value\":\"246,929,504.98\",\"value\":\"246929504.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"丽江千古情景区占营业收入比重\",\"raw_value\":\"10.94%\",\"value\":\"10.94\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"九寨千古情景区营业收入\",\"raw_value\":\"103,353,136.89\",\"value\":\"103353136.89\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"九寨千古情景区占营业收入比重\",\"raw_value\":\"4.58%\",\"value\":\"4.58\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"桂林千古情景区营业收入\",\"raw_value\":\"214,133,272.97\",\"value\":\"214133272.97\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"桂林千古情景区占营业收入比重\",\"raw_value\":\"9.49%\",\"value\":\"9.49\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"分产品看，张家界千古情景区营业收入20,288,888.18元，占0.90%；西安千古情景区160,705,389.39元，占7.12%；上海千古情景区165,273,827.70元，占7.32%；广东千古情景区194,781,902.09元，占8.63%；电子商务手续费236,499,617.69元，占10.48%；设计策划费130,256,808.37元，占5.77%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"张家界千古情景区营业收入\",\"raw_value\":\"20,288,888.18\",\"value\":\"20288888.18\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"张家界千古情景区占营业收入比重\",\"raw_value\":\"0.90%\",\"value\":\"0.90\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"西安千古情景区营业收入\",\"raw_value\":\"160,705,389.39\",\"value\":\"160705389.39\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"西安千古情景区占营业收入比重\",\"raw_value\":\"7.12%\",\"value\":\"7.12\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海千古情景区营业收入\",\"raw_value\":\"165,273,827.70\",\"value\":\"165273827.70\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海千古情景区占营业收入比重\",\"raw_value\":\"7.32%\",\"value\":\"7.32\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"广东千古情景区营业收入\",\"raw_value\":\"194,781,902.09\",\"value\":\"194781902.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"广东千古情景区占营业收入比重\",\"raw_value\":\"8.63%\",\"value\":\"8.63\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"电子商务手续费营业收入\",\"raw_value\":\"236,499,617.69\",\"value\":\"236499617.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"电子商务手续费占营业收入比重\",\"raw_value\":\"10.48%\",\"value\":\"10.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"设计策划费营业收入\",\"raw_value\":\"130,256,808.37\",\"value\":\"130256808.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"设计策划费占营业收入比重\",\"raw_value\":\"5.77%\",\"value\":\"5.77\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F10\",\"text\":\"占公司营业收入或营业利润10%以上的分行业毛利率：文化艺术业-现场演艺毛利率58.64%，同比下降2.20个百分点；旅游服务业毛利率96.31%，同比下降0.21个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"文化艺术业-现场演艺毛利率\",\"raw_value\":\"58.64%\",\"value\":\"58.64\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"文化艺术业-现场演艺毛利率同比增减\",\"raw_value\":\"-2.20%\",\"value\":\"-2.20\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业毛利率\",\"raw_value\":\"96.31%\",\"value\":\"96.31\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业毛利率同比增减\",\"raw_value\":\"-0.21%\",\"value\":\"-0.21\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F11\",\"text\":\"分地区收入构成中，浙江省杭州市营业收入1,000,458,780.34元，占44.32%；海南省三亚市151,673,318.44元，占6.72%；云南省丽江市246,929,504.98元，占10.94%；四川省九寨沟县103,353,136.89元，占4.58%；广西省桂林市214,133,272.97元，占9.49%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"浙江省杭州市营业收入\",\"raw_value\":\"1,000,458,780.34\",\"value\":\"1000458780.34\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"浙江省杭州市占营业收入比重\",\"raw_value\":\"44.32%\",\"value\":\"44.32\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"海南省三亚市营业收入\",\"raw_value\":\"151,673,318.44\",\"value\":\"151673318.44\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"云南省丽江市营业收入\",\"raw_value\":\"246,929,504.98\",\"value\":\"246929504.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"四川省九寨沟县营业收入\",\"raw_value\":\"103,353,136.89\",\"value\":\"103353136.89\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"广西省桂林市营业收入\",\"raw_value\":\"214,133,272.97\",\"value\":\"214133272.97\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"分地区收入构成中，湖南省张家界市营业收入20,288,888.18元，占0.90%；陕西省西安市160,705,389.39元，占7.12%；上海市165,273,827.70元，占7.32%；广东省佛山市194,781,902.09元，占8.63%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"湖南省张家界市营业收入\",\"raw_value\":\"20,288,888.18\",\"value\":\"20288888.18\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"陕西省西安市营业收入\",\"raw_value\":\"160,705,389.39\",\"value\":\"160705389.39\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"上海市营业收入\",\"raw_value\":\"165,273,827.70\",\"value\":\"165273827.70\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"广东省佛山市营业收入\",\"raw_value\":\"194,781,902.09\",\"value\":\"194781902.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"营业成本构成中，文化艺术业-现场演艺的现场演艺成本782,131,340.42元，占营业成本比重98.30%，同比增加1.98%；旅游服务业成本13,550,448.28元，占1.70%，同比下降15.16%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"现场演艺成本\",\"raw_value\":\"782,131,340.42\",\"value\":\"782131340.42\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"现场演艺成本占营业成本比重\",\"raw_value\":\"98.30%\",\"value\":\"98.30\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业成本\",\"raw_value\":\"13,550,448.28\",\"value\":\"13550448.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"旅游服务业成本占营业成本比重\",\"raw_value\":\"1.70%\",\"value\":\"1.70\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"报告期内公司规模化引进100余名管理和AI专业人才，搭建AI技术研发与应用专属团队；将总部十多个部门精简整合为AI创新中心、AI管理中心两大核心系统；成立AI管理中台与AI艺术中央厨房两大AI平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F15\",\"text\":\"公司通过收购宋城实业储备杭州大本营扩容升级空间，解决土地紧缺、产品迭代受限、停车与后勤不足等痛点，并强化杭州大本营中央厨房基地功能，为全国各地景区提供标准化、集约化赋能支持。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F16\",\"text\":\"前五名客户合计销售金额747,013,861.09元，占年度销售总额比例33.09%；前五名客户销售额中关联方销售额占年度销售总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"747,013,861.09\",\"value\":\"747013861.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"33.09%\",\"value\":\"33.09\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额中关联方销售额占年度销售总额比例\",\"raw_value\":\"0.00%\",\"value\":\"0.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"前五名供应商合计采购金额65,054,925.39元，占年度采购总额比例12.47%；前五名供应商采购额中关联方采购额占年度采购总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"65,054,925.39\",\"value\":\"65054925.39\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"12.47%\",\"value\":\"12.47\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额中关联方采购额占年度采购总额比例\",\"raw_value\":\"0.00%\",\"value\":\"0.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F18\",\"text\":\"报告期内公司实现营业收入225,759.80万元，同比下降6.61%；归属于上市公司股东的净利润81,767.05万元，同比下降22.03%；归属于上市公司股东的扣除非经常性损益的净利润78,454.15万元，同比下降23.99%；经营活动产生的现金流量净额154,593.12万元，同比上升6.96%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"225,759.80\",\"value\":\"225759.80\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"-6.61%\",\"value\":\"-6.61\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"81,767.05\",\"value\":\"81767.05\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比增减\",\"raw_value\":\"-22.03%\",\"value\":\"-22.03\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"78,454.15\",\"value\":\"78454.15\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润同比增减\",\"raw_value\":\"-23.99%\",\"value\":\"-23.99\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"154,593.12\",\"value\":\"154593.12\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额同比增减\",\"raw_value\":\"6.96%\",\"value\":\"6.96\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"上海项目依托高品质演艺内容持续深耕市场，经营业绩表现突出；西安项目通过持续加码内容创新和执行精准营销策略，游客量在高基数上实现稳步增长；杭州项目全面推进演艺产品迭代与沉浸式体验升级；桂林项目深入推动业态创新和散客转化，市场占有率断档领先。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"]},{\"fact_id\":\"F20\",\"text\":\"销售费用212,986,227.02元，同比增加51.85%，主要系报告期内公司广告宣传投入以及平台的技术服务费同比增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"销售费用\",\"raw_value\":\"212,986,227.02\",\"value\":\"212986227.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"销售费用同比增减\",\"raw_value\":\"51.85%\",\"value\":\"51.85\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"2025年是公司从传统文旅演艺向“文化+科技+AI+新场景”全面转型升级的战略奠基年，公司持续推进人才、平台、组织三大关键布局，为2026年落地见效筑基蓄能。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F22\",\"text\":\"公司先后签订青岛“丝路千古情”和台州“东海千古情”两大轻资产输出项目，进一步巩固行业领军地位，放大品牌价值。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F23\",\"text\":\"报告期内合并范围发生变动，本年减少合并单位宋城科技发展有限公司，投资比例100%，于2025年1月工商注销。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}]},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"公司第十三次荣膺“全国文化企业30强”称号，《上海千古情》入选第二批全国旅游演艺精品名录。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F25\",\"text\":\"主要子公司中，杭州宋城演艺谷科技文化发展有限公司（主题公园+演艺）营业收入531,945,935.82元，营业利润307,769,220.86元，净利润258,165,154.88元；丽江茶马古城旅游发展有限公司营业收入246,929,504.98元，净利润131,729,252.65元；佛山市南海樵山文化旅游发展有限公司营业收入194,781,902.09元，净利润69,414,319.09元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0012\"],\"metrics\":[{\"name\":\"杭州宋城演艺谷科技文化发展有限公司营业收入\",\"raw_value\":\"531,945,935.82\",\"value\":\"531945935.82\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"杭州宋城演艺谷科技文化发展有限公司净利润\",\"raw_value\":\"258,165,154.88\",\"value\":\"258165154.88\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"丽江茶马古城旅游发展有限公司营业收入\",\"raw_value\":\"246,929,504.98\",\"value\":\"246929504.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"丽江茶马古城旅游发展有限公司净利润\",\"raw_value\":\"131,729,252.65\",\"value\":\"131729252.65\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"佛山市南海樵山文化旅游发展有限公司营业收入\",\"raw_value\":\"194,781,902.09\",\"value\":\"194781902.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"佛山市南海樵山文化旅游发展有限公司净利润\",\"raw_value\":\"69,414,319.09\",\"value\":\"69414319.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"公司以“主题公园+文化演艺”模式运营，现场演艺以主题公园等特定场景为载体提供综合性文旅产品；旅游服务中的轻资产输出向合作方提供品牌授权、规划设计、导演编创、托管运营等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"选定章节未披露具体原材料、能源或资源采购品类及来源；仅披露前五名供应商合计采购金额及占比，未列明采购内容。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"公司客户包括现场演艺的游客及网络票务销售业务中的门票、演出票购买方，以及轻资产输出业务的合作方；前五名客户合计销售金额占年度销售总额比例33.09%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0007\"]}]}},\"limitations\":[\"选定章节未披露各景区游客量、客单价等经营指标明细。\",\"未获取各产品收入对应的成本明细（仅披露占营业收入或营业利润10%以上项目的成本与毛利率）。\",\"未获取轻资产输出项目收入与网络票务销售业务收入的单独拆分金额。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司以“主题公园+文化演艺”独创模式为根基，依托“宋城”“千古情”两大品牌，构建现场演艺、旅游服务双轮驱动的文旅生态；报告期内主要从事现场演艺业务和旅游服务业务，主营业务未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "现场演艺以主题公园等特定场景为载体，为客户提供以现场演艺为核心、集互动体验等内容于一体的综合性文旅产品；截至报告期末开业运营项目包括杭州宋城旅游区、三亚千古情景区、丽江千古情景区、九寨千古情景区、桂林千古情景区、张家界千古情景区、西安千古情景区、上海千古情景区、广东千古情景区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "旅游服务包括轻资产输出业务和网络票务销售业务；轻资产输出由公司向合作方提供品牌授权、规划设计、导演编创、托管运营等服务，收取一揽子服务费用及受托经营管理费，截至报告期末已开业运营的轻资产输出项目有长沙炭河古城、宜春明月千古情景区、三峡千古情景区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F04",
+              "text": "网络票务销售业务主要指对公司运营项目的门票、演出票进行线上直销和分销，以及在此基础上叠加第三方供应商形成的联票和套票销售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "分行业收入构成中，文化艺术业-现场演艺与旅游服务业为两大行业类别；分产品收入构成中，除各千古情景区外，还包括电子商务手续费和设计策划费。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F06",
+              "text": "公司2025年营业收入合计2,257,598,020.98元，占营业收入比重100%，同比下降6.61%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "2,257,598,020.98",
+                  "value": "2257598020.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入合计同比增减",
+                  "raw_value": "-6.61%",
+                  "value": "-6.61",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "分行业看，文化艺术业-现场演艺营业收入1,890,841,594.92元，占营业收入比重83.75%，同比下降3.47%；旅游服务业营业收入366,756,426.06元，占营业收入比重16.25%，同比下降20.02%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "文化艺术业-现场演艺营业收入",
+                  "raw_value": "1,890,841,594.92",
+                  "value": "1890841594.92",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "文化艺术业-现场演艺占营业收入比重",
+                  "raw_value": "83.75%",
+                  "value": "83.75",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业营业收入",
+                  "raw_value": "366,756,426.06",
+                  "value": "366756426.06",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业占营业收入比重",
+                  "raw_value": "16.25%",
+                  "value": "16.25",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "分产品看，杭州宋城旅游区营业收入633,702,354.28元，占28.07%；三亚千古情景区151,673,318.44元，占6.72%；丽江千古情景区246,929,504.98元，占10.94%；九寨千古情景区103,353,136.89元，占4.58%；桂林千古情景区214,133,272.97元，占9.49%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "杭州宋城旅游区营业收入",
+                  "raw_value": "633,702,354.28",
+                  "value": "633702354.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "杭州宋城旅游区占营业收入比重",
+                  "raw_value": "28.07%",
+                  "value": "28.07",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "三亚千古情景区营业收入",
+                  "raw_value": "151,673,318.44",
+                  "value": "151673318.44",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "三亚千古情景区占营业收入比重",
+                  "raw_value": "6.72%",
+                  "value": "6.72",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "丽江千古情景区营业收入",
+                  "raw_value": "246,929,504.98",
+                  "value": "246929504.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "丽江千古情景区占营业收入比重",
+                  "raw_value": "10.94%",
+                  "value": "10.94",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "九寨千古情景区营业收入",
+                  "raw_value": "103,353,136.89",
+                  "value": "103353136.89",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "九寨千古情景区占营业收入比重",
+                  "raw_value": "4.58%",
+                  "value": "4.58",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "桂林千古情景区营业收入",
+                  "raw_value": "214,133,272.97",
+                  "value": "214133272.97",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "桂林千古情景区占营业收入比重",
+                  "raw_value": "9.49%",
+                  "value": "9.49",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "分产品看，张家界千古情景区营业收入20,288,888.18元，占0.90%；西安千古情景区160,705,389.39元，占7.12%；上海千古情景区165,273,827.70元，占7.32%；广东千古情景区194,781,902.09元，占8.63%；电子商务手续费236,499,617.69元，占10.48%；设计策划费130,256,808.37元，占5.77%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "张家界千古情景区营业收入",
+                  "raw_value": "20,288,888.18",
+                  "value": "20288888.18",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "张家界千古情景区占营业收入比重",
+                  "raw_value": "0.90%",
+                  "value": "0.90",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "西安千古情景区营业收入",
+                  "raw_value": "160,705,389.39",
+                  "value": "160705389.39",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "西安千古情景区占营业收入比重",
+                  "raw_value": "7.12%",
+                  "value": "7.12",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海千古情景区营业收入",
+                  "raw_value": "165,273,827.70",
+                  "value": "165273827.70",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海千古情景区占营业收入比重",
+                  "raw_value": "7.32%",
+                  "value": "7.32",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "广东千古情景区营业收入",
+                  "raw_value": "194,781,902.09",
+                  "value": "194781902.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "广东千古情景区占营业收入比重",
+                  "raw_value": "8.63%",
+                  "value": "8.63",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "电子商务手续费营业收入",
+                  "raw_value": "236,499,617.69",
+                  "value": "236499617.69",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "电子商务手续费占营业收入比重",
+                  "raw_value": "10.48%",
+                  "value": "10.48",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "设计策划费营业收入",
+                  "raw_value": "130,256,808.37",
+                  "value": "130256808.37",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "设计策划费占营业收入比重",
+                  "raw_value": "5.77%",
+                  "value": "5.77",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "占公司营业收入或营业利润10%以上的分行业毛利率：文化艺术业-现场演艺毛利率58.64%，同比下降2.20个百分点；旅游服务业毛利率96.31%，同比下降0.21个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "文化艺术业-现场演艺毛利率",
+                  "raw_value": "58.64%",
+                  "value": "58.64",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "文化艺术业-现场演艺毛利率同比增减",
+                  "raw_value": "-2.20%",
+                  "value": "-2.20",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业毛利率",
+                  "raw_value": "96.31%",
+                  "value": "96.31",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业毛利率同比增减",
+                  "raw_value": "-0.21%",
+                  "value": "-0.21",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F11",
+              "text": "分地区收入构成中，浙江省杭州市营业收入1,000,458,780.34元，占44.32%；海南省三亚市151,673,318.44元，占6.72%；云南省丽江市246,929,504.98元，占10.94%；四川省九寨沟县103,353,136.89元，占4.58%；广西省桂林市214,133,272.97元，占9.49%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "浙江省杭州市营业收入",
+                  "raw_value": "1,000,458,780.34",
+                  "value": "1000458780.34",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "浙江省杭州市占营业收入比重",
+                  "raw_value": "44.32%",
+                  "value": "44.32",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海南省三亚市营业收入",
+                  "raw_value": "151,673,318.44",
+                  "value": "151673318.44",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "云南省丽江市营业收入",
+                  "raw_value": "246,929,504.98",
+                  "value": "246929504.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "四川省九寨沟县营业收入",
+                  "raw_value": "103,353,136.89",
+                  "value": "103353136.89",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "广西省桂林市营业收入",
+                  "raw_value": "214,133,272.97",
+                  "value": "214133272.97",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "分地区收入构成中，湖南省张家界市营业收入20,288,888.18元，占0.90%；陕西省西安市160,705,389.39元，占7.12%；上海市165,273,827.70元，占7.32%；广东省佛山市194,781,902.09元，占8.63%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "湖南省张家界市营业收入",
+                  "raw_value": "20,288,888.18",
+                  "value": "20288888.18",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "陕西省西安市营业收入",
+                  "raw_value": "160,705,389.39",
+                  "value": "160705389.39",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上海市营业收入",
+                  "raw_value": "165,273,827.70",
+                  "value": "165273827.70",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "广东省佛山市营业收入",
+                  "raw_value": "194,781,902.09",
+                  "value": "194781902.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F13",
+              "text": "营业成本构成中，文化艺术业-现场演艺的现场演艺成本782,131,340.42元，占营业成本比重98.30%，同比增加1.98%；旅游服务业成本13,550,448.28元，占1.70%，同比下降15.16%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "现场演艺成本",
+                  "raw_value": "782,131,340.42",
+                  "value": "782131340.42",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "现场演艺成本占营业成本比重",
+                  "raw_value": "98.30%",
+                  "value": "98.30",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业成本",
+                  "raw_value": "13,550,448.28",
+                  "value": "13550448.28",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "旅游服务业成本占营业成本比重",
+                  "raw_value": "1.70%",
+                  "value": "1.70",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "报告期内公司规模化引进100余名管理和AI专业人才，搭建AI技术研发与应用专属团队；将总部十多个部门精简整合为AI创新中心、AI管理中心两大核心系统；成立AI管理中台与AI艺术中央厨房两大AI平台。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "公司通过收购宋城实业储备杭州大本营扩容升级空间，解决土地紧缺、产品迭代受限、停车与后勤不足等痛点，并强化杭州大本营中央厨房基地功能，为全国各地景区提供标准化、集约化赋能支持。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F16",
+              "text": "前五名客户合计销售金额747,013,861.09元，占年度销售总额比例33.09%；前五名客户销售额中关联方销售额占年度销售总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "747,013,861.09",
+                  "value": "747013861.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "33.09%",
+                  "value": "33.09",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额中关联方销售额占年度销售总额比例",
+                  "raw_value": "0.00%",
+                  "value": "0.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "前五名供应商合计采购金额65,054,925.39元，占年度采购总额比例12.47%；前五名供应商采购额中关联方采购额占年度采购总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "65,054,925.39",
+                  "value": "65054925.39",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "12.47%",
+                  "value": "12.47",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额中关联方采购额占年度采购总额比例",
+                  "raw_value": "0.00%",
+                  "value": "0.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F18",
+              "text": "报告期内公司实现营业收入225,759.80万元，同比下降6.61%；归属于上市公司股东的净利润81,767.05万元，同比下降22.03%；归属于上市公司股东的扣除非经常性损益的净利润78,454.15万元，同比下降23.99%；经营活动产生的现金流量净额154,593.12万元，同比上升6.96%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "225,759.80",
+                  "value": "225759.80",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "-6.61%",
+                  "value": "-6.61",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "81,767.05",
+                  "value": "81767.05",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润同比增减",
+                  "raw_value": "-22.03%",
+                  "value": "-22.03",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+                  "raw_value": "78,454.15",
+                  "value": "78454.15",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的扣除非经常性损益的净利润同比增减",
+                  "raw_value": "-23.99%",
+                  "value": "-23.99",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "154,593.12",
+                  "value": "154593.12",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额同比增减",
+                  "raw_value": "6.96%",
+                  "value": "6.96",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "上海项目依托高品质演艺内容持续深耕市场，经营业绩表现突出；西安项目通过持续加码内容创新和执行精准营销策略，游客量在高基数上实现稳步增长；杭州项目全面推进演艺产品迭代与沉浸式体验升级；桂林项目深入推动业态创新和散客转化，市场占有率断档领先。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "销售费用212,986,227.02元，同比增加51.85%，主要系报告期内公司广告宣传投入以及平台的技术服务费同比增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "销售费用",
+                  "raw_value": "212,986,227.02",
+                  "value": "212986227.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "销售费用同比增减",
+                  "raw_value": "51.85%",
+                  "value": "51.85",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F21",
+              "text": "2025年是公司从传统文旅演艺向“文化+科技+AI+新场景”全面转型升级的战略奠基年，公司持续推进人才、平台、组织三大关键布局，为2026年落地见效筑基蓄能。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "公司先后签订青岛“丝路千古情”和台州“东海千古情”两大轻资产输出项目，进一步巩固行业领军地位，放大品牌价值。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "报告期内合并范围发生变动，本年减少合并单位宋城科技发展有限公司，投资比例100%，于2025年1月工商注销。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ]
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F24",
+              "text": "公司第十三次荣膺“全国文化企业30强”称号，《上海千古情》入选第二批全国旅游演艺精品名录。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "主要子公司中，杭州宋城演艺谷科技文化发展有限公司（主题公园+演艺）营业收入531,945,935.82元，营业利润307,769,220.86元，净利润258,165,154.88元；丽江茶马古城旅游发展有限公司营业收入246,929,504.98元，净利润131,729,252.65元；佛山市南海樵山文化旅游发展有限公司营业收入194,781,902.09元，净利润69,414,319.09元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "杭州宋城演艺谷科技文化发展有限公司营业收入",
+                  "raw_value": "531,945,935.82",
+                  "value": "531945935.82",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "杭州宋城演艺谷科技文化发展有限公司净利润",
+                  "raw_value": "258,165,154.88",
+                  "value": "258165154.88",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "丽江茶马古城旅游发展有限公司营业收入",
+                  "raw_value": "246,929,504.98",
+                  "value": "246929504.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "丽江茶马古城旅游发展有限公司净利润",
+                  "raw_value": "131,729,252.65",
+                  "value": "131729252.65",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "佛山市南海樵山文化旅游发展有限公司营业收入",
+                  "raw_value": "194,781,902.09",
+                  "value": "194781902.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "佛山市南海樵山文化旅游发展有限公司净利润",
+                  "raw_value": "69,414,319.09",
+                  "value": "69414319.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F26",
+              "text": "公司以“主题公园+文化演艺”模式运营，现场演艺以主题公园等特定场景为载体提供综合性文旅产品；旅游服务中的轻资产输出向合作方提供品牌授权、规划设计、导演编创、托管运营等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "选定章节未披露具体原材料、能源或资源采购品类及来源；仅披露前五名供应商合计采购金额及占比，未列明采购内容。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F27",
+              "text": "公司客户包括现场演艺的游客及网络票务销售业务中的门票、演出票购买方，以及轻资产输出业务的合作方；前五名客户合计销售金额占年度销售总额比例33.09%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0007"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "选定章节未披露各景区游客量、客单价等经营指标明细。",
+        "未获取各产品收入对应的成本明细（仅披露占营业收入或营业利润10%以上项目的成本与毛利率）。",
+        "未获取轻资产输出项目收入与网络票务销售业务收入的单独拆分金额。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 11923,
+      "output_tokens": 6639,
+      "total_tokens": 18562
+    }
+  },
+  {
+    "request_id": "bp-work-8a47bdc6129671bc9ca0fca1:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "5086bca4bb7a8783585de94948e3f60a50eea0cbbb7f05a227e012c5157783bf",
+    "response_hash": "2510ccf6f98e65501107d74dafa028c7a537ddd7a7829914a2ce5d4b69c0a89c",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F26\",\"F27\"],\"findings\":[{\"finding_id\":\"REV-001\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F15\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"原文以“通过收购宋城实业储备扩容升级空间，系统解决土地紧缺、产品迭代受限、停车与后勤不足等关键痛点”描述报告期内动作，但“强化杭州大本营中央厨房基地功能，为全国各地景区提供标准化、集约化的赋能支持”位于“后续将”之后，与发挥规模效应、构建闭环式演艺度假区、推动释放增长动能并列，属于后续安排。F15用“并”将其写成已完成事项，缺少计划属性。收购储备扩容及针对上述痛点的已支持内容可保留，后半句应限定为后续将实施，不得表述为报告期内已经实现。\"},{\"finding_id\":\"REV-002\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F19\",\"evidence_ids\":[\"source-0002\",\"source-0003\"],\"explanation\":\"该事实分别描述上海、西安、杭州、桂林各项目的经营表现、游客量和市场占有率，原文主体是各景区项目，不是集团整体。subject_scope标为consolidated_group，会把项目层面的定性表现提升为合并集团范围。应改为business_segment；正文已点名的项目及原文支持的定性表述可保留，不必改写成集团整体结论。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F26",
+        "F27"
+      ],
+      "findings": [
+        {
+          "finding_id": "REV-001",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F15",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "原文以“通过收购宋城实业储备扩容升级空间，系统解决土地紧缺、产品迭代受限、停车与后勤不足等关键痛点”描述报告期内动作，但“强化杭州大本营中央厨房基地功能，为全国各地景区提供标准化、集约化的赋能支持”位于“后续将”之后，与发挥规模效应、构建闭环式演艺度假区、推动释放增长动能并列，属于后续安排。F15用“并”将其写成已完成事项，缺少计划属性。收购储备扩容及针对上述痛点的已支持内容可保留，后半句应限定为后续将实施，不得表述为报告期内已经实现。"
+        },
+        {
+          "finding_id": "REV-002",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F19",
+          "evidence_ids": [
+            "source-0002",
+            "source-0003"
+          ],
+          "explanation": "该事实分别描述上海、西安、杭州、桂林各项目的经营表现、游客量和市场占有率，原文主体是各景区项目，不是集团整体。subject_scope标为consolidated_group，会把项目层面的定性表现提升为合并集团范围。应改为business_segment；正文已点名的项目及原文支持的定性表述可保留，不必改写成集团整体结论。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 19796,
+      "output_tokens": 446,
+      "total_tokens": 39339
+    }
+  },
+  {
+    "request_id": "bp-work-8a47bdc6129671bc9ca0fca1:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "8e709a02379361ec54a8f600335627e18d4bf558ce25617e48453cb0decac889",
+    "response_hash": "724c2638361e8c650184e9b05ed8c18c01ddd0913784e8b0283edde584a97f22",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F15\",\"text\":\"公司通过收购宋城实业储备杭州大本营扩容升级空间，解决土地紧缺、产品迭代受限、停车与后勤不足等痛点；后续将充分发挥规模效应和协同优势，构建层次更丰富、停留时间更长的闭环式演艺度假区，推动释放新一轮增长动能，并强化杭州大本营中央厨房基地功能，为全国各地景区提供标准化、集约化的赋能支持。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F19\",\"text\":\"上海项目依托高品质演艺内容持续深耕市场，经营业绩表现突出；西安项目通过持续加码内容创新和执行精准营销策略，游客量在高基数上实现稳步增长；杭州项目全面推进演艺产品迭代与沉浸式体验升级；桂林项目深入推动业态创新和散客转化，市场占有率断档领先。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F15",
+          "text": "公司通过收购宋城实业储备杭州大本营扩容升级空间，解决土地紧缺、产品迭代受限、停车与后勤不足等痛点；后续将充分发挥规模效应和协同优势，构建层次更丰富、停留时间更长的闭环式演艺度假区，推动释放新一轮增长动能，并强化杭州大本营中央厨房基地功能，为全国各地景区提供标准化、集约化的赋能支持。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F19",
+          "text": "上海项目依托高品质演艺内容持续深耕市场，经营业绩表现突出；西安项目通过持续加码内容创新和执行精准营销策略，游客量在高基数上实现稳步增长；杭州项目全面推进演艺产品迭代与沉浸式体验升级；桂林项目深入推动业态创新和散客转化，市场占有率断档领先。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002",
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 9228,
+      "output_tokens": 252,
+      "total_tokens": 9480
+    }
+  },
+  {
+    "request_id": "bp-work-8a47bdc6129671bc9ca0fca1:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "170770801fde59335103e177ca21984958a8c02c53930136d45d7e577f16af4e",
+    "response_hash": "d6755474f8051057cfc523ffd958e079eeaa5a3fc969578d5fa730acf2dbafce",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F15\",\"F19\"],\"checks\":[{\"fact_id\":\"F15\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"原文将收购宋城实业、储备扩容并系统解决土地紧缺等痛点置于“后续将”之前，而发挥规模效应、构建闭环式演艺度假区、释放增长动能及强化杭州大本营中央厨房基地功能均属后续安排。候选已用“后续将”统一限定后半部分，未再表述为报告期内已实现；主体“公司”按报告正文口径对应合并集团，期间与证据相符。\"},{\"fact_id\":\"F19\",\"accepted\":true,\"evidence_ids\":[\"source-0002\",\"source-0003\"],\"explanation\":\"原文分别以上海、西安、杭州、桂林项目描述经营表现、游客量和市场占有率，并非集团整体结论。候选将主体改为business_segment，并保留各项目有原文支持的定性表述；省略杭州项目“持续保持市场热度”不影响核心事实，也未提升为合并范围结论。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F15",
+        "F19"
+      ],
+      "checks": [
+        {
+          "fact_id": "F15",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "原文将收购宋城实业、储备扩容并系统解决土地紧缺等痛点置于“后续将”之前，而发挥规模效应、构建闭环式演艺度假区、释放增长动能及强化杭州大本营中央厨房基地功能均属后续安排。候选已用“后续将”统一限定后半部分，未再表述为报告期内已实现；主体“公司”按报告正文口径对应合并集团，期间与证据相符。"
+        },
+        {
+          "fact_id": "F19",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002",
+            "source-0003"
+          ],
+          "explanation": "原文分别以上海、西安、杭州、桂林项目描述经营表现、游客量和市场占有率，并非集团整体结论。候选将主体改为business_segment，并保留各项目有原文支持的定性表述；省略杭州项目“持续保持市场热度”不影响核心事实，也未提升为合并范围结论。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11239,
+      "output_tokens": 242,
+      "total_tokens": 14674
+    }
+  }
+]
