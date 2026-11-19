@@ -1,0 +1,142 @@
+"""Local metadata qualification and original-owner read regression; no model calls."""
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import sqlite3
+import subprocess
+import sys
+import time
+
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=C/'workpaper-general-closure-20261119'
+TEMP=Path(__file__).parent
+GROUPS={
+ 'manufacturing':['600309.SH','600438.SH','002594.SZ','000725.SZ','920002.BJ','920005.BJ'],
+ 'services':['601021.SH','601888.SH','002352.SZ','002027.SZ','300144.SZ','601111.SH'],
+ 'financial':['601601.SH','601881.SH','002142.SZ','601009.SH'],
+ 'other':['000027.SZ','000090.SZ','600663.SH','600655.SH'],
+}
+RESERVES={
+ 'manufacturing':['600690.SH','002415.SZ','920006.BJ'],
+ 'services':['002739.SZ','920003.BJ'],
+ 'financial':['601336.SH','600926.SH','000776.SZ'],
+ 'other':['000069.SZ','600606.SH'],
+}
+
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def dump(p,x):
+ p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(x,ensure_ascii=False,indent=2,default=str)+'\n')
+def load(p):return json.loads(p.read_text())
+
+def qualification():
+ from research.business_profile_documents import classify_business_profile_document
+ import pypdfium2 as pdfium
+ started=time.monotonic()
+ scopes=[str(C),str(ROOT/'data/research')]+[str(p) for p in (ROOT/'docs/development').glob('company_profile*') if p.is_file()]
+ result=subprocess.run(['rg','--no-ignore','-o','--no-filename',r'\b\d{6}\.(?:SH|SZ|BJ)\b',*scopes,
+     '-g','*.json','-g','*.md','-g','!**/workpaper-general-closure-20261119/**',
+     '-g','!**/company-profile-s2-confirmation-card.md'],capture_output=True,text=True)
+ assert result.returncode==0 and not result.stderr
+ excluded=set(result.stdout.splitlines());assert {'600103.SH','601318.SH','920000.BJ'}<=excluded
+ primary=[i for ids in GROUPS.values() for i in ids]
+ assert len(primary)==len(set(primary))==20 and not set(primary)&excluded
+ conn=sqlite3.connect('file:'+str(ROOT/'data/research.db')+'?mode=ro',uri=True)
+ conn.row_factory=sqlite3.Row;conn.execute("attach database 'file:"+str(ROOT/'data/quotes.db')+"?mode=ro' as q")
+ def item(instrument,layer,read_pdf):
+  # Same effective-report relation and scope as the asset read owner; RO only.
+  row=conn.execute('''select e.*, a.title, b.canonical_path,b.content_length,b.integrity_status,
+       v.version_available_at from effective_annual_reports e
+       join official_announcements a on a.announcement_id=e.announcement_id
+       join official_document_blobs b on b.content_hash=e.content_hash
+       left join official_attachment_versions v on v.version_id=e.version_id
+       where e.instrument_id=? and e.fiscal_year=2025 and e.document_family='annual_report'
+       and e.visibility_state='production' order by e.published_at desc limit 1''',(instrument,)).fetchone()
+  assert row is not None,instrument
+  assert row['is_full_report'] and row['integrity_status']=='valid'
+  assert row['published_at']<'2026-11-20' and row['report_period']=='2025-12-31'
+  stock=conn.execute('select name,exchange,industry from q.instruments where instrument_id=?',(instrument,)).fetchone()
+  industry=conn.execute('select sw_l1_name from industry_memberships where instrument_id=? and sw_l1_name is not null order by effective_date desc limit 1',(instrument,)).fetchone()
+  pdf=Path(row['canonical_path']);assert pdf.is_file() and sha(pdf)==row['content_hash']
+  classified=classify_business_profile_document(row['title'],adjunct_type='PDF')
+  assert classified.selected and classified.is_full_report,row['title']
+  pages=None
+  if read_pdf:
+   with pdfium.PdfDocument(pdf) as document:pages=len(document)
+   assert pages>0
+  return dict(instrument_id=instrument,name=stock['name'],exchange=stock['exchange'],layer=layer,
+      sw_l1_name=industry['sw_l1_name'] if industry else None,source_industry=stock['industry'],
+      layer_basis='metadata-based sampling stratum, not an inferred business description',
+      official_title=row['title'],pdf_pages=pages,document_variant=row['variant'],
+      asset=dict(instrument_id=instrument,report_period=row['report_period'],source_asset_id=row['asset_id'],
+          filing_id=row['source_announcement_id'],source=row['source'],published_at=row['published_at'],
+          content_hash=row['content_hash'],archive_path=str(pdf),report_type='annual_report'),
+      official_version_id=row['version_id'],version_available_at=row['version_available_at'],content_length=row['content_length'],
+      business_text_read=False,model_preview=False)
+ rows=[item(i,g,True) for g,ids in GROUPS.items() for i in ids]
+ reserves=[]
+ for g,ids in RESERVES.items():
+  for i in ids:
+   if i not in excluded:reserves.append(item(i,g,False))
+ conn.close()
+ exchanges={x:sum(r['instrument_id'].endswith('.'+x) for r in rows) for x in ['SH','SZ','BJ']}
+ industries=sorted({r['sw_l1_name'] for r in rows if r['sw_l1_name']})
+ assert exchanges['SH']>=6 and exchanges['SZ']>=6 and exchanges['BJ']>=2 and len(industries)>=8
+ dump(DEST/'confirmation-source-plan.json',dict(task='6.DZ',next_phase='S2 sole new confirmation group',
+      status='metadata_qualified_pending_explicit_call_authorization',companies=rows,reserves=reserves,
+      order=primary,counts_by_layer={g:len(ids) for g,ids in GROUPS.items()},counts_by_exchange=exchanges,
+      known_sw_l1_industries=industries,known_sw_l1_count=len(industries),unknown_sw_l1_ids=[r['instrument_id'] for r in rows if r['sw_l1_name'] is None],
+      exclusion_policy='conservative: any mentioned company in prior company-profile evidence/docs/research roots excluded; includes more than actually called firms',
+      excluded_instrument_ids=sorted(excluded),exclusion_scan_sha256=hashlib.sha256(result.stdout.encode()).hexdigest(),
+      exclusion_scan_scopes=['current change','data/research','docs/development/company_profile*'],
+      exclusion_scan_ignores=['this metadata-only preparation directory','this pending confirmation card'],
+      primary_exclusion_hits=[],exclusion_positive_controls=['600103.SH','601318.SH','920000.BJ'],
+      pre_first_run_replacements=[dict(original='600754.SH',replacement='601111.SH',layer='services',exchange='SSE',
+          source_title='锦江酒店年报',filing_id='1225048147',
+          reason='当前入口标题分类不选中这一旧导入短标题；仅源资格/接线不成立，不推断PDF非完整或模型表现。按既定首个同层同交易所候补，0模型/0正文预演前替换。')],
+      replacement_policy='only pre-first-run ineligibility; preserve stratum/exchange/industry quotas and the preordered reserve list; never replace after observing model performance',
+      preparation_seconds=round(time.monotonic()-started,3),new_model_requests=0,new_business_entries=0,
+      model_send_authorization=False,production_authorization='not_authorized',
+      remaining_before_execution=['explicit new public-material/model/budget authorization','independent three-question core references frozen before model, not supplied to model','final source/code/model/prompt/wiring snapshot and approved-network DNS/TLS','recheck qualification if any parallel business preview occurs'],
+      proposed_limits=dict(each_seconds=6000,each_tokens=1000000,each_physical_requests=10,each_recoveries=3,
+          per_logical_recovery=1,high_tier_physical_seconds=1200,high_tier_logical_seconds=2450,flash_physical_seconds=600,
+          concurrency=4,group_seconds=30600,group_tokens=20000000,group_physical_requests=200,known_cost_cny_each=10,
+          unpriced_cost='unknown',total_cny_cap='not_promised'),
+      stops=['same core root cause fails twice consecutively: stop new dispatch','unisolatable core contamination: stop sending','no hotfix, extra window or company21','S2 confirmation failure ends S2 scheme; do not add company41']))
+ print('QUALIFIED_METADATA',len(rows),exchanges,'known SW1',len(industries),flush=True)
+
+def old_regression():
+ from research.company_profile.runtime import CompanyProfileRuntimeRecordV3
+ from research.company_profile.reads import CompanyProfileReadService
+ from research.company_profile.workpaper_sections import extract_selected_layout,index_sections
+ started=time.monotonic();research=ROOT/'data/research/company_profile_audited_20261118'
+ files=sorted((research/'company_profile_common_core.v1').glob('*.json'));assert len(files)==12
+ before={str(p.relative_to(ROOT)):sha(p) for p in files}
+ reader=CompanyProfileReadService(research);rows=[]
+ for p in files:
+  record=CompanyProfileRuntimeRecordV3.model_validate_json(p.read_bytes());paper=record.workpaper
+  version=record.report.document_version
+  pdf=ROOT/'data/filings/announcements/blobs'/version[:2]/(version+'.pdf');assert sha(pdf)==version
+  cache=pdf.parent/'derived/business_profile_pdfium_recovery.v4'/(version+'_57e1dd4f16ef40ff.json.gz')
+  native=json.loads(gzip.decompress(cache.read_bytes()))['pages']
+  index=index_sections(native)
+  pages=sorted({s.page for e in paper.evidence for s in e.source_spans})
+  layout=extract_selected_layout(pdf.read_bytes(),pages,native_pages=native if paper.reading_scope.transcription_version=='shared-pdf-layout-with-native-fallback.v2' else None)
+  paper.validate_pages(layout)
+  detail=reader.research_profile(record.report.instrument_id)
+  assert detail==CompanyProfileReadService(research).research_profile(record.report.instrument_id)
+  visible=[e for e in detail['facts'] if e['fact'] is not None]
+  rows.append(dict(instrument_id=record.report.instrument_id,work_id=record.work_id,visible_facts=len(visible),
+       visible_metrics=sum(len(e['fact']['metrics']) for e in visible),source_coordinates_equal=True,current_heading_count=len(index)))
+  print('OLD_READ_OK',record.report.instrument_id,flush=True)
+ query=reader.query([r['instrument_id'] for r in rows]);exported=reader.export([r['instrument_id'] for r in rows],export_directory=TEMP/'old12-export')
+ assert query['profiles']==exported['profiles']==CompanyProfileReadService(research).query([r['instrument_id'] for r in rows])['profiles']
+ assert all(sha(ROOT/p)==h for p,h in before.items())
+ dump(DEST/'twelve-direct-regression.json',dict(task='6.DZ',companies=12,rows=rows,source_and_api_unchanged=True,
+       original_runtime_sha256=before,visible_facts=sum(r['visible_facts'] for r in rows),visible_metrics=sum(r['visible_metrics'] for r in rows),
+       query_export_fresh_equal=True,new_model_requests=0,new_business_entries=0,new_semantic_claim=False,seconds=round(time.monotonic()-started,3)))
+
+if __name__=='__main__':
+ qualification();old_regression()

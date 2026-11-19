@@ -173,6 +173,11 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **THEN** the patch is not accepted, the affected fact remains withheld and independent business facts stay readable
 - **AND** neither shared-dimension membership nor absence of a new issue alone resolves the original issue
 
+#### Scenario: Independent revenue statements have different reconciliation scopes
+- **WHEN** selected sources contain an independently meaningful company total, principal-business income and a reconciliation adjustment
+- **THEN** extraction and omission review SHOULD organize independently usable assertions and repair targets without bundling unrelated scopes into one all-or-nothing candidate
+- **AND** related same-subject metrics MAY remain together; the program MUST NOT salvage assertions from a rejected candidate by splitting text or guessing scope
+
 #### Scenario: One repair candidate cannot safely bind its source
 - **WHEN** a combined repair has unique known target IDs but one candidate fails its existing source, number or unit checks
 - **THEN** only that candidate is rejected with its original proposal and concrete local reason retained, while independent valid candidates may reach the single bounded final source verification

@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-19 6.DZ通用收口结束：[能力及确认组准备](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-general-closure-20261119/result.md)。抽取v21/复核v12引导独立主体断言/遗漏目标，原JSON/源硬约束和writer事件语义不改；131有效回归＋2新增原TaskService全链替换传输最终通过，旧12只读397/603及源坐标/三读不变，不算新真实成绩。唯一新20家确认源资格/候补/分层已备（6/6/4/4、沪10深8北2、已知SW一级12类），仓库内229保守排除无交集，1短标题首发前按预定候补替换不按模型表现挑样。下一6.EA须新明确外传/整卡预算批准，批准后发送前独立源参考/最终代码及联网接线再冻结；当前0模型/入口/可发送授权。旧S2失败/95%与99%/生产不改，必要一套后清本人QuoteBak和重复导出，不追平安单项或细供应链。
+
 2026-11-19 6.DY原六候选限定再核1/1结束：[实际新增及拒绝](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/result.md)。五通过含两原采纳，三新增补寿险新业务价值、保险投资与归母净利；收入构成因合并抵销主体错误仍拒，不新修订/追加窗。原20保留，新隔离根23可读/44指标、2源参考，5实际采纳有限独核、余按内容hash继承；两组三读/API200一致、11类缺项/1建议可见，旧core_complete=false/S2/DW失败不回算。1物理/0恢复/34399已知total、207.657业务秒，费用unknown。准备只修接续展示说明改hash的P2阻塞，60直接通过/strict/编译；归档异常保留后0模型恢复，一套证据后清本人垃圾。供应链后置，不启确认组/S3或生产。
 
 2026-11-19 6.DX零调用数字消费修复：[结果与真实边界](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-number-consumption-20261119/result.md)。原owner识别数字标点后同一行填充空格、明确财务表/多列科目行独立括号负数，保原文/偏移/raw/value，不跨列拼整数或猜单位/主体。DW四个旧拒绝均复现，新本地检查4/4通过；原seed hash匹配初核输入，原final边界接到6候选批次（4恢复+2原采纳），0新模型/0采纳，不冒领旧两个final。259直接/0跳过、3长入口未重跑，73.46秒，448受保护文件及原API20条不变；strict/Review/编译和本人临时库清理。下一DY仅原6候选批次一次真实再核已有具体待批卡，不重抽/新修订/借DW余额或启生产，供应链细项后置，旧S1/S2/DU/DW失败保持。

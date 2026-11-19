@@ -1,0 +1,13 @@
+{
+  "task": "6.DZ",
+  "files": {
+    "initial-verification.xml": "83abcca691624053c49ba5ec74430849151b4319e7204be187dc29bd743870dd",
+    "preparation-snapshot.txt": "4a448cfaa8e96bd81b002ae98cf57953b533add0560e9a968cd40bd3ee3993df",
+    "cleanup.json": "939c7420c5066cdb9576240909b8bf59a461052b4843a017602e798374712dba",
+    "verification.json": "ce769ef499bd06e67ac57463b4da900e2df54a1862904ea99747049f74540481",
+    "confirmation-source-plan.json": "1019410132ae6e262e051e37e7b67eaaee2083bb9b125f9b8566226781da27cf",
+    "twelve-direct-regression.json": "ec0dc802d2bcec8b88668106193f48c64fb340ec5bf6932e8bd1c508cfee6c90",
+    "result.md": "4d755bcbec0731cc71f81e35bc9d061e52eb8bef50c1b04d97cb2d2f0bb4a1ac",
+    "final-entry-verification.xml": "fd019d1236420ce74b71920c5e7b8fa45e355bbbaa68c6377367837978f219a0"
+  }
+}

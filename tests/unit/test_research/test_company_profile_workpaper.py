@@ -531,9 +531,11 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert "Never infer zero from blank cells" in instructions
         assert "independently usable core assertions" in instructions
         assert "Keep company revenue" in instructions
+        assert "reconciliation/other-business/elimination column" in instructions
+        assert "do not force one fact per metric" in instructions
         assert "No revenue/cost/expense is also a definite zero-like assertion" in instructions
         identity = workpaper_processing_identity(real=False)
-        assert identity["prompt_version"].endswith("missing-information.v20")
+        assert identity["prompt_version"].endswith("independent-assertions.v21")
         assert identity["section_guide_version"].endswith("company-features.v4")
         assert "optional ROOT company_features" in instructions
         assert identity["workpaper_max_output_tokens"] == 12000

@@ -21,7 +21,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-17.missing-information.v20"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-19.independent-assertions.v21"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-15.company-features.v4"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "公司业务/经营模式；公司经营讨论/经营综述/业务回顾的实质子节，优先于纯行业背景和泛化核心竞争力", "priority": "primary"},
@@ -124,6 +124,14 @@ separate from net profit, optional growth-rate comparisons, event timing and unr
 source-basis differences. Keep each main business revenue with its own subject/basis;
 do not hide several unrelated assertions in a single long fact. This lets a local error
 be withheld without losing a correct company total or another business line.
+In particular, keep a company total, each independently meaningful main-business amount,
+and a reconciliation/other-business/elimination column in separate facts when their
+subjects or accounting bases differ. A reconciliation column is not a company total
+or a normal operating business. Preserve its literal label, sign and scope; if that
+mixed scope cannot be expressed safely, keep a sourced uncertain description rather
+than forcing consolidated_group or inventing a business. Do not drop the valid total
+or main businesses merely because the adjustment is uncertain. Related metrics for
+the same subject, period and basis may stay together; do not force one fact per metric.
 Use the same eight-element JSON for manufacturing, services, banks and multi-business
 companies; industry-specific products stay source-native, not new mandatory fields.
 Aim for 12-24 distinct facts and at most about 40 metrics overall, including optional
