@@ -1,0 +1,150 @@
+{
+  "task": "6.DU",
+  "companies": [
+    {
+      "instrument_id": "600113.SH",
+      "name": "XD浙江东",
+      "exchange": "SSE",
+      "layer": "service",
+      "asset": {
+        "instrument_id": "600113.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_f2dda829c32d3b60bf4c34f5087921bf",
+        "filing_id": "1225000442",
+        "source": "cninfo",
+        "published_at": "2026-03-06T16:00:00+00:00",
+        "content_hash": "15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/15/15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 220,
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/600113.json",
+      "source_binding_sha256": "c08cd72860366f4e717c1d9e5bd01e7ffa097f467c318ee3571bfc8bd5adc4e7",
+      "official_title": "浙江东日股份有限公司2025年年度报告（全文）",
+      "classification": "annual_report",
+      "heading_count": 1190,
+      "prepared_sha256": "fa42e589bf8e15d2f52a6692c3855b251a6f3147dc7f2f53d36dd456114e203a"
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "name": "申万宏源",
+      "exchange": "SZSE",
+      "layer": "finance",
+      "asset": {
+        "instrument_id": "000166.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-d48f7d90d7413020a7850ebd",
+        "filing_id": "1225045474",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/6a/6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 458,
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/000166.json",
+      "source_binding_sha256": "b6c7327afc63c170254a7b899b300275fe3b9c8223943674ce4959556f66fc09",
+      "official_title": "2025年年度报告",
+      "classification": "annual_report",
+      "heading_count": 954,
+      "prepared_sha256": "152134f68e748e8d90824642345cf536ea0cf11a345f880f7bf19cc8e613eaac"
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "name": "特  力Ａ",
+      "exchange": "SZSE",
+      "layer": "other",
+      "asset": {
+        "instrument_id": "000025.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-e6e544cf126421e9a24b225b",
+        "filing_id": "1225138352",
+        "source": "cninfo",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "content_hash": "e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e7/e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 170,
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/000025.json",
+      "source_binding_sha256": "66eb95a0958cba2c265414080898b4d642db4b7b960ec05fcf0a6f4b12936b83",
+      "official_title": "2025年年度报告",
+      "classification": "annual_report",
+      "heading_count": 801,
+      "prepared_sha256": "38e2aaa1db3af4c6874def2686eceba2db43bf23357956ff78dfb6dbdb8bdab2"
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "name": "平安银行",
+      "exchange": "SZSE",
+      "layer": "finance",
+      "asset": {
+        "instrument_id": "000001.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-4e7c579345d807aa0699ee5e",
+        "filing_id": "1225022887",
+        "source": "cninfo",
+        "published_at": "2026-03-20T16:00:00+00:00",
+        "content_hash": "2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/22/2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 288,
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/000001.json",
+      "source_binding_sha256": "f6977ff419d3313375cd556d9bca40dd99506fff8f2bf5fb981c6adc286827f7",
+      "official_title": "2025年年度报告",
+      "classification": "annual_report",
+      "heading_count": 1038,
+      "prepared_sha256": "4b107d0be1cc2804907f58db2bf62a4be633acd7879b57c3d06d0e9ad47a0a3f"
+    },
+    {
+      "instrument_id": "600030.SH",
+      "name": "中信证券",
+      "exchange": "SSE",
+      "layer": "finance",
+      "asset": {
+        "instrument_id": "600030.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-966ac8c0a22e5ab07a22c32c",
+        "filing_id": "1225036081",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/43/438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 389,
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/600030.json",
+      "source_binding_sha256": "48aeb91f38c056f5b9ccb0ee4010bc61bcb7c101609dfeedf737f78520c91ec0",
+      "official_title": "中信证券股份有限公司2025年年度报告",
+      "classification": "annual_report",
+      "heading_count": 505,
+      "prepared_sha256": "e35b6a0739f376a6237f2ae115ef6cd7a70134f97f153bf0317d4094cfb6a757"
+    },
+    {
+      "instrument_id": "601318.SH",
+      "name": "中国平安",
+      "exchange": "SSE",
+      "layer": "finance",
+      "asset": {
+        "instrument_id": "601318.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-efc068d2819d50a9092aa70a",
+        "filing_id": "1225038263",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/86/860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 370,
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/601318.json",
+      "source_binding_sha256": "063db8eb403893f5e95740fd6d60eda865f8e094e8423b35a2411db2cf0c684f",
+      "official_title": "2025年年度报告",
+      "classification": "annual_report",
+      "heading_count": 1095,
+      "prepared_sha256": "0135bcd33ab827b2ed6ec4c7f7a6e039a6533072c6cb723c42612c053502e359"
+    }
+  ],
+  "old_semantic_inputs": false
+}

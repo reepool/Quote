@@ -1,0 +1,87 @@
+{
+  "task": "6.DU",
+  "status": "offline_ready_pending_explicit_new_call_approval",
+  "direct_regression_companies": 12,
+  "ready_sources": 6,
+  "new_model_requests": 0,
+  "new_business_entries": 0,
+  "production_authorization": "not_authorized",
+  "code_sha256": {
+    "research/business_profile_documents.py": "d16a33b81473f109e6e5159513c08272dc3ab0479bdf0f7239da90ae751e0924",
+    "research/company_profile/workpaper_llm.py": "4dafd7fa09d633f2f3cd5b53441d53a273035cefd3f1af2935a261f13a735d83",
+    "research/company_profile/workpaper_sections.py": "726171ad1e81d433a1e263702f33e8bab2d0e9950984c7b71e68c390f09b40c9",
+    "research/company_profile/workpaper_review.py": "e3bce8052be3a02e008cbc16e12ff09a589ca1e8bb56b1e5008219b27daa3fc3",
+    "research/company_profile/runtime.py": "f9027a759867144969f23e31564b7b1709628b931d4f34af97425223b2133dbc",
+    "research/company_profile/reads.py": "44df1ccad1c729bb507888e208064c4928a7561fbbe29dcfde7c2002c7f3c4f4",
+    "utils/llm/client.py": "fc44754a0a08a0df8a841f379a06d881ac229e5709136ee06a4029bc968daa85"
+  },
+  "preparation_wall_seconds": 52.474,
+  "protected_research_root": "/home/python/Quote/data/research/company_profile_audited_20261118",
+  "temporary_root": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe",
+  "prepared_sources_rebuild_seconds": 2.457,
+  "cleanup": {
+    "removed": [
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/export",
+        "files": 28,
+        "file_bytes": 8046034
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/precheck.py",
+        "files": 1,
+        "file_bytes": 7155
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/prepare_only.py",
+        "files": 1,
+        "file_bytes": 1906
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/close_preparation.py",
+        "files": 1,
+        "file_bytes": 3034
+      }
+    ],
+    "removed_file_bytes": 8058129,
+    "retained": [
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/600113.json",
+        "file_bytes": 1188824,
+        "purpose": "pending 6.DU official-source execution input"
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/000166.json",
+        "file_bytes": 1912976,
+        "purpose": "pending 6.DU official-source execution input"
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/000025.json",
+        "file_bytes": 903218,
+        "purpose": "pending 6.DU official-source execution input"
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/000001.json",
+        "file_bytes": 1326018,
+        "purpose": "pending 6.DU official-source execution input"
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/600030.json",
+        "file_bytes": 1735736,
+        "purpose": "pending 6.DU official-source execution input"
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe/601318.json",
+        "file_bytes": 1624545,
+        "purpose": "pending 6.DU official-source execution input"
+      }
+    ],
+    "retained_file_bytes": 8691317,
+    "clear_retained_when": "after the explicitly approved 6.DU execution ends; immediately if declined/cancelled",
+    "rebuild_from": "official shared native caches and preparation snapshot; no redownload",
+    "protected": [
+      "official sources/shared valid cache",
+      "old results/API/attempts",
+      "baseline and parallel changes"
+    ]
+  }
+}

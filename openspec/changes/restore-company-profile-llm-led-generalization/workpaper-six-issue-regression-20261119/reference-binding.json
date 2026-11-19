@@ -1,0 +1,15 @@
+{
+  "not_model_input": true,
+  "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-first-contract.json",
+  "sha256": "3336c0756528466306ae61f8f24e3b8e098a486890135dac85432bdd9e6a2b9e",
+  "instruments": [
+    "600113.SH",
+    "000166.SZ",
+    "000025.SZ",
+    "000001.SZ",
+    "600030.SH",
+    "601318.SH"
+  ],
+  "primary_questions": 18,
+  "scope": "Main business, main products/services, monetization; optional supplementary details do not become mandatory."
+}

@@ -1,0 +1,207 @@
+# File: precheck.py
+"""6.DU direct source/read regression and six-source preparation, zero model calls."""
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import time
+
+from research.business_profile_documents import classify_business_profile_document
+from research.company_profile.runtime import CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper_sections import extract_selected_layout, index_sections
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE / 'workpaper-six-issue-regression-20261119'
+TEMP = ROOT / 'data/QuoteBak/workpaper-du-iBzooe'
+OLD = CHANGE / 'workpaper-s2-first-result-20261118'
+RESEARCH = ROOT / 'data/research/company_profile_audited_20261118'
+ORDER = ['600113.SH', '000166.SZ', '000025.SZ', '000001.SZ', '600030.SH', '601318.SH']
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+
+def cache_for(pdf):
+    return pdf.parent / 'derived/business_profile_pdfium_recovery.v4' / (pdf.stem + '_57e1dd4f16ef40ff.json.gz')
+
+
+start = time.monotonic()
+code_paths = ['research/business_profile_documents.py', 'research/company_profile/workpaper_llm.py',
+              'research/company_profile/workpaper_sections.py', 'research/company_profile/workpaper_review.py',
+              'research/company_profile/runtime.py', 'research/company_profile/reads.py', 'utils/llm/client.py']
+before_code = {p: sha(ROOT / p) for p in code_paths}
+old_files = sorted((RESEARCH / 'company_profile_common_core.v1').glob('*.json'))
+assert len(old_files) == 12
+old_hashes = {str(p): sha(p) for p in old_files}
+reader = CompanyProfileReadService(RESEARCH)
+rows = []
+for path in old_files:
+    record = CompanyProfileRuntimeRecordV3.model_validate_json(path.read_bytes())
+    paper = record.workpaper
+    pdf = ROOT / 'data/filings/announcements/blobs' / record.report.document_version[:2] / (record.report.document_version + '.pdf')
+    assert sha(pdf) == record.report.document_version
+    native = load_cache = json.loads(gzip.decompress(cache_for(pdf).read_bytes()))['pages']
+    index = index_sections(native)
+    pages = sorted({s.page for e in paper.evidence for s in e.source_spans})
+    layout = extract_selected_layout(pdf.read_bytes(), pages)
+    paper.validate_pages(layout)
+    detail = reader.research_profile(record.report.instrument_id)
+    assert detail == CompanyProfileReadService(RESEARCH).research_profile(record.report.instrument_id)
+    visible = [entry for entry in detail['facts'] if entry['fact'] is not None]
+    rows.append({'instrument_id': record.report.instrument_id, 'work_id': record.work_id,
+                 'original_runtime_sha256': old_hashes[str(path)], 'source_sha256': pdf.stem,
+                 'source_coordinates_equal': True, 'current_heading_count': len(index),
+                 'visible_facts': len(visible), 'metrics': sum(len(e['fact']['metrics']) for e in visible),
+                 'review_status': paper.quality_review.status if paper.quality_review else 'not_reviewed',
+                 'new_instance_detail_equal': True})
+    print('DIRECT_OK', record.report.instrument_id, len(visible), flush=True)
+assert sum(row['visible_facts'] for row in rows) == 397
+query = reader.query([r['instrument_id'] for r in rows])
+export = reader.export([r['instrument_id'] for r in rows], export_directory=TEMP / 'export')
+assert query['profiles'] == export['profiles'] == CompanyProfileReadService(RESEARCH).query([r['instrument_id'] for r in rows])['profiles']
+assert {str(p): sha(p) for p in old_files} == old_hashes
+dump(DEST / 'twelve-direct-regression.json', {
+    'task': '6.DU', 'code_base': 'b12fba99', 'rows': rows, 'companies': 12,
+    'query_export_new_reader_equal': True, 'original_files_unchanged': True,
+    'new_model_requests': 0, 'new_business_entries': 0, 'new_semantic_quality_claim': False,
+    'scope': 'Current source-coordinate/index/read-use compatibility, not 12 new model runs or formal S1/S2 scoring.'})
+
+manifest = load(OLD / 'source-manifest.json')['companies']
+items = []
+for code in ORDER:
+    source_started = time.monotonic()
+    original = next(i for i in manifest if i['instrument_id'] == code)
+    item = {k: v for k, v in original.items() if k not in ('source_binding', 'source_binding_sha256')}
+    binding_path = ROOT / original['source_binding']
+    assert sha(binding_path) == original['source_binding_sha256']
+    binding = load(binding_path)
+    title = binding['announcement']['title']
+    classified = classify_business_profile_document(title, adjunct_type='PDF')
+    assert classified.selected and classified.is_full_report, (code, title, classified)
+    pdf = Path(item['asset']['archive_path'])
+    assert sha(pdf) == item['asset']['content_hash']
+    native = json.loads(gzip.decompress(cache_for(pdf).read_bytes()))['pages']
+    assert len(native) == item['pdf_pages']
+    index = index_sections(native)
+    prepared = {'asset': item['asset'], 'name': item['name'], 'exchange': item['exchange'],
+                'pages': native, 'index': [s.model_dump(mode='json') for s in index],
+                'preparation_seconds': round(time.monotonic() - source_started, 3),
+                'source_preparation': {'reused_shared_cache': str(cache_for(pdf))}}
+    dump(TEMP / (code[:6] + '.json'), prepared)
+    item.update(source_binding=original['source_binding'], source_binding_sha256=sha(binding_path),
+                official_title=title, classification=classified.document_type, heading_count=len(index),
+                prepared_sha256=sha(TEMP / (code[:6] + '.json')))
+    items.append(item)
+    print('SOURCE_READY', code, len(index), flush=True)
+assert before_code == {p: sha(ROOT / p) for p in code_paths}
+dump(DEST / 'source-manifest.json', {'task': '6.DU', 'companies': items, 'old_semantic_inputs': False})
+reference = load(OLD / 'source-first-contract.json')
+selected = [c for c in reference['companies'] if c['instrument_id'] in ORDER]
+assert len(selected) == 6 and sum(len(c['core_conditions']) for c in selected) == 18
+dump(DEST / 'reference-binding.json', {'not_model_input': True, 'path': str((OLD / 'source-first-contract.json').relative_to(ROOT)),
+      'sha256': sha(OLD / 'source-first-contract.json'), 'instruments': ORDER, 'primary_questions': 18,
+      'scope': 'Main business, main products/services, monetization; optional supplementary details do not become mandatory.'})
+dump(DEST / 'readiness.json', {'task': '6.DU', 'status': 'offline_ready_pending_explicit_new_call_approval',
+      'direct_regression_companies': 12, 'ready_sources': 6, 'new_model_requests': 0,
+      'new_business_entries': 0, 'production_authorization': 'not_authorized',
+      'code_sha256': before_code, 'preparation_wall_seconds': round(time.monotonic() - start, 3),
+      'protected_research_root': str(RESEARCH), 'temporary_root': str(TEMP)})
+print('OFFLINE_READY', flush=True)
+
+
+# File: prepare_only.py
+"""Rebuild only the six cached source packets with actual per-source preparation time."""
+import ast
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import time
+
+from research.company_profile.workpaper_sections import index_sections
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119'
+TEMP = ROOT / 'data/QuoteBak/workpaper-du-iBzooe'
+start = time.monotonic()
+manifest = json.loads((DEST / 'source-manifest.json').read_text())
+for item in manifest['companies']:
+    began = time.monotonic()
+    pdf = Path(item['asset']['archive_path'])
+    cache = pdf.parent / 'derived/business_profile_pdfium_recovery.v4' / (pdf.stem + '_57e1dd4f16ef40ff.json.gz')
+    assert hashlib.sha256(pdf.read_bytes()).hexdigest() == item['asset']['content_hash']
+    native = json.loads(gzip.decompress(cache.read_bytes()))['pages']
+    index = index_sections(native)
+    prepared = {'asset': item['asset'], 'name': item['name'], 'exchange': item['exchange'],
+        'pages': native, 'index': [s.model_dump(mode='json') for s in index],
+        'preparation_seconds': round(time.monotonic()-began, 3),
+        'source_preparation': {'reused_shared_cache': str(cache)}}
+    path = TEMP / (item['instrument_id'][:6] + '.json')
+    path.write_text(json.dumps(prepared, ensure_ascii=False, indent=2)+'\n')
+    item['prepared_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+(DEST / 'source-manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
+ready = json.loads((DEST / 'readiness.json').read_text())
+ready['prepared_sources_rebuild_seconds'] = round(time.monotonic()-start, 3)
+(DEST / 'readiness.json').write_text(json.dumps(ready, ensure_ascii=False, indent=2)+'\n')
+print('Six cached packets rebuilt with actual preparation time; no repeated twelve-company regression.')
+
+
+# File: close_preparation.py
+"""Remove ended preparation derivatives; keep only the six pending input dependencies."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+
+ROOT = Path('/home/python/Quote')
+TEMP = ROOT / 'data/QuoteBak/workpaper-du-iBzooe'
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119'
+ready = json.loads((DEST / 'readiness.json').read_text())
+direct = json.loads((DEST / 'twelve-direct-regression.json').read_text())
+assert ready['new_model_requests'] == ready['new_business_entries'] == 0
+assert direct['companies'] == 12 and direct['query_export_new_reader_equal']
+assert not (DEST / 'authorization.json').exists()
+processes = subprocess.check_output(['ps', '-eo', 'args='], text=True).splitlines()
+assert not any(str(TEMP / name) in line for line in processes for name in ['precheck.py', 'prepare_only.py'])
+for row in direct['rows']:
+    path = ROOT / 'data/research/company_profile_audited_20261118/company_profile_common_core.v1' / (row['work_id'] + '.json')
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == row['original_runtime_sha256']
+snapshot = '\n\n'.join('# File: ' + name + '\n' + (TEMP / name).read_text()
+                         for name in ['precheck.py', 'prepare_only.py', 'close_preparation.py'])
+(DEST / 'preparation-snapshot.txt').write_text(snapshot)
+removed = []
+for path in [TEMP / 'export', TEMP / 'precheck.py', TEMP / 'prepare_only.py', TEMP / 'close_preparation.py']:
+    assert path.is_relative_to(TEMP)
+    files = [p for p in path.rglob('*') if p.is_file()] if path.is_dir() else [path]
+    removed.append({'path': str(path), 'files': len(files), 'file_bytes': sum(p.stat().st_size for p in files)})
+    if path.is_dir():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
+manifest = json.loads((DEST / 'source-manifest.json').read_text())
+retained = []
+for item in manifest['companies']:
+    path = TEMP / (item['instrument_id'][:6] + '.json')
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == item['prepared_sha256']
+    retained.append({'path': str(path), 'file_bytes': path.stat().st_size, 'purpose': 'pending 6.DU official-source execution input'})
+assert len(list(TEMP.iterdir())) == len(retained) == 6
+ready['cleanup'] = {'removed': removed, 'removed_file_bytes': sum(x['file_bytes'] for x in removed),
+    'retained': retained, 'retained_file_bytes': sum(x['file_bytes'] for x in retained),
+    'clear_retained_when': 'after the explicitly approved 6.DU execution ends; immediately if declined/cancelled',
+    'rebuild_from': 'official shared native caches and preparation snapshot; no redownload',
+    'protected': ['official sources/shared valid cache', 'old results/API/attempts', 'baseline and parallel changes']}
+(DEST / 'readiness.json').write_text(json.dumps(ready, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({k:v for k,v in ready['cleanup'].items() if k in {'removed_file_bytes', 'retained_file_bytes', 'clear_retained_when'}}, ensure_ascii=False))
