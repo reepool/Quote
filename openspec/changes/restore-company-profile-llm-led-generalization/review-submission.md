@@ -1,5 +1,17 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 340. 6.DW中国平安一次真实处理：供源已通，部分画像交付
+
+用户call_12f93ef5002a4eaeae7775fefe895984明确批准唯一新入口。按openspec-apply-change/business-first-goal、产品→验收→交付→A/B v3执行；开工HEAD993c7447/master同步、暂存空，既有配置/骨架/混合文档及市场数据并行保护。核DV本人残留已清，复用131有效工程验证，不重复全套；唯一QuoteBak根复用正式PDF/共享缓存，重新生成1094标题索引，实际provider2450/高阶1200/Flash600和同获准联网DNS/TLS核后冻结64源码/提示/操作快照。无旧导航/答案/复核或人工参考入模型，无共享配置/生产修改。
+
+[实际部分画像/源复核/API与限制](workpaper-pingan-source-validation-20261119/result.md)：1/1名额用完，五板块及产品服务/财险数字等22原对象，当前逐ID有限独核后20普通可读/31指标、2仅源参考；2真实定性修订（金融主业、删除推定外贸客户）另核，4数字补充修订被本地源检查拒绝，未进final/正文。赚钱方式和寿险细项仍不足，原core_complete=false与completed_with_open_findings保留，不以字段存在或整链退出称完整。原公司/分部收入、新业务价值/投资机制及净利补充候选确有来源线索，首拒绝与PDF内填充空格、括号负数相关，只读诊断不自动采纳或改原文/候选；不能假定其所有单位/主体/列均正确。
+
+6物理/1恢复，账本376666＝137108已知供应商total＋239558未知usage预留，费用unknown。1546.113业务秒/1549.128入口监督/1578.113组监督，准备26.44秒及人工另计、活跃开发审核未精确测量。初核第一次约1001秒RemoteProtocolError对端流异常，未触1200物理/2450逻辑限，按唯一恢复成功；随后一次修订/最终核验成功，final仅2候选。源码/提示/配置运行时hash一致、无热修、未追加窗/第二公司/充值或生产，旧DU/S2失败不改。
+
+验证：deliver_dw.py原writer独立研究根company_profile_pingan_20261119，只新增use_review，原事实/引用/generation/quality_review及query/runtime hash不变；query/export/新实例一致，verify_dw_api.py进程内ASGI目录/详情200与canonical JSON相同且禁止外部连接，0新模型。diagnose_dw.py只读重现四候选首拒绝，保实际源字符坐标/hash；不拿源核模型意见当自动接受。strict、JSON/hash/链接及diff、有限Review收尾；A类风险通过2源参考避免确定误用，B类细产品/供应链后置，C类既有/并行不动。未改生产代码，不重跑131；本次不是S2未见/正式质量通过。
+
+必要原query/runtime/模型/账本/失败与审后API/人读版一套后清本人运行库2648433、准备/脚本/日志及重复导出3445189，共6093622文件字节，详cleanup.json；正式PDF/缓存、attempt、旧根和既有改动保护，本人文档块/新实物隔离提交普通推送，不整文件纳入混合段。下一仅零调用通用数值消费/错列错单位错主体反例，复用四个已保存真实候选，不重抽；须匹配真实final才可采纳候选，不能冒领旧final或续本卡额度。
+
 ## 339. 6.DV章节供源共性修复及零调用验证
 
 用户要求继续优化。沿openspec-apply-change/business-first-goal、产品→验收→交付→A/B v3，开工HEAD7a01c554/master同步、暂存空；既有配置/骨架/混合文档与市场数据并行保护。开工核6.DU本人临时根已清，只创建一个QuoteBak根；先写DV任务/设计/规范，再改原章节及LLM workpaper owner，不造parser/平台或逐股票规则。

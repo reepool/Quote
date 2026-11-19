@@ -1,0 +1,2012 @@
+[
+  {
+    "request_id": "bp-work-ad2413861ca4930f9b8d48dd:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "3e9f3cc825ee56dc9dfb87a63e0d5fa00d1f11f81ddf48d71a6a0116eb34b467",
+    "response_hash": "a3a2792973d96adb81ab2a65f50f8abddc9c75494f8645ead9ba591260fc85e3",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0038\",\"section-0041\",\"section-0015\",\"section-0084\",\"section-0086\",\"section-0126\",\"section-0147\",\"section-0161\",\"section-0750\"],\"rationale\":\"优先选取能解释集团整体经营、各板块业务结构与收入来源的实质子节。section-0038业绩综述与section-0041集团营运利润概览提供公司期间整体经营与利润口径；section-0015寿险及健康险业务、section-0084/0086财产保险业务概览与经营、section-0126银行业务、section-0147资产管理业务概览、section-0161金融赋能业务概览分别覆盖主要业务板块的产品服务、经营规模与收入构成；section-0750分部报告（续）提供分部收入与利润的量化拆分，用于补足收入主要权重。未选纯行业背景、治理、股本、审计及大量附注，避免扩读整份财报。\",\"deferred\":[\"section-0006内含价值分析\",\"section-0026金融赋能业务（超长合并章节）\",\"section-0752分部报告（续）\",\"section-0753分部报告（续）\",\"section-0905保险服务收入等收入附注\"],\"stop_reason\":\"已覆盖集团整体经营、主要业务板块经营与分部收入拆分，可回答业务结构、产品服务、盈利来源与规模权重；剩余为内含价值、详细附注与治理类内容，对本次经营画像边际贡献有限，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0038",
+        "section-0041",
+        "section-0015",
+        "section-0084",
+        "section-0086",
+        "section-0126",
+        "section-0147",
+        "section-0161",
+        "section-0750"
+      ],
+      "rationale": "优先选取能解释集团整体经营、各板块业务结构与收入来源的实质子节。section-0038业绩综述与section-0041集团营运利润概览提供公司期间整体经营与利润口径；section-0015寿险及健康险业务、section-0084/0086财产保险业务概览与经营、section-0126银行业务、section-0147资产管理业务概览、section-0161金融赋能业务概览分别覆盖主要业务板块的产品服务、经营规模与收入构成；section-0750分部报告（续）提供分部收入与利润的量化拆分，用于补足收入主要权重。未选纯行业背景、治理、股本、审计及大量附注，避免扩读整份财报。",
+      "deferred": [
+        "section-0006内含价值分析",
+        "section-0026金融赋能业务（超长合并章节）",
+        "section-0752分部报告（续）",
+        "section-0753分部报告（续）",
+        "section-0905保险服务收入等收入附注"
+      ],
+      "stop_reason": "已覆盖集团整体经营、主要业务板块经营与分部收入拆分，可回答业务结构、产品服务、盈利来源与规模权重；剩余为内含价值、详细附注与治理类内容，对本次经营画像边际贡献有限，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 17526,
+      "output_tokens": 332,
+      "total_tokens": 17858
+    }
+  },
+  {
+    "request_id": "bp-work-ad2413861ca4930f9b8d48dd:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "68eb75230c250fb4887e0a7aaf0cd3629837c9d77cfeed7832a705d0373784f1",
+    "response_hash": "d5d8edfe9c1775737addb2211d844e3245e65e323e74d12d783ab7a882022871",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司通过多渠道分销网络，借助平安寿险、平安养老险、平安健康险等子公司经营寿险及健康险业务，借助平安产险经营财产保险业务，借助平安银行经营银行业务，借助平安证券、平安信托、平安资产管理及平安融资租赁等子公司经营资产管理业务，借助平安健康、陆金所控股、金融壹账通等子公司打造金融赋能生态圈。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0012\",\"source-0013\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"分部报告将集团业务划分为寿险及健康险、财产保险、银行、资产管理、金融赋能五个报告分部，并单列其他业务及合并抵销。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]}],\"limitations\":[\"未获取各子公司股权层级与持股比例的详细披露。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"寿险及健康险业务围绕代理人渠道、银保渠道、社区金融服务及其他渠道开展，2025年新业务价值368.97亿元，同比增长29.3%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"寿险及健康险业务新业务价值\",\"raw_value\":\"368.97\",\"value\":\"368.97\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"寿险及健康险业务新业务价值同比增长率\",\"raw_value\":\"29.3\",\"value\":\"29.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-PS-02\",\"text\":\"财产保险业务按险种分为车险、意外伤害及健康保险、责任保险、农业保险、货物运输保险等，2025年车险原保险保费收入2,303.62亿元，意外伤害及健康保险382.39亿元，责任保险242.62亿元，农业保险124.70亿元，货物运输保险106.58亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"车险原保险保费收入\",\"raw_value\":\"2,303.62\",\"value\":\"2303.62\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"意外伤害及健康保险原保险保费收入\",\"raw_value\":\"382.39\",\"value\":\"382.39\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"责任保险原保险保费收入\",\"raw_value\":\"242.62\",\"value\":\"242.62\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"农业保险原保险保费收入\",\"raw_value\":\"124.70\",\"value\":\"124.70\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"货物运输保险原保险保费收入\",\"raw_value\":\"106.58\",\"value\":\"106.58\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-PS-03\",\"text\":\"银行业务开展大财富管理业务，通过场景化经营促进活期存款沉淀，并将银保业务打造为大财富业务增长的重要引擎；2025年代理个人保险收入12.92亿元，同比增长53.3%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"代理个人保险收入\",\"raw_value\":\"12.92\",\"value\":\"12.92\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"代理个人保险收入同比增长率\",\"raw_value\":\"53.3\",\"value\":\"53.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-PS-04\",\"text\":\"资产管理业务主要通过平安证券、平安信托、平安融资租赁和平安资产管理等公司经营，持续提升大类资产配置能力、长期稳定收益获取能力及多资产组合管理能力，为客户提供投资回报。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"金融赋能业务主要通过平安健康、陆金所控股等子公司打造生态圈，平安健康作为医疗养老生态圈核心旗舰，提供商保协同与企业健管服务，2025年实现营业收入54.68亿元、净利润3.80亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"平安健康营业收入\",\"raw_value\":\"54.68\",\"value\":\"54.68\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"平安健康净利润\",\"raw_value\":\"3.80\",\"value\":\"3.80\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各险种保费收入占比及寿险产品细分（如分红、万能、传统险）结构。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"集团2025年营业收入合计1,050,506百万元，其中寿险及健康险分部502,171百万元、财产保险分部353,272百万元、银行分部131,442百万元、资产管理分部51,346百万元、金融赋能分部49,358百万元，其他业务及合并抵销-37,083百万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"1,050,506\",\"value\":\"1050506\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"寿险及健康险分部营业收入\",\"raw_value\":\"502,171\",\"value\":\"502171\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财产保险分部营业收入\",\"raw_value\":\"353,272\",\"value\":\"353272\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"银行分部营业收入\",\"raw_value\":\"131,442\",\"value\":\"131442\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"资产管理分部营业收入\",\"raw_value\":\"51,346\",\"value\":\"51346\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"金融赋能分部营业收入\",\"raw_value\":\"49,358\",\"value\":\"49358\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务及合并抵销营业收入\",\"raw_value\":\"(37,083)\",\"value\":\"-37083\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"分部收入构成中，保险服务收入合计559,502百万元（寿险及健康险220,391百万元、财产保险338,912百万元），银行业务利息净收入88,662百万元，非保险业务手续费及佣金净收入43,532百万元，投资收益152,863百万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"保险服务收入合计\",\"raw_value\":\"559,502\",\"value\":\"559502\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"寿险及健康险保险服务收入\",\"raw_value\":\"220,391\",\"value\":\"220391\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财产保险保险服务收入\",\"raw_value\":\"338,912\",\"value\":\"338912\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"银行业务利息净收入\",\"raw_value\":\"88,021\",\"value\":\"88021\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"非保险业务手续费及佣金净收入合计\",\"raw_value\":\"43,532\",\"value\":\"43532\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"投资收益合计\",\"raw_value\":\"152,863\",\"value\":\"152863\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"财产保险业务2025年实现原保险保费收入3,431.68亿元，同比增长6.6%；保险服务收入3,389.12亿元，同比增长3.3%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"财产保险原保险保费收入\",\"raw_value\":\"3,431.68\",\"value\":\"3431.68\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财产保险原保险保费收入同比增长率\",\"raw_value\":\"6.6\",\"value\":\"6.6\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财产保险保险服务收入\",\"raw_value\":\"3,389.12\",\"value\":\"3389.12\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财产保险保险服务收入同比增长率\",\"raw_value\":\"3.3\",\"value\":\"3.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分部报告表格列关系未核定，仅按共享原生文本顺序引用，未做跨列换算。\",\"未获取寿险及健康险分部按产品类型的收入拆分。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"集团2025年营业收入1,050,506百万元，同比增长2.1%；归属于母公司股东的净利润134,778百万元，同比增长6.5%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,050,506\",\"value\":\"1050506\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比变动\",\"raw_value\":\"2.1\",\"value\":\"2.1\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"134,778\",\"value\":\"134778\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的净利润同比变动\",\"raw_value\":\"6.5\",\"value\":\"6.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"集团2025年归属于母公司股东的营运利润1,344.15亿元，同比增长10.3%；归属于母公司股东的扣非净利润1,437.73亿元，同比增长22.5%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"归属于母公司股东的营运利润\",\"raw_value\":\"134,415\",\"value\":\"134415\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的营运利润同比变动\",\"raw_value\":\"10.3\",\"value\":\"10.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的扣非净利润\",\"raw_value\":\"143,773\",\"value\":\"143773\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的扣非净利润同比变动\",\"raw_value\":\"22.5\",\"value\":\"22.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"银行业务2025年净利润426.33亿元，不良贷款率1.05%，拨备覆盖率220.88%，核心一级资本充足率9.36%，较年初上升0.24个百分点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"银行业务净利润\",\"raw_value\":\"426.33\",\"value\":\"426.33\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"不良贷款率\",\"raw_value\":\"1.05\",\"value\":\"1.05\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"拨备覆盖率\",\"raw_value\":\"220.88\",\"value\":\"220.88\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"核心一级资本充足率\",\"raw_value\":\"9.36\",\"value\":\"9.36\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"零售业务2025年营业收入61,626百万元，占银行营业收入46.9%；零售业务净利润2,683百万元，占比6.3%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"零售业务营业收入\",\"raw_value\":\"61,626\",\"value\":\"61626\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"零售业务营业收入占比\",\"raw_value\":\"46.9\",\"value\":\"46.9\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"零售业务净利润\",\"raw_value\":\"2,683\",\"value\":\"2683\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"零售业务净利润占比\",\"raw_value\":\"6.3\",\"value\":\"6.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各分部净利润的完整拆分。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"寿险及健康险业务2025年新业务价值率（按标准保费）28.5%，同比上升5.8个百分点；代理人渠道新业务价值同比增长10.4%，人均新业务价值同比增长17.2%；银保渠道新业务价值同比增长138.0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"新业务价值率（按标准保费）\",\"raw_value\":\"28.5\",\"value\":\"28.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"新业务价值率同比变动\",\"raw_value\":\"5.8\",\"value\":\"5.8\",\"unit\":\"百分点\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"代理人渠道新业务价值同比增长率\",\"raw_value\":\"10.4\",\"value\":\"10.4\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"银保渠道新业务价值同比增长率\",\"raw_value\":\"138.0\",\"value\":\"138.0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"财产保险业务2025年整体综合成本率96.8%，同比优化1.5个百分点；车险综合成本率95.8%，同比优化2.3个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"整体综合成本率\",\"raw_value\":\"96.8\",\"value\":\"96.8\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"整体综合成本率同比变动\",\"raw_value\":\"1.5\",\"value\":\"1.5\",\"unit\":\"百分点\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"车险综合成本率\",\"raw_value\":\"95.8\",\"value\":\"95.8\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"车险综合成本率同比变动\",\"raw_value\":\"2.3\",\"value\":\"2.3\",\"unit\":\"百分点\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"保险资金投资组合规模6.49万亿元，较年初增长13.2%；综合投资收益率6.3%，同比上升0.5个百分点；近10年平均净投资收益率4.8%，近10年平均综合投资收益率4.9%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"保险资金投资组合规模\",\"raw_value\":\"6.49\",\"value\":\"6.49\",\"unit\":\"万亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"综合投资收益率\",\"raw_value\":\"6.3\",\"value\":\"6.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"综合投资收益率同比变动\",\"raw_value\":\"0.5\",\"value\":\"0.5\",\"unit\":\"百分点\",\"currency\":null,\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"近10年平均净投资收益率\",\"raw_value\":\"4.8\",\"value\":\"4.8\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"近10年\",\"qualifier\":\"exact\"},{\"name\":\"近10年平均综合投资收益率\",\"raw_value\":\"4.9\",\"value\":\"4.9\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"近10年\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"平安产险2025年累计开发近8,800款产品，为293万小微企业提供373.04万亿元风险保障；绿色保险原保险保费收入764.74亿元，同比增长30.5%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"绿色保险原保险保费收入\",\"raw_value\":\"764.74\",\"value\":\"764.74\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"绿色保险原保险保费收入同比增长率\",\"raw_value\":\"30.5\",\"value\":\"30.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取保险资金投资组合的资产类别配置明细。\",\"未获取各业务板块的详细成本费用构成。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"集团2025年个人客户数2.51亿，较年初增长3.5%；线上月均活跃客户数约9,000万；持有集团内3类及以上产品的客户留存率99%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"个人客户数\",\"raw_value\":\"2.51\",\"value\":\"2.51\",\"unit\":\"亿\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"个人客户数较年初增长率\",\"raw_value\":\"3.5\",\"value\":\"3.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"线上月均活跃客户数\",\"raw_value\":\"约9,000\",\"value\":\"9000\",\"unit\":\"万\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"},{\"name\":\"持有集团内3类及以上产品的客户留存率\",\"raw_value\":\"99\",\"value\":\"99\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"银行业务2025年末零售客户数12,789.63万户，较年初增长1.9%；管理零售客户资产（AUM）4,238,409百万元，较年初增长1.1%；私行客户数10.56万户。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"零售客户数\",\"raw_value\":\"12,789.63\",\"value\":\"12789.63\",\"unit\":\"万户\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"管理零售客户资产（AUM）\",\"raw_value\":\"4,238,409\",\"value\":\"4238409\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"私行客户数\",\"raw_value\":\"10.56\",\"value\":\"10.56\",\"unit\":\"万户\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"平安健康2025年服务付费企业客户超6,700家；到线服务汇聚超3,500位签约专家医生，合作医院数超5,100家，合作药店数超24万家。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"服务付费企业客户数\",\"raw_value\":\"超6,700\",\"value\":\"6700\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"合作医院数\",\"raw_value\":\"超5,100\",\"value\":\"5100\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"合作药店数\",\"raw_value\":\"超24万\",\"value\":\"240000\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F-CC-04\",\"text\":\"平安产险2025年承保新能源车1,284万辆，同比增长44.8%；新能源车险原保险保费收入524.80亿元，同比增长39.0%，市场份额27.7%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"新能源车险原保险保费收入\",\"raw_value\":\"524.80\",\"value\":\"524.80\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"新能源车险原保险保费收入同比增长率\",\"raw_value\":\"39.0\",\"value\":\"39.0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"新能源车险市场份额\",\"raw_value\":\"27.7\",\"value\":\"27.7\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各渠道保费收入占比的完整拆分。\",\"未获取按地区划分的收入或客户分布。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"财产保险业务整体综合成本率同比优化1.5个百分点，主要因车险费用优化及保证保险扭亏为盈。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-OD-02\",\"text\":\"车险综合成本率同比优化2.3个百分点，主要得益于车险深化“报行合一”改革，持续推进费用精细化管理、优化费用投入。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F-OD-03\",\"text\":\"银行业务零售营业收入同比下降，主要受贷款利率下行和业务结构调整等因素影响；随着资产和客群结构持续优化，零售资产质量逐步改善，零售业务净利润同比增长。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F-OD-04\",\"text\":\"公司深化“综合金融+医疗养老”双轮并行、科技驱动战略，以“服务差异化”打造核心竞争力，通过“金融+服务”模式满足客户需求。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0007\"]}],\"limitations\":[\"未获取各驱动因素对收入或利润的量化贡献拆分。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"集团归属于母公司股东的扣非净利润1,437.73亿元，同比增长22.5%；归母净资产首次突破万亿，达10,004.19亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"归属于母公司股东的扣非净利润\",\"raw_value\":\"1,437.73\",\"value\":\"1437.73\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的扣非净利润同比增长率\",\"raw_value\":\"22.5\",\"value\":\"22.5\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东权益\",\"raw_value\":\"10,004.19\",\"value\":\"10004.19\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-02\",\"text\":\"集团2025年经营活动产生的现金流量净额658,632百万元，同比增长72.2%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"658,632\",\"value\":\"658632\",\"unit\":\"百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额同比变动\",\"raw_value\":\"72.2\",\"value\":\"72.2\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-03\",\"text\":\"财产保险业务经营活动现金净流入同比增长48.3%，投资规模（不含卖出回购金融资产）较年初增长12.1%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"财产保险经营活动现金净流入同比增长率\",\"raw_value\":\"48.3\",\"value\":\"48.3\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财产保险投资规模较年初增长率\",\"raw_value\":\"12.1\",\"value\":\"12.1\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-04\",\"text\":\"集团2025年拟派发年末期股息每股现金人民币1.75元，全年现金分红总额488.91亿元，连续14年保持增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"年末期股息每股现金\",\"raw_value\":\"1.75\",\"value\":\"1.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"全年现金分红总额\",\"raw_value\":\"488.91\",\"value\":\"488.91\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取重大资产收购或处置事件的详细披露。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"集团以保险为主业，通过寿险及健康险、财产保险等子公司承担保险保障职能，并通过银行、资产管理、金融赋能等子公司提供综合金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"选定章节未披露具体原材料、能源或供应商采购信息；金融企业不适用制造业投入口径。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"财产保险业务为小微企业、新能源车主、农户、外贸企业等提供风险保障，2025年为293万小微企业提供373.04万亿元风险保障，承保新能源车1,284万辆。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"]},{\"fact_id\":\"F-SC-03\",\"text\":\"平安健康作为医疗养老服务方，服务于集团个人金融用户，赋能平安寿险、平安产险、平安健康险、平安银行等支付方，并为企业客户提供“商业保险+健康保障委托+医疗健康服务”一体化解决方案。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]}],\"limitations\":[\"未获取具名客户或客户集中度信息。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司构建“四到”（到线、到院、到家、到企）医疗养老服务体系：到线汇聚超3,500名签约专家医生，AI医生秒级响应；到院网络涵盖超1,300家海外医疗机构，国内合作理赔服务医院数超3.7万家；到企全年服务企业客户数超9.5万家，服务企业员工数超6,000万。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"签约专家医生数\",\"raw_value\":\"超3,500\",\"value\":\"3500\",\"unit\":\"名\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"国内合作理赔服务医院数\",\"raw_value\":\"超3.7万\",\"value\":\"37000\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"},{\"name\":\"服务企业客户数\",\"raw_value\":\"超9.5万\",\"value\":\"95000\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司医疗养老战略持续落地：国内百强医院和三甲医院合作覆盖率100%，AI+真人医生覆盖集团100%个人客户，一键展码支付服务覆盖全国7.7万家药店，累计超24万名客户获得居家养老服务资格。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"国内百强医院和三甲医院合作覆盖率\",\"raw_value\":\"100\",\"value\":\"100\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"一键展码支付服务覆盖药店数\",\"raw_value\":\"7.7万\",\"value\":\"77000\",\"unit\":\"家\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"获得居家养老服务资格客户数\",\"raw_value\":\"超24万\",\"value\":\"240000\",\"unit\":\"名\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]}],\"limitations\":[\"未获取医疗养老生态圈对集团收入或利润贡献的量化数据。\"]},\"limitations\":[\"物理页40、41、53、54、55、64、65、69、72、73布局未恢复，表格列关系未核定，相关金额仅按共享原生文本顺序引用，未做跨列换算或推断。\",\"未获取内含价值分析、详细收入附注及分部报告后续页内容。\",\"未获取各业务板块净利润的完整拆分及寿险产品细分结构。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司通过多渠道分销网络，借助平安寿险、平安养老险、平安健康险等子公司经营寿险及健康险业务，借助平安产险经营财产保险业务，借助平安银行经营银行业务，借助平安证券、平安信托、平安资产管理及平安融资租赁等子公司经营资产管理业务，借助平安健康、陆金所控股、金融壹账通等子公司打造金融赋能生态圈。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0012",
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "分部报告将集团业务划分为寿险及健康险、财产保险、银行、资产管理、金融赋能五个报告分部，并单列其他业务及合并抵销。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各子公司股权层级与持股比例的详细披露。"
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "寿险及健康险业务围绕代理人渠道、银保渠道、社区金融服务及其他渠道开展，2025年新业务价值368.97亿元，同比增长29.3%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "寿险及健康险业务新业务价值",
+                  "raw_value": "368.97",
+                  "value": "368.97",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "寿险及健康险业务新业务价值同比增长率",
+                  "raw_value": "29.3",
+                  "value": "29.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "财产保险业务按险种分为车险、意外伤害及健康保险、责任保险、农业保险、货物运输保险等，2025年车险原保险保费收入2,303.62亿元，意外伤害及健康保险382.39亿元，责任保险242.62亿元，农业保险124.70亿元，货物运输保险106.58亿元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "车险原保险保费收入",
+                  "raw_value": "2,303.62",
+                  "value": "2303.62",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "意外伤害及健康保险原保险保费收入",
+                  "raw_value": "382.39",
+                  "value": "382.39",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "责任保险原保险保费收入",
+                  "raw_value": "242.62",
+                  "value": "242.62",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "农业保险原保险保费收入",
+                  "raw_value": "124.70",
+                  "value": "124.70",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "货物运输保险原保险保费收入",
+                  "raw_value": "106.58",
+                  "value": "106.58",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "银行业务开展大财富管理业务，通过场景化经营促进活期存款沉淀，并将银保业务打造为大财富业务增长的重要引擎；2025年代理个人保险收入12.92亿元，同比增长53.3%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "代理个人保险收入",
+                  "raw_value": "12.92",
+                  "value": "12.92",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "代理个人保险收入同比增长率",
+                  "raw_value": "53.3",
+                  "value": "53.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "资产管理业务主要通过平安证券、平安信托、平安融资租赁和平安资产管理等公司经营，持续提升大类资产配置能力、长期稳定收益获取能力及多资产组合管理能力，为客户提供投资回报。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "金融赋能业务主要通过平安健康、陆金所控股等子公司打造生态圈，平安健康作为医疗养老生态圈核心旗舰，提供商保协同与企业健管服务，2025年实现营业收入54.68亿元、净利润3.80亿元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "平安健康营业收入",
+                  "raw_value": "54.68",
+                  "value": "54.68",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "平安健康净利润",
+                  "raw_value": "3.80",
+                  "value": "3.80",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各险种保费收入占比及寿险产品细分（如分红、万能、传统险）结构。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "集团2025年营业收入合计1,050,506百万元，其中寿险及健康险分部502,171百万元、财产保险分部353,272百万元、银行分部131,442百万元、资产管理分部51,346百万元、金融赋能分部49,358百万元，其他业务及合并抵销-37,083百万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "1,050,506",
+                  "value": "1050506",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "寿险及健康险分部营业收入",
+                  "raw_value": "502,171",
+                  "value": "502171",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财产保险分部营业收入",
+                  "raw_value": "353,272",
+                  "value": "353272",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "银行分部营业收入",
+                  "raw_value": "131,442",
+                  "value": "131442",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资产管理分部营业收入",
+                  "raw_value": "51,346",
+                  "value": "51346",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "金融赋能分部营业收入",
+                  "raw_value": "49,358",
+                  "value": "49358",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务及合并抵销营业收入",
+                  "raw_value": "(37,083)",
+                  "value": "-37083",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "分部收入构成中，保险服务收入合计559,502百万元（寿险及健康险220,391百万元、财产保险338,912百万元），银行业务利息净收入88,662百万元，非保险业务手续费及佣金净收入43,532百万元，投资收益152,863百万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "保险服务收入合计",
+                  "raw_value": "559,502",
+                  "value": "559502",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "寿险及健康险保险服务收入",
+                  "raw_value": "220,391",
+                  "value": "220391",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财产保险保险服务收入",
+                  "raw_value": "338,912",
+                  "value": "338912",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "银行业务利息净收入",
+                  "raw_value": "88,021",
+                  "value": "88021",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "非保险业务手续费及佣金净收入合计",
+                  "raw_value": "43,532",
+                  "value": "43532",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资收益合计",
+                  "raw_value": "152,863",
+                  "value": "152863",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "财产保险业务2025年实现原保险保费收入3,431.68亿元，同比增长6.6%；保险服务收入3,389.12亿元，同比增长3.3%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "财产保险原保险保费收入",
+                  "raw_value": "3,431.68",
+                  "value": "3431.68",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财产保险原保险保费收入同比增长率",
+                  "raw_value": "6.6",
+                  "value": "6.6",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财产保险保险服务收入",
+                  "raw_value": "3,389.12",
+                  "value": "3389.12",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财产保险保险服务收入同比增长率",
+                  "raw_value": "3.3",
+                  "value": "3.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分部报告表格列关系未核定，仅按共享原生文本顺序引用，未做跨列换算。",
+            "未获取寿险及健康险分部按产品类型的收入拆分。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "集团2025年营业收入1,050,506百万元，同比增长2.1%；归属于母公司股东的净利润134,778百万元，同比增长6.5%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "1,050,506",
+                  "value": "1050506",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比变动",
+                  "raw_value": "2.1",
+                  "value": "2.1",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的净利润",
+                  "raw_value": "134,778",
+                  "value": "134778",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的净利润同比变动",
+                  "raw_value": "6.5",
+                  "value": "6.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "集团2025年归属于母公司股东的营运利润1,344.15亿元，同比增长10.3%；归属于母公司股东的扣非净利润1,437.73亿元，同比增长22.5%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于母公司股东的营运利润",
+                  "raw_value": "134,415",
+                  "value": "134415",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的营运利润同比变动",
+                  "raw_value": "10.3",
+                  "value": "10.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的扣非净利润",
+                  "raw_value": "143,773",
+                  "value": "143773",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的扣非净利润同比变动",
+                  "raw_value": "22.5",
+                  "value": "22.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "银行业务2025年净利润426.33亿元，不良贷款率1.05%，拨备覆盖率220.88%，核心一级资本充足率9.36%，较年初上升0.24个百分点。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "银行业务净利润",
+                  "raw_value": "426.33",
+                  "value": "426.33",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "不良贷款率",
+                  "raw_value": "1.05",
+                  "value": "1.05",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "拨备覆盖率",
+                  "raw_value": "220.88",
+                  "value": "220.88",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "核心一级资本充足率",
+                  "raw_value": "9.36",
+                  "value": "9.36",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "零售业务2025年营业收入61,626百万元，占银行营业收入46.9%；零售业务净利润2,683百万元，占比6.3%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "零售业务营业收入",
+                  "raw_value": "61,626",
+                  "value": "61626",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "零售业务营业收入占比",
+                  "raw_value": "46.9",
+                  "value": "46.9",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "零售业务净利润",
+                  "raw_value": "2,683",
+                  "value": "2683",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "零售业务净利润占比",
+                  "raw_value": "6.3",
+                  "value": "6.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各分部净利润的完整拆分。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "寿险及健康险业务2025年新业务价值率（按标准保费）28.5%，同比上升5.8个百分点；代理人渠道新业务价值同比增长10.4%，人均新业务价值同比增长17.2%；银保渠道新业务价值同比增长138.0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "新业务价值率（按标准保费）",
+                  "raw_value": "28.5",
+                  "value": "28.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新业务价值率同比变动",
+                  "raw_value": "5.8",
+                  "value": "5.8",
+                  "unit": "百分点",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "代理人渠道新业务价值同比增长率",
+                  "raw_value": "10.4",
+                  "value": "10.4",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "银保渠道新业务价值同比增长率",
+                  "raw_value": "138.0",
+                  "value": "138.0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "财产保险业务2025年整体综合成本率96.8%，同比优化1.5个百分点；车险综合成本率95.8%，同比优化2.3个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "整体综合成本率",
+                  "raw_value": "96.8",
+                  "value": "96.8",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "整体综合成本率同比变动",
+                  "raw_value": "1.5",
+                  "value": "1.5",
+                  "unit": "百分点",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "车险综合成本率",
+                  "raw_value": "95.8",
+                  "value": "95.8",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "车险综合成本率同比变动",
+                  "raw_value": "2.3",
+                  "value": "2.3",
+                  "unit": "百分点",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "保险资金投资组合规模6.49万亿元，较年初增长13.2%；综合投资收益率6.3%，同比上升0.5个百分点；近10年平均净投资收益率4.8%，近10年平均综合投资收益率4.9%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "保险资金投资组合规模",
+                  "raw_value": "6.49",
+                  "value": "6.49",
+                  "unit": "万亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "综合投资收益率",
+                  "raw_value": "6.3",
+                  "value": "6.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "综合投资收益率同比变动",
+                  "raw_value": "0.5",
+                  "value": "0.5",
+                  "unit": "百分点",
+                  "currency": null,
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "近10年平均净投资收益率",
+                  "raw_value": "4.8",
+                  "value": "4.8",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "近10年",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "近10年平均综合投资收益率",
+                  "raw_value": "4.9",
+                  "value": "4.9",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "近10年",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "平安产险2025年累计开发近8,800款产品，为293万小微企业提供373.04万亿元风险保障；绿色保险原保险保费收入764.74亿元，同比增长30.5%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "绿色保险原保险保费收入",
+                  "raw_value": "764.74",
+                  "value": "764.74",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "绿色保险原保险保费收入同比增长率",
+                  "raw_value": "30.5",
+                  "value": "30.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取保险资金投资组合的资产类别配置明细。",
+            "未获取各业务板块的详细成本费用构成。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "集团2025年个人客户数2.51亿，较年初增长3.5%；线上月均活跃客户数约9,000万；持有集团内3类及以上产品的客户留存率99%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "个人客户数",
+                  "raw_value": "2.51",
+                  "value": "2.51",
+                  "unit": "亿",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "个人客户数较年初增长率",
+                  "raw_value": "3.5",
+                  "value": "3.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "线上月均活跃客户数",
+                  "raw_value": "约9,000",
+                  "value": "9000",
+                  "unit": "万",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "持有集团内3类及以上产品的客户留存率",
+                  "raw_value": "99",
+                  "value": "99",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "银行业务2025年末零售客户数12,789.63万户，较年初增长1.9%；管理零售客户资产（AUM）4,238,409百万元，较年初增长1.1%；私行客户数10.56万户。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "零售客户数",
+                  "raw_value": "12,789.63",
+                  "value": "12789.63",
+                  "unit": "万户",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "管理零售客户资产（AUM）",
+                  "raw_value": "4,238,409",
+                  "value": "4238409",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "私行客户数",
+                  "raw_value": "10.56",
+                  "value": "10.56",
+                  "unit": "万户",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "平安健康2025年服务付费企业客户超6,700家；到线服务汇聚超3,500位签约专家医生，合作医院数超5,100家，合作药店数超24万家。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "服务付费企业客户数",
+                  "raw_value": "超6,700",
+                  "value": "6700",
+                  "unit": "家",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "合作医院数",
+                  "raw_value": "超5,100",
+                  "value": "5100",
+                  "unit": "家",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "合作药店数",
+                  "raw_value": "超24万",
+                  "value": "240000",
+                  "unit": "家",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "平安产险2025年承保新能源车1,284万辆，同比增长44.8%；新能源车险原保险保费收入524.80亿元，同比增长39.0%，市场份额27.7%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "新能源车险原保险保费收入",
+                  "raw_value": "524.80",
+                  "value": "524.80",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源车险原保险保费收入同比增长率",
+                  "raw_value": "39.0",
+                  "value": "39.0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源车险市场份额",
+                  "raw_value": "27.7",
+                  "value": "27.7",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各渠道保费收入占比的完整拆分。",
+            "未获取按地区划分的收入或客户分布。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "财产保险业务整体综合成本率同比优化1.5个百分点，主要因车险费用优化及保证保险扭亏为盈。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "车险综合成本率同比优化2.3个百分点，主要得益于车险深化“报行合一”改革，持续推进费用精细化管理、优化费用投入。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "银行业务零售营业收入同比下降，主要受贷款利率下行和业务结构调整等因素影响；随着资产和客群结构持续优化，零售资产质量逐步改善，零售业务净利润同比增长。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "公司深化“综合金融+医疗养老”双轮并行、科技驱动战略，以“服务差异化”打造核心竞争力，通过“金融+服务”模式满足客户需求。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取各驱动因素对收入或利润的量化贡献拆分。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "集团归属于母公司股东的扣非净利润1,437.73亿元，同比增长22.5%；归母净资产首次突破万亿，达10,004.19亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于母公司股东的扣非净利润",
+                  "raw_value": "1,437.73",
+                  "value": "1437.73",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的扣非净利润同比增长率",
+                  "raw_value": "22.5",
+                  "value": "22.5",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东权益",
+                  "raw_value": "10,004.19",
+                  "value": "10004.19",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "集团2025年经营活动产生的现金流量净额658,632百万元，同比增长72.2%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "658,632",
+                  "value": "658632",
+                  "unit": "百万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额同比变动",
+                  "raw_value": "72.2",
+                  "value": "72.2",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "财产保险业务经营活动现金净流入同比增长48.3%，投资规模（不含卖出回购金融资产）较年初增长12.1%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "财产保险经营活动现金净流入同比增长率",
+                  "raw_value": "48.3",
+                  "value": "48.3",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财产保险投资规模较年初增长率",
+                  "raw_value": "12.1",
+                  "value": "12.1",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-04",
+              "text": "集团2025年拟派发年末期股息每股现金人民币1.75元，全年现金分红总额488.91亿元，连续14年保持增长。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "年末期股息每股现金",
+                  "raw_value": "1.75",
+                  "value": "1.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "全年现金分红总额",
+                  "raw_value": "488.91",
+                  "value": "488.91",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取重大资产收购或处置事件的详细披露。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "集团以保险为主业，通过寿险及健康险、财产保险等子公司承担保险保障职能，并通过银行、资产管理、金融赋能等子公司提供综合金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "选定章节未披露具体原材料、能源或供应商采购信息；金融企业不适用制造业投入口径。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "财产保险业务为小微企业、新能源车主、农户、外贸企业等提供风险保障，2025年为293万小微企业提供373.04万亿元风险保障，承保新能源车1,284万辆。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F-SC-03",
+              "text": "平安健康作为医疗养老服务方，服务于集团个人金融用户，赋能平安寿险、平安产险、平安健康险、平安银行等支付方，并为企业客户提供“商业保险+健康保障委托+医疗健康服务”一体化解决方案。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取具名客户或客户集中度信息。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "公司构建“四到”（到线、到院、到家、到企）医疗养老服务体系：到线汇聚超3,500名签约专家医生，AI医生秒级响应；到院网络涵盖超1,300家海外医疗机构，国内合作理赔服务医院数超3.7万家；到企全年服务企业客户数超9.5万家，服务企业员工数超6,000万。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "签约专家医生数",
+                "raw_value": "超3,500",
+                "value": "3500",
+                "unit": "名",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "qualifier": "greater_than"
+              },
+              {
+                "name": "国内合作理赔服务医院数",
+                "raw_value": "超3.7万",
+                "value": "37000",
+                "unit": "家",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "qualifier": "greater_than"
+              },
+              {
+                "name": "服务企业客户数",
+                "raw_value": "超9.5万",
+                "value": "95000",
+                "unit": "家",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "qualifier": "greater_than"
+              }
+            ]
+          },
+          {
+            "fact_id": "F-CF-02",
+            "text": "公司医疗养老战略持续落地：国内百强医院和三甲医院合作覆盖率100%，AI+真人医生覆盖集团100%个人客户，一键展码支付服务覆盖全国7.7万家药店，累计超24万名客户获得居家养老服务资格。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "国内百强医院和三甲医院合作覆盖率",
+                "raw_value": "100",
+                "value": "100",
+                "unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "qualifier": "exact"
+              },
+              {
+                "name": "一键展码支付服务覆盖药店数",
+                "raw_value": "7.7万",
+                "value": "77000",
+                "unit": "家",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "qualifier": "exact"
+              },
+              {
+                "name": "获得居家养老服务资格客户数",
+                "raw_value": "超24万",
+                "value": "240000",
+                "unit": "名",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "qualifier": "greater_than"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "未获取医疗养老生态圈对集团收入或利润贡献的量化数据。"
+        ]
+      },
+      "limitations": [
+        "物理页40、41、53、54、55、64、65、69、72、73布局未恢复，表格列关系未核定，相关金额仅按共享原生文本顺序引用，未做跨列换算或推断。",
+        "未获取内含价值分析、详细收入附注及分部报告后续页内容。",
+        "未获取各业务板块净利润的完整拆分及寿险产品细分结构。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 17762,
+      "output_tokens": 8120,
+      "total_tokens": 25882
+    }
+  },
+  {
+    "request_id": "bp-work-ad2413861ca4930f9b8d48dd:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "291b85959104b3d18840913d8f182d24039cab4c124d1b26d93f643e703135cb",
+    "response_hash": "9cad146b93de12c3fb901a7cf318554a8664bc0652935b0ab23f56a3f6eb4c9a",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-RM-03\",\"F-SM-02\",\"F-SM-04\",\"F-OI-02\",\"F-OI-04\",\"F-CC-01\",\"F-CC-02\",\"F-CC-04\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-MC-03\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\"],\"findings\":[{\"finding_id\":\"R-001\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0005\",\"source-0014\"],\"explanation\":\"已采用收入事实只有财产保险原保险保费和保险服务收入、银行零售收入、平安健康营业收入等局部或补充数字，没有集团营业收入，也没有分部主营收入构成。source-0005列明2025年营业收入1,050,506百万元，同比增加2.1%。source-0014是正常分页部表，同行可加总核对，不是未核定列：营业收入合计（人民币百万元）为寿险及健康险502,171、财产保险353,272、银行131,442、资产管理51,346、金融赋能49,358、其他业务及合并抵销-37,083，合计1,050,506。最大分部寿险及健康险的保险服务收入仅220,391百万元，其投资收益126,017百万元、非银行业务利息收入103,678百万元是该分部收入的重要组成；财产保险保险服务收入为338,912百万元。产险保费、公司合计或平安健康54.68亿元等补充金额都不能代替这一构成。草稿关于分部表列关系未核定的限制不适用于source-0014，不应据此继续缺省主业收入结构。\"},{\"finding_id\":\"R-002\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"explanation\":\"已采用产品事实覆盖产险分险种、银行大财富、资产管理和平安健康，但没有寿险及健康险这一最大业务的经营结果。source-0001在新业务价值后连续载明368.97亿元、同比增长29.3%；source-0003独立确认寿险及健康险新业务价值同比增长29.3%。渠道增速等补充明细不必逐项转录，但主业新业务价值缺失会改变对该业务规模和增长的理解。隔离记录称该数字不在引用来源中，与本次选定章节不符，不能把已披露的主业指标当成未披露。\"},{\"finding_id\":\"R-003\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"explanation\":\"已采用驱动因素只解释产险综合成本率、车险费用和银行零售收入下降，没有保险资金投资这一主业盈利机制。source-0001载明保险资金投资组合规模6.49万亿元，较年初增长13.2%，综合投资收益率6.3%，同比上升0.5个百分点；source-0003确认综合投资收益率6.3%、同比上升0.5个百分点。这不是可选的地区、排名或资产配置明细，缺少后无法理解保险主业如何获取投资收益。\"},{\"finding_id\":\"R-004\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F-SM-02\",\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"explanation\":\"F-SM-02对归母营运利润1,344.15亿元、同比增长10.3%，以及扣非净利润1,437.73亿元、同比增长22.5%的表述与source-0007、source-0003一致，应保留。但同期归属于母公司股东的净利润未列入：source-0005和source-0007均为134,778百万元，同比增长6.5%。source-0007注明2025年非经常性损益合计-89.95亿元，source-0005合计为-8,995百万元。只呈现22.5%的扣非增速，会改变对盈利增长幅度的理解。应补充归母净利润及非经常性损益口径，而不是改动已支持的营运利润和扣非金额。\"},{\"finding_id\":\"R-005\",\"element\":\"position\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-01\",\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"explanation\":\"F-SC-01写“集团以保险为主业”，选定章节没有这一限定。source-0005写明本公司是综合性金融集团，投资业务是主营业务之一；source-0007的口径是坚守金融主业、强化保险保障功能。通过寿险及健康险、财产保险、银行、资产管理、金融赋能子公司提供保障和综合金融的后半句，与source-0007相符，可保留。只需把“以保险为主业”改为来源中的综合性金融集团和金融主业口径。\"},{\"finding_id\":\"R-006\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-02\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"293万小微企业及373.04万亿元风险保障见source-0009，承保新能源车1,284万辆见source-0010，农业保险及农户服务亦见source-0010，这些可保留。选定章节没有把客户对象写成“外贸企业”；货运险中“中国制造安全出海”不能单独推定客户就是外贸企业。应删除或限定“外贸企业”，不要因此舍弃已有来源支持的客户和金额。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-03",
+        "F-SM-02",
+        "F-SM-04",
+        "F-OI-02",
+        "F-OI-04",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-04",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-MC-03",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03"
+      ],
+      "findings": [
+        {
+          "finding_id": "R-001",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0005",
+            "source-0014"
+          ],
+          "explanation": "已采用收入事实只有财产保险原保险保费和保险服务收入、银行零售收入、平安健康营业收入等局部或补充数字，没有集团营业收入，也没有分部主营收入构成。source-0005列明2025年营业收入1,050,506百万元，同比增加2.1%。source-0014是正常分页部表，同行可加总核对，不是未核定列：营业收入合计（人民币百万元）为寿险及健康险502,171、财产保险353,272、银行131,442、资产管理51,346、金融赋能49,358、其他业务及合并抵销-37,083，合计1,050,506。最大分部寿险及健康险的保险服务收入仅220,391百万元，其投资收益126,017百万元、非银行业务利息收入103,678百万元是该分部收入的重要组成；财产保险保险服务收入为338,912百万元。产险保费、公司合计或平安健康54.68亿元等补充金额都不能代替这一构成。草稿关于分部表列关系未核定的限制不适用于source-0014，不应据此继续缺省主业收入结构。"
+        },
+        {
+          "finding_id": "R-002",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "explanation": "已采用产品事实覆盖产险分险种、银行大财富、资产管理和平安健康，但没有寿险及健康险这一最大业务的经营结果。source-0001在新业务价值后连续载明368.97亿元、同比增长29.3%；source-0003独立确认寿险及健康险新业务价值同比增长29.3%。渠道增速等补充明细不必逐项转录，但主业新业务价值缺失会改变对该业务规模和增长的理解。隔离记录称该数字不在引用来源中，与本次选定章节不符，不能把已披露的主业指标当成未披露。"
+        },
+        {
+          "finding_id": "R-003",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "explanation": "已采用驱动因素只解释产险综合成本率、车险费用和银行零售收入下降，没有保险资金投资这一主业盈利机制。source-0001载明保险资金投资组合规模6.49万亿元，较年初增长13.2%，综合投资收益率6.3%，同比上升0.5个百分点；source-0003确认综合投资收益率6.3%、同比上升0.5个百分点。这不是可选的地区、排名或资产配置明细，缺少后无法理解保险主业如何获取投资收益。"
+        },
+        {
+          "finding_id": "R-004",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F-SM-02",
+          "evidence_ids": [
+            "source-0005",
+            "source-0007"
+          ],
+          "explanation": "F-SM-02对归母营运利润1,344.15亿元、同比增长10.3%，以及扣非净利润1,437.73亿元、同比增长22.5%的表述与source-0007、source-0003一致，应保留。但同期归属于母公司股东的净利润未列入：source-0005和source-0007均为134,778百万元，同比增长6.5%。source-0007注明2025年非经常性损益合计-89.95亿元，source-0005合计为-8,995百万元。只呈现22.5%的扣非增速，会改变对盈利增长幅度的理解。应补充归母净利润及非经常性损益口径，而不是改动已支持的营运利润和扣非金额。"
+        },
+        {
+          "finding_id": "R-005",
+          "element": "position",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-SC-01",
+          "evidence_ids": [
+            "source-0005",
+            "source-0007"
+          ],
+          "explanation": "F-SC-01写“集团以保险为主业”，选定章节没有这一限定。source-0005写明本公司是综合性金融集团，投资业务是主营业务之一；source-0007的口径是坚守金融主业、强化保险保障功能。通过寿险及健康险、财产保险、银行、资产管理、金融赋能子公司提供保障和综合金融的后半句，与source-0007相符，可保留。只需把“以保险为主业”改为来源中的综合性金融集团和金融主业口径。"
+        },
+        {
+          "finding_id": "R-006",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-SC-02",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "293万小微企业及373.04万亿元风险保障见source-0009，承保新能源车1,284万辆见source-0010，农业保险及农户服务亦见source-0010，这些可保留。选定章节没有把客户对象写成“外贸企业”；货运险中“中国制造安全出海”不能单独推定客户就是外贸企业。应删除或限定“外贸企业”，不要因此舍弃已有来源支持的客户和金额。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 22734,
+      "output_tokens": 1433,
+      "total_tokens": 55946
+    }
+  },
+  {
+    "request_id": "bp-work-ad2413861ca4930f9b8d48dd:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "35dac2b79b8768bc1307c7b759f8e020e31b117dc8ae43003b917a25204e341c",
+    "response_hash": "c76724f1b27ae31e3c119e49291d906e8fe0fa046613eb9d3087953b3609ac5d",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:R-001\",\"text\":\"2025年集团营业收入1,050,506百万元，同比增长2.1%。分部营业收入合计：寿险及健康险502,171百万元、财产保险353,272百万元、银行131,442百万元、资产管理51,346百万元、金融赋能49,358百万元、其他业务及合并抵销-37,083百万元。寿险及健康险分部保险服务收入220,391百万元，投资收益126,017百万元，非银行业务利息收入103,678百万元；财产保险分部保险服务收入338,912百万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0014\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,050,506\",\"value\":\"1050506\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业收入同比变动\",\"raw_value\":\"2.1\",\"value\":\"2.1\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"寿险及健康险分部营业收入\",\"raw_value\":\"502,171\",\"value\":\"502171\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"财产保险分部营业收入\",\"raw_value\":\"353,272\",\"value\":\"353272\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"银行分部营业收入\",\"raw_value\":\"131,442\",\"value\":\"131442\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"资产管理分部营业收入\",\"raw_value\":\"51,346\",\"value\":\"51346\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"金融赋能分部营业收入\",\"raw_value\":\"49,358\",\"value\":\"49358\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务及合并抵销营业收入\",\"raw_value\":\"-37,083\",\"value\":\"-37083\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"寿险及健康险分部保险服务收入\",\"raw_value\":\"220,391\",\"value\":\"220391\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"寿险及健康险分部投资收益\",\"raw_value\":\"126,017\",\"value\":\"126017\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"寿险及健康险分部非银行业务利息收入\",\"raw_value\":\"103,678\",\"value\":\"103678\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"财产保险分部保险服务收入\",\"raw_value\":\"338,912\",\"value\":\"338912\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:R-002\",\"text\":\"2025年寿险及健康险业务新业务价值368.97亿元，同比增长29.3%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"metrics\":[{\"name\":\"寿险及健康险业务新业务价值\",\"raw_value\":\"368.97\",\"value\":\"368.97\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"寿险及健康险业务新业务价值同比变动\",\"raw_value\":\"29.3\",\"value\":\"29.3\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:R-003\",\"text\":\"2025年保险资金投资组合规模6.49万亿元，较年初增长13.2%；综合投资收益率6.3%，同比上升0.5个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"metrics\":[{\"name\":\"保险资金投资组合规模\",\"raw_value\":\"6.49\",\"value\":\"6.49\",\"unit\":\"万亿元\",\"source_unit\":\"万亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"保险资金投资组合规模较年初变动\",\"raw_value\":\"13.2\",\"value\":\"13.2\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"较年初\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合投资收益率\",\"raw_value\":\"6.3\",\"value\":\"6.3\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"综合投资收益率同比变动\",\"raw_value\":\"0.5\",\"value\":\"0.5\",\"unit\":\"个百分点\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:R-004\",\"text\":\"集团2025年归属于母公司股东的营运利润1,344.15亿元，同比增长10.3%；归属于母公司股东的扣非净利润1,437.73亿元，同比增长22.5%；归属于母公司股东的净利润134,778百万元，同比增长6.5%。2025年非经常性损益合计-89.95亿元（-8,995百万元）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"metrics\":[{\"name\":\"归属于母公司股东的营运利润\",\"raw_value\":\"134,415\",\"value\":\"134415\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的营运利润同比变动\",\"raw_value\":\"10.3\",\"value\":\"10.3\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的扣非净利润\",\"raw_value\":\"143,773\",\"value\":\"143773\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的扣非净利润同比变动\",\"raw_value\":\"22.5\",\"value\":\"22.5\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"134,778\",\"value\":\"134778\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的净利润同比变动\",\"raw_value\":\"6.5\",\"value\":\"6.5\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"非经常性损益合计\",\"raw_value\":\"-8,995\",\"value\":\"-8995\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-SC-01\",\"text\":\"本公司是综合性金融集团，投资业务是主营业务之一；集团坚守金融主业，通过寿险及健康险、财产保险等子公司承担保险保障职能，并通过银行、资产管理、金融赋能等子公司提供综合金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-SC-02\",\"text\":\"财产保险业务为小微企业、新能源车主、农户等提供风险保障，2025年为293万小微企业提供373.04万亿元风险保障，承保新能源车1,284万辆。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:R-001",
+          "text": "2025年集团营业收入1,050,506百万元，同比增长2.1%。分部营业收入合计：寿险及健康险502,171百万元、财产保险353,272百万元、银行131,442百万元、资产管理51,346百万元、金融赋能49,358百万元、其他业务及合并抵销-37,083百万元。寿险及健康险分部保险服务收入220,391百万元，投资收益126,017百万元，非银行业务利息收入103,678百万元；财产保险分部保险服务收入338,912百万元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0014"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "1,050,506",
+              "value": "1050506",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入同比变动",
+              "raw_value": "2.1",
+              "value": "2.1",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "寿险及健康险分部营业收入",
+              "raw_value": "502,171",
+              "value": "502171",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "财产保险分部营业收入",
+              "raw_value": "353,272",
+              "value": "353272",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "银行分部营业收入",
+              "raw_value": "131,442",
+              "value": "131442",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产管理分部营业收入",
+              "raw_value": "51,346",
+              "value": "51346",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "金融赋能分部营业收入",
+              "raw_value": "49,358",
+              "value": "49358",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务及合并抵销营业收入",
+              "raw_value": "-37,083",
+              "value": "-37083",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "寿险及健康险分部保险服务收入",
+              "raw_value": "220,391",
+              "value": "220391",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "寿险及健康险分部投资收益",
+              "raw_value": "126,017",
+              "value": "126017",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "寿险及健康险分部非银行业务利息收入",
+              "raw_value": "103,678",
+              "value": "103678",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "财产保险分部保险服务收入",
+              "raw_value": "338,912",
+              "value": "338912",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:R-002",
+          "text": "2025年寿险及健康险业务新业务价值368.97亿元，同比增长29.3%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "寿险及健康险业务新业务价值",
+              "raw_value": "368.97",
+              "value": "368.97",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "寿险及健康险业务新业务价值同比变动",
+              "raw_value": "29.3",
+              "value": "29.3",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:R-003",
+          "text": "2025年保险资金投资组合规模6.49万亿元，较年初增长13.2%；综合投资收益率6.3%，同比上升0.5个百分点。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "保险资金投资组合规模",
+              "raw_value": "6.49",
+              "value": "6.49",
+              "unit": "万亿元",
+              "source_unit": "万亿元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "保险资金投资组合规模较年初变动",
+              "raw_value": "13.2",
+              "value": "13.2",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "较年初",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合投资收益率",
+              "raw_value": "6.3",
+              "value": "6.3",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "综合投资收益率同比变动",
+              "raw_value": "0.5",
+              "value": "0.5",
+              "unit": "个百分点",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:R-004",
+          "text": "集团2025年归属于母公司股东的营运利润1,344.15亿元，同比增长10.3%；归属于母公司股东的扣非净利润1,437.73亿元，同比增长22.5%；归属于母公司股东的净利润134,778百万元，同比增长6.5%。2025年非经常性损益合计-89.95亿元（-8,995百万元）。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "归属于母公司股东的营运利润",
+              "raw_value": "134,415",
+              "value": "134415",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的营运利润同比变动",
+              "raw_value": "10.3",
+              "value": "10.3",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的扣非净利润",
+              "raw_value": "143,773",
+              "value": "143773",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的扣非净利润同比变动",
+              "raw_value": "22.5",
+              "value": "22.5",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的净利润",
+              "raw_value": "134,778",
+              "value": "134778",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的净利润同比变动",
+              "raw_value": "6.5",
+              "value": "6.5",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "非经常性损益合计",
+              "raw_value": "-8,995",
+              "value": "-8995",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SC-01",
+          "text": "本公司是综合性金融集团，投资业务是主营业务之一；集团坚守金融主业，通过寿险及健康险、财产保险等子公司承担保险保障职能，并通过银行、资产管理、金融赋能等子公司提供综合金融服务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0007"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-SC-02",
+          "text": "财产保险业务为小微企业、新能源车主、农户等提供风险保障，2025年为293万小微企业提供373.04万亿元风险保障，承保新能源车1,284万辆。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15305,
+      "output_tokens": 2482,
+      "total_tokens": 17787
+    }
+  },
+  {
+    "request_id": "bp-work-ad2413861ca4930f9b8d48dd:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "f8df4d29a545ea271c7438fee640c798f59faf6f97b188bc13a69bef12f790b2",
+    "response_hash": "d602ce371dde1339794144cabb7818ac92f6e82bac626e132545aa335a493f12",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-SC-01\",\"F-SC-02\"],\"checks\":[{\"fact_id\":\"F-SC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"explanation\":\"已删除无来源的“以保险为主业”。source-0005明确本公司为综合性金融集团且投资业务是主营业务之一；source-0007支持坚守金融主业，并通过寿险及健康险、财产保险、银行、资产管理、金融赋能等子公司经营金融业务、强化保险保障和提供综合金融服务。主体为合并集团，期间与限定均未超出来源。\"},{\"fact_id\":\"F-SC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"已删除无法由货运险“中国制造安全出海”推定的外贸企业。source-0009支持2025年平安产险为293万小微企业提供373.04万亿元风险保障；source-0010支持承保新能源车1,284万辆并为新能源车主提供风险保障，农业保险及农户服务亦有记载。主体限定为财产保险业务，金额、单位和期间正确。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-SC-01",
+        "F-SC-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-SC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0007"
+          ],
+          "explanation": "已删除无来源的“以保险为主业”。source-0005明确本公司为综合性金融集团且投资业务是主营业务之一；source-0007支持坚守金融主业，并通过寿险及健康险、财产保险、银行、资产管理、金融赋能等子公司经营金融业务、强化保险保障和提供综合金融服务。主体为合并集团，期间与限定均未超出来源。"
+        },
+        {
+          "fact_id": "F-SC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "已删除无法由货运险“中国制造安全出海”推定的外贸企业。source-0009支持2025年平安产险为293万小微企业提供373.04万亿元风险保障；source-0010支持承保新能源车1,284万辆并为新能源车主提供风险保障，农业保险及农户服务亦有记载。主体限定为财产保险业务，金额、单位和期间正确。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 16249,
+      "output_tokens": 268,
+      "total_tokens": 19635
+    }
+  }
+]

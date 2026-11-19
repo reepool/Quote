@@ -1,0 +1,286 @@
+# File: deliver_dw.py
+"""6.DW saved-result delivery through existing writer/read owner, no model calls."""
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+
+from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import workpaper_elements, workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119'
+RESEARCH = ROOT / 'data/research/company_profile_pingan_20261119'
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
+def dump(path, payload):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main():
+    group = load(DEST / 'group-execution.json')
+    assert group['executed'] == 1 and not group['not_started'] and group['source_code_unchanged']
+    folder = DEST / '601318'
+    summary, budget = load(folder / 'summary.json'), load(folder / 'budget.json')
+    attempts = budget['attempts']
+    counts = Counter(a['logical_request_id'] for a in attempts)
+    recovery = sum(n-1 for n in counts.values())
+    assert recovery <= 3 and max(counts.values(), default=0) <= 2
+    assert budget['physical_requests'] == len(attempts) <= 10
+    assert budget['charged_tokens'] == sum(a['charged_tokens'] for a in attempts) <= 1000000
+    known, unknown = 0, 0
+    for a in attempts:
+        total = (a.get('usage') or {}).get('total_tokens')
+        if total is None:
+            unknown += a['charged_tokens']
+        else:
+            assert total == a['charged_tokens']
+            known += total
+    dump(DEST / 'resource-audit.json', dict(task='6.DW', physical_requests=len(attempts), recoveries=recovery,
+         ledger=budget['charged_tokens'], known_supplier_total=known, unknown_usage_reservations=unknown,
+         fee='unknown', business_seconds=summary['business_seconds'], supervision_seconds=summary['supervision_seconds'],
+         group_supervision_seconds=group['supervision_wall_seconds'], preparation_seconds=summary['preparation_seconds'],
+         human_audit_active_time='not_completely_measured', supplier_total_not_input_plus_output=True))
+    raw_hashes = {str(p.relative_to(ROOT)):sha(p) for p in [folder / 'runtime.json', folder / 'query.json'] if p.exists()}
+    audit_path = DEST / 'independent-audit.json'
+    audit = load(audit_path)
+    record = CompanyProfileRuntimeRecordV3.model_validate_json((folder / 'runtime.json').read_bytes())
+    raw = record.workpaper.model_dump(mode='json')
+    facts = {f.fact_id:f for e in workpaper_elements(record.workpaper).values() for f in e.facts}
+    ids = audit['checked_fact_ids']
+    assert len(ids) == len(set(ids)) and set(ids) <= facts.keys()
+    decisions = []
+    for fid in ids:
+        disposition, reason = 'source_checked', audit['basis_by_fact'].get(fid, audit['basis'])
+        for key, target in [('errors', 'withheld'), ('source_only', 'source_only')]:
+            if fid in audit.get(key, {}):
+                disposition, reason = target, audit[key][fid]
+        fact = facts[fid]
+        decisions.append(dict(fact_id=fid, fact_sha256=workpaper_fact_hash(fact), disposition=disposition,
+                              evidence_ids=list(fact.evidence_ids), reason=reason, limitation=audit.get('limitations', {}).get(fid)))
+    paper = bind_workpaper_use_review(record.workpaper, dict(report=record.report.model_dump(mode='json'),
+        reviewer='Codex finite independent source check 6.DW', reference=str(audit_path.relative_to(ROOT)),
+        reference_sha256=sha(audit_path), decisions=decisions))
+    after = paper.model_dump(mode='json')
+    after.pop('use_review', None)
+    raw.pop('use_review', None)
+    assert after == raw, 'do not alter original facts/generation/model review'
+    record = record.model_copy(update={'workpaper':paper})
+    writer = CompanyProfileResearchWriter(RESEARCH)
+    target = writer.output_root / f'{record.work_id}.json'
+    if target.exists():
+        assert target.read_text() == record.model_dump_json(indent=2)
+    else:
+        writer.persist(record)
+    reader = CompanyProfileReadService(RESEARCH)
+    query = reader.query(('601318.SH',))
+    exported = reader.export(('601318.SH',), export_directory=DEST / 'delivery')
+    assert query['delivered'] == 1 and query['profiles'] == exported['profiles']
+    assert query['profiles'] == CompanyProfileReadService(RESEARCH).query(('601318.SH',))['profiles']
+    api = reader.research_profile('601318.SH')
+    assert api == CompanyProfileReadService(RESEARCH).research_profile('601318.SH')
+    visible = [e for e in api['facts'] if e['fact'] is not None]
+    revised = [f for f in paper.quality_review.findings if f.resolution == 'corrected_pending_trust' and f.revised_fact]
+    revised_ids = {f.revised_fact.fact_id for f in revised}
+    assert revised_ids <= set(ids), 'adopted real revisions must be independently checked'
+    for p, h in raw_hashes.items(): assert sha(ROOT / p) == h
+    dump(DEST / 'delivery/annual-api.json', dict(catalog=reader.research_profile_catalog(), profiles=[api],
+        requested_instrument_ids=['601318.SH'], missing_instrument_ids=[]))
+    dump(DEST / 'delivery-assessment.json', dict(task='6.DW', research_output_root=str(RESEARCH),
+        raw_fact_count=len(facts), visible_fact_count=len(visible),
+        visible_metric_count=sum(len(e['fact']['metrics']) for e in visible),
+        independent_checked_objects=len(ids), model_corrected_findings=len(revised), model_revised_objects=len(revised_ids),
+        delivery_states=dict(Counter(e['state'] for e in api['facts'])),
+        review_status=paper.quality_review.status, original_core_complete=summary.get('core_complete'),
+        gap_count=len(api['information_gaps']), suggested_acquisition_count=len(api['suggested_acquisitions']),
+        qualitative_basic_answers=audit['core'], full_profile_accuracy='not_assessed',
+        old_failure_changed=False, unseen_acceptance=False, production_authorization='not_authorized'))
+    dump(DEST / 'readback-check.json', dict(query_export_new_instance_equal=True, api_detail_fresh_reader_equal=True,
+         raw_runtime_and_query_hashes_unchanged=raw_hashes, audit_reference_sha256=sha(audit_path),
+         adopted_revised_objects_independently_checked=True, new_model_requests=0))
+    print(json.dumps(load(DEST / 'delivery-assessment.json'), ensure_ascii=False))
+
+
+if __name__ == '__main__': main()
+
+
+# File: verify_dw_api.py
+"""Read-only in-process API verification of saved single-company delivery."""
+import asyncio
+import json
+from pathlib import Path
+from unittest.mock import patch
+
+import httpx
+from fastapi import FastAPI
+from api.company_profile_routes import annual_profile_reader, router
+from research.company_profile.reads import CompanyProfileReadService
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119'
+
+
+async def main():
+    saved = json.loads((DEST / 'delivery/annual-api.json').read_text())
+    reader = CompanyProfileReadService(ROOT / 'data/research/company_profile_pingan_20261119')
+    app = FastAPI()
+    app.include_router(router, prefix='/api/v1')
+    app.dependency_overrides[annual_profile_reader] = lambda:reader
+    with patch('socket.create_connection', side_effect=AssertionError('external connections forbidden')):
+        async with asyncio.timeout(120):
+            async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://local') as client:
+                catalog = await client.get('/api/v1/research/company/annual-profiles')
+                detail = await client.get('/api/v1/research/company/601318.SH/annual-profile')
+                assert catalog.status_code == detail.status_code == 200
+                assert catalog.json() == saved['catalog'] and detail.json() == saved['profiles'][0]
+    result = dict(catalog_http_status=200, detail_http_status=200, details_equal_canonical_api=True,
+                  external_connections_forbidden=True, new_model_requests=0, shared_configuration_changed=False)
+    (DEST / 'api-check.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    print(json.dumps(result, ensure_ascii=False))
+
+
+if __name__ == '__main__': asyncio.run(main())
+
+
+# File: diagnose_dw.py
+"""Explain saved rejected candidates without changing or adopting their content."""
+import hashlib
+import json
+import re
+from pathlib import Path
+
+from research.company_profile.workpaper import CompanyProfileWorkpaper, _check_fact_source
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119'
+FOLDER = DEST / '601318'
+paper = CompanyProfileWorkpaper.model_validate(json.loads((FOLDER / 'runtime.json').read_text())['workpaper'])
+sources = {e.evidence_id:e for e in paper.evidence}
+rows = []
+for finding in paper.quality_review.findings:
+    candidate = finding.revised_fact
+    if finding.resolution != 'repair_rejected' or candidate is None: continue
+    try:
+        _check_fact_source(candidate, sources, check_units=True)
+    except ValueError as exc:
+        error = str(exc)
+    else:
+        error = None
+    rows.append(dict(finding_id=finding.finding_id, fact_id=candidate.fact_id,
+                     first_current_rejection=error, final_verification_sent=False, adopted=False,
+                     candidate_sha256=hashlib.sha256(candidate.model_dump_json().encode()).hexdigest(),
+                     evidence_ids=list(candidate.evidence_ids)))
+examples = []
+for eid, pattern, expected, category in [
+    ('source-0005', r'1,050,[ \t]+506', '1050506', 'space after comma inside a printed number'),
+    ('source-0001', r'368\.[ \t]+97', '368.97', 'space after decimal inside a printed number'),
+    ('source-0001', r'13\.[ \t]+2%', '13.2', 'space after decimal in a percentage'),
+    ('source-0005', r'\(8,995\)', '-8995', 'accounting parentheses, not an explicit minus sign'),
+]:
+    span = next(s for s in sources[eid].source_spans if re.search(pattern, s.quote))
+    match = re.search(pattern, span.quote)
+    at, end = match.span()
+    examples.append(dict(evidence_id=eid, physical_page=span.page,
+                         literal_compact_display=' '.join(match.group().split()),
+                         literal_start=span.start+at, literal_end=span.start+end,
+                         literal_sha256=hashlib.sha256(match.group().encode()).hexdigest(),
+                         reviewed_reading=expected, category=category,
+                         source_context=' '.join(span.quote[max(0,at-45):end+65].split())))
+result = dict(task='6.DW', type='saved_candidates_read_only_diagnosis', rejected=rows, observed_source_spellings=examples,
+              conclusion='The first numeric rejections include PDF-internal number spacing and accounting parentheses. This does not prove candidate scope/unit/period correctness or authorize automatic acceptance.',
+              no_source_or_model_reply_modified=True, candidates_adopted=0, new_model_requests=0,
+              next_scope='Local source-number consumption regression with positive/negative table-column/subject cases; reuse these saved candidates, do not repeat extraction or reopen this entry.')
+(DEST / 'consumption-diagnostics.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(dict(rejected=[(r['finding_id'],r['first_current_rejection']) for r in rows], candidates_adopted=0, new_model_requests=0),ensure_ascii=False))
+
+
+# File: close_dw.py
+"""Close the one completed approved entry; preserve receipts and clean derived copies."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+
+ROOT = Path('/home/python/Quote')
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119'
+TEMP = ROOT / 'data/QuoteBak/workpaper-dw-PLJcqW'
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+group = load(DEST / 'group-execution.json')
+check = load(DEST / 'readback-check.json')
+assert group['executed'] == 1 and not group['not_started'] and group['source_code_unchanged']
+assert check['query_export_new_instance_equal'] and load(DEST / 'api-check.json')['details_equal_canonical_api']
+for path, digest in check['raw_runtime_and_query_hashes_unchanged'].items(): assert sha(ROOT / path) == digest
+frozen = load(DEST / 'authorization.json')
+for path, digest in frozen['code_sha256'].items(): assert sha(ROOT / path) == digest
+assert sha(ROOT / 'config/13_llm.json') == frozen['shared_config_sha256']
+source = load(DEST / 'source-manifest.json')['companies'][0]
+assert sha(Path(source['asset']['archive_path'])) == source['asset']['content_hash']
+assert not Path(load(DEST / '601318/temporary-root.json')['root']).exists()
+commands = subprocess.check_output(['ps', '-eo', 'args='], text=True).splitlines()
+for command in commands:
+    parts = command.split()
+    if parts and 'python' in Path(parts[0]).name:
+        assert not any(Path(p).name in {'dw_runner.py', 'deliver_dw.py', 'verify_dw_api.py', 'diagnose_dw.py'} for p in parts[1:])
+events = [line for line in (TEMP / '601318-run.log').read_text().splitlines()
+          if any(name in line for name in ['event=llm.transport.failed', 'event=llm.attempt.failed',
+                                           'event=llm.attempt.started', 'event=llm.request.completed'])]
+assert any('RemoteProtocolError' in line for line in events)
+(DEST / 'runtime-events.log').write_text('\n'.join(events) + '\n')
+(DEST / 'finalization-snapshot.txt').write_text('\n\n'.join(
+    '# File: ' + name + '\n' + (TEMP / name).read_text()
+    for name in ['deliver_dw.py', 'verify_dw_api.py', 'diagnose_dw.py', 'close_dw.py']))
+kept = ['delivery/annual-api.json', 'delivery/601318.SH_2025-12-31.md']
+preserved = {name:sha(DEST / name) for name in kept}
+removed = []
+
+
+def remove(path):
+    assert not path.is_symlink()
+    path = path.resolve()
+    assert path == TEMP or path == DEST / '601318/export' or path.parent == DEST / 'delivery'
+    files = [p for p in path.rglob('*') if p.is_file()] if path.is_dir() else [path]
+    assert not any(p.is_symlink() for p in files)
+    removed.append(dict(path=str(path), files=len(files), file_bytes=sum(p.stat().st_size for p in files)))
+    if path.is_dir(): shutil.rmtree(path)
+    else: path.unlink()
+
+
+remove(DEST / '601318/export')
+for p in list((DEST / 'delivery').iterdir()):
+    if str(p.relative_to(DEST)) not in kept:
+        assert p.is_file()
+        remove(p)
+remove(TEMP)
+for name, digest in preserved.items(): assert sha(DEST / name) == digest
+closing = sum(p['file_bytes'] for p in removed)
+runtime = group['results'][0]['cleanup_bytes']
+result = dict(task='6.DW', removed=removed, closing_file_bytes=closing,
+              runtime_finally_cleanup_file_bytes=runtime, total_removed_file_bytes=closing+runtime,
+              final_canonical_outputs_sha256=preserved, other_task_or_unknown_ownership_removed=False,
+              preserved=['official PDF and shared valid cache', 'original query/runtime/model/ledger/failures',
+                         'used attempt marker', 'new isolated research root and all previous roots',
+                         'baseline config/core/parallel changes'],
+              recovery='Deleted process data and duplicate exports are reproducible from retained sources, receipts and snapshots.')
+(DEST / 'cleanup.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({k:v for k,v in result.items() if k not in ['removed', 'preserved', 'final_canonical_outputs_sha256']},ensure_ascii=False))

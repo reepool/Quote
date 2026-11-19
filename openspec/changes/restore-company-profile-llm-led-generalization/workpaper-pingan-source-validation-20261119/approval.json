@@ -1,0 +1,13 @@
+{
+  "task": "6.DW",
+  "status": "explicitly_approved",
+  "approval_reference": "用户call_12f93ef5002a4eaeae7775fefe895984明确答复：批准中国平安这一次限定真实验证。",
+  "instruments": ["601318.SH"],
+  "providers": ["official api.deepseek.com deepseek-flash", "existing scorpio.reepool.com grok-4.7 high"],
+  "data_scope": "Only selected sections from the existing public 2025 annual report and public derived workpaper; no accounts, keys, private content, old navigation, answers or human reference as model input.",
+  "each_limits": {"business_seconds": 6000, "tokens": 1000000, "physical_requests": 10, "recoveries": 3, "per_logical_recovery": 1, "known_cost_cny": 10},
+  "group_limits": {"business_wall_seconds": 6000, "tokens": 1000000, "physical_requests": 10, "concurrency": 1},
+  "timeouts": {"high_tier_physical_seconds": 1200, "logical_seconds": 2450, "flash_physical_seconds": 600},
+  "cost_when_unpriced": "unknown; no total CNY cap claimed",
+  "limits": ["one fresh original TaskService entry only", "freeze before send, no hotfix", "approved network environment only", "no added window, second company, recharge, shared config edit or production", "old S2 and DU failure unchanged"]
+}

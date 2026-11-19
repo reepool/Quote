@@ -1,0 +1,8 @@
+{
+  "catalog_http_status": 200,
+  "detail_http_status": 200,
+  "details_equal_canonical_api": true,
+  "external_connections_forbidden": true,
+  "new_model_requests": 0,
+  "shared_configuration_changed": false
+}

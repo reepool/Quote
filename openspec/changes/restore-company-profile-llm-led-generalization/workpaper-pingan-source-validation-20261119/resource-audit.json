@@ -1,0 +1,15 @@
+{
+  "task": "6.DW",
+  "physical_requests": 6,
+  "recoveries": 1,
+  "ledger": 376666,
+  "known_supplier_total": 137108,
+  "unknown_usage_reservations": 239558,
+  "fee": "unknown",
+  "business_seconds": 1546.113,
+  "supervision_seconds": 1549.128,
+  "group_supervision_seconds": 1578.113,
+  "preparation_seconds": 26.44,
+  "human_audit_active_time": "not_completely_measured",
+  "supplier_total_not_input_plus_output": true
+}

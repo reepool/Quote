@@ -1,0 +1,130 @@
+"""6.DW single approved fresh entry; reuse the exercised original owner operator."""
+from pathlib import Path
+import gzip
+import json
+import os
+import sys
+import time
+import zipfile
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DESTINATION = CHANGE / 'workpaper-pingan-source-validation-20261119'
+DU = CHANGE / 'workpaper-six-issue-regression-20261119/operator-snapshot.txt'
+
+# Mechanical operator adaptation only. The original TaskService, gateway,
+# budget, writer and query/export retain ownership of all business behavior.
+operator = DU.read_text().split("\nif __name__ == '__main__':", 1)[0]
+replacements = (
+    ('workpaper-six-issue-regression-20261119', 'workpaper-pingan-source-validation-20261119'),
+    ('6.DU', '6.DW'), ('v22-six-issue-', 'v23-pingan-source-'), ('workpaper-du-', 'workpaper-dw-'),
+    ("ORDERED = ['600113.SH', '000166.SZ', '000025.SZ', '000001.SZ', '600030.SH', '601318.SH']", "ORDERED = ['601318.SH']"),
+    ("assert [i['instrument_id'] for i in items] == ORDER and len(items) == 6", "assert [i['instrument_id'] for i in items] == ORDER and len(items) == 1"),
+    ("('started+7200', 'started+12600')", "('started+7200', 'started+6000')"),
+    ("\"totals['physical_requests']>=60\"", "\"totals['physical_requests']>=10\""),
+)
+for old, new in replacements:
+    assert old in operator, old
+    operator = operator.replace(old, new)
+exec(compile(operator, str(DU), 'exec'), globals())
+# group() was imported from the original owner adapter, not duplicated here.
+# It has just one source and the original in-flight hard-stop behavior.
+source = source.replace("totals['charged_tokens']>=6000000", "totals['charged_tokens']>=1000000")
+exec(compile(source[source.index('\ndef group('):], str(BASE), 'exec'), globals())
+
+
+def prepare(directory):
+    started = time.monotonic()
+    assert not (directory / '601318.json').exists()
+    manifest = json.loads((CHANGE / 'workpaper-six-issue-regression-20261119/source-manifest.json').read_text())
+    original = next(i for i in manifest['companies'] if i['instrument_id'] == '601318.SH')
+    from research.company_profile.workpaper_sections import index_sections
+    from research.business_profile_documents import classify_business_profile_document
+    pdf = Path(original['asset']['archive_path'])
+    assert sha(pdf) == original['asset']['content_hash']
+    cached = pdf.parent / 'derived/business_profile_pdfium_recovery.v4' / (pdf.stem + '_57e1dd4f16ef40ff.json.gz')
+    pages = json.loads(gzip.decompress(cached.read_bytes()))['pages']
+    assert len(pages) == original['pdf_pages']
+    binding_path = ROOT / original['source_binding']
+    assert sha(binding_path) == original['source_binding_sha256']
+    title = json.loads(binding_path.read_text())['announcement']['title']
+    classified = classify_business_profile_document(title, adjunct_type='PDF')
+    assert classified.selected and classified.is_full_report
+    index = index_sections(pages)
+    prepared = dict(asset=original['asset'], name=original['name'], exchange=original['exchange'], pages=pages,
+                    index=[s.model_dump(mode='json') for s in index],
+                    preparation_seconds=round(time.monotonic()-started, 3),
+                    source_preparation=dict(reused_shared_cache=str(cached), cache_sha256=sha(cached)))
+    dump(directory / '601318.json', prepared)
+    item = {k: original[k] for k in ['instrument_id', 'name', 'exchange', 'asset', 'pdf_pages', 'source_binding', 'source_binding_sha256']}
+    item.update(prepared_sha256=sha(directory / '601318.json'), heading_count=len(index), official_title=title)
+    dump(DEST / 'source-manifest.json', dict(task='6.DW', companies=[item], old_semantic_inputs=False))
+    check = json.loads((CHANGE / 'workpaper-section-isolation-20261119/source-check.json').read_text())
+    for path, digest in check['source_code_sha256'].items():
+        assert sha(ROOT / path) == digest
+    prior_cleanup = json.loads((CHANGE / 'workpaper-section-isolation-20261119/cleanup.json').read_text())
+    assert not Path(prior_cleanup['removed_root']).exists()
+    assert not Path(prior_cleanup['interrupted_api_controlled_test_root']).exists()
+    dump(DEST / 'readiness.json', dict(task='6.DW', new_model_requests=0, previous_owned_temp_absent=True,
+        source_sha256=sha(pdf), prepared_sha256=sha(directory / '601318.json'), heading_count=len(index),
+        reused_verification='993c7447:131 passed, no new semantic score', source_only=True,
+        code_sha256=code_hashes(), preparation_seconds=prepared['preparation_seconds']))
+    print('PREPARED_ONE_FRESH_SOURCE', len(index), flush=True)
+
+
+def freeze(directory):
+    assert os.environ['TMPDIR'] == str(ROOT / 'data/QuoteBak')
+    assert not (DEST / 'authorization.json').exists()
+    approval = json.loads((DEST / 'approval.json').read_text())
+    assert approval['status'] == 'explicitly_approved' and approval['instruments'] == ['601318.SH']
+    network = json.loads((DEST / 'network-preflight.json').read_text())
+    assert network['namespace'] == os.readlink('/proc/self/ns/net') and network['model_requests'] == 0
+    assert {c['host'] for c in network['checks']} == {'api.deepseek.com', 'scorpio.reepool.com'}
+    assert json.loads((DEST / 'binding-check.json').read_text())['provider_cap'] == 2450
+    ready = json.loads((DEST / 'readiness.json').read_text())
+    assert code_hashes() == ready['code_sha256']
+    item = source_items()[0]
+    prepared_path = directory / '601318.json'
+    prepared = json.loads(prepared_path.read_text())
+    assert sha(prepared_path) == item['prepared_sha256'] == ready['prepared_sha256']
+    assert set(prepared) == {'asset', 'name', 'exchange', 'pages', 'index', 'preparation_seconds', 'source_preparation'}
+    assert prepared['asset'] == item['asset'] and len(prepared['pages']) == item['pdf_pages']
+    assert sha(Path(item['asset']['archive_path'])) == item['asset']['content_hash']
+    assert not (ROOT / 'data/QuoteBak/s1-attempts/workpaper-dw-601318-20261119.json').exists()
+    config = config_for_run()
+    profiles = {name: dict(model=p.model, source_label=p.source_label, resource=config.resource_for_profile(p).name,
+        reasoning_effort=p.reasoning_effort, disable_thinking=p.disable_thinking, timeout_seconds=p.timeout_seconds,
+        attempt_timeout_seconds=p.attempt_timeout_seconds, max_retries=p.max_retries,
+        max_schema_repair_attempts=p.max_schema_repair_attempts) for name, p in config.profiles.items()}
+    hashes = code_hashes()
+    with zipfile.ZipFile(DEST / 'execution-code-snapshot.zip', 'x', compression=zipfile.ZIP_DEFLATED) as archive:
+        for path in hashes:
+            archive.write(ROOT / path, path)
+    dump(DEST / 'authorization.json', dict(task='6.DW', status='authorized', approval_reference=APPROVAL,
+        approval_sha256=sha(DEST / 'approval.json'), base_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+        prepared_root=str(directory), companies=[item], order=ORDER,
+        operator_sha256=sha(Path(__file__)), operator_base_sha256=sha(BASE), prior_operator_sha256=sha(DU),
+        code_sha256=hashes, shared_config_sha256=sha(ROOT / 'config/13_llm.json'), selected_profiles=profiles,
+        network_context=network, network_preflight_sha256=sha(DEST / 'network-preflight.json'),
+        capture_helper_sha256=sha(CAPTURE_HELPER), each_limits=approval['each_limits'], group_limits=approval['group_limits'],
+        production_authorization='not_authorized', old_semantic_input=False, human_reference_as_model_input=False,
+        classification='seen bounded development observation, not S2 unseen or production',
+        quality_scope='Substantive business/product/service/monetization and source accuracy, missing optional details deliverable'))
+    shutil.copy2(__file__, DEST / 'operator-snapshot.txt')
+    print('FROZEN_ONE_APPROVED', flush=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=['prepare', 'check', 'preflight', 'freeze', 'run', 'group'])
+    parser.add_argument('--prepared', type=Path)
+    parser.add_argument('--symbol')
+    parser.add_argument('--group-deadline', type=float)
+    parser.add_argument('--batch', type=int, default=1)
+    args = parser.parse_args()
+    if args.mode == 'prepare': prepare(args.prepared)
+    elif args.mode == 'check': boundary_check()
+    elif args.mode == 'preflight': network_preflight()
+    elif args.mode == 'freeze': freeze(args.prepared)
+    elif args.mode == 'run': run_one(args.prepared, args.symbol, args.group_deadline)
+    else: group(args.prepared, args.batch)

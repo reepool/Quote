@@ -1,0 +1,37 @@
+{
+  "task": "6.DW",
+  "research_output_root": "/home/python/Quote/data/research/company_profile_pingan_20261119",
+  "raw_fact_count": 22,
+  "visible_fact_count": 20,
+  "visible_metric_count": 31,
+  "independent_checked_objects": 22,
+  "model_corrected_findings": 2,
+  "model_revised_objects": 2,
+  "delivery_states": {
+    "limited": 8,
+    "reviewed": 12,
+    "source_only": 2
+  },
+  "review_status": "completed_with_open_findings",
+  "original_core_complete": false,
+  "gap_count": 11,
+  "suggested_acquisition_count": 4,
+  "qualitative_basic_answers": {
+    "business_structure": {
+      "status": "source_supported",
+      "reason": "五大金融业务板块和主要载体可读。"
+    },
+    "products_services": {
+      "status": "partially_source_supported",
+      "reason": "财险、银行财富、资管及医疗健康有实质内容；寿险健康险虽有板块名，但产品细节和新业务价值尚未接受。"
+    },
+    "revenue_model": {
+      "status": "partially_source_supported",
+      "reason": "财险保费/服务收入和平安健康收入已读；集团总额、分部收入及保险投资机制候选仍拒绝，整体赚钱方式尚不充分，不因字段存在称完整。"
+    }
+  },
+  "full_profile_accuracy": "not_assessed",
+  "old_failure_changed": false,
+  "unseen_acceptance": false,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,105 @@
+{
+  "task": "6.DW",
+  "type": "saved_candidates_read_only_diagnosis",
+  "rejected": [
+    {
+      "finding_id": "R-001",
+      "fact_id": "review-add:R-001",
+      "first_current_rejection": "metric number is absent from cited source: 营业收入",
+      "final_verification_sent": false,
+      "adopted": false,
+      "candidate_sha256": "f43df5776a533f0824468a724cf8ae23f91d66bf3b457bbba0c75abe160194e2",
+      "evidence_ids": [
+        "source-0005",
+        "source-0014"
+      ]
+    },
+    {
+      "finding_id": "R-002",
+      "fact_id": "review-add:R-002",
+      "first_current_rejection": "metric number is absent from cited source: 寿险及健康险业务新业务价值",
+      "final_verification_sent": false,
+      "adopted": false,
+      "candidate_sha256": "47f4e981293a7911f9b3500ba1b7857fa595e0693555c961541c38c0d094a0f1",
+      "evidence_ids": [
+        "source-0001",
+        "source-0003"
+      ]
+    },
+    {
+      "finding_id": "R-003",
+      "fact_id": "review-add:R-003",
+      "first_current_rejection": "metric number is absent from cited source: 保险资金投资组合规模较年初变动",
+      "final_verification_sent": false,
+      "adopted": false,
+      "candidate_sha256": "f466dabba5e054c32f07449b67dd2a4080b89baa60604652dc7ffcfe26adc526",
+      "evidence_ids": [
+        "source-0001",
+        "source-0003"
+      ]
+    },
+    {
+      "finding_id": "R-004",
+      "fact_id": "review-add:R-004",
+      "first_current_rejection": "metric number is absent from cited source: 非经常性损益合计",
+      "final_verification_sent": false,
+      "adopted": false,
+      "candidate_sha256": "1233ca222ab19180bdbdad4e21618a0d02b7ff45f5cb2dc9fd55331c086a7f97",
+      "evidence_ids": [
+        "source-0005",
+        "source-0007"
+      ]
+    }
+  ],
+  "observed_source_spellings": [
+    {
+      "evidence_id": "source-0005",
+      "physical_page": 14,
+      "literal_compact_display": "1,050, 506",
+      "literal_start": 15647,
+      "literal_end": 15713,
+      "literal_sha256": "dfdcb99a5603f0cdfc4419b9fc349f3857fa8f77103425da7565ec6bd51dcfe7",
+      "reviewed_reading": "1050506",
+      "category": "space after comma inside a printed number",
+      "source_context": "1,050, 506"
+    },
+    {
+      "evidence_id": "source-0001",
+      "physical_page": 10,
+      "literal_compact_display": "368. 97",
+      "literal_start": 2352,
+      "literal_end": 2428,
+      "literal_sha256": "34a39a9aafa140bbe995816dd0bd74a4f1b8525066ae2de7dbf87e1796a18e1a",
+      "reviewed_reading": "368.97",
+      "category": "space after decimal inside a printed number",
+      "source_context": "寿险及健康险业务新业务价值 368. 97亿元，同比增长 29. 3%"
+    },
+    {
+      "evidence_id": "source-0001",
+      "physical_page": 10,
+      "literal_compact_display": "13. 2%",
+      "literal_start": 5108,
+      "literal_end": 5159,
+      "literal_sha256": "3bf68452a8a2edb22db82c4cb4dec606aa5d5b2d48766eef1e2ed3641edc2c74",
+      "reviewed_reading": "13.2",
+      "category": "space after decimal in a percentage",
+      "source_context": "保险资金投资组合规模 6.49万亿元，较年初增长 13. 2% ；综合投资收益率 6.3%， 综合投资收益率"
+    },
+    {
+      "evidence_id": "source-0005",
+      "physical_page": 14,
+      "literal_compact_display": "(8,995)",
+      "literal_start": 64220,
+      "literal_end": 64227,
+      "literal_sha256": "e6099954695f69a6a157c79b257362ce910ef6a45b8b0cf25a076f188e9b31b1",
+      "reviewed_reading": "-8995",
+      "category": "accounting parentheses, not an explicit minus sign",
+      "source_context": "(8,995)"
+    }
+  ],
+  "conclusion": "The first numeric rejections include PDF-internal number spacing and accounting parentheses. This does not prove candidate scope/unit/period correctness or authorize automatic acceptance.",
+  "no_source_or_model_reply_modified": true,
+  "candidates_adopted": 0,
+  "new_model_requests": 0,
+  "next_scope": "Local source-number consumption regression with positive/negative table-column/subject cases; reuse these saved candidates, do not repeat extraction or reopen this entry."
+}

@@ -1,0 +1,11 @@
+{
+  "query_export_new_instance_equal": true,
+  "api_detail_fresh_reader_equal": true,
+  "raw_runtime_and_query_hashes_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/601318/runtime.json": "ead65d60a7e79d79a33ddf6feb74905898269a6facca556efa19270160256dcc",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/601318/query.json": "a43e5c669c1c18887302b3001740a50b8588cb5a7e306ed86bac2759c25130ea"
+  },
+  "audit_reference_sha256": "d2f8faf5c73f58b8386172bbf10f2380bbe9780fb8c211e78190254699b49b25",
+  "adopted_revised_objects_independently_checked": true,
+  "new_model_requests": 0
+}

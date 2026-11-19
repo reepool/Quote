@@ -1,0 +1,56 @@
+{
+  "task": "6.DW",
+  "removed": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/601318/export",
+      "files": 6,
+      "file_bytes": 900810
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/delivery/profiles.csv",
+      "files": 1,
+      "file_bytes": 1398
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/delivery/research_profiles.json",
+      "files": 1,
+      "file_bytes": 258325
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/delivery/export_manifest.json",
+      "files": 1,
+      "file_bytes": 1532
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/delivery/profiles.md",
+      "files": 1,
+      "file_bytes": 1368
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/delivery/601318.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 575232
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-dw-PLJcqW",
+      "files": 8,
+      "file_bytes": 1706524
+    }
+  ],
+  "closing_file_bytes": 3445189,
+  "runtime_finally_cleanup_file_bytes": 2648433,
+  "total_removed_file_bytes": 6093622,
+  "final_canonical_outputs_sha256": {
+    "delivery/annual-api.json": "d50485c49ed0599e3bcb2b7db1c5ee339a954a56bbaf8df1fdd7c732eef63923",
+    "delivery/601318.SH_2025-12-31.md": "de61065185c70ce52f4d13aa003c9b9f3665af2017cd87bf5a4ddbac5f1c1e1b"
+  },
+  "other_task_or_unknown_ownership_removed": false,
+  "preserved": [
+    "official PDF and shared valid cache",
+    "original query/runtime/model/ledger/failures",
+    "used attempt marker",
+    "new isolated research root and all previous roots",
+    "baseline config/core/parallel changes"
+  ],
+  "recovery": "Deleted process data and duplicate exports are reproducible from retained sources, receipts and snapshots."
+}

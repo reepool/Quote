@@ -1,0 +1,28 @@
+{
+  "task": "6.DW",
+  "companies": [
+    {
+      "instrument_id": "601318.SH",
+      "name": "中国平安",
+      "exchange": "SSE",
+      "asset": {
+        "instrument_id": "601318.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-efc068d2819d50a9092aa70a",
+        "filing_id": "1225038263",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/86/860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 370,
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/601318.json",
+      "source_binding_sha256": "063db8eb403893f5e95740fd6d60eda865f8e094e8423b35a2411db2cf0c684f",
+      "prepared_sha256": "23b241850946ade0cb6e47a29982bbbf6b4158016bd6d856c84ea16b8de652f0",
+      "heading_count": 1094,
+      "official_title": "2025年年度报告"
+    }
+  ],
+  "old_semantic_inputs": false
+}

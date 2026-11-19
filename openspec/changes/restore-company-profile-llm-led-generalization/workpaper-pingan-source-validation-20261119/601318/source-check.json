@@ -1,0 +1,21 @@
+{
+  "source_sha256": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+  "all_retained_evidence_coordinates_equal": true,
+  "pages": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    40,
+    41,
+    53,
+    54,
+    64,
+    69,
+    72,
+    249
+  ],
+  "semantic_accuracy_not_claimed": true
+}
