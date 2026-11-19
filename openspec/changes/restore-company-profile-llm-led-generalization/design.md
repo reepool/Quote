@@ -1,5 +1,9 @@
 ## Context
 
+### 6.DY 原回执接续保持原输入hash，源校验不跳过
+
+旧初核输入在新版重binding时可能新增展示限定/说明，虽数字与原文没改也会改变hash。明确review_resume的接续改为保原seed逐条检查Evidence/原数/单位，不写回展示说明；普通新review仍按原binding标准化，真实错误发送前拒绝。原stage回执与当前最终再核仍由原owner校验并分列，不借此复制旧final或绕过新候选核验。60直接通过后冻结执行6.DY，一次final五通过/一主体错拒绝，3新增沿原writer/API交付；局部复合候选拒绝不拖其他23条研究内容，不追加修订或逐公司规则。
+
 用户要求数千家公司自动年报解读，明确允许次要遗漏和有据不确定性。旧v61及S1路径可以在provider=None时交付，runtime按已有field消除unresolved，正文覆盖受正则控制；大量历史逐样本修复不能证明未见泛化。已有PDF、gateway、任务持久化和事实/读取模型值得复用。既有S1修复及S2源准备脏文件必须保留。
 
 ## Goals / Non-Goals

@@ -1,0 +1,31 @@
+{
+  "task": "6.DY",
+  "command": "source scripts/quote_dev_env.sh; python -m pytest -q tests/unit/test_research/test_company_profile_workpaper_continuation.py tests/unit/test_research/test_company_profile_workpaper_local_consumption.py tests/unit/test_research/test_company_profile_workpaper_source_recovery.py --basetemp=<owned QuoteBak root>/tests --junitxml=<owned QuoteBak root>/verification.xml",
+  "tests": 60,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "pytest_seconds": 25.79,
+  "xml_suite_seconds": 25.536,
+  "strict": "passed",
+  "compile": "passed",
+  "scoped_diff_check": "passed",
+  "review": {
+    "blocking_fixed": "P2 retained input changed by display-only rebinding",
+    "remaining_blocking": 0,
+    "nonblocking_deferred": "style/general platform/optional supply-chain"
+  },
+  "original36_hashes_unchanged": true,
+  "old20_api_facts_exactly_equal": true,
+  "shared_config_unchanged": true,
+  "actual_send_events": [
+    "[INFO][2026-11-19 21:30:44][client.py:909] - event=llm.attempt.first_admitted profile=semantic_extraction__scorpio_grok request_id=311086be67a142ffa4346eca3e93e2dd initial_queue_wait_ms=0 execution_timeout_seconds=2450.0",
+    "[INFO][2026-11-19 21:30:44][client.py:1451] - event=llm.attempt.started profile=semantic_extraction__scorpio_grok request_id=311086be67a142ffa4346eca3e93e2dd attempt=1/2 timeout_seconds=1200.0 remaining_seconds=2450.0",
+    "[INFO][2026-11-19 21:33:47][client.py:1104] - event=llm.request.completed profile=semantic_extraction__scorpio_grok request_id=311086be67a142ffa4346eca3e93e2dd request_hash=dee110a986271df69f87285c9512aada79d5cf81180a03bb5e523f4e7115e9ae attempts=1 latency_ms=183540 admission_wait_ms=0 execution_elapsed_ms=183498 input_tokens=19836 output_tokens=823 total_tokens=34399",
+    "RESULT {\"task\": \"6.DY\", \"instrument_id\": \"601318.SH\", \"entry_started\": true, \"readable\": false, \"exception\": \"AssertionError: \", \"preparation_seconds\": 25.686, \"state\": \"completed\", \"business_seconds\": 207.657, \"physical_requests\": 1, \"ledger\": 34399, \"cost\": \"unknown\", \"recoveries\": 0, \"stopped_reason\": null, \"supervision_seconds\": 235.819, \"protected_files_unchanged\": true, \"code_unchanged\": true, \"config_unchanged\": true}"
+  ],
+  "local_asgi_first_wait": "stopped after sandbox wait; no model or external connection; approved environment passed",
+  "preparation_operator_errors": "stdlib operator filename shadow and omitted native fallback corrected before freeze; no model/entry",
+  "unrelated_concurrent_commit": "b82af2555e8dd6170c887d17f41ee1869badbdbd",
+  "new_model_calls_outside_final": 0
+}

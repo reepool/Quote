@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-19 6.DY原六候选一次final已结束：[画像与实际缺项](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/result.md)。五通过含两旧、三新增，23可读/44指标与2源参考；原20保留，合并抵销主体错误使收入构成候选拒绝，不在本卡再修/重跑。实际采纳5项另核、其余hash继承，原始/审后两组三读及API200一致；1物理/34399已知total/0恢复、207.657业务秒、费用unknown。只修明确接续时保原seed hash的直接阻塞，逐条源检查仍在，60通过/strict/编译。归档错误原记录保留、0模型恢复，必要一套后清本人库/日志/重复导出，正式源/缓存/attempt/旧36文件和并行保护；旧失败/成绩/生产不改。后续优先通用独立事实与合并调整分开表达，不为一项追完美或自动开新付费组。
+
 2026-11-19 6.DX已交[通用数字消费修复](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-number-consumption-20261119/result.md)：同一行标点后填充空格、明确财务表/多列科目行独立括号负数由原owner消费，原文/坐标/raw/value不变、不猜主体/单位或跨列拼数。4真实候选旧拒绝复现、新本地4/4通过，259直接通过/0跳过（3长入口未重跑）和448旧文件hash/原20条API不变；0新模型/采纳，必要一套后清本人QuoteBak/库/日志，正式源/缓存/attempt与并行保护。下一DY原6候选批次（4恢复+2已采纳）仅一次真实final已有具体卡，需新明确外传/预算批准，不重抽/新修订或借DW余额；只实际通过才采纳，剩余缺项/供应链可选、不启生产，A/B v3/Review/strict及本人块Git收尾。
 
 2026-11-19 6.DW已交[中国平安画像/缺项/API](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/result.md)：1/1用完，原入口供源不再卡页脚，22原对象有限独核后20可读/31指标、2源参考；初核识别4数字补充但本地消费拒绝，赚钱方式仍不充分，不用字段非空改完整。6物理/1恢复/376666账本含239558未知预留、unknown费用，1546.113业务秒；原writer/API/三读及实际2修订另核，旧失败/assessment/根不改。下一只先离线修原数值消费的PDF内空格/括号负数，复用这四个候选及错列/单位/主体反例，不重抽公司或扩确认组；候选要获匹配真实final才能采纳，不套旧final。必要一套后清本人运行/准备/脚本日志/重复导出，正式源/缓存/attempt及并行保护，A/B v3/Review/strict/隔离Git，生产不启。

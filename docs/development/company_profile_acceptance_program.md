@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-19 6.DY原六候选限定再核1/1结束：[实际新增及拒绝](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/result.md)。五通过含两原采纳，三新增补寿险新业务价值、保险投资与归母净利；收入构成因合并抵销主体错误仍拒，不新修订/追加窗。原20保留，新隔离根23可读/44指标、2源参考，5实际采纳有限独核、余按内容hash继承；两组三读/API200一致、11类缺项/1建议可见，旧core_complete=false/S2/DW失败不回算。1物理/0恢复/34399已知total、207.657业务秒，费用unknown。准备只修接续展示说明改hash的P2阻塞，60直接通过/strict/编译；归档异常保留后0模型恢复，一套证据后清本人垃圾。供应链后置，不启确认组/S3或生产。
+
 2026-11-19 6.DX零调用数字消费修复：[结果与真实边界](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-number-consumption-20261119/result.md)。原owner识别数字标点后同一行填充空格、明确财务表/多列科目行独立括号负数，保原文/偏移/raw/value，不跨列拼整数或猜单位/主体。DW四个旧拒绝均复现，新本地检查4/4通过；原seed hash匹配初核输入，原final边界接到6候选批次（4恢复+2原采纳），0新模型/0采纳，不冒领旧两个final。259直接/0跳过、3长入口未重跑，73.46秒，448受保护文件及原API20条不变；strict/Review/编译和本人临时库清理。下一DY仅原6候选批次一次真实再核已有具体待批卡，不重抽/新修订/借DW余额或启生产，供应链细项后置，旧S1/S2/DU/DW失败保持。
 
 2026-11-19 6.DW限定真实观察1/1已结束：[中国平安部分画像与缺项](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/result.md)。原入口选章/正文及初核→一次修订→最终核验完成，22原对象有限独核后交20可读/31指标、2源参考，2修订实际采纳；另4数字补充被本地原文检查拒绝未送final，集团收入构成和保险投资机制仍不足，原core_complete=false不改绿。6物理/1恢复，账本376666＝137108已知供应商total＋239558未知预留、费用unknown；1546.113业务秒，初核第一次1001秒对端流异常非1200秒到限，唯一重试成功。query/export/新实例与API一致，源码/配置冻结不热修，必要一套后清本人运行/准备/重复导出；旧S2/DU失败、旧根和生产边界不改。下一先零调用共性修PDF数字内空格/括号负数及错列/主体负例，不付费重抽或把旧两个final套给四候选。

@@ -1,0 +1,148 @@
+"""Read saved 6.DY output; original writer/API delivery, no network or model calls."""
+import asyncio
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import sys
+from unittest.mock import patch
+
+sys.path.insert(0, '/home/python/Quote')
+
+import httpx
+from fastapi import FastAPI
+from api.company_profile_routes import annual_profile_reader, router
+from research.company_profile.runtime import CompanyProfileRuntimeRecordV3, CompanyProfileResearchWriter
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import workpaper_elements, workpaper_fact_hash
+from research.company_profile.workpaper_delivery import bind_workpaper_use_review
+
+ROOT=Path('/home/python/Quote')
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+OLD=C/'workpaper-pingan-source-validation-20261119'
+DEST=C/'workpaper-pingan-candidate-recheck-20261119'
+TEMP=Path(__file__).parent
+RESEARCH=ROOT/'data/research/company_profile_pingan_recheck_20261119'
+
+def load(path):return json.loads(path.read_text())
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def dump(path,value):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2,default=str)+'\n')
+def facts(paper):return {f.fact_id:f for e in workpaper_elements(paper).values() for f in e.facts}
+def exported_profiles(reader,target):
+    saved=target/'601318.SH_2025-12-31.json'
+    return [load(saved)] if saved.exists() else reader.export(('601318.SH',),export_directory=target)['profiles']
+
+async def verify_api(reader,saved):
+    app=FastAPI();app.include_router(router,prefix='/api/v1')
+    app.dependency_overrides[annual_profile_reader]=lambda:reader
+    with patch('socket.create_connection',side_effect=AssertionError('external connections forbidden')):
+        async with asyncio.timeout(90):
+            async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://local') as client:
+                catalog=await client.get('/api/v1/research/company/annual-profiles')
+                detail=await client.get('/api/v1/research/company/601318.SH/annual-profile')
+                assert catalog.status_code==detail.status_code==200
+                assert detail.json()==saved and catalog.json()==reader.research_profile_catalog()
+    return dict(catalog_http_status=200,detail_http_status=200,equal_read_owner=True,external_connections_forbidden=True)
+
+def main():
+    folder=DEST/'601318'
+    # The frozen operator counted writer.persist calls instead of unique paths.
+    # Keep its original exception, and recover the already-written single record.
+    candidates=list((TEMP/'execution/output/company_profile_common_core.v1').glob('*.json'))
+    assert len(candidates)==1
+    record=CompanyProfileRuntimeRecordV3.model_validate_json(candidates[0].read_bytes())
+    dump(folder/'runtime.json',record.model_dump(mode='json'))
+    query=load(folder/'query.json')
+    original_reader=CompanyProfileReadService(TEMP/'execution/output')
+    assert query['profiles']==original_reader.query(('601318.SH',))['profiles']
+    assert query['profiles']==exported_profiles(original_reader,TEMP/'recovery-export')
+    dump(DEST/'archival-recovery.json',dict(original_operator_exception_preserved=True,
+        cause='writer.paths contains repeated persist calls for the same path; list length is not unique-path count',
+        unique_persisted_records=1,query_export_fresh_equal=True,model_requests=0,
+        runtime_sha256=sha(folder/'runtime.json')))
+    paper=record.workpaper;current=facts(paper)
+    audit=load(DEST/'independent-audit.json')
+    old_api=load(OLD/'delivery/annual-api.json')['profiles'][0]
+    old_paper=load(OLD/'601318/runtime.json')['workpaper']
+    from research.company_profile.workpaper import CompanyProfileWorkpaper
+    old_facts=facts(CompanyProfileWorkpaper.model_validate(old_paper))
+    baseline=load(OLD/'independent-audit.json')
+    final_receipts=load(folder/'model-receipts.json')
+    assert len(final_receipts)==1 and final_receipts[0]['purpose']=='verify_profile_workpaper_repair'
+    final=final_receipts[0]['response_payload']
+    accepted={c['fact_id'] for c in final['checks'] if c['accepted']}
+    rejected={c['fact_id'] for c in final['checks'] if not c['accepted']}
+    assert set(final['checked_fact_ids'])==accepted|rejected
+    adopted={f.revised_fact.fact_id for f in paper.quality_review.findings
+        if f.resolution=='corrected_pending_trust' and f.revised_fact is not None}
+    assert adopted==accepted and rejected.isdisjoint(current)
+    decisions=[];inherited=[];display_rechecked=[]
+    for fid, fact in current.items():
+        if fid in audit['basis_by_fact']:
+            basis=audit['basis_by_fact'][fid]
+        else:
+            assert fid in old_facts and fid in baseline['checked_fact_ids']
+            old=old_facts[fid]
+            if workpaper_fact_hash(fact)!=workpaper_fact_hash(old):
+                a=old.model_dump(mode='json');b=fact.model_dump(mode='json')
+                a.pop('uncertainty_reason');b.pop('uncertainty_reason')
+                assert a==b and fid=='F-SM-02'
+                display_rechecked.append(fid)
+                basis='p40营运利润134,415百万元及扣非143,773百万元与正文亿元换算一致；只新增程序展示限定，未改原数/指标/主体。'
+            else:
+                inherited.append(fid)
+                basis=baseline['basis_by_fact'].get(fid,baseline['basis'])
+        disposition='source_only' if fid in baseline['source_only'] else 'source_checked'
+        if disposition=='source_only':basis=baseline['source_only'][fid]
+        limitation=baseline.get('limitations',{}).get(fid)
+        if fid=='F-BS-02':limitation='五个分部类别已核；收入构成候选本次因一项主体错误被拒绝，不能作为已采纳金额。'
+        if fid=='F-SM-02':limitation='营运利润和扣非净利不是归母净利；本次新增R-004另列归母净利，重复金额不可加总。'
+        decisions.append(dict(fact_id=fid,fact_sha256=workpaper_fact_hash(fact),disposition=disposition,
+            evidence_ids=list(fact.evidence_ids),reason=basis,limitation=limitation))
+    assert accepted<=current.keys() and accepted<=set(audit['basis_by_fact'])
+    paper=bind_workpaper_use_review(paper,dict(report=paper.report.model_dump(mode='json'),
+        reviewer='Codex 6.DY finite source check plus content-hash-bound DW decisions',
+        reference=str((DEST/'independent-audit.json').relative_to(ROOT)),reference_sha256=sha(DEST/'independent-audit.json'),decisions=decisions))
+    record=record.model_copy(update={'workpaper':paper})
+    writer=CompanyProfileResearchWriter(RESEARCH)
+    target=writer.output_root/(record.work_id+'.json')
+    if target.exists():
+        assert target.read_text()==record.model_dump_json(indent=2)
+    else:
+        writer.persist(record)
+    reader=CompanyProfileReadService(RESEARCH)
+    q=reader.query(('601318.SH',));exported=exported_profiles(reader,DEST/'delivery')
+    assert q['profiles']==exported==CompanyProfileReadService(RESEARCH).query(('601318.SH',))['profiles']
+    api=reader.research_profile('601318.SH')
+    assert api==CompanyProfileReadService(RESEARCH).research_profile('601318.SH')
+    visible=[row for row in api['facts'] if row['fact'] is not None]
+    old_visible={row['fact_id'] for row in old_api['facts'] if row['fact'] is not None}
+    new_visible={row['fact_id'] for row in visible}
+    assert old_visible<=new_visible
+    dump(DEST/'delivery/annual-api.json',dict(catalog=reader.research_profile_catalog(),profiles=[api],requested_instrument_ids=['601318.SH'],missing_instrument_ids=[]))
+    dump(DEST/'api-check.json',asyncio.run(verify_api(reader,api)))
+    budget=load(folder/'budget.json');attempts=budget['attempts']
+    known=sum((a.get('usage') or {}).get('total_tokens',0) for a in attempts)
+    unknown=sum(a['charged_tokens'] for a in attempts if (a.get('usage') or {}).get('total_tokens') is None)
+    summary=load(folder/'summary.json')
+    assert len({a['logical_request_id'] for a in attempts})==1
+    assert len(attempts)==budget['physical_requests']<=2 and known+unknown==budget['charged_tokens']<=600000
+    dump(DEST/'resource-audit.json',dict(task='6.DY',physical_requests=len(attempts),recoveries=len(attempts)-1,
+        ledger=budget['charged_tokens'],known_supplier_total=known,unknown_usage_reservations=unknown,
+        fee=budget['charged_cost_cny'],business_seconds=summary['business_seconds'],supervision_seconds=summary['supervision_seconds'],
+        new_final_input_tokens=final_receipts[0].get('usage'),old_DW_usage_not_recounted=True))
+    dump(DEST/'delivery-assessment.json',dict(task='6.DY',research_output_root=str(RESEARCH),
+        raw_fact_count=len(current),visible_fact_count=len(visible),visible_metric_count=sum(len(row['fact']['metrics']) for row in visible),
+        previous_visible_fact_count=len(old_visible),added_visible_fact_ids=sorted(new_visible-old_visible),
+        actual_final_accepted=sorted(accepted),actual_final_rejected=sorted(rejected),
+        inherited_by_content_hash=inherited,display_only_change_independently_checked=display_rechecked,
+        source_only_ids=list(baseline['source_only']),delivery_states=dict(Counter(row['state'] for row in api['facts'])),
+        review_status=paper.quality_review.status,core_complete=q['profiles'][0]['core_complete'],
+        basic_answers=audit['basic_answers'],gap_count=len(api['information_gaps']),suggested_acquisition_count=len(api['suggested_acquisitions']),
+        raw_three_reads_equal=True,audited_three_reads_equal=True,old20_preserved=True,
+        full_profile_accuracy='not_assessed',old_results_rescored=False,production_authorization='not_authorized'))
+    print(json.dumps(load(DEST/'delivery-assessment.json'),ensure_ascii=False))
+
+if __name__=='__main__':main()

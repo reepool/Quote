@@ -18,6 +18,11 @@ New batch acceptance contracts MUST separate substantive principal-business, mai
 ### Requirement: Source-backed uncertainty does not require deterministic closure
 New workpapers MUST retain source qualifications such as approximate values, bounds, differing units and unclear scope without forcing exact normalization. A metric MAY carry a null normalized value with its original spelling, source reference and uncertainty reason. Such a metric MUST NOT enter exact arithmetic. Facts with unclear scope MAY retain sourced text and an explicit uncertainty reason. Rendering MUST expose the qualification and original source, and MUST NOT label unknown scope as absence of disclosure. Correctly qualified uncertainty alone MUST NOT trigger repair or block the remaining profile or review workflow. Known false assertions and invalid evidence MUST remain withdrawn or rejected, not laundered by an uncertainty label. Historical results MUST remain unchanged.
 
+#### Scenario: A retained review predates display-only qualifications
+- **WHEN** a hash-bound review continuation reuses its exact original draft and stage receipts under newer source checks
+- **THEN** every original fact and source span is revalidated, but display-only qualification or normalization notes MUST NOT rewrite that retained review input
+- **AND** invalid source content fails before sending, original receipt hashes remain enforced, and final review is still required for newly recoverable repair candidates
+
 #### Scenario: A metric cannot safely be reduced to one number and unit
 - **WHEN** a selected source supports the quoted description but its magnitude, unit or scope cannot safely be normalized
 - **THEN** JSON and the readable profile retain the original wording, evidence and uncertainty reason with a null normalized value

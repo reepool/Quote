@@ -1,0 +1,70 @@
+{
+  "task": "6.DY",
+  "research_output_root": "/home/python/Quote/data/research/company_profile_pingan_recheck_20261119",
+  "raw_fact_count": 25,
+  "visible_fact_count": 23,
+  "visible_metric_count": 44,
+  "previous_visible_fact_count": 20,
+  "added_visible_fact_ids": [
+    "review-add:R-002",
+    "review-add:R-003",
+    "review-add:R-004"
+  ],
+  "actual_final_accepted": [
+    "F-SC-01",
+    "F-SC-02",
+    "review-add:R-002",
+    "review-add:R-003",
+    "review-add:R-004"
+  ],
+  "actual_final_rejected": [
+    "review-add:R-001"
+  ],
+  "inherited_by_content_hash": [
+    "F-BS-01",
+    "F-BS-02",
+    "F-PS-02",
+    "F-PS-03",
+    "F-PS-04",
+    "F-PS-05",
+    "F-RM-03",
+    "F-SM-02",
+    "F-SM-04",
+    "F-OI-02",
+    "F-OI-04",
+    "F-CC-01",
+    "F-CC-02",
+    "F-CC-04",
+    "F-OD-01",
+    "F-OD-02",
+    "F-OD-03",
+    "F-OD-04",
+    "F-MC-03",
+    "F-SC-03"
+  ],
+  "display_only_change_independently_checked": [],
+  "source_only_ids": [
+    "F-OI-02",
+    "F-SM-04"
+  ],
+  "delivery_states": {
+    "limited": 9,
+    "reviewed": 14,
+    "source_only": 2
+  },
+  "review_status": "completed_with_open_findings",
+  "core_complete": false,
+  "basic_answers": {
+    "business_structure": "五个金融业务板块及主要载体已可读。",
+    "products_services": "已读财险、银行财富、资管及医养；本次补寿险新业务价值，完整寿险产品清单仍建议获取，不逐子类作拒绝门槛。",
+    "revenue_model": "财险保费/保险服务、财富服务及医养收入原有，新增保险资金运用规模及收益表现；有源收益率和投资规模不等同投资收入金额，集团/分部收入复合候选仍未采纳。基础业务可研究使用，不能称全部收入口径已齐或改旧core_complete。"
+  },
+  "gap_count": 11,
+  "suggested_acquisition_count": 1,
+  "raw_three_reads_equal": true,
+  "audited_three_reads_equal": true,
+  "old20_preserved": true,
+  "full_profile_accuracy": "not_assessed",
+  "old_results_rescored": false,
+  "production_authorization": "not_authorized"
+}

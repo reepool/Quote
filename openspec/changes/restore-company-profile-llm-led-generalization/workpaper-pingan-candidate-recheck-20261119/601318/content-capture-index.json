@@ -1,0 +1,10 @@
+{
+  "representation": "model_content_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "sha256": "5d7fe6f72219a34c1fe989ca312bd4c16117b11add092e311c377477211a65b7",
+      "retained_separately": false
+    }
+  ]
+}

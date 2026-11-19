@@ -128,6 +128,31 @@ def test_display_rebinding_keeps_original_draft_hash():
     assert paper == rebound and workpaper_hash(paper) == workpaper_hash(rebound)
 
 
+def test_retained_review_checks_source_without_changing_original_display_hash():
+    from tests.unit.test_research.test_company_profile_workpaper_local_consumption import monetary_material
+
+    response, packet, evidence = monetary_material(matching=True)
+    raw = response.model_dump(mode='json')
+    raw['elements']['scale_and_mix']['facts'][0]['text'] = '租金收入5832.27亿元。'
+    paper = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=packet.report,
+        reading_scope=packet.reading_scope, evidence=evidence, origin='controlled_fixture')
+    # Reproduce a retained draft made before display-only qualifiers existed.
+    payload = paper.model_dump(mode='json')
+    payload['elements']['scale_and_mix']['facts'][0]['uncertainty_reason'] = None
+    payload['standardization_notes'] = []
+    old = CompanyProfileWorkpaper.model_validate(payload)
+    rebound, _, _ = seed_material(old, report=old.report, source_pdf_path=None,
+        real=False, preserve_review_hash=True)
+    assert rebound == old and workpaper_hash(rebound) == workpaper_hash(old)
+    new_binding, _, _ = seed_material(old, report=old.report, source_pdf_path=None, real=False)
+    assert workpaper_hash(new_binding) != workpaper_hash(old)
+    payload['elements']['scale_and_mix']['facts'][0]['text'] += '医疗收入为0。'
+    invalid = CompanyProfileWorkpaper.model_validate(payload)
+    with pytest.raises(ValueError, match='narrative'):
+        seed_material(invalid, report=invalid.report, source_pdf_path=None,
+            real=False, preserve_review_hash=True)
+
+
 @pytest.mark.parametrize('mode', ['review', 'extract'])
 @pytest.mark.parametrize('tampered', [False, True])
 def test_continuation_survives_runtime_checkpoint_and_original_writer_three_reads(mode, tampered):

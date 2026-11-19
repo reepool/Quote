@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 342. 6.DY六候选最终再核结束，新增三项、收入构成保缺项
+
+用户call_1c6813c208a74b729a8c55ff30299762明确批准；按openspec-apply-change/business-first-goal、产品→验收→交付→A/B v3实施。开工HEAD9555b009/master同步，保护既有配置/骨架/混合文档及市场数据并行暂存。误续旧DX纯离线检查0模型/入口，误生临时根1.3MiB先清，旧DX正式证据不改；随后只推进DY，无新选章/抽取/初核/修订或公司。
+
+[实际结果](workpaper-pingan-candidate-recheck-20261119/result.md)：原seed/原初核及修订回执/六候选hash匹配，准备发现展示说明重binding改旧seed hash，只在明确接续时逐条源重校验但保原输入，正常新绑定不变。60直接通过25.79秒，原runtime checkpoint/writer路径均保；63源码/2450provider与1200物理/同获准网络DNS/TLS冻结，未热修。真实1逻辑/1物理、0恢复，5final通过含2旧，新增寿险NBV/保险投资/归母净利三对象；合并抵销主体错的复合收入候选真实拒绝，不在本卡新修订追100%。
+
+新隔离根company_profile_pingan_recheck_20261119交23可读/44指标、2仅源参考，原20保留；5实际采纳另核，20原对象按内容hash复用，非全报告准确率。原始/审后两组三读、两API200一致且禁外部连接，11类缺项与1建议仍可见。原core_complete=false、模型completed_with_open_findings及F-OI-02/F-SM-04限制、旧DW/DU/S2失败与生产不改。34399全部供应商已知total、未知预留0/费用unknown，模型约183.54秒、业务207.657秒、监督235.819秒，旧资源不重计；人工活跃时间未完整计量，不报端到端自动质量通过。
+
+Review：P2旧输入hash漂移已修，归档operator重复persist计数断言原失败保留后由唯一持久记录0模型恢复；一次沙箱ASGI等待停止，获准环境本地验证通过，恢复脚本导出复用误检亦未重开业务。无业务遗留阻塞，非阻塞风格/平台/供应链不扩。strict/编译/diff通过，必要一套证据后清本人QuoteBak及重复导出，源/有效缓存/attempt/原36文件与并行保护，详cleanup/verification。仅本人块普通提交推送，既有混合内容不纳入。下一回通用独立事实表达，不再为平安单项追加付费。
+
 ## 341. 6.DX原数字消费修复，四真实候选只恢复到待核
 
 用户要求继续。按openspec-apply-change/business-first-goal、产品→验收→交付→A/B v3，开工HEAD7dfe713b/master同步、暂存空；既有配置/骨架/混合文档及市场数据并行保护。先核DW本人临时根已清，QuoteBak唯一任务根，文档先行DX/spec/design，再原workpaper数值与单位检查局部实现；不新造PDF/语义审核平台或公司/页码规则。

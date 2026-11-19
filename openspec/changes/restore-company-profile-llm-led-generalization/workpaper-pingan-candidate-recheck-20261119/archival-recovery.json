@@ -1,0 +1,8 @@
+{
+  "original_operator_exception_preserved": true,
+  "cause": "writer.paths contains repeated persist calls for the same path; list length is not unique-path count",
+  "unique_persisted_records": 1,
+  "query_export_fresh_equal": true,
+  "model_requests": 0,
+  "runtime_sha256": "b3bed78ef712ffc494cd99ee5e7afa76820434b4cfd2a395e2b3c2fcb195546f"
+}

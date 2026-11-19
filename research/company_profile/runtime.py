@@ -618,6 +618,7 @@ class CompanyProfileStageRuntime:
                         source_pdf_path=state.source_pdf_path,
                         real=state.processing_identity.get("execution_mode") == "provider",
                         native_pages=state.pages,
+                        preserve_review_hash=state.review_resume is not None,
                     )
                     state.pages = checked_pages or state.pages
                     state.workpaper.validate_pages(state.pages)

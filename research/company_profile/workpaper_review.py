@@ -140,7 +140,7 @@ def workpaper_hash(workpaper: CompanyProfileWorkpaper) -> str:
     return hashlib.sha256(workpaper.model_dump_json().encode()).hexdigest()
 
 
-def seed_material(seed, *, report, source_pdf_path, real: bool, native_pages=None):
+def seed_material(seed, *, report, source_pdf_path, real: bool, native_pages=None, preserve_review_hash=False):
     """Re-review explicit prior workpaper sources without reselecting or regenerating."""
     paper = seed if isinstance(seed, CompanyProfileWorkpaper) else CompanyProfileWorkpaper.model_validate(seed)
     if paper.report != report or paper.quality_review is not None:
@@ -158,6 +158,17 @@ def seed_material(seed, *, report, source_pdf_path, real: bool, native_pages=Non
             native_pages=native_pages if paper.reading_scope.transcription_version == "shared-pdf-layout-with-native-fallback.v2" else None,
         )
         paper.validate_pages(pages)
+    if preserve_review_hash:
+        # A retained review is bound to these exact input bytes. Recheck every
+        # fact under current source rules, but do not add display qualifications
+        # or normalization notes and thereby invalidate its original receipts.
+        sources = {item.evidence_id: item for item in paper.evidence}
+        for element in workpaper_elements(paper).values():
+            for fact in element.facts:
+                if set(fact.evidence_ids) - sources.keys():
+                    raise ValueError(f"review seed cites evidence outside the supplied packet: {fact.fact_id}")
+                _check_fact_source(fact, sources, check_units=True)
+        return paper, SectionPacket(report=report, reading_scope=paper.reading_scope, evidence=paper.evidence), pages
     # A new review entry is a new source binding, not a legacy read. Do not let
     # persisted text bypass the same checks used for extraction and repairs.
     rebound = bind_workpaper_draft(

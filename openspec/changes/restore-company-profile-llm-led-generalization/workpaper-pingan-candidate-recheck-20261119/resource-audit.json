@@ -1,0 +1,17 @@
+{
+  "task": "6.DY",
+  "physical_requests": 1,
+  "recoveries": 0,
+  "ledger": 34399,
+  "known_supplier_total": 34399,
+  "unknown_usage_reservations": 0,
+  "fee": "unknown",
+  "business_seconds": 207.657,
+  "supervision_seconds": 235.819,
+  "new_final_input_tokens": {
+    "input_tokens": 19836,
+    "output_tokens": 823,
+    "total_tokens": 34399
+  },
+  "old_DW_usage_not_recounted": true
+}

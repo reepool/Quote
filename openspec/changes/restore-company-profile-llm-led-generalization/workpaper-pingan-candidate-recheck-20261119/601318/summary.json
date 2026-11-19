@@ -1,0 +1,19 @@
+{
+  "task": "6.DY",
+  "instrument_id": "601318.SH",
+  "entry_started": true,
+  "readable": false,
+  "exception": "AssertionError: ",
+  "preparation_seconds": 25.686,
+  "state": "completed",
+  "business_seconds": 207.657,
+  "physical_requests": 1,
+  "ledger": 34399,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "supervision_seconds": 235.819,
+  "protected_files_unchanged": true,
+  "code_unchanged": true,
+  "config_unchanged": true
+}

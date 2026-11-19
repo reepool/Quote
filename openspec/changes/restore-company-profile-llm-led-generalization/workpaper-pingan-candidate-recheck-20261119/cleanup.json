@@ -1,0 +1,29 @@
+{
+  "task": "6.DY",
+  "removed_root": "/home/python/Quote/data/QuoteBak/workpaper-dy-yUsbYp",
+  "removed_root_file_bytes": 4782571,
+  "removed_redundant_delivery_files": [
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/delivery/profiles.csv",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/delivery/research_profiles.json",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/delivery/export_manifest.json",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/delivery/profiles.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-candidate-recheck-20261119/delivery/601318.SH_2025-12-31.json"
+  ],
+  "removed_redundant_delivery_bytes": 781713,
+  "prior_owned_accidental_dx_root": "/home/python/Quote/data/QuoteBak/workpaper-dx-J2U76u",
+  "prior_owned_accidental_dx_bytes": "about 1.3MiB",
+  "prior_dx_root_absent": true,
+  "current_root_absent": true,
+  "protected36_hashes_unchanged": true,
+  "retained": [
+    "official PDF",
+    "effective shared source cache",
+    "old DW/DX evidence and old research roots",
+    "DY attempt marker",
+    "one authoritative raw/review/API delivery set",
+    "new isolated research record",
+    "unrelated parallel changes"
+  ],
+  "new_research_root": "/home/python/Quote/data/research/company_profile_pingan_recheck_20261119",
+  "recovery": "temporary output reproducible; removed duplicates recoverable from canonical runtime/read owner"
+}
