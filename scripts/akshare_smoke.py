@@ -6,8 +6,9 @@
   2. 人工排查"某源突然失效"时快速定位。
 
 覆盖生产在用的关键行情接口：LME 新浪主源、东财备源、100ppi 现货、
-央行 SAFE 汇率、中美国债收益率。走项目统一的 proxy_patch 加载路径，
-冒烟结果即代表服务运行环境的可用性。
+央行 SAFE 汇率、中美国债收益率、A 股日线、交易日历，以及项目自有的
+CNInfo 公司行动适配器（含 akshare.utils.http 绑定链路）。走项目统一的
+proxy_patch 加载路径，冒烟结果即代表服务运行环境的可用性。
 
 输出：最后一行打印 JSON 汇总；exit 0 = 全部通过，exit 1 = 存在失败。
 """
@@ -46,6 +47,50 @@ def _lme_eastmoney_factory(symbol: str) -> Tuple[str, Callable, Dict[str, Any]]:
         f"lme_em_{symbol.lower()}",
         _call,
         {"min_rows": 1, "required_columns": ["日期", "开盘", "最高", "最低", "最新价"]},
+    )
+
+
+def _cninfo_corporate_action_case(today: date) -> Tuple[str, Callable, Dict[str, Any]]:
+    """CNInfo 公司行动适配器真实拉数。
+
+    走项目 CninfoCorporateActionProvider 的完整链路：构造时绑定
+    akshare.utils.http 统一入口（akshare 升级换 HTTP 客户端时在此断链，
+    2026-11 曾导致每日同步连续失败），再真实拉取 600519 全历史分红。
+    """
+
+    def _call(_akshare):
+        import pandas as pd
+
+        from data_sources.cninfo_corporate_actions import (
+            CninfoCorporateActionProvider,
+        )
+
+        provider = CninfoCorporateActionProvider(request_timeout_seconds=30.0)
+        result = provider.fetch_dividends(
+            "600519.SH",
+            "600519",
+            start_date=date(1990, 1, 1),
+            end_date=today,
+        )
+        if result.error:
+            raise AssertionError(
+                f"coverage={result.coverage_status} error={result.error}"
+            )
+        return pd.DataFrame(
+            [
+                {
+                    "instrument_id": item["instrument_id"],
+                    "action_type": item["action_type"],
+                    "ex_date": item["ex_date"],
+                }
+                for item in result.observations
+            ]
+        )
+
+    return (
+        "cninfo_corporate_action_provider_600519",
+        _call,
+        {"min_rows": 1, "required_columns": ["instrument_id", "action_type"]},
     )
 
 
@@ -91,6 +136,7 @@ def build_cases(today: Optional[date] = None) -> List[Tuple[str, Callable, Dict[
                 ],
             },
         ),
+        _cninfo_corporate_action_case(today),
     ]
 
 

@@ -4,7 +4,7 @@ import json
 import pytest
 import requests
 
-from data_sources.cninfo_corporate_actions import _bind_requests_timeout
+from data_sources.cninfo_corporate_actions import _bind_akshare_http
 from research.announcements import (
     AnnouncementAcquisitionConfig,
     AnnouncementAcquisitionService,
@@ -38,6 +38,17 @@ from research.providers.official_exchange_announcements import (
 )
 from research.providers.registry import OfficialAnnouncementProviderRegistry
 from utils.config_manager import ResearchConfig, config_manager
+
+
+class _StubAkshareHttp:
+    """Module-level ``akshare.utils.http`` stand-in referenced by loader bodies."""
+
+    @staticmethod
+    def post(*_args, **_kwargs):
+        raise AssertionError("stub http client must be replaced by monkeypatch")
+
+
+http = _StubAkshareHttp()
 
 
 def _query(**scope_overrides):
@@ -625,19 +636,19 @@ def test_cninfo_transport_keeps_403_when_proxy_unavailable(monkeypatch):
 
 
 def test_cninfo_business_paths_reuse_process_shared_source_throttle(monkeypatch):
-    class FakeRequests:
+    class FakeHttp:
         @staticmethod
         def post(*_args, **_kwargs):
             raise AssertionError("request is not expected")
 
     def loader():
-        return requests.post("https://example.invalid")
+        return http.post("https://example.invalid")
 
-    monkeypatch.setitem(loader.__globals__, "requests", FakeRequests())
-    bounded_loader = _bind_requests_timeout(loader, 5)
+    monkeypatch.setitem(loader.__globals__, "http", FakeHttp())
+    bounded_loader = _bind_akshare_http(loader, 5)
     provider = CninfoAnnouncementProvider(session=_Session())
 
-    proxy = bounded_loader._cninfo_requests_proxy
+    proxy = bounded_loader._cninfo_http_proxy
     assert proxy._adaptive_throttle is provider.transport.adaptive_throttle
 
 

@@ -441,6 +441,57 @@ async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(mon
 
 
 @pytest.mark.asyncio
+async def test_scheduler_cninfo_daily_sync_failure_sends_telegram_report(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = True
+    task._send_task_report = AsyncMock(return_value=False)
+    monkeypatch.setattr(
+        data_manager,
+        "maintain_a_share_cninfo_primary_factors",
+        AsyncMock(side_effect=RuntimeError("CNInfo loader is not bindable")),
+    )
+
+    result = await task.a_share_cninfo_corporate_action_daily_sync(
+        exchanges=["SZSE"],
+        rolling_days=7,
+    )
+
+    assert result["status"] == "failed"
+    assert "CNInfo loader is not bindable" in result["error"]
+    task._send_task_report.assert_awaited_once()
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert report_data["status"] == "failed"
+    assert "CNInfo loader is not bindable" in report_data["error_message"]
+    assert task._send_task_report.await_args.kwargs["report_type"] == (
+        "maintenance_report"
+    )
+    assert "a_share_cninfo_corporate_action_daily_sync" not in task._active_tasks
+
+
+@pytest.mark.asyncio
+async def test_scheduler_cninfo_daily_sync_failure_report_error_does_not_mask_result(
+    monkeypatch,
+):
+    task = ScheduledTasks()
+    task.telegram_enabled = True
+    task._send_task_report = AsyncMock(side_effect=RuntimeError("bot offline"))
+    monkeypatch.setattr(
+        data_manager,
+        "maintain_a_share_cninfo_primary_factors",
+        AsyncMock(side_effect=RuntimeError("boom")),
+    )
+
+    result = await task.a_share_cninfo_corporate_action_daily_sync(
+        exchanges=["SZSE"],
+        rolling_days=7,
+    )
+
+    assert result["status"] == "failed"
+    assert "boom" in result["error"]
+    assert "a_share_cninfo_corporate_action_daily_sync" not in task._active_tasks
+
+
+@pytest.mark.asyncio
 async def test_scheduler_weekly_tdx_reference_refresh_uses_full_market(monkeypatch):
     task = ScheduledTasks()
     task.telegram_enabled = False

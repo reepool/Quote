@@ -32,8 +32,12 @@ DEFAULT_RETRY_BACKOFF_SECONDS = 1.0
 cninfo_logger = logging.getLogger(__name__)
 
 
-class _RequestsTimeoutProxy:
-    """Delegate requests calls while enforcing a bounded POST timeout."""
+class _AkshareHttpProxy:
+    """Delegate ``akshare.utils.http`` calls with a bounded POST timeout.
+
+    AkShare >= 1.20 routes loader HTTP traffic through the unified
+    ``akshare.utils.http`` entry; responses remain ``requests.Response``.
+    """
 
     def __init__(
         self,
@@ -91,26 +95,35 @@ class _RequestsTimeoutProxy:
         return getattr(self._delegate, name)
 
 
-def _bind_requests_timeout(
+def _bind_akshare_http(
     loader: Callable[..., Any],
     timeout_seconds: float,
     adaptive_throttle: Optional[AdaptiveSourceThrottle] = None,
 ) -> Callable[..., Any]:
-    """Clone an AkShare loader with an isolated timeout-aware requests proxy."""
+    """Clone an AkShare loader with an isolated timeout-aware http proxy.
+
+    The loader's module references the unified client as ``http`` (i.e.
+    ``akshare.utils.http``); rebinding that name with a project-owned proxy
+    keeps the per-loader request timeout, adaptive throttle and response
+    diagnostics isolated without touching akshare's process-wide
+    ``context.config`` defaults.
+    """
     loader_globals = getattr(loader, "__globals__", None)
-    requests_client = (
-        loader_globals.get("requests") if isinstance(loader_globals, dict) else None
+    http_client = (
+        loader_globals.get("http") if isinstance(loader_globals, dict) else None
     )
-    if requests_client is None or not hasattr(requests_client, "post"):
-        raise RuntimeError("CNInfo AkShare loader does not expose requests.post")
+    if http_client is None or not callable(getattr(http_client, "post", None)):
+        raise RuntimeError(
+            "CNInfo AkShare loader does not expose akshare.utils.http.post"
+        )
 
     bound_globals = dict(loader_globals)
-    requests_proxy = _RequestsTimeoutProxy(
-        requests_client,
+    http_proxy = _AkshareHttpProxy(
+        http_client,
         max(1.0, float(timeout_seconds)),
         adaptive_throttle or get_adaptive_source_throttle(CNINFO_SOURCE),
     )
-    bound_globals["requests"] = requests_proxy
+    bound_globals["http"] = http_proxy
     bound = FunctionType(
         loader.__code__,
         bound_globals,
@@ -121,12 +134,12 @@ def _bind_requests_timeout(
     bound.__kwdefaults__ = getattr(loader, "__kwdefaults__", None)
     bound.__annotations__ = dict(getattr(loader, "__annotations__", {}))
     bound.__doc__ = loader.__doc__
-    bound._cninfo_requests_proxy = requests_proxy
+    bound._cninfo_http_proxy = http_proxy
     return bound
 
 
 def _loader_confirmed_empty(loader: Callable[..., Any]) -> bool:
-    proxy = getattr(loader, "_cninfo_requests_proxy", None)
+    proxy = getattr(loader, "_cninfo_http_proxy", None)
     payload = getattr(proxy, "last_payload", None)
     if not isinstance(payload, Mapping):
         return False
@@ -141,7 +154,7 @@ def _loader_confirmed_empty(loader: Callable[..., Any]) -> bool:
 
 
 def _loader_response_diagnostics(loader: Callable[..., Any]) -> str:
-    proxy = getattr(loader, "_cninfo_requests_proxy", None)
+    proxy = getattr(loader, "_cninfo_http_proxy", None)
     payload = getattr(proxy, "last_payload", None)
     status_code = getattr(proxy, "last_status_code", None)
     details = []
@@ -567,13 +580,13 @@ class CninfoCorporateActionProvider:
             import akshare as ak
 
             if dividend_loader is None:
-                dividend_loader = _bind_requests_timeout(
+                dividend_loader = _bind_akshare_http(
                     ak.stock_dividend_cninfo,
                     request_timeout_seconds,
                     source_throttle,
                 )
             if allotment_loader is None:
-                allotment_loader = _bind_requests_timeout(
+                allotment_loader = _bind_akshare_http(
                     ak.stock_allotment_cninfo,
                     request_timeout_seconds,
                     source_throttle,
@@ -590,7 +603,7 @@ class CninfoCorporateActionProvider:
         **kwargs: Any,
     ) -> Any:
         for attempt in range(1, self.loader_attempts + 1):
-            proxy = getattr(loader, "_cninfo_requests_proxy", None)
+            proxy = getattr(loader, "_cninfo_http_proxy", None)
             if proxy is not None and hasattr(proxy, "reset_diagnostics"):
                 proxy.reset_diagnostics()
             try:

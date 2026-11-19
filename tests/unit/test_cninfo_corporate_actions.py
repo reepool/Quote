@@ -7,12 +7,23 @@ import requests
 
 from data_sources.cninfo_corporate_actions import (
     CninfoCorporateActionProvider,
-    _bind_requests_timeout,
+    _bind_akshare_http,
     _retryable_loader_error,
     normalize_cninfo_allotment_rows,
     normalize_cninfo_dividend_rows,
     parse_cninfo_distribution_description,
 )
+
+
+class _StubAkshareHttp:
+    """Module-level ``akshare.utils.http`` stand-in referenced by loader bodies."""
+
+    @staticmethod
+    def post(*_args, **_kwargs):
+        raise AssertionError("stub http client must be replaced by monkeypatch")
+
+
+http = _StubAkshareHttp()
 
 
 class _TrackingThrottle:
@@ -48,22 +59,22 @@ def test_requests_json_decode_error_is_retryable():
 def test_bound_cninfo_loader_injects_timeout_without_global_patch(monkeypatch):
     calls = []
 
-    class FakeRequests:
+    class FakeHttp:
         @staticmethod
         def post(*args, **kwargs):
             calls.append((args, kwargs))
             return "ok"
 
     def loader():
-        return requests.post("https://example.invalid")
+        return http.post("https://example.invalid")
 
-    fake_requests = FakeRequests()
-    monkeypatch.setitem(loader.__globals__, "requests", fake_requests)
-    bounded_loader = _bind_requests_timeout(loader, 7.5)
+    fake_http = FakeHttp()
+    monkeypatch.setitem(loader.__globals__, "http", fake_http)
+    bounded_loader = _bind_akshare_http(loader, 7.5)
 
     assert bounded_loader() == "ok"
     assert calls[0][1]["timeout"] == 7.5
-    assert loader.__globals__["requests"] is fake_requests
+    assert loader.__globals__["http"] is fake_http
 
 
 def test_bound_cninfo_loader_reports_throttle_response_and_retry_after(monkeypatch):
@@ -77,16 +88,16 @@ def test_bound_cninfo_loader_reports_throttle_response_and_retry_after(monkeypat
         def json():
             return {"resultcode": 429}
 
-    class FakeRequests:
+    class FakeHttp:
         @staticmethod
         def post(*_args, **_kwargs):
             return FakeResponse()
 
     def loader():
-        return requests.post("https://example.invalid")
+        return http.post("https://example.invalid")
 
-    monkeypatch.setitem(loader.__globals__, "requests", FakeRequests())
-    bounded_loader = _bind_requests_timeout(
+    monkeypatch.setitem(loader.__globals__, "http", FakeHttp())
+    bounded_loader = _bind_akshare_http(
         loader,
         5,
         adaptive_throttle=throttle,
@@ -109,16 +120,16 @@ def test_bound_cninfo_loader_reports_stable_json_response(monkeypatch):
         def json():
             return {"resultcode": 200, "records": []}
 
-    class FakeRequests:
+    class FakeHttp:
         @staticmethod
         def post(*_args, **_kwargs):
             return FakeResponse()
 
     def loader():
-        return requests.post("https://example.invalid")
+        return http.post("https://example.invalid")
 
-    monkeypatch.setitem(loader.__globals__, "requests", FakeRequests())
-    bounded_loader = _bind_requests_timeout(
+    monkeypatch.setitem(loader.__globals__, "http", FakeHttp())
+    bounded_loader = _bind_akshare_http(
         loader,
         5,
         adaptive_throttle=throttle,
@@ -129,6 +140,24 @@ def test_bound_cninfo_loader_reports_stable_json_response(monkeypatch):
     assert throttle.waits == 1
     assert throttle.successes == 1
     assert throttle.throttles == []
+
+
+def test_bind_akshare_http_rejects_loader_without_http_client(monkeypatch):
+    def legacy_loader():
+        return "no unified http client in this module"
+
+    monkeypatch.delitem(legacy_loader.__globals__, "http")
+    with pytest.raises(RuntimeError, match="akshare.utils.http.post"):
+        _bind_akshare_http(legacy_loader, 5)
+
+
+def test_bind_akshare_http_rejects_http_client_without_post(monkeypatch):
+    def legacy_loader():
+        return "http client without post"
+
+    monkeypatch.setitem(legacy_loader.__globals__, "http", object())
+    with pytest.raises(RuntimeError, match="akshare.utils.http.post"):
+        _bind_akshare_http(legacy_loader, 5)
 
 
 def test_provider_recovers_confirmed_empty_akshare_response(monkeypatch):
@@ -143,20 +172,18 @@ def test_provider_recovers_confirmed_empty_akshare_response(monkeypatch):
                 "records": [],
             }
 
-    class FakeRequests:
+    class FakeHttp:
         @staticmethod
         def post(*_args, **_kwargs):
             calls.append(1)
             return FakeResponse()
 
     def failing_empty_loader(**_kwargs):
-        requests.post("https://example.invalid")
+        http.post("https://example.invalid")
         raise KeyError("实施方案公告日期")
 
-    monkeypatch.setitem(
-        failing_empty_loader.__globals__, "requests", FakeRequests()
-    )
-    bounded_loader = _bind_requests_timeout(failing_empty_loader, 5)
+    monkeypatch.setitem(failing_empty_loader.__globals__, "http", FakeHttp())
+    bounded_loader = _bind_akshare_http(failing_empty_loader, 5)
     provider = CninfoCorporateActionProvider(
         dividend_loader=bounded_loader,
         allotment_loader=lambda **_: pd.DataFrame(columns=[
@@ -258,18 +285,18 @@ def test_provider_reports_response_metadata_after_retry_exhaustion(monkeypatch):
         def json():
             return {"resultcode": 503, "resultmsg": "busy"}
 
-    class FakeRequests:
+    class FakeHttp:
         @staticmethod
         def post(*_args, **_kwargs):
             calls.append(1)
             return FakeResponse()
 
     def failing_loader(**_kwargs):
-        response = requests.post("https://example.invalid")
+        response = http.post("https://example.invalid")
         return pd.DataFrame(response.json()["records"])
 
-    monkeypatch.setitem(failing_loader.__globals__, "requests", FakeRequests())
-    bounded_loader = _bind_requests_timeout(failing_loader, 5)
+    monkeypatch.setitem(failing_loader.__globals__, "http", FakeHttp())
+    bounded_loader = _bind_akshare_http(failing_loader, 5)
     provider = CninfoCorporateActionProvider(
         dividend_loader=bounded_loader,
         allotment_loader=lambda **_: pd.DataFrame(columns=[

@@ -7955,6 +7955,25 @@ class ScheduledTasks:
             scheduler_logger.exception(
                 "[Scheduler] CNInfo corporate-action daily sync failed: %s", exc
             )
+            # 统一使用报告系统发送失败通知
+            if self.telegram_enabled:
+                try:
+                    await self._send_task_report(
+                        report_data={
+                            "name": "A 股 CNInfo/TDX 公司行动日更",
+                            "status": "failed",
+                            "error_message": str(exc),
+                        },
+                        report_type="maintenance_report",
+                        task_name=task_id,
+                        job_config=job_config,
+                    )
+                except Exception as notify_exc:
+                    scheduler_logger.error(
+                        "[Scheduler] Failed to send CNInfo daily-sync "
+                        "failure report: %s",
+                        notify_exc,
+                    )
             return {
                 "status": "failed",
                 "operation": task_id,

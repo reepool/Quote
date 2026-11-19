@@ -96,6 +96,14 @@ sudo systemctl restart quote-system.service
 | `spot_100ppi_ta` | `futures_spot_price_daily`（100ppi 现货） | date 列 + 近 14 天 ≥1 行 |
 | `fx_boc_safe` | `currency_boc_safe`（央行汇率） | 日期列 + ≥1 行 |
 | `bond_zh_us_rate` | `bond_zh_us_rate`（中国国债 10 年） | 日期 + 10 年收益率列（含 % 变体） |
+| `cninfo_corporate_action_provider_600519` | 项目 `CninfoCorporateActionProvider`（绑定 `akshare.utils.http` 统一入口 + 600519 分红全历史） | instrument_id、action_type 列 + ≥1 行 |
+
+最后一行不是 akshare 接口直调，而是项目自有 CNInfo 公司行动适配器的完整链路：
+akshare 1.20.x 起 loader 的 HTTP 调用统一改走 `akshare.utils.http`，适配器依赖在
+loader globals 里重绑该入口注入超时与限流（`data_sources/cninfo_corporate_actions.py`
+的 `_bind_akshare_http`）。akshare 再换 HTTP 客户端时该绑定会先于生产任务在此断链，
+冒烟先行拦截——2026-11-16 升级后绑定失效导致每日公司行动同步连续两晚失败且无报告，
+即此用例要防住的事故形态。
 
 新增生产接口（如 `data_manager` 的 `stock_fhps_em`）时，在 `build_cases()` 中
 追加用例即可；列名必须取自生产代码/配置的真实使用，不得猜测。
