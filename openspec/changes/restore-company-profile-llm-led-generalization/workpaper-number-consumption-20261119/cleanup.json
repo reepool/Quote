@@ -1,0 +1,18 @@
+{
+  "task": "6.DX",
+  "predevelopment_previous_owned_root_absent": true,
+  "previous_owned_root": "/home/python/Quote/data/QuoteBak/workpaper-dw-PLJcqW",
+  "predevelopment_removed_file_bytes": 0,
+  "removed_root": "/home/python/Quote/data/QuoteBak/workpaper-dx-J2U76u",
+  "removed_file_count": 51,
+  "removed_file_bytes": 569977,
+  "protected_files_unchanged": 448,
+  "other_task_or_unknown_ownership_removed": false,
+  "preserved": [
+    "official PDF and shared valid cache",
+    "old model receipts/candidates/failures/attempts",
+    "four persistent research roots including current 20-record Ping An API",
+    "all baseline/parallel changes"
+  ],
+  "recovery": "Only reproducible test databases/exports and process scripts removed; tests and compact verification snapshot retained."
+}

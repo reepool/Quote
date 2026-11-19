@@ -537,7 +537,7 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert identity["section_guide_version"].endswith("company-features.v4")
         assert "optional ROOT company_features" in instructions
         assert identity["workpaper_max_output_tokens"] == 12000
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.aligned-cells.v6"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.punctuated-numbers.v7"
         assert identity["workpaper_format_recovery"] == "validation_feedback.v2.syntax-diagnosis"
         assert identity["preprocessing_version"].endswith("v6.footer-safe-local-sections")
         assert "conditional disclosure heading is not a fact" in instructions

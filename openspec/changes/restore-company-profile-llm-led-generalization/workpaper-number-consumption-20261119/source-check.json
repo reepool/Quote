@@ -1,0 +1,97 @@
+{
+  "task": "6.DX",
+  "baseline": "7dfe713b",
+  "scope": "saved real candidates, local numeric consumption only",
+  "candidates": [
+    {
+      "finding_id": "R-001",
+      "fact_id": "review-add:R-001",
+      "fact_sha256": "6c243a65b98cf7dff13565167e22c4dee8e0a89ae2bd110be59c0d25f2f79158",
+      "prior_rejection": "metric number is absent from cited source: 营业收入",
+      "current_local_source_check": "passed",
+      "display_notes": [],
+      "final_source_recheck": "not_run",
+      "adopted": false,
+      "evidence_ids": [
+        "source-0005",
+        "source-0014"
+      ]
+    },
+    {
+      "finding_id": "R-002",
+      "fact_id": "review-add:R-002",
+      "fact_sha256": "7367dcc15d8d59c4cca2c6b85f9819bf29579e81013d9096fd5496931e672a89",
+      "prior_rejection": "metric number is absent from cited source: 寿险及健康险业务新业务价值",
+      "current_local_source_check": "passed",
+      "display_notes": [],
+      "final_source_recheck": "not_run",
+      "adopted": false,
+      "evidence_ids": [
+        "source-0001",
+        "source-0003"
+      ]
+    },
+    {
+      "finding_id": "R-003",
+      "fact_id": "review-add:R-003",
+      "fact_sha256": "5121176d34e4ad52508e1745f2ac458dfb04f18afcd35459812e3aa591996303",
+      "prior_rejection": "metric number is absent from cited source: 保险资金投资组合规模较年初变动",
+      "current_local_source_check": "passed",
+      "display_notes": [],
+      "final_source_recheck": "not_run",
+      "adopted": false,
+      "evidence_ids": [
+        "source-0001",
+        "source-0003"
+      ]
+    },
+    {
+      "finding_id": "R-004",
+      "fact_id": "review-add:R-004",
+      "fact_sha256": "f170b7d765729b5ae4b369be2286cf4c4ea60129c06ccc6cdb7451df0500243c",
+      "prior_rejection": "metric number is absent from cited source: 非经常性损益合计",
+      "current_local_source_check": "passed",
+      "display_notes": [
+        "程序显示说明：review-add:R-004正文1344.15亿元为归属于母公司股东的营运利润134,415百万元的等值换算；结构化原值及来源未改，不据展示值精确加总。",
+        "程序显示说明：review-add:R-004正文1437.73亿元为归属于母公司股东的扣非净利润143,773百万元的等值换算；结构化原值及来源未改，不据展示值精确加总。",
+        "程序显示说明：review-add:R-004正文-89.95亿元为非经常性损益合计-8,995百万元的等值换算；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "final_source_recheck": "not_run",
+      "adopted": false,
+      "evidence_ids": [
+        "source-0005",
+        "source-0007"
+      ]
+    }
+  ],
+  "original_seed_hash_matches_review_input": true,
+  "resume_payload_hash": "147668def36f342a29c427d540abcd8e0452ad3314e9672e44cd6418bb691000",
+  "final_boundary": {
+    "purpose": "verify_profile_workpaper_repair",
+    "candidate_ids": [
+      "review-add:R-001",
+      "review-add:R-002",
+      "review-add:R-003",
+      "review-add:R-004",
+      "F-SC-01",
+      "F-SC-02"
+    ],
+    "recovered_candidates": 4,
+    "previously_adopted_candidates": 2,
+    "network_requests": 0,
+    "note": "Existing original-owner resume verifies the original six-candidate batch together."
+  },
+  "current_api_unchanged": true,
+  "visible_facts": 20,
+  "original_model_resolutions_unchanged": true,
+  "protected_files": 448,
+  "protected_hashes_unchanged": true,
+  "protected_set_sha256": "166db965b9372e1f3dcfa66f4b1565998bfae011e40a48d63125a55a1d2806dd",
+  "new_model_requests": 0,
+  "candidates_adopted": 0,
+  "production_authorization": "not_authorized",
+  "current_code_sha256": {
+    "research/company_profile/workpaper.py": "3341a4642e19d0c3eaaf0562f8af23c96ec690617057c04304f63182df0f1c00",
+    "research/company_profile/workpaper_llm.py": "c30255a64b9b3766f28f5090cf7ebb1050bce84c331015b342a8d0592f37ff5f"
+  }
+}

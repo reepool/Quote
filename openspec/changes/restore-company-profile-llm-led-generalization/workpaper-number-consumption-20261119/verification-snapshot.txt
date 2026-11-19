@@ -1,0 +1,193 @@
+# File: calibrate_dx.py
+"""Saved-source regression and final-call readiness; no network or new answers."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import types
+
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import CompanyProfileWorkpaper, WorkpaperFact, _check_fact_source, workpaper_element_payloads, workpaper_fact_hash
+from research.company_profile.workpaper_llm import workpaper_processing_identity
+from research.company_profile.workpaper_review import review_workpaper, workpaper_hash
+from research.company_profile.workpaper_sections import SectionPacket
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+OLD = CHANGE / 'workpaper-pingan-source-validation-20261119'
+DEST = CHANGE / 'workpaper-number-consumption-20261119'
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+protected = [p for name in ['workpaper-pingan-source-validation-20261119', 'workpaper-six-issue-regression-20261119',
+                            'workpaper-s2-first-result-20261118'] for p in (CHANGE / name).rglob('*') if p.is_file()]
+for name in ['company_profile_audited_20261118', 'company_profile_s2_first_20261118',
+             'company_profile_six_regression_20261119', 'company_profile_pingan_20261119']:
+    protected.extend((ROOT / 'data/research' / name / 'company_profile_common_core.v1').glob('*.json'))
+before = {str(p.relative_to(ROOT)):sha(p) for p in protected}
+paper = CompanyProfileWorkpaper.model_validate(load(OLD / '601318/runtime.json')['workpaper'])
+sources = {e.evidence_id:e for e in paper.evidence}
+prior = types.ModuleType('research.company_profile._dx_prior_workpaper')
+sys.modules[prior.__name__] = prior
+baseline = subprocess.check_output(['git', 'show', '7dfe713b:research/company_profile/workpaper.py'], text=True)
+exec(compile(baseline, '7dfe713b:research/company_profile/workpaper.py', 'exec'), prior.__dict__)
+rows = []
+for finding in paper.quality_review.findings:
+    candidate = finding.revised_fact
+    if finding.resolution != 'repair_rejected' or candidate is None:
+        continue
+    old_error = None
+    try:
+        prior._check_fact_source(candidate, sources, check_units=True)
+    except ValueError as exc:
+        old_error = str(exc)
+    assert old_error is not None, 'must reproduce the actual old rejection'
+    notes = _check_fact_source(candidate, sources, check_units=True)
+    rows.append(dict(finding_id=finding.finding_id, fact_id=candidate.fact_id,
+                     fact_sha256=workpaper_fact_hash(candidate), prior_rejection=old_error,
+                     current_local_source_check='passed', display_notes=list(notes),
+                     final_source_recheck='not_run', adopted=False, evidence_ids=list(candidate.evidence_ids)))
+assert len(rows) == 4
+
+# Recover the exact original reviewed input, not a newly rebound extraction.
+# Existing accepted revisions retain their original_fact in the source review.
+seed_payload = paper.model_dump(mode='json')
+seed_payload['quality_review'] = None
+seed_payload.pop('use_review', None)
+seed_payload['standardization_notes'] = [n for n in seed_payload['standardization_notes']
+    if not n.startswith(('复核目标标准化：', '修订源检查隔离：'))]
+original_facts = {f.affected_fact_id:f.original_fact.model_dump(mode='json')
+                  for f in paper.quality_review.findings if f.original_fact is not None}
+for element in workpaper_element_payloads(seed_payload).values():
+    element['facts'] = [original_facts.get(f['fact_id'], f) for f in element['facts']]
+seed = CompanyProfileWorkpaper.model_validate(seed_payload)
+assert workpaper_hash(seed) == paper.quality_review.original_draft_hash
+receipts = load(OLD / '601318/model-receipts.json')
+retained = [r for r in receipts if r['purpose'] in {'review_profile_workpaper', 'repair_profile_workpaper'}]
+assert len(retained) == 2
+resume = dict(original_draft_hash=workpaper_hash(seed), document_version=paper.report.document_version,
+              review_response=retained[0]['response_payload'], repair_response=retained[1]['response_payload'],
+              receipts=retained)
+
+
+class Boundary(BaseException):
+    pass
+
+
+class NoSend:
+    workpaper_receipts = ()
+
+    def __init__(self):
+        self.payload = None
+
+    def workpaper_request(self, **kwargs):
+        assert kwargs['purpose'] == 'verify_profile_workpaper_repair'
+        self.payload = kwargs
+        raise Boundary()
+
+
+provider = NoSend()
+try:
+    review_workpaper(seed, packet=SectionPacket(report=seed.report, reading_scope=seed.reading_scope, evidence=seed.evidence),
+        provider=provider, work_id='dx-no-send-boundary',
+        identity=workpaper_processing_identity(real=False, review=True), resume=resume)
+except Boundary:
+    pass
+assert provider.payload is not None
+payload = provider.payload['payload']
+candidate_ids = [c['fact_id'] for c in payload['candidates']]
+assert len(candidate_ids) == 6 and {r['fact_id'] for r in rows} <= set(candidate_ids)
+
+reader = CompanyProfileReadService(ROOT / 'data/research/company_profile_pingan_20261119')
+api = reader.research_profile('601318.SH')
+saved = load(OLD / 'delivery/annual-api.json')['profiles'][0]
+assert api == saved
+assert len([f for f in api['facts'] if f['fact'] is not None]) == 20
+assert before == {str(p.relative_to(ROOT)):sha(p) for p in protected}
+result = dict(task='6.DX', baseline='7dfe713b', scope='saved real candidates, local numeric consumption only',
+    candidates=rows, original_seed_hash_matches_review_input=True,
+    resume_payload_hash=hashlib.sha256(json.dumps(resume, ensure_ascii=False, sort_keys=True).encode()).hexdigest(),
+    final_boundary=dict(purpose=provider.payload['purpose'], candidate_ids=candidate_ids,
+                        recovered_candidates=4, previously_adopted_candidates=2,
+                        network_requests=0, note='Existing original-owner resume verifies the original six-candidate batch together.'),
+    current_api_unchanged=True, visible_facts=20, original_model_resolutions_unchanged=True,
+    protected_files=len(before), protected_hashes_unchanged=True,
+    protected_set_sha256=hashlib.sha256(json.dumps(before, sort_keys=True).encode()).hexdigest(),
+    new_model_requests=0, candidates_adopted=0, production_authorization='not_authorized',
+    current_code_sha256={p:sha(ROOT / p) for p in ['research/company_profile/workpaper.py', 'research/company_profile/workpaper_llm.py']})
+DEST.mkdir(parents=True, exist_ok=True)
+(DEST / 'source-check.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(dict(local_candidates_passed=4, old_failures_reproduced=4, final_candidate_ids=candidate_ids,
+                     exact_seed_hash_matches=True, api_unchanged=True, protected_files=len(before), new_model_requests=0), ensure_ascii=False))
+
+
+# File: close_dx.py
+"""Keep one sufficient regression receipt and remove this task's own artifacts."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import xml.etree.ElementTree as ET
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE / 'workpaper-number-consumption-20261119'
+TEMP = ROOT / 'data/QuoteBak/workpaper-dx-J2U76u'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+source = json.loads((DEST / 'source-check.json').read_text())
+suite = ET.parse(TEMP / 'verification.xml').getroot().find('testsuite')
+assert suite is not None and int(suite.attrib['tests']) == 259
+assert all(int(suite.attrib[k]) == 0 for k in ['errors', 'failures', 'skipped'])
+for path, digest in source['current_code_sha256'].items():
+    assert sha(ROOT / path) == digest
+protected = [p for name in ['workpaper-pingan-source-validation-20261119', 'workpaper-six-issue-regression-20261119',
+                            'workpaper-s2-first-result-20261118'] for p in (CHANGE / name).rglob('*') if p.is_file()]
+for name in ['company_profile_audited_20261118', 'company_profile_s2_first_20261118',
+             'company_profile_six_regression_20261119', 'company_profile_pingan_20261119']:
+    protected.extend((ROOT / 'data/research' / name / 'company_profile_common_core.v1').glob('*.json'))
+hashes = {str(p.relative_to(ROOT)):sha(p) for p in protected}
+assert len(hashes) == source['protected_files'] == 448
+assert hashlib.sha256(json.dumps(hashes, sort_keys=True).encode()).hexdigest() == source['protected_set_sha256']
+shutil.copyfile(TEMP / 'verification.xml', DEST / 'verification.xml')
+tests = ['test_company_profile_workpaper_source_cells.py', 'test_company_profile_workpaper.py',
+         'test_company_profile_workpaper_local_consumption.py', 'test_company_profile_workpaper_delivery.py',
+         'test_company_profile_workpaper_review.py']
+command = ['python', '-m', 'pytest', *('tests/unit/test_research/' + p for p in tests), '-q',
+           '-k', 'not task_service_review_publishes_original', '--basetemp=' + str(TEMP / 'tests'),
+           '--junitxml=' + str(TEMP / 'verification.xml')]
+verification = dict(task='6.DX', command=command, tests=259, failures=0, errors=0, skipped=0, deselected=3,
+    deselection_reason='Existing long TaskService variants unchanged; original runtime/writer/three-read and review paths included.',
+    pytest_wall_seconds=73.46, junit_suite_seconds=float(suite.attrib['time']),
+    raw_xml_sha256=sha(DEST / 'verification.xml'), compileall='passed', openspec_strict='passed', diff_check='passed',
+    new_model_requests=0, controlled_semantic_decisions_not_model_detection_quality=True)
+(DEST / 'verification.json').write_text(json.dumps(verification, ensure_ascii=False, indent=2) + '\n')
+(DEST / 'verification-snapshot.txt').write_text('\n\n'.join(
+    '# File: ' + name + '\n' + (TEMP / name).read_text() for name in ['calibrate_dx.py', 'close_dx.py']))
+files = [p for p in TEMP.rglob('*') if p.is_file()]
+assert not TEMP.is_symlink() and not any(p.is_symlink() for p in files)
+removed_bytes = sum(p.stat().st_size for p in files)
+removed_files = len(files)
+shutil.rmtree(TEMP)
+assert not TEMP.exists()
+cleanup = dict(task='6.DX', predevelopment_previous_owned_root_absent=True,
+    previous_owned_root='/home/python/Quote/data/QuoteBak/workpaper-dw-PLJcqW', predevelopment_removed_file_bytes=0,
+    removed_root=str(TEMP), removed_file_count=removed_files, removed_file_bytes=removed_bytes,
+    protected_files_unchanged=448, other_task_or_unknown_ownership_removed=False,
+    preserved=['official PDF and shared valid cache', 'old model receipts/candidates/failures/attempts',
+               'four persistent research roots including current 20-record Ping An API', 'all baseline/parallel changes'],
+    recovery='Only reproducible test databases/exports and process scripts removed; tests and compact verification snapshot retained.')
+(DEST / 'cleanup.json').write_text(json.dumps(cleanup, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(cleanup, ensure_ascii=False))

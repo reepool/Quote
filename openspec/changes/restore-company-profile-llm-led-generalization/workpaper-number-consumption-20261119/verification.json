@@ -1,0 +1,32 @@
+{
+  "task": "6.DX",
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/unit/test_research/test_company_profile_workpaper_source_cells.py",
+    "tests/unit/test_research/test_company_profile_workpaper.py",
+    "tests/unit/test_research/test_company_profile_workpaper_local_consumption.py",
+    "tests/unit/test_research/test_company_profile_workpaper_delivery.py",
+    "tests/unit/test_research/test_company_profile_workpaper_review.py",
+    "-q",
+    "-k",
+    "not task_service_review_publishes_original",
+    "--basetemp=/home/python/Quote/data/QuoteBak/workpaper-dx-J2U76u/tests",
+    "--junitxml=/home/python/Quote/data/QuoteBak/workpaper-dx-J2U76u/verification.xml"
+  ],
+  "tests": 259,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "deselected": 3,
+  "deselection_reason": "Existing long TaskService variants unchanged; original runtime/writer/three-read and review paths included.",
+  "pytest_wall_seconds": 73.46,
+  "junit_suite_seconds": 73.241,
+  "raw_xml_sha256": "552d053a2b6c0d8a7ce0d9db850640cc9dca45602b2d0539fc018d42c3ba2cec",
+  "compileall": "passed",
+  "openspec_strict": "passed",
+  "diff_check": "passed",
+  "new_model_requests": 0,
+  "controlled_semantic_decisions_not_model_detection_quality": true
+}

@@ -5,7 +5,7 @@ import pytest
 
 from research.company_profile.workpaper import (
     WorkpaperEvidence, WorkpaperFact, WorkpaperMetric, WorkpaperSpan,
-    _check_fact_source, _wrapped_table_cells,
+    _check_fact_source, _source_number_cells, _wrapped_table_cells,
 )
 
 
@@ -34,6 +34,160 @@ def source_check(data, quote=TABLE):
         metrics=(WorkpaperMetric.model_validate(data),))
     _check_fact_source(fact, {"table": evidence}, check_units=True)
     return fact, evidence
+
+
+@pytest.mark.parametrize("spelling,raw,value", [
+    ("1,050, 506", "1,050,506", "1050506"),
+    ("1,   050,       506", "1,050,506", "1050506"),
+    ("368.                         97", "368.97", "368.97"),
+    ("13.\u00a02", "13.2", "13.2"),
+])
+def test_same_line_punctuation_recovers_one_number_without_changing_source(spelling, raw, value):
+    quote = "经营数据\n单位：元\n营业收入  " + spelling + "\n"
+    data = metric(raw_value=raw, value=value)
+    original = copy.deepcopy(data)
+    fact, evidence = source_check(data, quote)
+    assert fact.metrics[0].raw_value == raw and data == original
+    assert evidence.source_spans[0].quote == quote
+    recovered = next(c for c in _source_number_cells(quote) if c[0] == raw)
+    assert quote[recovered[1]:recovered[2]] == spelling
+
+
+@pytest.mark.parametrize("spelling", ["1 050 506", "1,050,\n506", "368.\n97", "1, 25", "1,050,507"])
+def test_number_recovery_does_not_flatten_columns_lines_or_change_digits(spelling):
+    with pytest.raises(ValueError, match="absent"):
+        source_check(metric(raw_value="1,050,506", value="1050506"), "单位：元\n收入  " + spelling + "\n")
+
+
+@pytest.mark.parametrize("quote", [
+    "单位：元\n非经常性损益合计  (8,995)\n",
+    "（人民币元）\n非经常性损益合计  （8,   995）\n",
+    "营业收入合计  502,171  353,272  (37, 083)  1,050,506\n",
+])
+def test_accounting_parentheses_preserve_negative_value_and_original_coordinates(quote):
+    raw = "-37,083" if "37," in quote else "-8,995"
+    fact, evidence = source_check(metric(raw_value=raw, value=raw.replace(",", "")), quote)
+    assert fact.metrics[0].value.startswith("-")
+    assert evidence.source_spans[0].quote == quote
+    cell = next(c for c in _source_number_cells(quote) if c[0] == raw)
+    assert quote[cell[1]] in "(（" and quote[cell[2]-1] in ")）"
+    with pytest.raises(ValueError, match="absent"):
+        source_check(metric(raw_value=raw[1:], value=raw[1:].replace(",", "")), quote)
+
+
+@pytest.mark.parametrize("quote,value", [
+    ("说明(1)，金额并未列示。", "-1"),
+    ("说明(8,995)，不是有货币标题的金额表。", "-8995"),
+    ("收入说明含括号示例(8,995)，没有多列金额。", "-8995"),
+    ("编号  10  20  (8,995)  30\n", "-8995"),
+])
+def test_note_or_unmarked_parentheses_do_not_supply_negative_money(quote, value):
+    with pytest.raises(ValueError, match="absent"):
+        source_check(metric(raw_value=value, value=value), quote)
+
+
+@pytest.mark.parametrize("spelling,value", [("1,050,   506", "1050506"), ("(8,995)", "-8995")])
+def test_recovered_number_still_rejects_wrong_explicit_currency_unit(spelling, value):
+    quote = "（人民币百万元）\n财务金额  " + spelling + "\n"
+    with pytest.raises(ValueError, match="monetary unit conflict"):
+        source_check(metric(raw_value=value, value=value, unit="元", source_unit="元"), quote)
+
+
+def test_legacy_positive_fragment_is_not_rewritten_but_new_binding_rejects_it():
+    quote = "单位：元\n损益合计  (8,995)\n"
+    evidence = WorkpaperEvidence(evidence_id="old", document_version="old-source", section_path=("财务表",),
+        physical_pages=(1,), source_spans=(WorkpaperSpan(page=1, start=0, end=len(quote), quote=quote),))
+    fact = WorkpaperFact(fact_id="old-fact", text="原保留金额。", subject_scope="consolidated_group", period="2025",
+        evidence_ids=("old",), metrics=(WorkpaperMetric.model_validate(metric(raw_value="8,995", value="8995")),))
+    before = fact.model_dump_json()
+    _check_fact_source(fact, {"old": evidence})
+    assert fact.model_dump_json() == before
+    with pytest.raises(ValueError, match="absent"):
+        _check_fact_source(fact, {"old": evidence}, check_units=True)
+
+
+def test_saved_ping_an_four_candidates_pass_only_local_source_binding():
+    import hashlib
+    import json
+    from pathlib import Path
+    from research.company_profile.workpaper import CompanyProfileWorkpaper
+
+    root = Path(__file__).resolve().parents[3]
+    path = root / "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/601318/runtime.json"
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    paper = CompanyProfileWorkpaper.model_validate(json.loads(path.read_text())["workpaper"])
+    sources = {e.evidence_id: e for e in paper.evidence}
+    candidates = [f.revised_fact for f in paper.quality_review.findings if f.resolution == "repair_rejected"]
+    assert len(candidates) == 4
+    for candidate in candidates:
+        _check_fact_source(candidate, sources, check_units=True)
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == before
+    assert all(f.resolution == "repair_rejected" for f in paper.quality_review.findings if f.revised_fact in candidates)
+
+
+@pytest.mark.parametrize("outcome", ["accepted", "wrong_column", "wrong_subject", "interrupted", "stale_final"])
+def test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads(outcome, tmp_path):
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileStageRuntime
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from tests.unit.test_research.test_company_profile_workpaper import PAGES, _Provider, _report
+
+    pages = tuple({**p, "text": p["text"].replace("100.00", "1,050,    506")} for p in PAGES)
+
+    class NumericProvider(_Provider):
+        def workpaper_request(self, **kwargs):
+            reply = super().workpaper_request(**kwargs)  # Explicit controlled receipt only.
+            if kwargs["purpose"] == "select_profile_sections":
+                return reply
+            if kwargs["purpose"] == "extract_profile_workpaper":
+                fact = reply["elements"]["scale_and_mix"]["facts"][0]
+                fact.update(text="净利润1,050,506元。")  # Wrong column, even though the number is present.
+                fact["metrics"][0].update(name="净利润", raw_value="1,050,506", value="1050506")
+                self.original = copy.deepcopy(fact)
+                return reply
+            if kwargs["purpose"] == "review_profile_workpaper":
+                return {"reviewed_fact_ids": ["main", "revenue"], "findings": [{
+                    "finding_id": "column", "element": "scale_and_mix", "severity": "material",
+                    "issue_type": "wrong_column", "action": "correct", "affected_fact_id": "revenue",
+                    "evidence_ids": self.original["evidence_ids"], "explanation": "原表是营业收入，数字存在不证明它是利润。"}]}
+            if kwargs["purpose"] == "repair_profile_workpaper":
+                fixed = copy.deepcopy(self.original)
+                if outcome != "wrong_column":
+                    fixed.update(text="营业收入1,050,506元。")
+                    fixed["metrics"][0]["name"] = "营业收入"
+                if outcome == "wrong_subject":
+                    fixed["subject_scope"] = "issuer"
+                    fixed["metrics"][0]["subject_scope"] = "issuer"
+                return {"repaired_facts": [fixed]}
+            if outcome == "interrupted":
+                from utils.llm.errors import LlmDeadlineExceededError
+
+                raise LlmDeadlineExceededError("controlled final interruption")
+            target = "other-fact" if outcome == "stale_final" else "revenue"
+            return {"checked_fact_ids": [target], "checks": [{"fact_id": target,
+                "accepted": outcome == "accepted", "evidence_ids": self.original["evidence_ids"],
+                "explanation": "受控源复核结论；列或主体不符时拒绝，不能靠数字命中放行。"}]}
+
+    provider = NumericProvider()
+    runtime = CompanyProfileStageRuntime(writer=CompanyProfileResearchWriter(tmp_path / "output"), provider=provider)
+    item = {"work_id": "controlled-numeric-" + outcome, "report": _report(), "pages": pages,
+            "processing_identity": workpaper_processing_identity(real=False, review=True)}
+    for stage in ("acquire", "parse", "semantic", "verify", "publish"):
+        assert runtime.run_stage(stage, item)["status"] == "success"
+    reader = CompanyProfileReadService(tmp_path / "output")
+    query = reader.query((_report().instrument_id,))
+    exported = reader.export((_report().instrument_id,), tmp_path / "export")
+    assert query["profiles"] == exported["profiles"] == CompanyProfileReadService(tmp_path / "output").query((_report().instrument_id,))["profiles"]
+    paper = query["profiles"][0]["workpaper"]
+    assert paper["origin"] == "controlled_fixture" and not query["profiles"][0]["core_complete"]
+    assert paper["elements"]["business_structure"]["facts"][0]["fact_id"] == "main"
+    facts = paper["elements"]["scale_and_mix"]["facts"]
+    if outcome == "accepted":
+        assert facts[0]["metrics"][0]["value"] == "1050506" and facts[0]["text"].startswith("营业收入")
+        assert paper["quality_review"]["findings"][0]["resolution"] == "corrected_pending_trust"
+    else:
+        assert not facts  # Literal numeric support never overrides column/subject/final-target checks.
+        assert paper["quality_review"]["findings"][0]["resolution"] != "corrected_pending_trust"
 
 
 def test_wrapped_monetary_cells_keep_column_digits_and_original_quote():
@@ -152,7 +306,7 @@ def test_new_processing_identity_versions_signed_source_rate_binding():
 
     for real in (False, True):
         identity = workpaper_processing_identity(real=real)
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.aligned-cells.v6"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.punctuated-numbers.v7"
         assert identity["semantic_reuse"] is False
 
 

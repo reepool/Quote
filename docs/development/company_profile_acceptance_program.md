@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-19 6.DX零调用数字消费修复：[结果与真实边界](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-number-consumption-20261119/result.md)。原owner识别数字标点后同一行填充空格、明确财务表/多列科目行独立括号负数，保原文/偏移/raw/value，不跨列拼整数或猜单位/主体。DW四个旧拒绝均复现，新本地检查4/4通过；原seed hash匹配初核输入，原final边界接到6候选批次（4恢复+2原采纳），0新模型/0采纳，不冒领旧两个final。259直接/0跳过、3长入口未重跑，73.46秒，448受保护文件及原API20条不变；strict/Review/编译和本人临时库清理。下一DY仅原6候选批次一次真实再核已有具体待批卡，不重抽/新修订/借DW余额或启生产，供应链细项后置，旧S1/S2/DU/DW失败保持。
+
 2026-11-19 6.DW限定真实观察1/1已结束：[中国平安部分画像与缺项](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-pingan-source-validation-20261119/result.md)。原入口选章/正文及初核→一次修订→最终核验完成，22原对象有限独核后交20可读/31指标、2源参考，2修订实际采纳；另4数字补充被本地原文检查拒绝未送final，集团收入构成和保险投资机制仍不足，原core_complete=false不改绿。6物理/1恢复，账本376666＝137108已知供应商total＋239558未知预留、费用unknown；1546.113业务秒，初核第一次1001秒对端流异常非1200秒到限，唯一重试成功。query/export/新实例与API一致，源码/配置冻结不热修，必要一套后清本人运行/准备/重复导出；旧S2/DU失败、旧根和生产边界不改。下一先零调用共性修PDF数字内空格/括号负数及错列/主体负例，不付费重抽或把旧两个final套给四候选。
 
 2026-11-19用户call_12f93ef5002a4eaeae7775fefe895984已明确批准6.DW中国平安601318.SH一次修正版全新原TaskService。仅公开2025年报/派生稿给既有官方DeepSeek与Scorpio/Grok high，6000秒/1000000保守账本/10物理含3恢复每逻辑1、高阶1200/逻辑2450及Flash600；无价unknown/有价限10元，不承诺人民币总额。复用993c7447的131离线验证和清理，源/实际接线/同联网DNS/TLS核后冻结并占用1/1，未载旧导航/语义/人工参考，不热修或借6.DU余额；原失败/成绩保留，不启其他公司、确认组/S3/充值/共享配置或生产。实际结果写workpaper-pingan-source-validation-20261119，交内容/缺项/API/有限源核及资源，一套必要证据后清本人垃圾。

@@ -339,6 +339,51 @@ def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
     return cells
 
 
+_MONEY_HEADER = re.compile(
+    r"(?:(?:金额单位|单位)\s*[:：]\s*(?:人民币\s*)?|[（(]\s*人民币\s*)"
+    r"(万亿元|亿元|百万元|万元|千元|元)"
+)
+
+
+def _source_number_cells(quote: str, *, legacy_fragments: bool = False) -> list[tuple[str, int, int]]:
+    """Recognize complete numeric spellings without flattening rows/columns.
+
+    Only comma/decimal punctuation may bridge same-line layout spaces. A
+    parenthesized grouped/decimal amount needs a monetary header or an
+    explicit multi-column account row; notes do not supply negatives or units.
+    All ranges remain original offsets.
+    Legacy deserialization retains its old fragments without rewriting files.
+    """
+    horizontal = r"[^\S\r\n]*"
+    amount = rf"(?:\d{{1,3}}(?:,{horizontal}\d{{3}})+|\d+)(?:\.{horizontal}\d+)?"
+    recovered = []
+    for match in re.finditer(rf"(?<!\S)[（(]{horizontal}({amount}){horizontal}[)）](?!\S)", quote):
+        text = re.sub(r"[^\S\r\n]", "", match.group(1))
+        line_start = quote.rfind("\n", 0, match.start()) + 1
+        line_end = quote.find("\n", match.end())
+        line = quote[line_start:line_end if line_end >= 0 else len(quote)]
+        # A continuation table may omit its currency caption. Multiple
+        # spaced numeric columns on an explicit financial-account row still
+        # establish accounting sign, but supply no missing monetary unit.
+        financial_row = re.search(r"收入|支出|损益|利润|费用|成本|资产|负债|余额|合计", line[:match.start()-line_start])
+        columns = re.findall(r"(?<!\S)[（(]?-?\d[\d,.]*[)）]?(?=[^\S\r\n]{2,}|$)", line)
+        accounting_context = _MONEY_HEADER.search(quote[:match.start()]) or (financial_row and len(columns) >= 3)
+        if ("," in text or "." in text) and accounting_context:
+            recovered.append(("-" + text, match.start(), match.end()))
+    # Do not bridge a bare gap between integers or a physical line break.
+    spaced = rf"(?<![\d.,])-?(?:\d{{1,3}}(?:,{horizontal}\d{{3}})+(?:\.{horizontal}\d+)?|\d+\.[^\S\r\n]+\d+)(?![\d.,])"
+    for match in re.finditer(spaced, quote):
+        text = re.sub(r"[^\S\r\n]", "", match.group())
+        if text != match.group() and not any(start <= match.start() < end for _, start, end in recovered):
+            recovered.append((text, match.start(), match.end()))
+    ordinary = [
+        (match.group(), match.start(), match.end())
+        for match in re.finditer(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", quote)
+        if legacy_fragments or not any(start <= match.start() < end for _, start, end in recovered)
+    ]
+    return [*ordinary, *recovered]
+
+
 def _check_fact_source(
     fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], *, check_units: bool = False,
 ) -> tuple[str, ...]:
@@ -348,7 +393,7 @@ def _check_fact_source(
         Decimal(value.replace(",", ""))
         for evidence_id in fact.evidence_ids
         for span in sources[evidence_id].source_spans
-        for value in re.findall(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)
+        for value, _, _ in _source_number_cells(span.quote, legacy_fragments=not check_units)
     }
     cells = [cell for eid in fact.evidence_ids for span in sources[eid].source_spans
              for cell in _wrapped_table_cells(span.quote)]
@@ -510,9 +555,8 @@ def _check_explicit_money_unit(
     units, headerless = set(), False
     for eid in fact.evidence_ids:
         for span in sources[eid].source_spans:
-            headers = list(re.finditer(r"(?:金额单位|单位)\s*[:：]\s*(?:人民币\s*)?(万亿元|亿元|百万元|万元|千元|元)", span.quote))
-            matches = [(m.group(), m.start(), m.end()) for m in
-                       re.finditer(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)]
+            headers = list(_MONEY_HEADER.finditer(span.quote))
+            matches = _source_number_cells(span.quote)
             matches.extend(cell for cell in _wrapped_table_cells(span.quote)
                            if re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", cell[0]))
             for text, start, end in matches:

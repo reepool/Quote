@@ -23,6 +23,16 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** JSON and the readable profile retain the original wording, evidence and uncertainty reason with a null normalized value
 - **AND** useful independent business content remains available without a paid clarification loop
 
+#### Scenario: PDF layout inserts spaces inside a source number
+- **WHEN** a source number has same-line layout spaces immediately after its decimal point or a complete thousands-group comma
+- **THEN** new source binding MAY recognize that complete numeric token while retaining its exact source range, original Evidence and model raw value
+- **AND** it MUST NOT join separate integer columns, cross lines, change digits/sign/unit or treat a numeric match as proof of the metric's column, subject or period
+
+#### Scenario: A monetary table expresses a loss with parentheses
+- **WHEN** a source monetary table or an explicit financial-account row with multiple numeric columns contains a standalone parenthesized grouped or decimal amount
+- **THEN** new binding recognizes its negative accounting value and the governing literal unit, not both positive and negative alternatives
+- **AND** a continuation row without a unit header supplies no missing unit; ordinary note markers or parentheses without accounting context do not supply a negative amount; historical files and model-review decisions remain unchanged, and a locally recovered repair still requires its own real source recheck before adoption
+
 #### Scenario: A qualified estimate is not a review defect
 - **WHEN** the draft preserves a source estimate or boundary with its original qualification and no unsupported conclusion
 - **THEN** review may complete with that content still uncertain and need not request a deterministic replacement
