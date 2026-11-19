@@ -1,0 +1,1390 @@
+[
+  {
+    "request_id": "bp-work-2db1b766a44e7ef11adc3b0d:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "96d66f18288e8f33a5a530d54fd9d5d943e8075ac1a0301a86c2017b5e928abd",
+    "response_hash": "5d4332e646bce319c7b5e9aa70348ca508bfaf0620b9a400fcf033b014a395b6",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0022\",\"section-0072\",\"section-0074\",\"section-0075\",\"section-0129\",\"section-0130\",\"section-0138\",\"section-0144\",\"section-0149\",\"section-0154\",\"section-0060\"],\"rationale\":\"本行为股份制商业银行，需围绕业务结构、产品服务、收入来源与规模展开。选取1.2报告期内公司从事的主要业务（section-0022）说明主营业务与产品；3.1总体经营情况（section-0072）提供公司层面经营综述与收入总额；3.2财务报表分析及3.2.1利润表项目分析（section-0074、0075）给出营业收入构成与利润表实质分析，满足收入与主要业务权重；3.3主要业务讨论与分析（section-0129）及其零售、对公、资金同业、数字金融、平安理财子节（0130、0138、0144、0149、0154）说明各板块经营、客户与渠道；2.5分部经营数据（section-0060）补充分部盈利与规模。以上均为信息密集的经营性实质子节，未选纯行业背景、治理、风险披露及整章财务报告。\",\"deferred\":[\"section-0025 所处行业基本情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0027/0034 发展战略与核心竞争力：偏泛化表述，经营实质已由业务与财务分析覆盖\",\"section-0111 贷款资产质量分析、section-0127 负债质量分析：属资产质量细节，非收入与业务结构核心，暂缓\",\"section-0408 财务报告整章及附注：仅在有实质缺口时定向补充，不整体扩读\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成、规模与主要业务板块经营，足以解释公司经营与盈利来源；行业背景、治理、风险披露及整章财务附注属次要或重复范围，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0022",
+        "section-0072",
+        "section-0074",
+        "section-0075",
+        "section-0129",
+        "section-0130",
+        "section-0138",
+        "section-0144",
+        "section-0149",
+        "section-0154",
+        "section-0060"
+      ],
+      "rationale": "本行为股份制商业银行，需围绕业务结构、产品服务、收入来源与规模展开。选取1.2报告期内公司从事的主要业务（section-0022）说明主营业务与产品；3.1总体经营情况（section-0072）提供公司层面经营综述与收入总额；3.2财务报表分析及3.2.1利润表项目分析（section-0074、0075）给出营业收入构成与利润表实质分析，满足收入与主要业务权重；3.3主要业务讨论与分析（section-0129）及其零售、对公、资金同业、数字金融、平安理财子节（0130、0138、0144、0149、0154）说明各板块经营、客户与渠道；2.5分部经营数据（section-0060）补充分部盈利与规模。以上均为信息密集的经营性实质子节，未选纯行业背景、治理、风险披露及整章财务报告。",
+      "deferred": [
+        "section-0025 所处行业基本情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0027/0034 发展战略与核心竞争力：偏泛化表述，经营实质已由业务与财务分析覆盖",
+        "section-0111 贷款资产质量分析、section-0127 负债质量分析：属资产质量细节，非收入与业务结构核心，暂缓",
+        "section-0408 财务报告整章及附注：仅在有实质缺口时定向补充，不整体扩读"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成、规模与主要业务板块经营，足以解释公司经营与盈利来源；行业背景、治理、风险披露及整章财务附注属次要或重复范围，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 23516,
+      "output_tokens": 436,
+      "total_tokens": 23952
+    }
+  },
+  {
+    "request_id": "bp-work-2db1b766a44e7ef11adc3b0d:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "8212ec395ff1b727b33c27532098117626c003ebb05815a11535243d06c47bdf",
+    "response_hash": "34e5ae2fe83e433f3b70d06c96a28f528a5fe081a0325c2f2cbac1065aec9df7",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"本行为中国内地首家公开上市的全国性股份制商业银行，经营商业银行业务，并形成科技赋能、零售业务、综合金融等经营特色。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"本行按监管批准经营吸收公众存款、发放短中长期贷款、国内外结算、票据承兑贴现、发行金融债券、同业拆借、银行卡、信用证担保、代理收付及保险、保管箱、结售汇、离岸银行、资产托管、黄金业务及财务顾问咨询等商业银行业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F03\",\"text\":\"本行战略目标为“中国最卓越、全球领先的智能化零售银行”，战略方针为“零售做强、对公做精、同业做专”，持续升级零售、对公、资金同业业务经营策略。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F04\",\"text\":\"本行全资子公司平安理财于2020年8月开业，主要业务为发行公募与私募理财产品、理财顾问和咨询服务等资产管理相关业务。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"注册资本\",\"raw_value\":\"50\",\"value\":\"50\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"}]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"零售业务以个人贷款为核心板块之一，包括住房按揭贷款、信用卡应收账款、消费性贷款和经营性贷款，2025年末抵押类贷款占个人贷款的比例为62.9%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"个人贷款余额\",\"raw_value\":\"1,727,294\",\"value\":\"1727294\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"住房按揭贷款余额\",\"raw_value\":\"355,148\",\"value\":\"355148\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"信用卡应收账款余额\",\"raw_value\":\"405,442\",\"value\":\"405442\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"消费性贷款余额\",\"raw_value\":\"463,017\",\"value\":\"463017\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"经营性贷款余额\",\"raw_value\":\"503,687\",\"value\":\"503687\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F06\",\"text\":\"信用卡业务面向白领、年轻客群、车主及财富客群等细分客群，推出联名卡及升级用卡、旅行、健康、还款、服务等权益，2025年末信用卡流通户数4,369.31万户，全年信用卡总消费金额20,124.35亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"信用卡流通户数\",\"raw_value\":\"4,369.31\",\"value\":\"4369.31\",\"unit\":\"万户\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"信用卡总消费金额\",\"raw_value\":\"20,124.35\",\"value\":\"20124.35\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F07\",\"text\":\"对公业务聚焦产业金融、科技金融、供应链金融、跨境金融、普惠金融重点方向，精选公共事业、数字产业、制造业、医疗、能源、汽车等重点细分行业，配套定制化行业服务方案。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F08\",\"text\":\"资金同业业务通过“投资交易+客户业务”双轮驱动，投资交易领域采取多元化资产配置策略，客户业务领域满足同业和企业客户金融服务需求，并聚焦清算结算型业务场景经营。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F09\",\"text\":\"数字金融方面，本行发布平安口袋银行APP 8.0版本并升级适老化及多语言版本，对公业务构建AI标书助手、跨境智能审单识别准确率超93%，资金同业依托“iDeal结构化询报价”现券交易量约3.6万亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"跨境智能审单识别准确率\",\"raw_value\":\"超93\",\"value\":\"93\",\"unit\":\"%\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"iDeal结构化询报价现券交易量\",\"raw_value\":\"约3.6\",\"value\":\"3.6\",\"unit\":\"万亿元\",\"qualifier\":\"approximate\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F10\",\"text\":\"平安理财发布“安+心稳致远”产品品牌体系，2025年末非现金管理类产品余额占理财产品余额的比例为70.3%，一年期以上产品余额占非现金管理类产品余额的比例为16.9%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"非现金管理类产品余额占理财产品余额比例\",\"raw_value\":\"70.3\",\"value\":\"70.3\",\"unit\":\"%\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"},{\"name\":\"一年期以上产品余额占非现金管理类产品余额比例\",\"raw_value\":\"16.9\",\"value\":\"16.9\",\"unit\":\"%\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"}]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F11\",\"text\":\"2025年本集团实现营业收入1,314.42亿元，同比下降10.4%；其中利息净收入880.21亿元，同比下降5.8%；非利息净收入434.21亿元，同比下降18.5%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,314.42\",\"value\":\"1314.42\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"利息净收入\",\"raw_value\":\"880.21\",\"value\":\"880.21\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"非利息净收入\",\"raw_value\":\"434.21\",\"value\":\"434.21\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F12\",\"text\":\"营业收入构成中，利息净收入占比67.0%，非利息净收入占比33.0%；非利息净收入中手续费及佣金净收入占比18.2%，其他非利息净收入占比14.8%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"利息净收入占营业收入比例\",\"raw_value\":\"67.0\",\"value\":\"67.0\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"非利息净收入占营业收入比例\",\"raw_value\":\"33.0\",\"value\":\"33.0\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"手续费及佣金净收入占营业收入比例\",\"raw_value\":\"18.2\",\"value\":\"18.2\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"其他非利息净收入占营业收入比例\",\"raw_value\":\"14.8\",\"value\":\"14.8\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F13\",\"text\":\"利息收入主要来自发放贷款和垫款，2025年利息收入130,501百万元，占利息收入小计的76.8%；金融投资利息收入27,327百万元，占16.2%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"发放贷款和垫款利息收入\",\"raw_value\":\"130,501\",\"value\":\"130501\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"发放贷款和垫款利息收入占利息收入小计比例\",\"raw_value\":\"76.8\",\"value\":\"76.8\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"金融投资利息收入\",\"raw_value\":\"27,327\",\"value\":\"27327\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"金融投资利息收入占利息收入小计比例\",\"raw_value\":\"16.2\",\"value\":\"16.2\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F14\",\"text\":\"利息支出主要来自吸收存款，2025年吸收存款利息支出59,409百万元，占利息支出小计的72.6%；已发行债务证券利息支出12,125百万元，占14.8%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"吸收存款利息支出\",\"raw_value\":\"59,409\",\"value\":\"59409\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"吸收存款利息支出占利息支出小计比例\",\"raw_value\":\"72.6\",\"value\":\"72.6\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"已发行债务证券利息支出\",\"raw_value\":\"12,125\",\"value\":\"12125\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"已发行债务证券利息支出占利息支出小计比例\",\"raw_value\":\"14.8\",\"value\":\"14.8\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F15\",\"text\":\"2025年本集团净息差1.78%，同比2024年下降9个基点，主要受贷款利率下行和业务结构调整等因素影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"metrics\":[{\"name\":\"净息差\",\"raw_value\":\"1.78\",\"value\":\"1.78\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"净息差同比变动\",\"raw_value\":\"9\",\"value\":\"9\",\"unit\":\"基点\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F16\",\"text\":\"2025年末本集团资产总额59,257.77亿元，较上年末增长2.7%；发放贷款和垫款本金总额33,908.40亿元，较上年末增长0.5%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"资产总额\",\"raw_value\":\"59,257.77\",\"value\":\"59257.77\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"发放贷款和垫款本金总额\",\"raw_value\":\"33,908.40\",\"value\":\"33908.40\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F17\",\"text\":\"2025年末本集团负债总额53,745.93亿元，较上年末增长1.9%；吸收存款本金余额35,827.55亿元，较上年末增长1.4%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"负债总额\",\"raw_value\":\"53,745.93\",\"value\":\"53745.93\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"吸收存款本金余额\",\"raw_value\":\"35,827.55\",\"value\":\"35827.55\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F18\",\"text\":\"分部经营数据中，零售金融业务2025年营业收入61,626百万元，占合计的46.9%；批发金融业务营业收入57,959百万元，占44.1%；其他业务营业收入11,857百万元，占9.0%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"零售金融业务营业收入\",\"raw_value\":\"61,626\",\"value\":\"61626\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"零售金融业务营业收入占比\",\"raw_value\":\"46.9\",\"value\":\"46.9\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"批发金融业务营业收入\",\"raw_value\":\"57,959\",\"value\":\"57959\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"批发金融业务营业收入占比\",\"raw_value\":\"44.1\",\"value\":\"44.1\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"其他业务营业收入\",\"raw_value\":\"11,857\",\"value\":\"11857\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"其他业务营业收入占比\",\"raw_value\":\"9.0\",\"value\":\"9.0\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F19\",\"text\":\"分部净利润中，零售金融业务净利润2,683百万元，占合计的6.3%；批发金融业务净利润30,540百万元，占71.6%；其他业务净利润9,410百万元，占22.1%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"零售金融业务净利润\",\"raw_value\":\"2,683\",\"value\":\"2683\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"零售金融业务净利润占比\",\"raw_value\":\"6.3\",\"value\":\"6.3\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"批发金融业务净利润\",\"raw_value\":\"30,540\",\"value\":\"30540\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"批发金融业务净利润占比\",\"raw_value\":\"71.6\",\"value\":\"71.6\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"其他业务净利润\",\"raw_value\":\"9,410\",\"value\":\"9410\",\"unit\":\"百万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"其他业务净利润占比\",\"raw_value\":\"22.1\",\"value\":\"22.1\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F20\",\"text\":\"2025年本集团实现净利润426.33亿元，同比下降4.2%；信用及其他资产减值损失405.67亿元，同比下降17.9%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"净利润\",\"raw_value\":\"426.33\",\"value\":\"426.33\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"信用及其他资产减值损失\",\"raw_value\":\"405.67\",\"value\":\"405.67\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"2025年本行业务及管理费381.96亿元，同比下降5.9%，通过数字化转型驱动降本增效。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"业务及管理费\",\"raw_value\":\"381.96\",\"value\":\"381.96\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F22\",\"text\":\"2025年本行IT资本性支出及费用投入48.06亿元，持续推动资源整合优化，提升研发和管理效能。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"IT资本性支出及费用投入\",\"raw_value\":\"48.06\",\"value\":\"48.06\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F23\",\"text\":\"2025年本集团计息负债平均付息率1.67%，同比2024年下降47个基点；吸收存款平均付息率1.65%，同比下降42个基点；活期存款日均余额11,919.78亿元，同比增长5.8%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"计息负债平均付息率\",\"raw_value\":\"1.67\",\"value\":\"1.67\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"吸收存款平均付息率\",\"raw_value\":\"1.65\",\"value\":\"1.65\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"活期存款日均余额\",\"raw_value\":\"11,919.78\",\"value\":\"11919.78\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"零售业务通过平安口袋银行APP等数字化渠道服务客户，2025年末为近860万大众客户提供7×24小时的“陪伴式”服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"7×24小时陪伴式服务大众客户数\",\"raw_value\":\"近860\",\"value\":\"860\",\"unit\":\"万\",\"qualifier\":\"approximate\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F25\",\"text\":\"对公业务建立战略客户、中型客户、小型客户的客户分层经营体系，2025年末对公客户数96.60万户，较上年末增长13.2%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"对公客户数\",\"raw_value\":\"96.60\",\"value\":\"96.60\",\"unit\":\"万户\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F26\",\"text\":\"2025年末本行总行级战略客户数3,239户，总行级战略客户贷款余额3,731.29亿元，同口径较上年末增长20.5%；总行级战略客户存款余额4,819.73亿元，同口径较上年末增长2.4%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"总行级战略客户数\",\"raw_value\":\"3,239\",\"value\":\"3239\",\"unit\":\"户\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"总行级战略客户贷款余额\",\"raw_value\":\"3,731.29\",\"value\":\"3731.29\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"总行级战略客户存款余额\",\"raw_value\":\"4,819.73\",\"value\":\"4819.73\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F27\",\"text\":\"机构客户方面，本行聚焦财政社保、住建民生、司法生态三大核心业务，2025年末已累计获取财政社保、公积金、维修金等业务资格1,232项，全年机构客户存款日均余额4,264.89亿元，同比增长4.7%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"累计获取机构业务资格\",\"raw_value\":\"1,232\",\"value\":\"1232\",\"unit\":\"项\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"机构客户存款日均余额\",\"raw_value\":\"4,264.89\",\"value\":\"4264.89\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F28\",\"text\":\"平安理财积极融入本行经营场景，与本行共同打造“买理财，找平安”服务体系，助力本行获客。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]}],\"limitations\":[]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"2025年本行企业贷款余额较上年末增长3.5%，其中一般企业贷款余额较上年末增长9.2%，科技企业、绿色金融等领域贷款实现较好增长；个人贷款余额较上年末下降2.3%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F30\",\"text\":\"2025年末本行不良贷款率1.05%，较上年末下降0.01个百分点；拨备覆盖率220.88%，风险抵补能力保持良好。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"不良贷款率\",\"raw_value\":\"1.05\",\"value\":\"1.05\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"拨备覆盖率\",\"raw_value\":\"220.88\",\"value\":\"220.88\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F31\",\"text\":\"2025年末本集团核心一级资本充足率、一级资本充足率及资本充足率分别为9.36%、11.49%、13.77%，较上年末分别上升0.24、0.80、0.66个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"核心一级资本充足率\",\"raw_value\":\"9.36\",\"value\":\"9.36\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"一级资本充足率\",\"raw_value\":\"11.49\",\"value\":\"11.49\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"资本充足率\",\"raw_value\":\"13.77\",\"value\":\"13.77\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]},{\"fact_id\":\"F32\",\"text\":\"2025年末本行企业存款余额22,952.55亿元，较上年末增长2.2%；企业贷款余额16,635.46亿元，较上年末增长3.5%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"企业存款余额\",\"raw_value\":\"22,952.55\",\"value\":\"22952.55\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"},{\"name\":\"企业贷款余额\",\"raw_value\":\"16,635.46\",\"value\":\"16635.46\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F33\",\"text\":\"2025年本行营业收入同比下降10.4%，主要受贷款利率下行和业务结构调整影响净息差下降，以及市场波动影响债券投资等业务非利息净收入下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F34\",\"text\":\"2025年末平安理财管理的理财产品余额10,922.11亿元，全年实现净利润14.76亿元；非现金管理类产品余额占比较上年末上升7.3个百分点，一年期以上产品余额占比较上年末上升2.3个百分点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"理财产品余额\",\"raw_value\":\"10,922.11\",\"value\":\"10922.11\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\"},{\"name\":\"净利润\",\"raw_value\":\"14.76\",\"value\":\"14.76\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F35\",\"text\":\"本行为全国性股份制商业银行，通过吸收存款获取资金、发放贷款和垫款及进行金融投资等开展银行业务，属于金融服务经营主体。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0007\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F36\",\"text\":\"本行资金来源包括吸收存款、向中央银行借款、同业存放及拆入、卖出回购金融资产款和已发行债务证券等，2025年吸收存款利息支出占利息支出小计的72.6%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F37\",\"text\":\"本行服务对象覆盖个人客户（住房按揭、信用卡、消费及经营性贷款）和对公客户（战略客户、机构客户及重点行业企业），并通过零售、对公、资金同业板块提供金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0011\",\"source-0013\"]}],\"limitations\":[]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F38\",\"text\":\"本行以“智能化零售银行”为战略目标，在科技赋能、零售业务、综合金融等领域形成较为鲜明的经营特色，并通过数字金融建设支持业务数智化发展。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\",\"source-0015\"]}],\"limitations\":[]},\"limitations\":[\"分部经营数据表按零售金融、批发金融、其他业务列示，与3.3节零售、对公、资金同业板块口径不完全一致，未作强行对应。\",\"平安理财注册资本50亿元为子公司口径，与集团资本项目不可直接比较。\",\"本工作底稿未覆盖资产质量明细、负债质量明细及财务报表附注，相关细节未获取。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "本行为中国内地首家公开上市的全国性股份制商业银行，经营商业银行业务，并形成科技赋能、零售业务、综合金融等经营特色。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "本行按监管批准经营吸收公众存款、发放短中长期贷款、国内外结算、票据承兑贴现、发行金融债券、同业拆借、银行卡、信用证担保、代理收付及保险、保管箱、结售汇、离岸银行、资产托管、黄金业务及财务顾问咨询等商业银行业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F03",
+              "text": "本行战略目标为“中国最卓越、全球领先的智能化零售银行”，战略方针为“零售做强、对公做精、同业做专”，持续升级零售、对公、资金同业业务经营策略。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "本行全资子公司平安理财于2020年8月开业，主要业务为发行公募与私募理财产品、理财顾问和咨询服务等资产管理相关业务。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "注册资本",
+                  "raw_value": "50",
+                  "value": "50",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F05",
+              "text": "零售业务以个人贷款为核心板块之一，包括住房按揭贷款、信用卡应收账款、消费性贷款和经营性贷款，2025年末抵押类贷款占个人贷款的比例为62.9%。",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "个人贷款余额",
+                  "raw_value": "1,727,294",
+                  "value": "1727294",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "住房按揭贷款余额",
+                  "raw_value": "355,148",
+                  "value": "355148",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "信用卡应收账款余额",
+                  "raw_value": "405,442",
+                  "value": "405442",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "消费性贷款余额",
+                  "raw_value": "463,017",
+                  "value": "463017",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "经营性贷款余额",
+                  "raw_value": "503,687",
+                  "value": "503687",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "信用卡业务面向白领、年轻客群、车主及财富客群等细分客群，推出联名卡及升级用卡、旅行、健康、还款、服务等权益，2025年末信用卡流通户数4,369.31万户，全年信用卡总消费金额20,124.35亿元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "信用卡流通户数",
+                  "raw_value": "4,369.31",
+                  "value": "4369.31",
+                  "unit": "万户",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "信用卡总消费金额",
+                  "raw_value": "20,124.35",
+                  "value": "20124.35",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "对公业务聚焦产业金融、科技金融、供应链金融、跨境金融、普惠金融重点方向，精选公共事业、数字产业、制造业、医疗、能源、汽车等重点细分行业，配套定制化行业服务方案。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "资金同业业务通过“投资交易+客户业务”双轮驱动，投资交易领域采取多元化资产配置策略，客户业务领域满足同业和企业客户金融服务需求，并聚焦清算结算型业务场景经营。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "数字金融方面，本行发布平安口袋银行APP 8.0版本并升级适老化及多语言版本，对公业务构建AI标书助手、跨境智能审单识别准确率超93%，资金同业依托“iDeal结构化询报价”现券交易量约3.6万亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "跨境智能审单识别准确率",
+                  "raw_value": "超93",
+                  "value": "93",
+                  "unit": "%",
+                  "qualifier": "greater_than",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "iDeal结构化询报价现券交易量",
+                  "raw_value": "约3.6",
+                  "value": "3.6",
+                  "unit": "万亿元",
+                  "qualifier": "approximate",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "平安理财发布“安+心稳致远”产品品牌体系，2025年末非现金管理类产品余额占理财产品余额的比例为70.3%，一年期以上产品余额占非现金管理类产品余额的比例为16.9%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "非现金管理类产品余额占理财产品余额比例",
+                  "raw_value": "70.3",
+                  "value": "70.3",
+                  "unit": "%",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "一年期以上产品余额占非现金管理类产品余额比例",
+                  "raw_value": "16.9",
+                  "value": "16.9",
+                  "unit": "%",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F11",
+              "text": "2025年本集团实现营业收入1,314.42亿元，同比下降10.4%；其中利息净收入880.21亿元，同比下降5.8%；非利息净收入434.21亿元，同比下降18.5%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "1,314.42",
+                  "value": "1314.42",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "利息净收入",
+                  "raw_value": "880.21",
+                  "value": "880.21",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "非利息净收入",
+                  "raw_value": "434.21",
+                  "value": "434.21",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "营业收入构成中，利息净收入占比67.0%，非利息净收入占比33.0%；非利息净收入中手续费及佣金净收入占比18.2%，其他非利息净收入占比14.8%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "利息净收入占营业收入比例",
+                  "raw_value": "67.0",
+                  "value": "67.0",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "非利息净收入占营业收入比例",
+                  "raw_value": "33.0",
+                  "value": "33.0",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "手续费及佣金净收入占营业收入比例",
+                  "raw_value": "18.2",
+                  "value": "18.2",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他非利息净收入占营业收入比例",
+                  "raw_value": "14.8",
+                  "value": "14.8",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F13",
+              "text": "利息收入主要来自发放贷款和垫款，2025年利息收入130,501百万元，占利息收入小计的76.8%；金融投资利息收入27,327百万元，占16.2%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "发放贷款和垫款利息收入",
+                  "raw_value": "130,501",
+                  "value": "130501",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "发放贷款和垫款利息收入占利息收入小计比例",
+                  "raw_value": "76.8",
+                  "value": "76.8",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "金融投资利息收入",
+                  "raw_value": "27,327",
+                  "value": "27327",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "金融投资利息收入占利息收入小计比例",
+                  "raw_value": "16.2",
+                  "value": "16.2",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "利息支出主要来自吸收存款，2025年吸收存款利息支出59,409百万元，占利息支出小计的72.6%；已发行债务证券利息支出12,125百万元，占14.8%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "吸收存款利息支出",
+                  "raw_value": "59,409",
+                  "value": "59409",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "吸收存款利息支出占利息支出小计比例",
+                  "raw_value": "72.6",
+                  "value": "72.6",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "已发行债务证券利息支出",
+                  "raw_value": "12,125",
+                  "value": "12125",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "已发行债务证券利息支出占利息支出小计比例",
+                  "raw_value": "14.8",
+                  "value": "14.8",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "2025年本集团净息差1.78%，同比2024年下降9个基点，主要受贷款利率下行和业务结构调整等因素影响。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "净息差",
+                  "raw_value": "1.78",
+                  "value": "1.78",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "净息差同比变动",
+                  "raw_value": "9",
+                  "value": "9",
+                  "unit": "基点",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F16",
+              "text": "2025年末本集团资产总额59,257.77亿元，较上年末增长2.7%；发放贷款和垫款本金总额33,908.40亿元，较上年末增长0.5%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "资产总额",
+                  "raw_value": "59,257.77",
+                  "value": "59257.77",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "发放贷款和垫款本金总额",
+                  "raw_value": "33,908.40",
+                  "value": "33908.40",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F17",
+              "text": "2025年末本集团负债总额53,745.93亿元，较上年末增长1.9%；吸收存款本金余额35,827.55亿元，较上年末增长1.4%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "负债总额",
+                  "raw_value": "53,745.93",
+                  "value": "53745.93",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "吸收存款本金余额",
+                  "raw_value": "35,827.55",
+                  "value": "35827.55",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "分部经营数据中，零售金融业务2025年营业收入61,626百万元，占合计的46.9%；批发金融业务营业收入57,959百万元，占44.1%；其他业务营业收入11,857百万元，占9.0%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "零售金融业务营业收入",
+                  "raw_value": "61,626",
+                  "value": "61626",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "零售金融业务营业收入占比",
+                  "raw_value": "46.9",
+                  "value": "46.9",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "批发金融业务营业收入",
+                  "raw_value": "57,959",
+                  "value": "57959",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "批发金融业务营业收入占比",
+                  "raw_value": "44.1",
+                  "value": "44.1",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他业务营业收入",
+                  "raw_value": "11,857",
+                  "value": "11857",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他业务营业收入占比",
+                  "raw_value": "9.0",
+                  "value": "9.0",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F19",
+              "text": "分部净利润中，零售金融业务净利润2,683百万元，占合计的6.3%；批发金融业务净利润30,540百万元，占71.6%；其他业务净利润9,410百万元，占22.1%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "零售金融业务净利润",
+                  "raw_value": "2,683",
+                  "value": "2683",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "零售金融业务净利润占比",
+                  "raw_value": "6.3",
+                  "value": "6.3",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "批发金融业务净利润",
+                  "raw_value": "30,540",
+                  "value": "30540",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "批发金融业务净利润占比",
+                  "raw_value": "71.6",
+                  "value": "71.6",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他业务净利润",
+                  "raw_value": "9,410",
+                  "value": "9410",
+                  "unit": "百万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他业务净利润占比",
+                  "raw_value": "22.1",
+                  "value": "22.1",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "2025年本集团实现净利润426.33亿元，同比下降4.2%；信用及其他资产减值损失405.67亿元，同比下降17.9%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "净利润",
+                  "raw_value": "426.33",
+                  "value": "426.33",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "信用及其他资产减值损失",
+                  "raw_value": "405.67",
+                  "value": "405.67",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F21",
+              "text": "2025年本行业务及管理费381.96亿元，同比下降5.9%，通过数字化转型驱动降本增效。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "业务及管理费",
+                  "raw_value": "381.96",
+                  "value": "381.96",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F22",
+              "text": "2025年本行IT资本性支出及费用投入48.06亿元，持续推动资源整合优化，提升研发和管理效能。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "IT资本性支出及费用投入",
+                  "raw_value": "48.06",
+                  "value": "48.06",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "2025年本集团计息负债平均付息率1.67%，同比2024年下降47个基点；吸收存款平均付息率1.65%，同比下降42个基点；活期存款日均余额11,919.78亿元，同比增长5.8%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "计息负债平均付息率",
+                  "raw_value": "1.67",
+                  "value": "1.67",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "吸收存款平均付息率",
+                  "raw_value": "1.65",
+                  "value": "1.65",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "活期存款日均余额",
+                  "raw_value": "11,919.78",
+                  "value": "11919.78",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F24",
+              "text": "零售业务通过平安口袋银行APP等数字化渠道服务客户，2025年末为近860万大众客户提供7×24小时的“陪伴式”服务。",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "7×24小时陪伴式服务大众客户数",
+                  "raw_value": "近860",
+                  "value": "860",
+                  "unit": "万",
+                  "qualifier": "approximate",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "对公业务建立战略客户、中型客户、小型客户的客户分层经营体系，2025年末对公客户数96.60万户，较上年末增长13.2%。",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "对公客户数",
+                  "raw_value": "96.60",
+                  "value": "96.60",
+                  "unit": "万户",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F26",
+              "text": "2025年末本行总行级战略客户数3,239户，总行级战略客户贷款余额3,731.29亿元，同口径较上年末增长20.5%；总行级战略客户存款余额4,819.73亿元，同口径较上年末增长2.4%。",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "总行级战略客户数",
+                  "raw_value": "3,239",
+                  "value": "3239",
+                  "unit": "户",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "总行级战略客户贷款余额",
+                  "raw_value": "3,731.29",
+                  "value": "3731.29",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "总行级战略客户存款余额",
+                  "raw_value": "4,819.73",
+                  "value": "4819.73",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "机构客户方面，本行聚焦财政社保、住建民生、司法生态三大核心业务，2025年末已累计获取财政社保、公积金、维修金等业务资格1,232项，全年机构客户存款日均余额4,264.89亿元，同比增长4.7%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "累计获取机构业务资格",
+                  "raw_value": "1,232",
+                  "value": "1232",
+                  "unit": "项",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "机构客户存款日均余额",
+                  "raw_value": "4,264.89",
+                  "value": "4264.89",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "平安理财积极融入本行经营场景，与本行共同打造“买理财，找平安”服务体系，助力本行获客。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F29",
+              "text": "2025年本行企业贷款余额较上年末增长3.5%，其中一般企业贷款余额较上年末增长9.2%，科技企业、绿色金融等领域贷款实现较好增长；个人贷款余额较上年末下降2.3%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "2025年末本行不良贷款率1.05%，较上年末下降0.01个百分点；拨备覆盖率220.88%，风险抵补能力保持良好。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "不良贷款率",
+                  "raw_value": "1.05",
+                  "value": "1.05",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "拨备覆盖率",
+                  "raw_value": "220.88",
+                  "value": "220.88",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F31",
+              "text": "2025年末本集团核心一级资本充足率、一级资本充足率及资本充足率分别为9.36%、11.49%、13.77%，较上年末分别上升0.24、0.80、0.66个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "核心一级资本充足率",
+                  "raw_value": "9.36",
+                  "value": "9.36",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "一级资本充足率",
+                  "raw_value": "11.49",
+                  "value": "11.49",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "资本充足率",
+                  "raw_value": "13.77",
+                  "value": "13.77",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末"
+                }
+              ]
+            },
+            {
+              "fact_id": "F32",
+              "text": "2025年末本行企业存款余额22,952.55亿元，较上年末增长2.2%；企业贷款余额16,635.46亿元，较上年末增长3.5%。",
+              "subject_scope": "business_segment",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "企业存款余额",
+                  "raw_value": "22,952.55",
+                  "value": "22952.55",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "企业贷款余额",
+                  "raw_value": "16,635.46",
+                  "value": "16635.46",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年末"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F33",
+              "text": "2025年本行营业收入同比下降10.4%，主要受贷款利率下行和业务结构调整影响净息差下降，以及市场波动影响债券投资等业务非利息净收入下降。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "text": "2025年末平安理财管理的理财产品余额10,922.11亿元，全年实现净利润14.76亿元；非现金管理类产品余额占比较上年末上升7.3个百分点，一年期以上产品余额占比较上年末上升2.3个百分点。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "理财产品余额",
+                  "raw_value": "10,922.11",
+                  "value": "10922.11",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年末"
+                },
+                {
+                  "name": "净利润",
+                  "raw_value": "14.76",
+                  "value": "14.76",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F35",
+              "text": "本行为全国性股份制商业银行，通过吸收存款获取资金、发放贷款和垫款及进行金融投资等开展银行业务，属于金融服务经营主体。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F36",
+              "text": "本行资金来源包括吸收存款、向中央银行借款、同业存放及拆入、卖出回购金融资产款和已发行债务证券等，2025年吸收存款利息支出占利息支出小计的72.6%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F37",
+              "text": "本行服务对象覆盖个人客户（住房按揭、信用卡、消费及经营性贷款）和对公客户（战略客户、机构客户及重点行业企业），并通过零售、对公、资金同业板块提供金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0011",
+                "source-0013"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F38",
+            "text": "本行以“智能化零售银行”为战略目标，在科技赋能、零售业务、综合金融等领域形成较为鲜明的经营特色，并通过数字金融建设支持业务数智化发展。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0005",
+              "source-0015"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "分部经营数据表按零售金融、批发金融、其他业务列示，与3.3节零售、对公、资金同业板块口径不完全一致，未作强行对应。",
+        "平安理财注册资本50亿元为子公司口径，与集团资本项目不可直接比较。",
+        "本工作底稿未覆盖资产质量明细、负债质量明细及财务报表附注，相关细节未获取。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 12514,
+      "output_tokens": 6404,
+      "total_tokens": 18918
+    }
+  },
+  {
+    "request_id": "bp-work-2db1b766a44e7ef11adc3b0d:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "c74324b500564e9de1955c17c1079096ec495ce64bcde8562e7d3b0a12d111c9",
+    "response_hash": "4db9b4c44a3b62766e50237faf623f7d9685dcad2bf7f4cb518b444c449a338a",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"RF-F12\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"wrong_unit_or_denominator\",\"action\":\"correct\",\"affected_fact_id\":\"F12\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"F12正文将手续费及佣金净收入18.2%、其他非利息净收入14.8%写成“非利息净收入中”的占比，把分母说成非利息净收入。source-0007中这两行占比与利息净收入67.0%、非利息净收入33.0%同属营业收入构成，18.2%+14.8%=33.0%，分别是营业收入总额131,442百万元中的份额，而不是非利息净收入43,421百万元内部占比（约55.0%与45.0%）。指标名称已正确标明占营业收入比例，应只修正正文分母，保留原百分比，不得改记为非利息净收入内部份额。\"},{\"finding_id\":\"RF-F34\",\"element\":\"material_changes\",\"severity\":\"minor\",\"issue_type\":\"wrong_unit_or_denominator\",\"action\":\"correct\",\"affected_fact_id\":\"F34\",\"evidence_ids\":[\"source-0017\"],\"explanation\":\"F34称非现金管理类产品余额占比上升7.3个百分点、一年期以上产品余额占比上升2.3个百分点，但未标明各自分母。source-0017中前者分母为理财产品余额，后者分母为非现金管理类产品余额，并非同一基数。理财产品余额10,922.11亿元、净利润14.76亿元及两个百分点变动均有来源支持，应保留核心金额并补充分母，避免把2.3个百分点误读为占全部理财产品余额的变动。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F18\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F27\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\",\"F34\",\"F35\",\"F36\",\"F37\",\"F38\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "RF-F12",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "wrong_unit_or_denominator",
+          "action": "correct",
+          "affected_fact_id": "F12",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "F12正文将手续费及佣金净收入18.2%、其他非利息净收入14.8%写成“非利息净收入中”的占比，把分母说成非利息净收入。source-0007中这两行占比与利息净收入67.0%、非利息净收入33.0%同属营业收入构成，18.2%+14.8%=33.0%，分别是营业收入总额131,442百万元中的份额，而不是非利息净收入43,421百万元内部占比（约55.0%与45.0%）。指标名称已正确标明占营业收入比例，应只修正正文分母，保留原百分比，不得改记为非利息净收入内部份额。"
+        },
+        {
+          "finding_id": "RF-F34",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_unit_or_denominator",
+          "action": "correct",
+          "affected_fact_id": "F34",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "explanation": "F34称非现金管理类产品余额占比上升7.3个百分点、一年期以上产品余额占比上升2.3个百分点，但未标明各自分母。source-0017中前者分母为理财产品余额，后者分母为非现金管理类产品余额，并非同一基数。理财产品余额10,922.11亿元、净利润14.76亿元及两个百分点变动均有来源支持，应保留核心金额并补充分母，避免把2.3个百分点误读为占全部理财产品余额的变动。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37",
+        "F38"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19347,
+      "output_tokens": 525,
+      "total_tokens": 50220
+    }
+  },
+  {
+    "request_id": "bp-work-2db1b766a44e7ef11adc3b0d:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "4feba0ffc97de6bd963a377fcf974746dd27e94c54eecafb477db6bae2dd5178",
+    "response_hash": "51854bf624f62613327754e6dd2d348c0e207fe412071d7b3ce9531457e46b63",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F12\",\"text\":\"营业收入构成中，利息净收入占比67.0%，非利息净收入占比33.0%；营业收入中手续费及佣金净收入占比18.2%，其他非利息净收入占比14.8%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"利息净收入占营业收入比例\",\"raw_value\":\"67.0\",\"value\":\"67.0\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"非利息净收入占营业收入比例\",\"raw_value\":\"33.0\",\"value\":\"33.0\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"手续费及佣金净收入占营业收入比例\",\"raw_value\":\"18.2\",\"value\":\"18.2\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他非利息净收入占营业收入比例\",\"raw_value\":\"14.8\",\"value\":\"14.8\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F34\",\"text\":\"2025年末平安理财管理的理财产品余额10,922.11亿元，全年实现净利润14.76亿元；非现金管理类产品余额占理财产品余额的比例较上年末上升7.3个百分点，一年期以上产品余额占非现金管理类产品余额的比例较上年末上升2.3个百分点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"理财产品余额\",\"raw_value\":\"10,922.11\",\"value\":\"10922.11\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"净利润\",\"raw_value\":\"14.76\",\"value\":\"14.76\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F12",
+          "text": "营业收入构成中，利息净收入占比67.0%，非利息净收入占比33.0%；营业收入中手续费及佣金净收入占比18.2%，其他非利息净收入占比14.8%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "利息净收入占营业收入比例",
+              "raw_value": "67.0",
+              "value": "67.0",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "非利息净收入占营业收入比例",
+              "raw_value": "33.0",
+              "value": "33.0",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手续费及佣金净收入占营业收入比例",
+              "raw_value": "18.2",
+              "value": "18.2",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他非利息净收入占营业收入比例",
+              "raw_value": "14.8",
+              "value": "14.8",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F34",
+          "text": "2025年末平安理财管理的理财产品余额10,922.11亿元，全年实现净利润14.76亿元；非现金管理类产品余额占理财产品余额的比例较上年末上升7.3个百分点，一年期以上产品余额占非现金管理类产品余额的比例较上年末上升2.3个百分点。",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "metrics": [
+            {
+              "name": "理财产品余额",
+              "raw_value": "10,922.11",
+              "value": "10922.11",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "净利润",
+              "raw_value": "14.76",
+              "value": "14.76",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 8934,
+      "output_tokens": 635,
+      "total_tokens": 9569
+    }
+  },
+  {
+    "request_id": "bp-work-2db1b766a44e7ef11adc3b0d:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "942beaf14766badc5ebb6a20bef5ec76cb1a59c1b7546eb148dff15c97d43b21",
+    "response_hash": "eee7088b031ab3d5eaf1170595d721883afdae00cd217cf2f6838f9425c28956",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F12\",\"F34\"],\"checks\":[{\"fact_id\":\"F12\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007以本集团营业收入总额131,442百万元为100.0%分母，利息净收入67.0%、非利息净收入33.0%、手续费及佣金净收入18.2%、其他非利息净收入14.8%同属该营业收入构成列，且后两项合计等于33.0%，并非非利息净收入内部占比。候选将后两项分母改为营业收入并保留原百分比，主体、期间与口径均正确，已实质纠正原分母错误。\"},{\"fact_id\":\"F34\",\"accepted\":true,\"evidence_ids\":[\"source-0017\"],\"explanation\":\"source-0017明确平安理财为全资子公司，2025年末管理的理财产品余额为10,922.11亿元、全年净利润为14.76亿元；非现金管理类产品余额占理财产品余额的比例上升7.3个百分点，一年期以上产品余额占非现金管理类产品余额的比例上升2.3个百分点。候选分别标明两个不同分母，主体、时点、金额和变动口径与原文一致，已消除基数混同。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F12",
+        "F34"
+      ],
+      "checks": [
+        {
+          "fact_id": "F12",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007以本集团营业收入总额131,442百万元为100.0%分母，利息净收入67.0%、非利息净收入33.0%、手续费及佣金净收入18.2%、其他非利息净收入14.8%同属该营业收入构成列，且后两项合计等于33.0%，并非非利息净收入内部占比。候选将后两项分母改为营业收入并保留原百分比，主体、期间与口径均正确，已实质纠正原分母错误。"
+        },
+        {
+          "fact_id": "F34",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "explanation": "source-0017明确平安理财为全资子公司，2025年末管理的理财产品余额为10,922.11亿元、全年净利润为14.76亿元；非现金管理类产品余额占理财产品余额的比例上升7.3个百分点，一年期以上产品余额占非现金管理类产品余额的比例上升2.3个百分点。候选分别标明两个不同分母，主体、时点、金额和变动口径与原文一致，已消除基数混同。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10657,
+      "output_tokens": 284,
+      "total_tokens": 15153
+    }
+  }
+]

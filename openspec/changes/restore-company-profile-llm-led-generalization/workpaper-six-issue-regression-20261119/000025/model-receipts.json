@@ -1,0 +1,1283 @@
+[
+  {
+    "request_id": "bp-work-d74259fd50c5d1cf0a50db26:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "c13804fbc8e050ab587a06313661759ecc17f2a9a3155a2c5c6547cbb3cc6d6c",
+    "response_hash": "869d8668f5daccb5fc7a312310c7531176ea55af6a63205667ec4c8a1008ae90",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0018\",\"section-0022\",\"section-0039\",\"section-0041\",\"section-0050\",\"section-0051\",\"section-0076\",\"section-0770\"],\"rationale\":\"选取公司主要业务介绍（section-0018）及其珠宝业务经营模式（section-0022），覆盖产品/服务、销售、生产、采购、门店与线上销售等经营方式；选取主营业务分析（section-0039）及其收入与成本（section-0041），获取公司层面营业收入总额、分业务收入构成与成本结构，回答怎么赚钱与主要业务权重；补充主要客户（section-0050）与主要供应商（section-0051）说明渠道与供应链位置；选取主要控股参股公司分析（section-0076）解释子公司经营贡献；选取分部信息（section-0770）作为收入构成的报表附注补充。未选行业背景与核心竞争力，因其为次要且不改变公司层面解读。\",\"deferred\":[\"section-0029 行业情况：属行业背景，非公司经营实质，暂不展开\",\"section-0035 核心竞争力分析：泛化竞争力描述，非收入与经营机制核心\",\"section-0058 资产及负债状况分析：资产结构非收入来源，暂不纳入\",\"section-0079 未来发展展望：计划性内容，仅作参考不纳入主读\"],\"stop_reason\":\"已覆盖业务结构、经营模式、收入构成与主要客户供应商及子公司贡献，足以解释公司经营与赚钱方式；行业背景、资产分析与未来计划属次要或计划性内容，可在不扩读的情况下停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0018",
+        "section-0022",
+        "section-0039",
+        "section-0041",
+        "section-0050",
+        "section-0051",
+        "section-0076",
+        "section-0770"
+      ],
+      "rationale": "选取公司主要业务介绍（section-0018）及其珠宝业务经营模式（section-0022），覆盖产品/服务、销售、生产、采购、门店与线上销售等经营方式；选取主营业务分析（section-0039）及其收入与成本（section-0041），获取公司层面营业收入总额、分业务收入构成与成本结构，回答怎么赚钱与主要业务权重；补充主要客户（section-0050）与主要供应商（section-0051）说明渠道与供应链位置；选取主要控股参股公司分析（section-0076）解释子公司经营贡献；选取分部信息（section-0770）作为收入构成的报表附注补充。未选行业背景与核心竞争力，因其为次要且不改变公司层面解读。",
+      "deferred": [
+        "section-0029 行业情况：属行业背景，非公司经营实质，暂不展开",
+        "section-0035 核心竞争力分析：泛化竞争力描述，非收入与经营机制核心",
+        "section-0058 资产及负债状况分析：资产结构非收入来源，暂不纳入",
+        "section-0079 未来发展展望：计划性内容，仅作参考不纳入主读"
+      ],
+      "stop_reason": "已覆盖业务结构、经营模式、收入构成与主要客户供应商及子公司贡献，足以解释公司经营与赚钱方式；行业背景、资产分析与未来计划属次要或计划性内容，可在不扩读的情况下停止。"
+    },
+    "usage": {
+      "input_tokens": 15604,
+      "output_tokens": 349,
+      "total_tokens": 15953
+    }
+  },
+  {
+    "request_id": "bp-work-d74259fd50c5d1cf0a50db26:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "2eabe012eb7f665bf472ababdef3827887eb8a44cb95fed572f5fbd499e614f3",
+    "response_hash": "f35f1d57e9415d1d76a9a793dd3cdd12d8a05cf1b837c01a9989c969839cf15e",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司报告期内主营业务为珠宝服务业务及商业综合体运营与物业租赁业务，划分为珠宝产业板块与物理平台板块。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"财务报表附注将经营业务划分为珠宝销售及服务（黄金珠宝的批发和零售）与租赁及服务（房产及商业地产租赁）两个报告分部。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"珠宝交易板块致力于建立数字化珠宝要素交易平台，报告期内平台正式上线，实现线上商城、看货会、供应链管理、分销系统等功能，构建线上展示、交易、结算的完整闭环，并应用于珍珠看货会及卖场管理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"黄金板块以黄金为载体、以中国优秀传统文化为内涵，致力于为客户提供定制化的产品解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"物理平台板块高效运营公司所持有的物业资源，推动由传统的空间租赁向以客户为中心的商业资产运营服务转变。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"珠宝业务除批发、零售外，还提供代理报关、黄金提纯/兑换等配套服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"珠宝业务采用批发、零售作为黄金、珠宝的主要销售模式，并另有其他服务收入；按销售模式划分，批发营业收入53,111.14万元、毛利率3.91%，零售营业收入59,138.24万元、毛利率3.84%，其他服务营业收入939.50万元、毛利率57.50%，合计营业收入113,188.88万元、毛利率4.32%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"珠宝业务批发营业收入\",\"raw_value\":\"53,111.14\",\"value\":\"53111.14\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务批发毛利率\",\"raw_value\":\"3.91\",\"value\":\"3.91\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务零售营业收入\",\"raw_value\":\"59,138.24\",\"value\":\"59138.24\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务零售毛利率\",\"raw_value\":\"3.84\",\"value\":\"3.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务其他服务营业收入\",\"raw_value\":\"939.50\",\"value\":\"939.50\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务其他服务毛利率\",\"raw_value\":\"57.50\",\"value\":\"57.50\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务营业收入合计\",\"raw_value\":\"113,188.88\",\"value\":\"113188.88\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务毛利率合计\",\"raw_value\":\"4.32\",\"value\":\"4.32\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"按行业/产品口径，珠宝销售及服务营业收入1,131,888,850.11元、营业成本1,083,515,862.78元、毛利率4.27%；租赁及服务营业收入329,714,550.42元、营业成本128,520,785.89元、毛利率61.02%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"珠宝销售及服务营业收入\",\"raw_value\":\"1,131,888,850.11\",\"value\":\"1131888850.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝销售及服务营业成本\",\"raw_value\":\"1,083,515,862.78\",\"value\":\"1083515862.78\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝销售及服务毛利率\",\"raw_value\":\"4.27\",\"value\":\"4.27\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁及服务营业收入\",\"raw_value\":\"329,714,550.42\",\"value\":\"329714550.42\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁及服务营业成本\",\"raw_value\":\"128,520,785.89\",\"value\":\"128520785.89\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁及服务毛利率\",\"raw_value\":\"61.02\",\"value\":\"61.02\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"珠宝业务销售模式表与收入构成表对珠宝业务合计金额口径略有差异（113,188.88万元与1,131,888,850.11元），系不同披露表口径，未作换算统一。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年度公司实现营业收入146,160万元，同比减少44.08%，收入变动的主要原因是公司主动调整黄金业务模式等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"146,160\",\"value\":\"146160\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"-44.08\",\"value\":\"-44.08\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"按营业收入构成，营业收入合计1,461,603,400.53元，其中珠宝销售及服务1,131,888,850.11元、占营业收入比重77.44%，租赁及服务329,714,550.42元、占22.56%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"1,461,603,400.53\",\"value\":\"1461603400.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珠宝销售及服务占营业收入比重\",\"raw_value\":\"77.44\",\"value\":\"77.44\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁及服务占营业收入比重\",\"raw_value\":\"22.56\",\"value\":\"22.56\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"2025年公司实现利润总额17,506万元，归属于母公司的净利润14,287万元，比2024年增加624万元；截至2025年12月31日资产总额为265,016万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"利润总额\",\"raw_value\":\"17,506\",\"value\":\"17506\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司的净利润\",\"raw_value\":\"14,287\",\"value\":\"14287\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"资产总额\",\"raw_value\":\"265,016\",\"value\":\"265016\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"按地区划分，华南地区营业收入943,760,912.51元、占64.57%，华东地区173,615,831.08元、占11.88%，北方地区77,242,667.32元、占5.28%，华中地区243,245,121.80元、占16.64%，其他地区23,738,867.82元、占1.62%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"华南地区营业收入\",\"raw_value\":\"943,760,912.51\",\"value\":\"943760912.51\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"华东地区营业收入\",\"raw_value\":\"173,615,831.08\",\"value\":\"173615831.08\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"北方地区营业收入\",\"raw_value\":\"77,242,667.32\",\"value\":\"77242667.32\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"华中地区营业收入\",\"raw_value\":\"243,245,121.80\",\"value\":\"243245121.80\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他地区营业收入\",\"raw_value\":\"23,738,867.82\",\"value\":\"23738867.82\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司黄金及其制品主要采用委托加工模式，钻石彩宝等不涉及加工；委托加工成品金额107,558.50万元，占比100.00%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"委托加工成品金额\",\"raw_value\":\"107,558.50\",\"value\":\"107558.50\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"委托加工成品占比\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"采购方面，黄金及其制品向上海黄金交易所或具备资质的单位购买黄金原材料，或向银行租借；其它珠宝玉石向境内外珠宝玉石供应商采购产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-OI-03\",\"text\":\"2025年现货交易采购中，黄金采购数量1,384.50KG、采购金额104,375.00万元；珍珠采购数量15,287.00粒、采购金额276.42万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"黄金现货交易采购数量\",\"raw_value\":\"1,384.50\",\"value\":\"1384.50\",\"unit\":\"KG\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"黄金现货交易采购金额\",\"raw_value\":\"104,375.00\",\"value\":\"104375.00\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珍珠现货交易采购数量\",\"raw_value\":\"15,287.00\",\"value\":\"15287.00\",\"unit\":\"粒\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珍珠现货交易采购金额\",\"raw_value\":\"276.42\",\"value\":\"276.42\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"截至2025年12月31日，公司珠宝业务的存货余额为5,965.75万元，其中以公允价值计量的金额为4,917.84万元，系以商品期货合约及T+D合约作为套期工具的被套期项目。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"珠宝业务存货余额\",\"raw_value\":\"5,965.75\",\"value\":\"5965.75\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\"},{\"name\":\"珠宝业务以公允价值计量的存货金额\",\"raw_value\":\"4,917.84\",\"value\":\"4917.84\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OI-05\",\"text\":\"黄金批发及零售2025年销售量1,561.66KG、生产量1,498.59KG、库存量53.98KG；珍珠批发及零售销售量2,641.00粒、库存量12,646.00粒、采购量15,287.00粒。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"黄金批发及零售销售量\",\"raw_value\":\"1,561.66\",\"value\":\"1561.66\",\"unit\":\"KG\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"黄金批发及零售生产量\",\"raw_value\":\"1,498.59\",\"value\":\"1498.59\",\"unit\":\"KG\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"黄金批发及零售库存量\",\"raw_value\":\"53.98\",\"value\":\"53.98\",\"unit\":\"KG\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珍珠批发及零售销售量\",\"raw_value\":\"2,641.00\",\"value\":\"2641.00\",\"unit\":\"粒\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珍珠批发及零售库存量\",\"raw_value\":\"12,646.00\",\"value\":\"12646.00\",\"unit\":\"粒\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"珍珠批发及零售采购量\",\"raw_value\":\"15,287.00\",\"value\":\"15287.00\",\"unit\":\"粒\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"采购模式表仅列示黄金与珍珠现货交易，其他珠宝玉石采购未列数量与金额。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户合计销售金额416,005,660.48元，占年度销售总额比例28.46%，其中关联方销售额占年度销售总额比例0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"416,005,660.48\",\"value\":\"416005660.48\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"28.46\",\"value\":\"28.46\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"前五名供应商合计采购金额1,125,996,365.70元，占年度采购总额比例94.87%，其中关联方采购额占年度采购总额比例1.84%；报告期内占公司年度采购总额比例超50%的供应商是上海黄金交易所。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"1,125,996,365.70\",\"value\":\"1125996365.70\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"94.87\",\"value\":\"94.87\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"线上销售方面，阿里平台店铺营业收入19,673.34万元、营业成本18,655.89万元，鲸芽平台营业收入16,084.20万元、营业成本15,622.58万元，京东平台店铺营业收入7,212.49万元、营业成本6,946.78万元，拼多多平台店铺营业收入5,790.50万元、营业成本5,629.10万元，小程序商城营业收入3,792.37万元、营业成本3,677.54万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"阿里平台店铺营业收入\",\"raw_value\":\"19,673.34\",\"value\":\"19673.34\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"鲸芽平台营业收入\",\"raw_value\":\"16,084.20\",\"value\":\"16084.20\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"京东平台店铺营业收入\",\"raw_value\":\"7,212.49\",\"value\":\"7212.49\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"拼多多平台店铺营业收入\",\"raw_value\":\"5,790.50\",\"value\":\"5790.50\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"小程序商城营业收入\",\"raw_value\":\"3,792.37\",\"value\":\"3792.37\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-04\",\"text\":\"实体店方面，国润（特力）负一楼柜台营业收入5,539.48万元、营业成本5,331.50万元，国润直营店（特力）一楼营业收入768.22万元、营业成本733.68万元，国润（特力）负一楼边厅营业收入46.16万元、营业成本44.39万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"国润（特力）负一楼柜台营业收入\",\"raw_value\":\"5,539.48\",\"value\":\"5539.48\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国润直营店（特力）一楼营业收入\",\"raw_value\":\"768.22\",\"value\":\"768.22\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"国润（特力）负一楼边厅营业收入\",\"raw_value\":\"46.16\",\"value\":\"46.16\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"客户与供应商名称以客户一至客户五、供应商一至供应商五匿名列示，未披露具体名称。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"珠宝交易板块数字化平台已准入多家供应商，注册用户超200名；打造水贝首个非洲翠专业市场，引入上游源头供应商，试点推广数字化交易平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"平台注册用户数\",\"raw_value\":\"超200\",\"value\":\"200\",\"unit\":\"名\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"物理平台板块珠宝商业综合体招商成效亮眼，组织开展文博会、特力珠宝产业嘉年华等9场活动，对接得物、拼多多等电商渠道为商户拓展线上渠道；传统物业2025年整体出租率保持良好态势。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"组织活动场次\",\"raw_value\":\"9\",\"value\":\"9\",\"unit\":\"场\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"利润增加的主要原因包括商业运营板块利润增加、参股公司投资收益增加等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司根据最新行业政策及市场运营情况，主动调整黄金业务模式，业务规模缩减，黄金批发及零售销售量同比下降66.03%、生产量同比下降63.78%、库存量同比下降76.65%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"黄金批发及零售销售量同比增减\",\"raw_value\":\"-66.03\",\"value\":\"-66.03\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"黄金批发及零售生产量同比增减\",\"raw_value\":\"-63.78\",\"value\":\"-63.78\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"黄金批发及零售库存量同比增减\",\"raw_value\":\"-76.65\",\"value\":\"-76.65\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内合并范围发生变动，深圳市华日安信汽车检测有限公司于2025年12月18日注销。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司珠宝业务处于珠宝产业链的批发零售与交易服务环节，黄金及其制品主要采用委托加工模式，钻石彩宝等不涉及加工。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"黄金原材料向上海黄金交易所或具备资质的单位购买，或向银行租借；其它珠宝玉石向境内外珠宝玉石供应商采购产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未披露具体珠宝玉石供应商名称及采购金额。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-03\",\"text\":\"珠宝业务通过批发、零售及线上平台店铺向客户销售，前五名客户合计销售金额占年度销售总额比例28.46%，客户集中度相对分散。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"28.46\",\"value\":\"28.46\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未披露具体客户名称及所属行业。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"公司荣登“2025产业数字化百强榜”第80名；特力珠宝文化产业园入选《中国商品市场综合百强》第11名。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[]},\"limitations\":[\"珠宝业务销售模式表与收入构成表对珠宝业务合计金额口径略有差异，未作换算统一。\",\"客户与供应商名称以匿名序号列示，未披露具体名称。\",\"未选行业背景、核心竞争力、资产分析及未来发展展望章节，相关补充信息未纳入。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司报告期内主营业务为珠宝服务业务及商业综合体运营与物业租赁业务，划分为珠宝产业板块与物理平台板块。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "财务报表附注将经营业务划分为珠宝销售及服务（黄金珠宝的批发和零售）与租赁及服务（房产及商业地产租赁）两个报告分部。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "珠宝交易板块致力于建立数字化珠宝要素交易平台，报告期内平台正式上线，实现线上商城、看货会、供应链管理、分销系统等功能，构建线上展示、交易、结算的完整闭环，并应用于珍珠看货会及卖场管理。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "黄金板块以黄金为载体、以中国优秀传统文化为内涵，致力于为客户提供定制化的产品解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "物理平台板块高效运营公司所持有的物业资源，推动由传统的空间租赁向以客户为中心的商业资产运营服务转变。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "珠宝业务除批发、零售外，还提供代理报关、黄金提纯/兑换等配套服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "珠宝业务采用批发、零售作为黄金、珠宝的主要销售模式，并另有其他服务收入；按销售模式划分，批发营业收入53,111.14万元、毛利率3.91%，零售营业收入59,138.24万元、毛利率3.84%，其他服务营业收入939.50万元、毛利率57.50%，合计营业收入113,188.88万元、毛利率4.32%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "珠宝业务批发营业收入",
+                  "raw_value": "53,111.14",
+                  "value": "53111.14",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务批发毛利率",
+                  "raw_value": "3.91",
+                  "value": "3.91",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务零售营业收入",
+                  "raw_value": "59,138.24",
+                  "value": "59138.24",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务零售毛利率",
+                  "raw_value": "3.84",
+                  "value": "3.84",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务其他服务营业收入",
+                  "raw_value": "939.50",
+                  "value": "939.50",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务其他服务毛利率",
+                  "raw_value": "57.50",
+                  "value": "57.50",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务营业收入合计",
+                  "raw_value": "113,188.88",
+                  "value": "113188.88",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务毛利率合计",
+                  "raw_value": "4.32",
+                  "value": "4.32",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "按行业/产品口径，珠宝销售及服务营业收入1,131,888,850.11元、营业成本1,083,515,862.78元、毛利率4.27%；租赁及服务营业收入329,714,550.42元、营业成本128,520,785.89元、毛利率61.02%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "珠宝销售及服务营业收入",
+                  "raw_value": "1,131,888,850.11",
+                  "value": "1131888850.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝销售及服务营业成本",
+                  "raw_value": "1,083,515,862.78",
+                  "value": "1083515862.78",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝销售及服务毛利率",
+                  "raw_value": "4.27",
+                  "value": "4.27",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁及服务营业收入",
+                  "raw_value": "329,714,550.42",
+                  "value": "329714550.42",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁及服务营业成本",
+                  "raw_value": "128,520,785.89",
+                  "value": "128520785.89",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁及服务毛利率",
+                  "raw_value": "61.02",
+                  "value": "61.02",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "珠宝业务销售模式表与收入构成表对珠宝业务合计金额口径略有差异（113,188.88万元与1,131,888,850.11元），系不同披露表口径，未作换算统一。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年度公司实现营业收入146,160万元，同比减少44.08%，收入变动的主要原因是公司主动调整黄金业务模式等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "146,160",
+                  "value": "146160",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增减",
+                  "raw_value": "-44.08",
+                  "value": "-44.08",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "按营业收入构成，营业收入合计1,461,603,400.53元，其中珠宝销售及服务1,131,888,850.11元、占营业收入比重77.44%，租赁及服务329,714,550.42元、占22.56%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入合计",
+                  "raw_value": "1,461,603,400.53",
+                  "value": "1461603400.53",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝销售及服务占营业收入比重",
+                  "raw_value": "77.44",
+                  "value": "77.44",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁及服务占营业收入比重",
+                  "raw_value": "22.56",
+                  "value": "22.56",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "2025年公司实现利润总额17,506万元，归属于母公司的净利润14,287万元，比2024年增加624万元；截至2025年12月31日资产总额为265,016万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "利润总额",
+                  "raw_value": "17,506",
+                  "value": "17506",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司的净利润",
+                  "raw_value": "14,287",
+                  "value": "14287",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资产总额",
+                  "raw_value": "265,016",
+                  "value": "265016",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025-12-31",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "按地区划分，华南地区营业收入943,760,912.51元、占64.57%，华东地区173,615,831.08元、占11.88%，北方地区77,242,667.32元、占5.28%，华中地区243,245,121.80元、占16.64%，其他地区23,738,867.82元、占1.62%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "华南地区营业收入",
+                  "raw_value": "943,760,912.51",
+                  "value": "943760912.51",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "华东地区营业收入",
+                  "raw_value": "173,615,831.08",
+                  "value": "173615831.08",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "北方地区营业收入",
+                  "raw_value": "77,242,667.32",
+                  "value": "77242667.32",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "华中地区营业收入",
+                  "raw_value": "243,245,121.80",
+                  "value": "243245121.80",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他地区营业收入",
+                  "raw_value": "23,738,867.82",
+                  "value": "23738867.82",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司黄金及其制品主要采用委托加工模式，钻石彩宝等不涉及加工；委托加工成品金额107,558.50万元，占比100.00%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "委托加工成品金额",
+                  "raw_value": "107,558.50",
+                  "value": "107558.50",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "委托加工成品占比",
+                  "raw_value": "100.00",
+                  "value": "100.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "采购方面，黄金及其制品向上海黄金交易所或具备资质的单位购买黄金原材料，或向银行租借；其它珠宝玉石向境内外珠宝玉石供应商采购产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "2025年现货交易采购中，黄金采购数量1,384.50KG、采购金额104,375.00万元；珍珠采购数量15,287.00粒、采购金额276.42万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "黄金现货交易采购数量",
+                  "raw_value": "1,384.50",
+                  "value": "1384.50",
+                  "unit": "KG",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "黄金现货交易采购金额",
+                  "raw_value": "104,375.00",
+                  "value": "104375.00",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珍珠现货交易采购数量",
+                  "raw_value": "15,287.00",
+                  "value": "15287.00",
+                  "unit": "粒",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珍珠现货交易采购金额",
+                  "raw_value": "276.42",
+                  "value": "276.42",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "截至2025年12月31日，公司珠宝业务的存货余额为5,965.75万元，其中以公允价值计量的金额为4,917.84万元，系以商品期货合约及T+D合约作为套期工具的被套期项目。",
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "珠宝业务存货余额",
+                  "raw_value": "5,965.75",
+                  "value": "5965.75",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025-12-31",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珠宝业务以公允价值计量的存货金额",
+                  "raw_value": "4,917.84",
+                  "value": "4917.84",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025-12-31",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-05",
+              "text": "黄金批发及零售2025年销售量1,561.66KG、生产量1,498.59KG、库存量53.98KG；珍珠批发及零售销售量2,641.00粒、库存量12,646.00粒、采购量15,287.00粒。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "黄金批发及零售销售量",
+                  "raw_value": "1,561.66",
+                  "value": "1561.66",
+                  "unit": "KG",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "黄金批发及零售生产量",
+                  "raw_value": "1,498.59",
+                  "value": "1498.59",
+                  "unit": "KG",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "黄金批发及零售库存量",
+                  "raw_value": "53.98",
+                  "value": "53.98",
+                  "unit": "KG",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珍珠批发及零售销售量",
+                  "raw_value": "2,641.00",
+                  "value": "2641.00",
+                  "unit": "粒",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珍珠批发及零售库存量",
+                  "raw_value": "12,646.00",
+                  "value": "12646.00",
+                  "unit": "粒",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "珍珠批发及零售采购量",
+                  "raw_value": "15,287.00",
+                  "value": "15287.00",
+                  "unit": "粒",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "采购模式表仅列示黄金与珍珠现货交易，其他珠宝玉石采购未列数量与金额。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "前五名客户合计销售金额416,005,660.48元，占年度销售总额比例28.46%，其中关联方销售额占年度销售总额比例0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额",
+                  "raw_value": "416,005,660.48",
+                  "value": "416005660.48",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "28.46",
+                  "value": "28.46",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "前五名供应商合计采购金额1,125,996,365.70元，占年度采购总额比例94.87%，其中关联方采购额占年度采购总额比例1.84%；报告期内占公司年度采购总额比例超50%的供应商是上海黄金交易所。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商合计采购金额",
+                  "raw_value": "1,125,996,365.70",
+                  "value": "1125996365.70",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商合计采购金额占年度采购总额比例",
+                  "raw_value": "94.87",
+                  "value": "94.87",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "线上销售方面，阿里平台店铺营业收入19,673.34万元、营业成本18,655.89万元，鲸芽平台营业收入16,084.20万元、营业成本15,622.58万元，京东平台店铺营业收入7,212.49万元、营业成本6,946.78万元，拼多多平台店铺营业收入5,790.50万元、营业成本5,629.10万元，小程序商城营业收入3,792.37万元、营业成本3,677.54万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "阿里平台店铺营业收入",
+                  "raw_value": "19,673.34",
+                  "value": "19673.34",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "鲸芽平台营业收入",
+                  "raw_value": "16,084.20",
+                  "value": "16084.20",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "京东平台店铺营业收入",
+                  "raw_value": "7,212.49",
+                  "value": "7212.49",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "拼多多平台店铺营业收入",
+                  "raw_value": "5,790.50",
+                  "value": "5790.50",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "小程序商城营业收入",
+                  "raw_value": "3,792.37",
+                  "value": "3792.37",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "实体店方面，国润（特力）负一楼柜台营业收入5,539.48万元、营业成本5,331.50万元，国润直营店（特力）一楼营业收入768.22万元、营业成本733.68万元，国润（特力）负一楼边厅营业收入46.16万元、营业成本44.39万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "国润（特力）负一楼柜台营业收入",
+                  "raw_value": "5,539.48",
+                  "value": "5539.48",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国润直营店（特力）一楼营业收入",
+                  "raw_value": "768.22",
+                  "value": "768.22",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国润（特力）负一楼边厅营业收入",
+                  "raw_value": "46.16",
+                  "value": "46.16",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "客户与供应商名称以客户一至客户五、供应商一至供应商五匿名列示，未披露具体名称。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "珠宝交易板块数字化平台已准入多家供应商，注册用户超200名；打造水贝首个非洲翠专业市场，引入上游源头供应商，试点推广数字化交易平台。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "平台注册用户数",
+                  "raw_value": "超200",
+                  "value": "200",
+                  "unit": "名",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "物理平台板块珠宝商业综合体招商成效亮眼，组织开展文博会、特力珠宝产业嘉年华等9场活动，对接得物、拼多多等电商渠道为商户拓展线上渠道；传统物业2025年整体出租率保持良好态势。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "组织活动场次",
+                  "raw_value": "9",
+                  "value": "9",
+                  "unit": "场",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "利润增加的主要原因包括商业运营板块利润增加、参股公司投资收益增加等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期内公司根据最新行业政策及市场运营情况，主动调整黄金业务模式，业务规模缩减，黄金批发及零售销售量同比下降66.03%、生产量同比下降63.78%、库存量同比下降76.65%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "黄金批发及零售销售量同比增减",
+                  "raw_value": "-66.03",
+                  "value": "-66.03",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "黄金批发及零售生产量同比增减",
+                  "raw_value": "-63.78",
+                  "value": "-63.78",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "黄金批发及零售库存量同比增减",
+                  "raw_value": "-76.65",
+                  "value": "-76.65",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "报告期内合并范围发生变动，深圳市华日安信汽车检测有限公司于2025年12月18日注销。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司珠宝业务处于珠宝产业链的批发零售与交易服务环节，黄金及其制品主要采用委托加工模式，钻石彩宝等不涉及加工。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "黄金原材料向上海黄金交易所或具备资质的单位购买，或向银行租借；其它珠宝玉石向境内外珠宝玉石供应商采购产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体珠宝玉石供应商名称及采购金额。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-03",
+              "text": "珠宝业务通过批发、零售及线上平台店铺向客户销售，前五名客户合计销售金额占年度销售总额比例28.46%，客户集中度相对分散。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户合计销售金额占年度销售总额比例",
+                  "raw_value": "28.46",
+                  "value": "28.46",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称及所属行业。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "公司荣登“2025产业数字化百强榜”第80名；特力珠宝文化产业园入选《中国商品市场综合百强》第11名。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "珠宝业务销售模式表与收入构成表对珠宝业务合计金额口径略有差异，未作换算统一。",
+        "客户与供应商名称以匿名序号列示，未披露具体名称。",
+        "未选行业背景、核心竞争力、资产分析及未来发展展望章节，相关补充信息未纳入。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 11362,
+      "output_tokens": 6134,
+      "total_tokens": 17496
+    }
+  },
+  {
+    "request_id": "bp-work-d74259fd50c5d1cf0a50db26:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "38ece1135df8954f4abab47a6923c31fa0f491756d2c808f0acb5a877ded7e98",
+    "response_hash": "13e55c8a12431630158ef046e9db9550008f4df2be1ded890b42dafde0fc55e7",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FR-001\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F-OI-02\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"原文采购模式为向上海黄金交易所或具备资质的单位购买黄金原材料，或向银行租金。底稿将租金改为租借，与原文不符，也不能由其他金额推断。应保留原文措辞，或标明该处表述不清，不得写成确定的租借；购买渠道等已支持内容可保留。\"},{\"finding_id\":\"FR-002\",\"element\":\"upstream_inputs\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-02\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"上游采购事实同样把原文的或向银行租金改成或向银行租借。该替代采购方式没有原文支持。应恢复原文措辞或标注不确定，不得断言租借；上海黄金交易所及具备资质单位购买、境内外珠宝玉石采购等已支持内容可保留。\"},{\"finding_id\":\"FR-003\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-SC-03\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"前五名客户合计销售金额占年度销售总额28.46%与原文一致，分母也是年度销售总额而非珠宝业务收入。但客户集中度相对分散是底稿自行定性，原文未作此判断。应保留28.46%及已有销售渠道描述，删除该集中度结论。\"},{\"finding_id\":\"FR-004\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"explanation\":\"销售模式表合计营业收入113,188.88万元折合1,131,888,800元，与收入构成表珠宝销售及服务1,131,888,850.11元仅差50.11元，属于万元披露的取整或截断，不能证明两表收入口径不同。局限说明将这一差异归因于不同披露口径，属于不支持的归因。未强行换算可以保留，但应改述为精度差异；不要据此把两笔收入当成不同口径。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-RM-01\",\"F-RM-02\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-OI-05\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-MC-01\",\"F-MC-02\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\",\"F-CF-01\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FR-001",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F-OI-02",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "原文采购模式为向上海黄金交易所或具备资质的单位购买黄金原材料，或向银行租金。底稿将租金改为租借，与原文不符，也不能由其他金额推断。应保留原文措辞，或标明该处表述不清，不得写成确定的租借；购买渠道等已支持内容可保留。"
+        },
+        {
+          "finding_id": "FR-002",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F-SC-02",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "上游采购事实同样把原文的或向银行租金改成或向银行租借。该替代采购方式没有原文支持。应恢复原文措辞或标注不确定，不得断言租借；上海黄金交易所及具备资质单位购买、境内外珠宝玉石采购等已支持内容可保留。"
+        },
+        {
+          "finding_id": "FR-003",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-SC-03",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "前五名客户合计销售金额占年度销售总额28.46%与原文一致，分母也是年度销售总额而非珠宝业务收入。但客户集中度相对分散是底稿自行定性，原文未作此判断。应保留28.46%及已有销售渠道描述，删除该集中度结论。"
+        },
+        {
+          "finding_id": "FR-004",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0004"
+          ],
+          "explanation": "销售模式表合计营业收入113,188.88万元折合1,131,888,800元，与收入构成表珠宝销售及服务1,131,888,850.11元仅差50.11元，属于万元披露的取整或截断，不能证明两表收入口径不同。局限说明将这一差异归因于不同披露口径，属于不支持的归因。未强行换算可以保留，但应改述为精度差异；不要据此把两笔收入当成不同口径。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-RM-01",
+        "F-RM-02",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-OI-05",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-MC-01",
+        "F-MC-02",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03",
+        "F-CF-01"
+      ]
+    },
+    "usage": {
+      "input_tokens": 18629,
+      "output_tokens": 763,
+      "total_tokens": 48220
+    }
+  },
+  {
+    "request_id": "bp-work-d74259fd50c5d1cf0a50db26:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "32a5d3ba7087b9e1f24c2010a22a864502abf8b4e8d09f2b028b84f3320bb7c0",
+    "response_hash": "95a6f428ecd3c1d2c14b37cfd3cfe66ebafe85774415dc1f67422e79d2e5ed3a",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-OI-02\",\"text\":\"采购方面，黄金及其制品向上海黄金交易所或具备资质的单位购买黄金原材料，或向银行租金；其它珠宝玉石向境内外珠宝玉石供应商采购产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[],\"uncertainty_reason\":\"原文表述为“或向银行租金”，措辞含义不清，按原文保留，未作推断。\"},{\"fact_id\":\"F-SC-02\",\"text\":\"黄金原材料向上海黄金交易所或具备资质的单位购买，或向银行租金；其它珠宝玉石向境内外珠宝玉石供应商采购产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[],\"uncertainty_reason\":\"原文表述为“或向银行租金”，措辞含义不清，按原文保留，未作推断。\"},{\"fact_id\":\"F-SC-03\",\"text\":\"珠宝业务通过批发、零售及线上平台店铺向客户销售，前五名客户合计销售金额占年度销售总额比例28.46%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"28.46\",\"value\":\"28.46\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-OI-02",
+          "text": "采购方面，黄金及其制品向上海黄金交易所或具备资质的单位购买黄金原材料，或向银行租金；其它珠宝玉石向境内外珠宝玉石供应商采购产品。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "原文表述为“或向银行租金”，措辞含义不清，按原文保留，未作推断。"
+        },
+        {
+          "fact_id": "F-SC-02",
+          "text": "黄金原材料向上海黄金交易所或具备资质的单位购买，或向银行租金；其它珠宝玉石向境内外珠宝玉石供应商采购产品。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "原文表述为“或向银行租金”，措辞含义不清，按原文保留，未作推断。"
+        },
+        {
+          "fact_id": "F-SC-03",
+          "text": "珠宝业务通过批发、零售及线上平台店铺向客户销售，前五名客户合计销售金额占年度销售总额比例28.46%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "前五名客户合计销售金额占年度销售总额比例",
+              "raw_value": "28.46",
+              "value": "28.46",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 8578,
+      "output_tokens": 370,
+      "total_tokens": 8948
+    }
+  },
+  {
+    "request_id": "bp-work-d74259fd50c5d1cf0a50db26:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "8de912368a61d02592977afb93f5909ce1288aed68151057f921b01e68e68641",
+    "response_hash": "103fe3812bc12b0bc544ec19c66245a4e1907eb40ab1302ddd88d0912ac5c97b",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-OI-02\",\"F-SC-02\",\"F-SC-03\"],\"checks\":[{\"fact_id\":\"F-OI-02\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"已恢复原文“或向银行租金”，并明确标注措辞含义不清、未推断为租借；向上海黄金交易所或具备资质单位购买黄金原材料、向境内外供应商采购其它珠宝玉石均有原文支持。主体按报告正文中的公司取合并口径，期间为2025年度，实质性纠正了原问题。\"},{\"fact_id\":\"F-SC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"上游采购已恢复原文“或向银行租金”并标注不确定，未断言租借；上海黄金交易所、具备资质单位购买及境内外珠宝玉石采购均有source-0001支持。主体、期间与报告期采购模式说明相符，已解决原改写问题。\"},{\"fact_id\":\"F-SC-03\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0002\",\"source-0007\"],\"explanation\":\"28.46%的分母为年度销售总额，与source-0007一致，且已删除原文未支持的客户集中度定性。批发、零售及线上平台店铺分别有经营模式和线上销售资料支持；指标单位、期间及合并口径正确，核心问题已解决。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-OI-02",
+        "F-SC-02",
+        "F-SC-03"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-OI-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "已恢复原文“或向银行租金”，并明确标注措辞含义不清、未推断为租借；向上海黄金交易所或具备资质单位购买黄金原材料、向境内外供应商采购其它珠宝玉石均有原文支持。主体按报告正文中的公司取合并口径，期间为2025年度，实质性纠正了原问题。"
+        },
+        {
+          "fact_id": "F-SC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "上游采购已恢复原文“或向银行租金”并标注不确定，未断言租借；上海黄金交易所、具备资质单位购买及境内外珠宝玉石采购均有source-0001支持。主体、期间与报告期采购模式说明相符，已解决原改写问题。"
+        },
+        {
+          "fact_id": "F-SC-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0007"
+          ],
+          "explanation": "28.46%的分母为年度销售总额，与source-0007一致，且已删除原文未支持的客户集中度定性。批发、零售及线上平台店铺分别有经营模式和线上销售资料支持；指标单位、期间及合并口径正确，核心问题已解决。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10414,
+      "output_tokens": 328,
+      "total_tokens": 16593
+    }
+  }
+]

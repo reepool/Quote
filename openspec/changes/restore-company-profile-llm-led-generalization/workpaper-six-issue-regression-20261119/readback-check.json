@@ -1,0 +1,24 @@
+{
+  "query_export_new_reader_equal": true,
+  "api_detail_fresh_reader_equal": true,
+  "profile_count": 5,
+  "missing_instrument_ids": [
+    "601318.SH"
+  ],
+  "raw_runtime_and_query_sha256_unchanged": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/600113/query.json": "25adf8a878b838558781a6e4914de275dc9a52b17215a87e6eb23b9433071c8d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/600113/runtime.json": "12fa2fdd7a4de1dad59c6d299cc13a53e43b2962cea3be6ef4ddc5d4fd0074f1",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000166/query.json": "c0e40de647d559884c02d3748dd75f47181deca329dd6f1b2edecbdf82158754",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000166/runtime.json": "a9dc6055f16b98471a892c37c79e83327128b93caee8e85951919d312fe094d8",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000025/query.json": "0690f113ad99c828f3a0e780a9d4e6d9757052ae9af7546a49758d7ecfb3c9ed",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000025/runtime.json": "c9ef3a7670d153c7c5a0957c4468d8e8e65d1646a6a1de895c3f326b8e5dd85f",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000001/query.json": "3c39db308794a59e85dafed5d42cadada689a6fd57d67314dbfef4d49809935c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000001/runtime.json": "0ca6cdeb7291cd191f1f222bfb39bb147842e90b51b368b2f374020376ac5c1e",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/600030/query.json": "fdc4731cffa632624e01b733f9c8736c787ab18ef1a1b79a2b6ee95bc7d9a5db",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/600030/runtime.json": "0e257f4bdd097b648ebbc27ad017da91abc14a701cb371246b755c66adb2186d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/601318/query.json": "a5fba979aef4d2480b90315cbc6e2dead6a2b75aec1cbd6500504be98a609400"
+  },
+  "review_reference_sha256": "bde8471431bb427adf94a30f1227e62d1338af2ff08d21af1076757f996d8991",
+  "adopted_revision_objects_independently_checked": true,
+  "new_model_requests_in_finalization": 0
+}

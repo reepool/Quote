@@ -1,0 +1,1874 @@
+[
+  {
+    "request_id": "bp-work-9cecb44388bc2a1429c2979b:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "f9d0d68b6d5dd1d4e604a1870441d074adabf31dc6d79a795aad776fbcf5eb49",
+    "response_hash": "03815b9e0802f014fda7fd1199a5c044872820d3ff980bc78c92a1ecc2b3b210",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0012\",\"section-0015\",\"section-0018\",\"section-0019\",\"section-0030\",\"section-0006\",\"section-0028\",\"section-0005\"],\"rationale\":\"本报告为中信证券2025年年报。选择经营情况讨论与分析（section-0012）作为核心经营综述，覆盖业务结构、经营回顾与主要变化；主营业务分析（section-0015）提供公司层面收入与成本总额；主营业务分行业（section-0018）与分地区（section-0019）提供收入构成与区域分布，用于解释主要业务权重与市场结构；其他业务（section-0030）与投资管理业务（section-0006）补充各业务板块经营情况；主要控股公司分析（section-0028）说明子公司经营角色；业务的变化情况（section-0005）说明本期业务结构变化。上述均为公司层面实质经营内容，避免纯行业背景、治理与薪酬章节。\",\"deferred\":[\"section-0011 报告期内公司所处行业情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0013 报告期内核心竞争力分析：篇幅短且偏泛化，暂不选\",\"section-0032 关于公司未来发展的讨论与分析：含计划性展望，非本期经营事实，暂不选\",\"section-0148 公司债券基本情况等债券章节：属融资披露，与业务经营解释关联弱，暂不选\",\"section-0266 财务报表附注：仅在分部/收入附注出现实质缺口时定向补充，暂不整体展开\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成、区域分布、子公司角色与本期业务变化等核心经营信息，可支撑公司经营解释；行业背景、治理薪酬、债券与完整财报附注属次要或重复范围，无需继续扩展。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0012",
+        "section-0015",
+        "section-0018",
+        "section-0019",
+        "section-0030",
+        "section-0006",
+        "section-0028",
+        "section-0005"
+      ],
+      "rationale": "本报告为中信证券2025年年报。选择经营情况讨论与分析（section-0012）作为核心经营综述，覆盖业务结构、经营回顾与主要变化；主营业务分析（section-0015）提供公司层面收入与成本总额；主营业务分行业（section-0018）与分地区（section-0019）提供收入构成与区域分布，用于解释主要业务权重与市场结构；其他业务（section-0030）与投资管理业务（section-0006）补充各业务板块经营情况；主要控股公司分析（section-0028）说明子公司经营角色；业务的变化情况（section-0005）说明本期业务结构变化。上述均为公司层面实质经营内容，避免纯行业背景、治理与薪酬章节。",
+      "deferred": [
+        "section-0011 报告期内公司所处行业情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0013 报告期内核心竞争力分析：篇幅短且偏泛化，暂不选",
+        "section-0032 关于公司未来发展的讨论与分析：含计划性展望，非本期经营事实，暂不选",
+        "section-0148 公司债券基本情况等债券章节：属融资披露，与业务经营解释关联弱，暂不选",
+        "section-0266 财务报表附注：仅在分部/收入附注出现实质缺口时定向补充，暂不整体展开"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成、区域分布、子公司角色与本期业务变化等核心经营信息，可支撑公司经营解释；行业背景、治理薪酬、债券与完整财报附注属次要或重复范围，无需继续扩展。"
+    },
+    "usage": {
+      "input_tokens": 8725,
+      "output_tokens": 401,
+      "total_tokens": 9126
+    }
+  },
+  {
+    "request_id": "bp-work-9cecb44388bc2a1429c2979b:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "8e61d8ddc5d3062b9d5180cea4042017dd741aa56940a45f6434d8a9dcb0ce09",
+    "response_hash": "5f66d95b961084bc22a644c25d8e95582b09f64577bb123bac451fb26e7eb6df",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司为综合类证券公司，业务按经纪业务、资产管理业务、证券投资业务、证券承销业务及其他业务分行业列示收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]},{\"fact_id\":\"F02\",\"text\":\"公司主要控股公司8家，包括中信证券山东、中信证券国际、中信金石、中信证券投资、中信期货、中信证券华南等，分别承担证券经纪、境外投行与经纪、私募股权投资、自有资金投资、期货经纪等职能。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\",\"source-0018\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"投资银行业务提供股权及债务融资、并购重组等综合投行服务；2025年完成A股主承销项目72单，承销规模2706.46亿元，市场份额24.36%，排名市场第一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"A股主承销项目数量\",\"raw_value\":\"72\",\"value\":\"72\",\"unit\":\"单\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"A股承销规模（现金类及资产类）\",\"raw_value\":\"2,706.46\",\"value\":\"2706.46\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"A股承销市场份额\",\"raw_value\":\"24.36\",\"value\":\"24.36\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F04\",\"text\":\"债务融资方面，公司完成发行境内债券6221只，承销规模22094.62亿元，占全市场承销总规模6.95%、证券公司承销总规模14.11%，同业中首家连续两年债券承销规模突破2万亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"境内债券发行只数\",\"raw_value\":\"6,221\",\"value\":\"6221\",\"unit\":\"只\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"境内债券承销规模\",\"raw_value\":\"22,094.62\",\"value\":\"22094.62\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"占全市场承销总规模比例\",\"raw_value\":\"6.95\",\"value\":\"6.95\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"占证券公司承销总规模比例\",\"raw_value\":\"14.11\",\"value\":\"14.11\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F05\",\"text\":\"财富管理业务构建多市场、多资产、多策略、多场景的金融产品体系，金融产品保有规模超8000亿元，发布“信100”财富管理品牌，覆盖个人和家庭全生命周期财富管理需求。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"金融产品保有规模\",\"raw_value\":\"超8,000\",\"value\":\"8000\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F06\",\"text\":\"机构股票经纪业务通过“客户经理+产品经理”双驱动机制服务专业投资机构，公募基金A+H股交易量市场份额7.65%，WIND公募基金佣金分仓排名保持市场第一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"公募基金A+H股交易量市场份额\",\"raw_value\":\"7.65\",\"value\":\"7.65\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F07\",\"text\":\"金融市场业务包括股权衍生品业务与固定收益业务：股权衍生品为客户提供全球多市场投资交易与风险管理服务；固定收益业务发展自营投资和对客业务，覆盖债券、外汇、大宗商品及FICC衍生品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F08\",\"text\":\"证券金融业务提供融资融券、股票质押等综合融资服务，并落地日元融资、并购贷款、比特币ETF融资、澳大利亚及美国等跨境融资创新业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F09\",\"text\":\"资产管理业务通过本公司资产管理业务及中信证券资管开展，包括集合、单一、专项资产管理计划；截至报告期末资产管理规模合计17615.41亿元，私募资产管理业务市场份额14.02%，排名行业第一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"资产管理规模合计\",\"raw_value\":\"17,615.41\",\"value\":\"17615.41\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"私募资产管理业务市场份额\",\"raw_value\":\"14.02\",\"value\":\"14.02\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F10\",\"text\":\"华夏基金作为公司公募基金管理平台，截至报告期末本部管理资产规模30144.84亿元，其中公募基金管理规模22832.20亿元，机构及国际业务资产管理规模7312.64亿元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"华夏基金本部管理资产规模\",\"raw_value\":\"30,144.84\",\"value\":\"30144.84\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"华夏基金公募基金管理规模\",\"raw_value\":\"22,832.20\",\"value\":\"22832.20\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"华夏基金机构及国际业务资产管理规模\",\"raw_value\":\"7,312.64\",\"value\":\"7312.64\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F11\",\"text\":\"托管业务提供资产托管及基金外包服务；截至报告期末提供资产托管服务的各类资产管理产品13848只，提供基金外包服务的各类资产管理产品16082只。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"资产托管服务产品数量\",\"raw_value\":\"13,848\",\"value\":\"13848\",\"unit\":\"只\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"基金外包服务产品数量\",\"raw_value\":\"16,082\",\"value\":\"16082\",\"unit\":\"只\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F12\",\"text\":\"股权投资业务通过中信证券投资开展自有资金股权投资，通过中信金石募集并管理私募股权投资基金，通过中信金石基金开展不动产投资，通过中信证券国际资本开展美元一级私募投资。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0012\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"2025年集团实现营业收入748.54亿元，同比增长28.79%；营业支出346.89亿元，同比增长17.14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"748.54\",\"value\":\"748.54\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"28.79\",\"value\":\"28.79\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"营业支出\",\"raw_value\":\"346.89\",\"value\":\"346.89\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F14\",\"text\":\"按业务分部，经纪业务收入207.87亿元，同比增长25.55%；资产管理业务收入142.94亿元，同比增长24.59%；证券投资业务收入276.05亿元，同比增长14.83%；证券承销业务收入60.55亿元，同比增长50.12%；其他业务收入61.13亿元，同比增长203.38%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"经纪业务营业收入\",\"raw_value\":\"20,787,402,940.51\",\"value\":\"207.87\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"资产管理业务营业收入\",\"raw_value\":\"14,294,329,181.83\",\"value\":\"142.94\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"证券投资业务营业收入\",\"raw_value\":\"27,605,377,070.99\",\"value\":\"276.05\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"证券承销业务营业收入\",\"raw_value\":\"6,055,217,321.40\",\"value\":\"60.55\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"其他业务营业收入\",\"raw_value\":\"6,112,041,838.12\",\"value\":\"61.13\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F15\",\"text\":\"分行业毛利率：经纪业务37.53%，资产管理业务42.73%，证券投资业务67.71%，证券承销业务36.57%，其他业务87.51%，合计53.66%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"经纪业务毛利率\",\"raw_value\":\"37.53\",\"value\":\"37.53\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"资产管理业务毛利率\",\"raw_value\":\"42.73\",\"value\":\"42.73\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"证券投资业务毛利率\",\"raw_value\":\"67.71\",\"value\":\"67.71\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"证券承销业务毛利率\",\"raw_value\":\"36.57\",\"value\":\"36.57\",\"unit\":\"%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F16\",\"text\":\"2025年集团实现归属于母公司股东的净利润300.76亿元，同比增长38.58%；基本每股收益1.96元，同比增长39.01%；加权平均净资产收益率10.59%，同比增加2.50个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"300.76\",\"value\":\"300.76\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"基本每股收益\",\"raw_value\":\"1.96\",\"value\":\"1.96\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"加权平均净资产收益率\",\"raw_value\":\"10.59\",\"value\":\"10.59\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"加权平均净资产收益率同比变动\",\"raw_value\":\"2.50\",\"value\":\"2.50\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F17\",\"text\":\"分行业收入构成中，证券投资业务276.05亿元为最大分部，经纪业务207.87亿元次之，资产管理业务142.94亿元，其他业务61.13亿元，证券承销业务60.55亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]},{\"fact_id\":\"F18\",\"text\":\"分地区收入：公司本部503.39亿元，境内小计593.36亿元，境外小计155.19亿元；境外收入同比增长41.75%，毛利率62.96%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"公司本部营业收入\",\"raw_value\":\"50,338,500,835.03\",\"value\":\"503.39\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\"},{\"name\":\"境内小计营业收入\",\"raw_value\":\"59,335,830,560.67\",\"value\":\"593.36\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"境外小计营业收入\",\"raw_value\":\"15,518,537,792.18\",\"value\":\"155.19\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"境外小计营业收入同比增长率\",\"raw_value\":\"41.75\",\"value\":\"41.75\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F19\",\"text\":\"公司在中国大陆境内共设立39家证券分公司，覆盖北京、上海、浙江、广东等主要区域，形成境内经营网络。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\",\"source-0021\"],\"metrics\":[{\"name\":\"境内证券分公司数量\",\"raw_value\":\"39\",\"value\":\"39\",\"unit\":\"家\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F20\",\"text\":\"公司通过数字化转型自主研发“人工智能+”平台，建成全球数据管理中心，实现境内外一体化数据治理，获得国家数据管理能力成熟度最高等级认证。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F21\",\"text\":\"中信证券国际下设子公司从事企业融资及资本市场、证券经纪、期货经纪、资产管理、自营业务、直接投资等业务，财务数据系香港财务报告准则口径。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\",\"source-0019\"]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F22\",\"text\":\"财富管理客户数量累计超1700万户，较上年末增长10%；托管客户资产规模超15万亿元，较上年末增长24%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"财富管理客户数量\",\"raw_value\":\"超1,700\",\"value\":\"1700\",\"unit\":\"万户\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"客户数量较上年末增长率\",\"raw_value\":\"10\",\"value\":\"10\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"托管客户资产规模\",\"raw_value\":\"超15\",\"value\":\"15\",\"unit\":\"万亿元\",\"currency\":\"人民币\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"托管客户资产规模较上年末增长率\",\"raw_value\":\"24\",\"value\":\"24\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F23\",\"text\":\"机构股票经纪业务客户覆盖公募、海外机构、金融同业等重点客群，合格境外投资者交易量同比增长162.7%，其中股票交易量同比增长127%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"合格境外投资者交易量同比增长率\",\"raw_value\":\"162.7\",\"value\":\"162.7\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"合格境外投资者股票交易量同比增长率\",\"raw_value\":\"127\",\"value\":\"127\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F24\",\"text\":\"境外财富管理以亚太地区为重心，聚焦全球主要经济体核心金融市场，为全球高净值客户及机构投资者提供资产配置解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F25\",\"text\":\"投资银行业务境外完成91单境外股权项目，承销规模79.11亿美元；完成311单中资离岸债项目，承销规模53.46亿美元，市场份额4.30%，排名市场第一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"境外股权项目数量\",\"raw_value\":\"91\",\"value\":\"91\",\"unit\":\"单\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"境外股权项目承销规模\",\"raw_value\":\"79.11\",\"value\":\"79.11\",\"unit\":\"亿美元\",\"currency\":\"美元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"中资离岸债项目数量\",\"raw_value\":\"311\",\"value\":\"311\",\"unit\":\"单\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"中资离岸债承销规模\",\"raw_value\":\"53.46\",\"value\":\"53.46\",\"unit\":\"亿美元\",\"currency\":\"美元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"中资离岸债市场份额\",\"raw_value\":\"4.30\",\"value\":\"4.30\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"手续费及佣金净收入348.48亿元，同比增长33.61%，主要因经纪业务、投资银行业务及基金管理业务手续费及佣金净收入增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"手续费及佣金净收入\",\"raw_value\":\"34,847,738,217.01\",\"value\":\"348.48\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"手续费及佣金净收入同比增长率\",\"raw_value\":\"33.61\",\"value\":\"33.61\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F27\",\"text\":\"利息净收入16.30亿元，同比增长50.44%，主要因融资融券利息收入增加及拆入资金利息支出减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"利息净收入\",\"raw_value\":\"1,630,420,350.77\",\"value\":\"16.30\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"利息净收入同比增长率\",\"raw_value\":\"50.44\",\"value\":\"50.44\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F28\",\"text\":\"2025年A股股权融资发行规模11110.36亿元，同比增长245.42%；债券（全口径）融资发行规模89.08万亿元，同比增长11.54%；中国市场并购交易规模25894.34亿元，同比增长16.12%，市场环境活跃推动投行业务增长。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"A股股权融资发行规模\",\"raw_value\":\"11,110.36\",\"value\":\"11110.36\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\"},{\"name\":\"A股股权融资发行规模同比增长率\",\"raw_value\":\"245.42\",\"value\":\"245.42\",\"unit\":\"%\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\"},{\"name\":\"中国市场并购交易规模\",\"raw_value\":\"25,894.34\",\"value\":\"25894.34\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"2025年公司营业收入和净利润取得较快增长，国际化战略稳步推进，多项业务继续保持行业领先地位。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F30\",\"text\":\"公司资产管理规模约4.8万亿元（含本公司资产管理业务、中信证券资管及华夏基金本部），托管客户资产规模超15万亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"资产管理规模（含华夏基金本部）\",\"raw_value\":\"约4.8\",\"value\":\"4.8\",\"unit\":\"万亿元\",\"currency\":\"人民币\",\"qualifier\":\"approximate\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F31\",\"text\":\"2025年公司获中国证监会批复同意于上交所发行科技创新公司债券，并获中国人民银行许可同意于全国银行间债券市场发行科技创新债券。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F32\",\"text\":\"公司为综合类证券公司，以证券经纪、投资银行、资产管理、证券投资、证券金融等金融服务为主业，属于金融服务提供方而非生产制造企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"limitations\":[\"选定章节未披露公司作为金融机构的具体上游资源采购（如IT系统、数据服务等）的供应商或采购金额。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F33\",\"text\":\"公司下游客户覆盖个人财富管理客户（累计超1700万户）、公募基金、海外机构、金融同业等专业投资机构，以及有股权及债务融资、并购重组需求的企业客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\",\"source-0006\"]}]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F34\",\"text\":\"公司积极做好金融“五篇大文章”：科技金融方面科创板、创业板及北交所合计股权承销规模排名市场第一，科技创新债券承销规模排名同业第一；绿色债券承销规模排名同业第一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F35\",\"text\":\"养老金融方面，养老“三大支柱”投资管理规模突破万亿元（含本公司资产管理业务、华夏基金本部），服务大中型企业年金客户超过200家。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"养老“三大支柱”投资管理规模\",\"raw_value\":\"突破万亿元\",\"value\":null,\"unit\":\"万亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"uncertainty_reason\":\"原文表述为“突破万亿元”，未给出精确数值\"},{\"name\":\"服务大中型企业年金客户数量\",\"raw_value\":\"超过200\",\"value\":\"200\",\"unit\":\"家\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F36\",\"text\":\"公司上市以来已连续24年开展现金分红，累计分红超930亿元；2025年度继续开展中期分红，并向H股股东提供股息货币选择权。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"连续现金分红年数\",\"raw_value\":\"24\",\"value\":\"24\",\"unit\":\"年\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"累计分红金额\",\"raw_value\":\"超930\",\"value\":\"930\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"qualifier\":\"greater_than\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}]},\"limitations\":[\"选定章节未披露各业务分部净利润、分产品细分收入及成本明细，相关补充分析受限。\",\"分地区表中“公司本部”与“境内小计”口径不同，公司本部为母公司口径，境内小计含境内证券、期货子公司营业分支机构。\",\"资产管理规模约4.8万亿元与资产管理业务规模17615.41亿元口径不同，前者含华夏基金本部，后者仅含本公司及中信证券资管。\",\"上游资源采购（如IT系统、数据服务等）的供应商及采购金额未在选定章节披露。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F01",
+              "text": "公司为综合类证券公司，业务按经纪业务、资产管理业务、证券投资业务、证券承销业务及其他业务分行业列示收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            },
+            {
+              "fact_id": "F02",
+              "text": "公司主要控股公司8家，包括中信证券山东、中信证券国际、中信金石、中信证券投资、中信期货、中信证券华南等，分别承担证券经纪、境外投行与经纪、私募股权投资、自有资金投资、期货经纪等职能。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017",
+                "source-0018"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F03",
+              "text": "投资银行业务提供股权及债务融资、并购重组等综合投行服务；2025年完成A股主承销项目72单，承销规模2706.46亿元，市场份额24.36%，排名市场第一。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "A股主承销项目数量",
+                  "raw_value": "72",
+                  "value": "72",
+                  "unit": "单",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "A股承销规模（现金类及资产类）",
+                  "raw_value": "2,706.46",
+                  "value": "2706.46",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "A股承销市场份额",
+                  "raw_value": "24.36",
+                  "value": "24.36",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F04",
+              "text": "债务融资方面，公司完成发行境内债券6221只，承销规模22094.62亿元，占全市场承销总规模6.95%、证券公司承销总规模14.11%，同业中首家连续两年债券承销规模突破2万亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "境内债券发行只数",
+                  "raw_value": "6,221",
+                  "value": "6221",
+                  "unit": "只",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境内债券承销规模",
+                  "raw_value": "22,094.62",
+                  "value": "22094.62",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "占全市场承销总规模比例",
+                  "raw_value": "6.95",
+                  "value": "6.95",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "占证券公司承销总规模比例",
+                  "raw_value": "14.11",
+                  "value": "14.11",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F05",
+              "text": "财富管理业务构建多市场、多资产、多策略、多场景的金融产品体系，金融产品保有规模超8000亿元，发布“信100”财富管理品牌，覆盖个人和家庭全生命周期财富管理需求。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "金融产品保有规模",
+                  "raw_value": "超8,000",
+                  "value": "8000",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "qualifier": "greater_than",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F06",
+              "text": "机构股票经纪业务通过“客户经理+产品经理”双驱动机制服务专业投资机构，公募基金A+H股交易量市场份额7.65%，WIND公募基金佣金分仓排名保持市场第一。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "公募基金A+H股交易量市场份额",
+                  "raw_value": "7.65",
+                  "value": "7.65",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F07",
+              "text": "金融市场业务包括股权衍生品业务与固定收益业务：股权衍生品为客户提供全球多市场投资交易与风险管理服务；固定收益业务发展自营投资和对客业务，覆盖债券、外汇、大宗商品及FICC衍生品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F08",
+              "text": "证券金融业务提供融资融券、股票质押等综合融资服务，并落地日元融资、并购贷款、比特币ETF融资、澳大利亚及美国等跨境融资创新业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F09",
+              "text": "资产管理业务通过本公司资产管理业务及中信证券资管开展，包括集合、单一、专项资产管理计划；截至报告期末资产管理规模合计17615.41亿元，私募资产管理业务市场份额14.02%，排名行业第一。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "资产管理规模合计",
+                  "raw_value": "17,615.41",
+                  "value": "17615.41",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "私募资产管理业务市场份额",
+                  "raw_value": "14.02",
+                  "value": "14.02",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F10",
+              "text": "华夏基金作为公司公募基金管理平台，截至报告期末本部管理资产规模30144.84亿元，其中公募基金管理规模22832.20亿元，机构及国际业务资产管理规模7312.64亿元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "华夏基金本部管理资产规模",
+                  "raw_value": "30,144.84",
+                  "value": "30144.84",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "华夏基金公募基金管理规模",
+                  "raw_value": "22,832.20",
+                  "value": "22832.20",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "华夏基金机构及国际业务资产管理规模",
+                  "raw_value": "7,312.64",
+                  "value": "7312.64",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F11",
+              "text": "托管业务提供资产托管及基金外包服务；截至报告期末提供资产托管服务的各类资产管理产品13848只，提供基金外包服务的各类资产管理产品16082只。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "资产托管服务产品数量",
+                  "raw_value": "13,848",
+                  "value": "13848",
+                  "unit": "只",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "基金外包服务产品数量",
+                  "raw_value": "16,082",
+                  "value": "16082",
+                  "unit": "只",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F12",
+              "text": "股权投资业务通过中信证券投资开展自有资金股权投资，通过中信金石募集并管理私募股权投资基金，通过中信金石基金开展不动产投资，通过中信证券国际资本开展美元一级私募投资。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0012"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F13",
+              "text": "2025年集团实现营业收入748.54亿元，同比增长28.79%；营业支出346.89亿元，同比增长17.14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "748.54",
+                  "value": "748.54",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "营业收入同比增长率",
+                  "raw_value": "28.79",
+                  "value": "28.79",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "营业支出",
+                  "raw_value": "346.89",
+                  "value": "346.89",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F14",
+              "text": "按业务分部，经纪业务收入207.87亿元，同比增长25.55%；资产管理业务收入142.94亿元，同比增长24.59%；证券投资业务收入276.05亿元，同比增长14.83%；证券承销业务收入60.55亿元，同比增长50.12%；其他业务收入61.13亿元，同比增长203.38%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "经纪业务营业收入",
+                  "raw_value": "20,787,402,940.51",
+                  "value": "207.87",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "资产管理业务营业收入",
+                  "raw_value": "14,294,329,181.83",
+                  "value": "142.94",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "证券投资业务营业收入",
+                  "raw_value": "27,605,377,070.99",
+                  "value": "276.05",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "证券承销业务营业收入",
+                  "raw_value": "6,055,217,321.40",
+                  "value": "60.55",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "其他业务营业收入",
+                  "raw_value": "6,112,041,838.12",
+                  "value": "61.13",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F15",
+              "text": "分行业毛利率：经纪业务37.53%，资产管理业务42.73%，证券投资业务67.71%，证券承销业务36.57%，其他业务87.51%，合计53.66%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "经纪业务毛利率",
+                  "raw_value": "37.53",
+                  "value": "37.53",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "资产管理业务毛利率",
+                  "raw_value": "42.73",
+                  "value": "42.73",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "证券投资业务毛利率",
+                  "raw_value": "67.71",
+                  "value": "67.71",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "证券承销业务毛利率",
+                  "raw_value": "36.57",
+                  "value": "36.57",
+                  "unit": "%",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F16",
+              "text": "2025年集团实现归属于母公司股东的净利润300.76亿元，同比增长38.58%；基本每股收益1.96元，同比增长39.01%；加权平均净资产收益率10.59%，同比增加2.50个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于母公司股东的净利润",
+                  "raw_value": "300.76",
+                  "value": "300.76",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "基本每股收益",
+                  "raw_value": "1.96",
+                  "value": "1.96",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "加权平均净资产收益率",
+                  "raw_value": "10.59",
+                  "value": "10.59",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "加权平均净资产收益率同比变动",
+                  "raw_value": "2.50",
+                  "value": "2.50",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F17",
+              "text": "分行业收入构成中，证券投资业务276.05亿元为最大分部，经纪业务207.87亿元次之，资产管理业务142.94亿元，其他业务61.13亿元，证券承销业务60.55亿元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            },
+            {
+              "fact_id": "F18",
+              "text": "分地区收入：公司本部503.39亿元，境内小计593.36亿元，境外小计155.19亿元；境外收入同比增长41.75%，毛利率62.96%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "公司本部营业收入",
+                  "raw_value": "50,338,500,835.03",
+                  "value": "503.39",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "issuer",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境内小计营业收入",
+                  "raw_value": "59,335,830,560.67",
+                  "value": "593.36",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境外小计营业收入",
+                  "raw_value": "15,518,537,792.18",
+                  "value": "155.19",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境外小计营业收入同比增长率",
+                  "raw_value": "41.75",
+                  "value": "41.75",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F19",
+              "text": "公司在中国大陆境内共设立39家证券分公司，覆盖北京、上海、浙江、广东等主要区域，形成境内经营网络。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020",
+                "source-0021"
+              ],
+              "metrics": [
+                {
+                  "name": "境内证券分公司数量",
+                  "raw_value": "39",
+                  "value": "39",
+                  "unit": "家",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F20",
+              "text": "公司通过数字化转型自主研发“人工智能+”平台，建成全球数据管理中心，实现境内外一体化数据治理，获得国家数据管理能力成熟度最高等级认证。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F21",
+              "text": "中信证券国际下设子公司从事企业融资及资本市场、证券经纪、期货经纪、资产管理、自营业务、直接投资等业务，财务数据系香港财务报告准则口径。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018",
+                "source-0019"
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F22",
+              "text": "财富管理客户数量累计超1700万户，较上年末增长10%；托管客户资产规模超15万亿元，较上年末增长24%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "财富管理客户数量",
+                  "raw_value": "超1,700",
+                  "value": "1700",
+                  "unit": "万户",
+                  "qualifier": "greater_than",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "客户数量较上年末增长率",
+                  "raw_value": "10",
+                  "value": "10",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "托管客户资产规模",
+                  "raw_value": "超15",
+                  "value": "15",
+                  "unit": "万亿元",
+                  "currency": "人民币",
+                  "qualifier": "greater_than",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "托管客户资产规模较上年末增长率",
+                  "raw_value": "24",
+                  "value": "24",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F23",
+              "text": "机构股票经纪业务客户覆盖公募、海外机构、金融同业等重点客群，合格境外投资者交易量同比增长162.7%，其中股票交易量同比增长127%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "合格境外投资者交易量同比增长率",
+                  "raw_value": "162.7",
+                  "value": "162.7",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "合格境外投资者股票交易量同比增长率",
+                  "raw_value": "127",
+                  "value": "127",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F24",
+              "text": "境外财富管理以亚太地区为重心，聚焦全球主要经济体核心金融市场，为全球高净值客户及机构投资者提供资产配置解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F25",
+              "text": "投资银行业务境外完成91单境外股权项目，承销规模79.11亿美元；完成311单中资离岸债项目，承销规模53.46亿美元，市场份额4.30%，排名市场第一。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "境外股权项目数量",
+                  "raw_value": "91",
+                  "value": "91",
+                  "unit": "单",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "境外股权项目承销规模",
+                  "raw_value": "79.11",
+                  "value": "79.11",
+                  "unit": "亿美元",
+                  "currency": "美元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "中资离岸债项目数量",
+                  "raw_value": "311",
+                  "value": "311",
+                  "unit": "单",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "中资离岸债承销规模",
+                  "raw_value": "53.46",
+                  "value": "53.46",
+                  "unit": "亿美元",
+                  "currency": "美元",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "中资离岸债市场份额",
+                  "raw_value": "4.30",
+                  "value": "4.30",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F26",
+              "text": "手续费及佣金净收入348.48亿元，同比增长33.61%，主要因经纪业务、投资银行业务及基金管理业务手续费及佣金净收入增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "手续费及佣金净收入",
+                  "raw_value": "34,847,738,217.01",
+                  "value": "348.48",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "手续费及佣金净收入同比增长率",
+                  "raw_value": "33.61",
+                  "value": "33.61",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F27",
+              "text": "利息净收入16.30亿元，同比增长50.44%，主要因融资融券利息收入增加及拆入资金利息支出减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "利息净收入",
+                  "raw_value": "1,630,420,350.77",
+                  "value": "16.30",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "利息净收入同比增长率",
+                  "raw_value": "50.44",
+                  "value": "50.44",
+                  "unit": "%",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F28",
+              "text": "2025年A股股权融资发行规模11110.36亿元，同比增长245.42%；债券（全口径）融资发行规模89.08万亿元，同比增长11.54%；中国市场并购交易规模25894.34亿元，同比增长16.12%，市场环境活跃推动投行业务增长。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "A股股权融资发行规模",
+                  "raw_value": "11,110.36",
+                  "value": "11110.36",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "unclear",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "A股股权融资发行规模同比增长率",
+                  "raw_value": "245.42",
+                  "value": "245.42",
+                  "unit": "%",
+                  "subject_scope": "unclear",
+                  "period": "2025年度"
+                },
+                {
+                  "name": "中国市场并购交易规模",
+                  "raw_value": "25,894.34",
+                  "value": "25894.34",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "unclear",
+                  "period": "2025年度"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F29",
+              "text": "2025年公司营业收入和净利润取得较快增长，国际化战略稳步推进，多项业务继续保持行业领先地位。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F30",
+              "text": "公司资产管理规模约4.8万亿元（含本公司资产管理业务、中信证券资管及华夏基金本部），托管客户资产规模超15万亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "资产管理规模（含华夏基金本部）",
+                  "raw_value": "约4.8",
+                  "value": "4.8",
+                  "unit": "万亿元",
+                  "currency": "人民币",
+                  "qualifier": "approximate",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度"
+                }
+              ]
+            },
+            {
+              "fact_id": "F31",
+              "text": "2025年公司获中国证监会批复同意于上交所发行科技创新公司债券，并获中国人民银行许可同意于全国银行间债券市场发行科技创新债券。",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F32",
+              "text": "公司为综合类证券公司，以证券经纪、投资银行、资产管理、证券投资、证券金融等金融服务为主业，属于金融服务提供方而非生产制造企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015",
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "not_disclosed",
+          "limitations": [
+            "选定章节未披露公司作为金融机构的具体上游资源采购（如IT系统、数据服务等）的供应商或采购金额。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F33",
+              "text": "公司下游客户覆盖个人财富管理客户（累计超1700万户）、公募基金、海外机构、金融同业等专业投资机构，以及有股权及债务融资、并购重组需求的企业客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008",
+                "source-0006"
+              ]
+            }
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F34",
+            "text": "公司积极做好金融“五篇大文章”：科技金融方面科创板、创业板及北交所合计股权承销规模排名市场第一，科技创新债券承销规模排名同业第一；绿色债券承销规模排名同业第一。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ]
+          },
+          {
+            "fact_id": "F35",
+            "text": "养老金融方面，养老“三大支柱”投资管理规模突破万亿元（含本公司资产管理业务、华夏基金本部），服务大中型企业年金客户超过200家。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "养老“三大支柱”投资管理规模",
+                "raw_value": "突破万亿元",
+                "value": null,
+                "unit": "万亿元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "uncertainty_reason": "原文表述为“突破万亿元”，未给出精确数值"
+              },
+              {
+                "name": "服务大中型企业年金客户数量",
+                "raw_value": "超过200",
+                "value": "200",
+                "unit": "家",
+                "qualifier": "greater_than",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度"
+              }
+            ]
+          },
+          {
+            "fact_id": "F36",
+            "text": "公司上市以来已连续24年开展现金分红，累计分红超930亿元；2025年度继续开展中期分红，并向H股股东提供股息货币选择权。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "连续现金分红年数",
+                "raw_value": "24",
+                "value": "24",
+                "unit": "年",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度"
+              },
+              {
+                "name": "累计分红金额",
+                "raw_value": "超930",
+                "value": "930",
+                "unit": "亿元",
+                "currency": "人民币",
+                "qualifier": "greater_than",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度"
+              }
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "选定章节未披露各业务分部净利润、分产品细分收入及成本明细，相关补充分析受限。",
+        "分地区表中“公司本部”与“境内小计”口径不同，公司本部为母公司口径，境内小计含境内证券、期货子公司营业分支机构。",
+        "资产管理规模约4.8万亿元与资产管理业务规模17615.41亿元口径不同，前者含华夏基金本部，后者仅含本公司及中信证券资管。",
+        "上游资源采购（如IT系统、数据服务等）的供应商及采购金额未在选定章节披露。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 20751,
+      "output_tokens": 5807,
+      "total_tokens": 26558
+    }
+  },
+  {
+    "request_id": "bp-work-9cecb44388bc2a1429c2979b:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "1da4bdccf652836c9506f2bebb157d54105d526fef319e3e183e11a2327df73b",
+    "response_hash": "7696f77f6e9a158eeafff859e7bbd663624d79fd7ac8ab38f4591f9ae79bbef9",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"W01\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"explanation\":\"已采用事实只有集团营业收入合计748.54亿元和分行业毛利率，没有来源已披露的主营业务分行业收入构成。source-0014载明2025年本集团经纪业务收入207.87亿元、同比增长25.55%，资产管理业务142.94亿元、增长24.59%，证券投资业务276.05亿元、增长14.83%，证券承销业务60.55亿元、增长50.12%，其他业务61.13亿元、增长203.38%。source-0015对应营业收入分别为20,787,402,940.51元、14,294,329,181.83元、27,605,377,070.99元、6,055,217,321.40元、6,112,041,838.12元，合计与748.54亿元一致。证券投资业务是最大收入类别，公司合计或毛利率不能代替该构成。隔离说明称276.05亿元不见于引用来源，但上述两处来源均支持该金额。其他业务叙述61.13亿元与表内约61.12亿元有0.01亿元尾差，属来源舍入差异，修复时应保留来源原值，不要自行轧平。\"},{\"finding_id\":\"W02\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F09\",\"evidence_ids\":[\"source-0010\",\"source-0004\"],\"explanation\":\"17,615.41亿元是截至报告期末本公司及中信证券资管的资产管理规模，含集合、单一、专项计划，不是集团全部资管规模。source-0010注1写明该规模包括本公司及中信证券资管，华夏基金本部另计30,144.84亿元。source-0004约4.8万亿元才含本公司资管、中信证券资管及华夏基金本部。正文已写出本公司及中信证券资管，但事实和指标的subject_scope标成consolidated_group，会与约4.8万亿元混淆。应保留17,615.41亿元，主体改为来源限定的本公司及中信证券资管，不得标为集团整体。\"},{\"finding_id\":\"W03\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":\"F09\",\"evidence_ids\":[\"source-0010\"],\"explanation\":\"私募资产管理业务市场份额14.02%及行业第一有来源支持，但来源限定不包括养老业务、资产证券化产品。草案未保留该排除项，份额会被理解成全部私募资管。应保留14.02%和排名，并补回来源中的排除范围。\"},{\"finding_id\":\"W04\",\"element\":\"products_services\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F05\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"金融产品保有规模超人民币8,000亿元位于境内财富管理句中，不是未加限定的集团或含境外保有规模。境外财富管理只称销售交易规模和保有规模倍增，没有可并入的金额。应保留超8,000亿元及信100品牌等已支持内容，并为该规模补上境内财富管理主体，指标不得标为consolidated_group。\"},{\"finding_id\":\"W05\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":\"F25\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"91单境外股权项目和承销规模79.11亿美元与来源一致，但来源写明该规模按项目发行总规模在所有账簿管理人中平均分配的口径计算。草案未保留该口径，79.11亿美元可能被理解成项目全额或公司独家承销额。中资离岸债311单、53.46亿美元、市场份额4.30%及市场第一不受该句口径约束，可保留。修复时应保留79.11亿美元并补上平均分配口径。\"},{\"finding_id\":\"W06\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_causality\",\"action\":\"correct\",\"affected_fact_id\":\"F28\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"来源只是并列市场发行规模和公司投行经营，没有表述市场环境活跃推动公司投行业务增长。该因果句是草案添加的。应删除该因果断言，保留已支持的市场规模数字。\"},{\"finding_id\":\"W07\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":\"F28\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"A股股权融资11,110.36亿元及同比245.42%对应的是A股现金类及资产类发行规模，草案省略了现金类及资产类。中国市场并购25,894.34亿元对应的是包含中国企业跨境并购的完成交易规模，草案省略了该范围和完成。债券全口径89.08万亿元及增长11.54%表述正确。应保留数字并补上来源限定，主体维持unclear，因为这是市场统计而不是公司自身指标。\"},{\"finding_id\":\"W08\",\"element\":\"downstream_customers\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F33\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"累计超1,700万户是财富管理段落中的客户数量，前文明确为机构与个人双轮驱动，来源没有把该数量限定为个人客户。草案写成个人财富管理客户累计超1,700万户，主体过窄。公募、海外机构、金融同业和企业融资客户的覆盖描述可保留。应将1,700万户改回客户数量，并按所在段落考虑境内财富管理范围。\"},{\"finding_id\":\"W09\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F22\",\"evidence_ids\":[\"source-0007\",\"source-0004\"],\"explanation\":\"客户数量累计超1,700万户及较上年末增长10%位于境内财富管理段落，草案未保留境内范围。托管客户资产规模超15万亿元及增长24%虽在同段出现，但source-0004在公司普惠金融表述中亦使用超15万亿元，故托管资产不必仅因段落位置收窄。应只为客户数量补上境内财富管理限定，保留超1,700万户、10%、超15万亿元和24%。\"},{\"finding_id\":\"W10\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F19\",\"evidence_ids\":[\"source-0020\"],\"explanation\":\"39家证券分公司的来源主语是本公司，即母公司在中国大陆境内设立的证券分公司，不是合并集团全部网点。事实和指标标成consolidated_group，范围过宽。应改为母公司口径，保留39家及北京、上海、浙江、广东等覆盖描述。\"},{\"finding_id\":\"W11\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0016\"],\"explanation\":\"草案局限称公司本部为母公司口径。来源注只说明境内地区行的收入和支出是公司及境内证券、期货子公司营业分支机构的经营情况，并未把公司本部定义为母公司单体。地区小计8,997,329,725.64元加公司本部50,338,500,835.03元等于境内小计59,335,830,560.67元，再加境外小计等于集团营业收入合计。公司本部是与分支机构地区行并列的类别，不能断言为母公司口径；境内小计也不等于分支机构小计。应改回来源注的范围。\"},{\"finding_id\":\"W12\",\"element\":\"company_features\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0005\"],\"explanation\":\"已采用特色事实未记录养老金融规模。source-0005称养老三大支柱投资管理规模突破人民币万亿元，注2含本公司资产管理业务和华夏基金本部，并称服务大中型企业年金客户超过200家。这不是要求补全可选排名，而是现有五篇大文章表述缺少这一万亿元级业务规模。若补充，应保留突破人民币万亿元的来源表述和注2范围，不要改写成精确值。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F07\",\"F08\",\"F09\",\"F10\",\"F11\",\"F12\",\"F13\",\"F15\",\"F16\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\",\"F24\",\"F25\",\"F28\",\"F29\",\"F30\",\"F31\",\"F32\",\"F33\",\"F34\",\"F36\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "W01",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "explanation": "已采用事实只有集团营业收入合计748.54亿元和分行业毛利率，没有来源已披露的主营业务分行业收入构成。source-0014载明2025年本集团经纪业务收入207.87亿元、同比增长25.55%，资产管理业务142.94亿元、增长24.59%，证券投资业务276.05亿元、增长14.83%，证券承销业务60.55亿元、增长50.12%，其他业务61.13亿元、增长203.38%。source-0015对应营业收入分别为20,787,402,940.51元、14,294,329,181.83元、27,605,377,070.99元、6,055,217,321.40元、6,112,041,838.12元，合计与748.54亿元一致。证券投资业务是最大收入类别，公司合计或毛利率不能代替该构成。隔离说明称276.05亿元不见于引用来源，但上述两处来源均支持该金额。其他业务叙述61.13亿元与表内约61.12亿元有0.01亿元尾差，属来源舍入差异，修复时应保留来源原值，不要自行轧平。"
+        },
+        {
+          "finding_id": "W02",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F09",
+          "evidence_ids": [
+            "source-0010",
+            "source-0004"
+          ],
+          "explanation": "17,615.41亿元是截至报告期末本公司及中信证券资管的资产管理规模，含集合、单一、专项计划，不是集团全部资管规模。source-0010注1写明该规模包括本公司及中信证券资管，华夏基金本部另计30,144.84亿元。source-0004约4.8万亿元才含本公司资管、中信证券资管及华夏基金本部。正文已写出本公司及中信证券资管，但事实和指标的subject_scope标成consolidated_group，会与约4.8万亿元混淆。应保留17,615.41亿元，主体改为来源限定的本公司及中信证券资管，不得标为集团整体。"
+        },
+        {
+          "finding_id": "W03",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": "F09",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "私募资产管理业务市场份额14.02%及行业第一有来源支持，但来源限定不包括养老业务、资产证券化产品。草案未保留该排除项，份额会被理解成全部私募资管。应保留14.02%和排名，并补回来源中的排除范围。"
+        },
+        {
+          "finding_id": "W04",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F05",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "金融产品保有规模超人民币8,000亿元位于境内财富管理句中，不是未加限定的集团或含境外保有规模。境外财富管理只称销售交易规模和保有规模倍增，没有可并入的金额。应保留超8,000亿元及信100品牌等已支持内容，并为该规模补上境内财富管理主体，指标不得标为consolidated_group。"
+        },
+        {
+          "finding_id": "W05",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": "F25",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "91单境外股权项目和承销规模79.11亿美元与来源一致，但来源写明该规模按项目发行总规模在所有账簿管理人中平均分配的口径计算。草案未保留该口径，79.11亿美元可能被理解成项目全额或公司独家承销额。中资离岸债311单、53.46亿美元、市场份额4.30%及市场第一不受该句口径约束，可保留。修复时应保留79.11亿美元并补上平均分配口径。"
+        },
+        {
+          "finding_id": "W06",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "unsupported_causality",
+          "action": "correct",
+          "affected_fact_id": "F28",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "来源只是并列市场发行规模和公司投行经营，没有表述市场环境活跃推动公司投行业务增长。该因果句是草案添加的。应删除该因果断言，保留已支持的市场规模数字。"
+        },
+        {
+          "finding_id": "W07",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": "F28",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "A股股权融资11,110.36亿元及同比245.42%对应的是A股现金类及资产类发行规模，草案省略了现金类及资产类。中国市场并购25,894.34亿元对应的是包含中国企业跨境并购的完成交易规模，草案省略了该范围和完成。债券全口径89.08万亿元及增长11.54%表述正确。应保留数字并补上来源限定，主体维持unclear，因为这是市场统计而不是公司自身指标。"
+        },
+        {
+          "finding_id": "W08",
+          "element": "downstream_customers",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F33",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "累计超1,700万户是财富管理段落中的客户数量，前文明确为机构与个人双轮驱动，来源没有把该数量限定为个人客户。草案写成个人财富管理客户累计超1,700万户，主体过窄。公募、海外机构、金融同业和企业融资客户的覆盖描述可保留。应将1,700万户改回客户数量，并按所在段落考虑境内财富管理范围。"
+        },
+        {
+          "finding_id": "W09",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F22",
+          "evidence_ids": [
+            "source-0007",
+            "source-0004"
+          ],
+          "explanation": "客户数量累计超1,700万户及较上年末增长10%位于境内财富管理段落，草案未保留境内范围。托管客户资产规模超15万亿元及增长24%虽在同段出现，但source-0004在公司普惠金融表述中亦使用超15万亿元，故托管资产不必仅因段落位置收窄。应只为客户数量补上境内财富管理限定，保留超1,700万户、10%、超15万亿元和24%。"
+        },
+        {
+          "finding_id": "W10",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F19",
+          "evidence_ids": [
+            "source-0020"
+          ],
+          "explanation": "39家证券分公司的来源主语是本公司，即母公司在中国大陆境内设立的证券分公司，不是合并集团全部网点。事实和指标标成consolidated_group，范围过宽。应改为母公司口径，保留39家及北京、上海、浙江、广东等覆盖描述。"
+        },
+        {
+          "finding_id": "W11",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0016"
+          ],
+          "explanation": "草案局限称公司本部为母公司口径。来源注只说明境内地区行的收入和支出是公司及境内证券、期货子公司营业分支机构的经营情况，并未把公司本部定义为母公司单体。地区小计8,997,329,725.64元加公司本部50,338,500,835.03元等于境内小计59,335,830,560.67元，再加境外小计等于集团营业收入合计。公司本部是与分支机构地区行并列的类别，不能断言为母公司口径；境内小计也不等于分支机构小计。应改回来源注的范围。"
+        },
+        {
+          "finding_id": "W12",
+          "element": "company_features",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "已采用特色事实未记录养老金融规模。source-0005称养老三大支柱投资管理规模突破人民币万亿元，注2含本公司资产管理业务和华夏基金本部，并称服务大中型企业年金客户超过200家。这不是要求补全可选排名，而是现有五篇大文章表述缺少这一万亿元级业务规模。若补充，应保留突破人民币万亿元的来源表述和注2范围，不要改写成精确值。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F15",
+        "F16",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F36"
+      ]
+    },
+    "usage": {
+      "input_tokens": 27981,
+      "output_tokens": 2170,
+      "total_tokens": 68011
+    }
+  },
+  {
+    "request_id": "bp-work-9cecb44388bc2a1429c2979b:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "1a2d2cf37104853e5a05458ac3d69a0d7776895c3065aa4c126e05516174a54a",
+    "response_hash": "5ac90f0326ea9597006b64aa013f09b5532e36de81d82daec6b6fc104f541d7c",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:W01\",\"text\":\"2025年，本集团主营业务分行业收入构成：经纪业务收入207.87亿元，同比增长25.55%；资产管理业务收入142.94亿元，同比增长24.59%；证券投资业务收入276.05亿元，同比增长14.83%；证券承销业务收入60.55亿元，同比增长50.12%；其他业务收入61.13亿元，同比增长203.38%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"经纪业务营业收入\",\"raw_value\":\"20,787,402,940.51\",\"value\":\"20787402940.51\",\"unit\":\"元\",\"source_unit\":\"人民币元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"经纪业务营业收入同比增长率\",\"raw_value\":\"25.55\",\"value\":\"25.55\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"资产管理业务营业收入\",\"raw_value\":\"14,294,329,181.83\",\"value\":\"14294329181.83\",\"unit\":\"元\",\"source_unit\":\"人民币元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"资产管理业务营业收入同比增长率\",\"raw_value\":\"24.59\",\"value\":\"24.59\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"证券投资业务营业收入\",\"raw_value\":\"27,605,377,070.99\",\"value\":\"27605377070.99\",\"unit\":\"元\",\"source_unit\":\"人民币元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"证券投资业务营业收入同比增长率\",\"raw_value\":\"14.83\",\"value\":\"14.83\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"证券承销业务营业收入\",\"raw_value\":\"6,055,217,321.40\",\"value\":\"6055217321.40\",\"unit\":\"元\",\"source_unit\":\"人民币元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"证券承销业务营业收入同比增长率\",\"raw_value\":\"50.12\",\"value\":\"50.12\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务营业收入\",\"raw_value\":\"6,112,041,838.12\",\"value\":\"6112041838.12\",\"unit\":\"元\",\"source_unit\":\"人民币元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务营业收入同比增长率\",\"raw_value\":\"203.38\",\"value\":\"203.38\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F09\",\"text\":\"本公司资产管理业务及中信证券资管持续完善养老业务并升级投资管理体系；截至报告期末，资产管理规模合计17615.41亿元，包括集合资产管理计划4289.78亿元、单一资产管理计划9858.57亿元、专项资产管理计划3467.06亿元；公司私募资产管理业务（不包括养老业务、资产证券化产品）市场份额14.02%，排名行业第一。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"本公司及中信证券资管资产管理规模合计\",\"raw_value\":\"17,615.41\",\"value\":\"17615.41\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"集合资产管理计划规模\",\"raw_value\":\"4,289.78\",\"value\":\"4289.78\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"单一资产管理计划规模\",\"raw_value\":\"9,858.57\",\"value\":\"9858.57\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"专项资产管理计划规模\",\"raw_value\":\"3,467.06\",\"value\":\"3467.06\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"私募资产管理业务市场份额（不包括养老业务、资产证券化产品）\",\"raw_value\":\"14.02\",\"value\":\"14.02\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F05\",\"text\":\"境内财富管理持续优化多市场、多资产、多策略、多场景的金融产品体系，金融产品保有规模超8000亿元，买方投顾业务规模等各项指标取得新突破；发布“信100”财富管理品牌，覆盖个人和家庭全生命周期不同阶段的财富管理需求。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"境内财富管理金融产品保有规模\",\"raw_value\":\"超8,000\",\"value\":\"8000\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F25\",\"text\":\"投资银行业务境外完成91单境外股权项目，按项目发行总规模在所有账簿管理人中平均分配的口径计算，承销规模79.11亿美元；完成311单中资离岸债项目，承销规模53.46亿美元，市场份额4.30%，排名市场第一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"境外股权项目数量\",\"raw_value\":\"91\",\"value\":\"91\",\"unit\":\"单\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"境外股权项目承销规模（按项目发行总规模在所有账簿管理人中平均分配的口径计算）\",\"raw_value\":\"79.11\",\"value\":\"79.11\",\"unit\":\"亿美元\",\"source_unit\":null,\"currency\":\"美元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"按项目发行总规模在所有账簿管理人中平均分配的口径计算\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"中资离岸债项目数量\",\"raw_value\":\"311\",\"value\":\"311\",\"unit\":\"单\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"中资离岸债承销规模\",\"raw_value\":\"53.46\",\"value\":\"53.46\",\"unit\":\"亿美元\",\"source_unit\":null,\"currency\":\"美元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"中资离岸债市场份额\",\"raw_value\":\"4.30\",\"value\":\"4.30\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F28\",\"text\":\"2025年，A股（现金类及资产类）股权融资发行规模人民币11110.36亿元，同比增长245.42%；债券（全口径）融资发行规模人民币89.08万亿元，同比增长11.54%；中国市场并购（包含中国企业跨境并购）完成交易规模人民币25894.34亿元，同比增长16.12%。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"A股（现金类及资产类）股权融资发行规模\",\"raw_value\":\"11,110.36\",\"value\":\"11110.36\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"A股（现金类及资产类）股权融资发行规模同比增长率\",\"raw_value\":\"245.42\",\"value\":\"245.42\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"债券（全口径）融资发行规模\",\"raw_value\":\"89.08\",\"value\":\"89.08\",\"unit\":\"万亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"债券（全口径）融资发行规模同比增长率\",\"raw_value\":\"11.54\",\"value\":\"11.54\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"中国市场并购（包含中国企业跨境并购）完成交易规模\",\"raw_value\":\"25,894.34\",\"value\":\"25894.34\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"中国市场并购（包含中国企业跨境并购）完成交易规模同比增长率\",\"raw_value\":\"16.12\",\"value\":\"16.12\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F33\",\"text\":\"公司下游客户覆盖财富管理客户（累计超1700万户）、公募基金、海外机构、金融同业等专业投资机构，以及有股权及债务融资、并购重组需求的企业客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\",\"source-0006\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F22\",\"text\":\"境内财富管理客户数量累计超1700万户，较上年末增长10%；托管客户资产规模超15万亿元，较上年末增长24%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"境内财富管理客户数量\",\"raw_value\":\"超1,700\",\"value\":\"1700\",\"unit\":\"万户\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null},{\"name\":\"境内财富管理客户数量较上年末增长率\",\"raw_value\":\"10\",\"value\":\"10\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"托管客户资产规模\",\"raw_value\":\"超15\",\"value\":\"15\",\"unit\":\"万亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":null},{\"name\":\"托管客户资产规模较上年末增长率\",\"raw_value\":\"24\",\"value\":\"24\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F19\",\"text\":\"截至报告期末，本公司在中国大陆境内共设立39家证券分公司，覆盖北京、上海、浙江、广东等主要区域，形成境内经营网络。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\",\"source-0021\"],\"metrics\":[{\"name\":\"本公司境内证券分公司数量\",\"raw_value\":\"39\",\"value\":\"39\",\"unit\":\"家\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:W01",
+          "text": "2025年，本集团主营业务分行业收入构成：经纪业务收入207.87亿元，同比增长25.55%；资产管理业务收入142.94亿元，同比增长24.59%；证券投资业务收入276.05亿元，同比增长14.83%；证券承销业务收入60.55亿元，同比增长50.12%；其他业务收入61.13亿元，同比增长203.38%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "经纪业务营业收入",
+              "raw_value": "20,787,402,940.51",
+              "value": "20787402940.51",
+              "unit": "元",
+              "source_unit": "人民币元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "经纪业务营业收入同比增长率",
+              "raw_value": "25.55",
+              "value": "25.55",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产管理业务营业收入",
+              "raw_value": "14,294,329,181.83",
+              "value": "14294329181.83",
+              "unit": "元",
+              "source_unit": "人民币元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产管理业务营业收入同比增长率",
+              "raw_value": "24.59",
+              "value": "24.59",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "证券投资业务营业收入",
+              "raw_value": "27,605,377,070.99",
+              "value": "27605377070.99",
+              "unit": "元",
+              "source_unit": "人民币元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "证券投资业务营业收入同比增长率",
+              "raw_value": "14.83",
+              "value": "14.83",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "证券承销业务营业收入",
+              "raw_value": "6,055,217,321.40",
+              "value": "6055217321.40",
+              "unit": "元",
+              "source_unit": "人民币元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "证券承销业务营业收入同比增长率",
+              "raw_value": "50.12",
+              "value": "50.12",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务营业收入",
+              "raw_value": "6,112,041,838.12",
+              "value": "6112041838.12",
+              "unit": "元",
+              "source_unit": "人民币元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务营业收入同比增长率",
+              "raw_value": "203.38",
+              "value": "203.38",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F09",
+          "text": "本公司资产管理业务及中信证券资管持续完善养老业务并升级投资管理体系；截至报告期末，资产管理规模合计17615.41亿元，包括集合资产管理计划4289.78亿元、单一资产管理计划9858.57亿元、专项资产管理计划3467.06亿元；公司私募资产管理业务（不包括养老业务、资产证券化产品）市场份额14.02%，排名行业第一。",
+          "subject_scope": "issuer",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "本公司及中信证券资管资产管理规模合计",
+              "raw_value": "17,615.41",
+              "value": "17615.41",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "集合资产管理计划规模",
+              "raw_value": "4,289.78",
+              "value": "4289.78",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "单一资产管理计划规模",
+              "raw_value": "9,858.57",
+              "value": "9858.57",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "专项资产管理计划规模",
+              "raw_value": "3,467.06",
+              "value": "3467.06",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "私募资产管理业务市场份额（不包括养老业务、资产证券化产品）",
+              "raw_value": "14.02",
+              "value": "14.02",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F05",
+          "text": "境内财富管理持续优化多市场、多资产、多策略、多场景的金融产品体系，金融产品保有规模超8000亿元，买方投顾业务规模等各项指标取得新突破；发布“信100”财富管理品牌，覆盖个人和家庭全生命周期不同阶段的财富管理需求。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "境内财富管理金融产品保有规模",
+              "raw_value": "超8,000",
+              "value": "8000",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F25",
+          "text": "投资银行业务境外完成91单境外股权项目，按项目发行总规模在所有账簿管理人中平均分配的口径计算，承销规模79.11亿美元；完成311单中资离岸债项目，承销规模53.46亿美元，市场份额4.30%，排名市场第一。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "境外股权项目数量",
+              "raw_value": "91",
+              "value": "91",
+              "unit": "单",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境外股权项目承销规模（按项目发行总规模在所有账簿管理人中平均分配的口径计算）",
+              "raw_value": "79.11",
+              "value": "79.11",
+              "unit": "亿美元",
+              "source_unit": null,
+              "currency": "美元",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "按项目发行总规模在所有账簿管理人中平均分配的口径计算",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "中资离岸债项目数量",
+              "raw_value": "311",
+              "value": "311",
+              "unit": "单",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "中资离岸债承销规模",
+              "raw_value": "53.46",
+              "value": "53.46",
+              "unit": "亿美元",
+              "source_unit": null,
+              "currency": "美元",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "中资离岸债市场份额",
+              "raw_value": "4.30",
+              "value": "4.30",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F28",
+          "text": "2025年，A股（现金类及资产类）股权融资发行规模人民币11110.36亿元，同比增长245.42%；债券（全口径）融资发行规模人民币89.08万亿元，同比增长11.54%；中国市场并购（包含中国企业跨境并购）完成交易规模人民币25894.34亿元，同比增长16.12%。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "A股（现金类及资产类）股权融资发行规模",
+              "raw_value": "11,110.36",
+              "value": "11110.36",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "A股（现金类及资产类）股权融资发行规模同比增长率",
+              "raw_value": "245.42",
+              "value": "245.42",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "债券（全口径）融资发行规模",
+              "raw_value": "89.08",
+              "value": "89.08",
+              "unit": "万亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "债券（全口径）融资发行规模同比增长率",
+              "raw_value": "11.54",
+              "value": "11.54",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "中国市场并购（包含中国企业跨境并购）完成交易规模",
+              "raw_value": "25,894.34",
+              "value": "25894.34",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "中国市场并购（包含中国企业跨境并购）完成交易规模同比增长率",
+              "raw_value": "16.12",
+              "value": "16.12",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F33",
+          "text": "公司下游客户覆盖财富管理客户（累计超1700万户）、公募基金、海外机构、金融同业等专业投资机构，以及有股权及债务融资、并购重组需求的企业客户。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008",
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F22",
+          "text": "境内财富管理客户数量累计超1700万户，较上年末增长10%；托管客户资产规模超15万亿元，较上年末增长24%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "境内财富管理客户数量",
+              "raw_value": "超1,700",
+              "value": "1700",
+              "unit": "万户",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内财富管理客户数量较上年末增长率",
+              "raw_value": "10",
+              "value": "10",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "托管客户资产规模",
+              "raw_value": "超15",
+              "value": "15",
+              "unit": "万亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "托管客户资产规模较上年末增长率",
+              "raw_value": "24",
+              "value": "24",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F19",
+          "text": "截至报告期末，本公司在中国大陆境内共设立39家证券分公司，覆盖北京、上海、浙江、广东等主要区域，形成境内经营网络。",
+          "subject_scope": "issuer",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0020",
+            "source-0021"
+          ],
+          "metrics": [
+            {
+              "name": "本公司境内证券分公司数量",
+              "raw_value": "39",
+              "value": "39",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 20286,
+      "output_tokens": 3192,
+      "total_tokens": 23478
+    }
+  },
+  {
+    "request_id": "bp-work-9cecb44388bc2a1429c2979b:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "e5a35ae5f8d1ac5ed267ce40cdb7580f23d4806262c1bd3f371ce1e2b6a968e4",
+    "response_hash": "f2b7eb31942d392e7419874683ed8b8aafe5dbf033d44b0850833123f0c82789",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:W01\",\"F09\",\"F05\",\"F25\",\"F28\",\"F33\",\"F22\",\"F19\"],\"checks\":[{\"fact_id\":\"review-add:W01\",\"accepted\":true,\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"explanation\":\"候选补入2025年本集团分行业收入及同比增速，叙述金额与source-0014一致，指标精确元值对应source-0015营业收入列；各行业指标单独标为business_segment，未继承集团口径。其他业务叙述61.13亿元与表内约61.12亿元的尾差分别保留来源原值，未自行轧平，主体、期间和口径足以解决构成遗漏。\"},{\"fact_id\":\"F09\",\"accepted\":false,\"evidence_ids\":[\"source-0010\",\"source-0004\"],\"explanation\":\"source-0010及注1表明17,615.41亿元是截至报告期末本公司及中信证券资管的资产管理规模，华夏基金本部另计，不是母公司单体，也不是约4.8万亿元的集团口径。issuer仅指母公司本身。候选正文虽写出该范围并补回私募资管份额不含养老业务、资产证券化产品的限定，但事实及各项指标仍标为issuer，主体不正确。\"},{\"fact_id\":\"F05\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007将金融产品保有规模超人民币8,000亿元置于境内财富管理句中，境外保有规模无可并入金额。候选保留超8,000亿元及信100品牌，指标限定为境内财富管理、business_segment和greater_than，未标为集团口径，主体与限定正确。\"},{\"fact_id\":\"F25\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"source-0006支持91单及79.11亿美元，并明确后者按项目发行总规模在所有账簿管理人中平均分配；311单、53.46亿美元、市场份额4.30%及市场第一不受该口径约束。候选只为79.11亿美元保留该口径，数字、期间和公司经营默认合并口径均符合来源。\"},{\"fact_id\":\"F28\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"候选删除了来源并未表述的市场活跃推动公司投行增长的因果断言，并补回A股现金类及资产类、债券全口径，以及中国市场并购包含中国企业跨境并购且为完成交易规模等限定。各项数字与source-0006一致，主体维持unclear，符合市场统计而非公司自身指标。\"},{\"fact_id\":\"F33\",\"accepted\":false,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"source-0007在境内财富管理段落记载的是客户数量累计超1,700万户，前文为机构与个人双轮驱动，并未限定为个人客户，也未给出集团口径。候选仍把该数量写成财富管理客户并置于consolidated_group，未恢复客户数量，也未限定境内财富管理，主体仍然不正确。\"},{\"fact_id\":\"F22\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0004\"],\"explanation\":\"候选仅为客户数量补上境内财富管理限定，保留超1,700万户及较上年末增长10%，对应指标为business_segment和greater_than。托管客户资产规模超15万亿元在source-0004的公司表述中亦出现，故超15万亿元及24%未仅因段落位置收窄，指标维持合并口径，符合应修复的范围。\"},{\"fact_id\":\"F19\",\"accepted\":true,\"evidence_ids\":[\"source-0020\",\"source-0021\"],\"explanation\":\"source-0020明确截至报告期末由本公司在中国大陆境内设立39家证券分公司，不是合并集团全部网点。候选改为issuer母公司口径，保留39家及北京、上海、浙江、广东等覆盖描述，主体、时点和数量均正确。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:W01",
+        "F09",
+        "F05",
+        "F25",
+        "F28",
+        "F33",
+        "F22",
+        "F19"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:W01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "explanation": "候选补入2025年本集团分行业收入及同比增速，叙述金额与source-0014一致，指标精确元值对应source-0015营业收入列；各行业指标单独标为business_segment，未继承集团口径。其他业务叙述61.13亿元与表内约61.12亿元的尾差分别保留来源原值，未自行轧平，主体、期间和口径足以解决构成遗漏。"
+        },
+        {
+          "fact_id": "F09",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0010",
+            "source-0004"
+          ],
+          "explanation": "source-0010及注1表明17,615.41亿元是截至报告期末本公司及中信证券资管的资产管理规模，华夏基金本部另计，不是母公司单体，也不是约4.8万亿元的集团口径。issuer仅指母公司本身。候选正文虽写出该范围并补回私募资管份额不含养老业务、资产证券化产品的限定，但事实及各项指标仍标为issuer，主体不正确。"
+        },
+        {
+          "fact_id": "F05",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007将金融产品保有规模超人民币8,000亿元置于境内财富管理句中，境外保有规模无可并入金额。候选保留超8,000亿元及信100品牌，指标限定为境内财富管理、business_segment和greater_than，未标为集团口径，主体与限定正确。"
+        },
+        {
+          "fact_id": "F25",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "source-0006支持91单及79.11亿美元，并明确后者按项目发行总规模在所有账簿管理人中平均分配；311单、53.46亿美元、市场份额4.30%及市场第一不受该口径约束。候选只为79.11亿美元保留该口径，数字、期间和公司经营默认合并口径均符合来源。"
+        },
+        {
+          "fact_id": "F28",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "候选删除了来源并未表述的市场活跃推动公司投行增长的因果断言，并补回A股现金类及资产类、债券全口径，以及中国市场并购包含中国企业跨境并购且为完成交易规模等限定。各项数字与source-0006一致，主体维持unclear，符合市场统计而非公司自身指标。"
+        },
+        {
+          "fact_id": "F33",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "source-0007在境内财富管理段落记载的是客户数量累计超1,700万户，前文为机构与个人双轮驱动，并未限定为个人客户，也未给出集团口径。候选仍把该数量写成财富管理客户并置于consolidated_group，未恢复客户数量，也未限定境内财富管理，主体仍然不正确。"
+        },
+        {
+          "fact_id": "F22",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0004"
+          ],
+          "explanation": "候选仅为客户数量补上境内财富管理限定，保留超1,700万户及较上年末增长10%，对应指标为business_segment和greater_than。托管客户资产规模超15万亿元在source-0004的公司表述中亦出现，故超15万亿元及24%未仅因段落位置收窄，指标维持合并口径，符合应修复的范围。"
+        },
+        {
+          "fact_id": "F19",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0020",
+            "source-0021"
+          ],
+          "explanation": "source-0020明确截至报告期末由本公司在中国大陆境内设立39家证券分公司，不是合并集团全部网点。候选改为issuer母公司口径，保留39家及北京、上海、浙江、广东等覆盖描述，主体、时点和数量均正确。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 25255,
+      "output_tokens": 907,
+      "total_tokens": 39483
+    }
+  }
+]

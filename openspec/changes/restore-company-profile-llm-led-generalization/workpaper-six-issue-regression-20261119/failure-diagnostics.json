@@ -1,0 +1,40 @@
+{
+  "task": "6.DU",
+  "instrument_id": "601318.SH",
+  "new_model_requests": 0,
+  "asset": {
+    "instrument_id": "601318.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-efc068d2819d50a9092aa70a",
+    "filing_id": "1225038263",
+    "source": "cninfo",
+    "published_at": "2026-03-26T16:00:00+00:00",
+    "content_hash": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/86/860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a.pdf",
+    "report_type": "annual_report"
+  },
+  "selected_section": {
+    "section_id": "section-0037",
+    "section_path": [
+      "经营情况讨论及分析"
+    ],
+    "start_page": 35,
+    "start_offset": 608,
+    "end_page": 40,
+    "end_offset": 0,
+    "characters": 3091,
+    "level": 1,
+    "next_title": "业绩综述"
+  },
+  "physical_page": 35,
+  "native_text": "医养生态建设进展\r\n链接资金（支付方）：聚合支付能力，提升客户价值\r\n金融机构\r\n2025年，平安寿险使用医疗养老服务客户数1,829.8万人，渗透率38.5%，新契约客户渗透率71%。\r\n截至2025年末，居家养老服务资格客户累计超24万人。\r\n企业客户\r\n2025年，平安覆盖企业客户超9.5万家；全年服务企业员工数超6,000万人。\r\n个人客户\r\n平安通过旗舰互联网医疗平台、自营及合作医疗养老机构，为个人客户直接提供更专业、更可及的服务体验。\r\n金融\r\n机构\r\n企业\r\n客户\r\n个人\r\n客户\r\n链接生态（支付网络）：建设支付与数据的 “智能枢纽” 线上线下\r\n线上购药\r\n2025年，平安打通在线药店“直付”场景，企业健管客户完成在线购药，由企业健康账户进行“直付”。\r\n线下医院\r\n线下药店\r\n2025年，平安实现企业健管客户就医（全国二级及以上医保定点医院）便捷支付。员工在医保结算后，剩余部\r\n分可直接扫码支付，实现零垫款、免理赔的体验。\r\n2025年，平安实现商保客户就医“直付”，覆盖公立医院（含特需国际部）、私立医院及海外医疗机构。客户\r\n在服务网络内就医，享有免垫付、免申请理赔的便捷体验。\r\n2025年，平安推出企业健管客户线下购药场景一键展码支付服务，已覆盖全国7.7万家药店，在提升用户便捷体\r\n验的同时，实现服务及数据闭环。\r\n二零二五年年报 中国平安保险（集团）股份有限公司 31\r\n经营情况讨论及分析",
+  "native_text_sha256": "1bd780a762e0ad94b396a0d00255ef6822328ab5d373fa7b9c64b62573a53172",
+  "original_error": "ValueError: layout section boundary cannot be located: section-0037:35",
+  "diagnosis": "原生p35实际医养生态正文；页脚最后一行经营情况讨论及分析被索引为独立章节起点。模型选择了这个伪候选，layout边界无法定位，整包在抽取前拒绝。重复次数过滤不足，不是网络、JSON或可选信息缺失。",
+  "next_minimal_scope": "原目录/章节owner排除页脚伪标题；单个候选不可定位时明确跳过并记录未读，不拖掉其他有效业务章节。先用保存导航零调用验证，不建公司/页码白名单或新parser。",
+  "current_code_changed": false,
+  "rerun": false,
+  "old_profile_borrowed": false,
+  "native_layout_table_relationships_proven": false,
+  "limits": "本次失败/已用名额及旧S2结果不改；下一离线改动不等于授权新真实处理。"
+}

@@ -1,0 +1,1522 @@
+[
+  {
+    "request_id": "bp-work-4ac77358a3b66a2e805e8d00:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "adde49c747d7234465be1adc3fce0743792fb615835a78820b9ba77511c39d36",
+    "response_hash": "0669106b239dac26d58db22192c8f36353587fd7312aec090f06cee6a0953d21",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0037\",\"section-0042\",\"section-0055\",\"section-0056\",\"section-0057\",\"section-0060\",\"section-0064\",\"section-0068\"],\"rationale\":\"所选章节构成公司经营与收入的主干：section-0037（含三个经营模式子节）说明农批市场、生鲜配送、豆制品加工的业务结构与经营方式；section-0042经营情况讨论与分析提供本期经营综述与变化；section-0055主要经营情况及section-0056主营业务分析、section-0057利润表及现金流量表科目变动分析给出收入、成本、费用与现金流的总量与变动；section-0060主营业务分行业情况与section-0064分行业情况提供收入构成与业务权重；section-0068主要销售客户及供应商情况补充客户与渠道结构。这些章节共同覆盖业务、产品用途、盈利来源、规模与结构、经营变化，且避免与财务报告附注重复扩读。\",\"deferred\":[\"section-0041行业情况与section-0097未来发展讨论：属行业背景与前瞻性内容，对本期公司经营解释为次要，暂不纳入\",\"section-0049核心竞争力分析：偏泛化竞争优势描述，信息密度低于经营与收入章节，暂不纳入\",\"section-0327财务报告及section-0919营业收入和营业成本等附注：仅在主营业务分析存在实质缺口时定向补充，当前不扩读整个财务报告\",\"section-0122公司治理、section-0187重要事项：与业务经营解释关联弱，暂不纳入\"],\"stop_reason\":\"已覆盖业务模式、经营综述、收入成本总量与分行业构成、客户供应商等核心经营信息，可回答公司做什么、怎么赚钱及本期变化；行业背景、治理与财务附注属次要或定向补充范围，无需继续扩读。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0037",
+        "section-0042",
+        "section-0055",
+        "section-0056",
+        "section-0057",
+        "section-0060",
+        "section-0064",
+        "section-0068"
+      ],
+      "rationale": "所选章节构成公司经营与收入的主干：section-0037（含三个经营模式子节）说明农批市场、生鲜配送、豆制品加工的业务结构与经营方式；section-0042经营情况讨论与分析提供本期经营综述与变化；section-0055主要经营情况及section-0056主营业务分析、section-0057利润表及现金流量表科目变动分析给出收入、成本、费用与现金流的总量与变动；section-0060主营业务分行业情况与section-0064分行业情况提供收入构成与业务权重；section-0068主要销售客户及供应商情况补充客户与渠道结构。这些章节共同覆盖业务、产品用途、盈利来源、规模与结构、经营变化，且避免与财务报告附注重复扩读。",
+      "deferred": [
+        "section-0041行业情况与section-0097未来发展讨论：属行业背景与前瞻性内容，对本期公司经营解释为次要，暂不纳入",
+        "section-0049核心竞争力分析：偏泛化竞争优势描述，信息密度低于经营与收入章节，暂不纳入",
+        "section-0327财务报告及section-0919营业收入和营业成本等附注：仅在主营业务分析存在实质缺口时定向补充，当前不扩读整个财务报告",
+        "section-0122公司治理、section-0187重要事项：与业务经营解释关联弱，暂不纳入"
+      ],
+      "stop_reason": "已覆盖业务模式、经营综述、收入成本总量与分行业构成、客户供应商等核心经营信息，可回答公司做什么、怎么赚钱及本期变化；行业背景、治理与财务附注属次要或定向补充范围，无需继续扩读。"
+    },
+    "usage": {
+      "input_tokens": 20632,
+      "output_tokens": 399,
+      "total_tokens": 21031
+    }
+  },
+  {
+    "request_id": "bp-work-4ac77358a3b66a2e805e8d00:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "90f391865aa116f6be67873757aa9888e4add6af6bbd1d4bcb7acc31d424aa02",
+    "response_hash": "61a0f48c0a9bbe8cdeb155988dd807a9639f14d563fbd82e286ba61a573a84c5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司主营业务由三部分组成：农副产品批发交易市场业务（含市场交易管理、市场租赁业务）、生鲜食材配送业务（配菜业务）和豆制品生产加工领域相关业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"农副产品批发交易市场业务包括店面/摊位租赁、交易管理及其他市场配套服务；对租赁经营户收取租金及管理费，对开放市场无固定摊位经营户按实际成交金额一定比例收取交易服务费，并对入场车辆收取车辆管理费。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"生鲜食材配送业务借助下属农副产品批发交易市场的规模优势、商品价格优势及公司品牌知名度，为各大单位、机关食堂、酒店提供蔬菜、肉品、粮油及其他农副产品的集采和配送服务，客户获取一般通过投标方式，盈利来源主要为商品利润加成。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-04\",\"text\":\"豆制品生产加工是公司基于主业的产业延伸，由雪顶豆制品从事豆制品的研发、生产和销售，产品注册商标为“雪顶”，包括绢豆腐、玉子豆腐、豆奶、豆乳等四十多种产品。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"农副产品批发交易市场业务提供店面/摊位租赁、交易管理及市场配套服务，经营店面/摊位只对外租赁、不对外销售，租赁期限一般为一年。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"生鲜食材配送业务向各大单位、机关食堂、酒店配送蔬菜、肉品、粮油及其他农副产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"雪顶豆制品产品包括绢豆腐、玉子豆腐、豆奶、豆乳等四十多种产品，已成为浙南地区颇具规模的豆制品生产企业和“放心豆制品工程”示范企业，在全国豆制品行业中排名前50强。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"农副产品批发交易市场业务通过向租赁经营户收取租金及管理费、按实际成交金额一定比例收取交易服务费、按标准收取车辆管理费取得收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"生鲜食材配送业务盈利来源主要为商品利润加成，客户获取一般通过投标方式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-RM-03\",\"text\":\"2025年度公司营业收入为77,350.48万元，比上年增加7.06%；营业成本为48,804.87万元，比上年增加10.30%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"77,350.48\",\"value\":\"77350.48\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入比上年增减\",\"raw_value\":\"7.06\",\"value\":\"7.06\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"},{\"name\":\"营业成本\",\"raw_value\":\"48,804.87\",\"value\":\"48804.87\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本比上年增减\",\"raw_value\":\"10.30\",\"value\":\"10.30\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年度农副产品批发交易市场业务（含市场交易管理、市场租赁业务）收入为27,138.21万元，占公司营业收入比例为35.08%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"metrics\":[{\"name\":\"农副产品批发交易市场业务收入\",\"raw_value\":\"27,138.21\",\"value\":\"27138.21\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"农副产品批发交易市场业务收入占营业收入比例\",\"raw_value\":\"35.08\",\"value\":\"35.08\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"2025年度生鲜食材配送业务收入为26,116.40万元，占公司营业收入比例的33.76%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"metrics\":[{\"name\":\"生鲜食材配送业务收入\",\"raw_value\":\"26,116.40\",\"value\":\"26116.40\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"生鲜食材配送业务收入占营业收入比例\",\"raw_value\":\"33.76\",\"value\":\"33.76\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"2025年度豆制品生产加工领域业务收入为7,834.46万元，占公司营业收入比例的10.13%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"metrics\":[{\"name\":\"豆制品生产加工领域业务收入\",\"raw_value\":\"7,834.46\",\"value\":\"7834.46\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"豆制品生产加工领域业务收入占营业收入比例\",\"raw_value\":\"10.13\",\"value\":\"10.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"主营业务分行业情况：商品销售收入343,978,655.01元，营业成本271,385,058.52元，毛利率21.10%，毛利率比上年增加1.65个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"商品销售收入\",\"raw_value\":\"343,978,655.01\",\"value\":\"343978655.01\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"商品销售营业成本\",\"raw_value\":\"271,385,058.52\",\"value\":\"271385058.52\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"商品销售毛利率\",\"raw_value\":\"21.10\",\"value\":\"21.10\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"商品销售毛利率比上年增减\",\"raw_value\":\"1.65\",\"value\":\"1.65\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"F-SM-05\",\"text\":\"主营业务分行业情况：批发交易市场收入156,589,414.82元，营业成本60,777,651.53元，毛利率61.19%，毛利率比上年减少2.82个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"批发交易市场收入\",\"raw_value\":\"156,589,414.82\",\"value\":\"156589414.82\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"批发交易市场营业成本\",\"raw_value\":\"60,777,651.53\",\"value\":\"60777651.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"批发交易市场毛利率\",\"raw_value\":\"61.19\",\"value\":\"61.19\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"批发交易市场毛利率比上年增减\",\"raw_value\":\"2.82\",\"value\":\"2.82\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"F-SM-06\",\"text\":\"主营业务分行业情况：租赁收入150,777,311.92元，营业成本94,523,347.77元，毛利率37.31%，毛利率比上年减少4.88个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"租赁收入\",\"raw_value\":\"150,777,311.92\",\"value\":\"150777311.92\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁收入营业成本\",\"raw_value\":\"94,523,347.77\",\"value\":\"94523347.77\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁收入毛利率\",\"raw_value\":\"37.31\",\"value\":\"37.31\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁收入毛利率比上年增减\",\"raw_value\":\"4.88\",\"value\":\"4.88\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"F-SM-07\",\"text\":\"主营业务分行业情况：农批市场开发收入82,245,825.64元，营业成本46,407,987.97元，毛利率43.57%，毛利率比上年增减为不适用。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"农批市场开发收入\",\"raw_value\":\"82,245,825.64\",\"value\":\"82245825.64\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"农批市场开发营业成本\",\"raw_value\":\"46,407,987.97\",\"value\":\"46407987.97\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"农批市场开发毛利率\",\"raw_value\":\"43.57\",\"value\":\"43.57\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-08\",\"text\":\"主营业务分行业情况：其他收入29,964,829.88元，营业成本13,191,071.27元，毛利率55.98%，毛利率比上年减少21.24个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"其他收入\",\"raw_value\":\"29,964,829.88\",\"value\":\"29964829.88\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他营业成本\",\"raw_value\":\"13,191,071.27\",\"value\":\"13191071.27\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他毛利率\",\"raw_value\":\"55.98\",\"value\":\"55.98\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他毛利率比上年增减\",\"raw_value\":\"21.24\",\"value\":\"21.24\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"F-SM-09\",\"text\":\"公司说明：商品销售业务主要包括所属配送公司、雪顶豆制品公司产品销售；批发交易市场业务主要包括所属各品类农产品批发交易市场的交易费收取等业务；租赁业务包括灯具市场、现代农贸城等摊位费收取；农批市场开发业务为外拓相关农批市场相关配套商铺销售业务；其他主要为公司所属市场收取物业管理费、水电费等业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[\"主营业务分行业表按商品销售、批发交易市场收入、租赁收入、农批市场开发、其他列示，与业务介绍中农批市场、生鲜配送、豆制品三分法口径不同，未在来源中建立对应关系。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"温州区域各市场全年实现蔬、果、肉等各类农产品交易130万吨，交易额约103亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"温州区域各市场农产品交易量\",\"raw_value\":\"130\",\"value\":\"130\",\"unit\":\"万吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"温州区域各市场农产品交易额\",\"raw_value\":\"约103\",\"value\":\"103\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"市场对场内交易商品在交易期间进行质量抽查并公示检测结果，对检测不合格商品予以清退销毁，对相应经营户采取市场禁入等措施。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-OI-03\",\"text\":\"成本构成：商品销售成本项目为折旧、材料、人工等，本期金额271,385,058.52元，占总成本比例55.81%；批发交易市场收入成本项目为折旧、人工、费用等，本期金额60,777,651.53元，占12.50%；租赁收入成本项目为折旧、费用等，本期金额94,523,347.77元，占19.44%；农批市场开发成本项目为开发成本等，本期金额46,407,987.97元，占9.54%；其他成本项目为费用等，本期金额13,191,071.27元，占2.71%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"商品销售成本占总成本比例\",\"raw_value\":\"55.81\",\"value\":\"55.81\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"批发交易市场收入成本占总成本比例\",\"raw_value\":\"12.50\",\"value\":\"12.50\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"租赁收入成本占总成本比例\",\"raw_value\":\"19.44\",\"value\":\"19.44\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"农批市场开发成本占总成本比例\",\"raw_value\":\"9.54\",\"value\":\"9.54\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他成本占总成本比例\",\"raw_value\":\"2.71\",\"value\":\"2.71\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取到主要原材料的具体采购品种、数量及供应商名称等明细。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户销售额4,680.35万元，占年度销售总额6.05%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"4,680.35\",\"value\":\"4680.35\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"6.05\",\"value\":\"6.05\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户中关联方销售额\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"前五名供应商采购额4,137.91万元，占年度采购总额8.48%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"4,137.91\",\"value\":\"4137.91\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"8.48\",\"value\":\"8.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商中关联方采购额\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"报告期内公司不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，也不存在向单个供应商采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-CC-04\",\"text\":\"生鲜食材配送业务客户为各大单位、机关食堂、酒店，客户获取一般通过投标方式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取到具体客户及供应商名称。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"2025年度研发费用为12,490,554.61元，比上年增加38.23%，变动原因为本年度研发费用投入增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"研发费用\",\"raw_value\":\"12,490,554.61\",\"value\":\"12490554.61\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发费用比上年增减\",\"raw_value\":\"38.23\",\"value\":\"38.23\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"研发投入合计12,490,554.61元，全部为费用化研发投入，研发投入总额占营业收入比例1.61%；研发人员61人，占公司总人数的比例5.75%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"12,490,554.61\",\"value\":\"12490554.61\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"1.61\",\"value\":\"1.61\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量\",\"raw_value\":\"61\",\"value\":\"61\",\"unit\":\"人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"5.75\",\"value\":\"5.75\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"截至2025年12月底，公司累计拥有发明专利、软件著作权等知识产权约156项；全资子公司浙江东日新技术发展有限公司完成“国家高新技术企业”认定，成为公司体系内第4家国家级高新技术企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"累计知识产权数量\",\"raw_value\":\"约156\",\"value\":\"156\",\"unit\":\"项\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F-OD-04\",\"text\":\"经营活动产生的现金流量净额68,887,631.90元，比上年减少40.53%，原因为本年度预付货款增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0010\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"68,887,631.90\",\"value\":\"68887631.90\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额比上年增减\",\"raw_value\":\"-40.53\",\"value\":\"-40.53\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]}],\"limitations\":[]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"截至2025年末，公司总资产354,179.63万元，比上年减少1.85%；归属于上市公司股东的净资产255,295.95万元，比上年增加6.00%；归属于上市公司股东的净利润14,406.36万元，比上年增加6.94%；扣除非经常性损益后的归属于上市公司股东的净利润12,469.22万元，比上年增加10.30%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"总资产\",\"raw_value\":\"354,179.63\",\"value\":\"354179.63\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"总资产比上年增减\",\"raw_value\":\"-1.85\",\"value\":\"-1.85\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年末\"},{\"name\":\"归属于上市公司股东的净资产\",\"raw_value\":\"255,295.95\",\"value\":\"255295.95\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"14,406.36\",\"value\":\"14406.36\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"扣除非经常性损益后的归属于上市公司股东的净利润\",\"raw_value\":\"12,469.22\",\"value\":\"12469.22\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内公司业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务未发生重大变化或调整，报告期主要子公司股权变动未导致合并范围变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0007\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"报告期内公司完成2024年年度权益分派实施工作，共计派发现金红利5,056.40万元，占合并报表中归属于上市公司普通股股东的净利润的比率37.54%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"2024年年度现金红利派发金额\",\"raw_value\":\"5,056.40\",\"value\":\"5056.40\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"现金红利占归属于上市公司普通股股东净利润比率\",\"raw_value\":\"37.54\",\"value\":\"37.54\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-01\",\"text\":\"公司聚焦农批主业上下游延伸，推动农产品批发交易市场与特色农产品产品矩阵式协同发展，尝试构建“采、运、产、储、销”一体化产业协同发展模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-02\",\"text\":\"商品销售成本构成包括折旧、材料、人工等；农批市场开发成本构成包括开发成本等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"未获取到具体原材料品种、采购来源及主要供应商名称。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-03\",\"text\":\"生鲜食材配送业务面向各大单位、机关食堂、酒店；农批市场经营户为市场租赁及交易服务对象。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取到具体客户名称。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CF-01\",\"text\":\"控股子公司东云智农（嘉兴）科技有限公司携手研发机构种植“浙里粮华粳308大米”优质越光米，联合高等院校推出“东雲”清酒，与科研机构联合开展的铁皮石斛多糖研究项目取得重要进展，相关研究成果在国际SCI期刊《Metabolites》上发表，公司已就该成果向国家知识产权局提交相关专利申请。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-CF-02\",\"text\":\"公司为生产型客户打造围绕知识管理、物资调度、库存管理、设备运维和合同风控等核心业务场景的智能化AI应用；为金融服务型客户搭建个人贷款自动化AI审批；为管理型客户群体推出智能助手“东智E-Mind”，集成各大主流语言模型，功能涵盖国资合规助理、文档智能解读、联网搜索、合同风险审查等专项模块。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[]},\"limitations\":[\"主营业务分行业表口径（商品销售、批发交易市场收入、租赁收入、农批市场开发、其他）与业务介绍三分法口径不同，来源未提供对应关系。\",\"未获取到主要原材料具体采购品种、数量及主要客户、供应商名称。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司主营业务由三部分组成：农副产品批发交易市场业务（含市场交易管理、市场租赁业务）、生鲜食材配送业务（配菜业务）和豆制品生产加工领域相关业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "农副产品批发交易市场业务包括店面/摊位租赁、交易管理及其他市场配套服务；对租赁经营户收取租金及管理费，对开放市场无固定摊位经营户按实际成交金额一定比例收取交易服务费，并对入场车辆收取车辆管理费。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-03",
+              "text": "生鲜食材配送业务借助下属农副产品批发交易市场的规模优势、商品价格优势及公司品牌知名度，为各大单位、机关食堂、酒店提供蔬菜、肉品、粮油及其他农副产品的集采和配送服务，客户获取一般通过投标方式，盈利来源主要为商品利润加成。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-04",
+              "text": "豆制品生产加工是公司基于主业的产业延伸，由雪顶豆制品从事豆制品的研发、生产和销售，产品注册商标为“雪顶”，包括绢豆腐、玉子豆腐、豆奶、豆乳等四十多种产品。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "农副产品批发交易市场业务提供店面/摊位租赁、交易管理及市场配套服务，经营店面/摊位只对外租赁、不对外销售，租赁期限一般为一年。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "生鲜食材配送业务向各大单位、机关食堂、酒店配送蔬菜、肉品、粮油及其他农副产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "雪顶豆制品产品包括绢豆腐、玉子豆腐、豆奶、豆乳等四十多种产品，已成为浙南地区颇具规模的豆制品生产企业和“放心豆制品工程”示范企业，在全国豆制品行业中排名前50强。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "农副产品批发交易市场业务通过向租赁经营户收取租金及管理费、按实际成交金额一定比例收取交易服务费、按标准收取车辆管理费取得收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "生鲜食材配送业务盈利来源主要为商品利润加成，客户获取一般通过投标方式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "2025年度公司营业收入为77,350.48万元，比上年增加7.06%；营业成本为48,804.87万元，比上年增加10.30%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "77,350.48",
+                  "value": "77350.48",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入比上年增减",
+                  "raw_value": "7.06",
+                  "value": "7.06",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "48,804.87",
+                  "value": "48804.87",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本比上年增减",
+                  "raw_value": "10.30",
+                  "value": "10.30",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年度农副产品批发交易市场业务（含市场交易管理、市场租赁业务）收入为27,138.21万元，占公司营业收入比例为35.08%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "农副产品批发交易市场业务收入",
+                  "raw_value": "27,138.21",
+                  "value": "27138.21",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "农副产品批发交易市场业务收入占营业收入比例",
+                  "raw_value": "35.08",
+                  "value": "35.08",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "2025年度生鲜食材配送业务收入为26,116.40万元，占公司营业收入比例的33.76%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "生鲜食材配送业务收入",
+                  "raw_value": "26,116.40",
+                  "value": "26116.40",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生鲜食材配送业务收入占营业收入比例",
+                  "raw_value": "33.76",
+                  "value": "33.76",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "2025年度豆制品生产加工领域业务收入为7,834.46万元，占公司营业收入比例的10.13%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "豆制品生产加工领域业务收入",
+                  "raw_value": "7,834.46",
+                  "value": "7834.46",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "豆制品生产加工领域业务收入占营业收入比例",
+                  "raw_value": "10.13",
+                  "value": "10.13",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "主营业务分行业情况：商品销售收入343,978,655.01元，营业成本271,385,058.52元，毛利率21.10%，毛利率比上年增加1.65个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "商品销售收入",
+                  "raw_value": "343,978,655.01",
+                  "value": "343978655.01",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "商品销售营业成本",
+                  "raw_value": "271,385,058.52",
+                  "value": "271385058.52",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "商品销售毛利率",
+                  "raw_value": "21.10",
+                  "value": "21.10",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "商品销售毛利率比上年增减",
+                  "raw_value": "1.65",
+                  "value": "1.65",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-05",
+              "text": "主营业务分行业情况：批发交易市场收入156,589,414.82元，营业成本60,777,651.53元，毛利率61.19%，毛利率比上年减少2.82个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "批发交易市场收入",
+                  "raw_value": "156,589,414.82",
+                  "value": "156589414.82",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "批发交易市场营业成本",
+                  "raw_value": "60,777,651.53",
+                  "value": "60777651.53",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "批发交易市场毛利率",
+                  "raw_value": "61.19",
+                  "value": "61.19",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "批发交易市场毛利率比上年增减",
+                  "raw_value": "2.82",
+                  "value": "2.82",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-06",
+              "text": "主营业务分行业情况：租赁收入150,777,311.92元，营业成本94,523,347.77元，毛利率37.31%，毛利率比上年减少4.88个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "租赁收入",
+                  "raw_value": "150,777,311.92",
+                  "value": "150777311.92",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁收入营业成本",
+                  "raw_value": "94,523,347.77",
+                  "value": "94523347.77",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁收入毛利率",
+                  "raw_value": "37.31",
+                  "value": "37.31",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁收入毛利率比上年增减",
+                  "raw_value": "4.88",
+                  "value": "4.88",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-07",
+              "text": "主营业务分行业情况：农批市场开发收入82,245,825.64元，营业成本46,407,987.97元，毛利率43.57%，毛利率比上年增减为不适用。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "农批市场开发收入",
+                  "raw_value": "82,245,825.64",
+                  "value": "82245825.64",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "农批市场开发营业成本",
+                  "raw_value": "46,407,987.97",
+                  "value": "46407987.97",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "农批市场开发毛利率",
+                  "raw_value": "43.57",
+                  "value": "43.57",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-08",
+              "text": "主营业务分行业情况：其他收入29,964,829.88元，营业成本13,191,071.27元，毛利率55.98%，毛利率比上年减少21.24个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "其他收入",
+                  "raw_value": "29,964,829.88",
+                  "value": "29964829.88",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他营业成本",
+                  "raw_value": "13,191,071.27",
+                  "value": "13191071.27",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他毛利率",
+                  "raw_value": "55.98",
+                  "value": "55.98",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他毛利率比上年增减",
+                  "raw_value": "21.24",
+                  "value": "21.24",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-09",
+              "text": "公司说明：商品销售业务主要包括所属配送公司、雪顶豆制品公司产品销售；批发交易市场业务主要包括所属各品类农产品批发交易市场的交易费收取等业务；租赁业务包括灯具市场、现代农贸城等摊位费收取；农批市场开发业务为外拓相关农批市场相关配套商铺销售业务；其他主要为公司所属市场收取物业管理费、水电费等业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ],
+          "limitations": [
+            "主营业务分行业表按商品销售、批发交易市场收入、租赁收入、农批市场开发、其他列示，与业务介绍中农批市场、生鲜配送、豆制品三分法口径不同，未在来源中建立对应关系。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "温州区域各市场全年实现蔬、果、肉等各类农产品交易130万吨，交易额约103亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "温州区域各市场农产品交易量",
+                  "raw_value": "130",
+                  "value": "130",
+                  "unit": "万吨",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "温州区域各市场农产品交易额",
+                  "raw_value": "约103",
+                  "value": "103",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "市场对场内交易商品在交易期间进行质量抽查并公示检测结果，对检测不合格商品予以清退销毁，对相应经营户采取市场禁入等措施。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "成本构成：商品销售成本项目为折旧、材料、人工等，本期金额271,385,058.52元，占总成本比例55.81%；批发交易市场收入成本项目为折旧、人工、费用等，本期金额60,777,651.53元，占12.50%；租赁收入成本项目为折旧、费用等，本期金额94,523,347.77元，占19.44%；农批市场开发成本项目为开发成本等，本期金额46,407,987.97元，占9.54%；其他成本项目为费用等，本期金额13,191,071.27元，占2.71%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "商品销售成本占总成本比例",
+                  "raw_value": "55.81",
+                  "value": "55.81",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "批发交易市场收入成本占总成本比例",
+                  "raw_value": "12.50",
+                  "value": "12.50",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "租赁收入成本占总成本比例",
+                  "raw_value": "19.44",
+                  "value": "19.44",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "农批市场开发成本占总成本比例",
+                  "raw_value": "9.54",
+                  "value": "9.54",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他成本占总成本比例",
+                  "raw_value": "2.71",
+                  "value": "2.71",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取到主要原材料的具体采购品种、数量及供应商名称等明细。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "前五名客户销售额4,680.35万元，占年度销售总额6.05%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "4,680.35",
+                  "value": "4680.35",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "6.05",
+                  "value": "6.05",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户中关联方销售额",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "前五名供应商采购额4,137.91万元，占年度采购总额8.48%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "4,137.91",
+                  "value": "4137.91",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "8.48",
+                  "value": "8.48",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商中关联方采购额",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "报告期内公司不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，也不存在向单个供应商采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "生鲜食材配送业务客户为各大单位、机关食堂、酒店，客户获取一般通过投标方式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取到具体客户及供应商名称。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "2025年度研发费用为12,490,554.61元，比上年增加38.23%，变动原因为本年度研发费用投入增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "研发费用",
+                  "raw_value": "12,490,554.61",
+                  "value": "12490554.61",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发费用比上年增减",
+                  "raw_value": "38.23",
+                  "value": "38.23",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "研发投入合计12,490,554.61元，全部为费用化研发投入，研发投入总额占营业收入比例1.61%；研发人员61人，占公司总人数的比例5.75%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "12,490,554.61",
+                  "value": "12490554.61",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "1.61",
+                  "value": "1.61",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "61",
+                  "value": "61",
+                  "unit": "人",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量占公司总人数比例",
+                  "raw_value": "5.75",
+                  "value": "5.75",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "截至2025年12月底，公司累计拥有发明专利、软件著作权等知识产权约156项；全资子公司浙江东日新技术发展有限公司完成“国家高新技术企业”认定，成为公司体系内第4家国家级高新技术企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "累计知识产权数量",
+                  "raw_value": "约156",
+                  "value": "156",
+                  "unit": "项",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "经营活动产生的现金流量净额68,887,631.90元，比上年减少40.53%，原因为本年度预付货款增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "68,887,631.90",
+                  "value": "68887631.90",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额比上年增减",
+                  "raw_value": "-40.53",
+                  "value": "-40.53",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年同期"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "截至2025年末，公司总资产354,179.63万元，比上年减少1.85%；归属于上市公司股东的净资产255,295.95万元，比上年增加6.00%；归属于上市公司股东的净利润14,406.36万元，比上年增加6.94%；扣除非经常性损益后的归属于上市公司股东的净利润12,469.22万元，比上年增加10.30%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "总资产",
+                  "raw_value": "354,179.63",
+                  "value": "354179.63",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "总资产比上年增减",
+                  "raw_value": "-1.85",
+                  "value": "-1.85",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact",
+                  "comparison_basis": "上年末"
+                },
+                {
+                  "name": "归属于上市公司股东的净资产",
+                  "raw_value": "255,295.95",
+                  "value": "255295.95",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "14,406.36",
+                  "value": "14406.36",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "扣除非经常性损益后的归属于上市公司股东的净利润",
+                  "raw_value": "12,469.22",
+                  "value": "12469.22",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务未发生重大变化或调整，报告期主要子公司股权变动未导致合并范围变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "报告期内公司完成2024年年度权益分派实施工作，共计派发现金红利5,056.40万元，占合并报表中归属于上市公司普通股股东的净利润的比率37.54%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "2024年年度现金红利派发金额",
+                  "raw_value": "5,056.40",
+                  "value": "5056.40",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "现金红利占归属于上市公司普通股股东净利润比率",
+                  "raw_value": "37.54",
+                  "value": "37.54",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": []
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-01",
+              "text": "公司聚焦农批主业上下游延伸，推动农产品批发交易市场与特色农产品产品矩阵式协同发展，尝试构建“采、运、产、储、销”一体化产业协同发展模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-02",
+              "text": "商品销售成本构成包括折旧、材料、人工等；农批市场开发成本构成包括开发成本等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取到具体原材料品种、采购来源及主要供应商名称。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-03",
+              "text": "生鲜食材配送业务面向各大单位、机关食堂、酒店；农批市场经营户为市场租赁及交易服务对象。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取到具体客户名称。"
+          ]
+        }
+      },
+      "company_features": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CF-01",
+            "text": "控股子公司东云智农（嘉兴）科技有限公司携手研发机构种植“浙里粮华粳308大米”优质越光米，联合高等院校推出“东雲”清酒，与科研机构联合开展的铁皮石斛多糖研究项目取得重要进展，相关研究成果在国际SCI期刊《Metabolites》上发表，公司已就该成果向国家知识产权局提交相关专利申请。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ]
+          },
+          {
+            "fact_id": "F-CF-02",
+            "text": "公司为生产型客户打造围绕知识管理、物资调度、库存管理、设备运维和合同风控等核心业务场景的智能化AI应用；为金融服务型客户搭建个人贷款自动化AI审批；为管理型客户群体推出智能助手“东智E-Mind”，集成各大主流语言模型，功能涵盖国资合规助理、文档智能解读、联网搜索、合同风险审查等专项模块。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "limitations": [
+        "主营业务分行业表口径（商品销售、批发交易市场收入、租赁收入、农批市场开发、其他）与业务介绍三分法口径不同，来源未提供对应关系。",
+        "未获取到主要原材料具体采购品种、数量及主要客户、供应商名称。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 10841,
+      "output_tokens": 6781,
+      "total_tokens": 17622
+    }
+  },
+  {
+    "request_id": "bp-work-4ac77358a3b66a2e805e8d00:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "e644373e6f7257309b29723187e747c698fa2926369e65e2e29fcfaf9bc8583a",
+    "response_hash": "3c445fd39dc8b6d0f032ac0027958b0b36055d5ccb1751e9f159713ded21df03",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FND-001\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-CC-03\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"来源对“向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户”以及供应商对应表述，只是或列示披露项勾选不适用。不适用仅表示该披露项的适用标记，不能单独证明上述情形均未发生；或列示标题也不是每一项条件都不成立。应改回相应披露项标记为不适用，不得写成确定的否定结论。F-CC-01、F-CC-02中有原文金额支持的前五名客户、供应商数据可保留。\"},{\"finding_id\":\"FND-002\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-02\",\"evidence_ids\":[\"source-0004\",\"source-0007\"],\"explanation\":\"“业务类型、利润构成或利润来源发生重大变动”“业务、产品或服务发生重大变化或调整”“主要子公司股权变动导致合并范围变化”在来源中均为适用性勾选不适用，不能据此断言未发生重大变动、未发生重大变化或股权变动未导致合并范围变化。应改为相应披露项标记为不适用，不得表述为已确认的经济事实。\"},{\"finding_id\":\"FND-003\",\"element\":\"operations_and_inputs\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OI-01\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"130万吨和约103亿元的对象是公司所属运营管理的温州区域各市场，不是合并集团整体。事实及其两项指标的subject_scope标为consolidated_group，会把区域市场成交量和约103亿元成交额误归为集团口径。应改为unclear或与原文“温州区域各市场”一致的更窄对象；不能仅凭金额标成consolidated_group。交易额的“约”应继续保留为近似，不必改成精确值。\"},{\"finding_id\":\"FND-004\",\"element\":\"business_structure\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":\"F-BS-01\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"原文是“主营业务收入主要由三部分组成”，草稿写成“主营业务由三部分组成”，删去“主要”和“收入”，把主要收入来源说成已穷尽的业务构成。三分法占营业收入合计约78.97%，分行业表另有农批市场开发等来源原生类别。应恢复“主营业务收入主要由三部分组成”，不得改成排他性的三部分结构。\"},{\"finding_id\":\"FND-005\",\"element\":\"operating_drivers\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-OD-02\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"研发投入合计与本期费用化研发投入12,490,554.61元、占营业收入1.61%以及研发人员61人、占比5.75%有来源支持；但本期资本化研发投入和资本化比重单元格为空白，不能据此断言资本化投入为零或研发投入全部费用化。应保留已支持的合计、费用化金额、占比和人员数据，删除或限定“全部为费用化研发投入”。\"},{\"finding_id\":\"FND-006\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"来源主要经营情况写明全年营业收入77,350.48万元、比上年增加7.06%，利润表同期营业收入为773,504,798.71元。草稿已有分业务收入及占营业收入比例，但未列示公司营业收入总额及该增幅。建议补入该规模口径；这是补充建议，不否定已支持的分项构成，也不要求补齐全部可选财务指标。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-BS-04\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-RM-01\",\"F-RM-02\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-SM-05\",\"F-SM-06\",\"F-SM-07\",\"F-SM-08\",\"F-SM-09\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-MC-02\",\"F-MC-03\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\",\"F-CF-01\",\"F-CF-02\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FND-001",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-CC-03",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "来源对“向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户”以及供应商对应表述，只是或列示披露项勾选不适用。不适用仅表示该披露项的适用标记，不能单独证明上述情形均未发生；或列示标题也不是每一项条件都不成立。应改回相应披露项标记为不适用，不得写成确定的否定结论。F-CC-01、F-CC-02中有原文金额支持的前五名客户、供应商数据可保留。"
+        },
+        {
+          "finding_id": "FND-002",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-MC-02",
+          "evidence_ids": [
+            "source-0004",
+            "source-0007"
+          ],
+          "explanation": "“业务类型、利润构成或利润来源发生重大变动”“业务、产品或服务发生重大变化或调整”“主要子公司股权变动导致合并范围变化”在来源中均为适用性勾选不适用，不能据此断言未发生重大变动、未发生重大变化或股权变动未导致合并范围变化。应改为相应披露项标记为不适用，不得表述为已确认的经济事实。"
+        },
+        {
+          "finding_id": "FND-003",
+          "element": "operations_and_inputs",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OI-01",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "130万吨和约103亿元的对象是公司所属运营管理的温州区域各市场，不是合并集团整体。事实及其两项指标的subject_scope标为consolidated_group，会把区域市场成交量和约103亿元成交额误归为集团口径。应改为unclear或与原文“温州区域各市场”一致的更窄对象；不能仅凭金额标成consolidated_group。交易额的“约”应继续保留为近似，不必改成精确值。"
+        },
+        {
+          "finding_id": "FND-004",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F-BS-01",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "原文是“主营业务收入主要由三部分组成”，草稿写成“主营业务由三部分组成”，删去“主要”和“收入”，把主要收入来源说成已穷尽的业务构成。三分法占营业收入合计约78.97%，分行业表另有农批市场开发等来源原生类别。应恢复“主营业务收入主要由三部分组成”，不得改成排他性的三部分结构。"
+        },
+        {
+          "finding_id": "FND-005",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-OD-02",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "研发投入合计与本期费用化研发投入12,490,554.61元、占营业收入1.61%以及研发人员61人、占比5.75%有来源支持；但本期资本化研发投入和资本化比重单元格为空白，不能据此断言资本化投入为零或研发投入全部费用化。应保留已支持的合计、费用化金额、占比和人员数据，删除或限定“全部为费用化研发投入”。"
+        },
+        {
+          "finding_id": "FND-006",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "来源主要经营情况写明全年营业收入77,350.48万元、比上年增加7.06%，利润表同期营业收入为773,504,798.71元。草稿已有分业务收入及占营业收入比例，但未列示公司营业收入总额及该增幅。建议补入该规模口径；这是补充建议，不否定已支持的分项构成，也不要求补齐全部可选财务指标。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-BS-04",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-RM-01",
+        "F-RM-02",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-SM-05",
+        "F-SM-06",
+        "F-SM-07",
+        "F-SM-08",
+        "F-SM-09",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-MC-02",
+        "F-MC-03",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03",
+        "F-CF-01",
+        "F-CF-02"
+      ]
+    },
+    "usage": {
+      "input_tokens": 17618,
+      "output_tokens": 1218,
+      "total_tokens": 49430
+    }
+  },
+  {
+    "request_id": "bp-work-4ac77358a3b66a2e805e8d00:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "b124ff9688d957ab6c86604125823f65f97789e9ad315ab823d0a83f0b80caea",
+    "response_hash": "10501e8fa4ae87e1da23410c465adc647f88614c0e71db71d99af567297518a5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-CC-03\",\"text\":\"报告期内“向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户的情形”披露项标记为不适用；“向单个供应商的采购比例超过总额的50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形”披露项标记为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":\"不适用仅为披露项适用性勾选，不能据此确认上述情形均未发生。\"},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内“业务类型、利润构成或利润来源发生重大变动的详细说明”“报告期主要子公司股权变动导致合并范围变化”“公司报告期内业务、产品或服务发生重大变化或调整有关情况”披露项均标记为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0007\"],\"metrics\":[],\"uncertainty_reason\":\"不适用仅为披露项适用性勾选，不能据此确认未发生重大变动或调整。\"},{\"fact_id\":\"F-OI-01\",\"text\":\"温州区域各市场全年实现蔬、果、肉等各类农产品交易130万吨，交易额约103亿元。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"温州区域各市场农产品交易量\",\"raw_value\":\"130\",\"value\":\"130\",\"unit\":\"万吨\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"对象为公司所属运营管理的温州区域各市场，非合并集团整体。\"},{\"name\":\"温州区域各市场农产品交易额\",\"raw_value\":\"约103\",\"value\":\"103\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":\"对象为公司所属运营管理的温州区域各市场，非合并集团整体。\"}],\"uncertainty_reason\":\"交易量及交易额的对象为温州区域各市场，非合并集团整体。\"},{\"fact_id\":\"F-BS-01\",\"text\":\"公司主营业务收入主要由三部分组成：农副产品批发交易市场业务（含市场交易管理、市场租赁业务）、生鲜食材配送业务（配菜业务）和豆制品生产加工领域相关业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-OD-02\",\"text\":\"研发投入合计12,490,554.61元，本期费用化研发投入12,490,554.61元，研发投入总额占营业收入比例1.61%；研发人员61人，占公司总人数的比例5.75%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"12,490,554.61\",\"value\":\"12490554.61\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"本期费用化研发投入\",\"raw_value\":\"12,490,554.61\",\"value\":\"12490554.61\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"1.61\",\"value\":\"1.61\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"研发人员数量\",\"raw_value\":\"61\",\"value\":\"61\",\"unit\":\"人\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"5.75\",\"value\":\"5.75\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"本期资本化研发投入及资本化比重单元格为空白，未确认资本化金额。\"}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-CC-03",
+          "text": "报告期内“向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户的情形”披露项标记为不适用；“向单个供应商的采购比例超过总额的50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形”披露项标记为不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "不适用仅为披露项适用性勾选，不能据此确认上述情形均未发生。"
+        },
+        {
+          "fact_id": "F-MC-02",
+          "text": "报告期内“业务类型、利润构成或利润来源发生重大变动的详细说明”“报告期主要子公司股权变动导致合并范围变化”“公司报告期内业务、产品或服务发生重大变化或调整有关情况”披露项均标记为不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0007"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "不适用仅为披露项适用性勾选，不能据此确认未发生重大变动或调整。"
+        },
+        {
+          "fact_id": "F-OI-01",
+          "text": "温州区域各市场全年实现蔬、果、肉等各类农产品交易130万吨，交易额约103亿元。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "温州区域各市场农产品交易量",
+              "raw_value": "130",
+              "value": "130",
+              "unit": "万吨",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "对象为公司所属运营管理的温州区域各市场，非合并集团整体。"
+            },
+            {
+              "name": "温州区域各市场农产品交易额",
+              "raw_value": "约103",
+              "value": "103",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": "对象为公司所属运营管理的温州区域各市场，非合并集团整体。"
+            }
+          ],
+          "uncertainty_reason": "交易量及交易额的对象为温州区域各市场，非合并集团整体。"
+        },
+        {
+          "fact_id": "F-BS-01",
+          "text": "公司主营业务收入主要由三部分组成：农副产品批发交易市场业务（含市场交易管理、市场租赁业务）、生鲜食材配送业务（配菜业务）和豆制品生产加工领域相关业务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-OD-02",
+          "text": "研发投入合计12,490,554.61元，本期费用化研发投入12,490,554.61元，研发投入总额占营业收入比例1.61%；研发人员61人，占公司总人数的比例5.75%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "研发投入合计",
+              "raw_value": "12,490,554.61",
+              "value": "12490554.61",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "本期费用化研发投入",
+              "raw_value": "12,490,554.61",
+              "value": "12490554.61",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "研发投入总额占营业收入比例",
+              "raw_value": "1.61",
+              "value": "1.61",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "研发人员数量",
+              "raw_value": "61",
+              "value": "61",
+              "unit": "人",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "研发人员数量占公司总人数比例",
+              "raw_value": "5.75",
+              "value": "5.75",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "本期资本化研发投入及资本化比重单元格为空白，未确认资本化金额。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 8969,
+      "output_tokens": 1085,
+      "total_tokens": 10054
+    }
+  },
+  {
+    "request_id": "bp-work-4ac77358a3b66a2e805e8d00:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "c64ba216b4c1441f5f2095d61d7408884cffa5f71163a67cf07608d2f5096857",
+    "response_hash": "24a7a6f11020b2a78881a2a3a19affaf3648f6779918651ba4dea1fbb9c5a14c",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-CC-03\",\"F-MC-02\",\"F-OI-01\",\"F-BS-01\",\"F-OD-02\"],\"checks\":[{\"fact_id\":\"F-CC-03\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"原文仅将两类客户、供应商集中度或依赖情形的披露项勾选为不适用。候选改为披露项标记表述，并保留不适用不能确认情形未发生的限定，主体、期间与证据相符。\"},{\"fact_id\":\"F-MC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0007\"],\"explanation\":\"利润构成或来源重大变动、子公司股权变动导致合并范围变化、业务产品或服务重大变化三项在原文均为适用性勾选不适用。候选只陈述披露标记并保留不能据此确认经济事实的不确定性，未作否定性断言。\"},{\"fact_id\":\"F-OI-01\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"130万吨和约103亿元的对象是公司所属运营管理的温州区域各市场，不是合并集团。候选将事实及两项指标改为unclear，正文保留区域市场对象，交易额继续以约数表述，解决了口径误归问题。\"},{\"fact_id\":\"F-BS-01\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"原文为公司主营业务收入主要由三部分组成。候选恢复“收入”和“主要”，并列明三类来源，未把主要收入构成改成排他性的全部业务结构。\"},{\"fact_id\":\"F-OD-02\",\"accepted\":true,\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"explanation\":\"研发投入合计、费用化投入、占营业收入比例及研发人员数量和占比均有原文支持；候选未把空白的资本化投入或资本化比重推断为零，也未断言全部费用化，并明确资本化金额未确认。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-CC-03",
+        "F-MC-02",
+        "F-OI-01",
+        "F-BS-01",
+        "F-OD-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-CC-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "原文仅将两类客户、供应商集中度或依赖情形的披露项勾选为不适用。候选改为披露项标记表述，并保留不适用不能确认情形未发生的限定，主体、期间与证据相符。"
+        },
+        {
+          "fact_id": "F-MC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0007"
+          ],
+          "explanation": "利润构成或来源重大变动、子公司股权变动导致合并范围变化、业务产品或服务重大变化三项在原文均为适用性勾选不适用。候选只陈述披露标记并保留不能据此确认经济事实的不确定性，未作否定性断言。"
+        },
+        {
+          "fact_id": "F-OI-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "130万吨和约103亿元的对象是公司所属运营管理的温州区域各市场，不是合并集团。候选将事实及两项指标改为unclear，正文保留区域市场对象，交易额继续以约数表述，解决了口径误归问题。"
+        },
+        {
+          "fact_id": "F-BS-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "原文为公司主营业务收入主要由三部分组成。候选恢复“收入”和“主要”，并列明三类来源，未把主要收入构成改成排他性的全部业务结构。"
+        },
+        {
+          "fact_id": "F-OD-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ],
+          "explanation": "研发投入合计、费用化投入、占营业收入比例及研发人员数量和占比均有原文支持；候选未把空白的资本化投入或资本化比重推断为零，也未断言全部费用化，并明确资本化金额未确认。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10764,
+      "output_tokens": 452,
+      "total_tokens": 14460
+    }
+  }
+]

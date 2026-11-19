@@ -1,0 +1,292 @@
+{
+  "task": "6.DU",
+  "status": "authorized",
+  "approval_reference": "用户call_43e9ac2a40424942817b01d969940918明确答复：批准六家这一次同版限定回归。",
+  "approval_sha256": "fbb4eb5b8b8c1fbb54720ba53992ded2577b3445008946af082f1dc31468b592",
+  "base_commit": "b705ee8ecaaa5b68347e2a74cdf84c21aad01d97",
+  "source_first_reference": {
+    "not_model_input": true,
+    "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-first-contract.json",
+    "sha256": "3336c0756528466306ae61f8f24e3b8e098a486890135dac85432bdd9e6a2b9e",
+    "instruments": [
+      "600113.SH",
+      "000166.SZ",
+      "000025.SZ",
+      "000001.SZ",
+      "600030.SH",
+      "601318.SH"
+    ],
+    "primary_questions": 18,
+    "scope": "Main business, main products/services, monetization; optional supplementary details do not become mandatory."
+  },
+  "companies": [
+    {
+      "instrument_id": "600113.SH",
+      "asset": {
+        "instrument_id": "600113.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_f2dda829c32d3b60bf4c34f5087921bf",
+        "filing_id": "1225000442",
+        "source": "cninfo",
+        "published_at": "2026-03-06T16:00:00+00:00",
+        "content_hash": "15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/15/15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c.pdf",
+        "report_type": "annual_report"
+      },
+      "prepared_sha256": "fa42e589bf8e15d2f52a6692c3855b251a6f3147dc7f2f53d36dd456114e203a",
+      "pdf_pages": 220
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "asset": {
+        "instrument_id": "000166.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-d48f7d90d7413020a7850ebd",
+        "filing_id": "1225045474",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/6a/6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471.pdf",
+        "report_type": "annual_report"
+      },
+      "prepared_sha256": "152134f68e748e8d90824642345cf536ea0cf11a345f880f7bf19cc8e613eaac",
+      "pdf_pages": 458
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "asset": {
+        "instrument_id": "000025.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-e6e544cf126421e9a24b225b",
+        "filing_id": "1225138352",
+        "source": "cninfo",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "content_hash": "e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e7/e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12.pdf",
+        "report_type": "annual_report"
+      },
+      "prepared_sha256": "38e2aaa1db3af4c6874def2686eceba2db43bf23357956ff78dfb6dbdb8bdab2",
+      "pdf_pages": 170
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "asset": {
+        "instrument_id": "000001.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-4e7c579345d807aa0699ee5e",
+        "filing_id": "1225022887",
+        "source": "cninfo",
+        "published_at": "2026-03-20T16:00:00+00:00",
+        "content_hash": "2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/22/2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c.pdf",
+        "report_type": "annual_report"
+      },
+      "prepared_sha256": "4b107d0be1cc2804907f58db2bf62a4be633acd7879b57c3d06d0e9ad47a0a3f",
+      "pdf_pages": 288
+    },
+    {
+      "instrument_id": "600030.SH",
+      "asset": {
+        "instrument_id": "600030.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-966ac8c0a22e5ab07a22c32c",
+        "filing_id": "1225036081",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/43/438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2.pdf",
+        "report_type": "annual_report"
+      },
+      "prepared_sha256": "e35b6a0739f376a6237f2ae115ef6cd7a70134f97f153bf0317d4094cfb6a757",
+      "pdf_pages": 389
+    },
+    {
+      "instrument_id": "601318.SH",
+      "asset": {
+        "instrument_id": "601318.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "bp-frontier-efc068d2819d50a9092aa70a",
+        "filing_id": "1225038263",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/86/860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a.pdf",
+        "report_type": "annual_report"
+      },
+      "prepared_sha256": "0135bcd33ab827b2ed6ec4c7f7a6e039a6533072c6cb723c42612c053502e359",
+      "pdf_pages": 370
+    }
+  ],
+  "operator_sha256": "884d4ae9ece81d4c7a62814814a870e449a998384c9e39e9d493c44e454f2ed8",
+  "operator_base_sha256": "7b7e3d60c9f2eb31a9df10b58cf94260ef226139fb6c0e2eba8dbe47e46f0bc2",
+  "code_sha256": {
+    "research/company_profile/__init__.py": "41e5f0c5c3562e789053ce756fe342d1cb8b2c34f4049920eb246855bdbf1364",
+    "research/company_profile/acceptance_policy.py": "d7b96d51401b7c4baac7c56db36d99ae3e5ffb8742c6cac4edc07a7d99776d5c",
+    "research/company_profile/bounded_entry.py": "03b79a7a11ac325b60e870cda4ed226e870f617d0a2b64f0753d85e72e98f428",
+    "research/company_profile/candidate_registry.py": "c782e7fb85379e07b464a1d90fdbf1b0ab527df287376a9091d2d7b00e0473c4",
+    "research/company_profile/commodity_exposure.py": "15d4cbf467013c23bb65db1fe0d8b9a69f68f323abefe2b0ccd1786c3652b063",
+    "research/company_profile/contracts.py": "bd6d1d8d01e7698affc3801f231a66dd72be849e6c7d59fbf49a4ca5768e789f",
+    "research/company_profile/core_assessment_projection.py": "562a2c95c59b05aaa842d32b1eace6e39b89beaab2a2be00f73b2296eb008737",
+    "research/company_profile/core_evidence_selection.py": "ec85df0ec7f0c89e13f6dd1bbeecd4b4838f3af587819a8c4014c95fe60f5f1d",
+    "research/company_profile/core_skeleton.py": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
+    "research/company_profile/counterparty_research.py": "83a3779d2e6c044acfe3f4e560b59b4a8d631bdcc03af8e8a4b686962b17fd83",
+    "research/company_profile/direct_reading.py": "abe8f222bb15eda8521fe7a8447aeb7d54cc0aa6848579764727a030aa0cc167",
+    "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
+    "research/company_profile/first_expansion.py": "a37fef38017082f82e71036d470462f08a92ed05324a4685b21572fef91bf661",
+    "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
+    "research/company_profile/live_plan.py": "12b442cd3334e65d4de050daa70043e02b2cb9271b0b90708be36fdd8e0dd856",
+    "research/company_profile/live_run.py": "ee7208f40879a12f2e87270743475a91aaf178a7bc2ec979cb36e059b4fb1933",
+    "research/company_profile/m4_next_batch.py": "a23249872610f38d1294a9945478cacf609455bfd453790044268c3bd9dc565a",
+    "research/company_profile/material_input_research.py": "1e903edfe38d1b0d569299436e59a150ca909570de5ac14c496630831d4d37ab",
+    "research/company_profile/models.py": "e85e4bd785ad698b814b84ecb69cba750f118a37140775d596fe01c3e12e2a2b",
+    "research/company_profile/operating_quantity_research.py": "d2dfadb2a88a5c2267daea7fda53b2147c47af2c1fe43a8eaa96c147452a029d",
+    "research/company_profile/operations.py": "974afeccb89c76f5c01873fdb1199df833a6db0b8e2f187b61330fd75c97dd47",
+    "research/company_profile/operator_closure.py": "529dd42b014449c0ac20c0e5be3180c8c21b4f9df3cb509d5334fe65bb0232dd",
+    "research/company_profile/projection.py": "504f8446256d157219e1d21ce35474b323f3c625a799d5f0a22809d3e656536c",
+    "research/company_profile/publication.py": "d2c43d7a6199f0fbab64915beec8768a65c11df7d67d6615b25bff76300c6f36",
+    "research/company_profile/reading_budget.py": "6713ca5d88c782709ed931c186d52a570689fa6884dc0fb7c98591c6456a1fe0",
+    "research/company_profile/reads.py": "44df1ccad1c729bb507888e208064c4928a7561fbbe29dcfde7c2002c7f3c4f4",
+    "research/company_profile/report_interpretation.py": "775f138cb8e964aa554cbc6a1efb1d406beadd535c6f8a1a2b26f03e6e40a937",
+    "research/company_profile/report_wire.py": "aa1a48b0bc71e2633393a3b49731b4c9d914908ab32f7a98e1334ec9d88a74af",
+    "research/company_profile/resource_probe.py": "760686a09cde4d618f2626a03113e2742306e885284c61fda11fb7c16c561216",
+    "research/company_profile/runtime.py": "f9027a759867144969f23e31564b7b1709628b931d4f34af97425223b2133dbc",
+    "research/company_profile/segment_financial_research.py": "1c0e27469a670e68fb289b4ad3dd86e643189c3874186f724c34f763e04a8d1f",
+    "research/company_profile/shadow_batch.py": "155e54e72c43a841683833e0ec46135ebde8e2572a195284b87b6a23340e4792",
+    "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
+    "research/company_profile/shadow_batch_service.py": "bc3be4bd327b49f4abbec98d83cbbd6108993f9ac1253ecf2b42620c0a5dec74",
+    "research/company_profile/shadow_evidence.py": "dc580e45feb9eb55b63e0bea608fe63c4f50bef0e8553eb0ba879da88602970b",
+    "research/company_profile/source_review.py": "4da6bcb7b1aa1be459cb1b232df59a65acef535afc8b8593d8852f26ebe02bf9",
+    "research/company_profile/stage4_restricted_read.py": "f29e14ad0754dd42a0bd950171fb077ebaf7f7175aef12bd55771a82619ccbaf",
+    "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
+    "research/company_profile/stage5_adjudication.py": "0897c27651a83f86da877d3940c7b21af5ddcc06e92b0ca32ffad94752037773",
+    "research/company_profile/stage5_benchmark.py": "c7cc313671af27e7c66687faf8ff8e774a993c47dd7fd97b2dbf83833d27290c",
+    "research/company_profile/stage5_bundle.py": "008b8c7d4de24ce03a75b95fbf97c47b24663d5950f53600761206e6397921c8",
+    "research/company_profile/stage5_provider.py": "3cd322d1cb87a175f250ece460cd32097c36e3d8a6fe7bc7ae5c92dfc3bb785c",
+    "research/company_profile/stage5_service.py": "e53776bfe200ab3341f88d22207a41508020b6867ef03c3312ec9ec250957b11",
+    "research/company_profile/workflow.py": "ea0a0318d2affc207ff43d588d3ed1b03a422b9cfcac0017053499e10046678f",
+    "research/company_profile/workpaper.py": "ac28a75c969e590e5abf6f4570e3d28afacd3e549a200a106434cfe4f2e13727",
+    "research/company_profile/workpaper_delivery.py": "88dd4aaea81229c3d5f02c20e7f824d04606918eb536fba112ddb39e74e0e2c5",
+    "research/company_profile/workpaper_enrichment.py": "4a8249bafe59b0986f50fa8ef2c27dbf371f539073eff1c002bb70266b6c70aa",
+    "research/company_profile/workpaper_llm.py": "4dafd7fa09d633f2f3cd5b53441d53a273035cefd3f1af2935a261f13a735d83",
+    "research/company_profile/workpaper_review.py": "e3bce8052be3a02e008cbc16e12ff09a589ca1e8bb56b1e5008219b27daa3fc3",
+    "research/company_profile/workpaper_sections.py": "726171ad1e81d433a1e263702f33e8bab2d0e9950984c7b71e68c390f09b40c9",
+    "utils/llm/__init__.py": "25a037dbccd41a9c9f2982061e658f7381d8bf79fdcdbc8abd6d5e1e1fe2ae70",
+    "utils/llm/budget.py": "791cbc2f7ee3d580042e286603c758aa488d094044186c7bdf7f5dc5ac0ea66c",
+    "utils/llm/client.py": "fc44754a0a08a0df8a841f379a06d881ac229e5709136ee06a4029bc968daa85",
+    "utils/llm/config.py": "5327f3d23be58c40eae147bae41ca31761e49ae48a34844dacdab9411944289a",
+    "utils/llm/errors.py": "3625a8325fa761194086e47b161672bb12d1f45b20ab1331b234caa37e7415a6",
+    "utils/llm/models.py": "3337c2936410cb4ac8ee9963ac1ce02caca2b0d2d318c9d17e9a7dee8d4eee84",
+    "utils/llm/rate_limit.py": "edaecaee1df375dfab8e5f3289a364de318fa00c32c233e74788863f730d6cd3",
+    "utils/llm/schema.py": "ec679ed8fec132b3e5e0f8598cca71b772628c73f341658f8c32f690268d6b35",
+    "utils/llm/testing.py": "cca9b7c3ec6c09d20690f4b70b4cfbecc974992f09a8d1f82a9a28ae4e82971a",
+    "utils/llm/transport.py": "a28c0c0e8aa3dffd04347f707f19e2ec5eacba32f21cb4b8f5d782e4f14b974d",
+    "research/storage.py": "119ecf44beae0a1762273d22f83b9744aa7c714e4141a5ba95c48cac2e8bb19c",
+    "research/business_profile_pdf_artifacts.py": "fc3861ab57b15af21434fafd0ed889a5a01cef180f91727bb7a29ab2b0450970",
+    "research/business_profile_production_operations.py": "e4827d7a11a42338bf0f2be0e7bcc16945c85669001ae2ae85b07a66ccf6aea6",
+    "research/business_profile_documents.py": "d16a33b81473f109e6e5159513c08272dc3ab0479bdf0f7239da90ae751e0924"
+  },
+  "shared_config_sha256": "7650f2960b036815a6c05649ca9caba7d518b73380e561e334db49d062d82233",
+  "selected_profiles": {
+    "semantic_extraction__deepseek": {
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash",
+      "resource": "deepseek",
+      "reasoning_effort": "high",
+      "disable_thinking": true,
+      "timeout_seconds": 2450,
+      "attempt_timeout_seconds": 600,
+      "max_retries": 1,
+      "max_schema_repair_attempts": 1
+    },
+    "semantic_extraction__scorpio_grok": {
+      "model": "grok-4.7",
+      "source_label": "scorpio:grok-4.7",
+      "resource": "scorpio:grok",
+      "reasoning_effort": "high",
+      "disable_thinking": false,
+      "timeout_seconds": 2450,
+      "attempt_timeout_seconds": 1200,
+      "max_retries": 1,
+      "max_schema_repair_attempts": 1
+    }
+  },
+  "network_context": {
+    "task": "6.DU",
+    "namespace": "net:[4026531840]",
+    "permission_mode": "approved_network_exec",
+    "checks": [
+      {
+        "host": "api.deepseek.com",
+        "dns_addresses": 2,
+        "tls": "TLSv1.3",
+        "seconds": 0.046
+      },
+      {
+        "host": "scorpio.reepool.com",
+        "dns_addresses": 1,
+        "tls": "TLSv1.3",
+        "seconds": 0.217
+      }
+    ],
+    "model_requests": 0
+  },
+  "network_preflight_sha256": "6b1dcc3e31ef4d1ee99b0aab580a4871ef508919ae8b084edd5d8672b559fdf0",
+  "capture_helper_sha256": "6d5bd03ab5feeec5935dce275c9c7a3a6e304ad5acc49553df2b31e67425f268",
+  "each_limits": {
+    "business_seconds": 6000,
+    "tokens": 1000000,
+    "physical_requests": 10,
+    "recoveries": 3,
+    "per_logical_recovery": 1,
+    "known_cost_cny": 10
+  },
+  "group_limits": {
+    "business_wall_seconds": 12600,
+    "tokens": 6000000,
+    "physical_requests": 60,
+    "concurrency": 4
+  },
+  "production_authorization": "not_authorized",
+  "old_semantic_input": false,
+  "human_reference_as_model_input": false,
+  "classification": "seen development regression, not unseen/S1/S2 acceptance",
+  "quality_scope": "Three substantive business questions, source accuracy and explicit missing data; optional details not mandatory",
+  "run_id": "v22-six-issue-000166-20261119",
+  "asset": {
+    "instrument_id": "000166.SZ",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-d48f7d90d7413020a7850ebd",
+    "filing_id": "1225045474",
+    "source": "cninfo",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "content_hash": "6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/6a/6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471.pdf",
+    "report_type": "annual_report"
+  },
+  "physical_pages": 458,
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-17.missing-information.v20",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+    "preprocessing_version": "toc_sections_native_layout.v5.plain-headings-local-layout",
+    "source_binding_policy": "company_workpaper_source_literals.aligned-cells.v6",
+    "workpaper_format_recovery": "validation_feedback.v2.syntax-diagnosis",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 2450,
+    "workpaper_review_policy": "company_profile_workpaper_review.v11",
+    "quality_review_profile": "semantic_extraction__scorpio_grok",
+    "repair_profile": "semantic_extraction__deepseek",
+    "review_max_output_tokens": 16384
+  },
+  "source_preparation": {
+    "reused_shared_cache": "/home/python/Quote/data/filings/announcements/blobs/6a/derived/business_profile_pdfium_recovery.v4/6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471_57e1dd4f16ef40ff.json.gz"
+  },
+  "source_only_metadata_from": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-first-result-20261118/source-bindings/000166.json",
+  "provider_constructor_binding_verified_before_entry": true
+}

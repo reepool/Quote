@@ -1,0 +1,193 @@
+"""Approved 6.DU; adapt the exercised operator, retain original TaskService ownership."""
+from pathlib import Path
+import ast
+import json
+import os
+import sys
+import zipfile
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DESTINATION = CHANGE / 'workpaper-six-issue-regression-20261119'
+BASE = CHANGE / 'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'
+approval = json.loads((DESTINATION / 'approval.json').read_text())
+assert approval['status'] == 'explicitly_approved'
+APPROVAL = approval['approval_reference']
+ORDERED = ['600113.SH', '000166.SZ', '000025.SZ', '000001.SZ', '600030.SH', '601318.SH']
+assert approval['instruments'] == ORDERED
+
+source = BASE.read_text().split('\ndef main():', 1)[0]
+for old, new in (
+    ('workpaper-twelve-explanatory-core-result-20261116', 'workpaper-six-issue-regression-20261119'),
+    ('6.CT', '6.DU'), ('20261116', '20261119'), ('2026-11-16', '2026-09-17'),
+    ('v18-explanatory-twelve-', 'v22-six-issue-'), ('workpaper-ct-', 'workpaper-du-'),
+    ('token_budget=500000', 'token_budget=1000000'), ('max_tokens=500000', 'max_tokens=1000000'),
+    ('started+1800', 'started+6000'), ('max_elapsed_seconds=1800', 'max_elapsed_seconds=6000'),
+    ('started+7200', 'started+12600'), ("totals['physical_requests']>=120", "totals['physical_requests']>=60"),
+    ('timeout_seconds=620,execution_authorization', 'timeout_seconds=2450,execution_authorization'),
+    ('identity.update(review_max_output_tokens=16384,repair_profile=EXTRACT)',
+     'identity.update(review_max_output_tokens=16384,repair_profile=EXTRACT,logical_request_timeout_seconds=2450)'),
+    ("'exchange':'SSE'", "'exchange':item['exchange']"), ("exchange='SSE'", "exchange=item['exchange']"),
+    ("'instrument_id':symbol+'.SH'", "'instrument_id':next(i['instrument_id'] for i in items if i['instrument_id'][:6]==symbol)"),
+    ('verified.validate_pages(extract_selected_layout(Path(asset[\'archive_path\']).read_bytes(),pages))',
+     'verified.validate_pages(extract_selected_layout(Path(asset[\'archive_path\']).read_bytes(),pages, native_pages=source[\'pages\'] if verified.reading_scope.transcription_version == "shared-pdf-layout-with-native-fallback.v2" else None))'),
+    ("else 'missing_core_elements:'+','.join(missing)", 'else None'),
+):
+    assert old in source, old
+    source = source.replace(old, new)
+source = source.replace("summary['review_limit_error']=summary.get('review_error')",
+    "summary['review_limit_error']=summary.get('review_error')\n"
+    "        if summary.get('review_status')=='failed' and summary.get('review_error') and not failure:\n"
+    "            failure='source_review_failed:'+summary['review_error']")
+source = source.replace("summary['captured_model_contents']=len(captures)",
+    "retain_writer_records(root,destination)\n        summary['captured_model_contents']=len(captures)")
+source = source.replace("summary={'instrument_id':asset['instrument_id']",
+    "dump(destination/'temporary-root.json',{'root':str(root)})\n    summary={'instrument_id':asset['instrument_id']")
+exec(compile(source, str(BASE), 'exec'), globals())
+MANIFEST = DEST / 'source-manifest.json'
+ORDER = ORDERED
+_original_config = config_for_run
+_original_code_hashes = code_hashes
+
+
+def config_for_run():
+    config = _original_config()
+    profiles = dict(config.profiles)
+    profiles[REVIEW] = replace(profiles[REVIEW], timeout_seconds=2450, attempt_timeout_seconds=1200)
+    profiles[EXTRACT] = replace(profiles[EXTRACT], timeout_seconds=2450, attempt_timeout_seconds=600)
+    return replace(config, profiles=profiles)
+
+
+def code_hashes():
+    return {**_original_code_hashes(), 'research/business_profile_documents.py': sha(ROOT / 'research/business_profile_documents.py')}
+
+
+def source_items():
+    items = json.loads(MANIFEST.read_text())['companies']
+    assert [i['instrument_id'] for i in items] == ORDER and len(items) == 6
+    return items
+
+
+def retain_writer_records(root, destination):
+    records = list((root / 'output/company_profile_common_core.v1').glob('*.json'))
+    assert len(records) <= 1
+    if records:
+        assert not (destination / 'runtime.json').exists()
+        shutil.copy2(records[0], destination / 'runtime.json')
+
+
+def boundary_check():
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.workpaper import WorkpaperReviewResponse, WorkpaperRepairResponse, WorkpaperRepairVerificationResponse
+    constructors = [n for n in ast.walk(ast.parse(source)) if isinstance(n, ast.Call)
+                    and isinstance(n.func, ast.Name) and n.func.id == 'CommonGatewaySemanticProvider']
+    assert len(constructors) == 1
+    cap = next(ast.literal_eval(k.value) for k in constructors[0].keywords if k.arg == 'timeout_seconds')
+    assert cap == 2450
+    config = config_for_run()
+    asset = source_items()[0]['asset']
+    report = ReportIdentity(instrument_id=asset['instrument_id'], report_id=asset['filing_id'],
+        document_version=asset['content_hash'], report_period=asset['report_period'], published_at=asset['published_at'])
+    captured = []
+    class Boundary(BaseException):
+        pass
+    class Client:
+        physical_budget = object()
+        def __init__(self):
+            self.config = config
+        async def complete(self, request):
+            captured.append({'purpose': purpose, 'profile': request.profile, 'timeout_seconds': request.timeout_seconds})
+            raise Boundary()
+    for purpose, model, profile in [
+        ('review_profile_workpaper', WorkpaperReviewResponse, REVIEW),
+        ('repair_profile_workpaper', WorkpaperRepairResponse, EXTRACT),
+        ('verify_profile_workpaper_repair', WorkpaperRepairVerificationResponse, REVIEW),
+    ]:
+        provider = CommonGatewaySemanticProvider(client=Client(), profile=EXTRACT, max_output_tokens=16384,
+            timeout_seconds=cap, execution_authorization={'status': 'authorized',
+                'document_version': report.document_version, 'approval_reference': APPROVAL})
+        try:
+            provider.workpaper_request(request_id='du-bind:'+purpose, purpose=purpose, report=report,
+                payload={'source_text': 'Parameter boundary only; no model response'}, instructions='Boundary check',
+                response_model=model, max_output_tokens=16384, timeout_seconds=2450, profile_override=profile)
+        except Boundary:
+            pass
+    assert [c['timeout_seconds'] for c in captured] == [2450, 2450, 2450]
+    assert config.profiles[REVIEW].attempt_timeout_seconds == 1200
+    assert config.profiles[EXTRACT].attempt_timeout_seconds == 600
+    dump(DEST / 'binding-check.json', {'provider_cap': cap, 'gateway_boundaries': captured,
+        'profile_physical_seconds': {'review': 1200, 'flash': 600}, 'new_model_requests': 0})
+    print('BINDING_CHECK_OK', flush=True)
+
+
+def freeze(directory):
+    assert os.environ['TMPDIR'] == str(ROOT / 'data/QuoteBak')
+    assert not (DEST / 'authorization.json').exists()
+    network = json.loads((DEST / 'network-preflight.json').read_text())
+    assert network['namespace'] == os.readlink('/proc/self/ns/net') and network['model_requests'] == 0
+    assert {c['host'] for c in network['checks']} == {'api.deepseek.com', 'scorpio.reepool.com'}
+    assert json.loads((DEST / 'binding-check.json').read_text())['provider_cap'] == 2450
+    ready = json.loads((DEST / 'readiness.json').read_text())
+    assert all(sha(ROOT / p) == digest for p, digest in ready['code_sha256'].items())
+    direct = json.loads((DEST / 'twelve-direct-regression.json').read_text())
+    assert direct['companies'] == 12 and direct['original_files_unchanged']
+    reference = json.loads((DEST / 'reference-binding.json').read_text())
+    assert reference['not_model_input'] and reference['primary_questions'] == 18 and reference['instruments'] == ORDER
+    assert sha(ROOT / reference['path']) == reference['sha256']
+    companies = []
+    for item in source_items():
+        prepared_path = directory / (item['instrument_id'][:6] + '.json')
+        assert sha(prepared_path) == item['prepared_sha256']
+        prepared = json.loads(prepared_path.read_text())
+        assert set(prepared) == {'asset', 'name', 'exchange', 'pages', 'index', 'preparation_seconds', 'source_preparation'}
+        assert prepared['asset'] == item['asset'] and len(prepared['pages']) == item['pdf_pages']
+        assert sha(Path(item['asset']['archive_path'])) == item['asset']['content_hash']
+        assert sha(ROOT / item['source_binding']) == item['source_binding_sha256']
+        assert not (ROOT / 'data/QuoteBak/s1-attempts' / ('workpaper-du-'+item['instrument_id'][:6]+'-20261119.json')).exists()
+        companies.append({'instrument_id': item['instrument_id'], 'asset': item['asset'],
+                          'prepared_sha256': sha(prepared_path), 'pdf_pages': item['pdf_pages']})
+    config = config_for_run()
+    profiles = {name: {'model': p.model, 'source_label': p.source_label,
+        'resource': config.resource_for_profile(p).name, 'reasoning_effort': p.reasoning_effort,
+        'disable_thinking': p.disable_thinking, 'timeout_seconds': p.timeout_seconds,
+        'attempt_timeout_seconds': p.attempt_timeout_seconds, 'max_retries': p.max_retries,
+        'max_schema_repair_attempts': p.max_schema_repair_attempts} for name, p in config.profiles.items()}
+    hashes = code_hashes()
+    with zipfile.ZipFile(DEST / 'execution-code-snapshot.zip', 'x', compression=zipfile.ZIP_DEFLATED) as archive:
+        for path in hashes:
+            archive.write(ROOT / path, path)
+    dump(DEST / 'authorization.json', {'task': '6.DU', 'status': 'authorized', 'approval_reference': APPROVAL,
+        'approval_sha256': sha(DEST / 'approval.json'), 'base_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+        'source_first_reference': reference, 'prepared_root': str(directory), 'companies': companies,
+        'operator_sha256': sha(Path(__file__)), 'operator_base_sha256': sha(BASE),
+        'code_sha256': hashes, 'shared_config_sha256': sha(ROOT / 'config/13_llm.json'),
+        'selected_profiles': profiles, 'order': ORDER, 'network_context': network,
+        'network_preflight_sha256': sha(DEST / 'network-preflight.json'),
+        'capture_helper_sha256': sha(CAPTURE_HELPER), 'each_limits': approval['each_limits'],
+        'group_limits': approval['group_limits'], 'production_authorization': 'not_authorized',
+        'old_semantic_input': False, 'human_reference_as_model_input': False,
+        'classification': 'seen development regression, not unseen/S1/S2 acceptance',
+        'quality_scope': 'Three substantive business questions, source accuracy and explicit missing data; optional details not mandatory'})
+    shutil.copy2(__file__, DEST / 'operator-snapshot.txt')
+    print('FROZEN_SIX_APPROVED', flush=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=['check', 'preflight', 'freeze', 'run', 'group'])
+    parser.add_argument('--prepared', type=Path)
+    parser.add_argument('--symbol')
+    parser.add_argument('--group-deadline', type=float)
+    parser.add_argument('--batch', type=int, default=1)
+    args = parser.parse_args()
+    if args.mode == 'check':
+        boundary_check()
+    elif args.mode == 'preflight':
+        network_preflight()
+    elif args.mode == 'freeze':
+        freeze(args.prepared)
+    elif args.mode == 'run':
+        run_one(args.prepared, args.symbol, args.group_deadline)
+    else:
+        group(args.prepared, args.batch)

@@ -1,0 +1,16 @@
+{
+  "catalog_http_status": 200,
+  "detail_statuses": {
+    "600113.SH": 200,
+    "000166.SZ": 200,
+    "000025.SZ": 200,
+    "000001.SZ": 200,
+    "600030.SH": 200,
+    "601318.SH": 404
+  },
+  "details_equal_canonical_api": true,
+  "external_connections_forbidden": true,
+  "network_transport": "in_process_ASGI_only",
+  "new_model_requests": 0,
+  "runtime_default_configuration_changed": false
+}

@@ -1,0 +1,14 @@
+{
+  "task": "6.DU",
+  "status": "explicitly_approved",
+  "approval_reference": "用户call_43e9ac2a40424942817b01d969940918明确答复：批准六家这一次同版限定回归。",
+  "instruments": ["600113.SH", "000166.SZ", "000025.SZ", "000001.SZ", "600030.SH", "601318.SH"],
+  "scope": "Each once fresh original TaskService; only existing public 2025 annual-report selected sections/public derivatives; no old semantics or human answers as model input.",
+  "providers": ["official DeepSeek deepseek-flash", "existing scorpio.reepool.com grok-4.7 high"],
+  "each_limits": {"business_seconds": 6000, "tokens": 1000000, "physical_requests": 10, "recoveries": 3, "per_logical_recovery": 1, "known_cost_cny": 10},
+  "group_limits": {"business_wall_seconds": 12600, "tokens": 6000000, "physical_requests": 60, "concurrency": 4},
+  "timeouts": {"high_tier_physical_seconds": 1200, "logical_seconds": 2450, "flash_physical_seconds": 600},
+  "cost_when_unpriced": "unknown; no total CNY cap claimed",
+  "boundaries": ["approved network environment only", "same version no hotfix", "stop pending dispatch on two consecutive same core root failures", "no extra window/seventh company/confirmation twenty/recharge/shared config edit/production"],
+  "classification": "seen development regression; original S2 failure unchanged"
+}

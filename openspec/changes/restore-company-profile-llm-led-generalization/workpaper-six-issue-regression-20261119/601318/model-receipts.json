@@ -1,0 +1,44 @@
+[
+  {
+    "request_id": "bp-work-6b41330c35615e7728459e03:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "aac5677741bf92b92e226c0405d42f68aff161e1a4cf2bbe54b765d85ee88640",
+    "response_hash": "b843a8fa76c7b92a420c45e1f147a833b84e429e6d7da8eeb14a63e793ee2f0e",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0037\",\"section-0039\",\"section-0042\",\"section-0015\",\"section-0085\",\"section-0087\",\"section-0127\",\"section-0162\",\"section-0751\"],\"rationale\":\"本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。\",\"stop_reason\":\"已覆盖业务结构、主要产品与服务、收入来源与分部权重、渠道与客户、经营变化等核心问题；剩余缺口（如细分险种收入附注、关联交易明细）属次要补充，可在不扩读全篇财务报表的前提下停止。\",\"deferred\":[\"section-0006内含价值分析\",\"section-0187营运利润分析\",\"section-0193寿险及健康险业务利源与合同服务边际分析\",\"section-0750分部报告\",\"section-0906保险服务收入附注\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0037",
+        "section-0039",
+        "section-0042",
+        "section-0015",
+        "section-0085",
+        "section-0087",
+        "section-0127",
+        "section-0162",
+        "section-0751"
+      ],
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。",
+      "stop_reason": "已覆盖业务结构、主要产品与服务、收入来源与分部权重、渠道与客户、经营变化等核心问题；剩余缺口（如细分险种收入附注、关联交易明细）属次要补充，可在不扩读全篇财务报表的前提下停止。",
+      "deferred": [
+        "section-0006内含价值分析",
+        "section-0187营运利润分析",
+        "section-0193寿险及健康险业务利源与合同服务边际分析",
+        "section-0750分部报告",
+        "section-0906保险服务收入附注"
+      ]
+    },
+    "usage": {
+      "input_tokens": 17543,
+      "output_tokens": 383,
+      "total_tokens": 17926
+    }
+  }
+]

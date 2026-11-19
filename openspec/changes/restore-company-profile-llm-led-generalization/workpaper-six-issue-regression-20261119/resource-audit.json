@@ -1,0 +1,81 @@
+{
+  "per_company": [
+    {
+      "instrument_id": "600113.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 112597,
+      "known_supplier_total": 112597,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown",
+      "business_seconds": 598.844
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 100303,
+      "known_supplier_total": 100303,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown",
+      "business_seconds": 486.05
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 107210,
+      "known_supplier_total": 107210,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown",
+      "business_seconds": 564.286
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 117812,
+      "known_supplier_total": 117812,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown",
+      "business_seconds": 538.264
+    },
+    {
+      "instrument_id": "600030.SH",
+      "physical_requests": 5,
+      "recoveries": 0,
+      "ledger": 166656,
+      "known_supplier_total": 166656,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown",
+      "business_seconds": 781.624
+    },
+    {
+      "instrument_id": "601318.SH",
+      "physical_requests": 1,
+      "recoveries": 0,
+      "ledger": 17926,
+      "known_supplier_total": 17926,
+      "unknown_usage_reservations": 0,
+      "fee": "unknown",
+      "business_seconds": 19.711
+    }
+  ],
+  "totals": {
+    "physical_requests": 26,
+    "ledger": 622504,
+    "known_supplier_total": 622504,
+    "unknown_usage_reservations": 0,
+    "recoveries": 0,
+    "raw_facts": 167,
+    "profiles_with_content": 5,
+    "model_corrected_findings": 18,
+    "model_revised_objects": 17,
+    "visible_facts": 161,
+    "visible_metrics": 272
+  },
+  "group_supervision_wall_seconds": 1355.304,
+  "fee": "unknown",
+  "supplier_total_not_input_plus_output": true,
+  "preparation_and_independent_review_time": "not_completely_measured"
+}

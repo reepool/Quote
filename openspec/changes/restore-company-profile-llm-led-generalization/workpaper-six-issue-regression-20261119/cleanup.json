@@ -1,0 +1,101 @@
+{
+  "task": "6.DU",
+  "deleted": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/600113/export",
+      "files": 6,
+      "file_bytes": 567227
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000166/export",
+      "files": 6,
+      "file_bytes": 555318
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000025/export",
+      "files": 6,
+      "file_bytes": 503434
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/000001/export",
+      "files": 6,
+      "file_bytes": 578332
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/600030/export",
+      "files": 6,
+      "file_bytes": 931789
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/profiles.csv",
+      "files": 1,
+      "file_bytes": 4926
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/research_profiles.json",
+      "files": 1,
+      "file_bytes": 805871
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/export_manifest.json",
+      "files": 1,
+      "file_bytes": 3332
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/600113.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 390758
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/000166.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 399582
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/600030.SH_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 626011
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/000025.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 335873
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/profiles.md",
+      "files": 1,
+      "file_bytes": 5618
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-six-issue-regression-20261119/delivery/000001.SZ_2025-12-31.json",
+      "files": 1,
+      "file_bytes": 392158
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-du-iBzooe",
+      "files": 18,
+      "file_bytes": 8885269
+    }
+  ],
+  "closing_file_bytes": 14985498,
+  "runtime_finally_cleanup_file_bytes": 12186323,
+  "total_observed_file_bytes": 27171821,
+  "final_canonical_outputs_sha256": {
+    "delivery/000166.SZ_2025-12-31.md": "286052e8a99fb9cc7dfde8a5adffc816d812c040f43369e2aa2326797d7455a2",
+    "delivery/000001.SZ_2025-12-31.md": "6a9838b98af1335139f055d4ed43c8e7b045f5b10bbeca780caaaee8c180a65a",
+    "delivery/600030.SH_2025-12-31.md": "7c0a82feccb93ab6eea5f8ad9fbdc25c56fac717492516a829f7b62dc5adffdf",
+    "delivery/annual-api.json": "e130dc3bd0e26cc2cc66b5404b973e273bad877ee15c95f71b867b37a5087381",
+    "delivery/000025.SZ_2025-12-31.md": "8d646789d2146d500dc3a04510cfa5ab38fad37c1f84df305f285e24f8c35abd",
+    "delivery/600113.SH_2025-12-31.md": "58eeca6f03ea820dc1d568dd5e419ad0d2033c726570324cfad4f13619d964ca"
+  },
+  "other_task_or_unknown_ownership_removed": false,
+  "preserved": [
+    "official PDFs and valid shared cache",
+    "original query/runtime/ledger/model/failure receipts",
+    "used attempt markers",
+    "isolated API research root",
+    "all previous roots and baseline changes"
+  ],
+  "recovery": "Only derived process files/exports removed; rebuild from retained source, receipts and snapshots.",
+  "prior_preparation_cleanup_bytes_not_double_counted": 8058129
+}

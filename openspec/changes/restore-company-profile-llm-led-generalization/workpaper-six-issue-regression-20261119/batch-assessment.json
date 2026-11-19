@@ -1,0 +1,178 @@
+{
+  "task": "6.DU",
+  "status": "completed_with_partial_delivery",
+  "executed": 6,
+  "not_started": [],
+  "profiles_with_content": 5,
+  "no_profile": [
+    "601318.SH"
+  ],
+  "rows": [
+    {
+      "instrument_id": "600113.SH",
+      "name": "XD浙江东",
+      "raw_fact_count": 36,
+      "status": "basic_description_source_supported",
+      "review_status": "completed_with_open_findings",
+      "business_seconds": 598.844,
+      "original_core_complete": false,
+      "model_corrected_findings": 5,
+      "model_revised_objects": 5,
+      "independent_core_answers": {
+        "business_structure": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "independently_checked_objects": 24,
+      "known_errors_withheld": 3,
+      "remaining": [
+        "公司期间营业收入总额在p20已读源中，但未进入本次模型正文；API保建议补充，不因此否定基础画像。",
+        "有限核查不包括所有客户、投入、驱动和变动对象。"
+      ],
+      "visible_fact_count": 33,
+      "visible_metric_count": 38,
+      "gap_count": 7,
+      "suggested_acquisition_count": 1
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "name": "申万宏源",
+      "raw_fact_count": 35,
+      "status": "basic_description_source_supported",
+      "review_status": "completed",
+      "business_seconds": 486.05,
+      "original_core_complete": false,
+      "model_corrected_findings": 1,
+      "model_revised_objects": 1,
+      "independent_core_answers": {
+        "business_structure": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "independently_checked_objects": 25,
+      "known_errors_withheld": 0,
+      "remaining": [
+        "供应链未形成可选事实；不强求银行/证券套制造原料。",
+        "其余经营指标及变化仍按实际模型核等级交付。"
+      ],
+      "visible_fact_count": 35,
+      "visible_metric_count": 62,
+      "gap_count": 9,
+      "suggested_acquisition_count": 0
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "name": "特  力Ａ",
+      "raw_fact_count": 30,
+      "status": "basic_description_source_supported",
+      "review_status": "completed_with_open_findings",
+      "business_seconds": 564.286,
+      "original_core_complete": false,
+      "model_corrected_findings": 3,
+      "model_revised_objects": 3,
+      "independent_core_answers": {
+        "business_structure": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "independently_checked_objects": 16,
+      "known_errors_withheld": 1,
+      "remaining": [
+        "销售模式万元合计与珠宝收入元值仅差50.11元，可由披露精度产生，不能断言业务口径不同；原归因已暂停，保模型开放意见。",
+        "其他采购、集中度和风险对象未逐条独立核。"
+      ],
+      "visible_fact_count": 28,
+      "visible_metric_count": 53,
+      "gap_count": 5,
+      "suggested_acquisition_count": 0
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "name": "平安银行",
+      "raw_fact_count": 37,
+      "status": "basic_description_source_supported",
+      "review_status": "completed",
+      "business_seconds": 538.264,
+      "original_core_complete": false,
+      "model_corrected_findings": 2,
+      "model_revised_objects": 2,
+      "independent_core_answers": {
+        "business_structure": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "independently_checked_objects": 22,
+      "known_errors_withheld": 1,
+      "remaining": [
+        "其余客户、经营驱动与可选供应链事实保实际模型核等级，不宣称已全量人工准确。"
+      ],
+      "visible_fact_count": 36,
+      "visible_metric_count": 63,
+      "gap_count": 1,
+      "suggested_acquisition_count": 0
+    },
+    {
+      "instrument_id": "600030.SH",
+      "name": "中信证券",
+      "raw_fact_count": 29,
+      "status": "basic_description_source_supported",
+      "review_status": "completed_with_open_findings",
+      "business_seconds": 781.624,
+      "original_core_complete": false,
+      "model_corrected_findings": 7,
+      "model_revised_objects": 6,
+      "independent_core_answers": {
+        "business_structure": true,
+        "products_services": true,
+        "revenue_model": true
+      },
+      "independently_checked_objects": 19,
+      "known_errors_withheld": 0,
+      "remaining": [
+        "F09、F33修订未获采纳，原内容不在普通事实中，不手工加回。资管17,615.41亿元限本公司及中信证券资管，华夏基金另计；份额还需保排除范围。",
+        "未单列全部会计小科目不阻断既有主要服务/收入说明。",
+        "养老金融可选特色建议未补，不追加调用；原局限中公司本部归因已暂停，开放意见保留。"
+      ],
+      "visible_fact_count": 29,
+      "visible_metric_count": 56,
+      "gap_count": 6,
+      "suggested_acquisition_count": 1
+    },
+    {
+      "instrument_id": "601318.SH",
+      "name": "中国平安",
+      "raw_fact_count": 0,
+      "status": "no_profile",
+      "review_status": null,
+      "business_seconds": 19.711,
+      "original_core_complete": null,
+      "model_corrected_findings": 0,
+      "model_revised_objects": 0
+    }
+  ],
+  "independent_objects_checked": 106,
+  "independent_errors_withheld": 5,
+  "independent_source_only": 1,
+  "delivery_states": {
+    "limited": 38,
+    "reviewed": 123,
+    "withheld": 5,
+    "source_only": 1
+  },
+  "research_output_root": "/home/python/Quote/data/research/company_profile_six_regression_20261119",
+  "all_six_basic_questions": {
+    "answered_companies": 5,
+    "total_companies": 6,
+    "source_supported_questions": 15,
+    "requested_questions": 18
+  },
+  "formal_accuracy": "not_assessed",
+  "s2_unseen_result": "not_applicable_seen_development_regression",
+  "old_s2_failure_changed": false,
+  "production_authorization": "not_authorized",
+  "limits": [
+    "已知局部错误通过原use_review隔离，原始事实不改；不能把其余未发现错误解释成零错误。",
+    "原runtime的core_complete=false及模型review状态保持，有限独立基础三问不重写原assessment或旧S2首发/资源。",
+    "不对全部167对象或整20家主张99%准确率；生产未授权，未启动确认组或S3。"
+  ]
+}
