@@ -1,5 +1,5 @@
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from unittest.mock import AsyncMock, Mock
 from zoneinfo import ZoneInfo
 
@@ -12,6 +12,7 @@ from data_sources.cninfo_corporate_action_incremental import (
     build_incremental_refresh_candidates,
     build_targeted_tdx_refresh_instruments,
     classify_daily_corporate_action_title,
+    iter_announcement_scan_chunks,
     normalize_active_instruments,
     resolve_daily_announcement_window,
     resolve_tdx_refresh_mode,
@@ -1181,3 +1182,213 @@ async def test_discovery_merges_retry_event_announcement_and_safety_candidates()
     assert result["candidate_count"] == 4
     assert result["reason_counts"]["safety_sweep"] == 1
     manager._persist_cninfo_daily_announcement_activity.assert_not_called()
+
+
+def test_iter_announcement_scan_chunks_partitions_wide_span():
+    chunks = iter_announcement_scan_chunks(date(2026, 10, 28), date(2026, 11, 20))
+
+    assert chunks[0][0] == date(2026, 10, 28)
+    assert chunks[-1][1] == date(2026, 11, 20)
+    for (chunk_start, chunk_end), (next_start, _) in zip(
+        chunks, chunks[1:]
+    ):
+        assert (chunk_end - chunk_start).days <= 2
+        assert chunk_end + timedelta(days=1) == next_start
+
+
+def test_iter_announcement_scan_chunks_keeps_short_span_single():
+    chunks = iter_announcement_scan_chunks(
+        date(2026, 11, 16), date(2026, 11, 18)
+    )
+
+    assert chunks == [(date(2026, 11, 16), date(2026, 11, 18))]
+
+
+def test_iter_announcement_scan_chunks_rejects_inverted_window():
+    with pytest.raises(ValueError, match="inverted"):
+        iter_announcement_scan_chunks(date(2026, 11, 20), date(2026, 11, 16))
+
+
+def _recording_acquire(queries, records=()):
+    def acquire(query: AnnouncementQuery):
+        queries.append(query)
+        scan = AnnouncementScanResult(
+            source="cninfo",
+            query=query,
+            status="success",
+            records=tuple(records),
+            pages_scanned=1,
+            requests_made=1,
+            announcements_seen=len(tuple(records)),
+            max_published_at="2026-07-22T01:00:00+00:00",
+            provider_cursor=ProviderCursor(
+                kind="published_at",
+                value="2026-07-22T01:00:00+00:00",
+            ),
+            is_complete=True,
+            stop_reason="last_page",
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status="success",
+            selected_source="cninfo",
+            scan_result=scan,
+            attempts=(AnnouncementRouteAttempt(
+                source="cninfo",
+                status="success",
+                record_count=len(tuple(records)),
+                selected_count=0,
+                pages_scanned=1,
+            ),),
+        )
+
+    return acquire
+
+
+def _scan_manager(storage_state=None):
+    manager = DataManager()
+    storage = Mock()
+    storage.get_announcement_scan_state.return_value = storage_state
+    manager.research_config = Mock(enabled=True)
+    manager.research_storage = storage
+    return manager
+
+
+_SH_SCAN_ACTIVE = normalize_active_instruments([
+    {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+    },
+])
+
+
+@pytest.mark.asyncio
+async def test_scan_replays_wide_window_as_disjoint_chunks_without_watermark():
+    committed_state = {
+        "committed_cursor": {
+            "kind": "published_at",
+            "value": "2026-07-22T01:30:00+00:00",
+        },
+        "metadata": {"pending_candidate_ids": ["600000.SH"]},
+    }
+    manager = _scan_manager(storage_state=committed_state)
+    queries = []
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=Mock(acquire=_recording_acquire(queries))
+    )
+
+    result = await manager._scan_cninfo_daily_announcement_activity(
+        active_instruments=_SH_SCAN_ACTIVE,
+        exchanges=["SSE"],
+        start_date=date(2026, 7, 1),
+        end_date=date(2026, 7, 22),
+        run_at=datetime(
+            2026, 7, 22, 9, 30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+        overlap_days=2,
+        page_size=30,
+        max_pages=60,
+        request_interval_seconds=0,
+        resume_from_watermark=False,
+    )
+
+    # Span 2026-06-29..2026-07-22 (24 days) replays as 3-day chunks.
+    assert len(queries) == 8
+    spans = [
+        (query.scope.start_date, query.scope.end_date) for query in queries
+    ]
+    assert spans[0][0] == "2026-06-29"
+    assert spans[-1][1] == "2026-07-22"
+    for (_, chunk_end), (next_start, _) in zip(spans, spans[1:]):
+        assert (
+            date.fromisoformat(chunk_end) + timedelta(days=1)
+        ).isoformat() == next_start
+    # Historical replay must not resume from the committed watermark and
+    # must not consume the nightly pending carryover.
+    assert all(query.scope.cursor is None for query in queries)
+    assert result["deferred_announcement_instrument_ids"] == []
+    assert result["status"] == "success"
+
+
+@pytest.mark.asyncio
+async def test_scan_resume_injects_watermark_into_every_chunk_and_carries_pending():
+    committed_state = {
+        "committed_cursor": {
+            "kind": "published_at",
+            "value": "2026-07-22T01:30:00+00:00",
+        },
+        "metadata": {"pending_candidate_ids": ["600000.SH"]},
+    }
+    manager = _scan_manager(storage_state=committed_state)
+    queries = []
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=Mock(acquire=_recording_acquire(queries))
+    )
+
+    result = await manager._scan_cninfo_daily_announcement_activity(
+        active_instruments=_SH_SCAN_ACTIVE,
+        exchanges=["SSE"],
+        start_date=date(2026, 7, 1),
+        end_date=date(2026, 7, 22),
+        run_at=datetime(
+            2026, 7, 22, 9, 30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+        overlap_days=2,
+        page_size=30,
+        max_pages=60,
+        request_interval_seconds=0,
+    )
+
+    assert len(queries) == 8
+    assert all(
+        query.scope.cursor is not None
+        and query.scope.cursor.value == "2026-07-22T01:30:00+00:00"
+        for query in queries
+    )
+    # Nightly resume keeps processing the pending carryover exactly once.
+    assert result["deferred_announcement_instrument_ids"] == ["600000.SH"]
+
+
+@pytest.mark.asyncio
+async def test_scan_processes_duplicated_announcement_across_chunks_once():
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="announcement-1",
+        announcement_key=build_announcement_key("cninfo", "announcement-1"),
+        title="2026年度权益分派实施公告",
+        published_at="2026-07-15T01:00:00+00:00",
+        exchange="SSE",
+        market="SSE",
+        symbols=("600000",),
+    )
+    manager = _scan_manager(storage_state=None)
+    queries = []
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=Mock(acquire=_recording_acquire(queries, records=[record]))
+    )
+
+    result = await manager._scan_cninfo_daily_announcement_activity(
+        active_instruments=_SH_SCAN_ACTIVE,
+        exchanges=["SSE"],
+        start_date=date(2026, 7, 1),
+        end_date=date(2026, 7, 22),
+        run_at=datetime(
+            2026, 7, 22, 9, 30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+        overlap_days=2,
+        page_size=30,
+        max_pages=60,
+        request_interval_seconds=0,
+        resume_from_watermark=False,
+    )
+
+    # The stub returns the same record for every chunk; selection and
+    # counting must still see it exactly once.
+    assert len(queries) == 8
+    assert result["matched_announcements"] == 1
+    assert result["announcement_instrument_ids"] == ["600000.SH"]
+    assert result["title_filter"]["selected_records"] == 1

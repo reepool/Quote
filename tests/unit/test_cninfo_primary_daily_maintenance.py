@@ -2188,3 +2188,104 @@ async def test_daily_maintenance_persists_complete_new_pending_factor_queue():
         ]
         == ["600000.SH", "600001.SH"]
     )
+
+
+def _replay_maintenance_manager():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+        },
+    ])
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 28)
+    )
+    manager.discover_a_share_cninfo_daily_candidates = AsyncMock(return_value={
+        "status": "success",
+        "candidate_ids": ["600000.SH"],
+        "candidate_count": 1,
+    })
+    manager.backfill_a_share_cninfo_corporate_actions = AsyncMock(return_value={
+        "status": "success",
+        "affected_instrument_ids": ["600000.SH"],
+    })
+    manager.backfill_tdx_xdxr_history = AsyncMock(return_value={
+        "status": "success",
+        "event_instrument_ids": [],
+        "totals": {},
+    })
+    rebuild_result = {
+        "status": "success",
+        "cninfo_path": {"pending_count": 0},
+        "tdx_path": {"pending_count": 0},
+        "reconciliation": {"status": "success", "totals": {}},
+        "source_completeness": {
+            "cninfo": {"status": "success"},
+            "tdx_reference": {"status": "success"},
+            "reconciliation": {"status": "success"},
+        },
+    }
+    manager.rebuild_cninfo_primary_adjustment_factors = AsyncMock(
+        return_value=rebuild_result
+    )
+    manager._load_daily_factor_cutoff_deferred_instrument_ids = AsyncMock(
+        return_value=[]
+    )
+    manager._govern_cninfo_daily_anomalies = AsyncMock(return_value={
+        "status": "success",
+        "execution_status": "success",
+        "readiness_status": "success",
+        "deferred_instrument_ids": [],
+        "promoted_instrument_ids": [],
+    })
+    return manager
+
+
+@pytest.mark.asyncio
+async def test_explicit_start_replays_announcement_window_without_watermark():
+    manager = _replay_maintenance_manager()
+
+    result = await manager.maintain_a_share_cninfo_primary_factors(
+        start_date="2026-07-01",
+        end_date="2026-07-29",
+        exchanges=["SSE"],
+        request_interval_seconds=0,
+    )
+
+    discovery_args = (
+        manager.discover_a_share_cninfo_daily_candidates.await_args.kwargs
+    )
+    # A historical catch-up replay scans announcements from the explicitly
+    # requested start instead of the single daily slice, and re-scans
+    # announcements already consumed by the committed watermark.
+    assert discovery_args["announcement_start_date"] == date(2026, 7, 1)
+    assert (
+        discovery_args["announcement_resume_from_watermark"] is False
+    )
+    assert result["parameters"]["announcement_start_date"] == "2026-07-01"
+    assert result["parameters"]["announcement_replayed_history"] is True
+
+
+@pytest.mark.asyncio
+async def test_rolling_nightly_run_keeps_daily_window_and_watermark_resume():
+    manager = _replay_maintenance_manager()
+
+    result = await manager.maintain_a_share_cninfo_primary_factors(
+        end_date="2026-07-29",
+        exchanges=["SSE"],
+        request_interval_seconds=0,
+    )
+
+    discovery_args = (
+        manager.discover_a_share_cninfo_daily_candidates.await_args.kwargs
+    )
+    # Nightly rolling runs keep the previous-trading-day window and the
+    # incremental watermark semantics.
+    assert discovery_args["announcement_start_date"] == date(2026, 7, 28)
+    assert (
+        discovery_args["announcement_resume_from_watermark"] is True
+    )
+    assert result["parameters"]["announcement_start_date"] == "2026-07-28"
+    assert result["parameters"]["announcement_replayed_history"] is False

@@ -6,7 +6,7 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 import unicodedata
-from typing import Any, Dict, Iterable, Mapping, Sequence
+from typing import Any, Dict, Iterable, List, Mapping, Sequence
 from zoneinfo import ZoneInfo
 
 from data_sources.cninfo_special_action_resolution import (
@@ -26,6 +26,13 @@ _REASON_PRIORITY = {
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
     "cninfo_corporate_action_daily_title_trigger_v8"
 )
+# One announcement scan scope is bounded by max_pages x page_size (240 x 30
+# = 7200 records per exchange). Observed market-wide announcement volume is
+# roughly 500-1000 per exchange per day (about 2000 on peak announcement
+# days), so a 3-calendar-day chunk stays under the pagination budget with
+# headroom. Wider catch-up windows are split into chunks of at most this
+# many days so replaying a multi-week gap never truncates silently.
+MAX_ANNOUNCEMENT_SCAN_CHUNK_DAYS = 3
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
     "权益分派",
@@ -297,6 +304,37 @@ def resolve_daily_announcement_window(
         "end_date": run_date,
         "run_at": normalized_run_at,
     }
+
+
+def iter_announcement_scan_chunks(
+    scan_start: date | datetime,
+    scan_end: date | datetime,
+    *,
+    max_days: int = MAX_ANNOUNCEMENT_SCAN_CHUNK_DAYS,
+) -> List[tuple[date, date]]:
+    """Split an announcement scan window into pagination-safe chunks.
+
+    Each chunk is at most ``max_days`` calendar days (inclusive) so one
+    provider scan stays inside the ``max_pages x page_size`` budget.
+    Nightly windows that already fit produce a single chunk with bounds
+    identical to the unchunked span.
+    """
+    if isinstance(scan_start, datetime):
+        scan_start = scan_start.date()
+    if isinstance(scan_end, datetime):
+        scan_end = scan_end.date()
+    if scan_end < scan_start:
+        raise ValueError(
+            f"announcement scan window is inverted: {scan_start}..{scan_end}"
+        )
+    span_days = max(1, int(max_days))
+    chunks: List[tuple[date, date]] = []
+    cursor = scan_start
+    while cursor <= scan_end:
+        chunk_end = min(cursor + timedelta(days=span_days - 1), scan_end)
+        chunks.append((cursor, chunk_end))
+        cursor = chunk_end + timedelta(days=1)
+    return chunks
 
 
 def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:

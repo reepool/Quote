@@ -25205,12 +25205,20 @@ class DataManager:
         page_size: int,
         max_pages: int,
         request_interval_seconds: float,
+        resume_from_watermark: bool = True,
     ) -> Dict[str, Any]:
-        """Scan market-wide announcement activity without semantic blocking."""
+        """Scan market-wide announcement activity without semantic blocking.
+
+        Windows wider than ``MAX_ANNOUNCEMENT_SCAN_CHUNK_DAYS`` are replayed
+        as consecutive pagination-safe chunks per exchange; pass
+        ``resume_from_watermark=False`` for historical catch-up runs so
+        chunks re-scan announcements already consumed by the watermark.
+        """
         from data_sources.cninfo_corporate_action_incremental import (
             DAILY_TITLE_TRIGGER_POLICY_VERSION,
             build_symbol_index,
             classify_daily_corporate_action_title,
+            iter_announcement_scan_chunks,
         )
         from data_sources.cninfo_non_xdxr_announcements import (
             POLICY_VERSION as NON_XDXR_DECISION_POLICY_VERSION,
@@ -25242,6 +25250,7 @@ class DataManager:
         announcement_xdxr_cases_by_id: Dict[str, Dict[str, Any]] = {}
         matched_records_by_exchange: Dict[str, List[Any]] = defaultdict(list)
         matched_instruments_by_record: Dict[str, Set[str]] = defaultdict(set)
+        seen_announcement_keys: Set[str] = set()
         route_results: Dict[str, Any] = {}
         errors: List[str] = []
         pages_scanned = 0
@@ -25258,13 +25267,18 @@ class DataManager:
                 tzinfo=get_shanghai_time().tzinfo
             )
 
+        # The span start folds the overlap in once at span level; individual
+        # chunk scopes partition the span without re-applying it.
+        scan_span_start = start_date - timedelta(days=max(0, int(overlap_days)))
         for exchange in exchanges:
-            scope = AnnouncementScope(
+            scan_chunks = iter_announcement_scan_chunks(
+                scan_span_start,
+                end_date,
+            )
+            stream_scope = AnnouncementScope(
                 exchange=exchange,
                 market=exchange,
-                start_date=(
-                    start_date - timedelta(days=max(0, int(overlap_days)))
-                ).isoformat(),
+                start_date=scan_span_start.isoformat(),
                 end_date=end_date.isoformat(),
                 page_size=max(1, int(page_size)),
                 max_pages=max(1, int(max_pages)),
@@ -25274,18 +25288,25 @@ class DataManager:
             state = storage.get_announcement_scan_state(
                 purpose_key="a_share_cninfo_corporate_action_daily_sync",
                 source="cninfo",
-                scope_key=scope.scope_key,
+                scope_key=stream_scope.scope_key,
             )
-            if state and state.get("committed_cursor"):
+            # scope_key is date-independent, so every chunk of one exchange
+            # stream shares a single committed watermark. Nightly runs resume
+            # from it; historical catch-up replays pass
+            # resume_from_watermark=False so already-consumed announcements
+            # inside the requested range are re-scanned, and yesterday's
+            # pending carryover is left for the next nightly run.
+            if resume_from_watermark and state and state.get("committed_cursor"):
                 cursor = state["committed_cursor"]
-                scope = replace(
-                    scope,
+                stream_scope = replace(
+                    stream_scope,
                     cursor=ProviderCursor(
                         kind=str(cursor["kind"]),
                         value=str(cursor["value"]),
                     ),
                 )
-            if state:
+            records_published_after_run_at = 0
+            if resume_from_watermark and state:
                 state_metadata = state.get("metadata") or {}
                 for case in state_metadata.get("announcement_xdxr_cases") or ():
                     if not isinstance(case, Mapping):
@@ -25480,113 +25501,145 @@ class DataManager:
                         ] += 1
                         continue
                     deferred_announcement_ids.add(instrument_id)
-            route_result = await asyncio.to_thread(
-                service.acquire,
-                AnnouncementQuery(
-                    purpose_key="a_share_cninfo_corporate_action_daily_sync",
-                    scope=scope,
-                ),
-            )
-            route_results[exchange] = route_result
-            scan_result = route_result.scan_result
-            if scan_result is None:
-                errors.append(f"{exchange}:announcement_route_returned_no_result")
-                continue
-            pages_scanned += int(scan_result.pages_scanned)
-            announcements_seen += int(scan_result.announcements_seen)
-            errors.extend(f"{exchange}:{error}" for error in scan_result.errors)
-            if scan_result.status not in {"success", "success_empty"}:
-                errors.append(
-                    f"{exchange}:announcement_scan_{scan_result.status}"
+            for chunk_start, chunk_end in scan_chunks:
+                scope = replace(
+                    stream_scope,
+                    start_date=chunk_start.isoformat(),
+                    end_date=chunk_end.isoformat(),
                 )
-            records_published_after_run_at = 0
-            for record in scan_result.records:
-                published_at = None
-                if record.published_at:
-                    try:
-                        published_at = datetime.fromisoformat(
-                            str(record.published_at).replace("Z", "+00:00")
-                        )
-                    except ValueError:
-                        published_at = None
-                published_after_run_at = (
-                    published_at is not None
-                    and published_at.tzinfo is not None
-                    and published_at > normalized_run_at.astimezone(timezone.utc)
-                )
-                if published_after_run_at:
-                    records_published_after_run_at += 1
-                matched_ids = {
-                    symbol_index[symbol]
-                    for symbol in tuple(record.symbols or ())
-                    if symbol in symbol_index
-                }
-                if not matched_ids:
-                    continue
-                title_records_evaluated += 1
-                if published_after_run_at:
-                    title_filter_reasons["published_after_run_at"] += 1
-                    continue
-                eligible_ids = set()
-                for instrument_id in matched_ids:
-                    operator_decision = (
-                        resolve_non_xdxr_announcement_decision(
-                            announcement_key=record.announcement_key,
-                            instrument_id=instrument_id,
-                            title=record.title,
-                        )
+                # Single-chunk spans keep the plain exchange error labels;
+                # chunked replays tag each label with its span for diagnosis.
+                error_prefix = (
+                    exchange
+                    if len(scan_chunks) == 1
+                    else (
+                        f"{exchange}"
+                        f"[{chunk_start.isoformat()}..{chunk_end.isoformat()}]"
                     )
-                    if operator_decision["matched"]:
-                        operator_decision_counts["current_excluded"] += 1
-                        if len(operator_decision_samples) < 20:
-                            operator_decision_samples.append({
-                                "announcement_key": record.announcement_key,
-                                "instrument_id": instrument_id,
-                                "reason": operator_decision["reason"],
-                            })
+                )
+                route_result = await asyncio.to_thread(
+                    service.acquire,
+                    AnnouncementQuery(
+                        purpose_key="a_share_cninfo_corporate_action_daily_sync",
+                        scope=scope,
+                    ),
+                )
+                route_results[exchange] = route_result
+                scan_result = route_result.scan_result
+                if scan_result is None:
+                    errors.append(f"{error_prefix}:announcement_route_returned_no_result")
+                    continue
+                pages_scanned += int(scan_result.pages_scanned)
+                announcements_seen += int(scan_result.announcements_seen)
+                errors.extend(
+                    f"{error_prefix}:{error}" for error in scan_result.errors
+                )
+                if scan_result.status not in {"success", "success_empty"}:
+                    errors.append(
+                        f"{error_prefix}:announcement_scan_{scan_result.status}"
+                    )
+                for record in scan_result.records:
+                    # Chunk replays can overlap when a provider returns
+                    # records slightly outside the requested span; process
+                    # each announcement exactly once per run.
+                    if record.announcement_key in seen_announcement_keys:
                         continue
-                    if operator_decision["decision_found"]:
-                        operator_decision_counts["identity_mismatch"] += 1
-                        if len(operator_decision_samples) < 20:
-                            operator_decision_samples.append({
-                                "announcement_key": record.announcement_key,
-                                "instrument_id": instrument_id,
-                                "reason": operator_decision["reason"],
-                                "mismatches": operator_decision["mismatches"],
-                            })
-                    eligible_ids.add(instrument_id)
-                if not eligible_ids:
-                    title_filter_reasons[
-                        "operator_verified_non_xdxr"
-                    ] += 1
-                    continue
-                title_decision = classify_daily_corporate_action_title(record.title)
-                title_filter_reasons[str(title_decision["reason"])] += 1
-                if not title_decision["selected"]:
-                    continue
-                title_records_selected += 1
-                announcement_ids.update(eligible_ids)
-                for instrument_id in eligible_ids:
-                    announcement_profiles_by_instrument[instrument_id].update(
-                        str(item).strip()
-                        for item in title_decision.get("source_profiles") or ()
-                        if str(item).strip()
+                    seen_announcement_keys.add(record.announcement_key)
+                    published_at = None
+                    if record.published_at:
+                        try:
+                            published_at = datetime.fromisoformat(
+                                str(record.published_at).replace("Z", "+00:00")
+                            )
+                        except ValueError:
+                            published_at = None
+                    published_after_run_at = (
+                        published_at is not None
+                        and published_at.tzinfo is not None
+                        and published_at > normalized_run_at.astimezone(timezone.utc)
                     )
-                matched_record = record.with_selection_reasons(
-                    ["corporate_action_announcement"]
-                )
-                matched_records_by_exchange[exchange].append(matched_record)
-                matched_instruments_by_record[
-                    matched_record.announcement_key
-                ].update(eligible_ids)
+                    if published_after_run_at:
+                        records_published_after_run_at += 1
+                    matched_ids = {
+                        symbol_index[symbol]
+                        for symbol in tuple(record.symbols or ())
+                        if symbol in symbol_index
+                    }
+                    if not matched_ids:
+                        continue
+                    title_records_evaluated += 1
+                    if published_after_run_at:
+                        title_filter_reasons["published_after_run_at"] += 1
+                        continue
+                    eligible_ids = set()
+                    for instrument_id in matched_ids:
+                        operator_decision = (
+                            resolve_non_xdxr_announcement_decision(
+                                announcement_key=record.announcement_key,
+                                instrument_id=instrument_id,
+                                title=record.title,
+                            )
+                        )
+                        if operator_decision["matched"]:
+                            operator_decision_counts["current_excluded"] += 1
+                            if len(operator_decision_samples) < 20:
+                                operator_decision_samples.append({
+                                    "announcement_key": record.announcement_key,
+                                    "instrument_id": instrument_id,
+                                    "reason": operator_decision["reason"],
+                                })
+                            continue
+                        if operator_decision["decision_found"]:
+                            operator_decision_counts["identity_mismatch"] += 1
+                            if len(operator_decision_samples) < 20:
+                                operator_decision_samples.append({
+                                    "announcement_key": record.announcement_key,
+                                    "instrument_id": instrument_id,
+                                    "reason": operator_decision["reason"],
+                                    "mismatches": operator_decision["mismatches"],
+                                })
+                        eligible_ids.add(instrument_id)
+                    if not eligible_ids:
+                        title_filter_reasons[
+                            "operator_verified_non_xdxr"
+                        ] += 1
+                        continue
+                    title_decision = classify_daily_corporate_action_title(record.title)
+                    title_filter_reasons[str(title_decision["reason"])] += 1
+                    if not title_decision["selected"]:
+                        continue
+                    title_records_selected += 1
+                    announcement_ids.update(eligible_ids)
+                    for instrument_id in eligible_ids:
+                        announcement_profiles_by_instrument[instrument_id].update(
+                            str(item).strip()
+                            for item in title_decision.get("source_profiles") or ()
+                            if str(item).strip()
+                        )
+                    matched_record = record.with_selection_reasons(
+                        ["corporate_action_announcement"]
+                    )
+                    matched_records_by_exchange[exchange].append(matched_record)
+                    matched_instruments_by_record[
+                        matched_record.announcement_key
+                    ].update(eligible_ids)
+            # Bound the committed watermark once per exchange after all
+            # chunks, using the run-level future-record count: a later
+            # chunk without future records must not un-bound an earlier
+            # bounded result (route_results keeps the last chunk).
+            final_route_result = route_results.get(exchange)
+            final_scan_result = getattr(
+                final_route_result, "scan_result", None
+            )
             if (
-                records_published_after_run_at
-                and scan_result.cursor_commit_allowed
-                and scan_result.provider_cursor is not None
-                and scan_result.provider_cursor.kind == "published_at"
+                final_scan_result is not None
+                and records_published_after_run_at
+                and final_scan_result.cursor_commit_allowed
+                and final_scan_result.provider_cursor is not None
+                and final_scan_result.provider_cursor.kind == "published_at"
             ):
                 cursor_ceiling = normalized_run_at.astimezone(timezone.utc)
-                committed_cursor = scope.cursor
+                committed_cursor = stream_scope.cursor
                 if (
                     committed_cursor is not None
                     and committed_cursor.kind == "published_at"
@@ -25605,23 +25658,25 @@ class DataManager:
                         cursor_ceiling = committed_cursor_at
                 bounded_cursor_value = cursor_ceiling.isoformat()
                 bounded_scan_result = replace(
-                    scan_result,
+                    final_scan_result,
                     max_published_at=bounded_cursor_value,
                     provider_cursor=ProviderCursor(
                         kind="published_at",
                         value=bounded_cursor_value,
                     ),
                     diagnostics={
-                        **scan_result.diagnostics,
+                        **final_scan_result.diagnostics,
                         "provider_cursor_bounded_by_run_at": True,
-                        "observed_max_published_at": scan_result.max_published_at,
+                        "observed_max_published_at": (
+                            final_scan_result.max_published_at
+                        ),
                         "records_published_after_run_at": (
                             records_published_after_run_at
                         ),
                     },
                 )
                 route_results[exchange] = replace(
-                    route_result,
+                    final_route_result,
                     scan_result=bounded_scan_result,
                 )
 
@@ -25838,6 +25893,7 @@ class DataManager:
         explicit_instrument_ids: Optional[List[str]] = None,
         announcement_start_date: Optional[date] = None,
         announcement_run_at: Optional[datetime] = None,
+        announcement_resume_from_watermark: bool = True,
         announcement_overlap_days: int = 3,
         announcement_page_size: int = 30,
         announcement_max_pages: int = 60,
@@ -25911,6 +25967,7 @@ class DataManager:
             page_size=announcement_page_size,
             max_pages=announcement_max_pages,
             request_interval_seconds=request_interval_seconds,
+            resume_from_watermark=announcement_resume_from_watermark,
         )
         safety_targets_by_profile = select_rotating_safety_targets(
             active_ids,
@@ -27269,6 +27326,10 @@ class DataManager:
         from utils.a_share_historical_backfill import coerce_date, normalize_string_list
         stage_durations: Dict[str, float] = {}
         operation_started_at = time.monotonic()
+        # An explicitly requested start_date marks a historical catch-up run:
+        # the announcement scan must replay the whole requested range instead
+        # of the single daily slice (see announcement_scan_start below).
+        explicit_start_requested = start_date is not None
 
         normalized_end = coerce_date(
             end_date or get_shanghai_time().date(),
@@ -27395,6 +27456,18 @@ class DataManager:
             schedule_mode=resolved_window_mode,
             previous_trading_day=previous_trading_day,
         )
+        # Nightly rolling runs keep the single-day announcement window and
+        # resume from the committed published_at watermark. Catch-up runs
+        # with an explicit start replay announcements across the whole
+        # maintenance range (chunked into pagination-safe spans inside the
+        # scan) without the watermark, so announcements published inside a
+        # coverage gap are re-discovered even when past discovery runs
+        # already advanced the watermark.
+        announcement_scan_start = (
+            min(announcement_window["start_date"], normalized_start)
+            if explicit_start_requested
+            else announcement_window["start_date"]
+        )
 
         bse_active_rows = active_rows_by_exchange.get("BSE", [])
         if "BSE" in normalized_exchanges:
@@ -27405,7 +27478,7 @@ class DataManager:
                         active_instruments=bse_active_rows,
                         start_date=max(
                             normalized_start,
-                            announcement_window["start_date"],
+                            announcement_scan_start,
                         ),
                         end_date=normalized_end,
                         page_size=announcement_page_size,
@@ -27624,8 +27697,11 @@ class DataManager:
                 start_date=normalized_start,
                 end_date=normalized_end,
                 explicit_instrument_ids=sorted(requested_ids),
-                announcement_start_date=announcement_window["start_date"],
+                announcement_start_date=announcement_scan_start,
                 announcement_run_at=announcement_window["run_at"],
+                announcement_resume_from_watermark=(
+                    not explicit_start_requested
+                ),
                 announcement_overlap_days=announcement_overlap_days,
                 announcement_page_size=announcement_page_size,
                 announcement_max_pages=announcement_max_pages,
@@ -28759,7 +28835,10 @@ class DataManager:
                 "announcement_overlap_days": int(announcement_overlap_days),
                 "announcement_schedule_mode": normalized_schedule_mode,
                 "announcement_start_date": (
-                    announcement_window["start_date"].isoformat()
+                    announcement_scan_start.isoformat()
+                ),
+                "announcement_replayed_history": bool(
+                    explicit_start_requested
                 ),
                 "announcement_run_at": (
                     announcement_window["run_at"].isoformat()
