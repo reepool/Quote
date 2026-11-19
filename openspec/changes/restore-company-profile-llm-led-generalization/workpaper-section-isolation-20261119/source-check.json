@@ -1,0 +1,257 @@
+{
+  "task": "6.DV",
+  "type": "saved_real_source_offline_engineering_calibration",
+  "base_commit": "7a01c554",
+  "source_asset": {
+    "instrument_id": "601318.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "bp-frontier-efc068d2819d50a9092aa70a",
+    "filing_id": "1225038263",
+    "source": "cninfo",
+    "published_at": "2026-03-26T16:00:00+00:00",
+    "content_hash": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/86/860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a.pdf",
+    "report_type": "annual_report"
+  },
+  "cache_sha256": "10d8476743de6d17ac5344122796c9807dd6409e6cd3a8d39f462748366f0652",
+  "original_navigation_sha256": "f3db578a93b00aa35e96b321cd5617aabb5b3836fa1987d7aaede6060c6112bd",
+  "original_strict_error": "layout section boundary cannot be located: section-0037:35",
+  "current_index_excludes_original_footer_boundary": true,
+  "index_counts": {
+    "old_v5": 1095,
+    "new_v6": 1094
+  },
+  "retained_old_navigation_used_only_for_calibration": true,
+  "readable_selected_sections": [
+    {
+      "section_id": "section-0015",
+      "section_path": [
+        "寿险及健康险业务"
+      ],
+      "start_page": 10,
+      "end_page": 15,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    },
+    {
+      "section_id": "section-0039",
+      "section_path": [
+        "业绩综述"
+      ],
+      "start_page": 40,
+      "end_page": 41,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    },
+    {
+      "section_id": "section-0042",
+      "section_path": [
+        "集团营运利润概览"
+      ],
+      "start_page": 41,
+      "end_page": 41,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    },
+    {
+      "section_id": "section-0085",
+      "section_path": [
+        "财产保险业务概览"
+      ],
+      "start_page": 53,
+      "end_page": 54,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    },
+    {
+      "section_id": "section-0087",
+      "section_path": [
+        "财产保险业务"
+      ],
+      "start_page": 54,
+      "end_page": 55,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    },
+    {
+      "section_id": "section-0127",
+      "section_path": [
+        "银行业务"
+      ],
+      "start_page": 64,
+      "end_page": 65,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    },
+    {
+      "section_id": "section-0162",
+      "section_path": [
+        "金融赋能业务概览"
+      ],
+      "start_page": 72,
+      "end_page": 73,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    },
+    {
+      "section_id": "section-0751",
+      "section_path": [
+        "七、分部报告（续）"
+      ],
+      "start_page": 249,
+      "end_page": 250,
+      "rationale": "本报告为中国平安2025年年报。优先选取能共同解释集团业务结构、产品服务、收入来源与规模权重的实质经营子节：section-0037为集团经营情况讨论及分析（业务结构与经营综述），section-0039业绩综述给出集团收入与利润总额，section-0042集团营运利润概览说明分部利润构成；section-0015寿险及健康险业务（最大板块，含渠道、新业务与规模保费），section-0085/0087财产保险业务概览与经营分析（保费规模、险种与承保质效），section-0127银行业务（零售/对公/资金同业收入与资产质量），section-0162金融赋能业务概览（科技与医疗养老等赋能板块）；section-0751分部报告（续）提供分部收入与利润的量化构成，用于交叉验证主要业务权重。以上均为信息密集的完整子节，未选纯行业背景、治理、审计与会计政策附录。"
+    }
+  ],
+  "selected_physical_pages": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    40,
+    41,
+    53,
+    54,
+    64,
+    72,
+    249
+  ],
+  "source_characters": 166510,
+  "unread_or_deferred": [
+    "section-0006内含价值分析",
+    "section-0187营运利润分析",
+    "section-0193寿险及健康险业务利源与合同服务边际分析",
+    "section-0750分部报告",
+    "section-0906保险服务收入附注",
+    "章节section-0037（经营情况讨论及分析）边界无法定位：物理页35未找到标题“经营情况讨论及分析”；本候选未读，不等于未披露，未猜测偏移或扩读全文。",
+    "物理页40布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页41布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页53布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页54布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页55布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页64布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页65布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页72布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页73布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+  ],
+  "evidence_coordinates_match": true,
+  "source_spans": [
+    {
+      "evidence_id": "source-0001",
+      "page": 10,
+      "start": 2189,
+      "end": 5593,
+      "quote_sha256": "19af74efbe679697ee31287d04c2d73dff94eb77f4960d6b17095216870b3e7d"
+    },
+    {
+      "evidence_id": "source-0002",
+      "page": 11,
+      "start": 0,
+      "end": 3895,
+      "quote_sha256": "0ed0c993dbd15d4c404d60ed751b631ab80b5fe1e6e20f5db574639a24e08c56"
+    },
+    {
+      "evidence_id": "source-0003",
+      "page": 12,
+      "start": 0,
+      "end": 13838,
+      "quote_sha256": "860f7b69029729b2d9850bacc126669b535a4d80a9bca7138e20d4fdef4cf5dc"
+    },
+    {
+      "evidence_id": "source-0004",
+      "page": 13,
+      "start": 0,
+      "end": 5805,
+      "quote_sha256": "eb3c4dce612a26aca8e5e4c3712ed6e52e84d596f1f29504cdaf35637e4d4bff"
+    },
+    {
+      "evidence_id": "source-0005",
+      "page": 14,
+      "start": 0,
+      "end": 65743,
+      "quote_sha256": "f91a4af4cfef68ec4949be1040205b75e24a72bfe64d3f014f9f9f5baec44bd3"
+    },
+    {
+      "evidence_id": "source-0006",
+      "page": 15,
+      "start": 0,
+      "end": 17937,
+      "quote_sha256": "809048b29ed995021ad62021286e8d18127fcc51b07aaa4d8782c66e0f6d36f1"
+    },
+    {
+      "evidence_id": "source-0007",
+      "page": 40,
+      "start": 0,
+      "end": 880,
+      "quote_sha256": "b61807589df38505ee6cc81f4d268b5c3a3bed695db0739eb132754122ce1219"
+    },
+    {
+      "evidence_id": "source-0008",
+      "page": 41,
+      "start": 40,
+      "end": 55,
+      "quote_sha256": "da78a55ab4207e78448f8be520da218bae91daef097d350f376918d6ab3ffee6"
+    },
+    {
+      "evidence_id": "source-0009",
+      "page": 53,
+      "start": 54,
+      "end": 1559,
+      "quote_sha256": "9f157089b7efaad879e4f4a2f8c48b3e80b5719065f58eea9bc4db00c2ca580d"
+    },
+    {
+      "evidence_id": "source-0010",
+      "page": 54,
+      "start": 6,
+      "end": 1444,
+      "quote_sha256": "6302af704802a5463a9ddc97d227ed028f5c2a70eb973600baa807834cbc982d"
+    },
+    {
+      "evidence_id": "source-0011",
+      "page": 64,
+      "start": 6,
+      "end": 973,
+      "quote_sha256": "deb099dabf0a38f1c1e9019fee205c5f690e4d85a3a86ab30c8666fbdbe01827"
+    },
+    {
+      "evidence_id": "source-0012",
+      "page": 72,
+      "start": 43,
+      "end": 1270,
+      "quote_sha256": "1a5335fdd940dbc6e4e2c07e51e768d568218c8d96c7dcfca624da161fa983bc"
+    },
+    {
+      "evidence_id": "source-0013",
+      "page": 249,
+      "start": 0,
+      "end": 49856,
+      "quote_sha256": "50b0c2b0bce66f59c2fb2f3164473586a33c0ca68103a460776390cc5d2a7d84"
+    }
+  ],
+  "existing_read_roots": [
+    {
+      "root": "company_profile_audited_20261118",
+      "profiles": 12,
+      "new_instance_equal": true
+    },
+    {
+      "root": "company_profile_s2_first_20261118",
+      "profiles": 16,
+      "new_instance_equal": true
+    },
+    {
+      "root": "company_profile_six_regression_20261119",
+      "profiles": 5,
+      "new_instance_equal": true
+    }
+  ],
+  "protected_files": 412,
+  "protected_file_hashes_unchanged": true,
+  "protected_set_sha256": "55bae8a7d6e6f8153cd9a5a9e87875e3eaffce47daa11b6c759f61bdb5baf6af",
+  "new_model_requests": 0,
+  "new_company_results": 0,
+  "original_failure_changed": false,
+  "source_code_sha256": {
+    "research/company_profile/workpaper_sections.py": "c2622486b1aa7a76f0d0945c198413167bd70b6b6fbb86fa597ffaf5b2a33b02",
+    "research/company_profile/workpaper_llm.py": "b4570fa6c42fadcaba801fe0b9d4f48c72d446d2f5abab90a685ce617f2b7511"
+  },
+  "limits": [
+    "No new LLM navigation or semantic quality claim.",
+    "Old S2/DU failures and production authorization unchanged."
+  ]
+}

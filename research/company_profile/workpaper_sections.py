@@ -33,6 +33,7 @@ _PLAIN_HEADING = re.compile(
     r"^[^\d\W][^。；;：:，,!?！？\d]{1,37}"
     r"(?:情况|分析|概览|综述|回顾|业务|经营模式|业务模式|财务报告|公司治理|重要事项|未来展望)$"
 )
+_REPORT_PAGE_FOOTER = re.compile(r"(?:年度报告|年报|annual\s+report).*\d\s*$", re.IGNORECASE)
 
 
 def _numeric_table_row(title: str, *, legacy: bool = False) -> bool:
@@ -132,7 +133,10 @@ def _source_pages(pages: Sequence[Mapping]) -> dict[int, str]:
     return dict(sorted(result.items()))
 
 
-def index_sections(pages: Sequence[Mapping], *, legacy_numbered_only: bool = False) -> tuple[IndexedSection, ...]:
+def index_sections(
+    pages: Sequence[Mapping], *, legacy_numbered_only: bool = False,
+    exclude_footer_labels: bool = True,
+) -> tuple[IndexedSection, ...]:
     """Index real headings; directory entries locate structure, not answers."""
     by_page = _source_pages(pages)
     footer_counts: dict[str, int] = {}
@@ -161,6 +165,12 @@ def index_sections(pages: Sequence[Mapping], *, legacy_numbered_only: bool = Fal
             plain = not legacy_numbered_only and bool(_PLAIN_HEADING.fullmatch(stripped))
             if plain and line_number >= len(lines) - 2 and footer_counts.get(stripped, 0) >= 3:
                 plain = False  # Repeated report/page footer, not a new boundary.
+            if plain and exclude_footer_labels and not any(t.strip() for t in lines[line_number + 1:]):
+                previous = next((t.strip() for t in reversed(lines[:line_number]) if t.strip()), "")
+                if _REPORT_PAGE_FOOTER.search(previous):
+                    # Running chapter labels can follow the report's page
+                    # footer even once. A real heading above it is preserved.
+                    plain = False
             if (match or plain) and not _numeric_table_row(stripped, legacy=legacy_numbered_only) and len(stripped) <= 150 and not re.search(r"\.{3,}|…{2,}", stripped):
                 title = re.split(r"[。；]", stripped, maxsplit=1)[0].strip()
                 level = _level(title) if match else 1
@@ -230,19 +240,36 @@ def build_section_packet(
     *,
     remap_layout: bool = False,
     max_characters: int = 160_000,
+    skip_unlocatable_sections: bool = False,
 ) -> SectionPacket:
     by_page = _source_pages(pages)
     page_metadata = {int(p.get("page", p.get("page_number"))): p for p in pages}
     by_id = {item.section_id: item for item in sections}
     selected_pages(sections, selection)
     chosen = sorted((by_id[sid] for sid in set(selection.selected_section_ids)), key=lambda e: (e.start_page, e.start_offset, -e.characters))
+    evidence, limitations = [], []
+    if remap_layout and skip_unlocatable_sections:
+        locatable = []
+        for section in chosen:
+            boundaries = ((section.start_page, section.section_path[-1]), (section.end_page, section.next_title))
+            for page, title in boundaries:
+                text = by_page.get(page)
+                if (title and text is not None and page_metadata[page].get("readable") is not False
+                    and _position(text, title) is None):
+                    limitations.append(
+                        f"章节{section.section_id}（{' / '.join(section.section_path)}）边界无法定位："
+                        f"物理页{page}未找到标题“{title}”；本候选未读，不等于未披露，未猜测偏移或扩读全文。"
+                    )
+                    break
+            else:
+                locatable.append(section)
+        chosen = locatable
     # An ancestor already contains its child; don't send its text twice.
     chosen = [item for index, item in enumerate(chosen) if not any(
         (other.start_page, other.start_offset) <= (item.start_page, item.start_offset)
         and (other.end_page, other.end_offset) >= (item.end_page, item.end_offset)
         for other in chosen[:index]
     )]
-    evidence, limitations = [], []
     for section in chosen:
         for page in range(section.start_page, section.end_page + 1):
             text = by_page.get(page)

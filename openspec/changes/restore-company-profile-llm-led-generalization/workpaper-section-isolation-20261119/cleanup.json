@@ -1,0 +1,21 @@
+{
+  "task": "6.DV",
+  "predevelopment_previous_owned_root_absent": true,
+  "previous_owned_root": "data/QuoteBak/workpaper-du-iBzooe",
+  "predevelopment_removed_bytes": 0,
+  "removed_root": "/home/python/Quote/data/QuoteBak/workpaper-dv-d3jsVx",
+  "removed_file_count": 21,
+  "removed_file_bytes": 168446,
+  "interrupted_api_controlled_test_root": "/home/python/Quote/data/QuoteBak/workpaper-dh-api-y6acc3tq",
+  "interrupted_api_controlled_files": 2,
+  "interrupted_api_controlled_bytes": 26826,
+  "total_removed_file_bytes": 195272,
+  "other_task_or_unknown_ownership_removed": false,
+  "preserved": [
+    "official PDF and shared valid cache",
+    "previous raw results, failures and attempts",
+    "three existing persistent research roots",
+    "baseline config/core/parallel changes"
+  ],
+  "recovery": "Only reproducible test databases/exports/scripts removed; tests and compact source verification snapshot retained."
+}

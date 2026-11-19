@@ -525,6 +525,16 @@ The new processing policy MUST use the existing real LLM gateway and company-pro
 ### Requirement: Discovery and omission checking are source-led
 The v9 ordinary path MUST begin with each report's TOC, bookmarks or equivalent heading hierarchy, choose relevant sections or subsections by business questions, and restore their actual boundaries with source-bound title locations. Physical pages are coordinates, not reusable selection policies. The system MUST prefer a small set of information-dense, subject/period-correct section sources that jointly support many profile elements, without requiring a global set-cover optimizer or repeating all alternative occurrences. Selected paragraphs and tables MUST retain necessary governing context and continuations. Local indexing MAY span all pages, but only declared section text and necessary recovery context are supplied for model analysis. Candidate-free source grounding MUST NOT receive the target company's answers or Gold; it MAY be evaluated from a frozen independent manual reference instead of a compulsory separate paid inventory request. Missing secondary details MAY remain explicit at the stopping boundary; a material business omission, subject/number conflict or damaged table context warrants only bounded targeted recovery under current authorization, otherwise partial delivery. Selected-scope coverage MUST NOT be reported as full-report completeness; known major gaps still prevent formal company usability. Historical v8 and earlier runs remain unchanged.
 
+#### Scenario: A running chapter label follows an annual-report page footer
+- **WHEN** native page text ends with an annual-report page-number line followed by an unnumbered chapter label
+- **THEN** the new versioned index excludes that page-furniture label rather than inventing a new chapter boundary, while retaining real body headings and original text coordinates
+- **AND** saved navigation under older preprocessing identities keeps its original index behavior; it is not rebound to renumbered current sections
+
+#### Scenario: One selected candidate has no locatable layout boundary
+- **WHEN** the new versioned section path cannot locate a selected candidate's start or end title but another selected section is readable
+- **THEN** the existing owner records the affected candidate as unread with its reason and delivers only the valid sections, preserving table headers, continuations, source coordinates and the unresolved coverage
+- **AND** validation precedes ancestor deduplication so an unusable ancestor cannot suppress a selected usable child; no offsets or full-report fallback are guessed, all-unreadable selections still fail explicitly, and older strict processing remains unchanged
+
 #### Scenario: Navigation omits a fee or purchasing disclosure
 - **WHEN** source-led review, section references or major income composition reveal a missing fee mechanism or purchasing disclosure
 - **THEN** the owner locates and reads its necessary context without candidate answers, including table headers and continuations, or retains the unresolved major gap

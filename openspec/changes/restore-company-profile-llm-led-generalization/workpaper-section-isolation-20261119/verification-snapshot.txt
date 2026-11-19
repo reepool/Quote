@@ -1,0 +1,172 @@
+# File: verify_source.py
+"""Read-only real-source calibration, not new model extraction or an S2 score."""
+import gzip
+import hashlib
+import json
+from pathlib import Path
+
+from research.company_profile.models import ReportIdentity
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper_sections import (
+    SectionSelection, build_section_packet, extract_selected_layout, index_sections, selected_pages,
+)
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+SOURCE = CHANGE / 'workpaper-six-issue-regression-20261119'
+DEST = CHANGE / 'workpaper-section-isolation-20261119'
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+paths = [p for name in ['workpaper-six-issue-regression-20261119', 'workpaper-s2-first-result-20261118']
+         for p in (CHANGE / name).rglob('*') if p.is_file()]
+research_roots = ['company_profile_audited_20261118', 'company_profile_s2_first_20261118', 'company_profile_six_regression_20261119']
+for name in research_roots:
+    paths.extend((ROOT / 'data/research' / name / 'company_profile_common_core.v1').glob('*.json'))
+before = {str(p.relative_to(ROOT)): sha(p) for p in paths}
+diagnostic = load(SOURCE / 'failure-diagnostics.json')
+asset = diagnostic['asset']
+pdf = Path(asset['archive_path'])
+assert sha(pdf) == asset['content_hash']
+cache = pdf.parent / 'derived/business_profile_pdfium_recovery.v4' / (pdf.stem + '_57e1dd4f16ef40ff.json.gz')
+native = json.loads(gzip.decompress(cache.read_bytes()))['pages']
+selection = SectionSelection.model_validate(load(SOURCE / '601318/model-receipts.json')[0]['response_payload'])
+old = index_sections(native, exclude_footer_labels=False)
+current = index_sections(native)
+bad = diagnostic['selected_section']
+assert not any((s.start_page, s.start_offset) == (bad['start_page'], bad['start_offset']) for s in current)
+layout = extract_selected_layout(pdf.read_bytes(), selected_pages(old, selection), native_pages=native)
+report = ReportIdentity(instrument_id=asset['instrument_id'], report_id=asset['source_asset_id'],
+                        document_version=asset['content_hash'], report_period=asset['report_period'],
+                        published_at=asset['published_at'])
+try:
+    build_section_packet(report, layout, old, selection, remap_layout=True, max_characters=500000)
+except ValueError as exc:
+    original_error = str(exc)
+    assert 'section-0037:35' in original_error
+else:
+    raise AssertionError('old strict failure was not reproduced')
+packet = build_section_packet(report, layout, old, selection, remap_layout=True,
+                              max_characters=500000, skip_unlocatable_sections=True)
+by_page = {p['page']: p['text'] for p in layout}
+for evidence in packet.evidence:
+    for span in evidence.source_spans:
+        assert by_page[span.page][span.start:span.end] == span.quote
+checks = []
+for name, count in zip(research_roots, [12, 16, 5], strict=True):
+    reader = CompanyProfileReadService(ROOT / 'data/research' / name)
+    query = reader.query()
+    assert query['delivered'] == count
+    assert query['profiles'] == CompanyProfileReadService(ROOT / 'data/research' / name).query()['profiles']
+    checks.append(dict(root=name, profiles=count, new_instance_equal=True))
+assert before == {str(p.relative_to(ROOT)): sha(p) for p in paths}
+result = dict(task='6.DV', type='saved_real_source_offline_engineering_calibration', base_commit='7a01c554',
+    source_asset=asset, cache_sha256=sha(cache), original_navigation_sha256=sha(SOURCE / '601318/model-receipts.json'),
+    original_strict_error=original_error, current_index_excludes_original_footer_boundary=True,
+    index_counts=dict(old_v5=len(old), new_v6=len(current)),
+    retained_old_navigation_used_only_for_calibration=True,
+    readable_selected_sections=[s.model_dump(mode='json') for s in packet.reading_scope.sections],
+    selected_physical_pages=sorted({s.page for e in packet.evidence for s in e.source_spans}),
+    source_characters=sum(len(s.quote) for e in packet.evidence for s in e.source_spans),
+    unread_or_deferred=list(packet.reading_scope.unread_or_deferred),
+    evidence_coordinates_match=True,
+    source_spans=[dict(evidence_id=e.evidence_id, page=s.page, start=s.start, end=s.end,
+                       quote_sha256=hashlib.sha256(s.quote.encode()).hexdigest()) for e in packet.evidence for s in e.source_spans],
+    existing_read_roots=checks, protected_files=len(before), protected_file_hashes_unchanged=True,
+    protected_set_sha256=hashlib.sha256(json.dumps(before, sort_keys=True).encode()).hexdigest(),
+    new_model_requests=0, new_company_results=0, original_failure_changed=False,
+    source_code_sha256={p:sha(ROOT / p) for p in ['research/company_profile/workpaper_sections.py', 'research/company_profile/workpaper_llm.py']},
+    limits=['No new LLM navigation or semantic quality claim.', 'Old S2/DU failures and production authorization unchanged.'])
+DEST.mkdir(parents=True, exist_ok=True)
+(DEST / 'source-check.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({k:result[k] for k in ['index_counts', 'selected_physical_pages', 'source_characters', 'protected_files', 'protected_file_hashes_unchanged']}, ensure_ascii=False))
+print('READABLE_SECTIONS', [(s.section_path, s.start_page, s.end_page) for s in packet.reading_scope.sections])
+
+
+# File: close_dv.py
+"""Retain one verification receipt and clean only owned, rebuildable artifacts."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import xml.etree.ElementTree as ET
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE / 'workpaper-section-isolation-20261119'
+TEMP = ROOT / 'data/QuoteBak/workpaper-dv-d3jsVx'
+API_RESIDUE = ROOT / 'data/QuoteBak/workpaper-dh-api-y6acc3tq'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+source = json.loads((DEST / 'source-check.json').read_text())
+suite = ET.parse(TEMP / 'verification.xml').getroot().find('testsuite')
+assert suite is not None and int(suite.attrib['tests']) == 131
+assert all(int(suite.attrib[k]) == 0 for k in ['errors', 'failures', 'skipped'])
+for path, digest in source['source_code_sha256'].items():
+    assert sha(ROOT / path) == digest
+paths = [p for name in ['workpaper-six-issue-regression-20261119', 'workpaper-s2-first-result-20261118']
+         for p in (CHANGE / name).rglob('*') if p.is_file()]
+for name in ['company_profile_audited_20261118', 'company_profile_s2_first_20261118', 'company_profile_six_regression_20261119']:
+    paths.extend((ROOT / 'data/research' / name / 'company_profile_common_core.v1').glob('*.json'))
+protected = {str(p.relative_to(ROOT)): sha(p) for p in paths}
+assert len(protected) == source['protected_files']
+assert hashlib.sha256(json.dumps(protected, sort_keys=True).encode()).hexdigest() == source['protected_set_sha256']
+shutil.copyfile(TEMP / 'verification.xml', DEST / 'verification.xml')
+files = ['test_company_profile_workpaper.py', 'test_company_profile_workpaper_source_recovery.py',
+         'test_company_profile_workpaper_format_consumption.py', 'test_company_profile_workpaper_local_consumption.py',
+         'test_company_profile_workpaper_delivery.py', 'test_company_profile_enrichment.py',
+         'test_company_profile_workpaper_review.py::test_runtime_seed_review_gateway_writer_and_three_reads']
+command = ['python', '-m', 'pytest', *('tests/unit/test_research/' + p for p in files), '-q',
+           '--basetemp=' + str(TEMP / 'tests'), '--junitxml=' + str(TEMP / 'verification.xml')]
+verification = dict(task='6.DV', command=command, execution_environment='approved_environment',
+                    tests=131, errors=0, failures=0, skipped=0, pytest_wall_seconds=168.87,
+                    junit_suite_seconds=float(suite.attrib['time']), raw_xml_sha256=sha(DEST / 'verification.xml'),
+                    interrupted_sandbox_api_wait_not_a_model_failure=True, compileall='passed',
+                    openspec_strict='passed', diff_check='passed', new_model_requests=0,
+                    controlled_runtime_not_real_model=True, protected_files_unchanged=len(protected))
+(DEST / 'verification.json').write_text(json.dumps(verification, ensure_ascii=False, indent=2) + '\n')
+(DEST / 'verification-snapshot.txt').write_text('\n\n'.join(
+    '# File: ' + p + '\n' + (TEMP / p).read_text() for p in ['verify_source.py', 'close_dv.py']))
+owned = [p for p in TEMP.rglob('*') if p.is_file()]
+assert not TEMP.is_symlink() and not any(p.is_symlink() for p in owned)
+deleted_bytes = sum(p.stat().st_size for p in owned)
+deleted_files = len(owned)
+api_residue_files = []
+api_residue_bytes = 0
+if API_RESIDUE.exists():
+    api_residue_files = [p for p in API_RESIDUE.rglob('*') if p.is_file()]
+    assert {str(p.relative_to(API_RESIDUE)) for p in api_residue_files} == {
+        'output/company_profile_common_core.v1/first-read.json',
+        'output/company_profile_common_core.v1/checkpoints/first-read.json'}
+    fixture = json.loads((API_RESIDUE / 'output/company_profile_common_core.v1/first-read.json').read_text())
+    assert fixture['work_id'] == 'first-read' and fixture['workpaper']['origin'] == 'controlled_fixture'
+    assert fixture['report']['document_version'] == 'fixture-document'
+    assert any(d['fact_id'] == 'main' and d['disposition'] == 'withheld'
+               for d in fixture['workpaper']['use_review']['decisions'])
+    assert not API_RESIDUE.is_symlink() and not any(p.is_symlink() for p in api_residue_files)
+    api_residue_bytes = sum(p.stat().st_size for p in api_residue_files)
+    shutil.rmtree(API_RESIDUE)  # Exact interrupted test root, verified controlled fixture only.
+shutil.rmtree(TEMP)
+assert not TEMP.exists()
+cleanup = dict(task='6.DV', predevelopment_previous_owned_root_absent=True,
+               previous_owned_root='data/QuoteBak/workpaper-du-iBzooe', predevelopment_removed_bytes=0,
+               removed_root=str(TEMP), removed_file_count=deleted_files, removed_file_bytes=deleted_bytes,
+               interrupted_api_controlled_test_root=str(API_RESIDUE),
+               interrupted_api_controlled_files=len(api_residue_files), interrupted_api_controlled_bytes=api_residue_bytes,
+               total_removed_file_bytes=deleted_bytes + api_residue_bytes, other_task_or_unknown_ownership_removed=False,
+               preserved=['official PDF and shared valid cache', 'previous raw results, failures and attempts',
+                          'three existing persistent research roots', 'baseline config/core/parallel changes'],
+               recovery='Only reproducible test databases/exports/scripts removed; tests and compact source verification snapshot retained.')
+(DEST / 'cleanup.json').write_text(json.dumps(cleanup, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(cleanup, ensure_ascii=False))

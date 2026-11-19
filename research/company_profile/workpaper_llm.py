@@ -42,7 +42,7 @@ def workpaper_processing_identity(
         "reading_strategy": WORKPAPER_READING_STRATEGY,
         "prompt_version": WORKPAPER_PROMPT_VERSION,
         "section_guide_version": SECTION_GUIDE_VERSION,
-        "preprocessing_version": "toc_sections_native_layout.v5.plain-headings-local-layout",
+        "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
         "source_binding_policy": "company_workpaper_source_literals.aligned-cells.v6",
         "workpaper_format_recovery": "validation_feedback.v2.syntax-diagnosis",
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
@@ -323,8 +323,10 @@ def run_workpaper(
     if content is not None and hashlib.sha256(content).hexdigest() != report.document_version:
         raise ValueError("source PDF hash differs from the bound report")
     source_identity = (extraction_resume or {}).get("original_processing_identity") or processing_identity
-    new_preprocessing = source_identity.get("preprocessing_version") == "toc_sections_native_layout.v5.plain-headings-local-layout"
-    index = index_sections(pages, legacy_numbered_only=not new_preprocessing)
+    preprocessing = source_identity.get("preprocessing_version")
+    local_sections = preprocessing == "toc_sections_native_layout.v6.footer-safe-local-sections"
+    new_preprocessing = local_sections or preprocessing == "toc_sections_native_layout.v5.plain-headings-local-layout"
+    index = index_sections(pages, legacy_numbered_only=not new_preprocessing, exclude_footer_labels=local_sections)
     selection_id = f"{work_id}:workpaper:sections"
     extraction_id = f"{work_id}:workpaper:extract"
     path_ids = {section.section_path: section.section_id for section in index}
@@ -419,6 +421,7 @@ def run_workpaper(
         # mistake preserved column whitespace for additional source sections.
         remap_layout=remap,
         max_characters=int(processing_identity.get("max_layout_characters", 500_000)) if remap else limit,
+        skip_unlocatable_sections=local_sections,
     )
     if local_only:
         extracted, normalization = normalize_retained_workpaper_format(raw_failure)
