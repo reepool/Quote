@@ -1,0 +1,17 @@
+{
+  "task": "6.EF",
+  "scope": "Only the nine supplemental objects and the two requested income questions, not the whole company/cohort or an accuracy score.",
+  "method": "Independent comparison to the official-version retained source spans and source-only read of the report's income-analysis pages; no new model call and no manual answers inserted into the model workpaper.",
+  "checks": [
+    {"fact_ids": ["RM-01", "RM-02", "RM-03", "RM-04", "RM-05", "RM-06", "RM-07"], "evidence_id": "source-0001", "physical_page": 23, "assessment": "The business/service definitions and named international/subsidiary platforms follow the original source; RM-02 is a service-based summary, not an independently established fee schedule. These facts still do not substantively explain the company's main income composition."},
+    {"fact_ids": ["RM-08"], "evidence_id": "source-0002", "physical_page": 26, "assessment": "Company completed 1 IPO, 7 refinancing projects, equity underwriting 86.97亿元, 3 listed-company restructuring projects with project transaction amount 194.66亿元, and 2 NEEQ placements. These are handled-project/underwriting scale, not company revenue or principal invested by the company."},
+    {"fact_ids": ["RM-09"], "evidence_id": "source-0002", "physical_page": 26, "assessment": "Company bond underwriting 6825.75亿元, +37.3%, ranking 6; components 4333.31/1458.81/300.00/100.92/91.44亿元 match company paragraphs, not the preceding whole-market 89.08万亿元. These are not income."}
+  ],
+  "income_target_assessment": {"company_income_acquired": false, "principal_income_mix_acquired": false, "substantive_income_mechanism_still_incomplete": true, "reason": "The executed source packet retained only pages 23 and 26. Income and composition were present in the official report but selected native sections were silently empty after layout remapping."},
+  "not_disclosed_does_not_mean_report_absence": true,
+  "actual_report_income_numbers_not_manually_added_to_profile": true,
+  "offline_recovered_source_is_not_new_model_output": true,
+  "zero_known_new_wrong_income_claims_externally_promoted": true,
+  "full_report_accuracy": "not_claimed",
+  "old_S2": "unchanged"
+}

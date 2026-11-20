@@ -42,7 +42,7 @@ def workpaper_processing_identity(
         "reading_strategy": WORKPAPER_READING_STRATEGY,
         "prompt_version": WORKPAPER_PROMPT_VERSION,
         "section_guide_version": SECTION_GUIDE_VERSION,
-        "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
         "source_binding_policy": "company_workpaper_source_literals.punctuated-numbers.v7",
         "workpaper_format_recovery": "validation_feedback.v2.syntax-diagnosis",
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
@@ -332,7 +332,8 @@ def run_workpaper(
         raise ValueError("source PDF hash differs from the bound report")
     source_identity = (extraction_resume or {}).get("original_processing_identity") or processing_identity
     preprocessing = source_identity.get("preprocessing_version")
-    local_sections = preprocessing == "toc_sections_native_layout.v6.footer-safe-local-sections"
+    ordered_remap = preprocessing == "toc_sections_native_layout.v7.ordered-section-remap"
+    local_sections = ordered_remap or preprocessing == "toc_sections_native_layout.v6.footer-safe-local-sections"
     new_preprocessing = local_sections or preprocessing == "toc_sections_native_layout.v5.plain-headings-local-layout"
     index = index_sections(pages, legacy_numbered_only=not new_preprocessing, exclude_footer_labels=local_sections)
     selection_id = f"{work_id}:workpaper:sections"
@@ -414,7 +415,10 @@ def run_workpaper(
     remap = source_pdf_path is not None
     if remap:
         assert content is not None
-        packet_pages = extract_selected_layout(content, chosen_pages, native_pages=pages if new_preprocessing else None)
+        packet_pages = extract_selected_layout(
+            content, chosen_pages, native_pages=pages if new_preprocessing else None,
+            **({"section_bounds": tuple(by_id[sid] for sid in selection.selected_section_ids)} if ordered_remap else {}),
+        )
     elif real:
         raise ValueError("real workpaper requires the official PDF for selected layout")
     else:

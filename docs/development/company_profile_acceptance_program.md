@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-20 6.EF仅单股补读执行与源包修复：[实际结论](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-galaxy-enrichment-20261120/result.md)。中国银河原16条保留，追加9服务/承销条目但收入机制/公司收入构成仍不足，模型初核completed不作为补齐或S2通过；3物理/52444全已知供应商total/122.326秒/费用unknown。布局空切片根因已离线恢复原文，未复验模型，不改旧首发或既有正式95%/99%，不补五家/第41家/S3或生产。
+
 2026-11-20 6.ED仅已有意见的研究消费：十五份后继快照400可读事实/648指标，分众两项局部限用/隔离、缺项说明随API交付，其他十四稿及原模型状态不变；原254证据/15writer/33份EC材料hash保持。0新模型，不是新增公司、正式补救或S2改判，不启S3/生产；[结果与限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-reviewed-snapshot-20261120/result.md)。
 
 2026-11-20 6.EC限定通道验证已2/2结束，[执行与限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-channel-check-20261120/result.md)：两份各1物理、0恢复，239.183/347.570秒；36/24事实ID完整，0/2意见，账本92162全为供应商已知total、费用unknown。2意见只读核源、不修订不改旧API，京东方原限制保留、旧254文件及15writer hash不变。串行2次成功只能证明本次可用，旧空返回未复现不等于已定因/长期稳定，原S2失败和本方案结束不改，不追加窗/五家/第41家/S3/生产；后续只宜优先利用已保存内容处理局部限制和分级研究/API验收，新的真实补救及正式方案另裁决。

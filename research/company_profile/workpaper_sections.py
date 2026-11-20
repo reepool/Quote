@@ -330,6 +330,7 @@ def build_section_packet(
 
 def extract_selected_layout(
     content: bytes, page_numbers: Sequence[int], *, native_pages: Sequence[Mapping] | None = None,
+    section_bounds: Sequence[IndexedSection] = (),
 ) -> tuple[dict, ...]:
     """Use the shared native PDF owner in opt-in fixed-width layout mode."""
     from research.document_processing.pdf import PypdfNativeAdapter, detect_text_quality
@@ -354,11 +355,25 @@ def extract_selected_layout(
             and not _numeric_table_row(line.strip())
         )
         lost_heading = any(_position(text, title) is None for title in native_titles)
+        empty_remap = False
+        for section in section_bounds:
+            if not section.start_page <= number <= section.end_page:
+                continue
+            native_start = section.start_offset if number == section.start_page else 0
+            native_end = section.end_offset if number == section.end_page else len(fallback.get(number, ""))
+            if not fallback.get(number, "")[native_start:native_end].strip():
+                continue
+            start = _position(text, section.section_path[-1]) if number == section.start_page else 0
+            end = (_position(text, section.next_title)
+                   if number == section.end_page and section.next_title else len(text))
+            if start is None or end is None or end <= start:
+                empty_remap = True
+                break
         # A native chapter divider can legitimately contain only its heading.
         # Keep that text and its coordinates: low character count is not a
         # decoding failure, and must not discard the following business pages.
         metadata = {}
-        if quality not in {"usable", "low_text"} or page is None or page.diagnostics or lost_heading:
+        if quality not in {"usable", "low_text"} or page is None or page.diagnostics or lost_heading or empty_remap:
             if native_pages is None:
                 raise ValueError(f"selected page has unreadable native layout: {number}")
             text = fallback.get(number, "")
@@ -366,6 +381,8 @@ def extract_selected_layout(
             readable = quality in {"usable", "low_text"}
             metadata = {
                 "layout_limitation": f"物理页{number}布局未恢复；" + (
+                    "选中章节的布局边界为空或顺序异常；" if empty_remap else ""
+                ) + (
                     "仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。" if readable
                     else "原生文本也不可读，本页未读，不等于未披露。"
                 ),

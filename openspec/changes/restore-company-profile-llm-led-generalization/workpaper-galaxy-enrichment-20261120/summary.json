@@ -1,0 +1,27 @@
+{
+  "task": "6.EF",
+  "instrument_id": "601881.SH",
+  "entry_started": true,
+  "state": "completed",
+  "before_readings": 1,
+  "exception": null,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 29.248,
+  "business_seconds": 122.326,
+  "physical_requests": 3,
+  "charged_tokens": 52444,
+  "fee": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "after_readings": 2,
+  "new_reading_work_ids": [
+    "bp-work-5ce29dc63f76696150d64e1a"
+  ],
+  "new_visible_facts": 9,
+  "new_visible_metrics": 8,
+  "before_facts_preserved": true,
+  "old_runtime_files_unchanged": true,
+  "review_status": "completed",
+  "review_error": null,
+  "supervision_seconds": 155.84
+}

@@ -1,0 +1,14 @@
+{
+  "task": "6.EF",
+  "phase": "approved_execution_and_post_run_offline_fix",
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6ef-run-JIO4iwNg",
+  "removed_temporary_files": 76,
+  "released_temporary_file_bytes": 2638278,
+  "removed_redundant_API_snapshot": {"path": "workpaper-galaxy-enrichment-20261120/api.json", "bytes": 159931, "sha256": "c0fad07a977392e75b703a44a16405e75e9ab8cf2c19c73257c6c29c2c42e010", "recoverability": "Original model facts/status are retained in runtime.json and provider receipts; the raw API can be reconstructed with the preserved base. The authoritative annotated consumer API is research-api.json."},
+  "released_total_file_bytes": 2798209,
+  "directory_absent_after_cleanup": true,
+  "scope": "Only this task's DB/checkpoints/scripts/process-local logs/tests/cache/capture duplicates/full temporary exports and one redundant API projection; all associated sessions had finished.",
+  "retained_business_root": "/home/python/Quote/data/research/company_profile_galaxy_enriched_20261120",
+  "retained_attempt_guard": "/home/python/Quote/data/QuoteBak/s1-attempts/workpaper-ef-601881-20261120.json",
+  "official_PDF_valid_cache_old_15_records_historical_failures_parallel_work": "untouched"
+}

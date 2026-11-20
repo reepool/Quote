@@ -24,7 +24,7 @@ from .workpaper import (
     qualify_workpaper_display, workpaper_fact_hash,
     WORKPAPER_SUBJECT_INSTRUCTIONS,
 )
-from .workpaper_sections import SectionPacket, extract_selected_layout
+from .workpaper_sections import SectionPacket, extract_selected_layout, index_sections
 
 REVIEW_POLICY = "company_profile_workpaper_review.v12"
 BATCH_STOP_POLICY = "consecutive_same_execution_failure.v1"
@@ -201,9 +201,19 @@ def seed_material(seed, *, report, source_pdf_path, real: bool, native_pages=Non
         if hashlib.sha256(content).hexdigest() != report.document_version:
             raise ValueError("review seed PDF hash differs from report")
         numbers = sorted({span.page for item in paper.evidence for span in item.source_spans})
+        layout_options = {}
+        if (paper.generation and paper.generation.preprocessing_version == "toc_sections_native_layout.v7.ordered-section-remap"
+            and paper.reading_scope.transcription_version == "shared-pdf-layout-with-native-fallback.v2"):
+            if native_pages is None:
+                raise ValueError("ordered-remap review requires the original native pages")
+            by_id = {section.section_id: section for section in index_sections(native_pages)}
+            if any(section.section_id not in by_id for section in paper.reading_scope.sections):
+                raise ValueError("review source section IDs differ from the native index")
+            layout_options["section_bounds"] = tuple(by_id[section.section_id] for section in paper.reading_scope.sections)
         pages = extract_selected_layout(
             content, numbers,
             native_pages=native_pages if paper.reading_scope.transcription_version == "shared-pdf-layout-with-native-fallback.v2" else None,
+            **layout_options,
         )
         paper.validate_pages(pages)
     if preserve_review_hash:

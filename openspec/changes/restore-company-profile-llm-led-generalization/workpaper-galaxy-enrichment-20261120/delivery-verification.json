@@ -1,0 +1,32 @@
+{
+  "task": "6.EF",
+  "new_model_calls_in_handoff": 0,
+  "raw_runtime_sha256": "46e5cd23be8985b346716f5c29aee3f3dbb6818f616823820bfb6fed44cca33c",
+  "successor_runtime_sha256": "3e34ec773d99c72c91c38028b3e3871387e47879517fc7d66a32e152a71988dd",
+  "successor_runtime": "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-5ce29dc63f76696150d64e1a.json",
+  "only_local_usage_metadata_adjusted": true,
+  "scale_gap_status": "extraction_failed (local source-pack diagnosis; raw model status retained in runtime.json)",
+  "all_facts_evidence_generation_model_review_unchanged": true,
+  "query_export_fresh_equal": true,
+  "annual_profiles_equal_to_API": true,
+  "http": {
+    "detail_status": 200,
+    "catalog_status": 200,
+    "API_equal": true,
+    "companies": 15
+  },
+  "old_15_records_unchanged": true,
+  "other_company_spot_check_unchanged": "000725.SZ",
+  "retained_old_base_facts": 16,
+  "new_reading_facts": 9,
+  "new_metrics": 8,
+  "company_revenue_still_missing": true,
+  "source_reference_not_a_delivered_fact": true,
+  "usage_known_supplier_total": 52444,
+  "unknown_usage_reserved": 0,
+  "conservative_ledger": 52444,
+  "fee": "unknown",
+  "shared_config_unchanged": true,
+  "production_authorization": "not_authorized",
+  "S2": "failed_scheme_ended_unchanged"
+}

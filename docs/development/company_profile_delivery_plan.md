@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-20 6.EF已按用户批准结束唯一真实精读：[结果与根因](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-galaxy-enrichment-20261120/result.md)。3物理/0恢复/52444供应商total、122.326业务秒，9条服务/承销补充不等于取得收入，目标仍缺。原v6布局重排把结束锚点算到开始前，选中的收入章静默空切；真实结束后v7离线恢复同选章2→10段，收入/构成原文与坐标成立，但未再发模型或改旧结果。117相关回归及末次59复验有重叠，原15稿/共享配置/S2与生产边界不变；原writer新根和API/导出明确缺项，必要一套后清本轮临时物，不借剩余额度续发。
+
 2026-11-20下一步收敛到[6.EF中国银河收入定向精读](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-galaxy-enrichment-card.md)，不继续增加展示层或重抽公司。原主营/服务线成立但收入机制/构成仍缺，当前API已生成同报告/base/hash绑定的两问题计划，原PDF/380页缓存及15writer零调用核对成立；真实调用与公开材料外传已合并询问，明确批准前不发送/排队/借旧额。见[计划与边界](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-galaxy-enrichment-20261120/result.md)。批准后整卡原TaskService.enrich并交实际新增/剩余缺项，旧S2/生产不改；必要一套后清本人QuoteBak，不留临时库等待，源/缓存/并行保护。
 
 2026-11-20 6.EE修复实际消费缺口：[补读导出卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-enrichment-export-card.md)。原export新增annual_profiles.json，复用API同报告多轮投影，旧文件不改；保存上汽首读＋精读39条/新增6条及十五家400条648指标零调用核对，缺项/局部隔离/原审核状态不丢，不新增公司或改S2。见[实物与边界](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-enrichment-export-20261120/result.md)。开工前轮临时根已清，必要一套后清本轮QuoteBak/完整重复导出，源/有效缓存/旧根/并行保护，不切共享配置或生产。

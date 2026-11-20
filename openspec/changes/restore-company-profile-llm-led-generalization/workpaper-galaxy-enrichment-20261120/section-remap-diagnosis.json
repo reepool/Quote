@@ -1,0 +1,144 @@
+{
+  "task": "6.EF",
+  "new_model_calls": 0,
+  "old_packet_evidence_count": 2,
+  "old_packet_evidence_pages": [
+    23,
+    26
+  ],
+  "actual_saved_selection_replayed": true,
+  "sections": [
+    {
+      "section_id": "section-0077",
+      "title": "一、报告期内公司从事的业务情况",
+      "start_page": 23,
+      "end_page": 23,
+      "native_characters": 714,
+      "next_title": "二、报告期内公司所处行业情况",
+      "layout_start": 14,
+      "layout_end": 756,
+      "inverted_or_empty_on_same_page": false
+    },
+    {
+      "section_id": "section-0080",
+      "title": "三、经营情况讨论与分析",
+      "start_page": 24,
+      "end_page": 24,
+      "native_characters": 1263,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 103,
+      "layout_end": 89,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0082",
+      "title": "（二）主营业务经营情况分析",
+      "start_page": 24,
+      "end_page": 24,
+      "native_characters": 1056,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 324,
+      "layout_end": 89,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0083",
+      "title": "1、财富管理业务",
+      "start_page": 24,
+      "end_page": 24,
+      "native_characters": 1017,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 375,
+      "layout_end": 89,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0090",
+      "title": "2、投资银行业务",
+      "start_page": 26,
+      "end_page": 26,
+      "native_characters": 1251,
+      "next_title": "3、机构业务",
+      "layout_start": 127,
+      "layout_end": 1616,
+      "inverted_or_empty_on_same_page": false
+    },
+    {
+      "section_id": "section-0093",
+      "title": "3、机构业务",
+      "start_page": 26,
+      "end_page": 26,
+      "native_characters": 313,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 1616,
+      "layout_end": 105,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0101",
+      "title": "4、国际业务",
+      "start_page": 28,
+      "end_page": 28,
+      "native_characters": 1428,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 417,
+      "layout_end": 120,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0105",
+      "title": "5、投资交易业务",
+      "start_page": 29,
+      "end_page": 29,
+      "native_characters": 830,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 787,
+      "layout_end": 0,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0109",
+      "title": "6、母子公司一体化业务",
+      "start_page": 30,
+      "end_page": 30,
+      "native_characters": 671,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 1311,
+      "layout_end": 89,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0124",
+      "title": "（一）主营业务分析",
+      "start_page": 34,
+      "end_page": 34,
+      "native_characters": 1753,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 633,
+      "layout_end": 587,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0129",
+      "title": "主营业务分行业情况",
+      "start_page": 35,
+      "end_page": 35,
+      "native_characters": 649,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 1887,
+      "layout_end": 0,
+      "inverted_or_empty_on_same_page": true
+    },
+    {
+      "section_id": "section-0131",
+      "title": "主营业务分地区情况",
+      "start_page": 36,
+      "end_page": 36,
+      "native_characters": 2042,
+      "next_title": "第三节 管理层讨论与分析",
+      "layout_start": 907,
+      "layout_end": 558,
+      "inverted_or_empty_on_same_page": true
+    }
+  ]
+}

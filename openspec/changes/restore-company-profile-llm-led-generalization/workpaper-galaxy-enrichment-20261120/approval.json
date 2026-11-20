@@ -1,0 +1,11 @@
+{
+  "task": "6.EF",
+  "status": "authorized",
+  "approval_reference": "用户call_ab3f4cdeff4a4790aa42382132fe08ed明确回复：批准中国银河这一次限定精读。",
+  "instrument_id": "601881.SH",
+  "public_material_only": "Existing public 2025 annual report selected sections and public derived workpapers; no private/account data.",
+  "providers": ["official DeepSeek for section selection/extraction and at most one merged repair", "existing scorpio.reepool.com grok-4.7 high for initial review and necessary final review"],
+  "limits": {"business_seconds": 6000, "conservative_ledger": 1000000, "physical_requests": 10, "recoveries": 3, "per_logical_recoveries": 1, "review_attempt_seconds": 1200, "logical_seconds": 2450, "flash_attempt_seconds": 600, "known_price_component_cny": 10},
+  "unpriced_fee": "unknown; no total CNY guarantee",
+  "constraints": "One enrich entry only in approved network environment, no extra window/company, recharge, shared config change or production. Old S2 failure unchanged. Execute whole card and clean task artifacts."
+}

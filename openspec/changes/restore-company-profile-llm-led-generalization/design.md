@@ -1,5 +1,9 @@
 ## Context
 
+### 6.EF 真实精读后只修源包空切片，不追加调用
+
+原v6真实入口已结束：选中收入/构成章节但布局页脚章节名移到页首，end<=start的片段被静默跳过，只交2段证据。原3物理/52444账本/9服务与承销对象保留，收入缺项不改成功。新v7预处理在原extract_selected_layout传入本次选择的原始边界，只对非空native片段却无法形成正向layout切片的页复用已有native降级，标表格列关系未核，不猜偏移/扩全文；其他页仍保layout。v6及旧身份重放保持，原选章可零调用重建源包，离线有表不冒称模型已补收入。修复在真实入口结束后实施，不热修在途或借余额再发。
+
 ### 6.EE 补读成果与API一致导出
 
 现有query及旧research_profiles.json保首读/单次底稿的兼容形态，不能替代API已实现的同报告多轮汇总。原ReadService.export按本次选中的work/processing identity定位同一base，直接复用`_research_profile_from_record`，增加`annual_profiles.json`；不重新找另一latest、不自行拼事实、不建新存储或模型阶段。原manifest列入新文件，旧导出不变，原API仍为唯一多轮投影。若两次读取间base已变化则明确拒绝，避免静默导出另一版；原报告/hash链、局部隔离、剩余缺项及模型失败照常保留。本卡仅离线实现/保存稿验证，不新增调用或启生产。

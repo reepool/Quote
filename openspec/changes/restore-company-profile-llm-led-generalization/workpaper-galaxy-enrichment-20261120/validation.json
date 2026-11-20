@@ -1,0 +1,43 @@
+{
+  "task": "6.EF",
+  "real_requests": 3,
+  "offline_replay_requests": 0,
+  "regressions": [
+    {
+      "run": "117 related regressions before final review-seed guard narrowing",
+      "completed": 117,
+      "seconds": "155.709",
+      "XML_sha256": "68a9005350902e6d92afe55dd3df25403c284199b75faf90ba5f7b01525356b4"
+    },
+    {
+      "run": "59 final targeted checks after guard narrowing; overlapping subset",
+      "completed": 59,
+      "seconds": "18.018",
+      "XML_sha256": "5f433c9aa3f1d9e34060eafbb5bbfd402fdfc2e9ba1699e9fb7ed28e95b8a3d5"
+    }
+  ],
+  "unique_completed_tests": 117,
+  "final_checks_overlap_previous": true,
+  "commands": [
+    "python -m pytest tests/unit/test_research/test_company_profile_workpaper_ordered_remap.py tests/unit/test_research/test_company_profile_workpaper_source_recovery.py tests/unit/test_research/test_company_profile_workpaper.py tests/unit/test_research/test_company_profile_workpaper_review.py -q",
+    "python -m pytest tests/unit/test_research/test_company_profile_workpaper_ordered_remap.py tests/unit/test_research/test_company_profile_workpaper_source_recovery.py::test_local_layout_recovery_survives_runtime_writer_and_review_seed tests/unit/test_research/test_company_profile_workpaper_review.py -q -k \"not test_task_service_review_publishes_original_before_review_and_corrected_afterward\"",
+    "python diagnose_packet.py (temporary, zero-call replay; source diagnosis/results retained)",
+    "python handoff.py (temporary, external sockets disabled; local ASGI verification in approved environment)",
+    "openspec validate restore-company-profile-llm-led-generalization --strict",
+    "git diff --check"
+  ],
+  "python": "/home/python/miniconda3/envs/Quote/bin/python",
+  "dev_environment": "source scripts/quote_dev_env.sh; all temporary files/cache/logs/task DB under dedicated QuoteBak root",
+  "code_fix_after_real_entry_finished": true,
+  "source_sha256_after_offline_fix": {
+    "research/company_profile/workpaper_sections.py": "994480c323874839040ee46db7d61447086b887e788b273bd9a395f492437a33",
+    "research/company_profile/workpaper_llm.py": "c90d96e914e20303c47647ec57f7e82d6dd19a975270072972c3091ea36edcf0",
+    "research/company_profile/workpaper_review.py": "7eb4d71bee4a926413ab6a7bb27429a7b6d190a0bdc00b595cb5d25f35fe6a5c",
+    "tests/unit/test_research/test_company_profile_workpaper_ordered_remap.py": "d360539e41668570c6a79f516ac63b2cf85e665ff628805170ee1a2fb8eefdd1",
+    "tests/unit/test_research/test_company_profile_workpaper.py": "1916b9fdecea99933fae8205ce46e7240093a8e752c938e2ed3094fbee898f22"
+  },
+  "syntax_parse_passed": true,
+  "old_frozen_runtime_still_v6": true,
+  "old_real_income_failure_not_reclassified": true,
+  "new_v7_default_not_real_validated": true
+}

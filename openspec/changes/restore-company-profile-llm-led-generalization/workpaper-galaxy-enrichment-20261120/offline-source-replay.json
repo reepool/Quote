@@ -1,0 +1,36 @@
+{
+  "task": "6.EF",
+  "old_saved_selection_only": true,
+  "new_model_calls": 0,
+  "old_evidence": 2,
+  "old_evidence_pages": [
+    23,
+    26
+  ],
+  "recovered_evidence": 10,
+  "recovered_evidence_pages": [
+    23,
+    24,
+    26,
+    28,
+    29,
+    30,
+    34,
+    35,
+    36
+  ],
+  "company_revenue_and_major_mix_original_text_present": true,
+  "source_coordinates_valid": true,
+  "layout_limitations": [
+    "物理页24布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页26布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页28布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页29布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页30布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页34布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页35布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+    "物理页36布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+  ],
+  "old_raw_draft_not_rebound_to_new_evidence_ids": true,
+  "not_a_new_model_answer_or_successful_income_enrichment": true
+}

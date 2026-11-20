@@ -1,0 +1,38 @@
+[
+  {
+    "model": "deepseek-flash",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 106847,
+    "payload_sha256": "2e1fd4a7da47d4f1ff55dd83ff01240c6ac9377b0b6919449bb165bde5671bab",
+    "max_tokens": 2500,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 3.075
+  },
+  {
+    "model": "deepseek-flash",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 35611,
+    "payload_sha256": "5b91896c463f5a092fb350c96b8e34bff09f143c8c324d9ab83f3b86d2897c6c",
+    "max_tokens": 12000,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 6.618
+  },
+  {
+    "model": "grok-4.7",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 24811,
+    "payload_sha256": "e386e09c78734255f273f41952e95e0724c8810cb5369733dd31d18dc2cb6f53",
+    "max_tokens": null,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 93.099
+  }
+]

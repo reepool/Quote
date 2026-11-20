@@ -369,6 +369,11 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** a genuinely unanswered basic business question remains explicitly incomplete but its reliable partial content is still delivered; known false assertions remain locally withheld, while historical frozen scores, formal batch validation and production authorization stay separate
 - **AND** future acceptance contracts MUST separate basic business questions from important supplementary targets; supplementary targets MUST NOT enter the mandatory denominator for basic profile completion, and prior frozen contracts/results MUST NOT be rewritten
 
+#### Scenario: Layout reordering must not silently erase selected source sections
+- **WHEN** an official selected section has nonempty native source text but layout remapping places its end boundary at or before its start, including a running footer moved before the body
+- **THEN** the new preprocessing identity MUST recover that affected page from the existing native text with explicit layout/table limitations, retaining source coordinates and selected-section bounds rather than silently sending an empty section or guessing an enlarged span
+- **AND** independent readable pages retain their layout, known table uncertainty remains visible, and old preprocessing identities, saved drafts, model calls and scores are not rebound or rerun
+
 #### Scenario: API clients inspect gaps and request targeted subsequent readings
 - **WHEN** a client reads an annual-report company profile through the HTTP API
 - **THEN** the original read owner MUST expose graded facts, explicit missing/uncertain items, suggested acquisition and selected/unread scope without raw rejected candidate payloads or implicit model calls

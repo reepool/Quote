@@ -1,0 +1,332 @@
+[
+  {
+    "request_id": "bp-work-5ce29dc63f76696150d64e1a:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "113c36d0ee12f8295cf5fa45f07207d68c7475a742c4297b9f77884dceb24b52",
+    "response_hash": "4cf58c97a45203502cdaa33f788c207e5799d8acb9ad783a4a06a8c62565d9d7",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0077\",\"section-0080\",\"section-0082\",\"section-0083\",\"section-0090\",\"section-0093\",\"section-0101\",\"section-0105\",\"section-0109\",\"section-0124\",\"section-0129\",\"section-0131\"],\"rationale\":\"本次为定向补充阅读，聚焦收入模型与规模结构。选取第三节中“报告期内公司从事的业务情况”(section-0077)说明业务与经营模式；经营情况讨论与分析(section-0080)及其主营业务经营情况分析(section-0082)下财富管理、投行、机构、国际、投资交易、母子公司一体化各业务子节，逐项说明收入来源与变现机制；主营业务分析(section-0124)及主营业务分行业(section-0129)、分地区(section-0131)提供报告期营业收入及业务/地区构成，满足规模与结构问题。未选行业背景、核心竞争力、风险展望及财务报告附注，避免重复全公司首读与过度扩读。\",\"deferred\":[\"行业格局与趋势、核心竞争力分析：属行业背景与泛化竞争力，非本次收入模型定向所需\",\"未来展望与风险章节：仅计划性/风险性信息，非收入来源与构成\",\"第八节财务报告及收入附注：经营分析已提供收入类别与构成，暂不扩读附注尾项\",\"分部报告附注：与主营业务分行业/分地区信息重叠，暂不重复选取\"],\"stop_reason\":\"已覆盖业务模式、各主要业务收入来源及报告期营业收入与行业/地区构成，可回答收入模型与规模结构两项定向问题；剩余为行业背景、风险展望及财务附注细节，超出本次定向阅读范围，故停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0077",
+        "section-0080",
+        "section-0082",
+        "section-0083",
+        "section-0090",
+        "section-0093",
+        "section-0101",
+        "section-0105",
+        "section-0109",
+        "section-0124",
+        "section-0129",
+        "section-0131"
+      ],
+      "rationale": "本次为定向补充阅读，聚焦收入模型与规模结构。选取第三节中“报告期内公司从事的业务情况”(section-0077)说明业务与经营模式；经营情况讨论与分析(section-0080)及其主营业务经营情况分析(section-0082)下财富管理、投行、机构、国际、投资交易、母子公司一体化各业务子节，逐项说明收入来源与变现机制；主营业务分析(section-0124)及主营业务分行业(section-0129)、分地区(section-0131)提供报告期营业收入及业务/地区构成，满足规模与结构问题。未选行业背景、核心竞争力、风险展望及财务报告附注，避免重复全公司首读与过度扩读。",
+      "deferred": [
+        "行业格局与趋势、核心竞争力分析：属行业背景与泛化竞争力，非本次收入模型定向所需",
+        "未来展望与风险章节：仅计划性/风险性信息，非收入来源与构成",
+        "第八节财务报告及收入附注：经营分析已提供收入类别与构成，暂不扩读附注尾项",
+        "分部报告附注：与主营业务分行业/分地区信息重叠，暂不重复选取"
+      ],
+      "stop_reason": "已覆盖业务模式、各主要业务收入来源及报告期营业收入与行业/地区构成，可回答收入模型与规模结构两项定向问题；剩余为行业背景、风险展望及财务附注细节，超出本次定向阅读范围，故停止。"
+    },
+    "usage": {
+      "input_tokens": 28759,
+      "output_tokens": 380,
+      "total_tokens": 29139
+    }
+  },
+  {
+    "request_id": "bp-work-5ce29dc63f76696150d64e1a:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "aa98c09149de450f0923666b9acc16ec7045c8044c50eacb8a09d56a0b74e6b2",
+    "response_hash": "47e8125a77756bc7851cb08245a018adb2a026ddd5978ec8745eb604f1ebf012",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次定向阅读未针对业务结构层级作系统梳理，仅按收入模型与规模结构目标读取选定章节。\"]},\"products_services\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次定向阅读未单独提取产品与服务清单，相关业务类别见收入模型要素。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-01\",\"text\":\"公司以“五位一体”业务模式提供综合金融服务，包括财富管理业务、投资银行业务、机构业务、国际业务、投资交易业务及母子公司一体化业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-02\",\"text\":\"财富管理业务通过为客户提供代理买卖股票、基金、债券、衍生金融工具等服务，提供投资咨询、投资组合建议、金融产品销售和资产配置等金融服务，以及向客户提供融资融券、股票质押式回购及约定购回交易等服务取得收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-03\",\"text\":\"投资银行业务为各类型企业和政府客户提供一站式投资银行服务，包括股权融资、债券融资、结构化融资、财务顾问及多样化融资解决方案等金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-04\",\"text\":\"机构业务提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-05\",\"text\":\"国际业务通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投资银行、研究和资产管理、融资和金融产品等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-06\",\"text\":\"投资交易业务从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融资及风险管理提供综合金融解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-07\",\"text\":\"母子公司一体化业务将从事期货业务、私募股权基金管理业务、另类投资业务、资产管理业务的子公司平台与前述五大业务线融合，强化业务协同、资源对接，持续为客户提供综合金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-08\",\"text\":\"投资银行业务中，公司完成1单IPO项目、7单再融资项目，股权承销规模为人民币86.97亿元，行业排名第12；完成3单上市公司发行股份购买资产/重大资产重组项目，交易金额为人民币194.66亿元，行业排名第7；另完成2单新三板定向发行项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"股权承销规模\",\"raw_value\":\"86.97\",\"value\":\"86.97\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"上市公司发行股份购买资产/重大资产重组项目交易金额\",\"raw_value\":\"194.66\",\"value\":\"194.66\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"RM-09\",\"text\":\"投资银行业务中，公司债券承销规模为人民币6,825.75亿元，同比增长37.3%，行业排名第6；其中地方政府债承销规模为人民币4,333.31亿元，金融债承销规模为人民币1,458.81亿元，中期票据承销规模为人民币300.00亿元，定向债务融资工具承销规模为人民币100.92亿元，短期融资券承销规模为人民币91.44亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"债券承销规模\",\"raw_value\":\"6,825.75\",\"value\":\"6825.75\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"地方政府债承销规模\",\"raw_value\":\"4,333.31\",\"value\":\"4333.31\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"金融债承销规模\",\"raw_value\":\"1,458.81\",\"value\":\"1458.81\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"中期票据承销规模\",\"raw_value\":\"300.00\",\"value\":\"300.00\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"定向债务融资工具承销规模\",\"raw_value\":\"100.92\",\"value\":\"100.92\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"短期融资券承销规模\",\"raw_value\":\"91.44\",\"value\":\"91.44\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"各业务收入的具体确认方式（如佣金费率、管理费计提基础、投资收益确认口径）未在选定章节中明示，未根据行业常识补充。\",\"投资银行承销规模为业务规模指标，不等同于投资银行业务收入。\"]},\"scale_and_mix\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次定向阅读所选章节未提供报告期营业收入总额及主营业务分行业、分地区收入构成表，未获取成功；未以承销规模等业务量指标替代营业收入。\"]},\"operations_and_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次定向阅读未针对运营与投入要素作系统提取。\"]},\"customers_channels_markets\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次定向阅读未单独提取客户、渠道与市场结构，相关客户类型散见于收入模型要素。\"]},\"operating_drivers\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次定向阅读未针对经营驱动因素作系统提取。\"]},\"material_changes\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次定向阅读未针对重大变化作系统提取。\"]}},\"limitations\":[\"本次为定向补充阅读，仅回答收入模型与规模结构两项问题，未覆盖全公司画像。\",\"规模与结构问题因选定章节未含营业收入及构成表而未获取成功，未作推测。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次定向阅读未针对业务结构层级作系统梳理，仅按收入模型与规模结构目标读取选定章节。"
+          ]
+        },
+        "products_services": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次定向阅读未单独提取产品与服务清单，相关业务类别见收入模型要素。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "RM-01",
+              "text": "公司以“五位一体”业务模式提供综合金融服务，包括财富管理业务、投资银行业务、机构业务、国际业务、投资交易业务及母子公司一体化业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-02",
+              "text": "财富管理业务通过为客户提供代理买卖股票、基金、债券、衍生金融工具等服务，提供投资咨询、投资组合建议、金融产品销售和资产配置等金融服务，以及向客户提供融资融券、股票质押式回购及约定购回交易等服务取得收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-03",
+              "text": "投资银行业务为各类型企业和政府客户提供一站式投资银行服务，包括股权融资、债券融资、结构化融资、财务顾问及多样化融资解决方案等金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-04",
+              "text": "机构业务提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-05",
+              "text": "国际业务通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投资银行、研究和资产管理、融资和金融产品等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-06",
+              "text": "投资交易业务从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融资及风险管理提供综合金融解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-07",
+              "text": "母子公司一体化业务将从事期货业务、私募股权基金管理业务、另类投资业务、资产管理业务的子公司平台与前述五大业务线融合，强化业务协同、资源对接，持续为客户提供综合金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-08",
+              "text": "投资银行业务中，公司完成1单IPO项目、7单再融资项目，股权承销规模为人民币86.97亿元，行业排名第12；完成3单上市公司发行股份购买资产/重大资产重组项目，交易金额为人民币194.66亿元，行业排名第7；另完成2单新三板定向发行项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "股权承销规模",
+                  "raw_value": "86.97",
+                  "value": "86.97",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "上市公司发行股份购买资产/重大资产重组项目交易金额",
+                  "raw_value": "194.66",
+                  "value": "194.66",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "RM-09",
+              "text": "投资银行业务中，公司债券承销规模为人民币6,825.75亿元，同比增长37.3%，行业排名第6；其中地方政府债承销规模为人民币4,333.31亿元，金融债承销规模为人民币1,458.81亿元，中期票据承销规模为人民币300.00亿元，定向债务融资工具承销规模为人民币100.92亿元，短期融资券承销规模为人民币91.44亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "债券承销规模",
+                  "raw_value": "6,825.75",
+                  "value": "6825.75",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "地方政府债承销规模",
+                  "raw_value": "4,333.31",
+                  "value": "4333.31",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "金融债承销规模",
+                  "raw_value": "1,458.81",
+                  "value": "1458.81",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中期票据承销规模",
+                  "raw_value": "300.00",
+                  "value": "300.00",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "定向债务融资工具承销规模",
+                  "raw_value": "100.92",
+                  "value": "100.92",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "短期融资券承销规模",
+                  "raw_value": "91.44",
+                  "value": "91.44",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "各业务收入的具体确认方式（如佣金费率、管理费计提基础、投资收益确认口径）未在选定章节中明示，未根据行业常识补充。",
+            "投资银行承销规模为业务规模指标，不等同于投资银行业务收入。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次定向阅读所选章节未提供报告期营业收入总额及主营业务分行业、分地区收入构成表，未获取成功；未以承销规模等业务量指标替代营业收入。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次定向阅读未针对运营与投入要素作系统提取。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次定向阅读未单独提取客户、渠道与市场结构，相关客户类型散见于收入模型要素。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次定向阅读未针对经营驱动因素作系统提取。"
+          ]
+        },
+        "material_changes": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次定向阅读未针对重大变化作系统提取。"
+          ]
+        }
+      },
+      "limitations": [
+        "本次为定向补充阅读，仅回答收入模型与规模结构两项问题，未覆盖全公司画像。",
+        "规模与结构问题因选定章节未含营业收入及构成表而未获取成功，未作推测。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 7540,
+      "output_tokens": 1621,
+      "total_tokens": 9161
+    }
+  },
+  {
+    "request_id": "bp-work-5ce29dc63f76696150d64e1a:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "5e972d57c8ea128999a0097755eacd910f609286d3d0fa862d0acf996a8e4544",
+    "response_hash": "cd6f29efc98e5218a391e092d02cdbaee2e2769e3a4ba3d303edadf6ea275518",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"RM-01\",\"RM-02\",\"RM-03\",\"RM-04\",\"RM-05\",\"RM-06\",\"RM-07\",\"RM-08\",\"RM-09\"],\"findings\":[]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "RM-01",
+        "RM-02",
+        "RM-03",
+        "RM-04",
+        "RM-05",
+        "RM-06",
+        "RM-07",
+        "RM-08",
+        "RM-09"
+      ],
+      "findings": []
+    },
+    "usage": {
+      "input_tokens": 6872,
+      "output_tokens": 49,
+      "total_tokens": 14144
+    }
+  }
+]
