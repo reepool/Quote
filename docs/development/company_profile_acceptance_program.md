@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-20 6.EC限定通道验证已2/2结束，[执行与限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-channel-check-20261120/result.md)：两份各1物理、0恢复，239.183/347.570秒；36/24事实ID完整，0/2意见，账本92162全为供应商已知total、费用unknown。2意见只读核源、不修订不改旧API，京东方原限制保留、旧254文件及15writer hash不变。串行2次成功只能证明本次可用，旧空返回未复现不等于已定因/长期稳定，原S2失败和本方案结束不改，不追加窗/五家/第41家/S3/生产；后续只宜优先利用已保存内容处理局部限制和分级研究/API验收，新的真实补救及正式方案另裁决。
+
 2026-11-20 6.EC只准备两份已有稿的通道诊断，[当前就绪与限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-channel-check-20261120/result.md)：技术发送/有效正文/Schema与范围、基础内容覆盖、已审准确性分别报告；不把通道故障算作已审内容正确，也不因本次准备改旧召回分母/95%/99%。仅京东方/分众保存公开原文和真实内容，不新增S2样本；新限定外传/预算未明确回复前0真实调用。两份即使成功也只是诊断，不回算旧20、补未启动五家、另开第41家或进S3/生产；后续正式补救验收方案须另裁决，研究API现有分级内容照常可读。
 
 2026-11-20 6.EB仅零调用修复复核执行状态消费，[结果与限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-failure-recovery-20261120/result.md)：初核failed与终核incomplete的相同空返回均进入显式停止策略，普通缺项/有源不确定不算执行失败；原稿/候选/模型归因和API可见，旧15稿及阶段失败不改。本轮受控整链与保存响应重放仅证明有限重试/止损/持久读取，不证明供应商已恢复、模型语义更准或S2通过，不增加公司/真实调用/生产权限。

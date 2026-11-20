@@ -1,0 +1,13 @@
+{
+  "task": "6.EC",
+  "status": "explicitly_approved",
+  "order": ["000725", "002027"],
+  "reference": "用户对call_92aef2bb304a4a6db2ce9c491179e555明确回复：批准这两份限定源复核验证。仅京东方000725、分众002027已保存真实底稿和公开2025年报所选章节，既有Scorpio/Grok scorpio.reepool.com、grok-4.7 high，各1初核逻辑/最多2物理含1恢复、300000保守账本；物理1200秒/逻辑2450秒，整组串行6000秒/600000账本/4物理。仅获准联网环境；不重选章/重抽/修订或再核，不新增公司/窗口，不改旧画像/API/S2成绩，不充值/改共享配置/生产。首份耗尽允许尝试无有效内容或认证/安全问题即停。费用无价unknown、有价各10元，不承诺人民币总额；结束清理垃圾。",
+  "source": "direct_human_question_reply",
+  "each_limits": {"logical_requests": 1, "physical_requests": 2, "recoveries": 1, "conservative_ledger": 300000, "known_cost_cny": 10},
+  "group_limits": {"business_seconds": 6000, "conservative_ledger": 600000, "physical_requests": 4, "concurrency": 1},
+  "models": [{"host": "scorpio.reepool.com", "model": "grok-4.7", "reasoning_effort": "high"}],
+  "no_repair_or_recheck": true,
+  "S2_unchanged": true,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,15 @@
+{
+  "task": "6.EC",
+  "exact_removed_temporary_root": "/home/python/Quote/data/QuoteBak/workpaper-ec-exec-E4Rw38",
+  "removed_file_bytes": 14318,
+  "own_model_and_check_sessions_finished": true,
+  "preserved": [
+    "formal PDFs and reusable source caches",
+    "original two papers and 15 API/writer outputs",
+    "old failures and attempt markers",
+    "one new approved diagnosis receipt/budget/response/source-spot-check set",
+    "parallel and pre-existing changes"
+  ],
+  "recovery": "removed process logs and check script can be regenerated; original response/ledger/event evidence retained",
+  "production_data_deleted": false
+}

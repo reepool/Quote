@@ -1,0 +1,35 @@
+{
+  "task": "6.EC",
+  "method": "Codex independent read-only comparison of the returned issues to retained source spans already coordinate-validated against the official PDF; not another provider call or repair",
+  "instrument_id": "002027.SZ",
+  "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+  "checks": [
+    {
+      "finding_id": "REV-MC-01",
+      "affected_fact_id": "F-MC-01",
+      "evidence_id": "source-0006",
+      "physical_page": 16,
+      "section_path": "第三节 管理层讨论与分析 / 四、主营业务分析 / （6）合并范围、（7）业务产品服务重大变化披露项目",
+      "assessment": "source_supports_scoping_concern_not_proof_that_an_actual_business_change_occurred",
+      "basis": "合并范围发生变动一项勾选是；业务、产品或服务发生重大变化或调整有关情况勾选不适用。后者宜保披露项目原口径，而不是据此扩成确定的经济无变化结论；合并范围原句本身有据。",
+      "old_API_state": "pending / not_reviewed"
+    },
+    {
+      "finding_id": "REV-MC-02",
+      "affected_fact_id": "F-MC-02",
+      "evidence_id": "source-0002",
+      "physical_page": 10,
+      "section_path": "第三节 管理层讨论与分析 / 一、报告期内公司从事的主要业务 / 生活圈媒体数量表",
+      "assessment": "confirmed_wrong_base_period_and_column_pairing",
+      "basis": "表头顺序为2026/3/31、2025/12/31、2024/12/31及2024/12/31至2026/3/31变动幅度。电视自营小计为122.3、121.5、113.0和8.2%；海报自营小计为106.1、112.9、147.0和-27.8%。原稿把中间列112.9/121.5错配到2024基期，和表中长周期变幅混写。",
+      "old_API_state": "pending / not_reviewed"
+    }
+  ],
+  "provider_findings_not_automatically_ground_truth": true,
+  "not_all_profile_facts_reaudited": true,
+  "does_not_make_optional_change_items_company_completion_gate": true,
+  "repairs_generated": 0,
+  "corrections_adopted": 0,
+  "old_API_modified": false,
+  "S2_unchanged": true
+}

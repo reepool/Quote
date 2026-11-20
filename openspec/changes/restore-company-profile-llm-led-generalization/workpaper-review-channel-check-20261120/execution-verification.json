@@ -1,0 +1,103 @@
+{
+  "task": "6.EC",
+  "actual_started": 2,
+  "not_started": [],
+  "totals": {
+    "physical_requests": 2,
+    "recoveries": 0,
+    "ledger": 92162,
+    "known_supplier_total": 92162,
+    "unknown_usage_reservations": 0
+  },
+  "rows": [
+    {
+      "code": "000725",
+      "instrument_id": "000725.SZ",
+      "valid_response": true,
+      "all_fact_ids_exact": true,
+      "unknown_finding_targets": [],
+      "unknown_finding_references": false,
+      "findings": 0,
+      "business_seconds": 239.183,
+      "fee": "unknown",
+      "models": [
+        {
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "finish_reason": "stop"
+        }
+      ],
+      "stream_summaries": [
+        {
+          "event_count": 380,
+          "content_fragments": 234,
+          "content_chars": 397,
+          "content_sha256": "960468b4bb135b6323f7dc38a4e8b7d57683317264aded7c707deb527221a3e4",
+          "reasoning_present": true,
+          "reasoning_chars": 12719,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      ],
+      "physical_requests": 1,
+      "recoveries": 0,
+      "ledger": 41121,
+      "known_supplier_total": 41121,
+      "unknown_usage_reservations": 0
+    },
+    {
+      "code": "002027",
+      "instrument_id": "002027.SZ",
+      "valid_response": true,
+      "all_fact_ids_exact": true,
+      "unknown_finding_targets": [],
+      "unknown_finding_references": false,
+      "findings": 2,
+      "business_seconds": 347.57,
+      "fee": "unknown",
+      "models": [
+        {
+          "model": "grok-4.7",
+          "source_label": "scorpio:grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "finish_reason": "stop"
+        }
+      ],
+      "stream_summaries": [
+        {
+          "event_count": 1139,
+          "content_fragments": 569,
+          "content_chars": 1102,
+          "content_sha256": "da3ed89e004c9bead84709f4099d6e0ea1994fa606a5acc0670e10905c5735aa",
+          "reasoning_present": true,
+          "reasoning_chars": 20164,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      ],
+      "physical_requests": 1,
+      "recoveries": 0,
+      "ledger": 51041,
+      "known_supplier_total": 51041,
+      "unknown_usage_reservations": 0
+    }
+  ],
+  "supervision_seconds": 589.146,
+  "stop_reason": null,
+  "source_code_and_config_unchanged": true,
+  "saved_254_evidence_files_and_15_writer_files_unchanged": true,
+  "no_old_API_or_picture_write": true,
+  "corrections_adopted": 0,
+  "no_extraction_repair_recheck_or_extra_company": true,
+  "BOE_independent_source_only_limit_retained": {
+    "F-OI-04": "研发费用13,836,670,878元/5.44%及前几项研发名在所引p22有据；但后半低碳环保、Tandem、极致窄边框、车载/MLED等项目延续在p23，当前事实仅引用source-0009(p22)，没有引用同包source-0010(p23)。不是证明原文无项目或金额错，而是该复合对象引用覆盖不全。保源参考，不手工追加引用或拆取正确金额，不让它清空其他事实。"
+  },
+  "model_no_findings_does_not_override_independent_source_limit": true,
+  "model_accuracy_not_independently_assessed": true,
+  "supplier_long_term_availability": "not_established",
+  "S2": "failed_scheme_ended_unchanged",
+  "production_authorization": "not_authorized"
+}

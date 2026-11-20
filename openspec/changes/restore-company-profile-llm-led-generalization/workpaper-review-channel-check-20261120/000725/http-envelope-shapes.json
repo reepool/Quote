@@ -1,0 +1,47 @@
+[
+  {
+    "sequence": 1,
+    "requested_timeout_seconds": 1200,
+    "request_payload_bytes": 84005,
+    "request_payload_sha256": "0aa9346d34ca21c6f790c994ca3b9a588d38d479f3bd16e099f3ebd2a760cfb1",
+    "status_code": 200,
+    "provider_request_id": "bc7e79c7-742b-478f-842e-1bb3b811a5e9, b864c677-4e25-4441-9456-dfd4f6e89847",
+    "payload_type": "dict",
+    "top_level_keys": [
+      "choices",
+      "id",
+      "model",
+      "stream_summary",
+      "usage"
+    ],
+    "usage_type": "dict",
+    "usage_keys": [
+      "completion_tokens",
+      "completion_tokens_details",
+      "cost_in_usd_ticks",
+      "num_sources_used",
+      "prompt_tokens",
+      "prompt_tokens_details",
+      "total_tokens"
+    ],
+    "choices_type": "list",
+    "choice_count": 1,
+    "first_choice_keys": [
+      "finish_reason",
+      "message"
+    ],
+    "finish_reason": "stop",
+    "message_type": "dict",
+    "message_keys": [
+      "content"
+    ],
+    "content_type": "str",
+    "content_chars": 397,
+    "reasoning_content_type": "NoneType",
+    "reasoning_content_chars": null,
+    "reasoning_type": "NoneType",
+    "reasoning_chars": null,
+    "error_type": "NoneType",
+    "physical_seconds": 239.003
+  }
+]

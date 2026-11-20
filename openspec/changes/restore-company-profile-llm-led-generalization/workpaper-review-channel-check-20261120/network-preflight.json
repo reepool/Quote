@@ -1,0 +1,7 @@
+{
+  "dns_addresses": 1,
+  "tls": "TLSv1.3",
+  "namespace": "net:[4026531840]",
+  "permission_mode": "approved_network_exec",
+  "model_requests": 0
+}

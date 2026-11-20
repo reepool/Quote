@@ -1,0 +1,54 @@
+{
+  "reviewed_fact_ids": [
+    "F-BS-01",
+    "F-BS-02",
+    "F-PS-01",
+    "F-PS-02",
+    "F-RM-01",
+    "F-RM-02",
+    "F-RM-03",
+    "F-SM-01",
+    "F-SM-03",
+    "F-SM-04",
+    "F-SM-05",
+    "F-OI-01",
+    "F-OI-02",
+    "F-CC-01",
+    "F-CC-02",
+    "F-CC-03",
+    "F-OD-01",
+    "F-OD-02",
+    "F-OD-03",
+    "F-MC-01",
+    "F-MC-02",
+    "F-SC-01",
+    "F-SC-02",
+    "F-SC-03"
+  ],
+  "findings": [
+    {
+      "finding_id": "REV-MC-01",
+      "element": "material_changes",
+      "severity": "material",
+      "issue_type": "unsupported_claim",
+      "action": "correct",
+      "affected_fact_id": "F-MC-01",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "explanation": "源文对「公司报告期内业务、产品或服务发生重大变化或调整有关情况」勾选的是不适用。不适用只表示该披露项目未适用，不能单独支持「未发生重大变化或调整」这一确定的经济结论。前半句合并范围发生变动有「是」支持，应保留并维持详见第八节的限定；后半句应改记为源文口径的不适用，不得写成未发生重大变化，也不得因此删除其他已支持事实。"
+    },
+    {
+      "finding_id": "REV-MC-02",
+      "element": "material_changes",
+      "severity": "material",
+      "issue_type": "wrong_period",
+      "action": "correct",
+      "affected_fact_id": "F-MC-02",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "explanation": "媒体数量表列序为2026年3月31日、2025年12月31日、2024年12月31日，以及2024年12月31日至2026年3月31日变动幅度。电梯海报自营112.9万个、电梯电视自营121.5万台是2025年末数，不是2024年末；2024年末分别为147.0万个、113.0万台。-27.8%对应147.0万个至106.1万个，8.2%对应113.0万台至122.3万台，不能配到112.9至106.1或121.5至122.3。应修正基期期间和基期金额；2026年3月末存量以及已正确标注长周期的变动幅度可保留。"
+    }
+  ]
+}
