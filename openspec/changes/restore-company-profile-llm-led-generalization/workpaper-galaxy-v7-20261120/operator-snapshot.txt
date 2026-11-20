@@ -1,0 +1,245 @@
+"""Authorized 6.EG: one new v7 Galaxy enrichment via the original owner."""
+from __future__ import annotations
+import asyncio
+from dataclasses import replace
+from decimal import Decimal
+import gzip
+import hashlib
+import json
+import os
+from pathlib import Path
+import runpy
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import time
+import httpx
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+C = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+D = C / 'workpaper-galaxy-v7-20261120'
+TEMP = Path(__file__).parent
+PREVIOUS = ROOT / 'data/research/company_profile_galaxy_enriched_20261120'
+OUTPUT = ROOT / 'data/research/company_profile_galaxy_v7_20261120'
+H = runpy.run_path(str(C / 'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'))
+EXTRACT, REVIEW = H['EXTRACT'], H['REVIEW']
+
+def read(path):
+    return json.loads(Path(path).read_text())
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+def dump(path, value):
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + '\n')
+
+class Capture(H['ContentCapture']):
+    """Task-local safe wire timing; gateway retains retries/schema/usage ownership."""
+    def __init__(self, delegate, directory):
+        super().__init__(delegate, directory)
+        self.wires = []
+
+    async def send(self, url, headers, payload, timeout_seconds):
+        maximum = 1200 if payload.get('model') == 'grok-4.7' else 600
+        assert 0 < timeout_seconds <= maximum + 0.01
+        encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()
+        entry = {'model': payload.get('model'), 'physical_timeout_seconds': timeout_seconds,
+            'payload_bytes': len(encoded), 'payload_sha256': hashlib.sha256(encoded).hexdigest(),
+            'max_tokens': payload.get('max_tokens'), 'reasoning_effort': payload.get('reasoning_effort'),
+            'headers_or_material_recorded': False, 'state': 'sending'}
+        self.wires.append(entry)
+        dump(D / 'request-wiring.json', self.wires)
+        started = time.monotonic()
+        try:
+            response = await super().send(url, headers, payload, timeout_seconds)
+            entry.update(state='returned', status_code=response.status_code)
+            return response
+        except Exception as exc:
+            entry.update(state='transport_error', exception_type=type(exc).__name__)
+            raise
+        finally:
+            entry['seconds'] = round(time.monotonic() - started, 3)
+            dump(D / 'request-wiring.json', self.wires)
+
+def main():
+    from research.announcements import AnnouncementRecord, AnnouncementAttachment
+    from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+    from research.company_profile.operations import CompanyProfileTaskService
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.workpaper import render_workpaper
+    from research.company_profile.workpaper_delivery import project_workpaper_delivery
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.company_profile.workpaper_review import workpaper_hash
+    from research.storage import ResearchStorageManager
+    from utils.config_manager import ResearchConfig, ResearchStorageConfig
+    from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy, DEVELOPMENT_UNPRICED_BILLING
+    from utils.llm.client import LlmClient
+    from utils.llm.transport import HttpxOpenAICompatibleTransport
+
+    preparation = time.monotonic()
+    assert os.environ['TMPDIR'] == str(ROOT / 'data/QuoteBak')
+    assert not (D / 'summary.json').exists(), 'this card already has an execution result'
+    marker = ROOT / 'data/QuoteBak/s1-attempts/workpaper-eg-601881-20261120.json'
+    assert not marker.exists(), 'unique enrich entry was already consumed'
+    assert not OUTPUT.exists(), 'do not overwrite a previous research root'
+    approval = read(D / 'approval.json')
+    assert approval['status'] == 'authorized' and approval['instrument_id'] == '601881.SH'
+    plan = read(D / 'enrichment-plan.json')['enrichment_plan']
+    readiness = read(D / 'readiness.json')
+    assert sha(D / 'enrichment-plan.json') == readiness['plan_sha256']
+    original_hashes = {str(p.relative_to(ROOT)): sha(p) for p in (PREVIOUS / 'company_profile_common_core.v1').glob('*.json')}
+    assert original_hashes == readiness['protected_runtime_files']
+    previous_reader = CompanyProfileReadService(PREVIOUS)
+    before = previous_reader.research_profile('601881.SH')
+    base = previous_reader._latest_by_instrument(work_id=plan['base_work_id'])['601881.SH']
+    assert workpaper_hash(base.workpaper) == plan['base_workpaper_sha256']
+    binding = read(C / 'workpaper-s2-confirmation-result-20261119/601881/binding.json')
+    source_binding = read(C / 'workpaper-s2-confirmation-result-20261119/source-bindings/601881.json')
+    asset, announcement = source_binding['asset'], source_binding['announcement']
+    assert sha(asset['archive_path']) == base.report.document_version
+    with gzip.open(binding['source_preparation']['artifact_path'], 'rt', encoding='utf-8') as stream:
+        cached = json.load(stream)
+    assert cached['source_content_hash'] == base.report.document_version
+    pages = [{'page': p['page_number'], 'text': p['text']} for p in cached['pages']]
+    assert len(pages) == 380
+
+    config = H['config_for_run']()
+    profiles = {name: replace(p, timeout_seconds=2450,
+        attempt_timeout_seconds=1200 if name == REVIEW else 600) for name, p in config.profiles.items()}
+    config = replace(config, profiles=profiles)
+    assert config.profiles[REVIEW].attempt_timeout_seconds == 1200
+    assert config.profiles[REVIEW].timeout_seconds == 2450
+    network = []
+    for host in ('api.deepseek.com', 'scorpio.reepool.com'):
+        addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
+        async def probe():
+            async with httpx.AsyncClient(timeout=20) as client:
+                response = await client.get('https://' + host + '/')
+                stream = response.extensions.get('network_stream')
+                tls = stream.get_extra_info('ssl_object') if stream else None
+                return response.status_code, tls.version() if tls else None
+        status, version = asyncio.run(probe())
+        assert version, 'TLS could not be verified in the actual network environment'
+        network.append({'host': host, 'dns_addresses': len(addresses), 'tls': version, 'public_get_status': status})
+    identity = workpaper_processing_identity(real=True, review=True, review_profile=REVIEW)
+    identity.update(logical_request_timeout_seconds=2450, review_max_output_tokens=16384, repair_profile=EXTRACT)
+    assert identity['preprocessing_version']=='toc_sections_native_layout.v7.ordered-section-remap'
+    db = str(TEMP / 'research.db')
+    storage = ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(
+        db_path=db, financials_db_path=db, valuation_db_path=db, interests_db_path=db,
+        quotes_db_path=str(TEMP / 'quotes.db'), attach_quotes_db=False)))
+    storage.initialize()
+    BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+        instrument={'instrument_id': '601881.SH', 'symbol': '601881', 'exchange': 'SSE'},
+        record=AnnouncementRecord(source='cninfo', source_announcement_id=asset['filing_id'],
+            announcement_key='cninfo:' + asset['filing_id'], title=announcement['title'],
+            published_at=asset['published_at'], exchange='SSE', symbols=('601881',),
+            attachments=(AnnouncementAttachment(source_url=announcement['source_url'],
+                resolved_url=announcement['source_url'], file_extension='PDF'),)))
+    capture = Capture(HttpxOpenAICompatibleTransport(), TEMP / 'captured-content')
+    client = LlmClient(config, transport=capture, owns_transport=True)
+    provider = CommonGatewaySemanticProvider(client=client, profile=EXTRACT, max_output_tokens=12000,
+        timeout_seconds=2450, execution_authorization={'status': 'authorized',
+            'document_version': asset['content_hash'], 'approval_reference': approval['approval_reference']})
+    assert provider._timeout_seconds == 2450
+    # Reuse the one writer, preserving exact old records in a successor root.
+    writer = CompanyProfileResearchWriter(OUTPUT)
+    for path in sorted((PREVIOUS / writer.namespace).glob('*.json')):
+        record = CompanyProfileRuntimeRecordV3.model_validate_json(path.read_text())
+        writer.persist(record)
+        assert sha(OUTPUT / writer.namespace / path.name) == sha(path)
+    service = CompanyProfileTaskService(storage=storage, output_root=OUTPUT, checkpoint_root=TEMP / 'checkpoints',
+        page_source=lambda _: {'report': base.report, 'pages': pages, 'source_pdf_path': asset['archive_path']},
+        provider=provider, processing_identity=identity, token_budget=1000000)
+    frozen = {'task': '6.EG', 'status': 'authorized', 'approval_sha256': sha(D / 'approval.json'),
+        'plan_sha256': sha(D / 'enrichment-plan.json'), 'base_runtime_sha256': readiness['base_runtime_sha256'],
+        'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+        'operator_sha256': sha(__file__), 'code_sha256': H['code_hashes'](),
+        'shared_llm_config_sha256': sha(ROOT / 'config/13_llm.json'), 'source_pdf_sha256': sha(asset['archive_path']),
+        'cache_file_sha256': sha(binding['source_preparation']['artifact_path']),
+        'old_runtime_hashes': original_hashes, 'network_namespace': os.readlink('/proc/self/ns/net'), 'network': network,
+        'identity': identity, 'provider_constructor_timeout_seconds': provider._timeout_seconds,
+        'profiles': {n: {'model': p.model, 'source_label': p.source_label, 'timeout_seconds': p.timeout_seconds,
+            'attempt_timeout_seconds': p.attempt_timeout_seconds, 'reasoning_effort': p.reasoning_effort,
+            'max_retries': p.max_retries, 'max_schema_repair_attempts': p.max_schema_repair_attempts} for n, p in profiles.items()},
+        'limits': approval['limits'], 'production_authorization': 'not_authorized'}
+    dump(D / 'authorization.json', frozen)
+    shutil.copy2(__file__, D / 'operator-snapshot.txt')
+    summary = {'task': '6.EG', 'instrument_id': '601881.SH', 'entry_started': False, 'state': 'preparing',
+        'before_readings': len(before['readings']), 'exception': None, 'production_authorization': 'not_authorized'}
+    budget = None
+    def stop(_sig, _frame):
+        if budget:
+            budget.cancel('supervisor_stop_requested')
+        service.pause(reason='supervisor_stop_requested')
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGUSR1, stop)
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    with marker.open('x') as handle:
+        json.dump({'task': '6.EG', 'approval_sha256': sha(D / 'approval.json'),
+            'authorization_sha256': sha(D / 'authorization.json')}, handle)
+    started = time.monotonic()
+    budget = LlmRunBudget(deadline=started + 6000, prices={}, max_tokens=1000000, max_requests=10,
+        max_cost_cny=Decimal(10), ledger_path=D / 'budget.json', billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        recovery_policy=LogicalRecoveryPolicy(3, 1), run_authorization='company_profile_workpaper_development.2026-11-11')
+    client.physical_budget = budget
+    service.execution_budget = service.runtime.execution_budget = budget
+    summary.update(entry_started=True, state='running', preparation_seconds=round(started - preparation, 3))
+    dump(D / 'summary.json', summary)
+    print('BUSINESS_STARTED 601881.SH', flush=True)
+    try:
+        executed = asyncio.run(service.execute('enrich', knowledge_cutoff='2026-11-20',
+            instrument_ids=('601881.SH',), enrichment_plan=plan, max_elapsed_seconds=6000))
+        dump(D / 'execution.json', executed)
+        summary['state'] = executed['state']
+    except Exception as exc:
+        summary.update(state='failed', exception=type(exc).__name__ + ': ' + str(exc)[:2000])
+    finally:
+        summary['business_seconds'] = round(time.monotonic() - started, 3)
+        asyncio.run(client.close())
+        dump(D / 'model-receipts.json', provider.workpaper_receipts)
+        dump(D / 'provider-traces.json', [t.model_dump(mode='json') for t in provider.traces])
+        snapshot = budget.snapshot()
+        dump(D / 'budget.json', snapshot)
+        attempts = {}
+        for attempt in snapshot['attempts']:
+            key = attempt['logical_request_id']; attempts[key] = attempts.get(key, 0) + 1
+        summary.update(physical_requests=snapshot['physical_requests'], charged_tokens=snapshot['charged_tokens'],
+            fee=snapshot['charged_cost_cny'], recoveries=sum(n - 1 for n in attempts.values()), stopped_reason=snapshot['stopped_reason'])
+        assert snapshot['physical_requests'] <= 10 and snapshot['charged_tokens'] <= 1000000
+        assert sum(n - 1 for n in attempts.values()) <= 3 and all(n <= 2 for n in attempts.values())
+        known = {hashlib.sha256(r['raw_content'].encode()).hexdigest() for r in provider.workpaper_receipts if isinstance(r.get('raw_content'), str)}
+        for path in (TEMP / 'captured-content').glob('*.json'):
+            if read(path).get('content_sha256') not in known:
+                target = D / 'failed-model-content' / path.name
+                target.parent.mkdir(exist_ok=True); shutil.copy2(path, target)
+        reader = CompanyProfileReadService(OUTPUT)
+        after = reader.research_profile('601881.SH')
+        dump(D / 'api.json', after)
+        previous_reading_ids = {reading['work_id'] for reading in before['readings']}
+        additions = [f for f in after['facts'] if f['reading_work_id'] not in previous_reading_ids]
+        summary.update(after_readings=len(after['readings']), new_reading_work_ids=sorted({f['reading_work_id'] for f in additions}),
+            new_visible_facts=sum(f['fact'] is not None for f in additions),
+            new_visible_metrics=sum(len(f['fact']['metrics']) for f in additions if f['fact'] is not None),
+            before_facts_preserved=all(f in after['facts'] for f in before['facts']),
+            old_runtime_files_unchanged=all(sha(ROOT / p) == h for p, h in original_hashes.items()))
+        for work_id in summary['new_reading_work_ids']:
+            record = reader._latest_by_instrument(work_id=work_id)['601881.SH']
+            dump(D / 'runtime.json', record.model_dump(mode='json'))
+            (D / 'supplement.md').write_text(render_workpaper(record.workpaper, delivery=project_workpaper_delivery(record.workpaper)))
+            summary['review_status'] = record.workpaper.quality_review.status if record.workpaper.quality_review else None
+            summary['review_error'] = record.workpaper.quality_review.error if record.workpaper.quality_review else None
+        assert summary['before_facts_preserved'] and summary['old_runtime_files_unchanged']
+        assert H['code_hashes']() == frozen['code_sha256'] and sha(ROOT / 'config/13_llm.json') == frozen['shared_llm_config_sha256']
+        summary['supervision_seconds'] = round(time.monotonic() - preparation, 3)
+        dump(D / 'summary.json', summary)
+        print('FINISHED ' + json.dumps(summary, ensure_ascii=False), flush=True)
+
+if __name__ == '__main__':
+    main()

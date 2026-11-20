@@ -1,0 +1,885 @@
+[
+  {
+    "request_id": "bp-work-58d1b361ac5dd345f0d4e2af:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "113c36d0ee12f8295cf5fa45f07207d68c7475a742c4297b9f77884dceb24b52",
+    "response_hash": "c6ae50ccc51963f9c1bca20d39d163722efe6183233d92638388fcde5cc5ffd7",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0077\",\"section-0080\",\"section-0082\",\"section-0083\",\"section-0090\",\"section-0093\",\"section-0101\",\"section-0105\",\"section-0109\",\"section-0124\",\"section-0125\",\"section-0127\",\"section-0129\",\"section-0131\",\"section-0133\"],\"rationale\":\"本次补充阅读聚焦收入模式与规模结构。选取第三节中“报告期内公司从事的业务情况”(section-0077)说明业务与经营模式；经营情况讨论与分析(section-0080)及其主营业务经营情况分析(section-0082)下财富管理、投行、机构、国际、投资交易、母子公司一体化各业务子节，逐项说明各板块收入来源与变现机制；再取“主要经营情况”(section-0124)及利润表科目变动分析(section-0125)、收入和成本分析(section-0127)、主营业务分行业(section-0129)、分地区(section-0131)与成本分行业(section-0133)，提供报告期营业收入总额、分业务/分地区收入构成及成本口径，满足规模与结构问题。未选行业背景、核心竞争力、治理、债券及财务报告附注，避免重复全公司首读与无关尾项。\",\"deferred\":[\"行业格局与趋势、核心竞争力分析：属行业背景与泛化竞争力，非本次收入模式与规模结构所需\",\"第四节公司治理、第五节重要事项、第六节股份变动、第七节债券：与收入模式及规模结构无直接关系\",\"第八节财务报告及第九节证券公司信息披露中的分部报告、收入附注：仅在经营分析披露不足时定向补充，本次经营章节已覆盖收入构成，暂不展开\"],\"stop_reason\":\"已选取覆盖业务模式、各板块收入来源、营业收入总额及分行业/分地区收入构成的完整经营分析子节，可回答收入模式与规模结构两个目标；剩余为行业背景、治理、债券及财务附注等非目标范围，无需继续扩展。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0077",
+        "section-0080",
+        "section-0082",
+        "section-0083",
+        "section-0090",
+        "section-0093",
+        "section-0101",
+        "section-0105",
+        "section-0109",
+        "section-0124",
+        "section-0125",
+        "section-0127",
+        "section-0129",
+        "section-0131",
+        "section-0133"
+      ],
+      "rationale": "本次补充阅读聚焦收入模式与规模结构。选取第三节中“报告期内公司从事的业务情况”(section-0077)说明业务与经营模式；经营情况讨论与分析(section-0080)及其主营业务经营情况分析(section-0082)下财富管理、投行、机构、国际、投资交易、母子公司一体化各业务子节，逐项说明各板块收入来源与变现机制；再取“主要经营情况”(section-0124)及利润表科目变动分析(section-0125)、收入和成本分析(section-0127)、主营业务分行业(section-0129)、分地区(section-0131)与成本分行业(section-0133)，提供报告期营业收入总额、分业务/分地区收入构成及成本口径，满足规模与结构问题。未选行业背景、核心竞争力、治理、债券及财务报告附注，避免重复全公司首读与无关尾项。",
+      "deferred": [
+        "行业格局与趋势、核心竞争力分析：属行业背景与泛化竞争力，非本次收入模式与规模结构所需",
+        "第四节公司治理、第五节重要事项、第六节股份变动、第七节债券：与收入模式及规模结构无直接关系",
+        "第八节财务报告及第九节证券公司信息披露中的分部报告、收入附注：仅在经营分析披露不足时定向补充，本次经营章节已覆盖收入构成，暂不展开"
+      ],
+      "stop_reason": "已选取覆盖业务模式、各板块收入来源、营业收入总额及分行业/分地区收入构成的完整经营分析子节，可回答收入模式与规模结构两个目标；剩余为行业背景、治理、债券及财务附注等非目标范围，无需继续扩展。"
+    },
+    "usage": {
+      "input_tokens": 28759,
+      "output_tokens": 441,
+      "total_tokens": 29200
+    }
+  },
+  {
+    "request_id": "bp-work-58d1b361ac5dd345f0d4e2af:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "9bba39cf6e93853c12d398c1828572855431fb2f1fd7a376d3523261093b50d0",
+    "response_hash": "46dcbbb5476f4f4c7ed0f5eb7fd82aef22aadf817a8de62ffdabc15b28f3058b",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次补充阅读仅针对收入模式与规模结构，未重新读取业务结构相关内容。\"]},\"products_services\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次补充阅读仅针对收入模式与规模结构，未重新读取产品与服务相关内容。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-01\",\"text\":\"公司以“五位一体”业务模式提供综合金融服务：财富管理业务为客户提供代理买卖股票、基金、债券、衍生金融工具，投资咨询、投资组合建议、金融产品销售和资产配置，以及融资融券、股票质押式回购及约定购回交易等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-02\",\"text\":\"投资银行业务为各类型企业和政府客户提供一站式投资银行服务，包括股权融资、债券融资、结构化融资、财务顾问及多样化融资解决方案等金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-03\",\"text\":\"机构业务提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-04\",\"text\":\"国际业务通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投资银行、研究和资产管理、融资和金融产品等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-05\",\"text\":\"投资交易业务从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融资及风险管理提供综合金融解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-06\",\"text\":\"母子公司一体化业务将从事期货业务、私募股权基金管理业务、另类投资业务、资产管理业务的子公司平台与前述五大业务线融合，强化业务协同、资源对接，持续为客户提供综合金融服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-07\",\"text\":\"报告期内，本集团营业收入同比增长24.34%，主要由于经纪业务手续费净收入增加带动手续费及佣金净收入增长41.35%，融出资金利息收入增加及业务融资利息支出减少带动利息净收入增长16.48%，处置金融工具取得投资收益增加及交易性金融资产和衍生金融工具及交易性金融负债公允价值变动影响带动投资收益及公允价值变动损益增长15.81%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"营业收入同比变动比例\",\"raw_value\":\"24.34\",\"value\":\"24.34\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"手续费及佣金净收入同比变动比例\",\"raw_value\":\"41.35\",\"value\":\"41.35\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"利息净收入同比变动比例\",\"raw_value\":\"16.48\",\"value\":\"16.48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"投资收益及公允价值变动损益同比变动比例\",\"raw_value\":\"15.81\",\"value\":\"15.81\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"原文按业务板块说明服务内容，未逐项披露各板块具体收费方式或费率机制；除营业收入变动原因说明中提及经纪业务手续费、利息收入、投资收益及公允价值变动外，未获取更细的变现机制说明。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SM-01\",\"text\":\"报告期内，本集团实现营业收入人民币283.02亿元，较2024年度增加人民币55.41亿元，增幅24.34%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"28,302,251,724.47\",\"value\":\"28302251724.47\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入较上年增加额\",\"raw_value\":\"55.41\",\"value\":\"55.41\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比变动比例\",\"raw_value\":\"24.34\",\"value\":\"24.34\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-02\",\"text\":\"主营业务分行业情况显示，财富管理业务营业收入人民币134.72亿元，占公司营业收入的47.60%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"财富管理业务营业收入\",\"raw_value\":\"13,471,647,340.02\",\"value\":\"13471647340.02\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"财富管理业务营业收入占公司营业收入比例\",\"raw_value\":\"47.60\",\"value\":\"47.60\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-03\",\"text\":\"主营业务分行业情况显示，投资交易业务营业收入人民币70.26亿元，占公司营业收入的24.82%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"投资交易业务营业收入\",\"raw_value\":\"7,026,017,998.15\",\"value\":\"7026017998.15\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"投资交易业务营业收入占公司营业收入比例\",\"raw_value\":\"24.82\",\"value\":\"24.82\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-04\",\"text\":\"主营业务分行业情况显示，国际业务营业收入人民币25.69亿元，占公司营业收入的9.08%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"国际业务营业收入\",\"raw_value\":\"2,568,513,564.51\",\"value\":\"2568513564.51\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"国际业务营业收入占公司营业收入比例\",\"raw_value\":\"9.08\",\"value\":\"9.08\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-05\",\"text\":\"主营业务分行业情况显示，机构业务营业收入人民币17.14亿元，占公司营业收入的6.06%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"机构业务营业收入\",\"raw_value\":\"1,714,321,579.93\",\"value\":\"1714321579.93\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"机构业务营业收入占公司营业收入比例\",\"raw_value\":\"6.06\",\"value\":\"6.06\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-06\",\"text\":\"主营业务分行业情况显示，投资银行业务营业收入人民币5.85亿元，占公司营业收入的2.07%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"投资银行业务营业收入\",\"raw_value\":\"585,113,645.92\",\"value\":\"585113645.92\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"投资银行业务营业收入占公司营业收入比例\",\"raw_value\":\"2.07\",\"value\":\"2.07\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-07\",\"text\":\"主营业务分行业情况显示，母子公司一体化业务营业收入人民币27.67亿元，占公司营业收入的9.77%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"母子公司一体化业务营业收入\",\"raw_value\":\"2,766,500,400.22\",\"value\":\"2766500400.22\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"母子公司一体化业务营业收入占公司营业收入比例\",\"raw_value\":\"9.77\",\"value\":\"9.77\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-08\",\"text\":\"主营业务分行业情况中“其他”行营业收入人民币170,137,195.72元，营业成本人民币3,159,407,064.49元，毛利率标注为不适用，营业收入比上年增减-65.99%，营业成本比上年增减69.25%。该行不是公司正常经营业务板块，其范围与合计口径的关系未在原文说明。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0012\"],\"metrics\":[{\"name\":\"其他行营业收入\",\"raw_value\":\"170,137,195.72\",\"value\":\"170137195.72\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"“其他”行范围未在原文说明，不能等同于公司合计或某一正常经营业务。\"},{\"name\":\"其他行营业成本\",\"raw_value\":\"3,159,407,064.49\",\"value\":\"3159407064.49\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"“其他”行范围未在原文说明。\"},{\"name\":\"其他行营业收入比上年增减\",\"raw_value\":\"-65.99\",\"value\":\"-65.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"“其他”行范围未在原文说明。\"},{\"name\":\"其他行营业成本比上年增减\",\"raw_value\":\"69.25\",\"value\":\"69.25\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"“其他”行范围未在原文说明。\"}]},{\"fact_id\":\"SM-09\",\"text\":\"主营业务分行业合计营业收入人民币28,302,251,724.47元，营业成本人民币13,845,856,470.63元，毛利率51.08%，营业收入比上年增减24.34%，营业成本比上年增减13.18%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"主营业务分行业合计营业收入\",\"raw_value\":\"28,302,251,724.47\",\"value\":\"28302251724.47\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业合计营业成本\",\"raw_value\":\"13,845,856,470.63\",\"value\":\"13845856470.63\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务分行业合计毛利率\",\"raw_value\":\"51.08\",\"value\":\"51.08\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-10\",\"text\":\"主营业务分地区情况显示，公司总部及境内子公司营业收入人民币17,070,496,269.09元，境外地区营业收入人民币2,568,513,564.51元；分地区合计营业收入人民币28,302,251,724.47元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"公司总部及境内子公司营业收入\",\"raw_value\":\"17,070,496,269.09\",\"value\":\"17070496269.09\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"境外地区营业收入\",\"raw_value\":\"2,568,513,564.51\",\"value\":\"2568513564.51\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"分地区合计营业收入\",\"raw_value\":\"28,302,251,724.47\",\"value\":\"28302251724.47\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分行业、分地区表格所在物理页布局未恢复，表格列关系未核定；本回复仅采用原文中可明确对应的行标签与金额，未推断缺失列或未披露数值。\",\"“其他”行范围与合计口径的关系未在原文说明，已按不确定范围保留，未将其并入任何正常经营业务板块。\",\"分地区明细中浙江、广东、北京、上海等地区收入未逐项列出，仅保留公司总部及境内子公司、境外地区与合计等集中口径。\"]},\"operations_and_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次补充阅读仅针对收入模式与规模结构，未重新读取运营与投入相关内容。\"]},\"customers_channels_markets\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次补充阅读仅针对收入模式与规模结构，未重新读取客户、渠道与市场相关内容。\"]},\"operating_drivers\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次补充阅读仅针对收入模式与规模结构，未重新读取经营驱动因素相关内容。\"]},\"material_changes\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次补充阅读仅针对收入模式与规模结构，未重新读取重大变化相关内容。\"]}},\"limitations\":[\"本次为补充阅读，仅回答收入模式与规模结构两个目标问题；其余六个要素未针对本任务读取，不代表公司未披露相关内容。\",\"所选章节物理页布局未恢复，表格列关系未核定；本回复仅采用原文中可明确对应的行标签与金额，未推断缺失列或未披露数值。\",\"未读取行业背景、核心竞争力、治理、债券及财务报告附注，收入模式与规模结构的回答不构成对全报告完整性的判断。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次补充阅读仅针对收入模式与规模结构，未重新读取业务结构相关内容。"
+          ]
+        },
+        "products_services": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次补充阅读仅针对收入模式与规模结构，未重新读取产品与服务相关内容。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "RM-01",
+              "text": "公司以“五位一体”业务模式提供综合金融服务：财富管理业务为客户提供代理买卖股票、基金、债券、衍生金融工具，投资咨询、投资组合建议、金融产品销售和资产配置，以及融资融券、股票质押式回购及约定购回交易等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-02",
+              "text": "投资银行业务为各类型企业和政府客户提供一站式投资银行服务，包括股权融资、债券融资、结构化融资、财务顾问及多样化融资解决方案等金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-03",
+              "text": "机构业务提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-04",
+              "text": "国际业务通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投资银行、研究和资产管理、融资和金融产品等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-05",
+              "text": "投资交易业务从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融资及风险管理提供综合金融解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-06",
+              "text": "母子公司一体化业务将从事期货业务、私募股权基金管理业务、另类投资业务、资产管理业务的子公司平台与前述五大业务线融合，强化业务协同、资源对接，持续为客户提供综合金融服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "RM-07",
+              "text": "报告期内，本集团营业收入同比增长24.34%，主要由于经纪业务手续费净收入增加带动手续费及佣金净收入增长41.35%，融出资金利息收入增加及业务融资利息支出减少带动利息净收入增长16.48%，处置金融工具取得投资收益增加及交易性金融资产和衍生金融工具及交易性金融负债公允价值变动影响带动投资收益及公允价值变动损益增长15.81%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入同比变动比例",
+                  "raw_value": "24.34",
+                  "value": "24.34",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "手续费及佣金净收入同比变动比例",
+                  "raw_value": "41.35",
+                  "value": "41.35",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利息净收入同比变动比例",
+                  "raw_value": "16.48",
+                  "value": "16.48",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资收益及公允价值变动损益同比变动比例",
+                  "raw_value": "15.81",
+                  "value": "15.81",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "原文按业务板块说明服务内容，未逐项披露各板块具体收费方式或费率机制；除营业收入变动原因说明中提及经纪业务手续费、利息收入、投资收益及公允价值变动外，未获取更细的变现机制说明。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "SM-01",
+              "text": "报告期内，本集团实现营业收入人民币283.02亿元，较2024年度增加人民币55.41亿元，增幅24.34%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "28,302,251,724.47",
+                  "value": "28302251724.47",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入较上年增加额",
+                  "raw_value": "55.41",
+                  "value": "55.41",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比变动比例",
+                  "raw_value": "24.34",
+                  "value": "24.34",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-02",
+              "text": "主营业务分行业情况显示，财富管理业务营业收入人民币134.72亿元，占公司营业收入的47.60%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "财富管理业务营业收入",
+                  "raw_value": "13,471,647,340.02",
+                  "value": "13471647340.02",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财富管理业务营业收入占公司营业收入比例",
+                  "raw_value": "47.60",
+                  "value": "47.60",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-03",
+              "text": "主营业务分行业情况显示，投资交易业务营业收入人民币70.26亿元，占公司营业收入的24.82%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "投资交易业务营业收入",
+                  "raw_value": "7,026,017,998.15",
+                  "value": "7026017998.15",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资交易业务营业收入占公司营业收入比例",
+                  "raw_value": "24.82",
+                  "value": "24.82",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-04",
+              "text": "主营业务分行业情况显示，国际业务营业收入人民币25.69亿元，占公司营业收入的9.08%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "国际业务营业收入",
+                  "raw_value": "2,568,513,564.51",
+                  "value": "2568513564.51",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国际业务营业收入占公司营业收入比例",
+                  "raw_value": "9.08",
+                  "value": "9.08",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-05",
+              "text": "主营业务分行业情况显示，机构业务营业收入人民币17.14亿元，占公司营业收入的6.06%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "机构业务营业收入",
+                  "raw_value": "1,714,321,579.93",
+                  "value": "1714321579.93",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "机构业务营业收入占公司营业收入比例",
+                  "raw_value": "6.06",
+                  "value": "6.06",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-06",
+              "text": "主营业务分行业情况显示，投资银行业务营业收入人民币5.85亿元，占公司营业收入的2.07%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "投资银行业务营业收入",
+                  "raw_value": "585,113,645.92",
+                  "value": "585113645.92",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资银行业务营业收入占公司营业收入比例",
+                  "raw_value": "2.07",
+                  "value": "2.07",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-07",
+              "text": "主营业务分行业情况显示，母子公司一体化业务营业收入人民币27.67亿元，占公司营业收入的9.77%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "母子公司一体化业务营业收入",
+                  "raw_value": "2,766,500,400.22",
+                  "value": "2766500400.22",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母子公司一体化业务营业收入占公司营业收入比例",
+                  "raw_value": "9.77",
+                  "value": "9.77",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-08",
+              "text": "主营业务分行业情况中“其他”行营业收入人民币170,137,195.72元，营业成本人民币3,159,407,064.49元，毛利率标注为不适用，营业收入比上年增减-65.99%，营业成本比上年增减69.25%。该行不是公司正常经营业务板块，其范围与合计口径的关系未在原文说明。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "其他行营业收入",
+                  "raw_value": "170,137,195.72",
+                  "value": "170137195.72",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "“其他”行范围未在原文说明，不能等同于公司合计或某一正常经营业务。"
+                },
+                {
+                  "name": "其他行营业成本",
+                  "raw_value": "3,159,407,064.49",
+                  "value": "3159407064.49",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "“其他”行范围未在原文说明。"
+                },
+                {
+                  "name": "其他行营业收入比上年增减",
+                  "raw_value": "-65.99",
+                  "value": "-65.99",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "“其他”行范围未在原文说明。"
+                },
+                {
+                  "name": "其他行营业成本比上年增减",
+                  "raw_value": "69.25",
+                  "value": "69.25",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "uncertainty_reason": "“其他”行范围未在原文说明。"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-09",
+              "text": "主营业务分行业合计营业收入人民币28,302,251,724.47元，营业成本人民币13,845,856,470.63元，毛利率51.08%，营业收入比上年增减24.34%，营业成本比上年增减13.18%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分行业合计营业收入",
+                  "raw_value": "28,302,251,724.47",
+                  "value": "28302251724.47",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业合计营业成本",
+                  "raw_value": "13,845,856,470.63",
+                  "value": "13845856470.63",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务分行业合计毛利率",
+                  "raw_value": "51.08",
+                  "value": "51.08",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-10",
+              "text": "主营业务分地区情况显示，公司总部及境内子公司营业收入人民币17,070,496,269.09元，境外地区营业收入人民币2,568,513,564.51元；分地区合计营业收入人民币28,302,251,724.47元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "公司总部及境内子公司营业收入",
+                  "raw_value": "17,070,496,269.09",
+                  "value": "17070496269.09",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境外地区营业收入",
+                  "raw_value": "2,568,513,564.51",
+                  "value": "2568513564.51",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "分地区合计营业收入",
+                  "raw_value": "28,302,251,724.47",
+                  "value": "28302251724.47",
+                  "unit": "元",
+                  "source_unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分行业、分地区表格所在物理页布局未恢复，表格列关系未核定；本回复仅采用原文中可明确对应的行标签与金额，未推断缺失列或未披露数值。",
+            "“其他”行范围与合计口径的关系未在原文说明，已按不确定范围保留，未将其并入任何正常经营业务板块。",
+            "分地区明细中浙江、广东、北京、上海等地区收入未逐项列出，仅保留公司总部及境内子公司、境外地区与合计等集中口径。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次补充阅读仅针对收入模式与规模结构，未重新读取运营与投入相关内容。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次补充阅读仅针对收入模式与规模结构，未重新读取客户、渠道与市场相关内容。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次补充阅读仅针对收入模式与规模结构，未重新读取经营驱动因素相关内容。"
+          ]
+        },
+        "material_changes": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "本次补充阅读仅针对收入模式与规模结构，未重新读取重大变化相关内容。"
+          ]
+        }
+      },
+      "limitations": [
+        "本次为补充阅读，仅回答收入模式与规模结构两个目标问题；其余六个要素未针对本任务读取，不代表公司未披露相关内容。",
+        "所选章节物理页布局未恢复，表格列关系未核定；本回复仅采用原文中可明确对应的行标签与金额，未推断缺失列或未披露数值。",
+        "未读取行业背景、核心竞争力、治理、债券及财务报告附注，收入模式与规模结构的回答不构成对全报告完整性的判断。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 15689,
+      "output_tokens": 3723,
+      "total_tokens": 19412
+    }
+  },
+  {
+    "request_id": "bp-work-58d1b361ac5dd345f0d4e2af:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "b06b548e523d4144a3071e61c6f4bca25b5bdaa13cd1e009a94c067aa314d918",
+    "response_hash": "5bcafa5776ca1517ddb2abc87ba2e0cc2ec33f2491ef58ab5794197565273307",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"F-SM10-SCOPE\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"SM-10\",\"evidence_ids\":[\"source-0011\",\"source-0008\"],\"explanation\":\"SM-10把事实整体以及“公司总部及境内子公司营业收入”“境外地区营业收入”的主体范围标成consolidated_group。分地区表中这两行只是地区/组织行：总部及境内子公司17,070,496,269.09元不是集团总额，境外地区2,568,513,564.51元也不是集团总额。同表出现或金额可定位，不能把子行升格为本集团。分地区合计28,302,251,724.47元与source-0008本集团营业收入同额，可继续对应集团合计，但不得据此改写前两行。应保留原行名和金额，将两行及事实的笼统集团范围改为unclear或按行限定，不要虚构精确主体。\"},{\"finding_id\":\"F-RM-PL-AMOUNTS\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0008\"],\"explanation\":\"目标问题需要看出主要收入来源的量级。source-0008已列明本集团2025年利息净收入4,482,828,193.13元、手续费及佣金净收入10,419,509,128.97元、投资收益及公允价值变动损益13,135,906,369.05元，增速分别为16.48%、41.35%、15.81%。RM-07只保留增速和原因，没有这三项本期金额。营业收入总额或分行业构成不能替代该会计科目口径；三项占营业收入绝大部分，缺失会改变对盈利机制结构的理解。其他收益、汇兑收益等尾项不必补。修复时应按本集团单列这三项金额，不与分行业收入相加，也不改已支持的增速表述。\"}],\"reviewed_fact_ids\":[\"RM-01\",\"RM-02\",\"RM-03\",\"RM-04\",\"RM-05\",\"RM-06\",\"RM-07\",\"SM-01\",\"SM-02\",\"SM-03\",\"SM-04\",\"SM-05\",\"SM-06\",\"SM-07\",\"SM-08\",\"SM-09\",\"SM-10\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "F-SM10-SCOPE",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "SM-10",
+          "evidence_ids": [
+            "source-0011",
+            "source-0008"
+          ],
+          "explanation": "SM-10把事实整体以及“公司总部及境内子公司营业收入”“境外地区营业收入”的主体范围标成consolidated_group。分地区表中这两行只是地区/组织行：总部及境内子公司17,070,496,269.09元不是集团总额，境外地区2,568,513,564.51元也不是集团总额。同表出现或金额可定位，不能把子行升格为本集团。分地区合计28,302,251,724.47元与source-0008本集团营业收入同额，可继续对应集团合计，但不得据此改写前两行。应保留原行名和金额，将两行及事实的笼统集团范围改为unclear或按行限定，不要虚构精确主体。"
+        },
+        {
+          "finding_id": "F-RM-PL-AMOUNTS",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "目标问题需要看出主要收入来源的量级。source-0008已列明本集团2025年利息净收入4,482,828,193.13元、手续费及佣金净收入10,419,509,128.97元、投资收益及公允价值变动损益13,135,906,369.05元，增速分别为16.48%、41.35%、15.81%。RM-07只保留增速和原因，没有这三项本期金额。营业收入总额或分行业构成不能替代该会计科目口径；三项占营业收入绝大部分，缺失会改变对盈利机制结构的理解。其他收益、汇兑收益等尾项不必补。修复时应按本集团单列这三项金额，不与分行业收入相加，也不改已支持的增速表述。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "RM-01",
+        "RM-02",
+        "RM-03",
+        "RM-04",
+        "RM-05",
+        "RM-06",
+        "RM-07",
+        "SM-01",
+        "SM-02",
+        "SM-03",
+        "SM-04",
+        "SM-05",
+        "SM-06",
+        "SM-07",
+        "SM-08",
+        "SM-09",
+        "SM-10"
+      ]
+    },
+    "usage": {
+      "input_tokens": 16974,
+      "output_tokens": 554,
+      "total_tokens": 35612
+    }
+  },
+  {
+    "request_id": "bp-work-58d1b361ac5dd345f0d4e2af:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "873459813120c5857a9f504792bd78e04640ad1c0bd04a511459ba70771b22d1",
+    "response_hash": "d15c0706848df69150486730734cd3780e090d07b1a1580d34ce5b12a46b942b",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"SM-10\",\"text\":\"主营业务分地区情况显示，公司总部及境内子公司营业收入人民币17,070,496,269.09元，境外地区营业收入人民币2,568,513,564.51元；分地区合计营业收入人民币28,302,251,724.47元。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"公司总部及境内子公司营业收入\",\"raw_value\":\"17,070,496,269.09\",\"value\":\"17070496269.09\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"分地区表中的组织/地区行，非集团总额，主体范围无法精确界定\"},{\"name\":\"境外地区营业收入\",\"raw_value\":\"2,568,513,564.51\",\"value\":\"2568513564.51\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"分地区表中的地区行，非集团总额，主体范围无法精确界定\"},{\"name\":\"分地区合计营业收入\",\"raw_value\":\"28,302,251,724.47\",\"value\":\"28302251724.47\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":\"分地区表中公司总部及境内子公司、境外地区为地区/组织行，非集团总额，主体范围无法精确界定\"},{\"fact_id\":\"review-add:F-RM-PL-AMOUNTS\",\"text\":\"2025年度，本集团利息净收入人民币4,482,828,193.13元，同比增长16.48%；手续费及佣金净收入人民币10,419,509,128.97元，同比增长41.35%；投资收益及公允价值变动损益人民币13,135,906,369.05元，同比增长15.81%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"利息净收入\",\"raw_value\":\"4,482,828,193.13\",\"value\":\"4482828193.13\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期数\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"手续费及佣金净收入\",\"raw_value\":\"10,419,509,128.97\",\"value\":\"10419509128.97\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期数\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资收益及公允价值变动损益\",\"raw_value\":\"13,135,906,369.05\",\"value\":\"13135906369.05\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期数\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "SM-10",
+          "text": "主营业务分地区情况显示，公司总部及境内子公司营业收入人民币17,070,496,269.09元，境外地区营业收入人民币2,568,513,564.51元；分地区合计营业收入人民币28,302,251,724.47元。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "公司总部及境内子公司营业收入",
+              "raw_value": "17,070,496,269.09",
+              "value": "17070496269.09",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "分地区表中的组织/地区行，非集团总额，主体范围无法精确界定"
+            },
+            {
+              "name": "境外地区营业收入",
+              "raw_value": "2,568,513,564.51",
+              "value": "2568513564.51",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "分地区表中的地区行，非集团总额，主体范围无法精确界定"
+            },
+            {
+              "name": "分地区合计营业收入",
+              "raw_value": "28,302,251,724.47",
+              "value": "28302251724.47",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "分地区表中公司总部及境内子公司、境外地区为地区/组织行，非集团总额，主体范围无法精确界定"
+        },
+        {
+          "fact_id": "review-add:F-RM-PL-AMOUNTS",
+          "text": "2025年度，本集团利息净收入人民币4,482,828,193.13元，同比增长16.48%；手续费及佣金净收入人民币10,419,509,128.97元，同比增长41.35%；投资收益及公允价值变动损益人民币13,135,906,369.05元，同比增长15.81%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "利息净收入",
+              "raw_value": "4,482,828,193.13",
+              "value": "4482828193.13",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期数",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手续费及佣金净收入",
+              "raw_value": "10,419,509,128.97",
+              "value": "10419509128.97",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期数",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益及公允价值变动损益",
+              "raw_value": "13,135,906,369.05",
+              "value": "13135906369.05",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期数",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10863,
+      "output_tokens": 764,
+      "total_tokens": 11627
+    }
+  },
+  {
+    "request_id": "bp-work-58d1b361ac5dd345f0d4e2af:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "161b51d955eb0374cae4649ec37e3a9124942385f50226496f0fa755b1ee5946",
+    "response_hash": "35bf5a14348393fa907af3789fea1d6ded06c3b59201016ca066a5401db12175",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"SM-10\",\"review-add:F-RM-PL-AMOUNTS\"],\"checks\":[{\"fact_id\":\"SM-10\",\"accepted\":true,\"evidence_ids\":[\"source-0011\",\"source-0008\",\"source-0009\"],\"explanation\":\"分地区表原行名及营业收入金额保留正确：公司总部及境内子公司17,070,496,269.09元、境外地区2,568,513,564.51元，二者均非集团总额，事实及两行主体改为unclear且未虚构精确主体。合计28,302,251,724.47元与source-0008、source-0009本集团营业收入本期数同额，且属同一主营业务分地区合计行，可单独标为consolidated_group，未据此改写前两行。期间为2025年度营业收入本期数，单位为人民币元，未误用营业成本列。\"},{\"fact_id\":\"review-add:F-RM-PL-AMOUNTS\",\"accepted\":true,\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"explanation\":\"source-0008按本集团列明2025年本期利息净收入4,482,828,193.13元、手续费及佣金净收入10,419,509,128.97元、投资收益及公允价值变动损益13,135,906,369.05元，变动比例分别为16.48%、41.35%、15.81%，叙事亦称较2024年度增加。候选按会计科目单列三项金额和同比增速，主体、期间、人民币元及上年同期比较基准正确，未与分行业收入相加或改写已支持增速。source-0009对同一表营业收入283.02亿元及24.34%印证本期数与变动比例列序。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "SM-10",
+        "review-add:F-RM-PL-AMOUNTS"
+      ],
+      "checks": [
+        {
+          "fact_id": "SM-10",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0011",
+            "source-0008",
+            "source-0009"
+          ],
+          "explanation": "分地区表原行名及营业收入金额保留正确：公司总部及境内子公司17,070,496,269.09元、境外地区2,568,513,564.51元，二者均非集团总额，事实及两行主体改为unclear且未虚构精确主体。合计28,302,251,724.47元与source-0008、source-0009本集团营业收入本期数同额，且属同一主营业务分地区合计行，可单独标为consolidated_group，未据此改写前两行。期间为2025年度营业收入本期数，单位为人民币元，未误用营业成本列。"
+        },
+        {
+          "fact_id": "review-add:F-RM-PL-AMOUNTS",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008",
+            "source-0009"
+          ],
+          "explanation": "source-0008按本集团列明2025年本期利息净收入4,482,828,193.13元、手续费及佣金净收入10,419,509,128.97元、投资收益及公允价值变动损益13,135,906,369.05元，变动比例分别为16.48%、41.35%、15.81%，叙事亦称较2024年度增加。候选按会计科目单列三项金额和同比增速，主体、期间、人民币元及上年同期比较基准正确，未与分行业收入相加或改写已支持增速。source-0009对同一表营业收入283.02亿元及24.34%印证本期数与变动比例列序。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12589,
+      "output_tokens": 402,
+      "total_tokens": 22154
+    }
+  }
+]

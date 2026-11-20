@@ -1,0 +1,27 @@
+{
+  "task": "6.EG",
+  "instrument_id": "601881.SH",
+  "entry_started": true,
+  "state": "completed",
+  "before_readings": 2,
+  "exception": null,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 27.89,
+  "business_seconds": 423.411,
+  "physical_requests": 5,
+  "charged_tokens": 118005,
+  "fee": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "after_readings": 3,
+  "new_reading_work_ids": [
+    "bp-work-58d1b361ac5dd345f0d4e2af"
+  ],
+  "new_visible_facts": 18,
+  "new_visible_metrics": 32,
+  "before_facts_preserved": true,
+  "old_runtime_files_unchanged": true,
+  "review_status": "completed",
+  "review_error": null,
+  "supervision_seconds": 454.668
+}

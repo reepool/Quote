@@ -1,0 +1,91 @@
+{
+  "task": "6.EG",
+  "phase": "one_real_entry_completed_targeted_income_acquired_with_limits",
+  "files": {
+    "approval.json": {
+      "sha256": "649f5b121d09ec3d484f6d4686a8e9ea6e303a6563f196199a1f289666fbf267",
+      "bytes": 1300
+    },
+    "authorization.json": {
+      "sha256": "51982e19a94c7a96f4d575b950ac553680fbed3fe981b121cdaec5872dff050d",
+      "bytes": 13630
+    },
+    "budget.json": {
+      "sha256": "6b567fc4556c76b972690095b59149af502f7503a27b209fae98f1addf73682e",
+      "bytes": 6098
+    },
+    "delivery-verification.json": {
+      "sha256": "f9a3de02a94f6eb065dff21b28f60553abb4efca55a5f53e0abd4e737bf22820",
+      "bytes": 1123
+    },
+    "enrichment-plan.json": {
+      "sha256": "c2bd7519c09f754d0c2ee2ad7f8753cbeee80e127e8fd4b70d6cedb9e72e8904",
+      "bytes": 1651
+    },
+    "execution-cleanup.json": {
+      "sha256": "0e1e8755c26caeac83f8c85f910c0fa578199d7b404df79a7c1bbc2e9e1c656f",
+      "bytes": 1320
+    },
+    "execution.json": {
+      "sha256": "4ace1bb3659506048011919350bcc7d6553aa0a801c3ce308ef35f396f9d4044",
+      "bytes": 31908
+    },
+    "independent-audit.json": {
+      "sha256": "651edd0e260524ff447907108d0766aebcd4970a8a6f007730ce0a0fdd02115c",
+      "bytes": 9164
+    },
+    "model-receipts.json": {
+      "sha256": "6cd4c26ce093e49a31ee748a35c47e6a9df545e8cfe69c8b9206d8c15ba02936",
+      "bytes": 64509
+    },
+    "operator-snapshot.txt": {
+      "sha256": "caec365be3595d9ae017819b5e6b9bd4dc4efd3f77b2e998cc7084add5aa9244",
+      "bytes": 15716
+    },
+    "provider-traces.json": {
+      "sha256": "527346cb1e028697f78e93e8ab9efc72dc6e89810a68c55bdfec27460b882144",
+      "bytes": 6437
+    },
+    "readiness.json": {
+      "sha256": "7f7be269b3234ad95de7fa3e33892460e9531b5b20f7e7a999ad944f3657d30e",
+      "bytes": 3760
+    },
+    "request-wiring.json": {
+      "sha256": "f2caacb13320b39a1f90db135ff526c13a8690834bce4111fc84eb9e96ba75b1",
+      "bytes": 1821
+    },
+    "research-api.json": {
+      "sha256": "d5bf7d277ea536152ab0d0909f00bd6e440063737ec2244d21aa7ee2cfb73066",
+      "bytes": 269670
+    },
+    "research-supplement.md": {
+      "sha256": "e7507cf13ba68e8bdbf2b9d99557ae0045c0d97d26fbed56d2f05bbf1f35e239",
+      "bytes": 60388
+    },
+    "result.md": {
+      "sha256": "907d85652acbb6e44003dce7b053ef2dc4c755cce98a64ec1c239169b8b19897",
+      "bytes": 5047
+    },
+    "runtime.json": {
+      "sha256": "df11b623431680d24d8e878b47ecef824154f244b535e899d311dd1e5890f766",
+      "bytes": 201988
+    },
+    "summary.json": {
+      "sha256": "deddc996c7991e1d819cf42e8ec77574e18511dc89119e53f61da5dee5b1fe75",
+      "bytes": 691
+    },
+    "validation.json": {
+      "sha256": "a648d6740093f571dc9561c53b2e40be4e6073c8d1dcc9f1e907ee588e6c0ba4",
+      "bytes": 2094
+    }
+  },
+  "real_physical_requests": 5,
+  "subsequent_model_requests": 0,
+  "authoritative_consumer_projections": [
+    "research-api.json",
+    "research-supplement.md"
+  ],
+  "raw_model_audit": "runtime.json and model-receipts.json",
+  "old_records_and_failures": "retained unchanged",
+  "production_authorization": "not_authorized"
+}

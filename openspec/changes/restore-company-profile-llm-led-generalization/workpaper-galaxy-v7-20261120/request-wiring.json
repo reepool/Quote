@@ -1,0 +1,62 @@
+[
+  {
+    "model": "deepseek-flash",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 106847,
+    "payload_sha256": "2e1fd4a7da47d4f1ff55dd83ff01240c6ac9377b0b6919449bb165bde5671bab",
+    "max_tokens": 2500,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 3.789
+  },
+  {
+    "model": "deepseek-flash",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 65604,
+    "payload_sha256": "b9154e47ad93aa14300c7e2ccc4d3c090cd037ddfbf577e451486edc3733e580",
+    "max_tokens": 12000,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 13.068
+  },
+  {
+    "model": "grok-4.7",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 59619,
+    "payload_sha256": "cf5a9d3bad76efed1d8d24a48a0bac0956a744c10b6152ad0aabd38a272b727e",
+    "max_tokens": null,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 236.455
+  },
+  {
+    "model": "deepseek-flash",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 42669,
+    "payload_sha256": "946776ba1490574bb5755938d73ddf2e0175cacb4dd78f7b437545f1fbd93371",
+    "max_tokens": 16384,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 3.263
+  },
+  {
+    "model": "grok-4.7",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 40429,
+    "payload_sha256": "772ea41699beb859d0860083d0b60ee1ffab7c8b9502d74f7446442e0d7892b6",
+    "max_tokens": null,
+    "reasoning_effort": "high",
+    "headers_or_material_recorded": false,
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 146.829
+  }
+]

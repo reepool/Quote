@@ -1,0 +1,17 @@
+{
+  "task": "6.EG",
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6eg-run-L149sePP",
+  "removed_temporary_files": 24,
+  "released_temporary_file_bytes": 1958475,
+  "removed_redundant_projections": [
+    {"path": "workpaper-galaxy-v7-20261120/api.json", "bytes": 269467, "sha256": "f19d909f4066f030fd2ffd8ac16a4b43b524f41770022f8ec6653184e6bfe8bc"},
+    {"path": "workpaper-galaxy-v7-20261120/supplement.md", "bytes": 60658, "sha256": "9ec6d121d0fc0299e800a858076fbe94e7837fb61d52dd5eca1313097765ad3f"}
+  ],
+  "released_total_file_bytes": 2288600,
+  "directory_absent_after_cleanup": true,
+  "scope": "Only this task's DB/checkpoints/scripts/logs/capture duplicates/full export and redundant ungraded API/Markdown; associated sessions finished before cleanup.",
+  "recoverability": "Raw model content, status and rejected/limited objects remain in runtime.json and receipts; ungraded projections are reproducible. Authoritative graded consumer projections are research-api.json and research-supplement.md.",
+  "retained_business_root": "/home/python/Quote/data/research/company_profile_galaxy_v7_20261120",
+  "retained_attempt_guard": "/home/python/Quote/data/QuoteBak/s1-attempts/workpaper-eg-601881-20261120.json",
+  "official_source_valid_cache_old_records_failures_parallel_work": "untouched"
+}

@@ -1,0 +1,221 @@
+{
+  "task": "6.EG",
+  "report": {
+    "instrument_id": "601881.SH",
+    "report_id": "1225051623",
+    "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "scope": "Only 18 new current-reading objects, including both actual adopted corrections; not old 25 or full-report/cohort accuracy.",
+  "method": "Independent source comparison to official-version pages 23,34,35,36 and exact evidence coordinates; expected values only local. Provider agreement/regex presence alone is not treated as truth.",
+  "decisions": [
+    {
+      "fact_id": "RM-01",
+      "fact_sha256": "e76dd232b4bcd6028b37c383ac9e451f7f2fd9a055506dffd040db9a0f7a15e0",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "原文p23五位一体/六类业务及其服务范围有据，未虚构各项费率或利润贡献。",
+      "limitation": null
+    },
+    {
+      "fact_id": "RM-02",
+      "fact_sha256": "9fe6b47d6ca95714af3cc640233e3c70bec145466e534a5ce69bd6920f99f2f1",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "原文p23五位一体/六类业务及其服务范围有据，未虚构各项费率或利润贡献。",
+      "limitation": null
+    },
+    {
+      "fact_id": "RM-03",
+      "fact_sha256": "51a677d788073bde8b4fe1f83af75ed3bc960c773e0ed5021f68adf6a9631b3f",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "原文p23五位一体/六类业务及其服务范围有据，未虚构各项费率或利润贡献。",
+      "limitation": null
+    },
+    {
+      "fact_id": "RM-04",
+      "fact_sha256": "73b2041939a7cec7823a5dcac13bdd4a4b84c5ec7e1bc789ce3464392b296d2e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "原文p23五位一体/六类业务及其服务范围有据，未虚构各项费率或利润贡献。",
+      "limitation": null
+    },
+    {
+      "fact_id": "RM-05",
+      "fact_sha256": "31b70fabb676c5754b3a166b30d44323f453fdf8a2338d2f3f683512a2436ddd",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "原文p23五位一体/六类业务及其服务范围有据，未虚构各项费率或利润贡献。",
+      "limitation": null
+    },
+    {
+      "fact_id": "RM-06",
+      "fact_sha256": "a96e70fbb5b526ae540c015af1a5c8700b989c55697d00400de2f5eceec686ab",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "reason": "原文p23五位一体/六类业务及其服务范围有据，未虚构各项费率或利润贡献。",
+      "limitation": null
+    },
+    {
+      "fact_id": "RM-07",
+      "fact_sha256": "c9b770666bb4f27c958e6f6b36d1ba5e7fe67f5c29deb14e65bce074690562c2",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "reason": "p34集团营业收入及三类净收入/投资收益变动原句有据，费用和收入来源分开，不把公允价值变动当现金收入。",
+      "limitation": null
+    },
+    {
+      "fact_id": "review-add:F-RM-PL-AMOUNTS",
+      "fact_sha256": "fb4df5e810dc6b28015ae3e6e9afa3fdcaa5513525b9f7b5badb8c3a8e5795de",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "reason": "p34本集团本期利息净收入、手续费及佣金净收入、投资收益及公允价值变动损益及同比有据；这是会计收入科目轴，不与业务板块收入叠加。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-01",
+      "fact_sha256": "7cd26f210eda9b105aee05deb89688b8e091308a95e57981d89fbdd5bfeeaf9d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "reason": "p34—36集团本期营业收入及主营业务分行业表/说明：原行名、元与亿元显示精度、金额和占比分别核对，不相加不同维度。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-02",
+      "fact_sha256": "7214d5b154ed77bae4d2fe302670fc3e87ea3d6b62effea27e45f14ea4dffd0b",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "reason": "p34—36集团本期营业收入及主营业务分行业表/说明：原行名、元与亿元显示精度、金额和占比分别核对，不相加不同维度。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-03",
+      "fact_sha256": "a62c5d1679a2bca221682fb76313945f854d1197c00b271c356019bd5425e1b3",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "reason": "p34—36集团本期营业收入及主营业务分行业表/说明：原行名、元与亿元显示精度、金额和占比分别核对，不相加不同维度。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-04",
+      "fact_sha256": "517cef0444ca3099eade7a070f20d7f7dcdb8aaef07a66ec9e843062f789f004",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "reason": "p34—36集团本期营业收入及主营业务分行业表/说明：原行名、元与亿元显示精度、金额和占比分别核对，不相加不同维度。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-05",
+      "fact_sha256": "0a470c6cedbeb7bed9b22c2a531b1b48f8d19c30bf515f057bf7472e50fb1162",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "reason": "p34—36集团本期营业收入及主营业务分行业表/说明：原行名、元与亿元显示精度、金额和占比分别核对，不相加不同维度。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-06",
+      "fact_sha256": "2af2afe1d4e36a348338ad6dbd641bc665391faca9bea3d257c5979fe51d0541",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "reason": "p34—36集团本期营业收入及主营业务分行业表/说明：原行名、元与亿元显示精度、金额和占比分别核对，不相加不同维度。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-07",
+      "fact_sha256": "61ef7a73f99ed68a5033f9c7670b3614c6ca45f0ac88c42503a72e73b3f37061",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "reason": "p34—36集团本期营业收入及主营业务分行业表/说明：原行名、元与亿元显示精度、金额和占比分别核对，不相加不同维度。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-08",
+      "fact_sha256": "44e255a5f58b682e6bec3c4d537a24aabc1be79b081f8c82b1045c61320d5a3c",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0010",
+        "source-0012"
+      ],
+      "reason": "其他行金额可对，但“不是公司正常经营业务板块”的性质解释原文没有明示；仅源参考，不作为确定经营结论或标准化指标交付，未手工拆取正确数值。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-09",
+      "fact_sha256": "a4777f723fd213e1cfb882b6f130481e1570d7510eb0d339d690bd1ef25c3f4e",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "reason": "p35主营业务分行业合计的收入、成本和毛利率有据，不把此条同公司总额重复加总。",
+      "limitation": null
+    },
+    {
+      "fact_id": "SM-10",
+      "fact_sha256": "5e2fefa0e36dc10a56462a4e234c7760aa0817f03ed64e8b03e64dc6a432627c",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "reason": "p36分地区的组织/地区行金额保原文，修订后为unclear；只有合计单独保持集团范围，不把局部行当全集团。",
+      "limitation": "分地区组织/区域口径仍不精确，保原文和unclear，不作集团统一精确主体。"
+    }
+  ],
+  "original_model_findings_retained": 2,
+  "both_actual_revisions_independently_checked": true,
+  "target_assessment": {
+    "company_revenue_and_major_business_mix_acquired": true,
+    "main_accounting_income_sources_acquired": true,
+    "fee_schedule_or_all_business_revenue_recognition_complete": false
+  },
+  "remaining": [
+    "各业务收费费率/确认细目未取得，不作为本轮失败。",
+    "其他行的性质解释未获原文支持，只作源参考。",
+    "原布局降级和跨阅读未自动对账限制保持，不能据此称全文完整。"
+  ],
+  "source_coordinates_valid": true,
+  "source_pdf_sha256": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+  "reference_values_not_sent_to_model": true,
+  "new_model_calls_in_handoff": 0,
+  "production_authorization": "not_authorized",
+  "S2_unchanged": true
+}

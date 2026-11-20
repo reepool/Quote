@@ -1,0 +1,11 @@
+{
+  "task": "6.EG",
+  "status": "authorized",
+  "approval_reference": "用户在6.EF明确提出修复版真实补读须新授权后，直接回复：授权按照 openspec 的规划方向和你的具体想法继续推进。仅按已提出下一步执行中国银河一次v7修复版复验，延续原模型/公开材料及资源上限，不扩公司。",
+  "instrument_id": "601881.SH",
+  "public_material_only": "Existing public 2025 annual report selected sections and public derived workpapers; no account/private data.",
+  "providers": ["official DeepSeek selection/extraction and at most one merged repair", "existing scorpio.reepool.com grok-4.7 high source review and necessary final review"],
+  "limits": {"business_seconds": 6000, "conservative_ledger": 1000000, "physical_requests": 10, "recoveries": 3, "per_logical_recoveries": 1, "review_attempt_seconds": 1200, "logical_seconds": 2450, "flash_attempt_seconds": 600, "known_price_component_cny": 10},
+  "unpriced_fee": "unknown; no total CNY guarantee",
+  "constraints": "One new corrected enrichment entrance, approved network only. No extra window/company, recharge, shared config change or production. Old raw answers/navigation and human reference not sent. Original 25 readable objects, prior failure and S2 conclusion retained."
+}

@@ -1,0 +1,30 @@
+{
+  "task": "6.EG",
+  "new_model_calls": 0,
+  "plan_sha256": "c2bd7519c09f754d0c2ee2ad7f8753cbeee80e127e8fd4b70d6cedb9e72e8904",
+  "base_runtime_sha256": "3e34ec773d99c72c91c38028b3e3871387e47879517fc7d66a32e152a71988dd",
+  "base_work_id": "bp-work-5ce29dc63f76696150d64e1a",
+  "before_readings": 2,
+  "before_visible_facts": 25,
+  "protected_runtime_files": {
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-5ce29dc63f76696150d64e1a.json": "3e34ec773d99c72c91c38028b3e3871387e47879517fc7d66a32e152a71988dd",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-a99435fdd6133370b6c27a91.json": "18b2c3be0449ba14c59a29bf1178b6e850d21dba5b17f992fd39c3333bb95568",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-7cd3e40c46bb206be0cd4234.json": "4ca7cf137b9ab54d4a05d15836fe62641c70e69412bfb3c127d486f9a3515e4e",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-b9c957eb2ed7cf1a2da0ca3e.json": "13d0b71da469a780ed934cda502363dd56540d582a476272593f29c571313538",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-b94386f72fa9b8008e18090c.json": "f2dbaeaf15aaf60aeca64acca6c86a834acfd2d3fa70b23b7e14dfecd60a2d3f",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-13b0c399f5b0c8150accfdcc.json": "2af7b907c390602466b165be50ee4b605cfd798d733c519100edd321c499b1f7",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-39973bd61a38a0f69bf6e159.json": "3b8e157ede7f00710b7a196f8b1bebf0558c06e911cc0361258a5eaf8b6b07a6",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-522acd73d4816c9de549211a.json": "865fb722db963c59dcc75580438d855bbf86294508dac5e7a6f2a7eaeb4867ef",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-2829fcbafb318d193e68b256.json": "fad23828bc78668cd6254f1044c3c2edc05d7812d01aceea00368111ed5f26cb",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-35b3e51d85531e58dbebe54e.json": "bb34ae5f7fc88fbf6bc6f68436086b3a49d4078c3355b39fe37ac9e013f6ebe5",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-714b0f41c03b8caee1d97f61.json": "8726eaeb7419475151662e46b02587287e8e502c08f4df6f43242519548f4f31",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-b714e2a56fcb44d188cf3fee.json": "abbcffe9b1fee63bb4dad080c448c5168cd382ad213438016b8604dd20eb1bc9",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-8a47bdc6129671bc9ca0fca1.json": "892c0522bb728a29b4d8124e51c47b58e4948ad3ff81ae33b512775785459e6f",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-d017ef9ea557d599dc731599.json": "a736f8275c99bdc5ef8ceb5e9472db4b3dafa8e26f02444f74b09a85328fbebb",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-245e7049d39a49cac0cd6996.json": "8b4dd9550749613eb63640d99981272a8753ffeac1dfe8e91a15a3d930028e38",
+    "data/research/company_profile_galaxy_enriched_20261120/company_profile_common_core.v1/bp-work-e27361c6f6d02924c70764e2.json": "74e165b81195e192d533b48b918e57d2ca9b27992f18802a5decfb089fb4b04d"
+  },
+  "reused_regressions": "2bd6424c: 117 related tests and final 59 overlapping checks; exact current source unchanged",
+  "old_navigation_or_answers_sent": false,
+  "production_authorization": "not_authorized"
+}

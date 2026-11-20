@@ -1,0 +1,33 @@
+{
+  "task": "6.EG",
+  "production_code_modified": false,
+  "reused_source_sha256": {
+    "research/company_profile/workpaper_sections.py": "994480c323874839040ee46db7d61447086b887e788b273bd9a395f492437a33",
+    "research/company_profile/workpaper_llm.py": "c90d96e914e20303c47647ec57f7e82d6dd19a975270072972c3091ea36edcf0",
+    "research/company_profile/workpaper_review.py": "7eb4d71bee4a926413ab6a7bb27429a7b6d190a0bdc00b595cb5d25f35fe6a5c",
+    "tests/unit/test_research/test_company_profile_workpaper_ordered_remap.py": "d360539e41668570c6a79f516ac63b2cf85e665ff628805170ee1a2fb8eefdd1",
+    "tests/unit/test_research/test_company_profile_workpaper.py": "1916b9fdecea99933fae8205ce46e7240093a8e752c938e2ed3094fbee898f22"
+  },
+  "reused_regressions": "117 related and final 59 overlapping checks at 2bd6424c; unchanged source/test hashes; not rerun",
+  "actual_new_model_requests": 5,
+  "subsequent_model_requests": 0,
+  "actual_new_checks": [
+    "one original TaskService enrichment from a two-reading base",
+    "18 current objects independently source checked including two actually adopted corrections",
+    "official PDF hash and v7 exact source-coordinate/seed reconstruction",
+    "17 graded objects/28 metrics retained; one unsupported optional interpretation source-only",
+    "query/export/new instance and annual_profiles/API equality",
+    "local ASGI detail/catalog 200; original 25 facts and 16 old records unchanged"
+  ],
+  "commands": [
+    "python prepare_plan.py (task local, no network)",
+    "python execute_enrichment.py (one approved network entry, 5 physical calls)",
+    "python handoff.py (external network disabled, no models; local ASGI in approved environment)",
+    "openspec validate restore-company-profile-llm-led-generalization --strict",
+    "git diff --check"
+  ],
+  "environment": "All commands source scripts/quote_dev_env.sh; Python /home/python/miniconda3/envs/Quote/bin/python; task artifacts under QuoteBak; shared configuration unchanged",
+  "syntax_parse_passed": true,
+  "production_authorization": "not_authorized",
+  "old_S2_unchanged": true
+}

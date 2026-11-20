@@ -1,0 +1,31 @@
+{
+  "task": "6.EG",
+  "raw_runtime_sha256": "df11b623431680d24d8e878b47ecef824154f244b535e899d311dd1e5890f766",
+  "audited_runtime": "data/research/company_profile_galaxy_v7_20261120/company_profile_common_core.v1/bp-work-58d1b361ac5dd345f0d4e2af.json",
+  "audited_runtime_sha256": "f3ccec6e2681d4917df1296c2b1ef9f239aa4988ec3481d5376f0d620909f4c1",
+  "all_business_facts_values_references_generation_review_unchanged": true,
+  "raw_new_facts": 18,
+  "visible_new_facts": 17,
+  "visible_new_metrics": 28,
+  "new_source_only": [
+    "SM-08"
+  ],
+  "original_25_facts_and_16_runtime_records_unchanged": true,
+  "API_export_fresh_equal": true,
+  "http": {
+    "detail_status": 200,
+    "catalog_status": 200,
+    "current_readable_facts": 42,
+    "current_readable_metrics": 55,
+    "readings": 3
+  },
+  "selected_source_evidence_fragments": 12,
+  "exact_source_coordinates_checked": true,
+  "supplier_known_total": 118005,
+  "unknown_usage_reservations": 0,
+  "fee": "unknown",
+  "shared_config_unchanged": true,
+  "new_model_calls_in_handoff": 0,
+  "old_S2_unchanged": true,
+  "production_authorization": "not_authorized"
+}
