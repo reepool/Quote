@@ -1,5 +1,11 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.EF 中国银河收入来源定向精读（真实调用待新明确批准）
+
+- [x] 6.EF1 基于既有独立缺项和当前API，绑定601881原report/base/hash，零调用生成收入机制/构成补读计划；核正式源与既有解析缓存、原入口接续条件，复用有效证明，不人工补答案。
+- [ ] 6.EF2 仅新明确批准后一次原TaskService.enrich，按报告目录取集中章节、真实抽取/复核及必要一次修订再核；只交实际新增与剩余缺项，保原base和其他股票，不改旧S2。
+- [x] 6.EF3 当前准备阶段的有限Review/strict与本人块Git；必要一套后清本人QuoteBak7336文件字节，未批不留临时库等待，不借旧额/加窗或启生产。真实6.EF2仍待新明确批准，见company-profile-galaxy-enrichment-card.md及workpaper-galaxy-enrichment-20261120/result.md。
+
 ### 6.EE 多轮补读成果随研究导出交付（零新模型）
 
 - [x] 6.EE1 原export复用API同报告投影，新增兼容annual_profiles.json，绑定本次实际选中的base/处理身份，原单次导出不变，不新增writer/模型调用。

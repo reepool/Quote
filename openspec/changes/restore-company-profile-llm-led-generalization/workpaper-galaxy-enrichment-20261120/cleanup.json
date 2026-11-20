@@ -1,0 +1,10 @@
+{
+  "task": "6.EF",
+  "phase": "offline_preparation",
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6ef-m2YuQ1dY",
+  "removed_files": 4,
+  "released_file_bytes": 7336,
+  "directory_absent_after_cleanup": true,
+  "removed": "One-off preparation script and process-local logs only, all associated sessions finished; no temporary work database retained waiting for authorization.",
+  "retained": "One plan/readiness set; official PDF, effective parse cache, 15 existing writer records, old failure/attempt evidence and parallel work untouched."
+}

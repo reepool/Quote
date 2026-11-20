@@ -1,0 +1,225 @@
+{
+  "task": "6.EF",
+  "phase": "offline_plan_prepared_real_authorization_pending",
+  "base_commit": "2914b091",
+  "new_model_calls": 0,
+  "external_network_disabled": true,
+  "no_provider_or_sender_instantiated": true,
+  "enrichment_execution_started": false,
+  "production_authorization": "not_authorized",
+  "stock": "601881.SH",
+  "base_work_id": "bp-work-522acd73d4816c9de549211a",
+  "base_workpaper_sha256": "559458927c9ef1cec78f433f08ba7f4f580b572228c69025bc9980a22385fa33",
+  "base_runtime_path": "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-522acd73d4816c9de549211a.json",
+  "base_runtime_sha256": "865fb722db963c59dcc75580438d855bbf86294508dac5e7a6f2a7eaeb4867ef",
+  "plan_sha256": "98a04d455173433aa26417fe11c7127e47b97c1ff34e2c92dc31ecd68ee7568f",
+  "independent_gap": {
+    "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/audit-decisions.json",
+    "sha256": "dac2b40e689be3769947dc30b41046d871d6c2d47efd846b116094c9fd43a06b",
+    "core": {
+      "principal_business": true,
+      "products_services": true,
+      "revenue_model": false
+    },
+    "reason": "服务线和产品完整，但F-RM-01修订后仅重复提供综合金融服务，缺独立赚钱机制/本公司收入构成，不能用市场融资规模或行业常识填补。",
+    "remaining": [
+      "公司收入/主要业务变现需定向补读经营收入分析；本卡停止不再补窗口。"
+    ],
+    "reference_or_answer_sent_to_model": false
+  },
+  "source": {
+    "PDF": "data/filings/announcements/blobs/56/56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410.pdf",
+    "PDF_sha256": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+    "cache": "data/filings/announcements/blobs/56/derived/business_profile_pdfium_recovery.v4/56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410_57e1dd4f16ef40ff.json.gz",
+    "cache_file_sha256": "e0e9b02b7a126926d2d7f7ce627744623261808c6f3b67d56f71a13369ddcac1",
+    "cache_artifact_hash": "c4a987ea3e03561f9cd0ef0565008757a8d0d53fe9ac4f23c56092b2b3e5da77",
+    "physical_pages": 380,
+    "indexed_sections": 1445,
+    "local_title_anchor_examples": [
+      {
+        "section_id": "section-0007",
+        "section_path": [
+          "七、本公司不存在被控股股东及其他关联方非经营性占用资金的情况"
+        ],
+        "physical_pages": [
+          2,
+          2
+        ],
+        "characters": 33
+      },
+      {
+        "section_id": "section-0080",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          24,
+          24
+        ],
+        "characters": 1263
+      },
+      {
+        "section_id": "section-0081",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析",
+          "（一）总体经营情况"
+        ],
+        "physical_pages": [
+          24,
+          24
+        ],
+        "characters": 194
+      },
+      {
+        "section_id": "section-0082",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析",
+          "（二）主营业务经营情况分析"
+        ],
+        "physical_pages": [
+          24,
+          24
+        ],
+        "characters": 1056
+      },
+      {
+        "section_id": "section-0083",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析",
+          "（二）主营业务经营情况分析",
+          "1、财富管理业务"
+        ],
+        "physical_pages": [
+          24,
+          24
+        ],
+        "characters": 1017
+      },
+      {
+        "section_id": "section-0084",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析",
+          "（二）主营业务经营情况分析",
+          "1、财富管理业务",
+          "（1）经纪业务"
+        ],
+        "physical_pages": [
+          24,
+          24
+        ],
+        "characters": 413
+      },
+      {
+        "section_id": "section-0118",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、报告期内核心竞争力分析",
+          "（一）经营管理稳健"
+        ],
+        "physical_pages": [
+          33,
+          33
+        ],
+        "characters": 169
+      },
+      {
+        "section_id": "section-0122",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          33,
+          33
+        ],
+        "characters": 242
+      },
+      {
+        "section_id": "section-0127",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "2、收入和成本分析"
+        ],
+        "physical_pages": [
+          35,
+          35
+        ],
+        "characters": 166
+      },
+      {
+        "section_id": "section-0128",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "2、收入和成本分析",
+          "（1）主营业务分行业、分地区情况"
+        ],
+        "physical_pages": [
+          35,
+          35
+        ],
+        "characters": 35
+      },
+      {
+        "section_id": "section-0156",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "（四）行业经营性信息分析"
+        ],
+        "physical_pages": [
+          40,
+          40
+        ],
+        "characters": 59
+      },
+      {
+        "section_id": "section-0189",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "六、公司关于未来发展的讨论与分析",
+          "（三）经营计划"
+        ],
+        "physical_pages": [
+          47,
+          47
+        ],
+        "characters": 716
+      }
+    ],
+    "local_index_is_not_model_section_selection": true,
+    "no_target_answer_or_fixed_page_in_plan": true
+  },
+  "protected_runtime_files": {
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-a99435fdd6133370b6c27a91.json": "18b2c3be0449ba14c59a29bf1178b6e850d21dba5b17f992fd39c3333bb95568",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-7cd3e40c46bb206be0cd4234.json": "4ca7cf137b9ab54d4a05d15836fe62641c70e69412bfb3c127d486f9a3515e4e",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-b9c957eb2ed7cf1a2da0ca3e.json": "13d0b71da469a780ed934cda502363dd56540d582a476272593f29c571313538",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-b94386f72fa9b8008e18090c.json": "f2dbaeaf15aaf60aeca64acca6c86a834acfd2d3fa70b23b7e14dfecd60a2d3f",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-13b0c399f5b0c8150accfdcc.json": "2af7b907c390602466b165be50ee4b605cfd798d733c519100edd321c499b1f7",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-39973bd61a38a0f69bf6e159.json": "3b8e157ede7f00710b7a196f8b1bebf0558c06e911cc0361258a5eaf8b6b07a6",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-522acd73d4816c9de549211a.json": "865fb722db963c59dcc75580438d855bbf86294508dac5e7a6f2a7eaeb4867ef",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-2829fcbafb318d193e68b256.json": "fad23828bc78668cd6254f1044c3c2edc05d7812d01aceea00368111ed5f26cb",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-35b3e51d85531e58dbebe54e.json": "bb34ae5f7fc88fbf6bc6f68436086b3a49d4078c3355b39fe37ac9e013f6ebe5",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-714b0f41c03b8caee1d97f61.json": "8726eaeb7419475151662e46b02587287e8e502c08f4df6f43242519548f4f31",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-b714e2a56fcb44d188cf3fee.json": "abbcffe9b1fee63bb4dad080c448c5168cd382ad213438016b8604dd20eb1bc9",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-8a47bdc6129671bc9ca0fca1.json": "892c0522bb728a29b4d8124e51c47b58e4948ad3ff81ae33b512775785459e6f",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-d017ef9ea557d599dc731599.json": "a736f8275c99bdc5ef8ceb5e9472db4b3dafa8e26f02444f74b09a85328fbebb",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-245e7049d39a49cac0cd6996.json": "8b4dd9550749613eb63640d99981272a8753ffeac1dfe8e91a15a3d930028e38",
+    "data/research/company_profile_reviewed_20261120/company_profile_common_core.v1/bp-work-e27361c6f6d02924c70764e2.json": "74e165b81195e192d533b48b918e57d2ca9b27992f18802a5decfb089fb4b04d"
+  },
+  "source_and_15_existing_records_unchanged": true,
+  "reused_proofs": [
+    "workpaper-saic-enrichment-result-20261117/result.md: original TaskService real enrichment",
+    "workpaper-enrichment-export-20261120/tests.json: 42 directly completed tests",
+    "workpaper-enrichment-export-20261120/verification.json: API/export actual saved readings"
+  ],
+  "remaining_before_real_entry": [
+    "new explicit authorization for this stock/window and public material transmission",
+    "same-network DNS/TLS and actual provider timeout/budget wiring freeze",
+    "isolated TaskService stock/report registration, base inheritance and frozen input/source/code identities"
+  ],
+  "S2": "failed_scheme_ended_unchanged"
+}

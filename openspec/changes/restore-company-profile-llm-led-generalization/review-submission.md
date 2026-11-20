@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 350. 6.EF回到实际缺项：中国银河收入定向补读已备，真实调用待新批准
+
+用户继续后按openspec-apply-change/business-first-goal、产品→验收→交付→A/B v3判断主线：API限用消费/多轮导出已交，不继续加展示层；现有中国银河能说明主营/产品服务，但独立源核确认F-RM-01只有综合服务表述，实际收入机制/构成仍不足，应对一个真正基础问题做定向精读，不追供应链或另一批20家。开工master/2914b091、暂存空，原EE本人根已清，既有配置/脏核心/市场依赖/混合及并行改动保护。
+
+沿[6.EF卡](company-profile-galaxy-enrichment-card.md)，当前原read owner生成601881同报告/base/workpaper hash绑定的两问题计划，原正式PDF与380页有效缓存身份和本地目录标题索引成立；不固定模型页码/输入章节、不送旧答案或人工参考。15个writer前后hash不变；未实例化provider/发送器、排队或占用真实入口，0新模型/外传/新画像。见[计划与待批边界](workpaper-galaxy-enrichment-20261120/result.md)及enrichment-plan.json/readiness.json。旧批次窗口已结束，新的6000秒/1000000账本/10物理单股精读与既有DeepSeek/Grok公开材料外传已整卡异步询问；明确批准前不发送。批准后仍须同联网、实际1200/2450/600接线及隔离任务/源码冻结，再原TaskService.enrich一次连续执行，不逐字段审批。
+
+本轮无生产代码改动；复用2914b091有效42直接验证、上汽真实enrich及API/导出证明，不重跑旧慢夹具、不把旧测试或当前计划称新语义成绩。当前仅本地计划/schema/hash/源身份核查及strict/diff通过。Review A类准备新增阻塞0；剩余为新调用授权及批准后的发送冻结，B类可选细项后置、C类既有核心和并行不动。S2失败/方案结束、原core/画像及生产权限不变，不补五家/第41家或启S3。
+
+必要一套后已清本人company-profile-6ef-m2YuQ1dY四文件7336字节，不留临时库等待；正式源/缓存/原15稿/失败/attempt及并行保护。仅本人新卡/计划和可隔离文档块正常commit/push，活跃开发/审核未单独精确计时。下一动作只有获批的真实单股定向补读，若未批准则保留当前研究可读内容，不另造准备轮次或借旧额发送。
+
 ## 349. 6.EE补读成果随研究导出交付：原API链复用，零新模型
 
 用户继续后按openspec-apply-change/business-first-goal和产品→验收→交付→A/B v3，沿[补读导出卡](company-profile-enrichment-export-card.md)实施。开工master/ca37dd52、暂存空，前轮本人ED根已清；本轮唯一QuoteBak根company-profile-6ee-Toan8JQg。当前可验证业务缺口是API已汇总后继精读、旧机器导出只带单次稿，下载会遗漏已取得内容；不是字段不全、供应链细度或需要再抽一批公司。既有配置/核心骨架/市场依赖/混合文档与并行全部保护。

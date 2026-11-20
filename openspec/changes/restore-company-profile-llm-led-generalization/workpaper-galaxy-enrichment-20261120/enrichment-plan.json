@@ -1,0 +1,34 @@
+{
+  "state": "planned",
+  "execution_started": false,
+  "action": "enrich",
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6-EF-galaxy-revenue-20261120",
+    "base_work_id": "bp-work-522acd73d4816c9de549211a",
+    "base_workpaper_sha256": "559458927c9ef1cec78f433f08ba7f4f580b572228c69025bc9980a22385fa33",
+    "report": {
+      "instrument_id": "601881.SH",
+      "report_id": "1225051623",
+      "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "revenue_model",
+        "question": "公司各主要业务如何获得收入？优先阅读本年报目录中的经营与财务分析、业务分析相关子节，按实际披露说明收入来源及变现机制。没有原文明示机制则保收入类别及缺项，不根据行业常识补收费方式；全市场融资或交易规模不能当本公司收入。"
+      },
+      {
+        "element": "scale_and_mix",
+        "question": "本公司报告期营业收入及主要业务收入构成是什么？按经营与财务分析/收入分析及必要相关附注取集中来源，保原科目、期间、币种单位与集团/板块/子公司范围，不将投资收益、营业收入等不同科目或不兼容范围相加，不要求抄全所有财务尾项。"
+      }
+    ]
+  },
+  "requires": [
+    "explicit_model_and_finite_budget",
+    "publication_write_permission"
+  ],
+  "production_authorization": "not_authorized"
+}
