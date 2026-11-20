@@ -33,6 +33,12 @@ class EnrichmentPlanRequest(BaseModel):
     targets: list[EnrichmentTarget] = Field(min_length=1, max_length=12)
 
 
+class ReviewRecoveryPlanRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    request_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+    reading_work_id: str | None = Field(default=None, min_length=1)
+
+
 @router.get("/research/company/annual-profiles")
 async def get_annual_company_profile_catalog(
     reader: CompanyProfileReadService = Depends(annual_profile_reader),
@@ -63,6 +69,21 @@ async def plan_annual_company_profile_enrichment(
     try:
         return await asyncio.to_thread(reader.plan_enrichment, convert_to_database_format(instrument_id),
             request_id=request.request_id, targets=request.targets, base_work_id=request.base_work_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/research/company/{instrument_id}/annual-profile/review-plan")
+async def plan_annual_company_profile_review_recovery(
+    instrument_id: str, request: ReviewRecoveryPlanRequest,
+    reader: CompanyProfileReadService = Depends(annual_profile_reader),
+):
+    """Plan only: a failed reviewer never implies a fresh extraction or paid retry."""
+    try:
+        return await asyncio.to_thread(reader.plan_review_recovery, convert_to_database_format(instrument_id),
+            request_id=request.request_id, reading_work_id=request.reading_work_id)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:

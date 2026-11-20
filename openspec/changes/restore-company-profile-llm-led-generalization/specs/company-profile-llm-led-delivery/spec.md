@@ -138,6 +138,14 @@ An explicitly review-enabled workpaper MUST reuse the current gateway and writer
 
 The reviewer MUST identify checked fact IDs/elements and source-cited errors, ambiguity and material omissions within the supplied scope. Unknown references MUST NOT remove or approve facts. Validly flagged erroneous/ambiguous facts MUST leave the ordinary narrative while remaining auditable. Independent useful facts and all original sources MUST be retained. Optional omissions MUST NOT require repair. At most one combined local repair and one source-grounded verification of its proposed changes are allowed; repairs MUST preserve unrelated facts, report/source identity, exact numeric constraints and original responses. Only explicitly resolved issues with actually checked repaired objects may be applied. Failure, insufficient coverage, unresolved or newly found issues MUST remain visible and limited, never silently clear gaps. Review status MUST distinguish model-reviewed scope from trusted release and full-report completeness.
 
+#### Scenario: Clients plan recovery of a saved review execution failure
+- **WHEN** an API client inspects or explicitly plans follow-up for a persisted reading
+- **THEN** the original review/read owners MUST distinguish pending initial review, pending repair, pending final recheck, completed review with ordinary open findings, and failures requiring source/contract inspection
+- **AND** only complete accepted stage receipts matching the stored review-call identity, JSON payload, response hash and typed contract may be listed for reuse; absent or inconsistent history MUST remain blocked rather than silently repeating completed stages
+- **AND** a stock-specific plan MUST bind the exact same-report reading work ID and current workpaper hash, expose only stage/request/candidate identities and safe reasons, and preserve existing facts, uncertainty, local restrictions and old failures without returning raw rejected or unadopted candidate content
+- **AND** GET and planning MUST NOT queue, call models or claim original-draft/source binding, final acceptance, finite-budget authorization or production permission; execution still requires the existing TaskService/seed/resume validation and explicitly authorized bounded calls
+- **AND** optional omissions and completed reviews with open findings MUST NOT by themselves trigger another review or repair
+
 #### Scenario: A final verification execution failure follows an initial review failure in a bounded batch
 - **WHEN** an explicitly enabled consecutive-same-execution-failure batch policy observes adjacent companies in actual processing order failing on the same review channel and gateway cause, whether at initial review or final verification
 - **THEN** the original task owner stops subsequent dispatch after retaining both available drafts, without interpreting incomplete final verification as a successful execution or reviving unverified edits

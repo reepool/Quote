@@ -208,7 +208,7 @@ class CompanyProfileReadService:
         from .workpaper import workpaper_elements
         from .workpaper_delivery import project_workpaper_delivery
         from .workpaper_enrichment import WorkpaperEnrichmentPlan
-        from .workpaper_review import workpaper_hash
+        from .workpaper_review import plan_review_follow_up, workpaper_hash
 
         records = {root.work_id: root}
         candidates = []
@@ -250,6 +250,7 @@ class CompanyProfileReadService:
                 "limitations": list(paper.limitations),
                 "generation": paper.generation.model_dump(mode="json") if paper.generation else None,
                 "review_status": paper.quality_review.status if paper.quality_review else "not_reviewed",
+                "review_follow_up": plan_review_follow_up(paper, record.workpaper_receipts),
                 "review_calls": [c.model_dump(mode="json") for c in paper.quality_review.calls] if paper.quality_review else [],
                 **({"review_execution_failure": paper.quality_review.execution_failure.model_dump(mode="json")}
                    if paper.quality_review and paper.quality_review.execution_failure else {}),
@@ -306,6 +307,30 @@ class CompanyProfileReadService:
             "research_only": True,
             "production_authorization": PRODUCTION_AUTHORIZATION,
         }
+
+    def plan_review_recovery(self, instrument_id: str, *, request_id: str,
+                             reading_work_id: str | None = None) -> dict[str, Any]:
+        """Bind a review-only follow-up plan; never enqueue or expose raw replies."""
+        from .workpaper_review import plan_review_follow_up, workpaper_hash
+
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", request_id):
+            raise ValueError("invalid review recovery request_id")
+        current = self.research_profile(instrument_id)
+        chosen = reading_work_id or current["latest_reading_work_id"]
+        reading = next((item for item in current["readings"] if item["work_id"] == chosen), None)
+        if reading is None:
+            raise ValueError("review reading is outside the current same-report lineage")
+        record = self._latest_by_instrument(work_id=chosen, include_enrichments=True).get(instrument_id)
+        if (not isinstance(record, CompanyProfileRuntimeRecordV3)
+            or record.report.model_dump(mode="json") != current["report"]
+            or workpaper_hash(record.workpaper) != reading["workpaper_sha256"]):
+            raise ValueError("review reading changed while planning")
+        follow_up = plan_review_follow_up(record.workpaper, record.workpaper_receipts)
+        return {"schema_version": "company_profile_review_recovery_plan.v1", "request_id": request_id,
+            "state": follow_up["state"], "execution_started": False,
+            "instrument_id": instrument_id, "report": current["report"], "reading_work_id": chosen,
+            "workpaper_sha256": workpaper_hash(record.workpaper), "review_follow_up": follow_up,
+            "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION}
 
     def plan_enrichment(self, instrument_id: str, *, request_id: str, targets,
                         base_work_id: str | None = None) -> dict[str, Any]:

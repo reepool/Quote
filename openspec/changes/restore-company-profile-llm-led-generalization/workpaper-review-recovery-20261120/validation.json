@@ -1,0 +1,75 @@
+{
+  "task": "6.EI",
+  "baseline_commit": "7733a2a6",
+  "final_tests": {
+    "command": "python -m pytest tests/unit/test_research/test_company_profile_review_recovery.py tests/unit/test_research/test_company_profile_catalog.py tests/unit/test_research/test_company_profile_workpaper_continuation.py tests/unit/test_research/test_company_profile_annual_export.py tests/unit/test_research/test_company_profile_review_failures.py -k 'not test_task_service_stops_before_third_company' -q --basetemp=<task temporary root>/pytest-targeted",
+    "passed": 77,
+    "deselected": 2,
+    "skipped": 0,
+    "seconds": 43.3,
+    "warnings": 6
+  },
+  "other_runs_not_accumulated": [
+    {
+      "stage": "restricted API test",
+      "result": "interrupted after ASGI hung",
+      "exit_code": 130
+    },
+    {
+      "stage": "initial approved run",
+      "passed": 16,
+      "failed": 1,
+      "seconds": 9.92,
+      "cause": "new test assumed existing annual export envelope was a list; assertion corrected"
+    },
+    {
+      "stage": "intermediate regression before extra identity checks",
+      "passed": 53,
+      "seconds": 26.91
+    },
+    {
+      "stage": "expanded regression",
+      "passed_before_interruption": 72,
+      "seconds": 117.94,
+      "exit_code": 124,
+      "limit_seconds": 120,
+      "not_a_complete_suite_pass": true
+    }
+  ],
+  "source_and_test_sha256": {
+    "api/company_profile_routes.py": "006b2e1a00233a459924ce2304a9b38080dbf25c74303c26ed2530de01a7327d",
+    "research/company_profile/reads.py": "83011bb42bfa8b9bbac1c22338253dd8a866c717815ab59fc83382153f66ed7b",
+    "research/company_profile/workpaper_review.py": "d37cbe0457c9d7f0bcfa8e7c799583df88637d8722bf3a26663b74b2c152c9eb",
+    "tests/unit/test_research/test_company_profile_review_recovery.py": "eac8069b5803de3b97eaa85a7f9da59bcee0808f65f48cece52c7ac1df01fcef",
+    "tests/unit/test_research/test_company_profile_catalog.py": "5160faa445fb282eb7a654af6d2d8b75095ff52e95682532ffc4c203c804b866",
+    "tests/unit/test_research/test_company_profile_workpaper_continuation.py": "dbc4d0086e16d43094af3f6ddaed1c4746b21e57961cfe01aab686e0928b441e",
+    "tests/unit/test_research/test_company_profile_annual_export.py": "08d7b1744ce87e0bf83310230fef7154a4b690cfd0cb2b5fd8404a364a888859",
+    "tests/unit/test_research/test_company_profile_review_failures.py": "36dc8ed8812b38877f6f3db8bc073bf64e8e4432061f9ef3e479ca943235def4"
+  },
+  "review": {
+    "blocking_remaining": 0,
+    "direct_risks_covered": [
+      "changed reading while binding",
+      "incomplete or tampered retained receipt",
+      "wrong stage/model identity",
+      "raw candidate leakage",
+      "implicit call or write"
+    ],
+    "nonblocking_deferred": [
+      "automatic background execution",
+      "read performance"
+    ],
+    "unrelated_preserved": "existing dirty core/configuration/market changes"
+  },
+  "openspec_strict": "passed",
+  "diff_check": "passed",
+  "new_real_calls": 0,
+  "new_company_writes": 0,
+  "cleanup": {
+    "target": "/home/python/Quote/data/QuoteBak/company-profile-6ei-DUObcb",
+    "files": 81,
+    "file_bytes": 3291479,
+    "after_authoritative_evidence_persisted": true,
+    "preserved": "official sources, valid caches, historical failures/attempts, current research root and unrelated worktree files"
+  }
+}

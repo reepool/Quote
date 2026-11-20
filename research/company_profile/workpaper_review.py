@@ -153,6 +153,93 @@ def workpaper_hash(workpaper: CompanyProfileWorkpaper) -> str:
     return hashlib.sha256(workpaper.model_dump_json().encode()).hexdigest()
 
 
+def plan_review_follow_up(paper: CompanyProfileWorkpaper, receipts=()) -> dict:
+    """Describe a bounded next stage, not execution authority or seed validation.
+
+    Reuse refers only to hash-checked original replies. The existing seed/resume
+    path must still validate original draft/source bindings before any new send.
+    Never return raw responses, proposed facts, or model error-body excerpts.
+    """
+    review = paper.quality_review
+    result = {
+        "state": "blocked", "execution_started": False,
+        "next_purpose": None, "resume_mode": None, "retained_stages": [],
+        "candidate_ids": [], "max_new_logical_requests": 0,
+        "original_draft_sha256": review.original_draft_hash if review else workpaper_hash(paper),
+        "binding_status": "required_before_execution",
+        "requires": ["original_draft_and_source_binding", "preserve_current_use_restrictions",
+                     "explicit_model_and_finite_budget", "publication_write_permission"],
+    }
+    if review is not None and review.status in {"completed", "completed_with_open_findings"}:
+        return {**result, "state": "not_needed", "reason": "review_execution_completed"}
+    initial = "review_profile_workpaper"
+    repair = "repair_profile_workpaper"
+    final = "verify_profile_workpaper_repair"
+    if review is None:
+        purpose = initial
+    elif review.execution_failure is not None:
+        if review.execution_failure.kind == "contract_error":
+            return {**result, "reason": "inspect_source_or_contract_before_retry"}
+        purpose = review.execution_failure.purpose
+    elif "LLM response message content is empty" in (review.error or ""):
+        # Only the exact previously diagnosed legacy failure has a safe fallback.
+        completed = {call.purpose for call in review.calls if call.contract_status == "accepted"}
+        if final in completed:
+            return {**result, "reason": "inconsistent_review_history"}
+        purpose = final if repair in completed else repair if initial in completed else initial
+    else:
+        return {**result, "reason": "failure_stage_unknown_requires_inspection"}
+    required = {initial: (), repair: (initial,), final: (initial, repair)}[purpose]
+    if review is not None:
+        # A successful reply followed by a local contract failure is not an
+        # invitation to blindly send that same stage again.
+        if any(call.purpose == purpose and call.contract_status == "accepted" for call in review.calls):
+            return {**result, "reason": "inconsistent_review_history"}
+        for retained in required:
+            calls = [call for call in review.calls if call.purpose == retained]
+            if len(calls) != 1 or calls[0].contract_status != "accepted":
+                return {**result, "reason": "retained_stage_history_invalid"}
+            call = calls[0]
+            matching = [item for item in receipts if item.get("request_id") == call.request_id
+                        and item.get("purpose") == retained]
+            if len(matching) != 1:
+                return {**result, "reason": "retained_stage_receipt_missing_or_duplicated"}
+            item = matching[0]
+            raw = item.get("raw_content")
+            if (item.get("contract_status") != "accepted" or item.get("finish_reason") != "stop"
+                or call.finish_reason != "stop"
+                or not isinstance(raw, str) or not call.response_hash
+                or hashlib.sha256(raw.encode()).hexdigest() != call.response_hash
+                or item.get("response_hash") != call.response_hash):
+                return {**result, "reason": "retained_stage_receipt_invalid"}
+            if any(getattr(call, key) is not None and item.get(key) != getattr(call, key) for key in (
+                "request_hash", "source_label", "model", "selected_profile", "logical_profile",
+                "route_fingerprint", "reasoning_effort",
+            )):
+                return {**result, "reason": "retained_stage_identity_changed"}
+            try:
+                payload = json.loads(raw)
+                if payload != item.get("response_payload"):
+                    raise ValueError("payload differs from original bytes")
+                response_type = WorkpaperReviewResponse if retained == initial else WorkpaperRepairResponse
+                response_type.model_validate(payload)
+            except (ValueError, TypeError):
+                return {**result, "reason": "retained_stage_payload_invalid"}
+            result["retained_stages"].append({
+                "purpose": retained, "request_id": call.request_id,
+                "response_sha256": call.response_hash,
+            })
+        if purpose == final:
+            result["candidate_ids"] = sorted({finding.revised_fact.fact_id for finding in review.findings
+                if finding.resolution == "verification_failed" and finding.revised_fact is not None})
+            if not result["candidate_ids"]:
+                return {**result, "reason": "no_locally_valid_candidates_for_final_check"}
+    return {**result, "state": "planned", "next_purpose": purpose,
+        "resume_mode": {initial: "review_saved_draft", repair: "repair_and_verify", final: "verify_only"}[purpose],
+        "max_new_logical_requests": {initial: 3, repair: 2, final: 1}[purpose],
+        "reason": "review_not_started" if review is None else "resume_failed_review_stage"}
+
+
 def review_execution_failure_signature(review: WorkpaperQualityReview | None) -> str | None:
     """Compare technical causes, not review completeness or optional gaps.
 

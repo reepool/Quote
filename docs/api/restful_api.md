@@ -359,6 +359,7 @@ curl http://127.0.0.1:8000/api/v1/research/company/600104.SH/annual-profile
 - `facts`：分级事实，以`reading_work_id + fact_id`共同定位。隔离、仅源参考和重复对象保状态/原因但`fact=null`，待核/保真限用不冒充正式接受。
 - `information_gaps`：要素、原状态、缺项或不确定原因及所属读取批次；`suggested_acquisitions`是复核提出的补充建议，不是已经取得的事实。
 - `readings`：各轮实际章节/原页、未读或后置范围、来源Evidence、模型及审核状态。事实的Evidence编号在其所属读取批次内解析。
+- `readings[].review_follow_up`：复核执行接续状态。`planned`指出下一阶段及可复用的成功请求编号/hash；`not_needed`表示审核执行已完成（可以仍有补充缺项）；`blocked`说明需先检查合同、源或历史回执。它不包含原始响应/未采纳修订正文，不代表已还原原稿、已授权或已开始调用。
 - `supplemental_reading_work_ids`提示同一要素已有补读内容，`follow_up_state=supplemented_not_fully_reassessed`不等于所有缺项已解决。没有发现缺项也不等于全文完整；`full_report_completeness`和跨轮自动消歧均为`not_assessed`。
 
 同报告补读追加展示，不覆盖首读、不自动将跨轮冲突结论合并成确定答案；新报告不会承接旧报告的补读链。当前仍为研究用途，生产权限不因GET或有内容而改变。
@@ -379,6 +380,22 @@ curl http://127.0.0.1:8000/api/v1/research/company/600104.SH/annual-profile
 返回`state=planned, execution_started=false, action=enrich, enrichment_plan=...`，计划含报告身份、原工作ID及内容hash。基础要素名沿既有八要素（如`business_structure`、`products_services`、`scale_and_mix`），也可指定既有供应链或`company_features`，不创建公司专属字段。
 
 受授权的内部调用方将原样计划交给已配置provider、复核profile及有限执行预算的原`CompanyProfileTaskService.execute("enrich", instrument_ids=("600104.SH",), enrichment_plan=plan, ...)`。入口只排入/处理这一家公司，按目录选章、取原文和复核，保存独立后继记录；原画像失败不清空、批量首读不自动等待补读。第三次及以后用新的request_id和问题，仍各有界，不自动循环或续旧额度。计划不是外传/付费或生产授权，HTTP端当前不直接执行付费精读。
+
+### POST /api/v1/research/company/{instrument_id}/annual-profile/review-plan
+
+为已有阅读生成复核接续计划，**只规划、不排队、不调用模型**，无需重选章或重抽画像。请求如下，`reading_work_id`省略时选当前同报告读取链的末端：
+
+```json
+{"request_id": "review-follow-up-1", "reading_work_id": "已有阅读工作ID"}
+```
+
+返回报告身份、`reading_work_id`、当前`workpaper_sha256`及`review_follow_up`。下一阶段为`review_profile_workpaper`（补初核）、`repair_profile_workpaper`（复用初核，合并修订后再核）或`verify_profile_workpaper_repair`（复用初核/修订，只补终核）。`max_new_logical_requests`是该链最多还需的逻辑阶段数提示，不含物理重试，也不是新增预算授权。
+
+仅原JSON、sha256、身份和类型检查完整的成功回执列为可复用；历史未知、损坏回执或合同问题返回`blocked`，不通过重复已成功阶段掩盖问题。已完成但留开放意见返回`not_needed`，不因可选缺项自动重跑；其他报告/不属于当前读取链的工作ID返回422。读取与计划不会修改原稿、采纳候选或清除独立使用限制。
+
+实际执行仍由受授权内部调用方沿原TaskService和现有review seed/resume路径完成，须先校验原稿/原文/内容hash、保留当前独立使用决定，并获得新的有限模型/外传/写入授权。HTTP端不直接发起付费复核，旧窗口不会因计划自动恢复，生产权限不变。
+
+6.EI的十五份保存稿核对使用`/home/python/Quote/data/research/company_profile_galaxy_v7_20261120`。若要读取该批内容，在独立研究API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`为此根；不改共享服务配置。该根含原十五家与银河后续阅读，跨版本内容不作为同版质量成绩；默认根不会自动切换。
 
 ### GET /api/v1/research/company/{instrument_id}/financial-indicators
 
