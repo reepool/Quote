@@ -1,0 +1,16 @@
+{
+  "task": "6.EK",
+  "status": "authorized",
+  "approval_reference": "2026-11-20 user: 批准继续推进; preceding 6.EK bounded final-review card",
+  "instrument_id": "002352.SZ",
+  "request_id": "6-EK-sf-final-20261120",
+  "allowed_purposes": ["verify_profile_workpaper_repair"],
+  "allowed_candidate_ids": ["F-RM-02", "F-SM-01", "F-MC-01", "F-CC-03", "F-PS-02"],
+  "model": "grok-4.7",
+  "host": "scorpio.reepool.com",
+  "reasoning_effort": "high",
+  "limits": {"logical_requests": 1, "physical_requests": 2, "recoveries": 1, "physical_seconds": 1200, "logical_seconds": 2450, "business_seconds": 3000, "conservative_tokens": 600000, "priced_cost_cny": "10", "unpriced_cost": "unknown"},
+  "source_scope": "existing selected public 2025 report sections and derived public candidates only",
+  "forbidden": ["new extraction", "new initial review", "new repair", "new company", "additional window", "shared config change", "production enablement", "recharge"],
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,63 @@
+{
+  "task": "6.EK",
+  "model_accepted": 5,
+  "independently_checked_actual_changes": 5,
+  "unchanged_prior_independent_decisions": 9,
+  "independent_decisions_current_total": 14,
+  "before_visible_facts": 23,
+  "after_visible_facts": 28,
+  "after_visible_metrics": 68,
+  "after_visible_states": {
+    "reviewed": 10,
+    "limited": 9,
+    "pending": 9
+  },
+  "remaining_active_gap_count": 9,
+  "query_export_fresh_instance_equal": true,
+  "annual_export_api_equal": true,
+  "local_asgi_http": {
+    "detail": 200,
+    "catalog": 200
+  },
+  "historical_facts_superseded_no_duplicate": true,
+  "other_14_companies_unchanged": true,
+  "other_companies_proof": "all 17 original writer bytes unchanged and successor copies match, same read implementation; no redundant per-company full API scan",
+  "original_17_writer_files_unchanged": true,
+  "successor_root": "/home/python/Quote/data/research/company_profile_sf_reviewed_20261120",
+  "successor_file_count": 18,
+  "catalog_visible_facts": 431,
+  "catalog_visible_metrics": 692,
+  "wire_requests": 1,
+  "physical_requests": 1,
+  "recoveries": 0,
+  "supplier_total_and_conservative_ledger": 17232,
+  "fee": "unknown",
+  "wire_seconds": 75.057,
+  "wire_payload_bytes": 35236,
+  "runtime_sha256": "ae2005d4255d937f1ac5ed1cfc7a51221998f93d9e6ca469a7ab2e56ba86cd89",
+  "api_sha256": "11cd54ea7c55bec3cd024d9e852e42511db31630a6036177bed416a1e9cf23b9",
+  "production_authorization": "not_authorized",
+  "formal_acceptance": "not_assessed",
+  "review": {
+    "blocking_remaining": 0,
+    "nonblocking": [
+      "no whole-profile/scale accuracy estimate; remaining supplemental omission retained"
+    ],
+    "unrelated": "pre-existing worktree changes untouched"
+  },
+  "reused_validation": {
+    "reference": "workpaper-review-execution-20261120/validation.json",
+    "source_test_hashes_match": true,
+    "prior_passed": [
+      16,
+      77
+    ],
+    "not_rerun_or_new_accuracy": true
+  },
+  "verification_process_notes": [
+    "local assertion initially expected wrong elements-set shape: restored five were absent in restricted parent; corrected against actual API and five allowed IDs",
+    "PDF line wrapping defeated a diagnostic substring assertion; original PDF read directly, no production source rule changed",
+    "sandbox local ASGI verification hung and was terminated; first authorized-environment retry stopped on existing-export protection; later 90-second run had both HTTP200 before timing out in redundant cross-company scans; final run uses writer hashes instead",
+    "none of these local checks resent a model request or changed the real review result"
+  ]
+}

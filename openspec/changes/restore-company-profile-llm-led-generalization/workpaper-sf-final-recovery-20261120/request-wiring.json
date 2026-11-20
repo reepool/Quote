@@ -1,0 +1,14 @@
+[
+  {
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 35236,
+    "payload_sha256": "cf96cd2be9c26c0314402259c9ae3011cbeb9e532952266f4853a5cb55be331e",
+    "max_tokens": null,
+    "state": "returned",
+    "headers_or_private_material_recorded": false,
+    "status_code": 200,
+    "seconds": 75.057
+  }
+]

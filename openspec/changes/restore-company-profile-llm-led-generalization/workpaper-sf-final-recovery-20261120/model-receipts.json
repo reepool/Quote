@@ -1,0 +1,73 @@
+[
+  {
+    "request_id": "bp-work-01e30502f99867e63a3e7126:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "28e03ab6c8b5550991b7dc61647652ce1d45af5c7a7df721730fa35401c6c3ec",
+    "response_hash": "76a9a87674e5c7127f5292fbd3ff2958b101c9c427e8eb7098cd947b62fa96f9",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-RM-02\",\"F-SM-01\",\"F-MC-01\",\"F-CC-03\",\"F-PS-02\"],\"checks\":[{\"fact_id\":\"F-RM-02\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"候选将物流及货运代理、其他非物流业务两项行业行改为business_segment，指标名称保留原行业类别；301,499,641千元、97.82%与6,727,006千元、2.18%对应2025年金额列和占营业收入比列，未把行业行改标为集团营业收入合计，已纠正口径继承。\"},{\"fact_id\":\"F-SM-01\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"166.3亿票、同比25.4%、票均收入13.7元及同比-11.4%均限定为速运物流业务，主体为business_segment，并保留不包括供应链及国际业务和其他非物流业务的限定，与注1及2025年列一致。\"},{\"fact_id\":\"F-MC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"11.4%降幅及自2025年9月起月度同比降幅收窄已限定为速运物流业务票均收入，主体改为business_segment；公司调优策略的表述有来源支持，未将票均收入扩成集团整体。\"},{\"fact_id\":\"F-CC-03\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"增长主体已改回速运物流业务量，subject_scope为business_segment；渗透国内生产制造及生活消费客户端到端场景的因果表述与原文一致，未再扩成公司整体业务量。\"},{\"fact_id\":\"F-PS-02\",\"accepted\":true,\"evidence_ids\":[\"source-0005\"],\"explanation\":\"期间已改为截至报告期末（2025-12-31），符合原文时点口径；国内所有城市、海外95个国家及地区、国际小包200个国家和地区的覆盖范围未改，报告正文中的公司按合并集团理解，主体正确。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-RM-02",
+        "F-SM-01",
+        "F-MC-01",
+        "F-CC-03",
+        "F-PS-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-RM-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "候选将物流及货运代理、其他非物流业务两项行业行改为business_segment，指标名称保留原行业类别；301,499,641千元、97.82%与6,727,006千元、2.18%对应2025年金额列和占营业收入比列，未把行业行改标为集团营业收入合计，已纠正口径继承。"
+        },
+        {
+          "fact_id": "F-SM-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "166.3亿票、同比25.4%、票均收入13.7元及同比-11.4%均限定为速运物流业务，主体为business_segment，并保留不包括供应链及国际业务和其他非物流业务的限定，与注1及2025年列一致。"
+        },
+        {
+          "fact_id": "F-MC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "11.4%降幅及自2025年9月起月度同比降幅收窄已限定为速运物流业务票均收入，主体改为business_segment；公司调优策略的表述有来源支持，未将票均收入扩成集团整体。"
+        },
+        {
+          "fact_id": "F-CC-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "增长主体已改回速运物流业务量，subject_scope为business_segment；渗透国内生产制造及生活消费客户端到端场景的因果表述与原文一致，未再扩成公司整体业务量。"
+        },
+        {
+          "fact_id": "F-PS-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "期间已改为截至报告期末（2025-12-31），符合原文时点口径；国内所有城市、海外95个国家及地区、国际小包200个国家和地区的覆盖范围未改，报告正文中的公司按合并集团理解，主体正确。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10593,
+      "output_tokens": 500,
+      "total_tokens": 17232
+    }
+  }
+]

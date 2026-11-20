@@ -1,5 +1,11 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.EK 顺丰五个保存候选限定最终再核（用户已批准）
+
+- [x] 6.EK1 核6.EJ源/原稿/五候选及10源码/测试hash，复用16+77用例；获准联网环境Scorpio DNS/TLS1.3及2450/1200实际接线已冻结，唯一attempt已占用。原九条独核限制及17父writer保护，不重抽前段。
+- [x] 6.EK2 原TaskService.execute_review_recovery真实终核五项均接受，1逻辑/1物理/0恢复、17232供应商total及账本、96.205业务秒/费用unknown；不重抽、新修订或公司，旧KLN补充仍不采纳、不加窗。
+- [x] 6.EK3 五项实际变化有限核源、原九决定继承，原writer独立后继及API/导出/新实例一致、详情/目录200；Review无剩余阻塞，strict/本人块Git及清理收尾，资源/质量/剩余缺项分列，不改旧S2或生产权限。见workpaper-sf-final-recovery-20261120/result.md及§356。
+
 ### 6.EJ 保存复核计划接原TaskService执行（离线，零新真实调用）
 
 - [x] 6.EJ1 原TaskService消费绑定计划，原JSON/来源/原稿hash重建seed及已有成功回执，只发下一失败阶段；新请求有界、同request幂等，错版本/合同/过期计划发送前拒绝，不新增HTTP付费执行或业务循环。

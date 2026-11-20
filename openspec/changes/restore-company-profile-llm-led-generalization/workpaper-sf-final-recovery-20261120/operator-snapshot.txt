@@ -1,0 +1,253 @@
+"""Approved 6.EK thin operator: the original TaskService owns all business stages."""
+from __future__ import annotations
+
+import asyncio
+from dataclasses import replace
+from decimal import Decimal
+import gzip
+import hashlib
+import json
+import os
+from pathlib import Path
+import runpy
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import time
+from urllib.parse import urlsplit
+
+import httpx
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+C = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+D = C / 'workpaper-sf-final-recovery-20261120'
+TEMP = Path(__file__).parent
+PREVIOUS = ROOT / 'data/research/company_profile_galaxy_v7_20261120'
+OUTPUT = ROOT / 'data/research/company_profile_sf_reviewed_20261120'
+REVIEW = 'semantic_extraction__scorpio_grok'
+H = runpy.run_path(str(C / 'workpaper-twelve-explanatory-core-result-20261116/operator-snapshot.txt'))
+
+
+def read(path):
+    return json.loads(Path(path).read_text())
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + '\n')
+
+
+class Capture(H['ContentCapture']):
+    def __init__(self, delegate, directory):
+        super().__init__(delegate, directory)
+        self.wires = []
+
+    async def send(self, url, headers, payload, timeout_seconds):
+        assert urlsplit(url).hostname == 'scorpio.reepool.com'
+        assert payload.get('model') == 'grok-4.7' and payload.get('reasoning_effort') == 'high'
+        assert 0 < timeout_seconds <= 1200.01 and len(self.wires) < 2
+        encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()
+        wire = {'model': payload['model'], 'reasoning_effort': payload['reasoning_effort'],
+                'physical_timeout_seconds': timeout_seconds, 'payload_bytes': len(encoded),
+                'payload_sha256': hashlib.sha256(encoded).hexdigest(), 'max_tokens': payload.get('max_tokens'),
+                'state': 'sending', 'headers_or_private_material_recorded': False}
+        self.wires.append(wire)
+        dump(D / 'request-wiring.json', self.wires)
+        started = time.monotonic()
+        try:
+            response = await super().send(url, headers, payload, timeout_seconds)
+            wire.update(state='returned', status_code=response.status_code)
+            return response
+        except Exception as exc:
+            wire.update(state='transport_error', exception_type=type(exc).__name__)
+            raise
+        finally:
+            wire['seconds'] = round(time.monotonic() - started, 3)
+            dump(D / 'request-wiring.json', self.wires)
+
+
+def main():
+    from research.announcements import AnnouncementRecord, AnnouncementAttachment
+    from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+    from research.company_profile.operations import CompanyProfileTaskService
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.company_profile.workpaper_review import workpaper_hash
+    from research.storage import ResearchStorageManager
+    from utils.config_manager import ResearchConfig, ResearchStorageConfig
+    from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy, DEVELOPMENT_UNPRICED_BILLING
+    from utils.llm.client import LlmClient
+    from utils.llm.config import load_project_environment
+    from utils.llm.models import LlmConfig
+    from utils.llm.transport import HttpxOpenAICompatibleTransport
+
+    preparation = time.monotonic()
+    assert os.environ['TMPDIR'] == str(ROOT / 'data/QuoteBak')
+    marker = ROOT / 'data/QuoteBak/s1-attempts/workpaper-ek-002352-20261120.json'
+    assert not marker.exists() and not (D / 'summary.json').exists() and not OUTPUT.exists()
+    approval = read(D / 'approval.json')
+    assert approval['status'] == 'authorized' and approval['instrument_id'] == '002352.SZ'
+    boundary_path = C / 'workpaper-review-execution-20261120/source-boundary.json'
+    boundary = read(boundary_path)
+    plan = boundary['plan']
+    assert plan['request_id'] == approval['request_id']
+    validation = read(C / 'workpaper-review-execution-20261120/validation.json')
+    assert all(sha(ROOT / p) == h for p, h in validation['source_and_test_sha256'].items())
+    old_hashes = {str(p.relative_to(ROOT)): sha(p) for p in (PREVIOUS / 'company_profile_common_core.v1').glob('*.json')}
+    assert old_hashes == boundary['protected_current_files_sha256']
+    previous_reader = CompanyProfileReadService(PREVIOUS)
+    base = previous_reader._latest_by_instrument(work_id=plan['reading_work_id'])['002352.SZ']
+    assert workpaper_hash(base.workpaper) == plan['workpaper_sha256']
+    before = previous_reader.research_profile('002352.SZ')
+    binding = read(C / 'workpaper-s2-confirmation-result-20261119/002352/binding.json')
+    source = read(C / 'workpaper-s2-confirmation-result-20261119/source-bindings/002352.json')
+    asset, announcement = source['asset'], source['announcement']
+    assert sha(asset['archive_path']) == base.report.document_version
+    with gzip.open(binding['source_preparation']['artifact_path'], 'rt', encoding='utf-8') as stream:
+        cached = json.load(stream)
+    assert cached['source_content_hash'] == base.report.document_version
+    pages = [{'page': p['page_number'], 'text': p['text']} for p in cached['pages']]
+    load_project_environment(ROOT)
+    original = LlmConfig.from_mapping(read(ROOT / 'config/13_llm.json')['llm'])
+    profile = replace(original.profiles[REVIEW], timeout_seconds=2450, attempt_timeout_seconds=1200,
+                      max_retries=1, max_schema_repair_attempts=1)
+    assert original.enabled and profile.enabled and os.environ.get(profile.api_key_env)
+    assert REVIEW not in original.routes and urlsplit(profile.base_url).hostname == 'scorpio.reepool.com'
+    assert profile.model == 'grok-4.7' and profile.reasoning_effort == 'high'
+    config = replace(original, profiles={REVIEW: profile}, routes={}, pools={})
+    addresses = socket.getaddrinfo('scorpio.reepool.com', 443, type=socket.SOCK_STREAM)
+
+    async def probe():
+        async with httpx.AsyncClient(timeout=20) as client:
+            response = await client.get('https://scorpio.reepool.com/')
+            stream = response.extensions.get('network_stream')
+            tls = stream.get_extra_info('ssl_object') if stream else None
+            return response.status_code, tls.version() if tls else None
+
+    status, tls = asyncio.run(probe())
+    assert tls, 'TLS not verified in the actual authorized network environment'
+    identity = workpaper_processing_identity(real=True, review=True, review_profile=REVIEW)
+    identity.update(logical_request_timeout_seconds=2450, review_max_output_tokens=16384, repair_profile=REVIEW)
+    db = str(TEMP / 'research.db')
+    storage = ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(
+        db_path=db, financials_db_path=db, valuation_db_path=db, interests_db_path=db,
+        quotes_db_path=str(TEMP / 'quotes.db'), attach_quotes_db=False)))
+    storage.initialize()
+    BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+        instrument={'instrument_id': '002352.SZ', 'symbol': '002352', 'exchange': 'SZSE'},
+        record=AnnouncementRecord(source='cninfo', source_announcement_id=asset['filing_id'],
+            announcement_key='cninfo:' + asset['filing_id'], title=announcement['title'],
+            published_at=asset['published_at'], exchange='SZSE', symbols=('002352',),
+            attachments=(AnnouncementAttachment(source_url=announcement['source_url'],
+                resolved_url=announcement['source_url'], file_extension='PDF'),)))
+    capture = Capture(HttpxOpenAICompatibleTransport(), TEMP / 'captured-content')
+    client = LlmClient(config, transport=capture, owns_transport=True)
+    provider = CommonGatewaySemanticProvider(client=client, profile=REVIEW, max_output_tokens=16384,
+        timeout_seconds=2450, execution_authorization={'status': 'authorized',
+            'document_version': asset['content_hash'], 'approval_reference': approval['approval_reference']})
+    writer = CompanyProfileResearchWriter(OUTPUT)
+    for path in sorted((PREVIOUS / writer.namespace).glob('*.json')):
+        writer.persist(CompanyProfileRuntimeRecordV3.model_validate_json(path.read_text()))
+        assert sha(OUTPUT / writer.namespace / path.name) == sha(path)
+    service = CompanyProfileTaskService(storage=storage, output_root=OUTPUT, checkpoint_root=TEMP / 'checkpoints',
+        page_source=lambda _: {'report': base.report, 'pages': pages, 'source_pdf_path': asset['archive_path']},
+        provider=provider, processing_identity=identity, token_budget=600000)
+    purposes = []
+    original_request = provider.workpaper_request
+
+    def bounded_request(**kwargs):
+        assert kwargs['purpose'] == 'verify_profile_workpaper_repair' and not purposes
+        purposes.append(kwargs['purpose'])
+        return original_request(**kwargs)
+
+    provider.workpaper_request = bounded_request
+    frozen = {'task': '6.EK', 'approval_sha256': sha(D / 'approval.json'),
+        'boundary_sha256': sha(boundary_path), 'plan': plan,
+        'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+        'operator_sha256': sha(__file__), 'code_sha256': H['code_hashes'](),
+        'reused_test_validation_sha256': sha(C / 'workpaper-review-execution-20261120/validation.json'),
+        'shared_llm_config_sha256': sha(ROOT / 'config/13_llm.json'), 'source_pdf_sha256': sha(asset['archive_path']),
+        'cache_file_sha256': sha(binding['source_preparation']['artifact_path']), 'old_runtime_hashes': old_hashes,
+        'network_namespace': os.readlink('/proc/self/ns/net'),
+        'network': {'host': 'scorpio.reepool.com', 'dns_addresses': len(addresses), 'tls': tls, 'public_get_status': status},
+        'identity': identity, 'provider_constructor_timeout_seconds': provider._timeout_seconds,
+        'profile': {k: getattr(profile, k) for k in ('model', 'source_label', 'timeout_seconds',
+            'attempt_timeout_seconds', 'reasoning_effort', 'max_retries', 'max_schema_repair_attempts')},
+        'limits': approval['limits'], 'production_authorization': 'not_authorized'}
+    dump(D / 'authorization.json', frozen)
+    shutil.copy2(__file__, D / 'operator-snapshot.txt')
+    summary = {'task': '6.EK', 'instrument_id': '002352.SZ', 'state': 'preparing', 'exception': None}
+    budget = None
+
+    def stop(_sig, _frame):
+        if budget:
+            budget.cancel('supervisor_stop_requested')
+        service.pause(reason='supervisor_stop_requested')
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGUSR1, stop)
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    with marker.open('x') as stream:
+        json.dump({'task': '6.EK', 'approval_sha256': sha(D / 'approval.json'),
+                   'authorization_sha256': sha(D / 'authorization.json')}, stream)
+    started = time.monotonic()
+    budget = LlmRunBudget(deadline=started + 3000, prices={}, max_tokens=600000, max_requests=2,
+        max_cost_cny=Decimal(10), ledger_path=D / 'budget.json', billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        recovery_policy=LogicalRecoveryPolicy(1, 1), run_authorization='company_profile_workpaper_development.2026-11-11')
+    client.physical_budget = budget
+    service.execution_budget = service.runtime.execution_budget = budget
+    summary.update(state='running', entry_started=True, preparation_seconds=round(started - preparation, 3))
+    dump(D / 'summary.json', summary)
+    print('BUSINESS_STARTED 002352.SZ verify_only', flush=True)
+    try:
+        executed = asyncio.run(service.execute_review_recovery(plan, knowledge_cutoff='2026-11-20', max_elapsed_seconds=3000))
+        dump(D / 'execution.json', executed)
+        summary['state'] = executed['state']
+    except Exception as exc:
+        summary.update(state='failed', exception=type(exc).__name__ + ': ' + str(exc)[:1500])
+    finally:
+        summary['business_seconds'] = round(time.monotonic() - started, 3)
+        asyncio.run(client.close())
+        dump(D / 'model-receipts.json', provider.workpaper_receipts)
+        dump(D / 'provider-traces.json', [t.model_dump(mode='json') for t in provider.traces])
+        snapshot = budget.snapshot()
+        dump(D / 'budget.json', snapshot)
+        summary.update(physical_requests=snapshot['physical_requests'], charged_tokens=snapshot['charged_tokens'],
+                       fee=snapshot['charged_cost_cny'], stopped_reason=snapshot['stopped_reason'], purposes=purposes)
+        known = {hashlib.sha256(r['raw_content'].encode()).hexdigest() for r in provider.workpaper_receipts if isinstance(r.get('raw_content'), str)}
+        for path in (TEMP / 'captured-content').glob('*.json'):
+            if read(path).get('content_sha256') not in known:
+                target = D / 'failed-model-content' / path.name
+                target.parent.mkdir(exist_ok=True)
+                shutil.copy2(path, target)
+        reader = CompanyProfileReadService(OUTPUT)
+        after = reader.research_profile('002352.SZ')
+        summary.update(before_readings=len(before['readings']), after_readings=len(after['readings']),
+            old_runtime_files_unchanged=all(sha(ROOT / p) == h for p, h in old_hashes.items()),
+            frozen_code_unchanged=H['code_hashes']() == frozen['code_sha256'],
+            shared_config_unchanged=sha(ROOT / 'config/13_llm.json') == frozen['shared_llm_config_sha256'])
+        old_ids = {r['work_id'] for r in before['readings']}
+        new_ids = [r['work_id'] for r in after['readings'] if r['work_id'] not in old_ids]
+        summary['new_reading_work_ids'] = new_ids
+        for work_id in new_ids:
+            record = reader._latest_by_instrument(work_id=work_id)['002352.SZ']
+            dump(D / 'runtime.json', record.model_dump(mode='json'))
+            summary['review_status'] = record.workpaper.quality_review.status if record.workpaper.quality_review else None
+        summary['supervision_seconds'] = round(time.monotonic() - preparation, 3)
+        dump(D / 'summary.json', summary)
+        print(json.dumps(summary, ensure_ascii=False), flush=True)
+    assert snapshot['physical_requests'] <= 2 and snapshot['charged_tokens'] <= 600000
+    assert summary['old_runtime_files_unchanged'] and summary['frozen_code_unchanged'] and summary['shared_config_unchanged']
+
+
+if __name__ == '__main__':
+    main()

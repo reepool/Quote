@@ -1,0 +1,168 @@
+"""Finite source assessment and existing-owner read/export checks, no model calls."""
+from __future__ import annotations
+
+import asyncio
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import sys
+import tempfile
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+C = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+D = C / 'workpaper-sf-final-recovery-20261120'
+TEMP = Path(__file__).parent
+PREVIOUS = ROOT / 'data/research/company_profile_galaxy_v7_20261120'
+OUTPUT = ROOT / 'data/research/company_profile_sf_reviewed_20261120'
+
+
+def read(path):
+    return json.loads(Path(path).read_text())
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + '\n')
+
+
+def main():
+    from fastapi import FastAPI
+    import httpx
+    from pypdf import PdfReader
+    from api.company_profile_routes import annual_profile_reader, router
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileRuntimeRecordV3
+    from research.company_profile.workpaper import workpaper_elements, workpaper_fact_hash, render_workpaper
+    from research.company_profile.workpaper_delivery import bind_workpaper_use_review, project_workpaper_delivery
+
+    summary = read(D / 'summary.json')
+    assert summary['state'] == 'completed' and summary['physical_requests'] == 1
+    assert len(summary['new_reading_work_ids']) == 1
+    reader = CompanyProfileReadService(OUTPUT)
+    record = reader._latest_by_instrument(work_id=summary['new_reading_work_ids'][0])['002352.SZ']
+    paper = record.workpaper
+    parent_reader = CompanyProfileReadService(PREVIOUS)
+    parent = parent_reader._latest_by_instrument(work_id=read(D / 'authorization.json')['plan']['reading_work_id'])['002352.SZ']
+    checks = read(D / 'model-receipts.json')[0]['response_payload']['checks']
+    approved = set(read(D / 'approval.json')['allowed_candidate_ids'])
+    assert {c['fact_id'] for c in checks} == approved and all(c['accepted'] for c in checks)
+    facts = {f.fact_id: f for group in workpaper_elements(paper).values() for f in group.facts}
+    old_facts = {f.fact_id: f for group in workpaper_elements(parent.workpaper).values() for f in group.facts}
+    assert set(old_facts) <= set(facts) and set(facts) - set(old_facts) == approved
+    assert all(facts[fid] == old_facts[fid] for fid in old_facts)
+    evidence = {e.evidence_id: e for e in paper.evidence}
+    document_path = ROOT / 'data/filings/announcements/blobs/24/240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2.pdf'
+    pdf = PdfReader(document_path)
+    # Read only the three physical source pages used by the five actual changes.
+    original_pages = {n: pdf.pages[n - 1].extract_text() for n in (49, 59, 60)}
+    assert all(original_pages.values())
+    reasons = {
+        'F-RM-02': '第四节/四、主营业务分析/营业收入构成，物理59（印刷058）：2025金额及占比列为301,499,641千元/97.82%、6,727,006千元/2.18%，单位人民币千元。两行业行不是集团合计308,226,647千元；当前事实和指标均为business_segment，科目保行业名。',
+        'F-SM-01': '第四节/四、主营业务分析/速运物流业务量及票均收入，物理60（印刷059）：2025年166.3亿票/同比25.4%、13.7元/同比-11.4%；注1排除供应链及国际、其他非物流，候选保此范围，非集团全口径。',
+        'F-MC-01': '同物理60：原文票均收入下降11.4%由产品结构变化导致，自2025年9月起月度同比降幅收窄，候选保留速运物流主体、2025期间及原文因果，不作全集团推断。',
+        'F-CC-03': '同物理60：速运物流业务量增长及国内生产制造/生活消费端到端场景均有原文；当前主体不再扩为全公司业务量，不据此认定全部集团客户行业。',
+        'F-PS-02': '第四节/三、核心竞争力，物理49（印刷048）：截至报告期末国内所有城市、海外95国家地区、国际小包200国家地区有原句。候选保时点2025-12-31，非全年新增流量。',
+    }
+    assert all(facts[fid].subject_scope == 'business_segment' for fid in approved - {'F-PS-02'})
+    assert facts['F-PS-02'].period == '截至报告期末（2025-12-31）'
+    assessment = {'task': '6.EK', 'scope': 'only five actual changed facts; no whole-profile accuracy claim',
+        'source_pdf_sha256': sha(document_path), 'original_pdf_pages_read': [49, 59, 60],
+        'method': 'independent reading of original PDF text, source table headings/columns/notes, bound original evidence and actual revised facts',
+        'model_accepted': sorted(approved), 'decisions': [
+            {'fact_id': fid, 'fact_sha256': workpaper_fact_hash(facts[fid]), 'disposition': 'source_checked',
+             'evidence_ids': list(facts[fid].evidence_ids), 'reason': reasons[fid],
+             'source_spans': [{'evidence_id': eid, 'pages': list(evidence[eid].physical_pages),
+                'quote_sha256': [hashlib.sha256(s.quote.encode()).hexdigest() for s in evidence[eid].source_spans]}
+                for eid in facts[fid].evidence_ids]} for fid in sorted(approved)],
+        'still_unadopted': 'review-add:WR-004 KLN financing interest reclassification; not sent or adopted by this task',
+        'source_limitation': 'native evidence originally flagged layout/table relations unverified; this finite check independently read actual heading/rows/notes for the two changed numerical facts only; other facts not newly audited'}
+    dump(D / 'independent-review.json', assessment)
+    decisions = {d.fact_id: d.model_dump(mode='json') for d in paper.use_review.decisions}
+    prior = {d.fact_id: d for d in parent.workpaper.use_review.decisions}
+    assert len(prior) == 9 and set(decisions) - approved == set(prior) and not (set(prior) & approved)
+    for fid, decision in prior.items():
+        assert workpaper_fact_hash(facts[fid]) == decision.fact_sha256
+    for fid in approved:
+        decisions[fid] = {'fact_id': fid, 'fact_sha256': workpaper_fact_hash(facts[fid]),
+            'disposition': 'source_checked', 'evidence_ids': list(facts[fid].evidence_ids), 'reason': reasons[fid]}
+    use_review = {'report': paper.report.model_dump(mode='json'), 'reviewer': 'Codex finite independent original-source review; prior nine valid hash-bound decisions preserved',
+        'reference': str((D / 'independent-review.json').relative_to(ROOT)),
+        'reference_sha256': sha(D / 'independent-review.json'), 'decisions': list(decisions.values())}
+    bound = bind_workpaper_use_review(paper, use_review)
+    assert bound.quality_review == paper.quality_review and bound.generation == paper.generation
+    record = record.model_copy(update={'workpaper': bound})
+    CompanyProfileResearchWriter(OUTPUT).persist(record)
+    dump(D / 'runtime.json', record.model_dump(mode='json'))
+    (D / 'profile.md').write_text(render_workpaper(bound, delivery=project_workpaper_delivery(bound)))
+
+    reader = CompanyProfileReadService(OUTPUT)
+    api = reader.research_profile('002352.SZ')
+    before = parent_reader.research_profile('002352.SZ')
+    assert all(row['fact'] is None for row in api['facts'] if row['reading_work_id'] == parent.work_id)
+    active = [row for row in api['facts'] if row['fact'] is not None]
+    assert len({(row['reading_work_id'], row['fact']['fact_id']) for row in active}) == len(active)
+    assert {row['fact']['fact_id'] for row in active} >= approved
+    assert 'review-add:WR-004' not in {row['fact']['fact_id'] for row in active}
+    dump(D / 'api.json', api)
+    query = reader.query(('002352.SZ',))
+    export_root = Path(tempfile.mkdtemp(prefix='verify-export-', dir=TEMP)) / 'data'
+    exported = reader.export(('002352.SZ',), export_root)
+    annual = read(export_root / 'annual_profiles.json')['profiles'][0]
+    assert annual == api == CompanyProfileReadService(OUTPUT).research_profile('002352.SZ')
+    assert query['profiles'] == exported['profiles'] == CompanyProfileReadService(OUTPUT).query(('002352.SZ',))['profiles']
+    app = FastAPI()
+    app.include_router(router, prefix='/api/v1')
+    app.dependency_overrides[annual_profile_reader] = lambda: reader
+    catalog = {}
+
+    async def check_http():
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://local-test') as client:
+            response = await client.get('/api/v1/research/company/002352.SZ/annual-profile')
+            assert response.status_code == 200 and response.json() == api
+            catalog_response = await client.get('/api/v1/research/company/annual-profiles')
+            assert catalog_response.status_code == 200
+            catalog.update(catalog_response.json())
+            return {'detail': response.status_code, 'catalog': catalog_response.status_code}
+
+    print('LOCAL_JSON_EXPORT_FRESH_INSTANCE_PASSED', flush=True)
+    http_result = asyncio.run(check_http())
+    assert catalog['total'] == 15
+    authorization = read(D / 'authorization.json')
+    assert all(sha(ROOT / p) == h for p, h in authorization['old_runtime_hashes'].items())
+    assert all(sha(OUTPUT / Path(p).relative_to(PREVIOUS.relative_to(ROOT))) == h for p, h in authorization['old_runtime_hashes'].items())
+    wire = read(D / 'request-wiring.json')
+    budget = read(D / 'budget.json')
+    counts = Counter(row['state'] for row in active)
+    verified = {'task': '6.EK', 'model_accepted': 5, 'independently_checked_actual_changes': 5,
+        'unchanged_prior_independent_decisions': 9, 'independent_decisions_current_total': len(decisions),
+        'before_visible_facts': sum(row['fact'] is not None for row in before['facts']),
+        'after_visible_facts': len(active), 'after_visible_metrics': sum(len(row['fact']['metrics']) for row in active),
+        'after_visible_states': dict(counts), 'remaining_active_gap_count': sum(row.get('active', True) for row in api['information_gaps']),
+        'query_export_fresh_instance_equal': True, 'annual_export_api_equal': True, 'local_asgi_http': http_result,
+        'historical_facts_superseded_no_duplicate': True, 'other_14_companies_unchanged': True,
+        'other_companies_proof': 'all 17 original writer bytes unchanged and successor copies match, same read implementation; no redundant per-company full API scan',
+        'original_17_writer_files_unchanged': True, 'successor_root': str(OUTPUT),
+        'successor_file_count': len(list((OUTPUT / 'company_profile_common_core.v1').glob('*.json'))),
+        'catalog_visible_facts': sum(row['visible_fact_count'] for row in catalog['profiles']),
+        'catalog_visible_metrics': sum(row['visible_metric_count'] for row in catalog['profiles']),
+        'wire_requests': len(wire), 'physical_requests': budget['physical_requests'], 'recoveries': 0,
+        'supplier_total_and_conservative_ledger': budget['charged_tokens'], 'fee': budget['charged_cost_cny'],
+        'wire_seconds': wire[0]['seconds'], 'wire_payload_bytes': wire[0]['payload_bytes'],
+        'runtime_sha256': sha(D / 'runtime.json'), 'api_sha256': sha(D / 'api.json'),
+        'production_authorization': 'not_authorized', 'formal_acceptance': 'not_assessed',
+        'review': {'blocking_remaining': 0, 'nonblocking': ['no whole-profile/scale accuracy estimate; remaining supplemental omission retained'],
+                   'unrelated': 'pre-existing worktree changes untouched'},
+        'reused_validation': {'reference': 'workpaper-review-execution-20261120/validation.json',
+                              'source_test_hashes_match': True, 'prior_passed': [16, 77], 'not_rerun_or_new_accuracy': True}}
+    verified['verification_process_notes'] = ['local assertion initially expected wrong elements-set shape: restored five were absent in restricted parent; corrected against actual API and five allowed IDs', 'PDF line wrapping defeated a diagnostic substring assertion; original PDF read directly, no production source rule changed', 'sandbox local ASGI verification hung and was terminated; first authorized-environment retry stopped on existing-export protection; later 90-second run had both HTTP200 before timing out in redundant cross-company scans; final run uses writer hashes instead', 'none of these local checks resent a model request or changed the real review result']
+    dump(D / 'validation.json', verified)
+    print(json.dumps(verified, ensure_ascii=False), flush=True)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,4383 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "002352.SZ",
+  "report": {
+    "instrument_id": "002352.SZ",
+    "report_id": "1225057387",
+    "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-a99435fdd6133370b6c27a91",
+  "latest_reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+  "readings": [
+    {
+      "work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "workpaper_sha256": "47db7d39877bf00ea17a008d95cf69ba5fd03aaf94dfa7a8f8e75810fc990150",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0032",
+            "section_path": [
+              "第四节　管理层讨论与分析"
+            ],
+            "start_page": 21,
+            "end_page": 22,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0039",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "二、公司业务发展情况"
+            ],
+            "start_page": 26,
+            "end_page": 27,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0064",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "三、核心竞争力"
+            ],
+            "start_page": 49,
+            "end_page": 50,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0075",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 59,
+            "end_page": 60,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0077",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "速运物流业务的业务量及票均收入情况"
+            ],
+            "start_page": 60,
+            "end_page": 61,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0093",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "六、利润分析"
+            ],
+            "start_page": 67,
+            "end_page": 68,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0095",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "七、现金流"
+            ],
+            "start_page": 68,
+            "end_page": 69,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0145",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "十三、公司未来发展的展望"
+            ],
+            "start_page": 80,
+            "end_page": 81,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          }
+        ],
+        "unread_or_deferred": [
+          "第九节财务报告中的分部信息与营业收入附注：仅在主营业务分析的收入构成存在实质缺口时定向补充，当前已选主营业务分析，暂不扩读",
+          "第五节公司治理、员工、股权激励等：与经营解释关联弱，不纳入",
+          "第六节重要事项中的担保、关联交易、募集资金等：非本次经营解释核心，暂缓",
+          "物理页21布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页22布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页26布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页27布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页49布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页50布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页59布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页60布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页61布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页67布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页68布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页69布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页80布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页81布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        ],
+        "selection_rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。",
+        "stop_reason": "已覆盖业务结构、产品服务、收入总额与构成、规模驱动、利润与现金流及展望等公司层面经营解释要点，所选子节互不重叠且信息密度高；行业背景与财务报告附注属次要或定向补充范围，可在不扩读全报告的前提下停止。",
+        "transcription_version": "shared-pdf-layout-with-native-fallback.v2"
+      },
+      "limitations": [
+        "物理页21、22、26、27、49、50、59、60、61、67、68、69、80、81布局未恢复，表格列关系未核定，金额与占比依据原文文字顺序对应，未据表格列位置推断。",
+        "所选章节未逐项展开各产品子类的服务内容、客户类型及渠道结构明细。",
+        "未分配部分及分部间调整的具体构成未在所选章节详细说明。",
+        "可选供应链结构无法解析，未作为结论采用；原内容保留在模型回执。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:sections",
+          "request_hash": "542bdbe09bca73aaca2cd5b95b04c674f1a9fed5ccbadd75876fd9f6008b45cd",
+          "response_hash": "a6f4d0accf7b96f310946cadcaa0896a7d9ca36bb73c22e26480618780cae2fd",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 13442,
+            "output_tokens": 404,
+            "total_tokens": 13846
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 573,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0227",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0370",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0492",
+            "section-0497",
+            "section-0502",
+            "section-0504",
+            "section-0506",
+            "section-0509",
+            "section-0512",
+            "section-0516",
+            "section-0520",
+            "section-0525",
+            "section-0529",
+            "section-0533",
+            "section-0537",
+            "section-0541",
+            "section-0545",
+            "section-0549",
+            "section-0552",
+            "section-0554",
+            "section-0557",
+            "section-0560",
+            "section-0562",
+            "section-0564",
+            "section-0566",
+            "section-0568",
+            "section-0570",
+            "section-0572",
+            "section-0574",
+            "section-0576",
+            "section-0578",
+            "section-0581",
+            "section-0583",
+            "section-0585",
+            "section-0587",
+            "section-0589",
+            "section-0592",
+            "section-0594",
+            "section-0596",
+            "section-0598",
+            "section-0601",
+            "section-0603",
+            "section-0605",
+            "section-0608",
+            "section-0611",
+            "section-0613",
+            "section-0616",
+            "section-0618",
+            "section-0620",
+            "section-0624",
+            "section-0626",
+            "section-0629",
+            "section-0631",
+            "section-0633",
+            "section-0635",
+            "section-0637",
+            "section-0640",
+            "section-0642",
+            "section-0644",
+            "section-0647",
+            "section-0649",
+            "section-0651",
+            "section-0654",
+            "section-0657",
+            "section-0659",
+            "section-0662",
+            "section-0666",
+            "section-0669",
+            "section-0672",
+            "section-0675",
+            "section-0677",
+            "section-0679",
+            "section-0681",
+            "section-0683",
+            "section-0685",
+            "section-0687",
+            "section-0689",
+            "section-0691",
+            "section-0693",
+            "section-0695",
+            "section-0697",
+            "section-0699",
+            "section-0701",
+            "section-0703",
+            "section-0705",
+            "section-0707",
+            "section-0709",
+            "section-0712",
+            "section-0713",
+            "section-0714",
+            "section-0717",
+            "section-0719",
+            "section-0721",
+            "section-0723",
+            "section-0725",
+            "section-0727",
+            "section-0729",
+            "section-0731",
+            "section-0733",
+            "section-0735",
+            "section-0739",
+            "section-0741",
+            "section-0743",
+            "section-0748",
+            "section-0749",
+            "section-0751",
+            "section-0754",
+            "section-0756",
+            "section-0758",
+            "section-0760",
+            "section-0762",
+            "section-0764",
+            "section-0766",
+            "section-0769",
+            "section-0772",
+            "section-0776",
+            "section-0778"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:extract",
+          "request_hash": "d5438e5378ea7ab74d572ee1876c2b939ac5e6896aff6826182dccdcef39a593",
+          "response_hash": "6cdefd13d108fb648c7b342fbdd41fec3f64223ace855b67b525e7062beefe03",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12270,
+            "output_tokens": 8399,
+            "total_tokens": 20669
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0039",
+            "section-0064",
+            "section-0075",
+            "section-0077",
+            "section-0093",
+            "section-0095",
+            "section-0145"
+          ],
+          "physical_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ]
+        }
+      },
+      "review_status": "incomplete",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [
+          {
+            "purpose": "review_profile_workpaper",
+            "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:review",
+            "response_sha256": "58f7498a52e666dd7233a615ea023c0f153bd1b761ac527de93ea7ddf35c775d"
+          },
+          {
+            "purpose": "repair_profile_workpaper",
+            "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:repair",
+            "response_sha256": "1ed0cf33ddac9a849a7fe56fd5b4eb8dc0e5fe492a9d572222071dd8af757cf8"
+          }
+        ],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "821dd1a7db2ba85db047598e548d7159cafa42529b9144025a781b31be5c23a9",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "superseded_by_review_successor"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:review",
+          "request_hash": "75ad4ff1b13a8374f7c654e9e259376864d60b63ecf40c30e04e2a23383279cf",
+          "response_hash": "58f7498a52e666dd7233a615ea023c0f153bd1b761ac527de93ea7ddf35c775d",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 19072,
+            "output_tokens": 1313,
+            "total_tokens": 53541
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0039",
+            "section-0064",
+            "section-0075",
+            "section-0077",
+            "section-0093",
+            "section-0095",
+            "section-0145"
+          ],
+          "physical_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:repair",
+          "request_hash": "0b21049d3720830400b86f256e8eb352dc679ce02fc240596309f2637c2e9ff2",
+          "response_hash": "1ed0cf33ddac9a849a7fe56fd5b4eb8dc0e5fe492a9d572222071dd8af757cf8",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10154,
+            "output_tokens": 1296,
+            "total_tokens": 11450
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0039",
+            "section-0064",
+            "section-0075",
+            "section-0077",
+            "section-0093",
+            "section-0095",
+            "section-0145"
+          ],
+          "physical_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0005",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "三、核心竞争力"
+          ],
+          "physical_pages": [
+            49
+          ],
+          "source_spans": [
+            {
+              "page": 49,
+              "start": 39,
+              "end": 1002,
+              "quote": "三、核心竞争力\r\n高效可靠的全球物流基础设施网络，立足亚洲、连接世界。\r\n截至报告期末，公司的服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区，\r\n国际小包服务触达全球200个国家和地区。\r\n拥有中国最大、全球前列的货运航空公司且为中国航空货运最大货主\r\n完善且领先的航空网络是公司构筑高标准时效服务的基石。2025年度，公司全球航空货运总量近280万吨，同比\r\n增长15% ；其中国内航空货量超过190万吨，占中国国内航空货邮运输量的33.1%，常年位居第一 ；国际航空货\r\n量近89万吨，同比增长18%。\r\n截至报告期末，公司共运营管理111架全货机，其中顺丰航空自有机队规模达90架。顺丰航空自2009年成立以\r\n来，已成长为全国最大、全球前列的货运航空公司，旗下拥有852名飞行员及357对稀缺航权时刻资源。2025年\r\n度，公司运营的全货机全球累计执飞228条航线，超过6万次航班，触达74个国内站点和63个国际及地区站点。\r\n全货机航空货量超过142万吨 ；其中，国际航线累计执飞69条，近1.4万次航班，航空货量超过42万吨。\r\n此外，公司与国内国际多家客运航空公司深度合作，以使用客机腹仓资源，形成覆盖更全面、时刻更灵活、成本\r\n更经济的航空运力补充。2025年度，公司通过全球超过206万次客运航班资源累计发货超过137万吨 ；其中，国\r\n际发货量超过46万吨。\r\n鄂州货运枢纽是亚洲第一、全球第四座以航空货运为主的物流枢纽，具有战略价值和稀缺性。公司于2023年9月\r\n开始运营位于鄂州货运枢纽的分拣及转运中心，并且截至报告期末已累计开通59条国内货运航线和22条国际货\r\n运航线，2025年度公司全货机在鄂州货运枢纽起降超3万个航班架次，同比增长11%。鄂州货运枢纽转运中心拥\r\n有全长52公里的智能分拣线，每小时峰值能处理28万件快递 ；同时14条海关智能查验线配合全自动分拣系统，\r\n让国际快件高效通关与发运。公司2025年度在鄂州货运枢纽的国际货运吞吐量较2024年同期增长85%。\r\n掌握丰富的运输方式资源，能够为客户提供国内及跨境多式联运服务\r\n公司掌握丰富的陆运、铁运、海运网络资源，与航空网络高效协同，为客户灵活定制匹配其时效与成本需求的最\r\n优运输解决方案。"
+            }
+          ],
+          "table_context": "物理页49布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            59
+          ],
+          "source_spans": [
+            {
+              "page": 59,
+              "start": 39,
+              "end": 1210,
+              "quote": "四、主营业务分析\r\n概述\r\n主营业务发展情况详情请见本章节“二、公司业务发展情况”的内容。\r\n收入与成本\r\n营业收入构成\r\n2025年集团总营业收入达成人民币3,082.3亿元，较2024年同期增长8.37%。营业收入按行业、按经营分部及按\r\n地理区域划分的明细列示如下。各项主要业务的发展情况及变动原因请详见本章节的”二、公司业务发展情况”。\r\n单位 ：人民币千元\r\n2025年 2024年\r\n金额 占营业收入比 金额 占营业收入比 金额同比变动\r\n营业收入合计 308,226,647 100.00% 284,420,059 100.00% 8.37%\r\n按行业划分 ：\r\n物流及货运代理 301,499,641 97.82% 276,275,771 97.14% 9.13%\r\n其他非物流业务1 6,727,006 2.18% 8,144,288 2.86% -17.40%\r\n按经营分部划分 ：\r\n速运及大件分部 217,553,282 70.58% 200,162,392 70.38% 8.69%\r\n时效快递 131,048,153 42.52% 122,205,976 42.97% 7.24%\r\n经济快递 32,052,891 10.40% 27,251,227 9.58% 17.62%\r\n快运 42,134,091 13.67% 37,641,125 13.23% 11.94%\r\n冷运及医药 10,605,560 3.44% 9,812,161 3.45% 8.09%\r\n其他2 1,712,587 0.56% 3,251,903 1.14% -47.34%\r\n同城即时配送分部 12,869,890 4.18% 9,010,521 3.17% 42.83%\r\n同城即时配送 12,719,470 4.13% 8,872,800 3.12% 43.35%\r\n其他2 150,420 0.05% 137,721 0.05% 9.22%\r\n供应链及国际分部 76,345,732 24.77% 74,000,342 26.02% 3.17%\r\n供应链及国际 72,939,476 23.66% 70,492,482 24.78% 3.47%\r\n其他2 3,406,256 1.11% 3,507,860 1.23% -2.90%\r\n未分配部分3 1,457,743 0.47% 1,246,804 0.44% 16.92%\r\n按地区划分 ：\r\n中国内地 266,818,257 86.57% 242,796,156 85.37% 9.89%\r\n中国港澳台 9,862,009 3.20% 9,467,291 3.33% 4.17%\r\n海外 31,546,381 10.23% 32,156,612 11.31% -1.90%"
+            }
+          ],
+          "table_context": "物理页59布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "速运物流业务的业务量及票均收入情况"
+          ],
+          "physical_pages": [
+            60
+          ],
+          "source_spans": [
+            {
+              "page": 60,
+              "start": 235,
+              "end": 1228,
+              "quote": "速运物流业务的业务量及票均收入情况\r\n2025年 2024年 同比变动\r\n业务量（亿票） 1 166.3 132.6 25.4%\r\n票均收入（人民币元） 1 13.7 15.5 -11.4%\r\n注1 ：速运物流业务主要包括时效快递、经济快递、快运、冷运及医药、同城即时配送业务。速运物流板块的业务量和票均收入的统计不包括供应链及国\r\n际业务和其他非物流业务的数据。\r\n速运物流业务的业务量同比增长25.4%，主要得益于公司持续完善产品矩阵及强化服务竞争力，不断渗透国内生\r\n产制造及生活消费领域客户的端到端物流场景，稳步扩大业务规模，实现件量快速增长。\r\n票均收入同比下降11.4%，主要由于产品结构变化导致。公司逐步调优市场策略与业务结构，自2025年9月份\r\n起，月度票均收入的同比降幅呈现持续收窄趋势。\r\n营业成本构成\r\n本集团2025年营业成本为人民币2,671.8亿元，较2024年同期增长9.14%，与公司报告期的营业收入增长趋势相\r\n一致。其中按行业划分的明细成本情况列示如下 ：\r\n单位 ：人民币千元\r\n2025年 2024年\r\n金额 占营业成本比 金额 占营业成本比 金额同比变动\r\n营业成本合计 267,178,276 100.00% 244,809,787 100.00% 9.14%\r\n按行业划分 ：\r\n物流及货运代理 261,916,992 98.03% 237,979,850 97.21% 10.06%\r\n人工成本1 129,779,584 48.57% 112,117,267 45.80% 15.75%\r\n运力成本1 98,899,597 37.02% 93,294,058 38.11% 6.01%\r\n其他经营成本 33,237,811 12.44% 32,568,525 13.30% 2.06%\r\n其他非物流业务 5,261,284 1.97% 6,829,937 2.79% -22.97%\r\n注1 ：公司已根据会计准则相关规定按资源项性质准确核算成本费用，具体详见“第九节财务报告”的“四合并财务报表项目附注”的“(48)费用按性质分类”。\r\n因公司物流网络运营中部分环节采用外包资源，此处为了有效分析物流及货运代理业务的营业成本构成，公司将其中的外包成本主要拆分为人工和\r\n运力两类，并分别与职工薪酬、运输成本合并统计为人工成本和运力成本。"
+            }
+          ],
+          "table_context": "物理页60布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "六、利润分析"
+          ],
+          "physical_pages": [
+            67
+          ],
+          "source_spans": [
+            {
+              "page": 67,
+              "start": 39,
+              "end": 1124,
+              "quote": "六、利润分析\r\n本集团2025年实现净利润为人民币116.8亿元，较2024年同期增长14.35%。其中归属于上市公司股东的净利润\r\n为人民币111.2亿元，较2024年同期增长9.31%。公司各经营分部的净利润金额及同比变动情况列示如下 ：\r\n单位 ：人民币千元\r\n2025年 2024年 同比变动\r\n速运及大件分部 10,600,973 10,981,266 -3.46%\r\n同城即时配送分部 277,718 132,460 109.66%\r\n供应链及国际分部 187,640 -761,699 124.63%\r\n未分配部分 647,285 -166,794 488.07%\r\n注：为更好呈现各经营分部利润结果，本集团于2025年将并购KLN相关的融资利息费用人民币5.6亿划分至未分配部分，并重述比较期间的数据，将\r\n2024年并购KLN相关的融资利息费用人民币5.6亿划分至未分配部分。\r\n速运及大件分部2025年净利润约为人民币106.0亿元，较2024年同期下降3.46%，主要由于公司积极主动的市场\r\n拓展策略与必要的长期战略投入 ：(1)深化“激活经营”机制，赋予业务前线充分经营授权与激励，同时将成本节降\r\n的效益反哺至前端业务拓展，提升产品与服务的市场竞争力 ；(2)强化对高品质时效服务的运营保障投入，巩固标\r\n准产品竞争优势。同时，公司亦结合市场动态与经营节奏，逐步动态调优市场策略，追求业务高质量增长，第四\r\n季度盈利能力环比第三季度实现回升。\r\n同城即时配送分部2025年净利润约为人民币2.8亿元，较2024年同期增长109.66%，净利润实现翻倍提升，主要\r\n得益于即时配送行业需求增加带来业务快速增长，同时业务结构更加健康 ；并通过精益管理及科技赋能推动运营\r\n底盘提质增效，网络规模效益扩大，带动盈利持续提升。\r\n供应链及国际分部2025年净利润约为人民币1.9亿元，实现扭亏为盈，较2024年同期增加人民币9.5亿元。主要\r\n由于 ：(1)海外子公司KEX通过业务结构调优与精益经营降本，实现同比大幅减亏 ；(2)若不考虑KEX因素，供应链\r\n及国际分部2025年净利润同比增长53.50%。公司积极投入战略资源强化供应链与国际服务能力，对外捕捉全球\r\n供应链重塑与中国企业出海机遇，同时对内通过精益运营提升效率，促进供应链及国际业务盈利能力同比提升。\r\n未分配部分2025年净利润约为人民币6.5亿元，主要包括报告期内公司将三家持有物业的全资子公司转让至南方\r\n顺丰物流REIT所产生的股权处置收益（税后金额为人民币5.9亿元）。"
+            }
+          ],
+          "table_context": "物理页67布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "七、现金流"
+          ],
+          "physical_pages": [
+            68
+          ],
+          "source_spans": [
+            {
+              "page": 68,
+              "start": 39,
+              "end": 1016,
+              "quote": "七、现金流\r\n单位 ：人民币千元\r\n2025年 2024年 同比变动\r\n经营活动现金流入小计 423,121,070 393,725,476 7.47%\r\n经营活动现金流出小计 395,565,795 361,539,103 9.41%\r\n经营活动产生的现金流量净额 27,555,275 32,186,373 -14.39%\r\n投资活动现金流入小计 99,084,169 88,518,006 11.94%\r\n投资活动现金流出小计 116,411,422 100,572,750 15.75%\r\n投资活动产生的现金流量净额 -17,327,253 -12,054,744 -43.74%\r\n筹资活动现金流入小计 32,395,256 41,510,823 -21.96%\r\n筹资活动现金流出小计 55,330,716 69,489,936 -20.38%\r\n筹资活动产生的现金流量净额 -22,935,460 -27,979,113 18.03%\r\n汇率变动对现金及现金等价物的影响 21,014 45,231 -53.54%\r\n现金及现金等价物净增加额 -12,686,424 -7,802,253 -62.60%\r\n年初现金及现金等价物 32,646,055 40,448,308 -19.29%\r\n年末现金及现金等价物 19,959,631 32,646,055 -38.86%\r\n经营活动产生的现金流量净额 ：2025年本集团经营活动产生的现金净额为人民币275.6亿元，相较2024年同期减\r\n少14.39%，主要受到支付的各项税费及业务结构变化带来经营性往来结算节奏变化的综合影响。本集团2025年\r\n经营活动产生的现金流量净额与净利润之间的差异说明请详见“第九节财务报告”的附注四(57)(a)。\r\n投资活动使用的现金流量净额 ：2025年本集团投资活动使用的现金净额为人民币173.3亿元，相较2024年同期增\r\n长43.74%，主要由于购买结构性存款和固定收益凭证净现金流出增加导致。\r\n筹资活动使用的现金流量净额 ：2025年本集团融资活动使用的现金净额为人民币229.4亿元，相较2024年同期减\r\n少18.03%，主要由于分配股利净流出减少、购买少数股东股权净流出减少、吸收投资净流入减少及偿还借款净\r\n流出增加等综合影响所致。"
+            }
+          ],
+          "table_context": "物理页68布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0015",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "十三、公司未来发展的展望"
+          ],
+          "physical_pages": [
+            80
+          ],
+          "source_spans": [
+            {
+              "page": 80,
+              "start": 39,
+              "end": 1173,
+              "quote": "十三、公司未来发展的展望\r\n公司战略方向\r\n基于2025年的坚实发展成果，结合全球物流产业变革趋势与中国企业全球化发展机遇，顺丰始终锚定“成为备受\r\n尊重全球领先的数智物流解决方案服务商”的长期愿景，以“亚洲唯一”为战略核心，深化产品与解决方案协同，促\r\n进国内国际业务均衡发展，成为企业及个人客户在亚洲的首选合作伙伴，最终实现业务规模与盈利水平的可持续\r\n健康增长。\r\n在标准产品业务领域，公司坚持规模与效益并重，通过小件与大件业务的双轮驱动，巩固市场领导地位，实现质\r\n量与效益的同步提升。\r\n小件业务聚焦利润良性增长与规模持续领先，通过持续优化标准快递产品矩阵保持服务领先优势，深化网络分层\r\n与资源适配以提升全链路成本竞争力，并基于多元场景打造差异化渠道壁垒，为国际及供应链业务提供协同支\r\n撑。大件业务以规模领先与利润同步提升为目标，加速构建高品质、高性价比的零担网络服务能力，协同发展经\r\n济型专线网络，并持续强化对国际及供应链业务的资源协同与能力反哺。\r\n在供应链业务领域，公司致力于深化向重点行业的渗透，推动供应链解决方案收入占比提升，并在核心赛道确立\r\n规模领先优势，实现可持续的盈利性增长。\r\n战略上将聚焦服务各行业头部客户的端到端供应链需求，构建贯通国内与国际的专业化服务能力。通过打造精益\r\n高效的中台运营体系，强化资源整合与流程标准化，夯实规模化复用的服务底盘。同时，积极推动物流服务与金\r\n融、科技等元素的深度融合，形成差异化竞争优势，为客户提供更具价值的综合供应链解决方案。\r\n在国际业务领域，公司瞄准亚太市场，以规模比肩全球头部企业并实现持续盈利为核心目标，加速构建领先的跨\r\n境综合服务能力。\r\n公司将持续强化国际网络基石，重点布局关键航线的航空货运资源，并协同卡位海运、陆运、铁路及清关等核心\r\n环节，形成全域资源保障。在此基础上，推动服务模式从单一资源输出向端到端一体化解决方案升级，全面满足\r\n客户跨境供应链全流程需求。同时，深化数智化技术在国际业务中的应用，通过数据驱动提升运营效率与服务透\r\n明度，打造智能、可靠、高效的全球供应链服务体系，支撑亚太区域业务的规模化高质量发展。\r\n公司致力于打破业务边界，通过三大板块深度协同，释放“1+1+1>3”的战略红利。标准产品业务通过小件与大件\r\n的资源反哺，为供应链与国际业务构筑起极具竞争力的履约韧性与成本壁垒 ；供应链业务将产品能力转化为数智\r\n服务能力，驱动业务向端到端高增值解决方案转型 ；国际业务则借力国内成熟体系加速全球布局，围绕各个行业\r\n的链主客户服务其全球端到端供应链需求。三位一体的深度耦合，将不仅强化规模经济效应，更为顺丰在全球化\r\n竞争中筑就坚实的护城河。"
+            }
+          ],
+          "table_context": "物理页80布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        }
+      ]
+    },
+    {
+      "work_id": "bp-work-01e30502f99867e63a3e7126",
+      "workpaper_sha256": "5cf244378046497f684541d26e95714edb3036f41410edad95f21bcfe9b90ab5",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_recovery": {
+        "base_work_id": "bp-work-a99435fdd6133370b6c27a91",
+        "base_workpaper_sha256": "47db7d39877bf00ea17a008d95cf69ba5fd03aaf94dfa7a8f8e75810fc990150",
+        "plan_sha256": "ca30bd6cc740f49b7b87a4fce91943fa889f10b95746a5ca89d1bff024e12a0a",
+        "report": {
+          "document_type": "annual_report",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "instrument_id": "002352.SZ",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "report_id": "1225057387",
+          "report_period": "2025-12-31"
+        },
+        "request_id": "6-EK-sf-final-20261120"
+      },
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0032",
+            "section_path": [
+              "第四节　管理层讨论与分析"
+            ],
+            "start_page": 21,
+            "end_page": 22,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0039",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "二、公司业务发展情况"
+            ],
+            "start_page": 26,
+            "end_page": 27,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0064",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "三、核心竞争力"
+            ],
+            "start_page": 49,
+            "end_page": 50,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0075",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 59,
+            "end_page": 60,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0077",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "速运物流业务的业务量及票均收入情况"
+            ],
+            "start_page": 60,
+            "end_page": 61,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0093",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "六、利润分析"
+            ],
+            "start_page": 67,
+            "end_page": 68,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0095",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "七、现金流"
+            ],
+            "start_page": 68,
+            "end_page": 69,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          },
+          {
+            "section_id": "section-0145",
+            "section_path": [
+              "第四节　管理层讨论与分析",
+              "十三、公司未来发展的展望"
+            ],
+            "start_page": 80,
+            "end_page": 81,
+            "rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。"
+          }
+        ],
+        "unread_or_deferred": [
+          "第九节财务报告中的分部信息与营业收入附注：仅在主营业务分析的收入构成存在实质缺口时定向补充，当前已选主营业务分析，暂不扩读",
+          "第五节公司治理、员工、股权激励等：与经营解释关联弱，不纳入",
+          "第六节重要事项中的担保、关联交易、募集资金等：非本次经营解释核心，暂缓",
+          "物理页21布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页22布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页26布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页27布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页49布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页50布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页59布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页60布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页61布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页67布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页68布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页69布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页80布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页81布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        ],
+        "selection_rationale": "本报告为顺丰控股2025年年报。选择逻辑：section-0032为管理层讨论与分析开篇经营综述，交代业务结构与整体经营情况；section-0039“公司业务发展情况”统领各业务板块（时效快递、经济快递、快运、冷运及医药、同城即时配送、供应链及国际等）的产品/服务与经营模式；section-0075“主营业务分析”提供公司期间营业收入总额及收入构成，是货币化与主要业务权重的核心来源；section-0077“速运物流业务的业务量及票均收入情况”补充规模与单价驱动；section-0093“利润分析”与section-0095“现金流”解释盈利与现金创造；section-0145“公司未来发展的展望”保留经营因素与计划限定；section-0064“核心竞争力”作为紧凑的公司层面特色说明。行业回顾（section-0033）为纯行业背景，优先级较低，未选。",
+        "stop_reason": "已覆盖业务结构、产品服务、收入总额与构成、规模驱动、利润与现金流及展望等公司层面经营解释要点，所选子节互不重叠且信息密度高；行业背景与财务报告附注属次要或定向补充范围，可在不扩读全报告的前提下停止。",
+        "transcription_version": "shared-pdf-layout-with-native-fallback.v2"
+      },
+      "limitations": [
+        "物理页21、22、26、27、49、50、59、60、61、67、68、69、80、81布局未恢复，表格列关系未核定，金额与占比依据原文文字顺序对应，未据表格列位置推断。",
+        "所选章节未逐项展开各产品子类的服务内容、客户类型及渠道结构明细。",
+        "未分配部分及分部间调整的具体构成未在所选章节详细说明。",
+        "可选供应链结构无法解析，未作为结论采用；原内容保留在模型回执。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:sections",
+          "request_hash": "542bdbe09bca73aaca2cd5b95b04c674f1a9fed5ccbadd75876fd9f6008b45cd",
+          "response_hash": "a6f4d0accf7b96f310946cadcaa0896a7d9ca36bb73c22e26480618780cae2fd",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 13442,
+            "output_tokens": 404,
+            "total_tokens": 13846
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 573,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0227",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0370",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0492",
+            "section-0497",
+            "section-0502",
+            "section-0504",
+            "section-0506",
+            "section-0509",
+            "section-0512",
+            "section-0516",
+            "section-0520",
+            "section-0525",
+            "section-0529",
+            "section-0533",
+            "section-0537",
+            "section-0541",
+            "section-0545",
+            "section-0549",
+            "section-0552",
+            "section-0554",
+            "section-0557",
+            "section-0560",
+            "section-0562",
+            "section-0564",
+            "section-0566",
+            "section-0568",
+            "section-0570",
+            "section-0572",
+            "section-0574",
+            "section-0576",
+            "section-0578",
+            "section-0581",
+            "section-0583",
+            "section-0585",
+            "section-0587",
+            "section-0589",
+            "section-0592",
+            "section-0594",
+            "section-0596",
+            "section-0598",
+            "section-0601",
+            "section-0603",
+            "section-0605",
+            "section-0608",
+            "section-0611",
+            "section-0613",
+            "section-0616",
+            "section-0618",
+            "section-0620",
+            "section-0624",
+            "section-0626",
+            "section-0629",
+            "section-0631",
+            "section-0633",
+            "section-0635",
+            "section-0637",
+            "section-0640",
+            "section-0642",
+            "section-0644",
+            "section-0647",
+            "section-0649",
+            "section-0651",
+            "section-0654",
+            "section-0657",
+            "section-0659",
+            "section-0662",
+            "section-0666",
+            "section-0669",
+            "section-0672",
+            "section-0675",
+            "section-0677",
+            "section-0679",
+            "section-0681",
+            "section-0683",
+            "section-0685",
+            "section-0687",
+            "section-0689",
+            "section-0691",
+            "section-0693",
+            "section-0695",
+            "section-0697",
+            "section-0699",
+            "section-0701",
+            "section-0703",
+            "section-0705",
+            "section-0707",
+            "section-0709",
+            "section-0712",
+            "section-0713",
+            "section-0714",
+            "section-0717",
+            "section-0719",
+            "section-0721",
+            "section-0723",
+            "section-0725",
+            "section-0727",
+            "section-0729",
+            "section-0731",
+            "section-0733",
+            "section-0735",
+            "section-0739",
+            "section-0741",
+            "section-0743",
+            "section-0748",
+            "section-0749",
+            "section-0751",
+            "section-0754",
+            "section-0756",
+            "section-0758",
+            "section-0760",
+            "section-0762",
+            "section-0764",
+            "section-0766",
+            "section-0769",
+            "section-0772",
+            "section-0776",
+            "section-0778"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:extract",
+          "request_hash": "d5438e5378ea7ab74d572ee1876c2b939ac5e6896aff6826182dccdcef39a593",
+          "response_hash": "6cdefd13d108fb648c7b342fbdd41fec3f64223ace855b67b525e7062beefe03",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12270,
+            "output_tokens": 8399,
+            "total_tokens": 20669
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0039",
+            "section-0064",
+            "section-0075",
+            "section-0077",
+            "section-0093",
+            "section-0095",
+            "section-0145"
+          ],
+          "physical_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ]
+        }
+      },
+      "review_status": "completed_with_open_findings",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "821dd1a7db2ba85db047598e548d7159cafa42529b9144025a781b31be5c23a9",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_execution_completed"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:review",
+          "request_hash": "75ad4ff1b13a8374f7c654e9e259376864d60b63ecf40c30e04e2a23383279cf",
+          "response_hash": "58f7498a52e666dd7233a615ea023c0f153bd1b761ac527de93ea7ddf35c775d",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 19072,
+            "output_tokens": 1313,
+            "total_tokens": 53541
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0039",
+            "section-0064",
+            "section-0075",
+            "section-0077",
+            "section-0093",
+            "section-0095",
+            "section-0145"
+          ],
+          "physical_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-a99435fdd6133370b6c27a91:workpaper:repair",
+          "request_hash": "0b21049d3720830400b86f256e8eb352dc679ce02fc240596309f2637c2e9ff2",
+          "response_hash": "1ed0cf33ddac9a849a7fe56fd5b4eb8dc0e5fe492a9d572222071dd8af757cf8",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10154,
+            "output_tokens": 1296,
+            "total_tokens": 11450
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0039",
+            "section-0064",
+            "section-0075",
+            "section-0077",
+            "section-0093",
+            "section-0095",
+            "section-0145"
+          ],
+          "physical_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-01e30502f99867e63a3e7126:workpaper:repair-verify",
+          "request_hash": "28e03ab6c8b5550991b7dc61647652ce1d45af5c7a7df721730fa35401c6c3ec",
+          "response_hash": "76a9a87674e5c7127f5292fbd3ff2958b101c9c427e8eb7098cd947b62fa96f9",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10593,
+            "output_tokens": 500,
+            "total_tokens": 17232
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0039",
+            "section-0064",
+            "section-0075",
+            "section-0077",
+            "section-0093",
+            "section-0095",
+            "section-0145"
+          ],
+          "physical_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0005",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "三、核心竞争力"
+          ],
+          "physical_pages": [
+            49
+          ],
+          "source_spans": [
+            {
+              "page": 49,
+              "start": 39,
+              "end": 1002,
+              "quote": "三、核心竞争力\r\n高效可靠的全球物流基础设施网络，立足亚洲、连接世界。\r\n截至报告期末，公司的服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区，\r\n国际小包服务触达全球200个国家和地区。\r\n拥有中国最大、全球前列的货运航空公司且为中国航空货运最大货主\r\n完善且领先的航空网络是公司构筑高标准时效服务的基石。2025年度，公司全球航空货运总量近280万吨，同比\r\n增长15% ；其中国内航空货量超过190万吨，占中国国内航空货邮运输量的33.1%，常年位居第一 ；国际航空货\r\n量近89万吨，同比增长18%。\r\n截至报告期末，公司共运营管理111架全货机，其中顺丰航空自有机队规模达90架。顺丰航空自2009年成立以\r\n来，已成长为全国最大、全球前列的货运航空公司，旗下拥有852名飞行员及357对稀缺航权时刻资源。2025年\r\n度，公司运营的全货机全球累计执飞228条航线，超过6万次航班，触达74个国内站点和63个国际及地区站点。\r\n全货机航空货量超过142万吨 ；其中，国际航线累计执飞69条，近1.4万次航班，航空货量超过42万吨。\r\n此外，公司与国内国际多家客运航空公司深度合作，以使用客机腹仓资源，形成覆盖更全面、时刻更灵活、成本\r\n更经济的航空运力补充。2025年度，公司通过全球超过206万次客运航班资源累计发货超过137万吨 ；其中，国\r\n际发货量超过46万吨。\r\n鄂州货运枢纽是亚洲第一、全球第四座以航空货运为主的物流枢纽，具有战略价值和稀缺性。公司于2023年9月\r\n开始运营位于鄂州货运枢纽的分拣及转运中心，并且截至报告期末已累计开通59条国内货运航线和22条国际货\r\n运航线，2025年度公司全货机在鄂州货运枢纽起降超3万个航班架次，同比增长11%。鄂州货运枢纽转运中心拥\r\n有全长52公里的智能分拣线，每小时峰值能处理28万件快递 ；同时14条海关智能查验线配合全自动分拣系统，\r\n让国际快件高效通关与发运。公司2025年度在鄂州货运枢纽的国际货运吞吐量较2024年同期增长85%。\r\n掌握丰富的运输方式资源，能够为客户提供国内及跨境多式联运服务\r\n公司掌握丰富的陆运、铁运、海运网络资源，与航空网络高效协同，为客户灵活定制匹配其时效与成本需求的最\r\n优运输解决方案。"
+            }
+          ],
+          "table_context": "物理页49布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            59
+          ],
+          "source_spans": [
+            {
+              "page": 59,
+              "start": 39,
+              "end": 1210,
+              "quote": "四、主营业务分析\r\n概述\r\n主营业务发展情况详情请见本章节“二、公司业务发展情况”的内容。\r\n收入与成本\r\n营业收入构成\r\n2025年集团总营业收入达成人民币3,082.3亿元，较2024年同期增长8.37%。营业收入按行业、按经营分部及按\r\n地理区域划分的明细列示如下。各项主要业务的发展情况及变动原因请详见本章节的”二、公司业务发展情况”。\r\n单位 ：人民币千元\r\n2025年 2024年\r\n金额 占营业收入比 金额 占营业收入比 金额同比变动\r\n营业收入合计 308,226,647 100.00% 284,420,059 100.00% 8.37%\r\n按行业划分 ：\r\n物流及货运代理 301,499,641 97.82% 276,275,771 97.14% 9.13%\r\n其他非物流业务1 6,727,006 2.18% 8,144,288 2.86% -17.40%\r\n按经营分部划分 ：\r\n速运及大件分部 217,553,282 70.58% 200,162,392 70.38% 8.69%\r\n时效快递 131,048,153 42.52% 122,205,976 42.97% 7.24%\r\n经济快递 32,052,891 10.40% 27,251,227 9.58% 17.62%\r\n快运 42,134,091 13.67% 37,641,125 13.23% 11.94%\r\n冷运及医药 10,605,560 3.44% 9,812,161 3.45% 8.09%\r\n其他2 1,712,587 0.56% 3,251,903 1.14% -47.34%\r\n同城即时配送分部 12,869,890 4.18% 9,010,521 3.17% 42.83%\r\n同城即时配送 12,719,470 4.13% 8,872,800 3.12% 43.35%\r\n其他2 150,420 0.05% 137,721 0.05% 9.22%\r\n供应链及国际分部 76,345,732 24.77% 74,000,342 26.02% 3.17%\r\n供应链及国际 72,939,476 23.66% 70,492,482 24.78% 3.47%\r\n其他2 3,406,256 1.11% 3,507,860 1.23% -2.90%\r\n未分配部分3 1,457,743 0.47% 1,246,804 0.44% 16.92%\r\n按地区划分 ：\r\n中国内地 266,818,257 86.57% 242,796,156 85.37% 9.89%\r\n中国港澳台 9,862,009 3.20% 9,467,291 3.33% 4.17%\r\n海外 31,546,381 10.23% 32,156,612 11.31% -1.90%"
+            }
+          ],
+          "table_context": "物理页59布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "速运物流业务的业务量及票均收入情况"
+          ],
+          "physical_pages": [
+            60
+          ],
+          "source_spans": [
+            {
+              "page": 60,
+              "start": 235,
+              "end": 1228,
+              "quote": "速运物流业务的业务量及票均收入情况\r\n2025年 2024年 同比变动\r\n业务量（亿票） 1 166.3 132.6 25.4%\r\n票均收入（人民币元） 1 13.7 15.5 -11.4%\r\n注1 ：速运物流业务主要包括时效快递、经济快递、快运、冷运及医药、同城即时配送业务。速运物流板块的业务量和票均收入的统计不包括供应链及国\r\n际业务和其他非物流业务的数据。\r\n速运物流业务的业务量同比增长25.4%，主要得益于公司持续完善产品矩阵及强化服务竞争力，不断渗透国内生\r\n产制造及生活消费领域客户的端到端物流场景，稳步扩大业务规模，实现件量快速增长。\r\n票均收入同比下降11.4%，主要由于产品结构变化导致。公司逐步调优市场策略与业务结构，自2025年9月份\r\n起，月度票均收入的同比降幅呈现持续收窄趋势。\r\n营业成本构成\r\n本集团2025年营业成本为人民币2,671.8亿元，较2024年同期增长9.14%，与公司报告期的营业收入增长趋势相\r\n一致。其中按行业划分的明细成本情况列示如下 ：\r\n单位 ：人民币千元\r\n2025年 2024年\r\n金额 占营业成本比 金额 占营业成本比 金额同比变动\r\n营业成本合计 267,178,276 100.00% 244,809,787 100.00% 9.14%\r\n按行业划分 ：\r\n物流及货运代理 261,916,992 98.03% 237,979,850 97.21% 10.06%\r\n人工成本1 129,779,584 48.57% 112,117,267 45.80% 15.75%\r\n运力成本1 98,899,597 37.02% 93,294,058 38.11% 6.01%\r\n其他经营成本 33,237,811 12.44% 32,568,525 13.30% 2.06%\r\n其他非物流业务 5,261,284 1.97% 6,829,937 2.79% -22.97%\r\n注1 ：公司已根据会计准则相关规定按资源项性质准确核算成本费用，具体详见“第九节财务报告”的“四合并财务报表项目附注”的“(48)费用按性质分类”。\r\n因公司物流网络运营中部分环节采用外包资源，此处为了有效分析物流及货运代理业务的营业成本构成，公司将其中的外包成本主要拆分为人工和\r\n运力两类，并分别与职工薪酬、运输成本合并统计为人工成本和运力成本。"
+            }
+          ],
+          "table_context": "物理页60布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "六、利润分析"
+          ],
+          "physical_pages": [
+            67
+          ],
+          "source_spans": [
+            {
+              "page": 67,
+              "start": 39,
+              "end": 1124,
+              "quote": "六、利润分析\r\n本集团2025年实现净利润为人民币116.8亿元，较2024年同期增长14.35%。其中归属于上市公司股东的净利润\r\n为人民币111.2亿元，较2024年同期增长9.31%。公司各经营分部的净利润金额及同比变动情况列示如下 ：\r\n单位 ：人民币千元\r\n2025年 2024年 同比变动\r\n速运及大件分部 10,600,973 10,981,266 -3.46%\r\n同城即时配送分部 277,718 132,460 109.66%\r\n供应链及国际分部 187,640 -761,699 124.63%\r\n未分配部分 647,285 -166,794 488.07%\r\n注：为更好呈现各经营分部利润结果，本集团于2025年将并购KLN相关的融资利息费用人民币5.6亿划分至未分配部分，并重述比较期间的数据，将\r\n2024年并购KLN相关的融资利息费用人民币5.6亿划分至未分配部分。\r\n速运及大件分部2025年净利润约为人民币106.0亿元，较2024年同期下降3.46%，主要由于公司积极主动的市场\r\n拓展策略与必要的长期战略投入 ：(1)深化“激活经营”机制，赋予业务前线充分经营授权与激励，同时将成本节降\r\n的效益反哺至前端业务拓展，提升产品与服务的市场竞争力 ；(2)强化对高品质时效服务的运营保障投入，巩固标\r\n准产品竞争优势。同时，公司亦结合市场动态与经营节奏，逐步动态调优市场策略，追求业务高质量增长，第四\r\n季度盈利能力环比第三季度实现回升。\r\n同城即时配送分部2025年净利润约为人民币2.8亿元，较2024年同期增长109.66%，净利润实现翻倍提升，主要\r\n得益于即时配送行业需求增加带来业务快速增长，同时业务结构更加健康 ；并通过精益管理及科技赋能推动运营\r\n底盘提质增效，网络规模效益扩大，带动盈利持续提升。\r\n供应链及国际分部2025年净利润约为人民币1.9亿元，实现扭亏为盈，较2024年同期增加人民币9.5亿元。主要\r\n由于 ：(1)海外子公司KEX通过业务结构调优与精益经营降本，实现同比大幅减亏 ；(2)若不考虑KEX因素，供应链\r\n及国际分部2025年净利润同比增长53.50%。公司积极投入战略资源强化供应链与国际服务能力，对外捕捉全球\r\n供应链重塑与中国企业出海机遇，同时对内通过精益运营提升效率，促进供应链及国际业务盈利能力同比提升。\r\n未分配部分2025年净利润约为人民币6.5亿元，主要包括报告期内公司将三家持有物业的全资子公司转让至南方\r\n顺丰物流REIT所产生的股权处置收益（税后金额为人民币5.9亿元）。"
+            }
+          ],
+          "table_context": "物理页67布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "七、现金流"
+          ],
+          "physical_pages": [
+            68
+          ],
+          "source_spans": [
+            {
+              "page": 68,
+              "start": 39,
+              "end": 1016,
+              "quote": "七、现金流\r\n单位 ：人民币千元\r\n2025年 2024年 同比变动\r\n经营活动现金流入小计 423,121,070 393,725,476 7.47%\r\n经营活动现金流出小计 395,565,795 361,539,103 9.41%\r\n经营活动产生的现金流量净额 27,555,275 32,186,373 -14.39%\r\n投资活动现金流入小计 99,084,169 88,518,006 11.94%\r\n投资活动现金流出小计 116,411,422 100,572,750 15.75%\r\n投资活动产生的现金流量净额 -17,327,253 -12,054,744 -43.74%\r\n筹资活动现金流入小计 32,395,256 41,510,823 -21.96%\r\n筹资活动现金流出小计 55,330,716 69,489,936 -20.38%\r\n筹资活动产生的现金流量净额 -22,935,460 -27,979,113 18.03%\r\n汇率变动对现金及现金等价物的影响 21,014 45,231 -53.54%\r\n现金及现金等价物净增加额 -12,686,424 -7,802,253 -62.60%\r\n年初现金及现金等价物 32,646,055 40,448,308 -19.29%\r\n年末现金及现金等价物 19,959,631 32,646,055 -38.86%\r\n经营活动产生的现金流量净额 ：2025年本集团经营活动产生的现金净额为人民币275.6亿元，相较2024年同期减\r\n少14.39%，主要受到支付的各项税费及业务结构变化带来经营性往来结算节奏变化的综合影响。本集团2025年\r\n经营活动产生的现金流量净额与净利润之间的差异说明请详见“第九节财务报告”的附注四(57)(a)。\r\n投资活动使用的现金流量净额 ：2025年本集团投资活动使用的现金净额为人民币173.3亿元，相较2024年同期增\r\n长43.74%，主要由于购买结构性存款和固定收益凭证净现金流出增加导致。\r\n筹资活动使用的现金流量净额 ：2025年本集团融资活动使用的现金净额为人民币229.4亿元，相较2024年同期减\r\n少18.03%，主要由于分配股利净流出减少、购买少数股东股权净流出减少、吸收投资净流入减少及偿还借款净\r\n流出增加等综合影响所致。"
+            }
+          ],
+          "table_context": "物理页68布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0015",
+          "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+          "section_path": [
+            "第四节　管理层讨论与分析",
+            "十三、公司未来发展的展望"
+          ],
+          "physical_pages": [
+            80
+          ],
+          "source_spans": [
+            {
+              "page": 80,
+              "start": 39,
+              "end": 1173,
+              "quote": "十三、公司未来发展的展望\r\n公司战略方向\r\n基于2025年的坚实发展成果，结合全球物流产业变革趋势与中国企业全球化发展机遇，顺丰始终锚定“成为备受\r\n尊重全球领先的数智物流解决方案服务商”的长期愿景，以“亚洲唯一”为战略核心，深化产品与解决方案协同，促\r\n进国内国际业务均衡发展，成为企业及个人客户在亚洲的首选合作伙伴，最终实现业务规模与盈利水平的可持续\r\n健康增长。\r\n在标准产品业务领域，公司坚持规模与效益并重，通过小件与大件业务的双轮驱动，巩固市场领导地位，实现质\r\n量与效益的同步提升。\r\n小件业务聚焦利润良性增长与规模持续领先，通过持续优化标准快递产品矩阵保持服务领先优势，深化网络分层\r\n与资源适配以提升全链路成本竞争力，并基于多元场景打造差异化渠道壁垒，为国际及供应链业务提供协同支\r\n撑。大件业务以规模领先与利润同步提升为目标，加速构建高品质、高性价比的零担网络服务能力，协同发展经\r\n济型专线网络，并持续强化对国际及供应链业务的资源协同与能力反哺。\r\n在供应链业务领域，公司致力于深化向重点行业的渗透，推动供应链解决方案收入占比提升，并在核心赛道确立\r\n规模领先优势，实现可持续的盈利性增长。\r\n战略上将聚焦服务各行业头部客户的端到端供应链需求，构建贯通国内与国际的专业化服务能力。通过打造精益\r\n高效的中台运营体系，强化资源整合与流程标准化，夯实规模化复用的服务底盘。同时，积极推动物流服务与金\r\n融、科技等元素的深度融合，形成差异化竞争优势，为客户提供更具价值的综合供应链解决方案。\r\n在国际业务领域，公司瞄准亚太市场，以规模比肩全球头部企业并实现持续盈利为核心目标，加速构建领先的跨\r\n境综合服务能力。\r\n公司将持续强化国际网络基石，重点布局关键航线的航空货运资源，并协同卡位海运、陆运、铁路及清关等核心\r\n环节，形成全域资源保障。在此基础上，推动服务模式从单一资源输出向端到端一体化解决方案升级，全面满足\r\n客户跨境供应链全流程需求。同时，深化数智化技术在国际业务中的应用，通过数据驱动提升运营效率与服务透\r\n明度，打造智能、可靠、高效的全球供应链服务体系，支撑亚太区域业务的规模化高质量发展。\r\n公司致力于打破业务边界，通过三大板块深度协同，释放“1+1+1>3”的战略红利。标准产品业务通过小件与大件\r\n的资源反哺，为供应链与国际业务构筑起极具竞争力的履约韧性与成本壁垒 ；供应链业务将产品能力转化为数智\r\n服务能力，驱动业务向端到端高增值解决方案转型 ；国际业务则借力国内成熟体系加速全球布局，围绕各个行业\r\n的链主客户服务其全球端到端供应链需求。三位一体的深度耦合，将不仅强化规模经济效应，更为顺丰在全球化\r\n竞争中筑就坚实的护城河。"
+            }
+          ],
+          "table_context": "物理页80布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-PS-01",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-PS-03",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "人民币3082.3亿元为原文显示精度，不当额外精确总额。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "速运及大件内部各产品金额保层级，不与分部父项重复。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-RM-05",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "其他含商品购销；供应链及国际与其分部口径不同，按原表保层级。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-RM-06",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F-OI-03正文2671.8亿元为营业成本合计267,178,276人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OD-02",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F-OD-02正文106.0亿元为速运及大件分部净利润10,600,973人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F-OD-03正文2.8亿元为同城即时配送分部净利润277,718人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OD-04",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F-OD-04正文1.9亿元为供应链及国际分部净利润187,640人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-OD-05",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F-OD-05正文275.6亿元为经营活动产生的现金流量净额27,555,275人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-MC-03",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-MC-04",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-CF-01",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "fact_id": "F-CF-02",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "fact": null,
+      "prior_state": "reviewed",
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-BS-01",
+        "text": "公司按经营分部划分为速运及大件分部、同城即时配送分部、供应链及国际分部，另有未分配部分；速运及大件分部内含时效快递、经济快递、快运、冷运及医药等业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-BS-02",
+        "text": "按行业划分，公司营业收入主要来自物流及货运代理业务，另有其他非物流业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-PS-01",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-PS-01",
+        "text": "公司速运物流业务主要包括时效快递、经济快递、快运、冷运及医药、同城即时配送业务；供应链及国际业务和其他非物流业务不计入速运物流板块的业务量与票均收入统计。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-PS-02",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "第四节/三、核心竞争力，物理49（印刷048）：截至报告期末国内所有城市、海外95国家地区、国际小包200国家地区有原句。候选保时点2025-12-31，非全年新增流量。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-PS-02",
+        "text": "截至报告期末，公司提供国际快递、货运及供应链业务，国际小包服务触达全球200个国家和地区；服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区。",
+        "subject_scope": "consolidated_group",
+        "period": "截至报告期末（2025-12-31）",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-PS-03",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-PS-03",
+        "text": "公司掌握陆运、铁运、海运网络资源并与航空网络协同，可为客户提供国内及跨境多式联运服务，按客户时效与成本需求定制运输解决方案。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "人民币3082.3亿元为原文显示精度，不当额外精确总额。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-RM-01",
+        "text": "2025年集团总营业收入为人民币3,082.3亿元，较2024年同期增长8.37%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入合计",
+            "raw_value": "308,226,647",
+            "value": "308226647",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入合计同比变动",
+            "raw_value": "8.37%",
+            "value": "8.37",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F-RM-01正文3082.3亿元为营业收入合计308,226,647人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-RM-02",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "第四节/四、主营业务分析/营业收入构成，物理59（印刷058）：2025金额及占比列为301,499,641千元/97.82%、6,727,006千元/2.18%，单位人民币千元。两行业行不是集团合计308,226,647千元；当前事实和指标均为business_segment，科目保行业名。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-RM-02",
+        "text": "按行业划分，物流及货运代理业务收入为人民币301,499,641千元，占营业收入97.82%；其他非物流业务收入为人民币6,727,006千元，占2.18%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "物流及货运代理营业收入",
+            "raw_value": "301,499,641",
+            "value": "301499641",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物流及货运代理占营业收入比",
+            "raw_value": "97.82%",
+            "value": "97.82",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他非物流业务营业收入",
+            "raw_value": "6,727,006",
+            "value": "6727006",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他非物流业务占营业收入比",
+            "raw_value": "2.18%",
+            "value": "2.18",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-RM-03",
+        "text": "按经营分部划分，速运及大件分部营业收入为人民币217,553,282千元，占70.58%；同城即时配送分部为人民币12,869,890千元，占4.18%；供应链及国际分部为人民币76,345,732千元，占24.77%；未分配部分为人民币1,457,743千元，占0.47%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "速运及大件分部营业收入",
+            "raw_value": "217,553,282",
+            "value": "217553282",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "速运及大件分部占营业收入比",
+            "raw_value": "70.58%",
+            "value": "70.58",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "同城即时配送分部营业收入",
+            "raw_value": "12,869,890",
+            "value": "12869890",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "同城即时配送分部占营业收入比",
+            "raw_value": "4.18%",
+            "value": "4.18",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际分部营业收入",
+            "raw_value": "76,345,732",
+            "value": "76345732",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际分部占营业收入比",
+            "raw_value": "24.77%",
+            "value": "24.77",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "未分配部分营业收入",
+            "raw_value": "1,457,743",
+            "value": "1457743",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "未分配部分非正常经营业务，原文未说明其具体构成。"
+          },
+          {
+            "name": "未分配部分占营业收入比",
+            "raw_value": "0.47%",
+            "value": "0.47",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "未分配部分非正常经营业务，原文未说明其具体构成。"
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "速运及大件内部各产品金额保层级，不与分部父项重复。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-RM-04",
+        "text": "速运及大件分部内，时效快递收入为人民币131,048,153千元，占42.52%；经济快递为人民币32,052,891千元，占10.40%；快运为人民币42,134,091千元，占13.67%；冷运及医药为人民币10,605,560千元，占3.44%；其他为人民币1,712,587千元，占0.56%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "时效快递营业收入",
+            "raw_value": "131,048,153",
+            "value": "131048153",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "时效快递占营业收入比",
+            "raw_value": "42.52%",
+            "value": "42.52",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经济快递营业收入",
+            "raw_value": "32,052,891",
+            "value": "32052891",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经济快递占营业收入比",
+            "raw_value": "10.40%",
+            "value": "10.40",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "快运营业收入",
+            "raw_value": "42,134,091",
+            "value": "42134091",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "快运占营业收入比",
+            "raw_value": "13.67%",
+            "value": "13.67",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "冷运及医药营业收入",
+            "raw_value": "10,605,560",
+            "value": "10605560",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "冷运及医药占营业收入比",
+            "raw_value": "3.44%",
+            "value": "3.44",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "速运及大件分部其他营业收入",
+            "raw_value": "1,712,587",
+            "value": "1712587",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "速运及大件分部其他占营业收入比",
+            "raw_value": "0.56%",
+            "value": "0.56",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-RM-05",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。",
+        "其他含商品购销；供应链及国际与其分部口径不同，按原表保层级。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-RM-05",
+        "text": "同城即时配送分部内，同城即时配送收入为人民币12,719,470千元，占4.13%；其他为人民币150,420千元，占0.05%。供应链及国际分部内，供应链及国际收入为人民币72,939,476千元，占23.66%；其他为人民币3,406,256千元，占1.11%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "同城即时配送营业收入",
+            "raw_value": "12,719,470",
+            "value": "12719470",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "同城即时配送占营业收入比",
+            "raw_value": "4.13%",
+            "value": "4.13",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "同城即时配送分部其他营业收入",
+            "raw_value": "150,420",
+            "value": "150420",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际营业收入",
+            "raw_value": "72,939,476",
+            "value": "72939476",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际占营业收入比",
+            "raw_value": "23.66%",
+            "value": "23.66",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际分部其他营业收入",
+            "raw_value": "3,406,256",
+            "value": "3406256",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-RM-06",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "核p49多式联运服务、p59收入表行业/分部/子业务/地区各轴及p60速运统计排除范围。分部数217553282/12869890/76345732千元和总额308226647千元，子行不与父行再相加。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-RM-06",
+        "text": "按地区划分，中国内地收入为人民币266,818,257千元，占86.57%；中国港澳台为人民币9,862,009千元，占3.20%；海外为人民币31,546,381千元，占10.23%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "中国内地营业收入",
+            "raw_value": "266,818,257",
+            "value": "266818257",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中国内地占营业收入比",
+            "raw_value": "86.57%",
+            "value": "86.57",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中国港澳台营业收入",
+            "raw_value": "9,862,009",
+            "value": "9862009",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "海外营业收入",
+            "raw_value": "31,546,381",
+            "value": "31546381",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "海外占营业收入比",
+            "raw_value": "10.23%",
+            "value": "10.23",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-SM-01",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "第四节/四、主营业务分析/速运物流业务量及票均收入，物理60（印刷059）：2025年166.3亿票/同比25.4%、13.7元/同比-11.4%；注1排除供应链及国际、其他非物流，候选保此范围，非集团全口径。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-SM-01",
+        "text": "2025年速运物流业务量为166.3亿票，同比增长25.4%；票均收入为人民币13.7元，同比下降11.4%。该统计不包括供应链及国际业务和其他非物流业务。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "速运物流业务量",
+            "raw_value": "166.3",
+            "value": "166.3",
+            "unit": "亿票",
+            "source_unit": "亿票",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "速运物流业务量同比变动",
+            "raw_value": "25.4%",
+            "value": "25.4",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "较2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "速运物流票均收入",
+            "raw_value": "13.7",
+            "value": "13.7",
+            "unit": "人民币元",
+            "source_unit": "人民币元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "速运物流票均收入同比变动",
+            "raw_value": "-11.4%",
+            "value": "-11.4",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "较2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-OI-01",
+        "text": "截至报告期末，公司共运营管理111架全货机，其中顺丰航空自有机队规模达90架；顺丰航空拥有852名飞行员及357对航权时刻资源。2025年度全货机全球累计执飞228条航线、超过6万次航班，触达74个国内站点和63个国际及地区站点。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "运营管理全货机数量",
+            "raw_value": "111",
+            "value": "111",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "顺丰航空自有机队规模",
+            "raw_value": "90",
+            "value": "90",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025-12-31",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-OI-02",
+        "text": "鄂州货运枢纽转运中心拥有全长52公里的智能分拣线，每小时峰值能处理28万件快递，并配有14条海关智能查验线；2025年度公司全货机在鄂州货运枢纽起降超3万个航班架次，同比增长11%，国际货运吞吐量较2024年同期增长85%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "鄂州枢纽智能分拣线长度",
+            "raw_value": "52",
+            "value": "52",
+            "unit": "公里",
+            "source_unit": "公里",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "鄂州枢纽每小时峰值处理快递量",
+            "raw_value": "28",
+            "value": "28",
+            "unit": "万件",
+            "source_unit": "万件",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "鄂州枢纽全货机起降架次同比变动",
+            "raw_value": "11%",
+            "value": "11",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "鄂州枢纽国际货运吞吐量同比变动",
+            "raw_value": "85%",
+            "value": "85",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。",
+        "程序显示说明：F-OI-03正文2671.8亿元为营业成本合计267,178,276人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-OI-03",
+        "text": "2025年公司营业成本为人民币2,671.8亿元，较2024年同期增长9.14%；其中物流及货运代理业务成本中，人工成本为人民币129,779,584千元，占营业成本48.57%；运力成本为人民币98,899,597千元，占37.02%；其他经营成本为人民币33,237,811千元，占12.44%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "营业成本合计",
+            "raw_value": "267,178,276",
+            "value": "267178276",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业成本合计同比变动",
+            "raw_value": "9.14%",
+            "value": "9.14",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "人工成本",
+            "raw_value": "129,779,584",
+            "value": "129779584",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "人工成本占营业成本比",
+            "raw_value": "48.57%",
+            "value": "48.57",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "运力成本",
+            "raw_value": "98,899,597",
+            "value": "98899597",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "运力成本占营业成本比",
+            "raw_value": "37.02%",
+            "value": "37.02",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F-OI-03正文2671.8亿元为营业成本合计267,178,276人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-CC-01",
+        "text": "公司服务网络覆盖国内所有城市，国际快递、货运及供应链业务拓展至海外95个国家及地区，国际小包服务触达全球200个国家和地区。",
+        "subject_scope": "consolidated_group",
+        "period": "2025-12-31",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-CC-02",
+        "text": "按地区划分，公司收入以中国内地为主，占86.57%；中国港澳台占3.20%，海外占10.23%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "中国内地占营业收入比",
+            "raw_value": "86.57%",
+            "value": "86.57",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "海外占营业收入比",
+            "raw_value": "10.23%",
+            "value": "10.23",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-CC-03",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "同物理60：速运物流业务量增长及国内生产制造/生活消费端到端场景均有原文；当前主体不再扩为全公司业务量，不据此认定全部集团客户行业。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-CC-03",
+        "text": "速运物流业务量增长主要得益于持续完善产品矩阵及强化服务竞争力，不断渗透国内生产制造及生活消费领域客户的端到端物流场景。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F-OD-01",
+        "text": "2025年公司净利润为人民币116.8亿元，同比增长14.35%；归属于上市公司股东的净利润为人民币111.2亿元，同比增长9.31%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "净利润",
+            "raw_value": "116.8",
+            "value": "116.8",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "净利润同比变动",
+            "raw_value": "14.35%",
+            "value": "14.35",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润",
+            "raw_value": "111.2",
+            "value": "111.2",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润同比变动",
+            "raw_value": "9.31%",
+            "value": "9.31",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OD-02",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。",
+        "程序显示说明：F-OD-02正文106.0亿元为速运及大件分部净利润10,600,973人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F-OD-02",
+        "text": "速运及大件分部2025年净利润约人民币106.0亿元，同比下降3.46%，主要由于主动市场拓展策略与长期战略投入，包括深化“激活经营”机制、将成本节降效益反哺前端业务拓展，以及强化高品质时效服务的运营保障投入；第四季度盈利能力环比第三季度回升。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "速运及大件分部净利润",
+            "raw_value": "10,600,973",
+            "value": "10600973",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "速运及大件分部净利润同比变动",
+            "raw_value": "-3.46%",
+            "value": "-3.46",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F-OD-02正文106.0亿元为速运及大件分部净利润10,600,973人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。",
+        "程序显示说明：F-OD-03正文2.8亿元为同城即时配送分部净利润277,718人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F-OD-03",
+        "text": "同城即时配送分部2025年净利润约人民币2.8亿元，同比增长109.66%，主要得益于即时配送行业需求增加带来业务快速增长、业务结构更加健康，以及精益管理与科技赋能推动运营提质增效。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "同城即时配送分部净利润",
+            "raw_value": "277,718",
+            "value": "277718",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "同城即时配送分部净利润同比变动",
+            "raw_value": "109.66%",
+            "value": "109.66",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F-OD-03正文2.8亿元为同城即时配送分部净利润277,718人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OD-04",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。",
+        "程序显示说明：F-OD-04正文1.9亿元为供应链及国际分部净利润187,640人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F-OD-04",
+        "text": "供应链及国际分部2025年净利润约人民币1.9亿元，实现扭亏为盈，较2024年同期增加人民币9.5亿元，主要由于海外子公司KEX通过业务结构调优与精益经营降本实现同比大幅减亏；若不考虑KEX因素，该分部净利润同比增长53.50%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "供应链及国际分部净利润",
+            "raw_value": "187,640",
+            "value": "187640",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际分部净利润同比变动",
+            "raw_value": "124.63%",
+            "value": "124.63",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际分部净利润同比增加额",
+            "raw_value": "9.5",
+            "value": "9.5",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "供应链及国际分部净利润同比变动（不考虑KEX）",
+            "raw_value": "53.50%",
+            "value": "53.50",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期，不考虑KEX因素",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F-OD-04正文1.9亿元为供应链及国际分部净利润187,640人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-OD-05",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。",
+        "程序显示说明：F-OD-05正文275.6亿元为经营活动产生的现金流量净额27,555,275人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F-OD-05",
+        "text": "2025年公司经营活动产生的现金流量净额为人民币275.6亿元，较2024年同期减少14.39%，主要受支付的各项税费及业务结构变化带来经营性往来结算节奏变化的综合影响。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "经营活动产生的现金流量净额",
+            "raw_value": "27,555,275",
+            "value": "27555275",
+            "unit": "人民币千元",
+            "source_unit": "人民币千元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经营活动产生的现金流量净额同比变动",
+            "raw_value": "-14.39%",
+            "value": "-14.39",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较2024年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F-OD-05正文275.6亿元为经营活动产生的现金流量净额27,555,275人民币千元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-MC-01",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "同物理60：原文票均收入下降11.4%由产品结构变化导致，自2025年9月起月度同比降幅收窄，候选保留速运物流主体、2025期间及原文因果，不作全集团推断。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-MC-01",
+        "text": "速运物流业务票均收入同比下降11.4%，主要由于产品结构变化导致；公司逐步调优市场策略与业务结构，自2025年9月份起月度票均收入的同比降幅呈现持续收窄趋势。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-MC-03",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F-MC-03",
+        "text": "报告期内公司将三家持有物业的全资子公司转让至南方顺丰物流REIT，产生股权处置收益（税后金额为人民币5.9亿元），计入未分配部分。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "股权处置收益（税后）",
+            "raw_value": "5.9",
+            "value": "5.9",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-MC-04",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "fact": {
+        "fact_id": "F-MC-04",
+        "text": "公司战略以“亚洲唯一”为核心，标准产品业务坚持小件与大件双轮驱动，供应链业务聚焦重点行业端到端解决方案，国际业务瞄准亚太市场并强化关键航线航空货运资源及海运、陆运、铁路、清关等环节协同。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0015"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-CF-01",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-CF-01",
+        "text": "公司拥有中国最大、全球前列的货运航空公司，为中国航空货运最大货主；鄂州货运枢纽为亚洲第一、全球第四座以航空货运为主的物流枢纽，具有战略价值和稀缺性。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "fact_id": "F-CF-02",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "未有匹配当前内容的有效核验；旧已核编号不自动继承。"
+      ],
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "fact": {
+        "fact_id": "F-CF-02",
+        "text": "公司战略愿景为“成为备受尊重全球领先的数智物流解决方案服务商”，通过标准产品、供应链、国际三大板块深度协同，释放“1+1+1>3”的战略红利。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0015"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "business_structure",
+      "status": "observed",
+      "reasons": [
+        "物理页59布局未恢复，分部与业务行之间的层级关系依据原文文字表述整理，未据表格列位置推断。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "所选章节未逐项展开各产品子类的服务内容与客户类型，产品用途细节有限。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "收入构成表按行业、经营分部、地区三种口径分别列示，各口径内部合计为100%，不同口径之间不可直接相加。",
+        "物理页59布局未恢复，金额与占比依据原文文字顺序对应，未据表格列位置推断。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "scale_and_mix",
+      "status": "unclear",
+      "reasons": [
+        "业务量与票均收入仅覆盖速运物流板块，不含供应链及国际业务和其他非物流业务。",
+        "指标格式隔离：事实F-SM-02未作为结论采用；metrics.2: Value error, metric values must be decimal strings；原内容保留在模型回执。",
+        "原事实因复核问题已隔离。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "成本构成中人工成本与运力成本为物流及货运代理业务口径，且已将外包成本拆分并入，与集团营业成本合计口径不同。",
+        "未逐项列示仓储、运输设备等具体资源投入明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "所选章节未披露具体客户名称、客户集中度或渠道结构明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未分配部分净利润约人民币6.5亿元主要含转让三家持有物业的全资子公司至南方顺丰物流REIT的股权处置收益（税后人民币5.9亿元），属非经常性事项，未单独列示为经营驱动。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未来展望中的战略方向属计划性表述，不代表已实现的经营结果。",
+        "事实F-MC-02已隔离，未作为结论采用：source monetary unit conflict: 并购KLN相关融资利息费用; 原表千元，返回亿元；未猜测换算"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "element": "company_features",
+      "status": "observed",
+      "reasons": [
+        "战略愿景与协同效应属计划性表述，非当前经营结果。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "business_structure",
+      "status": "observed",
+      "reasons": [
+        "物理页59布局未恢复，分部与业务行之间的层级关系依据原文文字表述整理，未据表格列位置推断。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "所选章节未逐项展开各产品子类的服务内容与客户类型，产品用途细节有限。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "收入构成表按行业、经营分部、地区三种口径分别列示，各口径内部合计为100%，不同口径之间不可直接相加。",
+        "物理页59布局未恢复，金额与占比依据原文文字顺序对应，未据表格列位置推断。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "业务量与票均收入仅覆盖速运物流板块，不含供应链及国际业务和其他非物流业务。",
+        "指标格式隔离：事实F-SM-02未作为结论采用；metrics.2: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "成本构成中人工成本与运力成本为物流及货运代理业务口径，且已将外包成本拆分并入，与集团营业成本合计口径不同。",
+        "未逐项列示仓储、运输设备等具体资源投入明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "所选章节未披露具体客户名称、客户集中度或渠道结构明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未分配部分净利润约人民币6.5亿元主要含转让三家持有物业的全资子公司至南方顺丰物流REIT的股权处置收益（税后人民币5.9亿元），属非经常性事项，未单独列示为经营驱动。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未来展望中的战略方向属计划性表述，不代表已实现的经营结果。",
+        "事实F-MC-02已隔离，未作为结论采用：source monetary unit conflict: 并购KLN相关融资利息费用; 原表千元，返回亿元；未猜测换算"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "element": "company_features",
+      "status": "observed",
+      "reasons": [
+        "战略愿景与协同效应属计划性表述，非当前经营结果。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [
+    {
+      "reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "finding_id": "WR-004",
+      "element": "operating_drivers",
+      "severity": "material",
+      "reason": "利润分析附注载明，2025年将并购KLN相关融资利息费用人民币5.6亿元划分至未分配部分，并对2024年比较期按同一金额重述。比较期已同步重述，各分部净利润同比变动可继续沿用表格数字，不必改已列金额。但供应链及国际分部2025年净利润约1.9亿元（187,640千元）已不含该项利息；该分部占营业收入24.77%，缺少这一重分类说明会改变对其盈利水平的理解。应补充该利息划出及比较期重述，金额采用正文“人民币5.6亿”，不要按千元利润表猜测换算。此为口径补充，不否定已列示的分部利润。",
+      "evidence_ids": [
+        "source-0011"
+      ]
+    },
+    {
+      "reading_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "active": true,
+      "finding_id": "WR-004",
+      "element": "operating_drivers",
+      "severity": "material",
+      "reason": "利润分析附注载明，2025年将并购KLN相关融资利息费用人民币5.6亿元划分至未分配部分，并对2024年比较期按同一金额重述。比较期已同步重述，各分部净利润同比变动可继续沿用表格数字，不必改已列金额。但供应链及国际分部2025年净利润约1.9亿元（187,640千元）已不含该项利息；该分部占营业收入24.77%，缺少这一重分类说明会改变对其盈利水平的理解。应补充该利息划出及比较期重述，金额采用正文“人民币5.6亿”，不要按千元利润表猜测换算。此为口径补充，不否定已列示的分部利润。",
+      "evidence_ids": [
+        "source-0011"
+      ]
+    }
+  ],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

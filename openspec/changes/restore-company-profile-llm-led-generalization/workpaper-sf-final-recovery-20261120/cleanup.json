@@ -1,0 +1,24 @@
+{
+  "task": "6.EK",
+  "target": "/home/python/Quote/data/QuoteBak/company-profile-6ek-Q1hyYx",
+  "files": 29,
+  "file_bytes": 3925983,
+  "prior_6EJ_temporary_root_absent": true,
+  "authoritative_evidence_checked_before_removal": true,
+  "removed": [
+    "temporary DB and WAL/SHM",
+    "captured response duplicate",
+    "verification exports",
+    "operator/verification scripts",
+    "OpenSpec apply process output"
+  ],
+  "preserved": [
+    "formal PDF and effective page cache",
+    "all old research roots and failures",
+    "successor research root with 18 writer files",
+    "unique attempt marker",
+    "necessary current evidence",
+    "pre-existing worktree and concurrent work"
+  ],
+  "target_exists_after": false
+}

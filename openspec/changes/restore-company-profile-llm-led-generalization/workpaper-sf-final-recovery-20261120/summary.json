@@ -1,0 +1,26 @@
+{
+  "task": "6.EK",
+  "instrument_id": "002352.SZ",
+  "state": "completed",
+  "exception": null,
+  "entry_started": true,
+  "preparation_seconds": 26.917,
+  "business_seconds": 96.205,
+  "physical_requests": 1,
+  "charged_tokens": 17232,
+  "fee": "unknown",
+  "stopped_reason": null,
+  "purposes": [
+    "verify_profile_workpaper_repair"
+  ],
+  "before_readings": 1,
+  "after_readings": 2,
+  "old_runtime_files_unchanged": true,
+  "frozen_code_unchanged": true,
+  "shared_config_unchanged": true,
+  "new_reading_work_ids": [
+    "bp-work-01e30502f99867e63a3e7126"
+  ],
+  "review_status": "completed_with_open_findings",
+  "supervision_seconds": 127.089
+}

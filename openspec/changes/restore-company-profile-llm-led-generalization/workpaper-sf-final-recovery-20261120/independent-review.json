@@ -1,0 +1,122 @@
+{
+  "task": "6.EK",
+  "scope": "only five actual changed facts; no whole-profile accuracy claim",
+  "source_pdf_sha256": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+  "original_pdf_pages_read": [
+    49,
+    59,
+    60
+  ],
+  "method": "independent reading of original PDF text, source table headings/columns/notes, bound original evidence and actual revised facts",
+  "model_accepted": [
+    "F-CC-03",
+    "F-MC-01",
+    "F-PS-02",
+    "F-RM-02",
+    "F-SM-01"
+  ],
+  "decisions": [
+    {
+      "fact_id": "F-CC-03",
+      "fact_sha256": "c619b16a0e1a80d824e0e70c42d6f1eecd155b11422d3dedbaebf62d2ce1f452",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "同物理60：速运物流业务量增长及国内生产制造/生活消费端到端场景均有原文；当前主体不再扩为全公司业务量，不据此认定全部集团客户行业。",
+      "source_spans": [
+        {
+          "evidence_id": "source-0009",
+          "pages": [
+            60
+          ],
+          "quote_sha256": [
+            "5f897aa9f95436abaa2b356891d8a0a62d60fd168c801b70208ba391038bad22"
+          ]
+        }
+      ]
+    },
+    {
+      "fact_id": "F-MC-01",
+      "fact_sha256": "833c1b91a550d5753242e8d787cfb5877e077d4d6aeef028efe6ad1be01cfcc9",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "同物理60：原文票均收入下降11.4%由产品结构变化导致，自2025年9月起月度同比降幅收窄，候选保留速运物流主体、2025期间及原文因果，不作全集团推断。",
+      "source_spans": [
+        {
+          "evidence_id": "source-0009",
+          "pages": [
+            60
+          ],
+          "quote_sha256": [
+            "5f897aa9f95436abaa2b356891d8a0a62d60fd168c801b70208ba391038bad22"
+          ]
+        }
+      ]
+    },
+    {
+      "fact_id": "F-PS-02",
+      "fact_sha256": "2045b55dcf04acfb212e6f2a3279bff5a78da1648486052af12fafb8e17dc3b1",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "reason": "第四节/三、核心竞争力，物理49（印刷048）：截至报告期末国内所有城市、海外95国家地区、国际小包200国家地区有原句。候选保时点2025-12-31，非全年新增流量。",
+      "source_spans": [
+        {
+          "evidence_id": "source-0005",
+          "pages": [
+            49
+          ],
+          "quote_sha256": [
+            "1579704554c106bd9fde67f2cf754914b223db7816818e415310ae64e8bd49e3"
+          ]
+        }
+      ]
+    },
+    {
+      "fact_id": "F-RM-02",
+      "fact_sha256": "3fb8b9ef0ff1aa127689510a4473273dc893753067105a2580aad552bf9d4f3d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "reason": "第四节/四、主营业务分析/营业收入构成，物理59（印刷058）：2025金额及占比列为301,499,641千元/97.82%、6,727,006千元/2.18%，单位人民币千元。两行业行不是集团合计308,226,647千元；当前事实和指标均为business_segment，科目保行业名。",
+      "source_spans": [
+        {
+          "evidence_id": "source-0007",
+          "pages": [
+            59
+          ],
+          "quote_sha256": [
+            "089049a2e001518752cc9a677da73c05b7fbad90b79774231707f5f5f493f32e"
+          ]
+        }
+      ]
+    },
+    {
+      "fact_id": "F-SM-01",
+      "fact_sha256": "4e5f0c56d42807704ede79c26901517d52c4bb05c4ee20585884a59c0c686ac5",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "reason": "第四节/四、主营业务分析/速运物流业务量及票均收入，物理60（印刷059）：2025年166.3亿票/同比25.4%、13.7元/同比-11.4%；注1排除供应链及国际、其他非物流，候选保此范围，非集团全口径。",
+      "source_spans": [
+        {
+          "evidence_id": "source-0009",
+          "pages": [
+            60
+          ],
+          "quote_sha256": [
+            "5f897aa9f95436abaa2b356891d8a0a62d60fd168c801b70208ba391038bad22"
+          ]
+        }
+      ]
+    }
+  ],
+  "still_unadopted": "review-add:WR-004 KLN financing interest reclassification; not sent or adopted by this task",
+  "source_limitation": "native evidence originally flagged layout/table relations unverified; this finite check independently read actual heading/rows/notes for the two changed numerical facts only; other facts not newly audited"
+}
