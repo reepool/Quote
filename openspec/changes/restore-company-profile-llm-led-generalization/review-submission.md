@@ -1,5 +1,19 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 355. 6.EJ保存复核计划接原TaskService：不重抽、保限制、无旧错稿提前曝光
+
+用户继续推进，按产品→验收→交付→A/B v3及OpenSpec/business-first技能，68d1762a/master开工、暂存空，6.EI本人临时根已清。当前下一业务切片从“计划能看”推进到“计划能执行”，只在原TaskService增加内部execute_review_recovery，调用原_run限定单股及既有seed/resume/队列/writer/read owner；无HTTP付费执行、新调度平台或业务循环。先同步6.EJ任务/设计/spec，再实现；唯一临时根company-profile-6ej-KXt6aJ。
+
+绑定计划必须匹配当前报告/reading/hash；从保存的原抽取JSON精确重建原稿、核原成功回执及模型身份，复用初核/修订，只发未完成阶段。同request已有持久结果不再发送，不同/过期计划发送前拒绝；失败后的独立新计划可接保存后继，原失败保留。恢复旧原稿可能重含已隔离错项，本轮在原runtime跳过恢复稿的提前writer发布，等待复核返回后再写后继；父稿在途仍可读。genrecepts原样hash绑定传入并随后继保留，原生成模型归因不变。
+
+原writer保存独立work，原read owner按同报告/base hash链接入，旧阅读/审核状态不改，旧普通事实superseded/fact=null并指向后继，不把复核重复算成新抽取；历史缺项active=false、当前缺项保留，API/annual_profiles及新实例一致。原单次query/export兼容和正式core计数不改。独核source_checked只在内容hash不变时继承，source_only/withheld/duplicate保守继承并标不是新独核；新/改事实不套旧独核批准，决定引用父阅读/hash，不让模型清除已知限制。
+
+新增16项226.50秒完成，含三份保存真实原稿重建、实际TaskService成功/拒绝/初核接续、重复无发送、终核再失败后新计划继续、旧错稿不提前可见、版本/回执拒绝及独立限用；原五文件77项82.39秒/2 deselected通过、0 skipped，与16文件不重叠，两组并发不叠加作墙钟。首次140秒探索在最后存储初始化到限，仅6项完成/142.69秒，不累计为全套绿；后续完整16已过。strict/语法/diff及Review通过，A类旧错稿曝光/错继承/重发风险已覆盖，B类后台调度/性能后置，C类既有核心/配置/市场并行不动。活跃开发/审核未精确计时，不用测试时间替代。
+
+零调用顺丰原稿hash/PDF/14页16片段及五候选本地源检查成立，原终核接点请求内容体30817字节（非完整wire/token/费用）；当前研究根17文件hash不变。原9个独核决定不变，尚无新的Grok接受或事实采纳。详[唯一结果](workpaper-review-execution-20261120/result.md)和source-boundary.json。下一6.EK仅这五候选一次原文Grok high终核已询问新授权：1逻辑/2物理含1恢复、3000秒/600000账本，原模型/公开材料、unknown/有价部分10元，原S2/生产不改；批准后代码冻结直接执行，不逐字段请批，未批准不发送或排队。
+
+本轮0新真实模型/探针/外传/公司writer/生产或共享配置变化。必要证据一套后清本人脚本/测试数据库/中断残留/重复导出，量见validation.json，原源/有效缓存/旧失败/attempt及并行保护；本人块隔离Git收尾，不提交既有混合内容。当前6.EJ功能完成，6.EK仍待明确授权，旧S2/95%与99%/S3限制保持，不自动重抽整批或追加旧名额。
+
 ## 354. 6.EI复核接续计划交API，不重抽或盲重跑已成功阶段
 
 接用户“继续推进”，沿产品→验收→交付→A/B v3和OpenSpec/business-first技能，将下一业务切片限定为原review/read owner的失败接续计划；7733a2a6/master开工、暂存空，旧6.EH临时根已清。现有seed/resume消费者保留，未新造执行循环、模型阶段、事实库或任务平台；新增GET阅读批次的review_follow_up及POST review-plan，绑定具体report/work/当前底稿hash，只投影失败阶段、原成功请求/hash、候选编号及安全原因，不返原响应/候选正文、不调用或排队。详[结果/限制](workpaper-review-recovery-20261120/result.md)及API current说明。

@@ -1,5 +1,11 @@
 ## Context
 
+### 6.EJ 原TaskService执行只读计划，不再手工组装续跑答案
+
+在既有TaskService增加内部execute_review_recovery用例，不加HTTP付费执行、调度器或第二业务循环。计划和当前reading/report/hash完全匹配后，从本地保存的原抽取JSON重建seed并核原draft hash；已有初核/修订只按原hash回执复用。调用原_run限定单股票及原seed/resume路径，新request生成独立工作ID，同request不重复发送。复核接续已有可读父稿，故不先公开恢复的未经审查原稿；源/PDF仍在发送前核对。
+
+后继以同报告base work/hash接原读取链，旧阅读/失败保留但普通事实标superseded，不把复核当重新抽取增加重复事实；缺项保历史/当前标记。原独立source_checked只在内容hash不变时继承，source_only/withheld/duplicate保守继承到同编号修订并说明不是新独核，模型不能解除；新或已变事实不自动继承独核通过。全部沿原writer/read owner，不写平行库；本卡仅离线受控验证，不启新真实窗口或生产。
+
 ### 6.EI 复核执行失败的接续计划与内容缺项分开
 
 沿原review owner将保存的执行失败投影成下一语义阶段：初核、一次合并修订或最终再核。成功阶段只有与本记录审核调用身份相符、原JSON/sha256/类型完整的回执才可列为复用；历史错误缺阶段或合同/源问题不能猜成可盲重试。原read owner提供绑定report/work/当前底稿hash的只读计划，并随年报API阅读批次展示接续状态，不暴露raw响应/未采纳候选正文、不自动发模型/排队或放宽质量。计划不是已还原原稿或已获运行授权；执行仍沿原TaskService和既有seed/resume验证、有限预算与原文核查，保原失败/独立使用限制。普通缺项和已完成但留开放意见不自动重跑；本轮仅离线实现及受控接续验证，不启动新真实批次。

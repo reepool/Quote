@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-20 6.EJ已完成[原TaskService保存复核计划执行](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-execution-20261120/result.md)：不重抽/不换业务循环，精确还原原稿及成功回执，单请求幂等、失败可用新有界计划接续；恢复原错稿不提前公开。原writer写独立后继，API/合并导出标superseded和历史缺项active=false，不重复计普通事实，独立限制不被模型解除。16新增原入口用例及77相关回归通过（两旧长用例明确排除）；当前真实研究根未写。顺丰5候选原稿/PDF/14页/16片段已零调用到最终发送接点，下一[6.EK有限卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-sf-final-recovery-card.md)已合并询问新授权，未批前不发/排队或借旧额，批准后冻结一次执行。原S2/正式阈值/生产及既有并行不改；必要一套后清本人QuoteBak/测试库/重复输出和中断残留，原源/缓存/失败/attempt保护。
+
 2026-11-20 6.EI已完成[复核失败接续计划API](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-recovery-20261120/result.md)：原review/read owner区分补初核/修订/终核、执行完成与需检查，成功回执核原JSON/hash/类型/模型身份；指定reading/report/当前hash绑定，GET/POST计划不发模型或排队、不回传未采纳候选正文。当前十五稿内容/19受保护文件hash不改，末端11执行完成、分众/国航待初核、顺丰5候选待终核、通威历史问题先查，不拒整稿或洗旧S2。受控只补终核与API/导出回归77通过/2长用例明确排除；扩大运行曾到120秒，未称全套绿。无新真实调用/外传/公司写入/生产，下一实际补核须新有限授权，不重抽整池；必要证据一套后清本人QuoteBak及中断用例残留，原源/缓存/attempt和既有并行保护。
 
 2026-11-20 6.EH已完成[十五份真实选章供源回归](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-source-regression-20261120/result.md)：沿原run_workpaper到正文发送前停止，v7在选中范围未发现同类实质正文丢失，银河9段真实正文恢复成立，国航/万达轴承仅页码差异不修。19相关回归/0跳过，原源/缓存/旧runtime及binding hash不改；0新模型/外传/画像写入，不改生产代码或S2历史。章节方向收口，下一主要矛盾为批量运行/复核可用性，不追字段齐全或再加公司规则；新正式方案的名单/有限资源与停止须另明确批准，不能补旧五家/第41家/S3或生产。开工核前轮临时根已清，必要一套后清本轮QuoteBak，正式源/缓存/attempt及既有并行保护。

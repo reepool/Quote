@@ -208,16 +208,21 @@ class CompanyProfileReadService:
         from .workpaper import workpaper_elements
         from .workpaper_delivery import project_workpaper_delivery
         from .workpaper_enrichment import WorkpaperEnrichmentPlan
-        from .workpaper_review import plan_review_follow_up, workpaper_hash
+        from .workpaper_review import ReviewRecoveryLink, plan_review_follow_up, workpaper_hash
 
         records = {root.work_id: root}
         candidates = []
         for path in self.namespace_root.glob("*.json"):
             try:
                 record = _RUNTIME_ADAPTER.validate_json(path.read_text(encoding="utf-8"))
-                raw = _record_processing_identity(record).get("workpaper_enrichment")
+                identity = _record_processing_identity(record)
+                recovery = identity.get("workpaper_review_recovery")
+                raw = recovery or identity.get("workpaper_enrichment")
                 if raw and isinstance(record, CompanyProfileRuntimeRecordV3) and record.report == root.report:
-                    candidates.append((WorkpaperEnrichmentPlan.model_validate(raw), record))
+                    if recovery and record.workpaper.quality_review is None:
+                        continue  # An unreviewed restored original is not a successor.
+                    model = ReviewRecoveryLink if recovery else WorkpaperEnrichmentPlan
+                    candidates.append((model.model_validate(raw), record))
             except (OSError, ValueError):
                 continue
         while candidates:
@@ -231,6 +236,10 @@ class CompanyProfileReadService:
             if len(remaining) == len(candidates):
                 break
             candidates = remaining
+        superseded = {
+            _record_processing_identity(record)["workpaper_review_recovery"]["base_work_id"]: record.work_id
+            for record in records.values() if _record_processing_identity(record).get("workpaper_review_recovery")
+        }
         readings, facts, gaps, suggestions = [], [], [], []
         for record in records.values():
             paper = record.workpaper
@@ -238,24 +247,40 @@ class CompanyProfileReadService:
             plan = _record_processing_identity(record).get("workpaper_enrichment")
             targeted = {t["element"] for t in plan["targets"]} if plan else set(workpaper_elements(paper))
             entries = [entry for entry in delivery["facts"] if entry["element"] in targeted]
+            successor = superseded.get(record.work_id)
+            if successor:
+                entries = [{**entry, "fact": None, "prior_state": entry["state"], "state": "superseded",
+                            "superseded_by_review_work_id": successor} for entry in entries]
             facts.extend({"reading_work_id": record.work_id, **entry} for entry in entries)
-            gaps.extend({"reading_work_id": record.work_id, **gap} for gap in delivery["information_gaps"]
+            historical = ({"active": not bool(successor), **({"superseded_by_review_work_id": successor} if successor else {})}
+                          if superseded else {})
+            gaps.extend({"reading_work_id": record.work_id, **historical, **gap} for gap in delivery["information_gaps"]
                         if gap["element"] in targeted)
-            suggestions.extend({"reading_work_id": record.work_id, **item}
+            suggestions.extend({"reading_work_id": record.work_id, **historical, **item}
                                for item in delivery["suggested_acquisitions"] if item["element"] in targeted)
             cited = {eid for entry in entries for eid in entry["evidence_ids"]}
+            recovery = _record_processing_identity(record).get("workpaper_review_recovery")
+            follow_up = plan_review_follow_up(paper, record.workpaper_receipts)
+            if successor:
+                follow_up = {**follow_up, "state": "not_needed", "next_purpose": None, "resume_mode": None,
+                             "max_new_logical_requests": 0, "candidate_ids": [], "reason": "superseded_by_review_successor"}
             readings.append({"work_id": record.work_id, "workpaper_sha256": workpaper_hash(paper),
                 "enrichment": plan, "origin": paper.origin,
+                **({"review_recovery": {key: value for key, value in recovery.items() if key != "prior_use_review"}} if recovery else {}),
+                **({"superseded_by_review_work_id": successor} if successor else {}),
                 "reading_scope": paper.reading_scope.model_dump(mode="json"),
                 "limitations": list(paper.limitations),
                 "generation": paper.generation.model_dump(mode="json") if paper.generation else None,
                 "review_status": paper.quality_review.status if paper.quality_review else "not_reviewed",
-                "review_follow_up": plan_review_follow_up(paper, record.workpaper_receipts),
+                "review_follow_up": follow_up,
                 "review_calls": [c.model_dump(mode="json") for c in paper.quality_review.calls] if paper.quality_review else [],
                 **({"review_execution_failure": paper.quality_review.execution_failure.model_dump(mode="json")}
                    if paper.quality_review and paper.quality_review.execution_failure else {}),
                 "evidence": [e.model_dump(mode="json") for e in paper.evidence if e.evidence_id in cited]})
         for gap in gaps:
+            if gap.get("active") is False:
+                gap.update(supplemental_reading_work_ids=[], follow_up_state="superseded_by_review")
+                continue
             gap["supplemental_reading_work_ids"] = list(dict.fromkeys(
                 fact["reading_work_id"] for fact in facts
                 if fact["reading_work_id"] not in {root.work_id, gap["reading_work_id"]} and fact["element"] == gap["element"]
@@ -292,10 +317,10 @@ class CompanyProfileReadService:
                 "fact_states": dict(sorted(Counter(entry["state"] for entry in profile["facts"]).items())),
                 "readings": [{key: reading[key] for key in ("work_id", "origin", "review_status")}
                              for reading in profile["readings"]],
-                "information_gap_count": len(profile["information_gaps"]),
-                "information_gap_elements": sorted({gap["element"] for gap in profile["information_gaps"]}),
-                "suggested_acquisition_count": len(profile["suggested_acquisitions"]),
-                "suggested_acquisition_elements": sorted({item["element"] for item in profile["suggested_acquisitions"]}),
+                "information_gap_count": sum(gap.get("active", True) for gap in profile["information_gaps"]),
+                "information_gap_elements": sorted({gap["element"] for gap in profile["information_gaps"] if gap.get("active", True)}),
+                "suggested_acquisition_count": sum(item.get("active", True) for item in profile["suggested_acquisitions"]),
+                "suggested_acquisition_elements": sorted({item["element"] for item in profile["suggested_acquisitions"] if item.get("active", True)}),
             })
         return {
             "schema_version": "company_profile_research_catalog.v1",
@@ -325,7 +350,8 @@ class CompanyProfileReadService:
             or record.report.model_dump(mode="json") != current["report"]
             or workpaper_hash(record.workpaper) != reading["workpaper_sha256"]):
             raise ValueError("review reading changed while planning")
-        follow_up = plan_review_follow_up(record.workpaper, record.workpaper_receipts)
+        follow_up = (reading["review_follow_up"] if reading.get("superseded_by_review_work_id")
+                     else plan_review_follow_up(record.workpaper, record.workpaper_receipts))
         return {"schema_version": "company_profile_review_recovery_plan.v1", "request_id": request_id,
             "state": follow_up["state"], "execution_started": False,
             "instrument_id": instrument_id, "report": current["report"], "reading_work_id": chosen,
@@ -408,7 +434,8 @@ class CompanyProfileReadService:
                 )
             except (OSError, ValueError):
                 continue
-            if not include_enrichments and not work_id and _record_processing_identity(record).get("workpaper_enrichment"):
+            if (not include_enrichments and not work_id and wanted_identity is None and any(
+                _record_processing_identity(record).get(key) for key in ("workpaper_enrichment", "workpaper_review_recovery"))):
                 continue
             if work_id and record.work_id != work_id:
                 continue

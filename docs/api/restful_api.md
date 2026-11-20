@@ -395,6 +395,10 @@ curl http://127.0.0.1:8000/api/v1/research/company/600104.SH/annual-profile
 
 实际执行仍由受授权内部调用方沿原TaskService和现有review seed/resume路径完成，须先校验原稿/原文/内容hash、保留当前独立使用决定，并获得新的有限模型/外传/写入授权。HTTP端不直接发起付费复核，旧窗口不会因计划自动恢复，生产权限不变。
 
+6.EJ提供内部用例`await service.execute_review_recovery(plan, knowledge_cutoff="YYYY-MM-DD", max_elapsed_seconds=...)`，`plan`为上述API完整返回对象；服务实例须已显式配置provider、审核策略、有限预算和写入许可。每个操作使用独立TaskService实例，不在同一实例并发执行。该方法沿原队列只处理计划股票，验证原保存JSON/原稿hash并复用成功阶段，不重新选章或抽取；同request_id已保存结果返回`already_processed`，不重新消耗调用。过期/跨报告/blocked计划发送前拒绝，新恢复窗须有新明确授权。
+
+接续期间继续提供父稿，不提前公开还原出的旧错项；完成后写独立后继。年报API/annual_profiles导出保留历史阅读，旧事实显示`state=superseded, fact=null`及`superseded_by_review_work_id`，只计后继普通内容；旧缺项/建议以`active=false`标历史，当前缺项仍可见。`review_recovery`给出父work/hash，不输出独立审核原始记录。原模型状态、原稿和原单次query/export兼容读取不改；模型终核不自动解除已有source_only/withheld/duplicate限制，修改过的事实不继承旧hash上的独核通过。
+
 6.EI的十五份保存稿核对使用`/home/python/Quote/data/research/company_profile_galaxy_v7_20261120`。若要读取该批内容，在独立研究API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`为此根；不改共享服务配置。该根含原十五家与银河后续阅读，跨版本内容不作为同版质量成绩；默认根不会自动切换。
 
 ### GET /api/v1/research/company/{instrument_id}/financial-indicators

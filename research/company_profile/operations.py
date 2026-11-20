@@ -8,6 +8,7 @@ names stay disconnected from this chain. Production stays not_authorized.
 from __future__ import annotations
 
 import json
+import hashlib
 import logging
 import re
 import threading
@@ -673,6 +674,84 @@ class CompanyProfileTaskService:
             reason=reason,
             control=control,
         )
+
+    async def execute_review_recovery(
+        self, plan: Mapping[str, Any], *, knowledge_cutoff: str | None = None,
+        max_elapsed_seconds: float = DEFAULT_MAX_ELAPSED_SECONDS,
+    ) -> dict[str, Any]:
+        """Execute one bounded saved plan through the original queue and writer."""
+        from .reads import _record_processing_identity
+        from .models import ReportIdentity
+        from .runtime import CompanyProfileRuntimeRecordV3
+        from .workpaper_review import ReviewRecoveryLink, prepare_review_recovery, workpaper_hash
+
+        instrument = str(plan.get("instrument_id") or "")
+        base = self.reads._latest_by_instrument(work_id=plan.get("reading_work_id"), include_enrichments=True).get(instrument)
+        if (not isinstance(base, CompanyProfileRuntimeRecordV3)
+            or base.report.model_dump(mode="json") != plan.get("report")
+            or workpaper_hash(base.workpaper) != plan.get("workpaper_sha256")):
+            raise ValueError("review recovery reading/report/hash changed")
+        link = ReviewRecoveryLink(request_id=plan.get("request_id"), base_work_id=base.work_id,
+            base_workpaper_sha256=workpaper_hash(base.workpaper), report=base.report,
+            plan_sha256=_stable_hash(dict(plan)), prior_use_review=base.workpaper.use_review)
+        for path in self.reads.namespace_root.glob("*.json"):
+            try:
+                prior = CompanyProfileRuntimeRecordV3.model_validate_json(path.read_text(encoding="utf-8"))
+                raw = _record_processing_identity(prior).get("workpaper_review_recovery")
+                saved = ReviewRecoveryLink.model_validate(raw) if raw else None
+            except (OSError, ValueError):
+                continue
+            if saved and prior.report.instrument_id == instrument and saved.request_id == link.request_id:
+                if saved != link:
+                    raise ValueError("review recovery request_id already names another plan")
+                return {"action": "review_recovery", "state": "already_processed", "work_id": prior.work_id,
+                    "review_status": prior.workpaper.quality_review.status if prior.workpaper.quality_review else "not_reviewed",
+                    "production_authorization": PRODUCTION_AUTHORIZATION}
+        current = self.reads.plan_review_recovery(instrument, request_id=link.request_id, reading_work_id=base.work_id)
+        if current != dict(plan) or current["state"] != "planned":
+            raise ValueError("review recovery plan is stale, blocked or already superseded")
+        if (self.processing_identity.get("reading_strategy") != "chapter_workpaper_v1"
+            or not self.processing_identity.get("workpaper_review_policy") or self.provider is None
+            or self.token_budget <= 0 or not 0 < max_elapsed_seconds < float("inf")):
+            raise ValueError("review recovery requires a provider and finite budget")
+        if self.processing_identity.get("execution_mode") == "provider" and self.execution_budget is None:
+            raise ValueError("real review recovery requires an explicit execution budget")
+        if self.execution_budget is not None:
+            max_elapsed_seconds = min(max_elapsed_seconds, self.execution_budget.remaining_time())
+            if max_elapsed_seconds <= 0:
+                raise ValueError("review recovery budget is exhausted")
+        self._ensure_publication_allows_writes()
+        seed, resume, receipts = prepare_review_recovery(base)
+        old_identity, old_hash = self.processing_identity, self.processing_identity_hash
+        old_source, old_runtime_source = self.page_source, self.runtime.page_source
+        identity = {key: value for key, value in old_identity.items() if key not in {
+            "review_resume_hash", "workpaper_extraction_resume_hash", "workpaper_enrichment"}}
+        digest = lambda value: hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        identity.update(workpaper_review_recovery=link.model_dump(mode="json"),
+            review_existing_draft_hash=workpaper_hash(seed), review_seed_receipts_hash=digest(receipts))
+        enrichment = _record_processing_identity(base).get("workpaper_enrichment")
+        if enrichment:
+            identity["workpaper_enrichment"] = enrichment
+        if resume is not None:
+            identity["review_resume_hash"] = digest(resume)
+
+        def saved_source(item):
+            loaded = old_source(item)
+            if not loaded or ReportIdentity.model_validate(loaded.get("report")) != base.report:
+                raise ValueError("review recovery source differs from its bound report")
+            return {**loaded, "review_seed": seed.model_dump(mode="json"), "review_resume": resume,
+                    "review_seed_receipts": receipts}
+
+        self.processing_identity, self.processing_identity_hash = identity, _stable_hash(identity)
+        self.page_source = self.runtime.page_source = saved_source
+        try:
+            result = await self._run(knowledge_cutoff=_knowledge_cutoff(knowledge_cutoff),
+                instrument_ids=(instrument,), max_items=1, max_elapsed_seconds=float(max_elapsed_seconds),
+                enqueue=True, limit_drain_to_enqueued=True)
+            return {**result, "action": "review_recovery", "recovery_plan": dict(plan)}
+        finally:
+            self.processing_identity, self.processing_identity_hash = old_identity, old_hash
+            self.page_source, self.runtime.page_source = old_source, old_runtime_source
 
     async def execute(
         self,

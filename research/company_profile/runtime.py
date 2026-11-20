@@ -211,6 +211,8 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "workpaper_review_policy",
             "review_existing_draft_hash",
             "review_resume_hash",
+            "review_seed_receipts_hash",
+            "workpaper_review_recovery",
             "workpaper_extraction_resume_hash",
             "workpaper_enrichment",
             "quality_review_profile",
@@ -539,6 +541,12 @@ class CompanyProfileStageRuntime:
             != _reading_policy(state.processing_identity)
         ):
             state.report_interpretation = None
+        if item.get("review_seed_receipts") is not None:
+            receipts = [dict(receipt) for receipt in item["review_seed_receipts"]]
+            if (state.review_seed is None or state.processing_identity.get("review_seed_receipts_hash") != hashlib.sha256(
+                json.dumps(receipts, ensure_ascii=False, sort_keys=True).encode()).hexdigest()):
+                raise ValueError("review seed receipts do not match their explicit hash")
+            state.workpaper_receipts = receipts
         return state
 
     def _acquire(
@@ -642,7 +650,7 @@ class CompanyProfileStageRuntime:
                         source_pdf_path=state.source_pdf_path,
                         real=state.processing_identity.get("execution_mode") == "provider",
                         native_pages=state.pages,
-                        preserve_review_hash=state.review_resume is not None,
+                        preserve_review_hash=state.review_resume is not None or bool(state.processing_identity.get("workpaper_review_recovery")),
                     )
                     state.pages = checked_pages or state.pages
                     state.workpaper.validate_pages(state.pages)
@@ -672,14 +680,20 @@ class CompanyProfileStageRuntime:
                     raise ValueError("persisted review continuation does not match its bound hash")
                 if state.workpaper.quality_review is None:
                     # Make useful extraction readable before the slower review call.
-                    self._verify(state)
-                    self._publish(state)
+                    if not state.processing_identity.get("workpaper_review_recovery"):
+                        self._verify(state)
+                        self._publish(state)
                     state.workpaper, receipts = review_workpaper(
                         state.workpaper, packet=state.workpaper_packet,
                         provider=self._report_provider, work_id=state.work_id,
                         identity=state.processing_identity, resume=state.review_resume,
                     )
                     state.workpaper_receipts.extend(dict(item) for item in receipts)
+            if state.processing_identity.get("workpaper_review_recovery"):
+                from .workpaper_review import ReviewRecoveryLink, inherit_recovery_use_review
+
+                state.workpaper = inherit_recovery_use_review(state.workpaper,
+                    ReviewRecoveryLink.model_validate(state.processing_identity["workpaper_review_recovery"]))
             state.provider_calls = [str(item["purpose"]) for item in state.workpaper_receipts]
             gateway_budget = getattr(self._report_provider, "run_budget", None)
             if gateway_budget is not None:

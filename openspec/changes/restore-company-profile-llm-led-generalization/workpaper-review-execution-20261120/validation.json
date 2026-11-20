@@ -1,0 +1,66 @@
+{
+  "task": "6.EJ",
+  "baseline_commit": "68d1762a",
+  "new_real_calls": 0,
+  "new_company_writes": 0,
+  "tests": [
+    {
+      "command": "python -m pytest tests/unit/test_research/test_company_profile_review_execution.py -x -q --basetemp=<task root>/pytest-execution",
+      "passed": 16,
+      "skipped": 0,
+      "seconds": 226.5
+    },
+    {
+      "command": "python -m pytest tests/unit/test_research/test_company_profile_review_recovery.py tests/unit/test_research/test_company_profile_catalog.py tests/unit/test_research/test_company_profile_workpaper_continuation.py tests/unit/test_research/test_company_profile_annual_export.py tests/unit/test_research/test_company_profile_review_failures.py -k 'not test_task_service_stops_before_third_company' -q --basetemp=<task root>/pytest-regression",
+      "passed": 77,
+      "deselected": 2,
+      "skipped": 0,
+      "seconds": 82.39
+    }
+  ],
+  "tests_in_disjoint_files": true,
+  "test_groups_ran_concurrently": true,
+  "incomplete_run_not_accumulated": {
+    "timeout_seconds": 140,
+    "exit_code": 124,
+    "passed_before_interruption": 6,
+    "seconds": 142.69
+  },
+  "source_and_test_sha256": {
+    "research/company_profile/operations.py": "0c5789f7b2a286f48fa2000bc9433b82dd8c582bf806b91fa9345cc9a8f86d18",
+    "research/company_profile/runtime.py": "5b1522d91f98af72f61c759bb90b385bf852d286d9f51901a590452016be5850",
+    "research/company_profile/reads.py": "181047eed414f0d1aaa6ed71dc420095853ee735006b656f0c7fd5198f5f511e",
+    "research/company_profile/workpaper_review.py": "5b21e81dbb7c26a88de8e783f196bf6b746be39b10af050580c077377d9c7414",
+    "tests/unit/test_research/test_company_profile_review_execution.py": "a923258d47780be56289b5e0e531e33988a7717f075047adba419c0cbb38c8c4",
+    "tests/unit/test_research/test_company_profile_review_recovery.py": "eac8069b5803de3b97eaa85a7f9da59bcee0808f65f48cece52c7ac1df01fcef",
+    "tests/unit/test_research/test_company_profile_catalog.py": "5160faa445fb282eb7a654af6d2d8b75095ff52e95682532ffc4c203c804b866",
+    "tests/unit/test_research/test_company_profile_workpaper_continuation.py": "dbc4d0086e16d43094af3f6ddaed1c4746b21e57961cfe01aab686e0928b441e",
+    "tests/unit/test_research/test_company_profile_annual_export.py": "08d7b1744ce87e0bf83310230fef7154a4b690cfd0cb2b5fd8404a364a888859",
+    "tests/unit/test_research/test_company_profile_review_failures.py": "36dc8ed8812b38877f6f3db8bc073bf64e8e4432061f9ef3e479ca943235def4"
+  },
+  "review": {
+    "blocking_remaining": 0,
+    "direct_risks_covered": [
+      "restored wrong draft exposure before review",
+      "independent restrictions bypassed by a correction",
+      "changed fact inheriting independent approval",
+      "duplicate sends",
+      "stale/cross-report/hash-mismatched plan",
+      "failed later stage losing valid content"
+    ],
+    "nonblocking_deferred": [
+      "background scheduling",
+      "read performance"
+    ],
+    "unrelated": "pre-existing dirty core/configuration/market changes untouched"
+  },
+  "openspec_strict": "passed",
+  "syntax_and_diff_check": "passed",
+  "cleanup": {
+    "target": "/home/python/Quote/data/QuoteBak/company-profile-6ej-KXt6aJ",
+    "files": 132,
+    "file_bytes": 12894280,
+    "after_authoritative_evidence_persisted": true,
+    "preserved": "formal PDF/cache, current research root, original failures/attempts and unrelated worktree files"
+  }
+}

@@ -146,6 +146,14 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **AND** GET and planning MUST NOT queue, call models or claim original-draft/source binding, final acceptance, finite-budget authorization or production permission; execution still requires the existing TaskService/seed/resume validation and explicitly authorized bounded calls
 - **AND** optional omissions and completed reviews with open findings MUST NOT by themselves trigger another review or repair
 
+#### Scenario: An explicitly bounded internal task executes a saved review plan
+- **WHEN** an authorized internal caller supplies the exact current reading/report/hash plan and a finite provider budget to the original TaskService
+- **THEN** the owner MUST reconstruct and validate the original seed and retained stage receipts from local saved data, run only the unfinished review stages through the existing queue/seed/resume path, and reject stale/cross-report/blocked plans before any model send
+- **AND** the same request identity MUST NOT resend completed work; recovery writes a distinct report/hash-bound successor, preserves original failures and source/model attribution, and does not expose a restored unreviewed original before the recovery review returns
+- **AND** API and combined exports MUST preserve predecessor metadata while marking superseded facts/gaps explicitly so unchanged content is not counted twice as newly extracted facts
+- **AND** unchanged independently source-checked facts may inherit their existing decision, restrictive source-only/withheld/duplicate decisions MUST NOT be cleared by model review, and changed or new facts MUST NOT inherit independent approval from a different content hash
+- **AND** planning/GET remain read-only, no new public paid executor or parallel fact store is created, and historical stage results, finite-call authority and production restrictions remain separate
+
 #### Scenario: A final verification execution failure follows an initial review failure in a bounded batch
 - **WHEN** an explicitly enabled consecutive-same-execution-failure batch policy observes adjacent companies in actual processing order failing on the same review channel and gateway cause, whether at initial review or final verification
 - **THEN** the original task owner stops subsequent dispatch after retaining both available drafts, without interpreting incomplete final verification as a successful execution or reviving unverified edits
