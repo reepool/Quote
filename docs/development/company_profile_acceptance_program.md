@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-20 6.EH仅离线供源回归：[十五份原导航与实际正文接点](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-source-regression-20261120/result.md)。当前v7在本次所选范围未发现同类实质正文丢失，原始/降级片段坐标成立；19相关测试通过，不改生产代码、不重抽或生成新画像。正常布局非逐字/表格语义证明，页码差异不修，已知布局限制保留。旧S2结束/95%与99%及S3/生产不改；下步转有界批量可靠性交付方案，不在章节/字段方向继续扩修，新真实运行另行明确范围与预算。
+
 2026-11-20 6.EG单股修复版补读完成：[当前成果及范围](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-galaxy-v7-20261120/result.md)。中国银河收入总额、主要业务构成与主要会计收入来源得到真实抽取/纠错再核及有限独核；17新增可读/28指标、1仅源参考，不要求细费率齐全。原25条及失败不改，三轮42可读对象含重复，不折算新公司、同版S2可用数或全稿99%；5物理/118005全已知total/423.411秒/费用unknown，旧S2结束及S3/生产边界不变。
 
 2026-11-20 6.EF仅单股补读执行与源包修复：[实际结论](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-galaxy-enrichment-20261120/result.md)。中国银河原16条保留，追加9服务/承销条目但收入机制/公司收入构成仍不足，模型初核completed不作为补齐或S2通过；3物理/52444全已知供应商total/122.326秒/费用unknown。布局空切片根因已离线恢复原文，未复验模型，不改旧首发或既有正式95%/99%，不补五家/第41家/S3或生产。

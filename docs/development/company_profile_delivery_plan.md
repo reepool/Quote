@@ -1,5 +1,8 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-20 6.EH已完成[十五份真实选章供源回归](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-source-regression-20261120/result.md)：沿原run_workpaper到正文发送前停止，v7在选中范围未发现同类实质正文丢失，银河9段真实正文恢复成立，国航/万达轴承仅页码差异不修。19相关回归/0跳过，原源/缓存/旧runtime及binding hash不改；0新模型/外传/画像写入，不改生产代码或S2历史。章节方向收口，下一主要矛盾为批量运行/复核可用性，不追字段齐全或再加公司规则；新正式方案的名单/有限资源与停止须另明确批准，不能补旧五家/第41家/S3或生产。开工核前轮临时根已清，必要一套后清本轮QuoteBak，正式源/缓存/attempt及既有并行保护。
+
+
 2026-11-20 6.EG已按用户新授权完成一次中国银河v7定向补读：[实际收入内容与闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-galaxy-v7-20261120/result.md)。集团营业收入、六主业务构成和三类主要收入科目已取得，两项真实修订终核接受；18本轮对象有限独核后17可读28指标/1仅源参考，原25条保留，当前三轮API42对象55指标（含跨轮重复）。5物理/0恢复/118005全已知total/423.411业务秒，费用unknown；原16writer/旧失败/S2/共享配置/生产不改，不扩批或追细费率。源/测试hash复用原有效证明，API/导出/新实例一致，必要一套后清本人QuoteBak及重复物，正式源/缓存/并行保护。
 
 2026-11-20 6.EF已按用户批准结束唯一真实精读：[结果与根因](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-galaxy-enrichment-20261120/result.md)。3物理/0恢复/52444供应商total、122.326业务秒，9条服务/承销补充不等于取得收入，目标仍缺。原v6布局重排把结束锚点算到开始前，选中的收入章静默空切；真实结束后v7离线恢复同选章2→10段，收入/构成原文与坐标成立，但未再发模型或改旧结果。117相关回归及末次59复验有重叠，原15稿/共享配置/S2与生产边界不变；原writer新根和API/导出明确缺项，必要一套后清本轮临时物，不借剩余额度续发。

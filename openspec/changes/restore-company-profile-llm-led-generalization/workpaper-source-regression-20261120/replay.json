@@ -1,0 +1,995 @@
+{
+  "task": "6.EH",
+  "new_model_calls": 0,
+  "navigation_reused_only_for_offline_source_check": true,
+  "reports": [
+    {
+      "instrument_id": "000725.SZ",
+      "document_version": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+      "runtime_sha256": "88a0869c58d773679c0a8133fe93f7e2c52a84a1a22456ed0a28d1bd4b955da9",
+      "binding_sha256": "1d3021078f46f307a9503d3dfe82d4b12d22303dd0c3cb8b9287ded544701206",
+      "native_cache_sha256": "5cfc13308fb95d192aa441bd1bd9f065ffb5260d8263d419bd4624dc70abc7bf",
+      "selection_response_sha256": "e59a993c6c12abe9f34b06c3e14ffeebbbd1b4bddf6730388077aedc08a571e9",
+      "selected_section_ids": [
+        "section-0015",
+        "section-0017",
+        "section-0031",
+        "section-0039",
+        "section-0048",
+        "section-0049",
+        "section-0051",
+        "section-0079"
+      ],
+      "native_packet_fragments": 12,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 12,
+          "source_characters": 28968,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "e8bc5dac1a0e63f601e4164b1d768dc398bee632e2633f7b82f5d7845afb5e14",
+          "elapsed_seconds": 1.721
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 12,
+          "source_characters": 28968,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "e8bc5dac1a0e63f601e4164b1d768dc398bee632e2633f7b82f5d7845afb5e14",
+          "elapsed_seconds": 1.518
+        }
+      }
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+      "runtime_sha256": "a69624d4a0307e707fe9d1e917df84c9807356c27561416acb62784b02ba3605",
+      "binding_sha256": "5ccabb2a139348c75e7a86c7975430eb77f42709e867de54f67a76c56b769db2",
+      "native_cache_sha256": "d752acaca6cbf358527be61244567b61ec66abdf54f1272696bc2d3f79d1369d",
+      "selection_response_sha256": "96d64559842cba6062c705299e29af34d7f8308ab9e55d1cd1a2873bfd430bb3",
+      "selected_section_ids": [
+        "section-0020",
+        "section-0033",
+        "section-0035",
+        "section-0044",
+        "section-0045",
+        "section-1059",
+        "section-0013"
+      ],
+      "native_packet_fragments": 14,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 14,
+          "source_characters": 186676,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "7b1179c2c838e765b07059812decba00c05ecc60518f5547b8740817be25af87",
+          "elapsed_seconds": 1.253
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 14,
+          "source_characters": 186676,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "7b1179c2c838e765b07059812decba00c05ecc60518f5547b8740817be25af87",
+          "elapsed_seconds": 1.124
+        }
+      }
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "document_version": "6610078eb1d109465781dbd47d3256d4abbbe2f4ff1f8017e1724b3fadb35558",
+      "runtime_sha256": "18f78541ef4c93c067d60688dcfb0e973fe9aa0e8341b92f590048e9754a548c",
+      "binding_sha256": "ba7a39fa00ccaaaf23237021c56e5e86f41fd267aba48fc393fb32beb14edff2",
+      "native_cache_sha256": "c8c4e5ee2d79db86f7445e2cdd743663b4e23e9c153671bd48328679e1cf73b4",
+      "selection_response_sha256": "40f3e7e5e73c5cb7c9e2bc3a653eea676e304fbf796959e3bfbb2e0f163e71ba",
+      "selected_section_ids": [
+        "section-0044",
+        "section-0049",
+        "section-0050",
+        "section-0058",
+        "section-0126",
+        "section-0031",
+        "section-0037"
+      ],
+      "native_packet_fragments": 22,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 22,
+          "source_characters": 48434,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "714bac862612a6fdbad41ca125700fb54af51c5c663544eda7623ee0c2855acc",
+          "elapsed_seconds": 2.221
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 22,
+          "source_characters": 48434,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "714bac862612a6fdbad41ca125700fb54af51c5c663544eda7623ee0c2855acc",
+          "elapsed_seconds": 2.2
+        }
+      }
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+      "runtime_sha256": "0bb1f048eb553bdae5dc8c27629edb864b2501bc2078c967cd77c20a07ff8bdf",
+      "binding_sha256": "a922d66e71102246bb4f15ef36654a01126b3e902c2620973c6c0edaa2984859",
+      "native_cache_sha256": "7577911a2767879bd22c0d5f1900bbc71691b6477b38a387c76e7a0dda20a862",
+      "selection_response_sha256": "a6f4d0accf7b96f310946cadcaa0896a7d9ca36bb73c22e26480618780cae2fd",
+      "selected_section_ids": [
+        "section-0032",
+        "section-0039",
+        "section-0075",
+        "section-0077",
+        "section-0093",
+        "section-0095",
+        "section-0145",
+        "section-0064"
+      ],
+      "native_packet_fragments": 16,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 16,
+          "source_characters": 7869,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ],
+          "limitations": [
+            "物理页21布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页22布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页26布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页27布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页49布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页50布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页59布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页60布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页61布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页67布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页68布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页69布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页80布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页81布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+          ],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "6c9e8452e04c0a88927630433d843e26cc6a09940b0ffdffe855da55ed4bdce5",
+          "elapsed_seconds": 1.197
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 16,
+          "source_characters": 7869,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [
+            21,
+            22,
+            26,
+            27,
+            49,
+            50,
+            59,
+            60,
+            61,
+            67,
+            68,
+            69,
+            80,
+            81
+          ],
+          "limitations": [
+            "物理页21布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页22布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页26布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页27布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页49布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页50布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页59布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页60布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页61布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页67布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页68布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页69布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页80布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页81布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+          ],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "0c90875ee13b78906a1942f3f6de0defd01b0b175329ffcf423255fc923e4ff8",
+          "elapsed_seconds": 1.0
+        }
+      }
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "document_version": "710d8b2e08e37ba521f1c4071d2c3e2369d3cadabc21a45073215d9f72138b0b",
+      "runtime_sha256": "3b82ff38da7024b24ff1a10721019d490651aff6b7f4d0f4d0b36b4c1a69585a",
+      "binding_sha256": "d13fb6562b5eef2c590e76e789d11a7f876f4d2ef294b38d894a0f12763ad8d7",
+      "native_cache_sha256": "239cc960cb79dcf8af4d95ad2339aa6abe819ec0bc2d3cf82c94b1d9ef28a489",
+      "selection_response_sha256": "82cc58cd2ee50df3fefc45028803536af09fa8f8e079db2dd778ea69169bf8a1",
+      "selected_section_ids": [
+        "section-0020",
+        "section-0022",
+        "section-0030",
+        "section-0031",
+        "section-0033",
+        "section-0035",
+        "section-0037",
+        "section-0039",
+        "section-0048",
+        "section-0049"
+      ],
+      "native_packet_fragments": 19,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 19,
+          "source_characters": 30869,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "bbec0e93a82c3fc38f2cbbdbce6dd7cd539d64680fa67b7a9d80a083f41a0bd7",
+          "elapsed_seconds": 1.921
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 19,
+          "source_characters": 30869,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "bbec0e93a82c3fc38f2cbbdbce6dd7cd539d64680fa67b7a9d80a083f41a0bd7",
+          "elapsed_seconds": 1.621
+        }
+      }
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "document_version": "4b7ab7551e2c3066f01257afcf18c9a10a020b9410c5c6bc97a67c328a45cbeb",
+      "runtime_sha256": "52849b7b923d83490a0ded2dcaa0f2aeec887cab328db4ae9b38c3d54861e36c",
+      "binding_sha256": "80634e918ce97d914ffb871677ede28e4f67b13b4cdd0f15658b64a1022df1ea",
+      "native_cache_sha256": "dbeea796f0c186d563a31d71cf0e18701c0210465d751a408493f7223c643b02",
+      "selection_response_sha256": "5213812624aadfc9d23491ef8526505f9bb146bb5b3951f9a8ca474653ed5af9",
+      "selected_section_ids": [
+        "section-0016",
+        "section-0018",
+        "section-0030",
+        "section-0031",
+        "section-0037",
+        "section-0080",
+        "section-0081",
+        "section-0105"
+      ],
+      "native_packet_fragments": 12,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 12,
+          "source_characters": 26853,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "ce9ea68375c64573483a006ecef1ba8b792214df9e7fd0c386adc22b0d2126fe",
+          "elapsed_seconds": 1.224
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 12,
+          "source_characters": 26853,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "ce9ea68375c64573483a006ecef1ba8b792214df9e7fd0c386adc22b0d2126fe",
+          "elapsed_seconds": 0.843
+        }
+      }
+    },
+    {
+      "instrument_id": "600309.SH",
+      "document_version": "766717cc1a3b74221d4a20892b28152b3180ef5c63d683623e8a903eebddac95",
+      "runtime_sha256": "168eda26f8ef62de3c8479bc0f46c5c8f354c24360527c4152d28ce3dbd9a56d",
+      "binding_sha256": "f0cffccbdd7f4ebc426aa85e4663325fa562c7efa920a2905111a435201ea9e3",
+      "native_cache_sha256": "506eab72279194fced9a04613df1c8fd2eef7c1d2e0d363dbd0c10e5d02e3910",
+      "selection_response_sha256": "5551c4338a912b70baeb6780b1d0913904125f88a837110f444c8e84edd6fada",
+      "selected_section_ids": [
+        "section-0038",
+        "section-0040",
+        "section-0059",
+        "section-0060",
+        "section-0061",
+        "section-0072",
+        "section-0094",
+        "section-0114"
+      ],
+      "native_packet_fragments": 16,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 16,
+          "source_characters": 22196,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "b91e0bee7fbee48e5b94ae1dcdcf2031582a87a1b65f250f49cdf9caf354610c",
+          "elapsed_seconds": 1.59
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 16,
+          "source_characters": 22196,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "b91e0bee7fbee48e5b94ae1dcdcf2031582a87a1b65f250f49cdf9caf354610c",
+          "elapsed_seconds": 1.532
+        }
+      }
+    },
+    {
+      "instrument_id": "600438.SH",
+      "document_version": "f0bd49a42e0cc42ea8766a6a8b10c70b912904788c4e69a03a9051ff29f4c2e0",
+      "runtime_sha256": "643f24878248fc3f136eb28a0440e0825c1040e6645aba70e42b86a79ad1e0b1",
+      "binding_sha256": "90e296cdd7632c69303edb27769cb90969b1e74a671362fa6ed666b0c35f966f",
+      "native_cache_sha256": "746a465e754d858d867637779de82b7e0dfad78954fb10defbaada7249e1f0d6",
+      "selection_response_sha256": "ff77d3ab82cbd90409d9e567727ed8fd127cca8385a985818ec3d41538ea0ad1",
+      "selected_section_ids": [
+        "section-0042",
+        "section-0043",
+        "section-0044",
+        "section-0055",
+        "section-0056",
+        "section-0057",
+        "section-0058",
+        "section-0060",
+        "section-0061",
+        "section-0069",
+        "section-0070",
+        "section-0071",
+        "section-0074",
+        "section-0075",
+        "section-0076",
+        "section-0077",
+        "section-0087",
+        "section-0091"
+      ],
+      "native_packet_fragments": 22,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 22,
+          "source_characters": 25699,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "f981eea4732ff0d87f9811811593b4fa8489de548abcb2a80c1bac4055ff92f6",
+          "elapsed_seconds": 1.431
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 22,
+          "source_characters": 25699,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "f981eea4732ff0d87f9811811593b4fa8489de548abcb2a80c1bac4055ff92f6",
+          "elapsed_seconds": 1.429
+        }
+      }
+    },
+    {
+      "instrument_id": "601021.SH",
+      "document_version": "d865b40eeccba86f465d98282989d8aacc410806f021c126cfc56de3a4f176d3",
+      "runtime_sha256": "43785e0156fc611f33c97ced54da531c608ef0b198cdba990b74bccbcde77eea",
+      "binding_sha256": "3460c1613d6bf643c853c8f8ef3b73d0544f134e23184c5502d419b8e9afd54f",
+      "native_cache_sha256": "a77702cf1146016832dd0e95155eb6fa713eb1276a478378f1ae89ced8a23603",
+      "selection_response_sha256": "8c78d238f9f92c1e14f057aac0b16e4b5f99fa8000a05fcc028f9ec026072bab",
+      "selected_section_ids": [
+        "section-0036",
+        "section-0049",
+        "section-0064",
+        "section-0065",
+        "section-0066",
+        "section-0067",
+        "section-0071",
+        "section-0080",
+        "section-0094",
+        "section-0096",
+        "section-0097"
+      ],
+      "native_packet_fragments": 18,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 18,
+          "source_characters": 30257,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "8d2fddf4641e93c9f2cda23c9c59e88812eee213816514b5e1a811eb789aaae5",
+          "elapsed_seconds": 1.894
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 18,
+          "source_characters": 30257,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "8d2fddf4641e93c9f2cda23c9c59e88812eee213816514b5e1a811eb789aaae5",
+          "elapsed_seconds": 1.647
+        }
+      }
+    },
+    {
+      "instrument_id": "601111.SH",
+      "document_version": "cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec",
+      "runtime_sha256": "c1f4d4db4578db758b5c12d4da9f76305a8e2e7d503c8fd3f0b9840edb8e92bf",
+      "binding_sha256": "b146f92511d9f0d03a3a9de4763114547913809ccda9d400fe432e553ef765a6",
+      "native_cache_sha256": "e357c3007d7db2f0b5ba09574a8b9cf2727fd98959fe48527e7faf9fb41b5e1b",
+      "selection_response_sha256": "d0530f976472a363789351d290b81cc0ac0ded734f7165dc37803aeb5bf6564e",
+      "selected_section_ids": [
+        "section-0037",
+        "section-0044",
+        "section-0045",
+        "section-0046",
+        "section-0049",
+        "section-0050",
+        "section-0081",
+        "section-0082",
+        "section-0083",
+        "section-0098"
+      ],
+      "native_packet_fragments": 12,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 11,
+          "source_characters": 22503,
+          "missing_native_fragments": [
+            {
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "维修业务"
+              ],
+              "page": 28,
+              "native_characters": 4,
+              "page_number_only": true
+            }
+          ],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "28225915b66d97e004f9292829201d9cf7f7635c26b526b06e1fbfec588d12e6",
+          "elapsed_seconds": 1.161
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 12,
+          "source_characters": 22507,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [
+            28
+          ],
+          "limitations": [
+            "物理页28布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+          ],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "481cd20e51252a0caa1782baef7d9eb702eb2ada098dfde9b313c393d2da54f8",
+          "elapsed_seconds": 1.111
+        }
+      }
+    },
+    {
+      "instrument_id": "601601.SH",
+      "document_version": "3787b6a6ec1bf480be2092e7bae156bd0f1d1b7f9f28bd9226d038951c788dee",
+      "runtime_sha256": "ea3d8a31e7f2094e371c7525b6898a94132540f6c9760b194f61036d8e1a5d7e",
+      "binding_sha256": "969d0f527c2177dac70dd19d36b43a507599a05e23109d73c9be601714387da1",
+      "native_cache_sha256": "38f97a8c8af06ab5932dac929e6fab0e03dd06e315e43d1af07bafe5f1ad8a56",
+      "selection_response_sha256": "1f8663c72642b730eb6b727f2e0a717a2f2f6172d12302a78d06727d6eebf7c2",
+      "selected_section_ids": [
+        "section-0016",
+        "section-0017",
+        "section-0026",
+        "section-0029",
+        "section-0045",
+        "section-0046",
+        "section-0066",
+        "section-0067",
+        "section-0084",
+        "section-0085",
+        "section-0097"
+      ],
+      "native_packet_fragments": 24,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 24,
+          "source_characters": 101216,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [
+            23,
+            35,
+            36,
+            37,
+            39,
+            40,
+            44,
+            45,
+            47,
+            49,
+            51
+          ],
+          "limitations": [
+            "物理页23布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页29布局未恢复；原生文本也不可读，本页未读，不等于未披露。",
+            "物理页35布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页36布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页37布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页39布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页40布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页44布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页45布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页47布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页48布局未恢复；原生文本也不可读，本页未读，不等于未披露。",
+            "物理页49布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页51布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+          ],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "12177ed9c0c7d775b2c8b26794ca06c55e26a29ea6f4b9341b248703f8024e8a",
+          "elapsed_seconds": 2.153
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 24,
+          "source_characters": 101216,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [
+            23,
+            35,
+            36,
+            37,
+            39,
+            40,
+            44,
+            45,
+            47,
+            49,
+            51
+          ],
+          "limitations": [
+            "物理页23布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页29布局未恢复；原生文本也不可读，本页未读，不等于未披露。",
+            "物理页35布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页36布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页37布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页39布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页40布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页44布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页45布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页47布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页48布局未恢复；原生文本也不可读，本页未读，不等于未披露。",
+            "物理页49布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页51布局未恢复；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+          ],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "e64b0efcd890f5d5f4300057d3c42306d0a4a1e6bfd2bc1d916dffb9a792310b",
+          "elapsed_seconds": 2.313
+        }
+      }
+    },
+    {
+      "instrument_id": "601881.SH",
+      "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+      "runtime_sha256": "a9c701be3c46f18d3f48122c26c42866241b61efaa887768659b04c7a7dc1d0c",
+      "binding_sha256": "9888e5e469cb6b5de2ea984e724b1ca40fb4555d3b8d654fe77babed26465ba2",
+      "native_cache_sha256": "e0e9b02b7a126926d2d7f7ce627744623261808c6f3b67d56f71a13369ddcac1",
+      "selection_response_sha256": "9b0b1b905ff1c8de755e754e5e1eecfa57afc993713b9033d442981b9b5b582e",
+      "selected_section_ids": [
+        "section-0077",
+        "section-0080",
+        "section-0082",
+        "section-0083",
+        "section-0090",
+        "section-0093",
+        "section-0101",
+        "section-0105",
+        "section-0109",
+        "section-0124",
+        "section-0125",
+        "section-0129",
+        "section-0131",
+        "section-0057",
+        "section-0058"
+      ],
+      "native_packet_fragments": 11,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 2,
+          "source_characters": 2231,
+          "missing_native_fragments": [
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "3、机构业务"
+              ],
+              "page": 26,
+              "native_characters": 313,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "4、国际业务"
+              ],
+              "page": 28,
+              "native_characters": 1428,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "5、投资交易业务"
+              ],
+              "page": 29,
+              "native_characters": 830,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "6、母子公司一体化业务"
+              ],
+              "page": 30,
+              "native_characters": 671,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "page": 24,
+              "native_characters": 1263,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "主营业务分地区情况"
+              ],
+              "page": 36,
+              "native_characters": 2042,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "主营业务分行业情况"
+              ],
+              "page": 35,
+              "native_characters": 649,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "（一）主营业务分析"
+              ],
+              "page": 34,
+              "native_characters": 1753,
+              "page_number_only": false
+            },
+            {
+              "section_path": [
+                "第二节 公司简介和主要财务指标",
+                "八、近三年主要会计数据和财务指标"
+              ],
+              "page": 17,
+              "native_characters": 1432,
+              "page_number_only": false
+            }
+          ],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "c25a9ed987f6653ed4736728a7c2770f6ed4b1d6451c789aff7cb8d1cee17ed2",
+          "elapsed_seconds": 1.446
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 11,
+          "source_characters": 12374,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [
+            17,
+            24,
+            26,
+            28,
+            29,
+            30,
+            34,
+            35,
+            36
+          ],
+          "limitations": [
+            "物理页17布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页24布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页26布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页28布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页29布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页30布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页34布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页35布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+            "物理页36布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+          ],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "f623c46010159d7cc60fcf924b31e2bc83df1c14146fde12df1dfe7fd6dd2ece",
+          "elapsed_seconds": 1.434
+        }
+      }
+    },
+    {
+      "instrument_id": "601888.SH",
+      "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+      "runtime_sha256": "50ea9071f5cdfc34c90b47f7d79fb43d90156a7af82a5c57bb74b282d431058c",
+      "binding_sha256": "e5c13d7364aeff2f97184b90702081f13b39f4d8674243206c9c022b50179c63",
+      "native_cache_sha256": "eac85c386a6a7da5e922b6639e3b88df080db4d3db9c696ad5ff1331f4442353",
+      "selection_response_sha256": "254af3050c09f23bbe5cad48a0717ab04b7512d0ed94cf187d1ff51bc37e8849",
+      "selected_section_ids": [
+        "section-0037",
+        "section-0047",
+        "section-0062",
+        "section-0063",
+        "section-0064",
+        "section-0067",
+        "section-0068",
+        "section-0069",
+        "section-0099",
+        "section-0110"
+      ],
+      "native_packet_fragments": 14,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 14,
+          "source_characters": 13393,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "f44011ad515c670c43e9fc072b107d4d21dba1aa814984650d2437b3a729154b",
+          "elapsed_seconds": 1.098
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 14,
+          "source_characters": 13393,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "f44011ad515c670c43e9fc072b107d4d21dba1aa814984650d2437b3a729154b",
+          "elapsed_seconds": 1.174
+        }
+      }
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "document_version": "64897a270ddf98208d7856fb929903ac8e8a954b0cd2622ac02bb2533b817579",
+      "runtime_sha256": "feb7a4a4dfd1f713cdbfbe23c43bbf5f99b0b451c75c4d98ffe97da407bac33d",
+      "binding_sha256": "f5d1b79649f6325770bd70d0a3f08972136354e51bfc389edb75316203806166",
+      "native_cache_sha256": "df4a06b83e7372ed216821806db1f92b0f9225fc5e7ef824e9c21c3812413437",
+      "selection_response_sha256": "26550ed3abaa05bbad1977c9ae12e4f4afe9457a310b5885e9d14e7c21581801",
+      "selected_section_ids": [
+        "section-0026",
+        "section-0032",
+        "section-0038",
+        "section-0085",
+        "section-0806",
+        "section-0807",
+        "section-0808",
+        "section-0118"
+      ],
+      "native_packet_fragments": 19,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 19,
+          "source_characters": 26254,
+          "missing_native_fragments": [
+            {
+              "section_path": [
+                "第四节 管理层讨论与分析",
+                "四、 风险因素"
+              ],
+              "page": 41,
+              "native_characters": 4,
+              "page_number_only": true
+            }
+          ],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "8b0312be0abf7cf611416bda998b5ae71610bb755537819ff83855c178b4d664",
+          "elapsed_seconds": 1.421
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 19,
+          "source_characters": 26254,
+          "missing_native_fragments": [
+            {
+              "section_path": [
+                "第四节 管理层讨论与分析",
+                "四、 风险因素"
+              ],
+              "page": 41,
+              "native_characters": 4,
+              "page_number_only": true
+            }
+          ],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "8b0312be0abf7cf611416bda998b5ae71610bb755537819ff83855c178b4d664",
+          "elapsed_seconds": 1.313
+        }
+      }
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "document_version": "31cb2c3709b934ac76094a5683a013d21a0f2375c908f302798343ddc6937653",
+      "runtime_sha256": "d35902adf9a6b41f9f3d04e28dc62a94f169770b84dddb9285c53d8b8d1c1e4d",
+      "binding_sha256": "71df2e499afdd6a74eaf7b0e58b818e77335a3cd7a95315b51630264ead5ca20",
+      "native_cache_sha256": "283032c818e139ce8213b88675667d67db199a7efff425f18222dd36f5a8aebd",
+      "selection_response_sha256": "4323e87c19026dd170d314501fb7411ae4306957483ffe012e838ea21b67cb91",
+      "selected_section_ids": [
+        "section-0026",
+        "section-0032",
+        "section-0035",
+        "section-0044",
+        "section-0074",
+        "section-0197",
+        "section-0740"
+      ],
+      "native_packet_fragments": 14,
+      "versions": {
+        "previous": {
+          "preprocessing_version": "toc_sections_native_layout.v6.footer-safe-local-sections",
+          "packet_fragments": 14,
+          "source_characters": 24748,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "46c350653dc2809acdcb92204b430237bf8a90ac9853e27fb11c2f3556ca7096",
+          "elapsed_seconds": 1.046
+        },
+        "current": {
+          "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+          "packet_fragments": 14,
+          "source_characters": 24748,
+          "missing_native_fragments": [],
+          "native_fallback_boundary_mismatches": [],
+          "native_fallback_pages": [],
+          "limitations": [],
+          "source_coordinates_valid": true,
+          "source_text_sha256": "46c350653dc2809acdcb92204b430237bf8a90ac9853e27fb11c2f3556ca7096",
+          "elapsed_seconds": 0.977
+        }
+      }
+    }
+  ],
+  "summary": {
+    "reports": 15,
+    "previous_fragments": 235,
+    "current_fragments": 245,
+    "current_missing_native_body_fragments": 0,
+    "not_full_text_or_semantic_completeness": true,
+    "extra_air_china_fragment_is_page_number_only": true,
+    "wanda_missing_native_fragment_is_page_number_only": true,
+    "protected_original_runtime_binding_pdf_and_cache_hashes_unchanged": true,
+    "new_model_or_provider_transport_requests": 0,
+    "new_company_profile_writes": 0
+  },
+  "validation": {
+    "command": "python -m pytest tests/unit/test_research/test_company_profile_workpaper_ordered_remap.py tests/unit/test_research/test_company_profile_workpaper_source_recovery.py -q --basetemp=<task temporary root>/pytest-final",
+    "passed": 19,
+    "skipped": 0,
+    "seconds": 17.7,
+    "warnings": 6,
+    "review": {
+      "blocking": 0,
+      "nonblocking": "page-number-only differences and finer table layout deferred",
+      "unrelated": "pre-existing worktree changes untouched"
+    },
+    "protected_current_source_and_test_hashes": {
+      "research/company_profile/workpaper_sections.py": "994480c323874839040ee46db7d61447086b887e788b273bd9a395f492437a33",
+      "research/company_profile/workpaper_llm.py": "c90d96e914e20303c47647ec57f7e82d6dd19a975270072972c3091ea36edcf0",
+      "research/company_profile/workpaper_review.py": "7eb4d71bee4a926413ab6a7bb27429a7b6d190a0bdc00b595cb5d25f35fe6a5c",
+      "tests/unit/test_research/test_company_profile_workpaper_ordered_remap.py": "c051328ff2921f1f0510fba168d97df0f9f48ec6e74212e7ad61ac38dfeb044e",
+      "tests/unit/test_research/test_company_profile_workpaper_source_recovery.py": "6776c98e1b4d1ffbd74a21327f51515dafe81447267cfd85fecb6d609091f565"
+    },
+    "openspec_strict": "passed"
+  },
+  "cleanup": {
+    "target": "/home/python/Quote/data/QuoteBak/company-profile-6eh-LRqNef",
+    "file_count": 23,
+    "file_bytes": 210307,
+    "after_evidence_persisted": true,
+    "preserved": "official PDF, valid cache, historical evidence, attempts, research roots and unrelated worktree files"
+  }
+}

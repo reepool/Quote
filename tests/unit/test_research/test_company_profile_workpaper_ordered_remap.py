@@ -1,6 +1,13 @@
 """A reordered running label must not erase the selected revenue evidence."""
 from types import SimpleNamespace
 
+import gzip
+import hashlib
+import json
+from pathlib import Path
+
+import pytest
+
 from research.company_profile.workpaper_sections import (
     SectionSelection, build_section_packet, extract_selected_layout, index_sections,
 )
@@ -55,3 +62,60 @@ def test_ordered_remap_does_not_replace_valid_layout_or_native_blank_scope(monke
     result = extract_selected_layout(b'fixture', (1, 2), native_pages=corrected_native, section_bounds=(empty, bounds[1]))
     assert 'layout_limitation' not in result[0]
     assert 'layout_limitation' not in result[1]
+
+
+@pytest.mark.parametrize('ordered_remap', (False, True))
+def test_saved_navigation_reaches_actual_extraction_source_without_reusing_answers(ordered_remap):
+    """Freeze the real lost-revenue case at the original outbound source seam."""
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.workpaper_llm import run_workpaper
+
+    root = Path(__file__).resolve().parents[3]
+    saved = root / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/601881'
+    if not (saved / 'runtime.json').is_file() or not (saved / 'binding.json').is_file():
+        pytest.skip('saved real navigation is unavailable')
+    runtime = json.loads((saved / 'runtime.json').read_text())
+    binding = json.loads((saved / 'binding.json').read_text())
+    pdf = Path(binding['asset']['archive_path'])
+    cache = Path(binding['source_preparation']['artifact_path'])
+    if not pdf.is_file() or not cache.is_file():
+        pytest.skip('saved official PDF/native text cache is unavailable')
+    report = ReportIdentity.model_validate(runtime['report'])
+    assert hashlib.sha256(pdf.read_bytes()).hexdigest() == report.document_version
+    with gzip.open(cache, 'rt', encoding='utf-8') as stream:
+        native = json.load(stream)
+    assert native['source_content_hash'] == report.document_version
+    assert native['artifact_hash'] == binding['source_preparation']['artifact_hash']
+    receipt = next(item for item in runtime['workpaper_receipts']
+                   if item['purpose'] == 'select_profile_sections' and item['contract_status'] == 'accepted')
+    assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+    assert json.loads(receipt['raw_content']) == receipt['response_payload']
+    pages = tuple({'page': page['page_number'], 'text': page['text']} for page in native['pages'])
+    payloads = []
+
+    class SourceCaptured(Exception):
+        pass
+
+    class Provider:
+        offline_only = False  # Use provider-mode source preparation, no transport.
+
+        def workpaper_request(self, *, purpose, payload, **kwargs):
+            if purpose == 'select_profile_sections':
+                return receipt['response_payload']
+            assert purpose == 'extract_profile_workpaper'
+            payloads.append(payload)
+            raise SourceCaptured()
+
+    identity = dict(binding['identity'], execution_mode='provider')
+    if ordered_remap:
+        identity['preprocessing_version'] = 'toc_sections_native_layout.v7.ordered-section-remap'
+    with pytest.raises(SourceCaptured):
+        run_workpaper(report=report, pages=pages, processing_identity=identity,
+            provider=Provider(), work_id='offline-source-regression', source_pdf_path=str(pdf))
+    assert len(payloads) == 1
+    source = payloads[0]['source_text']
+    assert ('28,302,251,724.47' in source) is ordered_remap
+    assert ('主营业务分行业情况' in source) is ordered_remap
+    if ordered_remap:
+        assert '表格列关系未核定' in source
+    # No old extraction/review response is returned, bound, or published.

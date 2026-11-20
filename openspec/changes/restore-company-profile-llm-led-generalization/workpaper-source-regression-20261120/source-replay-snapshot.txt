@@ -1,0 +1,149 @@
+"""Offline saved-navigation check; no extraction response is returned or rebound."""
+from __future__ import annotations
+
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import socket
+import time
+from unittest.mock import patch
+
+from research.company_profile.models import ReportIdentity
+from research.company_profile.workpaper_llm import run_workpaper
+from research.company_profile.workpaper_sections import (
+    SectionSelection, build_section_packet, index_sections,
+)
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+SAVED = CHANGE / 'workpaper-s2-confirmation-result-20261119'
+OUT = Path(__file__).parent
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def deny_network(*args, **kwargs):
+    raise AssertionError('offline replay must not open a network socket')
+
+
+class StopBeforeExtraction(Exception):
+    pass
+
+
+class SavedNavigation:
+    offline_only = False  # Exercise the actual provider-mode PDF preparation.
+
+    def __init__(self, selection):
+        self.selection = selection
+        self.source_payload = None
+
+    def workpaper_request(self, *, purpose, payload, **kwargs):
+        if purpose == 'select_profile_sections':
+            return self.selection
+        assert purpose == 'extract_profile_workpaper'
+        self.source_payload = payload
+        raise StopBeforeExtraction()
+
+
+def replay(directory):
+    runtime_path, binding_path = directory / 'runtime.json', directory / 'binding.json'
+    runtime = json.loads(runtime_path.read_text())
+    binding = json.loads(binding_path.read_text())
+    receipt = next(r for r in runtime['workpaper_receipts']
+                   if r['purpose'] == 'select_profile_sections' and r['contract_status'] == 'accepted')
+    assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+    assert json.loads(receipt['raw_content']) == receipt['response_payload']
+    pdf = Path(binding['asset']['archive_path'])
+    assert sha(pdf) == runtime['report']['document_version']
+    cache = Path(binding['source_preparation']['artifact_path'])
+    with gzip.open(cache, 'rt', encoding='utf-8') as stream:
+        cached = json.load(stream)
+    assert cached['artifact_hash'] == binding['source_preparation']['artifact_hash']
+    assert cached['source_content_hash'] == runtime['report']['document_version']
+    native = tuple({'page': p['page_number'], 'text': p['text']} for p in cached['pages'])
+    report = ReportIdentity.model_validate(runtime['report'])
+    selection = SectionSelection.model_validate(receipt['response_payload'])
+    sections = index_sections(native)
+    expected = build_section_packet(report, native, sections, selection,
+                                    max_characters=500_000)
+    expected_keys = {(e.section_path, span.page) for e in expected.evidence for span in e.source_spans}
+    native_spans = {(e.section_path, s.page): s for e in expected.evidence for s in e.source_spans}
+    versions = {}
+    for label, version in [('previous', binding['identity']['preprocessing_version']),
+                           ('current', 'toc_sections_native_layout.v7.ordered-section-remap')]:
+        provider = SavedNavigation(receipt['response_payload'])
+        captured = {}
+
+        def capture_packet(*args, **kwargs):
+            packet = build_section_packet(*args, **kwargs)
+            captured['packet'] = packet
+            captured['pages'] = args[1]
+            return packet
+
+        identity = dict(binding['identity'], execution_mode='provider', preprocessing_version=version)
+        started = time.monotonic()
+        try:
+            with patch('research.company_profile.workpaper_llm.build_section_packet', capture_packet):
+                run_workpaper(report=report, pages=native, processing_identity=identity,
+                    provider=provider, work_id='offline-6eh-' + directory.name,
+                    source_pdf_path=str(pdf))
+        except StopBeforeExtraction:
+            assert provider.source_payload is not None
+        except ValueError as exc:
+            versions[label] = {'preprocessing_version': version, 'error': str(exc)}
+            continue
+        packet = captured['packet']
+        page_map = {p['page']: p for p in captured['pages']}
+        actual = {(e.section_path, s.page) for e in packet.evidence for s in e.source_spans}
+        for evidence in packet.evidence:
+            for span in evidence.source_spans:
+                assert page_map[span.page]['text'][span.start:span.end] == span.quote
+        fallback_mismatches = []
+        for evidence in packet.evidence:
+            for span in evidence.source_spans:
+                original = native_spans.get((evidence.section_path, span.page))
+                if original and page_map[span.page]['extraction_method'] == 'shared-native-text-fallback.v1':
+                    if (span.start, span.end, span.quote) != (original.start, original.end, original.quote):
+                        fallback_mismatches.append({'section_path': evidence.section_path, 'page': span.page,
+                            'native_bounds': [original.start, original.end], 'actual_bounds': [span.start, span.end]})
+        versions[label] = {'preprocessing_version': version,
+            'packet_fragments': len(packet.evidence),
+            'source_characters': sum(len(s.quote) for e in packet.evidence for s in e.source_spans),
+            'missing_native_fragments': [{'section_path': path, 'page': page,
+                'native_characters': len(native_spans[(path, page)].quote),
+                'page_number_only': native_spans[(path, page)].quote.strip() == str(page)}
+                for path, page in sorted(expected_keys - actual)],
+            'native_fallback_boundary_mismatches': fallback_mismatches,
+            'native_fallback_pages': [p['page'] for p in captured['pages']
+                if p['extraction_method'] == 'shared-native-text-fallback.v1'],
+            'limitations': list(packet.limitations), 'source_coordinates_valid': True,
+            'source_text_sha256': hashlib.sha256(provider.source_payload['source_text'].encode()).hexdigest(),
+            'elapsed_seconds': round(time.monotonic() - started, 3)}
+    return {'instrument_id': report.instrument_id, 'document_version': report.document_version,
+        'runtime_sha256': sha(runtime_path), 'binding_sha256': sha(binding_path),
+        'native_cache_sha256': sha(cache), 'selection_response_sha256': receipt['response_hash'],
+        'selected_section_ids': list(selection.selected_section_ids),
+        'native_packet_fragments': len(expected.evidence), 'versions': versions}
+
+
+def main():
+    rows = []
+    directories = sorted(p.parent for p in SAVED.glob('*/runtime.json'))
+    assert len(directories) == 15
+    with patch.object(socket.socket, 'connect', deny_network), patch.object(socket, 'create_connection', deny_network):
+        for directory in directories:
+            row = replay(directory)
+            rows.append(row)
+            (OUT / 'replay.json').write_text(json.dumps({'task': '6.EH', 'new_model_calls': 0,
+                'navigation_reused_only_for_offline_source_check': True, 'reports': rows}, ensure_ascii=False, indent=2) + '\n')
+            current = row['versions']['current']
+            print(directory.name, 'fragments', row['native_packet_fragments'], '->',
+                current.get('packet_fragments'), 'missing', len(current.get('missing_native_fragments', [])),
+                'bounds', len(current.get('native_fallback_boundary_mismatches', [])), current.get('error', ''), flush=True)
+
+
+if __name__ == '__main__':
+    main()
