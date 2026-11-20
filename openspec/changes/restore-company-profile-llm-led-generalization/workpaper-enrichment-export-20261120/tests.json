@@ -1,0 +1,205 @@
+{
+  "task": "6.EE",
+  "unique_completed_tests": 42,
+  "runs": [
+    {
+      "source": "regression.xml",
+      "state": "interrupted_after_33_completed_at_old_TaskService_read_fixture",
+      "completed": 33,
+      "cases": [
+        {
+          "class": "tests.unit.test_research.test_company_profile_annual_export",
+          "test": "test_combined_export_matches_api_after_two_readings_with_local_restriction"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_annual_export",
+          "test": "test_export_does_not_merge_orphan_hash_or_different_report"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_annual_export",
+          "test": "test_export_uses_selected_base_not_another_latest_report[work_id]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_annual_export",
+          "test": "test_export_uses_selected_base_not_another_latest_report[processing_identity]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_annual_export",
+          "test": "test_legacy_only_export_does_not_fabricate_workpapers"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_annual_export",
+          "test": "test_changed_snapshot_is_rejected_before_writing_another_base[work_id]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_annual_export",
+          "test": "test_changed_snapshot_is_rejected_before_writing_another_base[content]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_independent_checked_pending_and_raw_are_distinct"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_restriction_overrides_model_completed_without_erasing_raw[source_only]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_restriction_overrides_model_completed_without_erasing_raw[withheld]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_restriction_overrides_model_completed_without_erasing_raw[duplicate]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_invalid_or_stale_independent_use_review_rejected[version]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_invalid_or_stale_independent_use_review_rejected[fact]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_invalid_or_stale_independent_use_review_rejected[hash]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_invalid_or_stale_independent_use_review_rejected[evidence]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_invalid_or_stale_independent_use_review_rejected[duplicate]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_model_cannot_author_independent_review_metadata"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_actual_model_scope_requires_current_content_binding_not_company_state[completed]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_actual_model_scope_requires_current_content_binding_not_company_state[incomplete]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_actual_model_scope_requires_current_content_binding_not_company_state[completed_with_open_findings]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_legacy_exact_draft_hash_can_bind_unchanged_scope_but_not_changed_text"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_saved_initial_input_can_bind_only_unchanged_facts_after_repair"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_retained_initial_reply_cannot_be_relabelled_as_checking_new_seed"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_review_status_without_actual_accepted_call_never_means_reviewed"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_repaired_content_needs_matching_final_not_old_initial_id"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_uncertainty_remains_readable_and_limited_not_forced_exact"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_source_checked_fact_with_explicit_use_limit_explains_it_in_markdown"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions[False-withheld]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions[False-source_only]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions[False-duplicate]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions[True-withheld]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions[True-source_only]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_workpaper_delivery",
+          "test": "test_original_writer_query_export_csv_and_fresh_read_agree_with_restrictions[True-duplicate]"
+        }
+      ],
+      "unnamed_incomplete_cases_not_counted": 1
+    },
+    {
+      "source": "api-regression.xml",
+      "state": "completed",
+      "completed": 9,
+      "cases": [
+        {
+          "class": "tests.unit.test_research.test_company_profile_catalog",
+          "test": "test_catalog_counts_only_visible_content_and_retains_incomplete_review[withheld]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_catalog",
+          "test": "test_catalog_counts_only_visible_content_and_retains_incomplete_review[source_only]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_catalog",
+          "test": "test_catalog_counts_only_visible_content_and_retains_incomplete_review[duplicate]"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_catalog",
+          "test": "test_catalog_includes_same_report_supplements_but_not_orphans_or_other_companies"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_catalog",
+          "test": "test_catalog_http_empty_legacy_and_invalid_explicit_root"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_enrichment",
+          "test": "test_explicit_research_root_never_falls_back_to_another_dataset"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_enrichment",
+          "test": "test_api_reads_gap_scope_and_plans_without_models_or_raw_withheld_values"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_enrichment",
+          "test": "test_enrichment_source_drift_is_rejected_before_any_model_call"
+        },
+        {
+          "class": "tests.unit.test_research.test_company_profile_enrichment",
+          "test": "test_failed_supplement_keeps_the_previously_readable_profile"
+        }
+      ],
+      "unnamed_incomplete_cases_not_counted": 0
+    }
+  ],
+  "initial_reproduction": "Before code change, combined-export test failed with FileNotFoundError for annual_profiles.json; completed original single-reading export omitted supplemental content.",
+  "commands": [
+    "python -m pytest tests/unit/test_research/test_company_profile_annual_export.py tests/unit/test_research/test_company_profile_workpaper_delivery.py tests/unit/test_research/test_company_profile_reads.py tests/unit/test_research/test_company_profile_catalog.py tests/unit/test_research/test_company_profile_enrichment.py -q -k \"not original_task_service_two_supplemental_reads\" (interrupted at old reads fixture after 33 completed, exit 2, 133.80 seconds)",
+    "python -m pytest tests/unit/test_research/test_company_profile_catalog.py tests/unit/test_research/test_company_profile_enrichment.py -q -k \"not original_task_service_two_supplemental_reads\" (9 passed, 1 deselected, 11.92 seconds)",
+    "python data/QuoteBak/company-profile-6ee-Toan8JQg/verify_saved.py (temporary, removed after proof retained)",
+    "OPENSPEC_TELEMETRY=0 DO_NOT_TRACK=1 openspec validate restore-company-profile-llm-led-generalization --strict",
+    "git diff --check"
+  ],
+  "environment": "All commands source scripts/quote_dev_env.sh; Python /home/python/miniconda3/envs/Quote/bin/python; process-local logs/cache/tests under the task QuoteBak root; local ASGI checks in approved environment, no real model calls.",
+  "syntax_parse_passed": true,
+  "source_sha256": {
+    "research/company_profile/reads.py": "2215e583b7e2fb3257cfc77568c255b5f10f961384ce02da1b690bfd8d69c0d7",
+    "tests/unit/test_research/test_company_profile_annual_export.py": "08d7b1744ce87e0bf83310230fef7154a4b690cfd0cb2b5fd8404a364a888859"
+  },
+  "not_full_legacy_suite_pass": true
+}

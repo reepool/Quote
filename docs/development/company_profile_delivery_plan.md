@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-20 6.EE修复实际消费缺口：[补读导出卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-enrichment-export-card.md)。原export新增annual_profiles.json，复用API同报告多轮投影，旧文件不改；保存上汽首读＋精读39条/新增6条及十五家400条648指标零调用核对，缺项/局部隔离/原审核状态不丢，不新增公司或改S2。见[实物与边界](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-enrichment-export-20261120/result.md)。开工前轮临时根已清，必要一套后清本轮QuoteBak/完整重复导出，源/有效缓存/旧根/并行保护，不切共享配置或生产。
+
 2026-11-20 6.ED依[已有意见消费卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-reviewed-snapshot-card.md)零调用推进：原writer/read owner交十五份后继研究快照，分众两条重大变化对象分别仅源参考/隔离，其他内容继承；API显示具体缺项原因及按需补读章节，不自动补读或拒整稿。京东方旧限制和全部原模型状态保持，旧根/API/S2失败不改，不切共享配置/生产；结果见[实物与使用](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-reviewed-snapshot-20261120/result.md)。必要一套后清本轮QuoteBak，正式源/缓存/旧失败/并行保护，不再为补充项或证明通道整池重抽。
 
 2026-11-20 6.EC按用户限定批准已执行结束，[2份源复核及资源](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-channel-check-20261120/result.md)：正常对照京东方与历史失败分众各1物理有效回复，36/24ID，0/2意见；239.183/347.570业务秒、合2物理/0恢复/92162供应商total、费用unknown，组监督589.146秒。分众2意见只读对照原文，披露项目“不适用”范围过强及媒体数量基期列错配，保pending/不生成修订，原API/15writer/254证据hash不改；京东方无意见也不洗旧限制。冻结版无热修，必要一套后清本人执行日志/脚本，正式源/缓存/attempt/旧根/并行保护。下一建议复用已有稿作局部限制与研究/API验收，不为证明通道或补充项再拉新20家；本卡已用尽，不自动补五家/第41家或启S3/生产，新真实补救/验收方案另裁决。

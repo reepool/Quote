@@ -135,11 +135,25 @@ class CompanyProfileReadService:
         views = list(queried.get("stage4_restricted_views") or [])
         target = _resolve_export_directory(Path(export_directory))
         _reject_protected_export(target, self.protected_export_roots)
+        annual_profiles: list[dict[str, Any]] = []
+        if any(profile.get("workpaper") for profile in profiles):
+            selected = self._latest_by_instrument(
+                processing_identity=processing_identity, work_id=work_id,
+            )
+            for profile in profiles:
+                if not profile.get("workpaper"):
+                    continue
+                record = selected.get(profile["instrument_id"])
+                if (not isinstance(record, CompanyProfileRuntimeRecordV3)
+                    or record.work_id != profile["work_id"]
+                    or record.workpaper.model_dump(mode="json") != profile["workpaper"]):
+                    raise ValueError("selected company-profile snapshot changed during export")
+                annual_profiles.append(self._research_profile_from_record(record))
         profile_state = str(queried.get("state") or "idle")
         written: list[str] = []
         if profiles or views:
             with _exclusive_export(target):
-                written.extend(_write_profile_export(target, profiles))
+                written.extend(_write_profile_export(target, profiles, annual_profiles=annual_profiles))
                 written.extend(_write_stage4_export(target, views))
                 manifest_path = target / "export_manifest.json"
                 manifest = _export_manifest(
@@ -835,6 +849,8 @@ def _reject_existing_export(target: Path) -> None:
 def _write_profile_export(
     target: Path,
     profiles: Sequence[Mapping[str, Any]],
+    *,
+    annual_profiles: Sequence[Mapping[str, Any]] = (),
 ) -> list[str]:
     written: list[str] = []
     if not profiles:
@@ -882,6 +898,15 @@ def _write_profile_export(
             "profiles": research_profiles,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
         written.append(str(research_path))
+    if annual_profiles:
+        annual_path = target / "annual_profiles.json"
+        annual_path.write_text(json.dumps({
+            "schema_version": "company_profile_annual_research_export.v1",
+            "research_only": True, "formal_acceptance": "not_assessed",
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+            "profiles": list(annual_profiles),
+        }, ensure_ascii=False, indent=2), encoding="utf-8")
+        written.append(str(annual_path))
     csv_path = target / "profiles.csv"
     _write_profile_csv(csv_path, profiles)
     written.append(str(csv_path))

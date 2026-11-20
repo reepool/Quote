@@ -1,0 +1,10 @@
+{
+  "task": "6.EE",
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6ee-Toan8JQg",
+  "removed_files": 72,
+  "released_file_bytes": 16655338,
+  "directory_absent_after_cleanup": true,
+  "scope": "This task's full temporary exports, one-off verification script, local logs, test/cache outputs, XML and interrupted old-fixture databases. All task sessions finished before cleanup.",
+  "recoverability": "Disposable outputs can be regenerated from the unchanged saved writer records and existing read/export owner; one necessary SAIC combined delivery and verification/test summaries retained.",
+  "official_sources_valid_shared_cache_old_research_roots_old_failures_attempts_parallel_work": "untouched"
+}

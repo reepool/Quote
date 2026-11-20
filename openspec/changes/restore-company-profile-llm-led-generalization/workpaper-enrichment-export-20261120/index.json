@@ -1,0 +1,27 @@
+{
+  "task": "6.EE",
+  "files": {
+    "600104-annual-profile.json": {
+      "sha256": "b274f56174a64676ab7c451ceda6fa73bc7c323ce6db24439e6c4f318a55983d",
+      "bytes": 223597
+    },
+    "cleanup.json": {
+      "sha256": "2f133bf4c87bc540de2f5c29fe248ced86e4691803d2431fc0847728e424c7e0",
+      "bytes": 722
+    },
+    "result.md": {
+      "sha256": "92235af73ead7ed074c282670dfd6e85ea1a2aef5b2bf5b844602004281381ad",
+      "bytes": 3664
+    },
+    "tests.json": {
+      "sha256": "875ef9989dd8a81e0586b54ca51b34b56893c3e017af2c5d46b6ed865cbd8cc7",
+      "bytes": 10567
+    },
+    "verification.json": {
+      "sha256": "5e942e976ba5bb269a65b1877641ffee31d8af82a9b6a45ccab484d987feb562",
+      "bytes": 6863
+    }
+  },
+  "new_model_calls": 0,
+  "runtime_hashes": "verification.json:protected_runtime_hashes"
+}

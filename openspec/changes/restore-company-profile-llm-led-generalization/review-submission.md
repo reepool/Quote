@@ -1,5 +1,17 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 349. 6.EE补读成果随研究导出交付：原API链复用，零新模型
+
+用户继续后按openspec-apply-change/business-first-goal和产品→验收→交付→A/B v3，沿[补读导出卡](company-profile-enrichment-export-card.md)实施。开工master/ca37dd52、暂存空，前轮本人ED根已清；本轮唯一QuoteBak根company-profile-6ee-Toan8JQg。当前可验证业务缺口是API已汇总后继精读、旧机器导出只带单次稿，下载会遗漏已取得内容；不是字段不全、供应链细度或需要再抽一批公司。既有配置/核心骨架/市场依赖/混合文档与并行全部保护。
+
+只改原ReadService.export：按本次work/处理身份选中的同一base复用原API投影，新增annual_profiles.json并列原manifest；旧单次JSON/Markdown/CSV/research_profiles.json不变。首读和多次补读以reading_work_id/fact_id区别，不跨报告/错hash/孤儿链拼接；原缺项、局部隔离、真实模型状态保留，读取间base变化明确拒绝而不静默取另一latest。没有新增writer、业务循环、平台、模型阶段或共享配置切换。详[实物及结果](workpaper-enrichment-export-20261120/result.md)。
+
+保存真实材料零调用核对：上汽原首读＋一次精读共39条可读事实，其中精读新增6条，3已知缺项仍见；十五家仍400可读/648指标，分众两项限制及原failed、京东方跨页引用限制保持。两个原研究根29个JSON前后hash不变，当前原15个writer同时对既有ED回执成立；新研究API/模型/原失败/S2未改。只留一份上汽合并机器交付与核对摘要，不重复归档完整十五家导出。
+
+验证：先用新测试复现修改前漏合并文件，再7新增场景＋26旧分级导出完成；扩展进入旧TaskService读取夹具后133.80秒主动中止，未命名中断用例不计通过、不称旧大套全绿。另补9项未跑API/目录/补读兼容11.92秒通过，合42不同完成用例；旧长两轮TaskService整链未重跑，不扩修既有脏核心。strict、语法和diff检查通过，测试命令/源hash与实际保存稿结果见tests.json/verification.json；均非新模型语义质量证明。
+
+Review：A类本轮补读导出遗漏已修，新增阻塞0；B类完整变化清单/细供应链及非必要性能后置，C类旧TaskService夹具和市场并行不动。必要一套后清本轮临时完整导出/脚本/日志/测试缓存和中断库，量见cleanup.json；正式源/有效缓存/历史失败/原研究根/attempt保护，仅本人源/新测试及可隔离文档块正常commit/push。活跃开发/人工审核未独立精确计时，不将测试等待算模型处理耗时。0新模型/外传/付费/TaskService处理入口，不补五家/第41家/S3或生产，旧S2结束结论不改；下一步按实际研究问题定向精读，不为可选补充项整批重抽。
+
 ## 348. 6.ED已有复核意见进入研究快照：十五稿保留，两个补充对象局部退出
 
 用户继续后按openspec-apply-change/business-first-goal和产品→验收→交付→A/B v3执行[已有意见消费卡](company-profile-reviewed-snapshot-card.md)。开工master/b21317d9、暂存空，既有配置/核心骨架/市场依赖/混合文档及并行不动；前轮本人EC执行根已清，本轮唯一QuoteBak根company-profile-6ed-vxbTgvA8。主矛盾是把已确认问题反映到可消费画像，而不是继续证明通道/付费重抽或追补充项完美。

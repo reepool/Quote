@@ -290,6 +290,13 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** source_only, withheld and duplicate entries retain their status/reasons with null fact payloads; raw workpapers and original/revised audit candidates MUST NOT be copied into that research payload
 - **AND** pending/limited facts retain their labels, qualifications and null values as applicable; research delivery is not formal acceptance or production authorization, legacy audit JSON/CSV/Markdown remain available, and no model call or parallel writer is introduced
 
+#### Scenario: Export includes the same-report supplemental readings visible through the API
+- **WHEN** the original read owner exports a selected workpaper base that has subsequent readings
+- **THEN** it MUST additionally write annual_profiles.json containing the same safe annual-profile projection and exact report/hash-bound reading ancestry as that selected base, including each reading's work identity, facts, sources, actual review status, remaining gaps and acquisition suggestions
+- **AND** existing per-reading JSON/Markdown/CSV and research_profiles.json remain compatible; the new combined file is listed in the existing export manifest, contains no raw rejected/original repair candidates, and preserves null payloads for withheld/source-only objects
+- **AND** stock, work and processing-identity selection MUST NOT silently export a different latest base or a different report; missing, orphaned or hash-mismatched supplemental ancestry is not merged, repeated fact IDs remain reading-qualified, and no model calls or source writes occur
+- **AND** this is a research delivery only, not cross-reading reconciliation, full-report completion, revised historical scores or production authorization
+
 #### Scenario: A model discovers distinctive information outside the baseline
 - **WHEN** the selected original sections contain company-specific information the model judges useful beyond the baseline eight elements
 - **THEN** the model MAY populate optional company_features using the existing element/fact/metric/evidence contract, without a fixed feature taxonomy, mandatory number of extras or a parallel writer
