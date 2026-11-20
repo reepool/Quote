@@ -1,0 +1,22 @@
+"""Run the single legacy-route assertion against HEAD code in memory only."""
+import importlib
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+import research.company_profile.operations
+
+for name in ['workpaper', 'workpaper_review', 'runtime', 'reads', 'operations']:
+    path = f'research/company_profile/{name}.py'
+    original = subprocess.check_output(['git', 'show', f'21ffe7a2:{path}'], cwd=ROOT, text=True)
+    module = importlib.import_module(f'research.company_profile.{name}')
+    exec(compile(original, f'<21ffe7a2:{path}>', 'exec'), module.__dict__)
+
+import pytest
+raise SystemExit(pytest.main([
+    '-q', 'tests/unit/test_research/test_company_profile_operations.py::test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer',
+    '--basetemp=' + str(Path(__file__).parent / 'baseline-tests'),
+    '--junitxml=' + str(Path(__file__).parent / 'baseline.xml'),
+]))

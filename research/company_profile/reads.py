@@ -237,6 +237,8 @@ class CompanyProfileReadService:
                 "generation": paper.generation.model_dump(mode="json") if paper.generation else None,
                 "review_status": paper.quality_review.status if paper.quality_review else "not_reviewed",
                 "review_calls": [c.model_dump(mode="json") for c in paper.quality_review.calls] if paper.quality_review else [],
+                **({"review_execution_failure": paper.quality_review.execution_failure.model_dump(mode="json")}
+                   if paper.quality_review and paper.quality_review.execution_failure else {}),
                 "evidence": [e.model_dump(mode="json") for e in paper.evidence if e.evidence_id in cited]})
         for gap in gaps:
             gap["supplemental_reading_work_ids"] = list(dict.fromkeys(

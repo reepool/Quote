@@ -1,0 +1,123 @@
+{
+  "task": "6.EB",
+  "base_commit": "21ffe7a2cd8f8a389d514e3f107c76468f7a2557",
+  "commands": {
+    "direct_and_delivery": "python -m pytest -q tests/unit/test_research/test_company_profile_review_failures.py tests/unit/test_research/test_company_profile_workpaper_delivery.py --basetemp=<owned QuoteBak>/final-tests --junitxml=<owned QuoteBak>/final.xml",
+    "final_metadata_scope": "python -m pytest -q tests/unit/test_research/test_company_profile_review_failures.py -k 'not task_service_stops' --basetemp=<owned QuoteBak>/metadata-tests --junitxml=<owned QuoteBak>/metadata.xml",
+    "extended_interrupted": "python -m pytest -q tests/unit/test_research/test_company_profile_review_failures.py tests/unit/test_research/test_company_profile_workpaper_review.py tests/unit/test_research/test_company_profile_workpaper_general_closure.py tests/unit/test_research/test_company_profile_operations.py --basetemp=<owned QuoteBak>/verified-tests --junitxml=<owned QuoteBak>/verified.xml",
+    "legacy_api_hash": "python <owned QuoteBak>/check_legacy.py (snapshot retained)",
+    "baseline": "python <owned QuoteBak>/check_baseline.py (five baseline modules loaded from 21ffe7a2 in memory only)",
+    "strict": "OPENSPEC_TELEMETRY=0 DO_NOT_TRACK=1 openspec validate restore-company-profile-llm-led-generalization --strict"
+  },
+  "changed_python_sha256": {
+    "research/company_profile/workpaper.py": "1ccf776c86473d3c6f076dde3256168ca6a84a49f267c989b53af3f3f85c9b81",
+    "research/company_profile/workpaper_review.py": "a4a7b1a71567eb7c27fa00fa50c25c3c3827704b011e236f3689003faeba58cb",
+    "research/company_profile/runtime.py": "90e4df4a23326ed2794020fcb4100ea22fbf5bcc05b7c58aa0217aeaf2e4d396",
+    "research/company_profile/operations.py": "29114369951c2d1541b12f52981d4793079f8d3504f76a2178f3848bc7506f33",
+    "research/company_profile/reads.py": "d839dfdf557e1fad929d81b47ee02422e1b466ccc1bed4ccef295d342e0e2ae7",
+    "tests/unit/test_research/test_company_profile_review_failures.py": "36dc8ed8812b38877f6f3db8bc073bf64e8e4432061f9ef3e479ca943235def4"
+  },
+  "real_model_requests": 0,
+  "external_data_transmission": 0,
+  "real_company_entries": 0,
+  "direct_and_delivery": {
+    "tests": 42,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suite_seconds": 223.748,
+    "failed_testcases": []
+  },
+  "final_metadata_scope": {
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suite_seconds": 10.58,
+    "failed_testcases": []
+  },
+  "overlapping_tests_not_added_as_distinct": true,
+  "final_scope_delta": "after direct integration run, failure-order gap handling, early scope guards and requested-vs-selected attribution received targeted checks; unaffected successful integration assertions reused",
+  "extended_interrupted": {
+    "passed": 75,
+    "failed": 3,
+    "not_completed": 9,
+    "exit_code": 130,
+    "completed_failure_ids": [
+      "tests/unit/test_research/test_company_profile_operations.py::test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer",
+      "tests/unit/test_research/test_company_profile_operations.py::test_pause_stops_further_drain_and_resume_skips_completed_scopes",
+      "tests/unit/test_research/test_company_profile_operations.py::test_one_unbound_company_does_not_block_the_other"
+    ],
+    "reason": "stop expanding into unrelated legacy overview path; no whole-suite pass claimed"
+  },
+  "baseline": {
+    "result": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "suite_seconds": 159.544,
+      "failed_testcases": [
+        "test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer"
+      ]
+    },
+    "method": "compile and execute HEAD five changed modules in memory; dirty core skeleton unchanged",
+    "known_failure": "legacy fixture expected extract_calls=1, observed0",
+    "remaining_two": "same fixture dependencies, not individually baseline-proved"
+  },
+  "early_fixture_runs": {
+    "initial": {
+      "tests": 7,
+      "failures": 5,
+      "errors": 0,
+      "skipped": 0,
+      "suite_seconds": 5.489,
+      "failed_testcases": [
+        "test_real_empty_shape_has_one_retry_and_keeps_unrelated_content[initial]",
+        "test_real_empty_shape_has_one_retry_and_keeps_unrelated_content[repair]",
+        "test_real_empty_shape_has_one_retry_and_keeps_unrelated_content[final]",
+        "test_task_service_stops_before_third_company_but_keeps_initial_and_final_failed_drafts[True]",
+        "test_task_service_stops_before_third_company_but_keeps_initial_and_final_failed_drafts[False]"
+      ]
+    },
+    "second": {
+      "tests": 7,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "suite_seconds": 112.295,
+      "failed_testcases": [
+        "test_task_service_stops_before_third_company_but_keeps_initial_and_final_failed_drafts[True]",
+        "test_task_service_stops_before_third_company_but_keeps_initial_and_final_failed_drafts[False]"
+      ]
+    },
+    "causes": [
+      "fixture requested20 exceeds default16 physical cap",
+      "fixture three-company unknown reservations exhausted one-company120000 ledger"
+    ],
+    "production_caps_or_acceptance_assertions_relaxed": false
+  },
+  "old_delivery": {
+    "canonical_files_unchanged": 254,
+    "writer_files_unchanged": 15,
+    "old_API_profiles_equal": 15,
+    "old_catalog_equal": true,
+    "new_model_requests": 0
+  },
+  "strict_valid": true,
+  "changed_python_ast_valid": true,
+  "scoped_diff_clean": true,
+  "review": {
+    "resolved_current_blockers": [
+      "initial/final execution failure parity",
+      "actual processing order and missing-result gap",
+      "requested profile not actual model attribution"
+    ],
+    "nonblocking": "optional detail/supply chain/style not expanded",
+    "unrelated": "legacy overview assertions and pre-existing core/config/market changes not repaired"
+  },
+  "supplier_empty_content_root_cause": "unknown_not_fixed_by_offline_checks",
+  "S2": "failed_scheme_ended_unchanged",
+  "S3_authorized": false,
+  "production_authorization": "not_authorized"
+}

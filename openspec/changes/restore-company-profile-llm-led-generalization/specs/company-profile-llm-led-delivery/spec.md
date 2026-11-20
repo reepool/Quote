@@ -138,6 +138,11 @@ An explicitly review-enabled workpaper MUST reuse the current gateway and writer
 
 The reviewer MUST identify checked fact IDs/elements and source-cited errors, ambiguity and material omissions within the supplied scope. Unknown references MUST NOT remove or approve facts. Validly flagged erroneous/ambiguous facts MUST leave the ordinary narrative while remaining auditable. Independent useful facts and all original sources MUST be retained. Optional omissions MUST NOT require repair. At most one combined local repair and one source-grounded verification of its proposed changes are allowed; repairs MUST preserve unrelated facts, report/source identity, exact numeric constraints and original responses. Only explicitly resolved issues with actually checked repaired objects may be applied. Failure, insufficient coverage, unresolved or newly found issues MUST remain visible and limited, never silently clear gaps. Review status MUST distinguish model-reviewed scope from trusted release and full-report completeness.
 
+#### Scenario: A final verification execution failure follows an initial review failure in a bounded batch
+- **WHEN** an explicitly enabled consecutive-same-execution-failure batch policy observes adjacent companies in actual processing order failing on the same review channel and gateway cause, whether at initial review or final verification
+- **THEN** the original task owner stops subsequent dispatch after retaining both available drafts, without interpreting incomplete final verification as a successful execution or reviving unverified edits
+- **AND** actual failure stage and safe gateway cause/channel remain machine-readable, requested profiles are not misreported as actual selected models, ordinary missing information or open findings do not trigger this execution-failure rule, legacy records keep their original serialized shape, and no additional retry, model call or authorization is created
+
 #### Scenario: A partial review contains independent valid findings
 - **WHEN** a structurally valid review lists missing, duplicate or unknown checked IDs, or one finding has invalid references while other findings have unique known targets and sources
 - **THEN** the owner MUST retain the known unique checked scope and independent valid findings, isolate invalid findings with explicit reasons, and keep the review incomplete

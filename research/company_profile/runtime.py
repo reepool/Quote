@@ -369,6 +369,7 @@ class CompanyProfileStageRuntime:
         )
         self._semantic_service = semantic_service or CompanyProfileSemanticService()
         self._states: dict[str, _WorkState] = {}
+        self._semantic_attempt_order: list[str] = []
 
     def apply_token_budget(self, token_budget: int) -> None:
         """Push the remaining shared budget into this runtime and its provider."""
@@ -380,6 +381,27 @@ class CompanyProfileStageRuntime:
 
     def tokens_consumed(self) -> int:
         return sum(max(0, int(state.tokens_used)) for state in self._states.values())
+
+    def begin_review_batch(self) -> None:
+        """Do not carry a prior invocation's failure streak into a new run."""
+        self._semantic_attempt_order.clear()
+
+    def review_batch_stop_reason(self, work_ids: Sequence[str]) -> str | None:
+        """Inspect this run's actual completion order, not unstable queue key order."""
+        from .workpaper_review import consecutive_review_failure
+
+        reviews = []
+        selected = set(work_ids)
+        for work_id in self._semantic_attempt_order:
+            if work_id not in selected:
+                continue
+            state = self._states.get(work_id)
+            record = state.published if state is not None else None
+            reviews.append(
+                (record.report.instrument_id, record.workpaper.quality_review)
+                if isinstance(record, CompanyProfileRuntimeRecordV3) else None
+            )
+        return consecutive_review_failure(tuple(reviews))
 
     def fresh_tokens(self) -> int:
         """Tokens spent in this process, excluding a ledger restored from disk."""
@@ -443,6 +465,8 @@ class CompanyProfileStageRuntime:
             return self._publish(state)
         finally:
             self._active_state = None
+            if stage == "semantic" and state.work_id not in self._semantic_attempt_order:
+                self._semantic_attempt_order.append(state.work_id)
 
     def _bind(self, item: Mapping[str, Any]) -> _WorkState:
         work_id = str(item["work_id"])

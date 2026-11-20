@@ -1287,6 +1287,18 @@ class CompanyProfileTaskService:
         | None = None,
     ) -> dict[str, Any]:
         requested_ids = tuple(instrument_ids)
+        from .workpaper_review import BATCH_STOP_POLICY
+
+        batch_stop_policy = self.processing_identity.get("workpaper_batch_stop_policy")
+        if batch_stop_policy not in {None, BATCH_STOP_POLICY}:
+            raise ValueError("unknown workpaper batch stop policy")
+        if batch_stop_policy and (not enqueue or not requested_ids):
+            raise ValueError("workpaper batch stop requires an explicit bounded run, not an unscoped resume")
+        if batch_stop_policy and (
+            self.processing_identity.get("reading_strategy") != "chapter_workpaper_v1"
+            or not self.processing_identity.get("workpaper_review_policy")
+        ):
+            raise ValueError("workpaper batch stop requires source-review-enabled workpapers")
         batch_plan = load_m4_next_batch_plan(
             self.checkpoint_root, plan_directory=self.plan_directory
         )
@@ -1436,10 +1448,23 @@ class CompanyProfileTaskService:
                 if limit_drain_to_enqueued
                 else None
             )
+        batch_stop_reason = None
+        run_work_ids = tuple(include_work_ids if include_work_ids is not None
+                             else enqueue_result.get("work_ids") or ())
+        if batch_stop_policy:
+            include_work_ids = run_work_ids
+            self.runtime.begin_review_batch()
+
+        def should_stop() -> bool:
+            nonlocal batch_stop_reason
+            if batch_stop_policy == BATCH_STOP_POLICY:
+                batch_stop_reason = batch_stop_reason or self.runtime.review_batch_stop_reason(run_work_ids)
+            return batch_stop_reason is not None or self._should_stop_run()
+
         try:
             if include_work_ids is None or include_work_ids:
                 for stage in WORK_STAGES:
-                    if self._should_stop_run():
+                    if should_stop():
                         stopped = True
                         break
                     drain[stage] = await self.production._drain_stage(
@@ -1447,10 +1472,10 @@ class CompanyProfileTaskService:
                         budget,
                         processing_identity_hash=self.processing_identity_hash,
                         include_work_ids=include_work_ids,
-                        should_stop=self._should_stop_run,
+                        should_stop=should_stop,
                     )
                     if (
-                        self._should_stop_run()
+                        should_stop()
                         or drain[stage].get("stop_requested")
                         or drain[stage].get("status") == "stopped"
                     ):
@@ -1494,6 +1519,8 @@ class CompanyProfileTaskService:
             drain=drain,
             queue=health,
         )
+        if batch_stop_reason is not None:
+            result["stop_reason"] = batch_stop_reason
         delivered_ids, _incomplete = self._this_round_live_outcomes(
             instrument_ids,
             tuple(enqueue_result.get("work_ids") or ()),

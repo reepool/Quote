@@ -1,5 +1,17 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 345. 6.EB离线修复：失败可见、原稿保留与连续停止
+
+用户在6.EA结束后要求继续，按openspec-apply-change/business-first-goal及产品→验收→交付→A/B v3，先判主矛盾为复核执行可用性/状态消费，不追供应链或重抽。开工master/21ffe7a2、暂存空，EA本人临时根已清；既有配置/核心骨架/混合文档及市场数据并行保护，仅新QuoteBak/workpaper-eb-p8RgLe。先写6.EB卡/spec/design/tasks，再原workpaper/review/runtime/TaskService及read owner最小实现，不新建批量循环或平台。
+
+[实际行为与限制](workpaper-review-failure-recovery-20261120/result.md)：quality_review.execution_failure区分初核/修订/终核、网关code/空内容及请求profile/实际selected/model/source；未知实际身份不伪装。年报API按readings展示，只新失败有该元数据，旧稿序列化/原值/hash不改。显式新run策略consecutive_same_execution_failure.v1收窄本轮证券工作集，按原runtime实际语义处理完成顺序，第二个同根因失败稿由原writer先保存再停下一发送；普通缺项/覆盖意见/成功/不同通道/无结果间隔/同公司重复不凑两连败，跨run重置。未启用策略的旧调用不变，无范围resume不假装已启保护；原EA多进程适配器不改、不再复用failed-only条件，不冒称本卡验证了新并发多进程调度。
+
+实际CommonGateway替换传输复用EA保存空正文形态（非HTTP字节），三失败阶段各恰好一次允许恢复，未知usage预留累计；一次恢复成功则不记执行失败。原TaskService三公司受控：先终核失败再初核同类失败，启用10物理后停第三家，默认13物理处理三家；两失败稿主营仍非空、未核修订不复活，query/export/新实例/API缺项一致。原EA254文件及15 writer输出hash不变、当前目录与15份API逐家等于旧快照；0新真实模型/外传/公司/生产，不把工程修复计S2通过或供应商恢复。
+
+直接修复/交付42通过、最终归因/作用域14通过，有重叠不直接相加；早期夹具请求cap与三公司预留准备错误5/2失败保记录，改测试准备而非生产预算/断言。扩展旧入口75通过/3失败后主动停止，9未完成；旧overview夹具未调extract的首失败已用任务前21ffe7a2五模块内存原代码复现0!=1，另两共享夹具的暂停/单坏公司旧路径未逐项基线，不称全仓全绿，不扩修脏核心骨架。Review A类本轮停止漏计、完成顺序、无结果间隔误连、请求身份误标实际均已收口；B类可选明细/平台后置，C类旧入口与并行不动。strict/语法/diff及旧hash检查、具体命令/当前快照与回执见verification.json。
+
+单份必要XML/旧API核对/结论后清本人库、测试导出、日志/脚本，正式源/缓存/attempt/旧回执和并行保护，见cleanup。仅本人五源/新测试和可隔离文档块普通commit/push；活跃开发/人工审核未单独精确计时，测试时间不冒称开发时间。外部空返回根因仍未知，下一宜先裁决小范围通道验证，不借旧S2余额/补五家/第41家/启S3或生产；不再为验证通道而整批重抽。
+
 ## 344. 6.EA唯一新20家确认结束：15份研究稿，S2未通过
 
 用户call_ed4cf8881a7643b8aee6b64c1b85f2e3明确批准整卡。按openspec-apply-change/business-first-goal、产品→验收→交付→A/B v3实施；开工master/4239a4cb、暂存空，既有配置/核心骨架/混合文档与市场数据并行保护。先清前轮本人无依赖物，再原PDF owner准备20公开2025年报、独立读集中章节冻结60基础参考且不给模型；实际provider2450/高阶物理1200/Flash600及同获准联网DNS/TLS核后冻结64源码/提示v21/复核v12/源与operator，原TaskService无旧导航/答案/人工参考，不热修。

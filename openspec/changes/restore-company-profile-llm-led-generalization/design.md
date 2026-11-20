@@ -1,5 +1,9 @@
 ## Context
 
+### 6.EB 复核执行失败不再依赖公司完成状态的字符串猜测
+
+原quality_review新增可选本地execution_failure，保实际purpose、网关code/空返回分类与通道身份，年报API的readings按需展示；缺省序列化不增加字段，旧原件/hash不改。基础内容/意见与执行失败分开，终核incomplete同初核failed参与同根因判断；普通缺项、源歧义和completed_with_open_findings不等于执行失败。原TaskService通过显式workpaper_batch_stop_policy=consecutive_same_execution_failure.v1约束本轮明确证券/工作集，按原runtime实际处理完成顺序判断而非猜数据库hash顺序，第二个失败稿先由原writer保存，再停下一公司语义请求；已有在途不回滚，每轮重置。无显式名单或无范围的resume拒绝启用该策略，默认历史调用不变。独立operator若并发多个服务，须消费同一复核判定，不得继续复用EA冻结适配器的failed-only条件。卡内仅离线验证，不复活S2/扩大外传或生产。
+
 ### 6.EA 唯一确认组失败后的交付与执行边界
 
 冻结组不热修；高阶返回空正文/缺finish_reason虽尚未到时限，仍是复核失败，终核incomplete不能从同核心根因停止判断中漏掉。原适配器本轮确有漏计，独立监督只停派发父进程、在途按原限结束后走既有stop hook，实际15启动/5未启动；不冒称原自动停止正确，也不改旧失败。15原稿沿原writer以显式use_review新研究根交付，原业务内容/来源/模型意见/hash不改；254有限源核覆盖所有48实际采纳修订，6项source_only不进入普通精确结论。API保信息缺口、建议、模型及研究分级，未启动明确404。确认未过结束S2本方案，不补五家/扩第41家/进S3或生产；不以14基础有源描述或400之外有限核查伪造正式质量通过。

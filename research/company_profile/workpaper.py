@@ -735,6 +735,18 @@ class WorkpaperReviewFinding(_Model):
     revised_fact: WorkpaperFact | None = None
 
 
+class WorkpaperReviewExecutionFailure(_Model):
+    """Local execution diagnostics; never a model-authored quality decision."""
+
+    purpose: Literal["review_profile_workpaper", "repair_profile_workpaper", "verify_profile_workpaper_repair"]
+    kind: Literal["empty_response", "gateway_error", "contract_error"]
+    code: str = Field(min_length=1)
+    requested_profile: str | None = None
+    selected_profile: str | None = None
+    source_label: str | None = None
+    model: str | None = None
+
+
 class WorkpaperQualityReview(_Model):
     status: Literal["completed", "completed_with_open_findings", "incomplete", "failed"]
     policy_version: str = "company_profile_workpaper_review.v1"
@@ -746,12 +758,15 @@ class WorkpaperQualityReview(_Model):
     locally_revalidated_request_ids: tuple[str, ...] = ()
     error: str | None = None
     checked_fact_hashes: dict[str, str] | None = None
+    execution_failure: WorkpaperReviewExecutionFailure | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
         payload = handler(self)
         if self.checked_fact_hashes is None:
             payload.pop("checked_fact_hashes", None)
+        if self.execution_failure is None:
+            payload.pop("execution_failure", None)
         return payload
 
 

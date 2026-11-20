@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="159.544" timestamp="2026-11-20T10:42:39.457170+08:00" hostname="ComputeR"><testcase classname="tests.unit.test_research.test_company_profile_operations" name="test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer" time="158.169"><failure message="assert 0 == 1&#10; +  where 0 = &lt;tests.unit.test_research.test_company_profile_runtime._RequestBoundOverviewProvider object at 0x7f613220fcd0&gt;.extract_calls">tests/unit/test_research/test_company_profile_operations.py:159: in test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer
+    assert provider.extract_calls == 1
+E   assert 0 == 1
+E    +  where 0 = &lt;tests.unit.test_research.test_company_profile_runtime._RequestBoundOverviewProvider object at 0x7f613220fcd0&gt;.extract_calls</failure></testcase></testsuite></testsuites>

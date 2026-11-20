@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-20接6.EA只做[6.EB复核失败处理卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-review-failure-card.md)：原review/workpaper/runtime/TaskService以显式策略处理初核和终核相同执行失败，API按读取批次保失败阶段/网关原因及请求配置与实际模型身份差别；缺项/限用不混作执行失败。保存响应离线重放与受控原入口证明第二失败稿先持久、再停后续发送，原15稿/API不变；无新真实调用、不重开S2/补五家/第41家/S3或生产，外部供应商空返回根因仍未知。必要测试/Review/strict和本人块Git后清本轮QuoteBak，正式源/旧证据/有效缓存及并行保护，结果见workpaper-review-failure-recovery-20261120/result.md。
+
 2026-11-20 6.EA整卡已结束，[15份实际画像/API缺项及资源对照](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/result.md)。核心价值是15份非空有源研究稿、402可读对象/650指标，254有限独核、48真实采纳修订全核、6项仅源参考；14基础描述成立但不冒称正式可用或全稿99%。顺丰终核/分众初核连续高阶空正文用尽恢复，适配器漏计incomplete导致未自动停派，独立只停派发父进程、在途原限收尾，未热修；实际15/20、余5未启动，不重开。77物理/6恢复/2687292保守账本/unknown费用、业务跨度2362.612秒，三读及API15个200/5个404一致。唯一S2确认未通过且方案结束，不补五家/第41家、不进S3/生产，不把执行可靠性问题转成供应链/可选要素门槛；后续方案需明确裁决，当前只交研究内容/限制。必要证据一套后清本人QuoteBak/重复导出，正式源/有效缓存/旧API/attempt及并行保护，A/B v3/Review/strict/本人Git收尾。
 
 2026-11-19 6.DZ已交[通用收口及唯一确认组准备](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-general-closure-20261119/result.md)：原抽取v21/复核v12分别组织独立收入/调整断言及补缺目标，同主体多指标/特色/不确定继续允许；writer重复写事件不改，归档按唯一路径消费。131有效旧验证＋2新增全新原TaskService受控全链最终通过，旧12只读397/603、源坐标和三读不变。下一6.EA固定20源/候补/分层及资源卡已备，当前新外传/模型/入口授权0，不重抽旧12/20或续平安；批准后先冻独立参考、实际代码/接线与同联网，再一次同版确认。旧S2失败保留、通过才进100家准备，不追加第41家/生产；必要一套后清本人库/测试/日志和重复导出，正式源/有效缓存/旧API/attempt及并行保护，A/B v3/Review/本人Git收尾。
