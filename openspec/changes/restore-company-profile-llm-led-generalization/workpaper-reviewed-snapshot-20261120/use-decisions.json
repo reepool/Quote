@@ -1,0 +1,131 @@
+{
+  "task": "6.ED",
+  "report": {
+    "instrument_id": "002027.SZ",
+    "report_id": "1225251512",
+    "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "basis": "Inherited finite independent source decisions from 6.EA plus the two 6.EC findings independently checked against source; not full-profile re-audit or model correction.",
+  "inherited_review": {
+    "report": {
+      "instrument_id": "002027.SZ",
+      "report_id": "1225251512",
+      "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-28T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reviewer": "Codex finite independent core/adopted-revision source check 6.EA; not full sample accuracy",
+    "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/audit-decisions.json",
+    "reference_sha256": "dac2b40e689be3769947dc30b41046d871d6c2d47efd846b116094c9fd43a06b",
+    "decisions": [
+      {
+        "fact_id": "F-BS-01",
+        "fact_sha256": "cbdd22aef04f4ed5a33246a1e86f116edfc16a8b139b438c23e0cea37542d71c",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+        "limitation": null
+      },
+      {
+        "fact_id": "F-BS-02",
+        "fact_sha256": "50c9cb6d61004941187142b1bf4d891ad7d3d5860f46d1d7142c0be8ea91346a",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+        "limitation": "源时点为2026-03-31，不写2025年末；约数和自营/加盟/参股分开。"
+      },
+      {
+        "fact_id": "F-PS-01",
+        "fact_sha256": "8e56da4f2aaf2f02a8425f0634d65a39f0bcc035c523d83250d41c3084c5c04d",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0002",
+          "source-0012"
+        ],
+        "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+        "limitation": null
+      },
+      {
+        "fact_id": "F-PS-02",
+        "fact_sha256": "696ce4b149a5a536c8afad0f9633dbf3afadafb1c390e734c4a4fbe4f5334067",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+        "limitation": null
+      },
+      {
+        "fact_id": "F-RM-01",
+        "fact_sha256": "21bb1bec626ec376f7191e0518761e379539ce9293a95cad4524bb463abc1827",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+        "limitation": null
+      },
+      {
+        "fact_id": "F-RM-02",
+        "fact_sha256": "acc77dd7bc5e12fa7da05fe7f8f4f8edfe1f5691fbba3acc4b12da491a6a63cf",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+        "limitation": null
+      },
+      {
+        "fact_id": "F-RM-03",
+        "fact_sha256": "b1de36f0ec75bf48c58a01b875a65f67580d3bbeb56e8fd5c57d526414f96611",
+        "disposition": "source_checked",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "reason": "p10楼宇/影院媒体及2026-03-31媒体数量，p15产品收入而非广告主行业作自身业务，p16楼宇成本毛利，p162广告履约/主要责任人及按时段确认收入。",
+        "limitation": "毛利率增减原表以百分号显示，标准化为百分点保原来源单位；不当相对增长率。"
+      }
+    ]
+  },
+  "spot_check": {
+    "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-channel-check-20261120/finding-spot-check.json",
+    "sha256": "d172c2b08b6eebbf639ed84c37df9006d567bf217d5a24eb567e4eafb33d55fb"
+  },
+  "model_response": {
+    "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-channel-check-20261120/002027/response.json",
+    "sha256": "48071af6a2f77f01ff92808ec14403b59247bc78109b32a0ae4af4893a86e6ba"
+  },
+  "additional_decisions": [
+    {
+      "fact_id": "F-MC-01",
+      "fact_sha256": "1de9bffc8bdc0e8b96f3c25452c5f798ae11ba81a42cb2f51bad96c366a6c299",
+      "disposition": "source_only",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "reason": "合并范围发生变动一项勾选是；业务、产品或服务发生重大变化或调整有关情况勾选不适用。后者宜保披露项目原口径，而不是据此扩成确定的经济无变化结论；合并范围原句本身有据。",
+      "limitation": "本轮仅决定使用范围，未生成或采纳修订答案；不是公司整体失败。"
+    },
+    {
+      "fact_id": "F-MC-02",
+      "fact_sha256": "885e0c04b9c194e329918861fd98efe4f58a72d65afd3e605c3bd4a6c23ff8aa",
+      "disposition": "withheld",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "reason": "表头顺序为2026/3/31、2025/12/31、2024/12/31及2024/12/31至2026/3/31变动幅度。电视自营小计为122.3、121.5、113.0和8.2%；海报自营小计为106.1、112.9、147.0和-27.8%。原稿把中间列112.9/121.5错配到2024基期，和表中长周期变幅混写。",
+      "limitation": "本轮仅决定使用范围，未生成或采纳修订答案；不是公司整体失败。"
+    }
+  ],
+  "new_model_requests": 0,
+  "new_repaired_facts": 0,
+  "S2_unchanged": true
+}

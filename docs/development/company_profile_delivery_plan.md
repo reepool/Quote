@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-20 6.ED依[已有意见消费卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-reviewed-snapshot-card.md)零调用推进：原writer/read owner交十五份后继研究快照，分众两条重大变化对象分别仅源参考/隔离，其他内容继承；API显示具体缺项原因及按需补读章节，不自动补读或拒整稿。京东方旧限制和全部原模型状态保持，旧根/API/S2失败不改，不切共享配置/生产；结果见[实物与使用](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-reviewed-snapshot-20261120/result.md)。必要一套后清本轮QuoteBak，正式源/缓存/旧失败/并行保护，不再为补充项或证明通道整池重抽。
+
 2026-11-20 6.EC按用户限定批准已执行结束，[2份源复核及资源](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-channel-check-20261120/result.md)：正常对照京东方与历史失败分众各1物理有效回复，36/24ID，0/2意见；239.183/347.570业务秒、合2物理/0恢复/92162供应商total、费用unknown，组监督589.146秒。分众2意见只读对照原文，披露项目“不适用”范围过强及媒体数量基期列错配，保pending/不生成修订，原API/15writer/254证据hash不改；京东方无意见也不洗旧限制。冻结版无热修，必要一套后清本人执行日志/脚本，正式源/缓存/attempt/旧根/并行保护。下一建议复用已有稿作局部限制与研究/API验收，不为证明通道或补充项再拉新20家；本卡已用尽，不自动补五家/第41家或启S3/生产，新真实补救/验收方案另裁决。
 
 2026-11-20下一步收敛为[6.EC两份保存稿源复核通道诊断](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-review-channel-card.md)：京东方正常对照→分众历史空返回，不重选章/抽取/修订或新增公司。原源坐标、原provider实际请求与2450/1200边界零调用就绪；分众241052字节/257664静态预留，在30万上限未知失败后不会有第二次发送，预算拒发与模型失败分开，不偷偷加窗/缩源。新的限定Grok调用已整卡询问、明确回复前0真实/外传，无可发送授权；结果/限制见workpaper-review-channel-check-20261120/result.md。获批才同联网核DNS/TLS/冻结并串行执行，首份无有效回复即停后者，不启旧并发operator，不把两份诊断计正式S2/扩样；一套准备证据后清本人QuoteBak，源/缓存/旧API/attempt/并行保护。

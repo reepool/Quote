@@ -1,0 +1,560 @@
+{
+  "schema_version": "company_profile_research_catalog.v1",
+  "state": "found",
+  "total": 15,
+  "profiles": [
+    {
+      "instrument_id": "000725.SZ",
+      "report": {
+        "instrument_id": "000725.SZ",
+        "report_id": "1225068510",
+        "document_version": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-31T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-39973bd61a38a0f69bf6e159",
+      "latest_reading_work_id": "bp-work-39973bd61a38a0f69bf6e159",
+      "visible_fact_count": 35,
+      "visible_metric_count": 39,
+      "fact_states": {
+        "limited": 4,
+        "reviewed": 31,
+        "source_only": 1
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-39973bd61a38a0f69bf6e159",
+          "origin": "llm_generated",
+          "review_status": "completed"
+        }
+      ],
+      "information_gap_count": 0,
+      "information_gap_elements": [],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "002027.SZ",
+      "report": {
+        "instrument_id": "002027.SZ",
+        "report_id": "1225251512",
+        "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-714b0f41c03b8caee1d97f61",
+      "latest_reading_work_id": "bp-work-714b0f41c03b8caee1d97f61",
+      "visible_fact_count": 22,
+      "visible_metric_count": 59,
+      "fact_states": {
+        "limited": 2,
+        "pending": 15,
+        "reviewed": 5,
+        "source_only": 1,
+        "withheld": 1
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-714b0f41c03b8caee1d97f61",
+          "origin": "llm_generated",
+          "review_status": "failed"
+        }
+      ],
+      "information_gap_count": 7,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "material_changes",
+        "operations_and_inputs",
+        "revenue_model",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "report": {
+        "instrument_id": "002142.SZ",
+        "report_id": "1225189419",
+        "document_version": "6610078eb1d109465781dbd47d3256d4abbbe2f4ff1f8017e1724b3fadb35558",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-24T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-b9c957eb2ed7cf1a2da0ca3e",
+      "latest_reading_work_id": "bp-work-b9c957eb2ed7cf1a2da0ca3e",
+      "visible_fact_count": 25,
+      "visible_metric_count": 62,
+      "fact_states": {
+        "limited": 10,
+        "reviewed": 15
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-b9c957eb2ed7cf1a2da0ca3e",
+          "origin": "llm_generated",
+          "review_status": "completed"
+        }
+      ],
+      "information_gap_count": 6,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "revenue_model",
+        "scale_and_mix"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "002352.SZ",
+      "report": {
+        "instrument_id": "002352.SZ",
+        "report_id": "1225057387",
+        "document_version": "240c05b80783bc350ba9fedf22487bc4ed0e370ccd3943ed6c2736de06050ae2",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "latest_reading_work_id": "bp-work-a99435fdd6133370b6c27a91",
+      "visible_fact_count": 23,
+      "visible_metric_count": 60,
+      "fact_states": {
+        "limited": 9,
+        "reviewed": 14
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-a99435fdd6133370b6c27a91",
+          "origin": "llm_generated",
+          "review_status": "incomplete"
+        }
+      ],
+      "information_gap_count": 9,
+      "information_gap_elements": [
+        "business_structure",
+        "company_features",
+        "customers_channels_markets",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "products_services",
+        "revenue_model",
+        "scale_and_mix"
+      ],
+      "suggested_acquisition_count": 1,
+      "suggested_acquisition_elements": [
+        "operating_drivers"
+      ]
+    },
+    {
+      "instrument_id": "002594.SZ",
+      "report": {
+        "instrument_id": "002594.SZ",
+        "report_id": "1225045351",
+        "document_version": "710d8b2e08e37ba521f1c4071d2c3e2369d3cadabc21a45073215d9f72138b0b",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-b94386f72fa9b8008e18090c",
+      "latest_reading_work_id": "bp-work-b94386f72fa9b8008e18090c",
+      "visible_fact_count": 33,
+      "visible_metric_count": 32,
+      "fact_states": {
+        "limited": 5,
+        "reviewed": 28,
+        "source_only": 2
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-b94386f72fa9b8008e18090c",
+          "origin": "llm_generated",
+          "review_status": "completed_with_open_findings"
+        }
+      ],
+      "information_gap_count": 9,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "products_services",
+        "revenue_model",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 1,
+      "suggested_acquisition_elements": [
+        "scale_and_mix"
+      ]
+    },
+    {
+      "instrument_id": "300144.SZ",
+      "report": {
+        "instrument_id": "300144.SZ",
+        "report_id": "1225164604",
+        "document_version": "4b7ab7551e2c3066f01257afcf18c9a10a020b9410c5c6bc97a67c328a45cbeb",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-8a47bdc6129671bc9ca0fca1",
+      "latest_reading_work_id": "bp-work-8a47bdc6129671bc9ca0fca1",
+      "visible_fact_count": 25,
+      "visible_metric_count": 62,
+      "fact_states": {
+        "limited": 4,
+        "reviewed": 21
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-8a47bdc6129671bc9ca0fca1",
+          "origin": "llm_generated",
+          "review_status": "completed"
+        }
+      ],
+      "information_gap_count": 1,
+      "information_gap_elements": [
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "600309.SH",
+      "report": {
+        "instrument_id": "600309.SH",
+        "report_id": "1225130793",
+        "document_version": "766717cc1a3b74221d4a20892b28152b3180ef5c63d683623e8a903eebddac95",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-20T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-2829fcbafb318d193e68b256",
+      "latest_reading_work_id": "bp-work-2829fcbafb318d193e68b256",
+      "visible_fact_count": 37,
+      "visible_metric_count": 18,
+      "fact_states": {
+        "limited": 7,
+        "reviewed": 30
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-2829fcbafb318d193e68b256",
+          "origin": "llm_generated",
+          "review_status": "completed"
+        }
+      ],
+      "information_gap_count": 4,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "operating_drivers",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "600438.SH",
+      "report": {
+        "instrument_id": "600438.SH",
+        "report_id": "1225259224",
+        "document_version": "f0bd49a42e0cc42ea8766a6a8b10c70b912904788c4e69a03a9051ff29f4c2e0",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-b714e2a56fcb44d188cf3fee",
+      "latest_reading_work_id": "bp-work-b714e2a56fcb44d188cf3fee",
+      "visible_fact_count": 35,
+      "visible_metric_count": 66,
+      "fact_states": {
+        "limited": 13,
+        "reviewed": 22
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-b714e2a56fcb44d188cf3fee",
+          "origin": "llm_generated",
+          "review_status": "incomplete"
+        }
+      ],
+      "information_gap_count": 5,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "operating_drivers",
+        "operations_and_inputs",
+        "revenue_model",
+        "scale_and_mix"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "601021.SH",
+      "report": {
+        "instrument_id": "601021.SH",
+        "report_id": "1225093115",
+        "document_version": "d865b40eeccba86f465d98282989d8aacc410806f021c126cfc56de3a4f176d3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-10T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-13b0c399f5b0c8150accfdcc",
+      "latest_reading_work_id": "bp-work-13b0c399f5b0c8150accfdcc",
+      "visible_fact_count": 31,
+      "visible_metric_count": 47,
+      "fact_states": {
+        "limited": 4,
+        "reviewed": 27
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-13b0c399f5b0c8150accfdcc",
+          "origin": "llm_generated",
+          "review_status": "completed_with_open_findings"
+        }
+      ],
+      "information_gap_count": 2,
+      "information_gap_elements": [
+        "downstream_customers",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "601111.SH",
+      "report": {
+        "instrument_id": "601111.SH",
+        "report_id": "1225039287",
+        "document_version": "cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-d017ef9ea557d599dc731599",
+      "latest_reading_work_id": "bp-work-d017ef9ea557d599dc731599",
+      "visible_fact_count": 17,
+      "visible_metric_count": 36,
+      "fact_states": {
+        "limited": 4,
+        "pending": 11,
+        "reviewed": 2,
+        "source_only": 2
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-d017ef9ea557d599dc731599",
+          "origin": "llm_generated",
+          "review_status": "failed"
+        }
+      ],
+      "information_gap_count": 10,
+      "information_gap_elements": [
+        "business_structure",
+        "customers_channels_markets",
+        "downstream_customers",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "products_services",
+        "revenue_model",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "601601.SH",
+      "report": {
+        "instrument_id": "601601.SH",
+        "report_id": "1225035569",
+        "document_version": "3787b6a6ec1bf480be2092e7bae156bd0f1d1b7f9f28bd9226d038951c788dee",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-e27361c6f6d02924c70764e2",
+      "latest_reading_work_id": "bp-work-e27361c6f6d02924c70764e2",
+      "visible_fact_count": 23,
+      "visible_metric_count": 42,
+      "fact_states": {
+        "limited": 7,
+        "reviewed": 16
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-e27361c6f6d02924c70764e2",
+          "origin": "llm_generated",
+          "review_status": "completed_with_open_findings"
+        }
+      ],
+      "information_gap_count": 3,
+      "information_gap_elements": [
+        "material_changes",
+        "products_services",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 2,
+      "suggested_acquisition_elements": [
+        "products_services",
+        "revenue_model"
+      ]
+    },
+    {
+      "instrument_id": "601881.SH",
+      "report": {
+        "instrument_id": "601881.SH",
+        "report_id": "1225051623",
+        "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-522acd73d4816c9de549211a",
+      "latest_reading_work_id": "bp-work-522acd73d4816c9de549211a",
+      "visible_fact_count": 16,
+      "visible_metric_count": 19,
+      "fact_states": {
+        "limited": 2,
+        "reviewed": 14
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-522acd73d4816c9de549211a",
+          "origin": "llm_generated",
+          "review_status": "completed_with_open_findings"
+        }
+      ],
+      "information_gap_count": 6,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "revenue_model",
+        "scale_and_mix"
+      ],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "601888.SH",
+      "report": {
+        "instrument_id": "601888.SH",
+        "report_id": "1225063442",
+        "document_version": "295c5638af6ce04d2890c073c269c364d3f880fa224ace06df8bc75e0a610ec8",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-245e7049d39a49cac0cd6996",
+      "latest_reading_work_id": "bp-work-245e7049d39a49cac0cd6996",
+      "visible_fact_count": 23,
+      "visible_metric_count": 24,
+      "fact_states": {
+        "limited": 6,
+        "reviewed": 17
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-245e7049d39a49cac0cd6996",
+          "origin": "llm_generated",
+          "review_status": "completed_with_open_findings"
+        }
+      ],
+      "information_gap_count": 8,
+      "information_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "material_changes",
+        "operating_drivers",
+        "operations_and_inputs",
+        "products_services",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "suggested_acquisition_count": 2,
+      "suggested_acquisition_elements": [
+        "scale_and_mix"
+      ]
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "report": {
+        "instrument_id": "920002.BJ",
+        "report_id": "1225191989",
+        "document_version": "64897a270ddf98208d7856fb929903ac8e8a954b0cd2622ac02bb2533b817579",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-35b3e51d85531e58dbebe54e",
+      "latest_reading_work_id": "bp-work-35b3e51d85531e58dbebe54e",
+      "visible_fact_count": 29,
+      "visible_metric_count": 27,
+      "fact_states": {
+        "limited": 2,
+        "reviewed": 27
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-35b3e51d85531e58dbebe54e",
+          "origin": "llm_generated",
+          "review_status": "completed"
+        }
+      ],
+      "information_gap_count": 0,
+      "information_gap_elements": [],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    },
+    {
+      "instrument_id": "920005.BJ",
+      "report": {
+        "instrument_id": "920005.BJ",
+        "report_id": "1225196057",
+        "document_version": "31cb2c3709b934ac76094a5683a013d21a0f2375c908f302798343ddc6937653",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-7cd3e40c46bb206be0cd4234",
+      "latest_reading_work_id": "bp-work-7cd3e40c46bb206be0cd4234",
+      "visible_fact_count": 26,
+      "visible_metric_count": 55,
+      "fact_states": {
+        "limited": 2,
+        "reviewed": 24,
+        "source_only": 1
+      },
+      "readings": [
+        {
+          "work_id": "bp-work-7cd3e40c46bb206be0cd4234",
+          "origin": "llm_generated",
+          "review_status": "completed_with_open_findings"
+        }
+      ],
+      "information_gap_count": 0,
+      "information_gap_elements": [],
+      "suggested_acquisition_count": 0,
+      "suggested_acquisition_elements": []
+    }
+  ],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

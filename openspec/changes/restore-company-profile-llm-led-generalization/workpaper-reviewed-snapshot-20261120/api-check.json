@@ -1,0 +1,22 @@
+{
+  "task": "6.ED",
+  "transport": "local ASGI, external sockets disabled",
+  "process_local_research_root": "/home/python/Quote/data/research/company_profile_reviewed_20261120",
+  "shared_configuration_modified": false,
+  "production_authorization": "not_authorized",
+  "test_preparation_correction": "Initial harness used unqualified 002027 rather than the API canonical instrument_id 002027.SZ and got 404; corrected harness only, no business code or contract change.",
+  "status_codes": {
+    "catalog": 200,
+    "focus": 200,
+    "BOE": 200,
+    "unstarted_company": 404,
+    "enrichment_plan_only": 200
+  },
+  "catalog_equal": true,
+  "focus_API_equal": true,
+  "focus_API_sha256_canonical_json": "3e7457940027fb266249ee4b834689c9dae2e87f3b75585ff7a1d25775fc4322",
+  "BOE_limit_retained": true,
+  "plan_equal_and_not_executed": true,
+  "all_runtime_files_unchanged_by_reads_and_planning": true,
+  "new_model_requests": 0
+}

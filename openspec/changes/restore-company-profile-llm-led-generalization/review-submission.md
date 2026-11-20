@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 348. 6.ED已有复核意见进入研究快照：十五稿保留，两个补充对象局部退出
+
+用户继续后按openspec-apply-change/business-first-goal和产品→验收→交付→A/B v3执行[已有意见消费卡](company-profile-reviewed-snapshot-card.md)。开工master/b21317d9、暂存空，既有配置/核心骨架/市场依赖/混合文档及并行不动；前轮本人EC执行根已清，本轮唯一QuoteBak根company-profile-6ed-vxbTgvA8。主矛盾是把已确认问题反映到可消费画像，而不是继续证明通道/付费重抽或追补充项完美。
+
+沿原use-review/writer/read owner生成company_profile_reviewed_20261120新研究根：十五份400可读事实/648指标（原402/650），分众F-MC-01仅源参考、F-MC-02列期错误整对象隔离，其余十四份投影和分众其他对象原样。新增决定绑定原report/fact/hash/证据，原七项独核决定继承，6.EC独立读源为新增依据；不把两项错误人工拆取成新答案，不伪造修订采纳。京东方F-OI-04旧source_only和全部作者/模型质量状态保持，分众原failed未改绿；information_gaps明示两项未可靠获取的内容、原因和按需补读章节。详[实物/API与边界](workpaper-reviewed-snapshot-20261120/result.md)。
+
+验证：query/export/新实例一致，安全研究导出不含两个payload，原对象仍保审计；HTTP目录/两详情/精读计划200、未启动公司404，计划未执行且writer文件不变。首次ASGI测试未带交易所ID得到404，只把测试改回既有规范ID，不改业务代码或股票别名。现有10局部测试3.05秒通过/16非相关未运行，strict/diff检查通过；254原EA证据、15旧writer及33份EC材料前后hash均成立，不再跑旧大套/共享脏核心。0新模型/外传/TaskService处理入口；旧S2失败、本方案结束及S3/生产边界不变，不补五家/第41家。
+
+Review：本轮数据/绑定/分级与未改原值已核，A类新增阻塞0；B类补充变化完整性及供应链细度后置；C类既有脏核心/旧失败和市场并行不动。新结果不是新十五家公司或正式99%验收。活跃开发/审核时间未独立精确计时，验证时间不冒称业务模型耗时。必要证据一套后清本轮完整临时导出/脚本/日志/用例根，清理量见cleanup.json；新4MB研究根为实际交付保留，正式源/缓存/历史及并行保护。仅本人块正常commit/push，不整文件提交混合文档。下一步用现有分级研究API核对实际研究需求，按需指定股票补读，不为两个补充项再开付费完美闭环；新的正式扩批方案另裁决。
+
 ## 347. 6.EC两份限定源复核结束：本次通道可用，2项意见保留
 
 用户对call_92aef2bb304a4a6db2ce9c491179e555明确批准后，按openspec-apply-change/business-first-goal、产品→验收→交付→A/B v3直接执行，不逐字段请批。开工master/0d3fa02a、暂存空；原准备根已清、唯一workpaper-ec-exec-E4Rw38，仅核既有operator/源/配置/code hash未变，复用已完成离线检查，不重跑旧概述失败/全库。既有配置/核心骨架/混合文档与市场数据并行保护，授权先持久，获准联网DNS/TLS/TLSv1.3及同命名空间成立，原operator冻结无热修。

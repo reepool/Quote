@@ -1,0 +1,30 @@
+{
+  "state": "planned",
+  "execution_started": false,
+  "action": "enrich",
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6ED-focus-media-optional-followup",
+    "base_work_id": "bp-work-714b0f41c03b8caee1d97f61",
+    "base_workpaper_sha256": "5873fd9a5c5024ed6299e4ee8ee9f76b2696bff6dc492429dc2f98e304435926",
+    "report": {
+      "instrument_id": "002027.SZ",
+      "report_id": "1225251512",
+      "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-28T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "material_changes",
+        "question": "仅在用户需要时复读主要业务中的生活圈媒体数量表：区分2024/12/31、2025/12/31及2026/3/31，核变化幅度的基期；披露项目不适用保其原范围，不改写为经济无变化。"
+      }
+    ]
+  },
+  "requires": [
+    "explicit_model_and_finite_budget",
+    "publication_write_permission"
+  ],
+  "production_authorization": "not_authorized"
+}

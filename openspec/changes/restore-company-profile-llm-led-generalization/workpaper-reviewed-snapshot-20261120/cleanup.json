@@ -1,0 +1,12 @@
+{
+  "task": "6.ED",
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6ed-vxbTgvA8",
+  "removed_files": 50,
+  "released_file_bytes": 8909666,
+  "directory_absent_after_cleanup": true,
+  "scope": "This task's complete temporary export, one-off projection/API scripts, process-local logs, pytest cache and test artifacts only; all associated sessions finished before deletion.",
+  "recoverability": "Disposable outputs can be regenerated from saved real inputs and existing writer/read owner; no business source asset or unique necessary evidence deleted.",
+  "retained_business_root": "/home/python/Quote/data/research/company_profile_reviewed_20261120",
+  "retained_evidence": "workpaper-reviewed-snapshot-20261120, one authoritative necessary set",
+  "official_PDF_shared_valid_cache_old_failure_attempts_old_API_parallel_work": "untouched"
+}

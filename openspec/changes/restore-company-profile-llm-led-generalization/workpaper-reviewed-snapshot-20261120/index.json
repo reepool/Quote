@@ -1,0 +1,44 @@
+{
+  "task": "6.ED",
+  "files": {
+    "002027-annual-api.json": {
+      "sha256": "936f298447d21f4dd749a8ac80a53c3710f22e470db1c9fb233926581763f01e",
+      "bytes": 255050
+    },
+    "002027-profile.md": {
+      "sha256": "7a664412a750596cdd9364e42ac5c7e63192e698c799a2e3afaf0212e0e06386",
+      "bytes": 51750
+    },
+    "api-check.json": {
+      "sha256": "32fd8e8751854a5582d603b3c615326c7d8b11de4903ea8c4b2086bcb9e80dc7",
+      "bytes": 929
+    },
+    "catalog.json": {
+      "sha256": "8abd8aee0cd34bceb76574d61d7e1027391f4c4855e8abe6515ac25eff6d33f9",
+      "bytes": 17654
+    },
+    "cleanup.json": {
+      "sha256": "ce2582b1b4c3e8c78c400dffea740598d8327357d352a114013a4f8bffa18466",
+      "bytes": 862
+    },
+    "optional-enrichment-plan.json": {
+      "sha256": "34b11ebf7fda962cf15317b75cdafa5fa13ec56af05eb75e0e859123e8b287fc",
+      "bytes": 1138
+    },
+    "result.md": {
+      "sha256": "5f741ef744c36a5d5de7eaf92fbd0b296281aa700b2b17d9152d53f72dcf1565",
+      "bytes": 5174
+    },
+    "use-decisions.json": {
+      "sha256": "c1a2fc94601b9e6db69bb408957cbffe18210d5b6f6f089aa6f900506be11dea",
+      "bytes": 6594
+    },
+    "verification.json": {
+      "sha256": "b3e840550774619c9b933952ef99a13d5be109d505be53a3efe439505342e316",
+      "bytes": 5147
+    }
+  },
+  "runtime_file_hashes": "verification.json:new_runtime_files",
+  "source_inheritance": "use-decisions.json; unchanged records inherit the original EA index",
+  "new_model_requests": 0
+}
