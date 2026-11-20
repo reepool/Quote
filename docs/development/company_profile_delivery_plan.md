@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-20下一步收敛为[6.EC两份保存稿源复核通道诊断](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-review-channel-card.md)：京东方正常对照→分众历史空返回，不重选章/抽取/修订或新增公司。原源坐标、原provider实际请求与2450/1200边界零调用就绪；分众241052字节/257664静态预留，在30万上限未知失败后不会有第二次发送，预算拒发与模型失败分开，不偷偷加窗/缩源。新的限定Grok调用已整卡询问、明确回复前0真实/外传，无可发送授权；结果/限制见workpaper-review-channel-check-20261120/result.md。获批才同联网核DNS/TLS/冻结并串行执行，首份无有效回复即停后者，不启旧并发operator，不把两份诊断计正式S2/扩样；一套准备证据后清本人QuoteBak，源/缓存/旧API/attempt/并行保护。
+
 2026-11-20接6.EA只做[6.EB复核失败处理卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-review-failure-card.md)：原review/workpaper/runtime/TaskService以显式策略处理初核和终核相同执行失败，API按读取批次保失败阶段/网关原因及请求配置与实际模型身份差别；缺项/限用不混作执行失败。保存响应离线重放与受控原入口证明第二失败稿先持久、再停后续发送，原15稿/API不变；无新真实调用、不重开S2/补五家/第41家/S3或生产，外部供应商空返回根因仍未知。必要测试/Review/strict和本人块Git后清本轮QuoteBak，正式源/旧证据/有效缓存及并行保护，结果见workpaper-review-failure-recovery-20261120/result.md。
 
 2026-11-20 6.EA整卡已结束，[15份实际画像/API缺项及资源对照](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-s2-confirmation-result-20261119/result.md)。核心价值是15份非空有源研究稿、402可读对象/650指标，254有限独核、48真实采纳修订全核、6项仅源参考；14基础描述成立但不冒称正式可用或全稿99%。顺丰终核/分众初核连续高阶空正文用尽恢复，适配器漏计incomplete导致未自动停派，独立只停派发父进程、在途原限收尾，未热修；实际15/20、余5未启动，不重开。77物理/6恢复/2687292保守账本/unknown费用、业务跨度2362.612秒，三读及API15个200/5个404一致。唯一S2确认未通过且方案结束，不补五家/第41家、不进S3/生产，不把执行可靠性问题转成供应链/可选要素门槛；后续方案需明确裁决，当前只交研究内容/限制。必要证据一套后清本人QuoteBak/重复导出，正式源/有效缓存/旧API/attempt及并行保护，A/B v3/Review/strict/本人Git收尾。

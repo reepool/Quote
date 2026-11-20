@@ -1,0 +1,15 @@
+{
+  "task": "6.EC",
+  "exact_removed_temporary_root": "/home/python/Quote/data/QuoteBak/workpaper-ec-TDPYkZ",
+  "removed_file_bytes": 41622,
+  "previous_EB_root_already_absent": true,
+  "no_active_task_sessions": true,
+  "retained": "single operator snapshot, compact preparation/selfcheck/verification, no duplicated source text or PDF",
+  "protected": [
+    "formal PDFs and valid caches",
+    "EA/B original failures and API roots",
+    "attempt markers",
+    "parallel/pre-existing changes"
+  ],
+  "recoverability": "temporary logs and operator copy rebuildable from retained snapshot; no live DB or source asset removed"
+}

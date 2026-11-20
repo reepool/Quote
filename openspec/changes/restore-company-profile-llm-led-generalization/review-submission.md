@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 346. 6.EC两份源复核通道诊断准备（零真实调用，待限定授权）
+
+用户按OpenSpec/既定方向继续。用openspec-apply-change/business-first-goal，产品→验收→交付→A/B v3先判断主矛盾是复核可用性，不再付费重抽或钻供应链细目；开工master/59e03630、暂存空，既有配置/核心骨架/混合文档/市场数据并行保护。核EB本人临时根已清，QuoteBak唯一workpaper-ec-TDPYkZ；先写本卡/tasks/design，未修改production代码或公共Schema。
+
+[准备、约束及后续](workpaper-review-channel-check-20261120/result.md)：固定京东方000725正常对照→分众002027历史空返回，复用EA最终真实内容与原已选公开章节，不传旧审核/人工参考，不冒称原始首抽或新未见。两原PDFhash与保留Evidence坐标成立，原稿/query hash不变；实际CommonGateway workpaper_request/现有Grok high传输替换证明两份构造合法且2450逻辑/1200物理接线成立，只review目的，无选章/抽取/repair/final/writer。响应诊断只保公共传输归一化后的安全结构/长度，非原HTTP字节/SSE，不记录密钥/请求头/正文；合法与五种异常形态及秘密哨兵通过。早期自检误读预算reserved_tokens字段已改用原reserved_input/output相加，初失败只在测试准备，不改公共账本。
+
+实际静态请求京东方84005字节/100617预留，分众241052字节/257664预留；两次空内容模拟分别发2/1，分众第二次在出网前因30万上限拒绝，原257664未知预留保留，不把本地预算拒发称模型超时或保证两物理都能用。只测现有请求+上限，未为多一次恢复新增平台/缩源/改预算。原EA254文件及15 writer输出hash未变；EB同实现工程回执复用，不为本卡重复全库/旧概述失败。strict/语法/diff及有限Review，仅本人operator一次性诊断，不复制业务循环；不更改旧S2失败/门槛/API/生产。
+
+已整卡询问两稿限定公开材料外传至既有Scorpio/Grok grok-4.7 high：各1逻辑/最多2物理含1恢复/30万账本，整组串行6000秒/60万/4物理、1200物理/2450逻辑，无价unknown/有价各10元、不承诺人民币总额，无重抽/修订/再核/新公司/追加窗/共享配置或生产。明确回复前不写可发送授权、0真实/外传/联网业务入口；获批后同获准联网DNS/TLS与实际源/代码/模型再冻，首份无有效内容或认证安全问题停未启动者，整卡执行不逐字段请批。当前只交离线就绪，EC2/3仍待运行，不标整卡通过。必要一套准备/操作快照后清本人脚本日志，正式源/缓存/attempt/旧15稿及并行保护；本人文档块/准备物普通Git收尾，具体verification/cleanup。活跃开发/审核未独立精确计时，不将准备时长算模型性能。
+
 ## 345. 6.EB离线修复：失败可见、原稿保留与连续停止
 
 用户在6.EA结束后要求继续，按openspec-apply-change/business-first-goal及产品→验收→交付→A/B v3，先判主矛盾为复核执行可用性/状态消费，不追供应链或重抽。开工master/21ffe7a2、暂存空，EA本人临时根已清；既有配置/核心骨架/混合文档及市场数据并行保护，仅新QuoteBak/workpaper-eb-p8RgLe。先写6.EB卡/spec/design/tasks，再原workpaper/review/runtime/TaskService及read owner最小实现，不新建批量循环或平台。

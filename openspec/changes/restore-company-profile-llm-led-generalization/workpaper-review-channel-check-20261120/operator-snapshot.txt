@@ -1,0 +1,340 @@
+"""Two explicitly authorized source-review diagnostics, not a company re-extractor.
+
+prepare/selfcheck never use a network transport. run needs its own human approval,
+frozen preparation and approved network environment. No writer or repair call.
+"""
+import argparse
+import asyncio
+from collections import Counter
+from dataclasses import replace
+from decimal import Decimal
+import hashlib
+import json
+import os
+from pathlib import Path
+import socket
+import ssl
+import subprocess
+import sys
+import tempfile
+import time
+from urllib.parse import urlsplit
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+C = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+EA = C / 'workpaper-s2-confirmation-result-20261119'
+DEST = C / 'workpaper-review-channel-check-20261120'
+PROFILE = 'semantic_extraction__scorpio_grok'
+ORDER = ('000725', '002027')
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+
+
+def dump(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + '\n')
+
+
+def code_hashes():
+    paths = sorted((ROOT / 'research/company_profile').glob('*.py'))
+    paths += sorted((ROOT / 'utils/llm').glob('*.py'))
+    paths += sorted((ROOT / 'utils/llm/orchestration').glob('*.py'))
+    return {str(p.relative_to(ROOT)): sha(p) for p in paths}
+
+
+def input_for(code, *, validate_source=False):
+    from research.company_profile.workpaper import CompanyProfileWorkpaper, workpaper_elements
+    from research.company_profile.workpaper_sections import SectionPacket, extract_selected_layout
+
+    raw = read(EA / code / 'runtime.json')
+    paper = CompanyProfileWorkpaper.model_validate(raw['workpaper'])
+    asset = read(EA / code / 'binding.json')['asset']
+    assert sha(Path(asset['archive_path'])) == paper.report.document_version == asset['content_hash']
+    if validate_source:
+        pages = sorted({s.page for e in paper.evidence for s in e.source_spans})
+        assert paper.reading_scope.transcription_version == 'shared-pdf-pypdf-layout.v1'
+        paper.validate_pages(extract_selected_layout(Path(asset['archive_path']).read_bytes(), pages))
+    packet = SectionPacket(report=paper.report, reading_scope=paper.reading_scope, evidence=paper.evidence)
+    payload = dict(report=paper.report.model_dump(mode='json'), source_text=packet.model_text(), draft=dict(
+        elements=paper.elements.model_dump(mode='json'),
+        supply_chain=paper.supply_chain.model_dump(mode='json') if paper.supply_chain else None,
+        company_features=paper.company_features.model_dump(mode='json') if paper.company_features else None,
+        limitations=paper.limitations))
+    facts = {f.fact_id: f for e in workpaper_elements(paper).values() for f in e.facts}
+    return paper, payload, facts
+
+
+def config_for_check(*, offline=False):
+    from utils.llm.models import LlmConfig
+
+    original = LlmConfig.from_mapping(read(ROOT / 'config/13_llm.json')['llm'])
+    profile = original.profiles[PROFILE]
+    assert original.enabled and profile.enabled and PROFILE not in original.routes
+    assert urlsplit(profile.base_url).hostname == 'scorpio.reepool.com'
+    assert profile.model == 'grok-4.7' and profile.reasoning_effort == 'high'
+    profile = replace(profile, timeout_seconds=2450, attempt_timeout_seconds=1200,
+                      max_retries=1, max_schema_repair_attempts=1,
+                      **({'retry_backoff_seconds': 0, 'requests_per_minute': 0} if offline else {}))
+    return replace(original, profiles={PROFILE: profile}, routes={}, pools={})
+
+
+def envelope_shape(response):
+    """No arbitrary provider bodies, user text, credentials or headers in diagnostics."""
+    data = response.data
+    shape = dict(status_code=response.status_code, provider_request_id=response.provider_request_id,
+                 payload_type=type(data).__name__)
+    if not isinstance(data, dict):
+        return shape
+    usage = data.get('usage')
+    shape.update(top_level_keys=sorted(map(str, data)), usage_type=type(usage).__name__,
+                 usage_keys=sorted(map(str, usage)) if isinstance(usage, dict) else None)
+    choices = data.get('choices')
+    shape.update(choices_type=type(choices).__name__, choice_count=len(choices) if isinstance(choices, list) else None)
+    if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+        choice = choices[0]
+        shape.update(first_choice_keys=sorted(map(str, choice)), finish_reason=choice.get('finish_reason'))
+        message = choice.get('message')
+        shape['message_type'] = type(message).__name__
+        if isinstance(message, dict):
+            shape['message_keys'] = sorted(map(str, message))
+            for key in ['content', 'reasoning_content', 'reasoning']:
+                value = message.get(key)
+                shape[key + '_type'] = type(value).__name__
+                shape[key + '_chars'] = len(value) if isinstance(value, str) else None
+    error = data.get('error')
+    shape['error_type'] = type(error).__name__
+    if isinstance(error, dict):
+        shape['error_keys'] = sorted(map(str, error))
+    return shape
+
+
+class ObservedTransport:
+    def __init__(self, transport, diagnostics):
+        self.transport, self.diagnostics = transport, diagnostics
+        self.summaries = []
+
+    async def send(self, url, headers, payload, timeout_seconds):
+        sequence = len(self.summaries) + 1
+        started = time.monotonic()
+        summary = dict(sequence=sequence, requested_timeout_seconds=timeout_seconds,
+                       request_payload_bytes=len(json.dumps(payload, ensure_ascii=False).encode()),
+                       request_payload_sha256=digest(payload))
+        try:
+            response = await self.transport.send(url, headers, payload, timeout_seconds)
+            summary.update(envelope_shape(response))
+            return response
+        except Exception as exc:
+            summary['exception_type'] = type(exc).__name__
+            raise
+        finally:
+            summary['physical_seconds'] = round(time.monotonic() - started, 3)
+            self.summaries.append(summary)
+            if self.diagnostics is not None:
+                dump(self.diagnostics, self.summaries)
+
+    async def close(self):
+        await self.transport.close()
+
+
+def call_once(paper, payload, *, client, request_id, authorization=None):
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.workpaper import WorkpaperReviewResponse
+    from research.company_profile.workpaper_review import REVIEW_INSTRUCTIONS
+
+    provider = CommonGatewaySemanticProvider(client=client, profile=PROFILE, max_output_tokens=16384,
+        timeout_seconds=2450, execution_authorization=authorization)
+    if authorization is None:
+        provider.offline_only = True
+    result = None
+    error = None
+    try:
+        response = provider.workpaper_request(request_id=request_id, purpose='review_profile_workpaper',
+            report=paper.report, payload=payload, instructions=REVIEW_INSTRUCTIONS,
+            response_model=WorkpaperReviewResponse, max_output_tokens=16384,
+            timeout_seconds=2450, profile_override=PROFILE)
+        result = WorkpaperReviewResponse.model_validate(response)
+    except Exception as exc:
+        error = dict(type=type(exc).__name__, code=getattr(getattr(exc, 'code', None), 'value', None), detail=str(exc)[:800])
+    return result, error, provider
+
+
+def make_budget(path, *, deadline):
+    from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy, DEVELOPMENT_UNPRICED_BILLING
+    return LlmRunBudget(deadline=deadline, prices={}, max_tokens=300000, max_requests=2,
+        max_cost_cny=Decimal(10), ledger_path=path, billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        recovery_policy=LogicalRecoveryPolicy(1, 1),
+        run_authorization='company_profile_workpaper_development.2026-11-11')
+
+
+def prepare():
+    rows = []
+    config_for_check(offline=True)  # validate enabled model/host without loading credentials
+    for code in ORDER:
+        paper, payload, facts = input_for(code, validate_source=True)
+        rows.append(dict(code=code, instrument_id=paper.report.instrument_id, runtime_sha256=sha(EA / code / 'runtime.json'),
+            query_sha256=sha(EA / code / 'query.json'), document_version=paper.report.document_version,
+            input_payload_sha256=digest(payload), payload_utf8_bytes=len(json.dumps(payload, ensure_ascii=False).encode()),
+            fact_ids=list(facts), evidence_ids=[e.evidence_id for e in paper.evidence], source_coordinates_equal=True,
+            prior_model_review_status=paper.quality_review.status, source_pages=sorted({s.page for e in paper.evidence for s in e.source_spans})))
+    dump(DEST / 'preparation.json', dict(task='6.EC', status='offline_prepared_not_authorized',
+        shared_config_sha256=sha(ROOT / 'config/13_llm.json'), rows=rows,
+        code_sha256=code_hashes(),
+        new_model_requests=0, original_runtime_and_API_unchanged=True,
+        input_is_saved_final_real_content_not_original_first_extraction=True))
+    print(json.dumps(rows, ensure_ascii=False))
+
+
+def selfcheck():
+    from utils.llm.client import LlmClient
+    from utils.llm.testing import ScriptedTransport
+    from utils.llm.transport import TransportResponse
+
+    config = config_for_check(offline=True)
+    rows = []
+    secret = 'must-not-appear-in-diagnostics'
+    diagnostic = envelope_shape(TransportResponse(200, {'error': {'message': secret}, 'choices': [
+        {'message': {'content': '', 'reasoning_content': secret}, 'finish_reason': None}]}))
+    assert secret not in json.dumps(diagnostic) and diagnostic['content_chars'] == 0
+    shapes = [None, {'choices': None}, {'choices': [{}], 'usage': 42},
+              {'choices': [{'message': {'content': [], 'tool_calls': []}}]}, {'error': secret}]
+    for data in shapes:
+        assert secret not in json.dumps(envelope_shape(TransportResponse(200, data)))
+    for item in read(DEST / 'preparation.json')['rows']:
+        paper, payload, facts = input_for(item['code'])
+        assert digest(payload) == item['input_payload_sha256']
+        raw = dict(reviewed_fact_ids=list(facts), findings=[])
+        scripted = ScriptedTransport([{'choices': [{'message': {'content': json.dumps(raw)}, 'finish_reason': 'stop'}],
+                                      'model': 'controlled-not-real', 'usage': {'prompt_tokens': 1, 'completion_tokens': 1, 'total_tokens': 2}}])
+        observed = ObservedTransport(scripted, None)
+        budget = make_budget(None, deadline=time.monotonic() + 6000)
+        client = LlmClient(config, transport=observed, owns_transport=True,
+            environment={config.profiles[PROFILE].api_key_env: 'offline-placeholder'}, physical_budget=budget)
+        try:
+            result, error, provider = call_once(paper, payload, client=client, request_id='controlled-channel-' + item['code'])
+            assert error is None and result is not None and set(result.reviewed_fact_ids) == set(facts)
+            assert len(scripted.calls) == budget.snapshot()['physical_requests'] == 1
+            assert [r['purpose'] for r in provider.workpaper_receipts] == ['review_profile_workpaper']
+            attempt = budget.snapshot()['attempts'][0]
+            reservation = attempt['reserved_input_tokens'] + attempt['reserved_output_tokens']
+            assert 1190 <= observed.summaries[0]['requested_timeout_seconds'] <= 1200
+            rows.append(dict(code=item['code'], physical_calls_simulated=1, purpose='review_profile_workpaper',
+                timeout_cap=2450, physical_timeout=observed.summaries[0]['requested_timeout_seconds'],
+                request_payload_bytes=observed.summaries[0]['request_payload_bytes'],
+                reserved_tokens=reservation, two_unchanged_unknown_reservations_fit=2 * reservation <= 300000,
+                fields_and_all_fact_IDs_valid=True))
+        finally:
+            asyncio.run(client.close())
+    failure_rows = []
+    for code in ORDER:
+        paper, payload, _ = input_for(code)
+        empty = {'choices': [{'message': {'content': ''}, 'finish_reason': None}]}
+        scripted = ScriptedTransport([empty, empty])
+        observed = ObservedTransport(scripted, None)
+        budget = make_budget(None, deadline=time.monotonic() + 6000)
+        client = LlmClient(config, transport=observed, owns_transport=True,
+            environment={config.profiles[PROFILE].api_key_env: 'offline-placeholder'}, physical_budget=budget)
+        try:
+            result, error, _ = call_once(paper, payload, client=client, request_id='controlled-empty-' + code)
+            expected = 2 if code == '000725' else 1
+            assert result is None and error is not None
+            assert len(scripted.calls) == budget.snapshot()['physical_requests'] == expected
+            assert all(s['status_code'] == 200 and s['content_chars'] == 0 and s['finish_reason'] is None
+                       for s in observed.summaries)
+            failure_rows.append(dict(code=code, simulated_physical_calls=expected, empty_HTTP200_captured=True,
+                error=error, unknown_ledger=budget.snapshot()['charged_tokens'],
+                admission_refuses_extra_send_when_reservation_does_not_fit=code == '002027'))
+        finally:
+            asyncio.run(client.close())
+    dump(DEST / 'offline-check.json', dict(task='6.EC', diagnostics_do_not_contain_text_or_headers=True,
+        rows=rows, simulated_failure_cases=failure_rows, new_model_requests=0, simulated_content_not_quality_evidence=True))
+    print(json.dumps(rows, ensure_ascii=False))
+
+
+def run():
+    from utils.llm.client import LlmClient
+    from utils.llm.config import load_project_environment
+    from utils.llm.transport import HttpxOpenAICompatibleTransport
+
+    approval = read(DEST / 'approval.json')
+    assert approval['status'] == 'explicitly_approved' and approval['order'] == list(ORDER)
+    assert not (DEST / 'group-start.json').exists(), 'unique window already occupied'
+    assert sha(Path(__file__)) == read(DEST / 'readiness.json')['operator_sha256']
+    started = time.monotonic()
+    deadline = started + 6000
+    prepared = read(DEST / 'preparation.json')
+    assert sha(ROOT / 'config/13_llm.json') == prepared['shared_config_sha256']
+    assert code_hashes() == prepared['code_sha256']
+    load_project_environment(ROOT)
+    config = config_for_check()
+    assert os.environ.get(config.profiles[PROFILE].api_key_env)
+    try:
+        found = socket.getaddrinfo('scorpio.reepool.com', 443, type=socket.SOCK_STREAM)
+        with socket.create_connection(('scorpio.reepool.com', 443), timeout=10) as connection:
+            with ssl.create_default_context().wrap_socket(connection, server_hostname='scorpio.reepool.com') as tls:
+                preflight = dict(dns_addresses=len(found), tls=tls.version(), namespace=os.readlink('/proc/self/ns/net'))
+    except (OSError, ssl.SSLError) as exc:
+        dump(DEST / 'environment-failure.json', dict(phase='DNS_TLS_preflight', exception_type=type(exc).__name__,
+             model_requests=0, actual_entry_started=False))
+        raise
+    dump(DEST / 'network-preflight.json', dict(**preflight, permission_mode='approved_network_exec', model_requests=0))
+    dump(DEST / 'group-start.json', dict(started=started, deadline=deadline, operator_sha256=sha(Path(__file__)), approval=approval))
+    rows = []
+    stop = None
+    for item in prepared['rows']:
+        code = item['code']
+        assert code_hashes() == prepared['code_sha256'] and sha(ROOT / 'config/13_llm.json') == prepared['shared_config_sha256']
+        assert not (DEST / code).exists()
+        paper, payload, facts = input_for(code)
+        assert digest(payload) == item['input_payload_sha256'] and sha(EA / code / 'runtime.json') == item['runtime_sha256']
+        folder = DEST / code
+        folder.mkdir()
+        dump(folder / 'attempt.json', dict(code=code, approval_reference=approval['reference'], input_payload_sha256=digest(payload)))
+        budget = make_budget(folder / 'budget.json', deadline=deadline)
+        transport = ObservedTransport(HttpxOpenAICompatibleTransport(), folder / 'http-envelope-shapes.json')
+        client = LlmClient(config, transport=transport, owns_transport=True, physical_budget=budget)
+        begun = time.monotonic()
+        try:
+            result, error, provider = call_once(paper, payload, client=client, request_id='6ec-review-' + code,
+                authorization=dict(status='authorized', document_version=paper.report.document_version,
+                                   approval_reference=approval['reference']))
+            counts = Counter(result.reviewed_fact_ids) if result is not None else Counter()
+            source_ids = {e.evidence_id for e in paper.evidence}
+            row = dict(code=code, instrument_id=paper.report.instrument_id, valid_response=result is not None,
+                complete_checked_IDs=set(counts) == set(facts) and all(n == 1 for n in counts.values()),
+                unknown_finding_references=any(set(f.evidence_ids) - source_ids for f in result.findings) if result else None,
+                findings=len(result.findings) if result else None, error=error,
+                business_seconds=round(time.monotonic() - begun, 3), budget=budget.snapshot(),
+                semantic_accuracy='not_independently_assessed', corrections_adopted=0)
+            dump(folder / 'response.json', result.model_dump(mode='json') if result else None)
+            dump(folder / 'model-receipts.json', provider.workpaper_receipts)
+            dump(folder / 'provider-traces.json', [t.model_dump(mode='json') for t in provider.traces])
+            dump(folder / 'result.json', row)
+            rows.append(row)
+            print(json.dumps(row, ensure_ascii=False), flush=True)
+            if result is None:
+                stop = 'no_valid_review_after_bounded_attempts'
+                break
+        finally:
+            asyncio.run(client.close())
+    dump(DEST / 'execution.json', dict(task='6.EC', rows=rows, stop_reason=stop,
+        not_started=[c for c in ORDER if c not in {r['code'] for r in rows}],
+        supervision_seconds=round(time.monotonic() - started, 3), old_S2_unchanged=True,
+        production_authorization='not_authorized'))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action', choices=['prepare', 'selfcheck', 'run'])
+    action = parser.parse_args().action
+    {'prepare': prepare, 'selfcheck': selfcheck, 'run': run}[action]()

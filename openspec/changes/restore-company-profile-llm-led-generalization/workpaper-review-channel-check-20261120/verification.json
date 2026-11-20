@@ -1,0 +1,40 @@
+{
+  "task": "6.EC",
+  "base_commit": "59e03630",
+  "commands": [
+    "python <owned QuoteBak>/channel_check.py prepare",
+    "python <owned QuoteBak>/channel_check.py selfcheck",
+    "OPENSPEC_TELEMETRY=0 DO_NOT_TRACK=1 openspec validate restore-company-profile-llm-led-generalization --strict"
+  ],
+  "source_coordinates_equal": true,
+  "successful_controlled_gateway_requests": 2,
+  "malformed_diagnostic_shapes_checked": 5,
+  "credential_text_sentinel_absent": true,
+  "controlled_empty_failure_physical_counts": [
+    2,
+    1
+  ],
+  "physical_timeout": 1200,
+  "logical_timeout": 2450,
+  "initial_selfcheck_failure": "operator expected a nonexistent reserved_tokens field; fixed by summing existing reserved_input_tokens and reserved_output_tokens",
+  "production_budget_or_schema_changed": false,
+  "production_code_changed": false,
+  "mechanical_EB_checks_reused_without_rerun": true,
+  "unapproved_run_refused_before_network": true,
+  "old_EA_canonical_files_unchanged": 254,
+  "old_writer_files_unchanged": 15,
+  "full_API_readback": "not_repeated; same read implementation and immutable files, reuse EB",
+  "actual_model_requests": 0,
+  "external_data_transmission": 0,
+  "source_review_quality": "not_assessed",
+  "strict_valid": true,
+  "AST_valid": true,
+  "diff_clean": true,
+  "review": {
+    "blocking": "no remaining offline input/diagnostic issue; paid authority still pending",
+    "resource_limit": "large saved Focus packet does not fit a second unknown-usage reservation; refuse, do not expand",
+    "nonblocking": "no supply-chain refinement or new pipeline",
+    "unrelated": "pre-existing mixed/core/config/market edits untouched"
+  },
+  "production_authorization": "not_authorized"
+}

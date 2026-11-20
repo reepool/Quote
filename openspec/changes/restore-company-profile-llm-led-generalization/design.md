@@ -1,5 +1,9 @@
 ## Context
 
+### 6.EC 先验证两份已有稿的复核通道，不重新抽取公司
+
+固定正常对照京东方与历史空返回分众，只复用EA最终真实内容及原公开章节，历史审核/人工参考不送新复核，原文件/API不改；诊断不冒称还原首抽。原CommonGatewaySemanticProvider的一次review目的与原Schema即可，既不新造业务循环，也不授权自动repair/final。解析前在operator局部只记录安全的响应结构与内容长度以分离HTTP成功、有效正文、Schema/语义覆盖；不保存鉴权头或猜供应商内部根因。新增真实请求须明确限定授权，未批仅准备；原S2结束、不追加样本/窗口/生产。
+
 ### 6.EB 复核执行失败不再依赖公司完成状态的字符串猜测
 
 原quality_review新增可选本地execution_failure，保实际purpose、网关code/空返回分类与通道身份，年报API的readings按需展示；缺省序列化不增加字段，旧原件/hash不改。基础内容/意见与执行失败分开，终核incomplete同初核failed参与同根因判断；普通缺项、源歧义和completed_with_open_findings不等于执行失败。原TaskService通过显式workpaper_batch_stop_policy=consecutive_same_execution_failure.v1约束本轮明确证券/工作集，按原runtime实际处理完成顺序判断而非猜数据库hash顺序，第二个失败稿先由原writer保存，再停下一公司语义请求；已有在途不回滚，每轮重置。无显式名单或无范围的resume拒绝启用该策略，默认历史调用不变。独立operator若并发多个服务，须消费同一复核判定，不得继续复用EA冻结适配器的failed-only条件。卡内仅离线验证，不复活S2/扩大外传或生产。

@@ -1,0 +1,56 @@
+{
+  "task": "6.EC",
+  "diagnostics_do_not_contain_text_or_headers": true,
+  "rows": [
+    {
+      "code": "000725",
+      "physical_calls_simulated": 1,
+      "purpose": "review_profile_workpaper",
+      "timeout_cap": 2450,
+      "physical_timeout": 1200,
+      "request_payload_bytes": 84005,
+      "reserved_tokens": 100617,
+      "two_unchanged_unknown_reservations_fit": true,
+      "fields_and_all_fact_IDs_valid": true
+    },
+    {
+      "code": "002027",
+      "physical_calls_simulated": 1,
+      "purpose": "review_profile_workpaper",
+      "timeout_cap": 2450,
+      "physical_timeout": 1200,
+      "request_payload_bytes": 241052,
+      "reserved_tokens": 257664,
+      "two_unchanged_unknown_reservations_fit": false,
+      "fields_and_all_fact_IDs_valid": true
+    }
+  ],
+  "simulated_failure_cases": [
+    {
+      "code": "000725",
+      "simulated_physical_calls": 2,
+      "empty_HTTP200_captured": true,
+      "error": {
+        "type": "SemanticProviderError",
+        "code": "candidate_schema_invalid",
+        "detail": "LLM response message content is empty; finish_reason is missing"
+      },
+      "unknown_ledger": 201547,
+      "admission_refuses_extra_send_when_reservation_does_not_fit": false
+    },
+    {
+      "code": "002027",
+      "simulated_physical_calls": 1,
+      "empty_HTTP200_captured": true,
+      "error": {
+        "type": "SemanticProviderError",
+        "code": "deadline_exceeded",
+        "detail": "physical_request_token_context_or_cost_budget_exhausted"
+      },
+      "unknown_ledger": 257664,
+      "admission_refuses_extra_send_when_reservation_does_not_fit": true
+    }
+  ],
+  "new_model_requests": 0,
+  "simulated_content_not_quality_evidence": true
+}

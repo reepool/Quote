@@ -1,0 +1,12 @@
+{
+  "task": "6.EC",
+  "state": "offline_prepared_waiting_explicit_authorization",
+  "operator_sha256": "18dd9ad661985ec80f4b852dd62e90ce9038711dc98d70adcb4ffbd4c124b7ee",
+  "preparation_sha256": "313834c2c06cd6e0c04595642134f280f2fb422a66f804ae277a2c8885df7b75",
+  "offline_checks_sha256": "f7fd08662171f254998256a4cdfc5549d8cfc0a8b2437e9f0ee5fa64fb810e33",
+  "source_profile_binding": "existing scorpio.reepool.com / grok-4.7 high",
+  "approved_network_preflight": "not_run_pending_authorization",
+  "actual_model_requests": 0,
+  "callable_authorization": false,
+  "S2_unchanged": true
+}
