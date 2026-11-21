@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 364. 6.EQ日常job两阶段入口：显式文件完成模型/预算接线，不再逐轮手写Python
+
+用户继续推进，按产品→验收→交付→A/B v3及OpenSpec/business-first技能，95242653/master开工、暂存空。6.EP两份真实画像证明先交稿后复核成立，本轮主要P2是原CLI不能注入模型/预算，仍依赖临时操作脚本；先同步spec/设计/任务卡，再于company_profile域增加窄task_entry适配，main/scheduler仅参数与条件转发。非框架重构，不新增调度/业务循环，既有原应用与writer不变，不借EP余额或为未采纳非息候选加窗。
+
+原job支持first_read/review_batch和execution-plan-file；文件明确当前授权/引用、股票/报告版本、截止日、研究/检查点根、已启用具体profile身份及有限预算。实际请求核股票/version，模型identity不符拒绝；只任务局部设置，不改共享配置/默认路由。相同run_id参数hash/结果/账本持久，重提只复用、不重新构造client/预算；变参或已开始无完整结果不能重开旧额。status/pause/query/export由文件定位根、不创建模型或占run_id；旧无文件行为和job_config位置参数保留。模板planned，不把配置文件当新授权，正式用法见docs/development/company_profile_task_usage.md。
+
+22新增＋4相关旧共26passed/0skipped，70.56秒（JUnit70.313）。实际CLI parser/main/run_job→job方法→适配器→原应用/正式源适配器/本地两页PDF→公共网关/writer，受控首读非空/待核→保存完整计划→新实例复核、旧稿superseded及相同ID不重发成立，59.51秒；仅初始化/一般调度/通知与外部传输被替换，不声称真实付费CLI或新模型质量。第一夹具无标题按原规则拒绝后改成有标题PDF，未放宽源规则。早期21/25/26集重叠不累加，未跑无关旧大套；Review修CLI无文件提前拒绝、校验值隐藏，并保旧位置参数，已针对复验无剩余A类阻塞；B泛化/调度/细项后置，C既有并行与旧测试问题不动。strict/语法/diff及JSON模板解析通过，见[结果及JUnit/hash](workpaper-configured-job-20261121/result.md)。
+
+当前两研究根24writer hash不变（旧15家20文件、EP两股4文件），0新模型/外传/真实公司运行/生产或共享配置变化；旧S2结束与95%/99%/S3不改。仅保必要结果/最终JUnit/校验及当前用法，核无占用后清本人company-profile-6eq-ytUFFXQw测试库/检查点/生成PDF缓存/重复输出和日志，量见cleanup.json；原来源/缓存/真实稿/失败/attempt及其他改动保护。scheduler/tasks.py仅隔离本函数新增接线，不纳入既有并行内容；本人块正常commit/push。活跃开发/审核总时长未精确计量。
+
 ## 363. 6.EP真实两阶段闭环：约102秒先交两稿，复核补3条/修4条，保1候选缺项
 
 用户对call_0woVGnosFSnrfjfOxIGfyxI2明确答“批准这两家一次两阶段真实观察”后，按原6.EP连续执行；4e594554/master及原60模块/来源/config hash冻结，无生产代码修改。获准联网DeepSeek/Scorpio DNS及TLSv1.3/实际2450与600/1200接线成立，唯一attempt写入。原execute_published_task(first_read)全新读宁波002142/万达920002，102.432秒交22/29待核对象；保存计划后新TaskService由同应用函数review_batch源复核，不载旧语义或人工参考。

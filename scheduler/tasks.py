@@ -8843,8 +8843,9 @@ class ScheduledTasks:
         reason: str = "operator_request",
         output_directory: Optional[str] = None,
         job_config: Optional[JobConfig] = None,
+        execution_plan_file: Optional[str] = None,
     ) -> bool:
-        """Forward Stage 5 common-core preview/run/status/pause/resume/query/export."""
+        """Forward legacy actions or an explicit workpaper execution-plan file."""
         task_id = "company_profile_common_core"
         self._active_tasks.add(task_id)
         try:
@@ -8867,20 +8868,29 @@ class ScheduledTasks:
                         "[Scheduler] Official annual-report access unavailable: %s",
                         exc,
                     )
-            result = await execute_published_task(
-                action=action,
-                storage=storage,
-                output_root=DEFAULT_OUTPUT_ROOT,
-                checkpoint_root=DEFAULT_CHECKPOINT_ROOT,
-                shared_asset_access=shared_asset_access,
-                knowledge_cutoff=knowledge_cutoff,
-                instrument_ids=instrument_ids,
-                max_items=max_items,
-                token_budget=token_budget,
-                max_elapsed_seconds=max_elapsed_seconds,
-                reason=reason,
-                output_directory=output_directory,
-            )
+            if execution_plan_file is not None:
+                from research.company_profile.task_entry import execute_configured_task
+
+                result = await execute_configured_task(action=action, storage=storage,
+                    execution_plan_file=execution_plan_file, shared_asset_access=shared_asset_access,
+                    output_directory=output_directory, reason=reason)
+            elif str(action).strip().lower() in {"first_read", "review_batch"}:
+                raise ValueError("company-profile first_read/review_batch requires execution_plan_file")
+            else:
+                result = await execute_published_task(
+                    action=action,
+                    storage=storage,
+                    output_root=DEFAULT_OUTPUT_ROOT,
+                    checkpoint_root=DEFAULT_CHECKPOINT_ROOT,
+                    shared_asset_access=shared_asset_access,
+                    knowledge_cutoff=knowledge_cutoff,
+                    instrument_ids=instrument_ids,
+                    max_items=max_items,
+                    token_budget=token_budget,
+                    max_elapsed_seconds=max_elapsed_seconds,
+                    reason=reason,
+                    output_directory=output_directory,
+                )
             status = str(result.get("state") or "failed")
             normalized_action = str(action or "").strip().lower()
             if normalized_action in {"preview", "status", "pause", "query"}:

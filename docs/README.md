@@ -31,6 +31,7 @@
 ## 研究数据域
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
+- [公司画像首读与独立复核命令](development/company_profile_task_usage.md)：显式股票/来源/模型/预算文件，原job入口执行、读取与幂等记录
 - [公司画像产品总需求](development/company_profile_product_and_industry_semantic_requirements.md)：唯一产品目标；全A股公司画像、产品暴露、供应链定位；真实LLM语义与程序硬约束分工。
 - [公司画像研究预览](development/company_profile_research_preview.md)：当前十二家CT/CV/CX有源内容；[原查询/导出分级读回](../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-graded-delivery-result-20261117/profiles.md)区分已核、待核、限用及隔离，仍非正式同版验收或生产发布。
 - [验收计划v2](development/company_profile_acceptance_program.md)：唯一数量、质量/成本门槛、容错/补救和实际进度；4家开发、12家新链回归、20家盲测、100家试运行，再全市场分波。

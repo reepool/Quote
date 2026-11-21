@@ -1185,10 +1185,11 @@ def create_parser():
     job_parser.add_argument('--job-id', required=True, help='任务ID')
     job_parser.add_argument(
         '--action',
-        choices=['preview', 'run', 'status', 'pause', 'resume', 'query', 'export'],
+        choices=['preview', 'run', 'status', 'pause', 'resume', 'query', 'export', 'first_read', 'review_batch'],
         help='company_profile_common_core 等任务的操作',
     )
     job_parser.add_argument('--knowledge-cutoff', help='知识截止日 YYYY-MM-DD')
+    job_parser.add_argument('--execution-plan-file', help='公司画像显式股票/来源/模型/预算JSON；不隐式授权')
     job_parser.add_argument('--instrument-ids', help='逗号分隔证券代码，可空')
     job_parser.add_argument('--max-items', type=int, help='每阶段有界条数')
     job_parser.add_argument('--token-budget', type=int, help='总 token 预算')
@@ -1227,6 +1228,17 @@ async def main():
     """主函数"""
     parser = create_parser()
     args = parser.parse_args()
+
+    if args.command == 'job' and args.action in {'first_read', 'review_batch'}:
+        if args.job_id != 'company_profile_common_core' or not args.execution_plan_file:
+            parser.error('first_read/review_batch requires the company-profile task and an execution plan file')
+    if args.command == 'job' and args.execution_plan_file:
+        if args.job_id != 'company_profile_common_core':
+            parser.error('--execution-plan-file is only supported by company_profile_common_core')
+        if any(getattr(args, key) is not None for key in (
+            'knowledge_cutoff', 'instrument_ids', 'max_items', 'token_budget', 'max_elapsed_seconds',
+        )):
+            parser.error('stock scope and limits must come from the execution plan file')
 
     if not args.command:
         parser.print_help()
@@ -1336,6 +1348,7 @@ async def main():
                 "max_elapsed_seconds",
                 "reason",
                 "output_directory",
+                "execution_plan_file",
             ):
                 value = getattr(args, key, None)
                 if value is not None:

@@ -1,5 +1,11 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.EQ 日常job入口消费显式有界执行文件（离线开发）
+
+- [x] 6.EQ1 同步设计/spec和用法；原job支持first_read/review_batch及execution-plan-file，显式股票/源版本/模型/预算和研究根，不默认开模型或改共享配置。
+- [x] 6.EQ2 在company_profile域增加窄参数适配，复用原配置/网关/预算和execute_published_task，保唯一队列/writer；相同run_id不可重置旧预算，完成结果重提复用、未完成不自动续发，控制/只读动作不创建模型。
+- [x] 6.EQ3 受控实际CLI/任务→原应用/正式源/PDF/网关首读及保存计划复核、重复不重发成立；26直接/相关回归通过，含越界源/坏计划/暂停/旧位置参数和默认兼容。两研究根24writer不变，Review/strict/本人块Git及QuoteBak清理，0新真实调用/生产，见workpaper-configured-job-20261121/result.md及§364。
+
 ### 6.EP 两家真实两阶段使用观察（先完成准备，新调用待限定授权）
 
 - [x] 6.EP1 复用6.EO当前同hash验证；宁波银行002142/万达轴承920002正式PDF/237及190页原生缓存、实际deferred身份和任务局部2450/600/1200接线核对，原入口到首个选章边界成立、0发送。完整有限卡/两阶段操作快照已备，20writer不变；临时库收尾清理。详workpaper-two-phase-observation-20261121/result.md及§362，尚非新画像/质量结果。

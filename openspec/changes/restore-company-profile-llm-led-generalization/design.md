@@ -1,5 +1,13 @@
 ## Context
 
+### 6.EQ 用现有job命令使用两阶段动作
+
+6.EP验证两阶段真实有效，但CLI仍不能注入模型/有限预算，只能每轮手写操作脚本。本轮增加execution-plan-file这个显式参数，main/scheduler仅薄转发到company_profile域的参数适配，再调用既有execute_published_task；不复制业务循环，不新增调度器或修改共享默认模型/配置。新文件只接受first_read/review_batch及当前研究用途：明确run_id、授权状态/引用、股票和报告版本、截止日、研究/检查点根、既有具体profile身份及本次有限预算。源版本在每个实际请求前核对；引用模型是配置中已启用、名称/host/model吻合的具体profile，禁止隐式换路由。
+
+适配器只负责本次明确依赖的构造及关闭：原配置、原LlmClient/CommonGateway、原预算和workpaper身份，任务局部等待/协议参数不写共享配置。相同run_id保存规范化参数hash和执行结果，重提只读旧结果；已开始但没有完整结果不得用新预算自动续发，范围/模型/额度变化不得复用该ID。新计划不是自动追加授权；实际新外传/预算仍按任务卡明确批准。status/pause/query/export可用同文件定位根和股票，但不构造模型或改变执行记录；旧无文件动作行为不变。
+
+这是日常使用的直接P2接线，不是通用模型工厂/授权平台或框架重构。scheduler/tasks.py只增加参数和条件转发，已有脏内容隔离；同一权威应用服务及writer不变，未启用任何生产调度。本轮受控响应/临时库验证，不借6.EP余额或新发真实调用。开工核6.EP根已清，全部本人临时物只在company-profile-6eq-ytUFFXQw，交接持久必要一套后清理；真实源/缓存、两研究根24writer及既有并行保护。
+
 ### 6.EO 两阶段动作在同一应用入口分发
 
 在既有execute_published_task与CompanyProfileTaskService.execute公开first_read和review_batch，不新增业务循环、运行器或默认模型工厂。内部调用方显式注入provider、processing_identity、execution_budget、storage及根目录；本卡不接通CLI共享模型配置，不新增HTTP付费执行。旧run/resume默认内联形态不变。

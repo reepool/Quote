@@ -1,0 +1,64 @@
+{
+  "task": "6.EQ",
+  "baseline_commit": "95242653",
+  "business_behavior": "Existing job CLI consumes a bounded explicit workpaper plan and reuses the published application owner",
+  "test_command": "python -m pytest tests/unit/test_research/test_company_profile_configured_task.py tests/unit/test_research/test_company_profile_operations.py::test_cli_forwards_five_actions_to_execute_job_direct tests/unit/test_research/test_company_profile_operations.py::test_scheduler_job_only_forwards_to_operations_owner tests/unit/test_research/test_company_profile_operations.py::test_scheduler_run_does_not_treat_zero_delivery_as_success tests/unit/test_research/test_company_profile_operations.py::test_published_catalog_lists_verified_task_not_design_or_legacy_names -q --basetemp=<task root>/pytest-reviewed --junitxml=<task root>/tests-reviewed.xml",
+  "tests": {
+    "passed": 26,
+    "new_cases": 22,
+    "related_existing_cases": 4,
+    "skipped": 0,
+    "failures": 0,
+    "pytest_seconds": 70.56,
+    "junit_seconds": 70.313,
+    "controlled_cli_to_saved_review_call_seconds": 59.51,
+    "transport": "ScriptedTransport; no external model sends",
+    "scope": "Actual CLI parser/main/run_job, job handler, configured adapter, original published owner, official source adapter with a generated two-page PDF, gateway and writer. Only the general scheduler dispatch/process initialization and notification were stubbed.",
+    "earlier_overlapping_runs": "Initial fixture lacked section headings and failed; corrected PDF fixture. Intermediate 21/25-case runs overlap and are not added to final counts."
+  },
+  "source_test_sha256": {
+    "research/company_profile/task_entry.py": "8aa19e1d8ba757ae37118d660c6a61561146be191b9b0258919eb1c7c1f6f276",
+    "main.py": "ab0d8982b7a5aa668c73f835aed9d01370501b52acdbd221099181d674330da0",
+    "tests/unit/test_research/test_company_profile_configured_task.py": "c6a2291457ce99b218113e9f3d1d2d7a743ecf8c31a97fa2f8eb2165a3ed0b35"
+  },
+  "scheduler_owned_function_sha256": "6e43ed68b018351dc849a8f97763cb3a5cd0d93550c7d7c8f7338ae4b16dde59",
+  "scheduler_preexisting_context": "The file had unrelated edits before work; stage only the owned company_profile_common_core function change. Whole-file working-tree context is not part of this commit.",
+  "checks": [
+    "Source-bound pending content exists after first_read",
+    "Saved disk plans run review_batch without re-extraction",
+    "Same run_id returns saved result without constructing another client or budget",
+    "Changed/unfinished run IDs cannot reopen their limits",
+    "Bad scope, report version, authorization, profile drift, credentials and publication stop rejected",
+    "Read/control modes construct no models",
+    "CLI budget/scope ambiguity, other job and missing plan rejected before initialization",
+    "Unknown inputs do not leak their values in validation errors",
+    "Legacy CLI and job forwarding remain compatible",
+    "Documented template parses and stays planned"
+  ],
+  "research_protection": {
+    "prior20_reference": "../workpaper-batch-query-20261121/saved-batch-verification.json#protected_20_writer_sha256",
+    "new4_reference": "../workpaper-two-phase-observation-20261121/delivery-verification.json#new_writer_sha256",
+    "unchanged_files": 24
+  },
+  "review": {
+    "blocking_remaining": 0,
+    "issues_fixed": [
+      "Explicit paid CLI actions now reject missing execution files before initialization",
+      "Validation exceptions omit raw input values"
+    ],
+    "nonblocking_deferred": [
+      "Generic model factories or scheduling",
+      "Optional company details"
+    ],
+    "unrelated_untouched": "Pre-existing market/config/core edits and legacy test issues"
+  },
+  "syntax_and_diff": "passed",
+  "openspec_strict": "passed",
+  "actual_shared_config_lookup_without_client": "enabled named DeepSeek/Scorpio profiles resolve through UnifiedConfigManager.get_llm_config; no model client or external send",
+  "new_real_calls": 0,
+  "new_external_transfers": 0,
+  "shared_configuration_changed": false,
+  "production_schedules_enabled": false,
+  "old_S2_changed": false,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,15 @@
+{
+  "task": "6.EQ",
+  "previous_6EP_preparation_and_execution_roots_absent_at_start": true,
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6eq-ytUFFXQw",
+  "active_open_fds_before_cleanup": [],
+  "files_removed": 185,
+  "logical_file_bytes_removed": 7989624,
+  "physical_reclaimed_bytes_measured": false,
+  "root_absent_after_cleanup": true,
+  "persistent_evidence": ["result.md", "validation.json", "tests.xml", "cleanup.json"],
+  "removed": ["temporary SQLite databases/queue/checkpoints", "generated PDF fixtures and their derived caches", "controlled workpapers and execution-plan records", "overlapping intermediate test reports"],
+  "retained": ["current product code, tests and command runbook", "official sources and useful caches", "24 unchanged real research writer files", "old failures/attempts", "shared logs/cache and all parallel or pre-existing work"],
+  "new_real_model_calls": 0,
+  "recoverability": "removed fixture data is reproducible from committed tests; original source and research data was not deleted"
+}
