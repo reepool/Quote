@@ -1,0 +1,67 @@
+{
+  "run_id": "6eu-920016-review_batch",
+  "action": "review_batch",
+  "started_epoch": 1795280808.0779135,
+  "finished_epoch": 1795281143.0615802,
+  "command_wall_seconds": 334.984,
+  "process_returncode": 0,
+  "absolute_deadline_timeout": false,
+  "allocated_budget": {
+    "seconds": 5939.051070213318,
+    "tokens": 953738,
+    "physical_requests": 8,
+    "recoveries": 3,
+    "logical_seconds": 2450,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "result_path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/920016/executions/6eu-920016-review_batch/result.json",
+  "result_state": "completed",
+  "usage": {
+    "physical_requests": 1,
+    "recoveries": 0,
+    "charged_tokens": 54294,
+    "known_supplier_total": 54294,
+    "unknown_usage_reservation": 0,
+    "priced_cost_cny": "0",
+    "fees": "unknown",
+    "budget_path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/920016/executions/6eu-920016-review_batch/budget.json",
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "18f1b22c9f9c45ea8e27fb2afd6608b2",
+        "logical_request_id": "17c6302425b2f77f738dc8fe29290ad1294d574cdfe67fde6b26edec6403279e",
+        "source_label": "scorpio:grok-4.7",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_grok",
+        "provider_resource": "scorpio:grok",
+        "model": "grok-4.7",
+        "reserved_input_tokens": 103801,
+        "reserved_output_tokens": 16384,
+        "charged_tokens": 54294,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 25813,
+          "output_tokens": 395,
+          "total_tokens": 54294
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 656,
+          "content_fragments": 395,
+          "content_chars": 757,
+          "content_sha256": "ba84285d0448488a68b2db23fbec7f002e19455a452cc2d5c04ea0a2c51cc348",
+          "reasoning_present": true,
+          "reasoning_chars": 22022,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6eu-b-3YUSDBLW/6eu-920016-review_batch.log"
+}

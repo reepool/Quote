@@ -1,0 +1,18 @@
+{
+  "temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6eu-b-3YUSDBLW",
+  "removed": true,
+  "regular_files_removed": 88,
+  "regular_file_bytes_removed": 17485133,
+  "active_own_processes_before_removal": [],
+  "removed_scope": "Completed one-off metadata/parameter/dispatch/verification scripts, duplicate successful process logs, local pytest databases/fixtures/intermediates. Rebuildable; no real model evidence or official source removed.",
+  "retained": {
+    "necessary_failure_log": "000070-original-initialization-error.log: minimal original failure tail; full temporary log intentionally removed",
+    "original_initial_records": "34 original first-run writers and281 originally frozen files unchanged; actual failure and all95 parsed request/response receipts remain in business checkpoints",
+    "raw_company_records": "/home/python/Quote/data/research/company_profile_prospective20_20261122",
+    "execution_checkpoints": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122",
+    "single_current_release": "/home/python/Quote/data/research/company_profile_prospective20_release_20261122",
+    "official_sources": "All approved PDFs, original failed retrieval observations and valid reusable page caches preserved",
+    "old_and_parallel": "Original29 writer records/old15-company release and all parallel/unowned paths protected; A temp root untouched"
+  },
+  "historical_phase_log_path_policy": "Temporary log_path values in frozen phase results are historical locations, not required read dependencies; actual receipts/budgets/results and the necessary initialization failure tail are persistent."
+}

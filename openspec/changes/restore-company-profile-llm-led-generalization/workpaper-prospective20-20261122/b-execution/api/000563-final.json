@@ -1,0 +1,4660 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "000563.SZ",
+  "report": {
+    "instrument_id": "000563.SZ",
+    "report_id": "asset_496a38b2046429fbe2bad5e2499ee74e",
+    "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+    "report_period": "2025-12-31",
+    "published_at": "2026-02-09T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-e1378be74bf6cc830e83b055",
+  "latest_reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+  "readings": [
+    {
+      "work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "workpaper_sha256": "0fb4605d9133bb333bb696dc2b1ec75195bea34c3af700dafdc52b0fc9cbacf6",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0023",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司所处的行业情况"
+            ],
+            "start_page": 11,
+            "end_page": 12,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          },
+          {
+            "section_id": "section-0026",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "二、报告期内公司从事的主要业务"
+            ],
+            "start_page": 12,
+            "end_page": 14,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          },
+          {
+            "section_id": "section-0037",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 14,
+            "end_page": 18,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          },
+          {
+            "section_id": "section-0079",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "十一、公司未来发展的展望"
+            ],
+            "start_page": 24,
+            "end_page": 25,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0005（公司简介和主要财务指标）与section-0016（主要会计数据和财务指标）可提供总量财务摘要，但section-0037/0045已覆盖经营与收入，故不重复扩读",
+          "section-0060（资产及负债状况分析）与section-0066（投资状况分析）属资产结构细节，非收入来源核心，暂不纳入",
+          "section-0324至section-0347（信托财务报告）为信托项目汇总表，属受托资产口径，不能替代公司营业收入，故不选",
+          "section-0433（财务报告）及附注仅在有实质缺口时定向补充，不整体扩读"
+        ],
+        "selection_rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。",
+        "stop_reason": "已覆盖业务结构、产品服务、经营模式、收入构成与主要业务权重、经营变化与展望等核心问题；剩余为治理、财务附注与信托项目汇总等非必要范围，可在不扩读的情况下停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "营业收入构成表仅按“金融信托业务”单一类别列示，未拆分信托业务、固有业务、投资顾问等中介业务的收入金额或占比，主要业务权重无法从收入口径进一步细化。",
+        "主要销售客户和主要供应商情况标注为不适用，未披露客户集中度或供应商信息。",
+        "信托业务报酬计费方式、定增实施进度等细节在所选章节未披露。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-e1378be74bf6cc830e83b055:workpaper:sections",
+          "request_hash": "064959f9f92e79841d047094cb25fc537d1b3cefb999ae5888ca263c867149f3",
+          "response_hash": "f44295d8a44ccc40fceeee8eb1bc046d5752b2723ebfdf52dd75a4ba45560c24",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 22261,
+            "output_tokens": 418,
+            "total_tokens": 22679
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 843,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0283",
+            "section-0287",
+            "section-0288",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0301",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0440",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0474",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0611",
+            "section-0612",
+            "section-0613",
+            "section-0614",
+            "section-0615",
+            "section-0616",
+            "section-0617",
+            "section-0623",
+            "section-0624",
+            "section-0625",
+            "section-0626",
+            "section-0627",
+            "section-0628",
+            "section-0629",
+            "section-0630",
+            "section-0631",
+            "section-0632",
+            "section-0633",
+            "section-0634",
+            "section-0635",
+            "section-0638",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0650",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0661",
+            "section-0662",
+            "section-0663",
+            "section-0664",
+            "section-0665",
+            "section-0666",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0670",
+            "section-0671",
+            "section-0672",
+            "section-0673",
+            "section-0674",
+            "section-0675",
+            "section-0676",
+            "section-0677",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0681",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0690",
+            "section-0691",
+            "section-0692",
+            "section-0693",
+            "section-0694",
+            "section-0695",
+            "section-0696",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0702",
+            "section-0704",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0710",
+            "section-0712",
+            "section-0713",
+            "section-0714",
+            "section-0715",
+            "section-0716",
+            "section-0717",
+            "section-0718",
+            "section-0719",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0730",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0735",
+            "section-0737",
+            "section-0739",
+            "section-0740",
+            "section-0741",
+            "section-0742",
+            "section-0744",
+            "section-0746",
+            "section-0747",
+            "section-0748",
+            "section-0749",
+            "section-0750",
+            "section-0751",
+            "section-0752",
+            "section-0753",
+            "section-0755",
+            "section-0757",
+            "section-0758",
+            "section-0759",
+            "section-0760",
+            "section-0762",
+            "section-0764",
+            "section-0765",
+            "section-0766",
+            "section-0767",
+            "section-0768",
+            "section-0769",
+            "section-0770",
+            "section-0771",
+            "section-0772",
+            "section-0773",
+            "section-0774",
+            "section-0775",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0779",
+            "section-0785",
+            "section-0786",
+            "section-0787",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0795",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0824",
+            "section-0825",
+            "section-0826",
+            "section-0827",
+            "section-0828",
+            "section-0829",
+            "section-0830",
+            "section-0831",
+            "section-0832",
+            "section-0833",
+            "section-0834",
+            "section-0835",
+            "section-0836",
+            "section-0837",
+            "section-0838",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0844",
+            "section-0845",
+            "section-0846",
+            "section-0847",
+            "section-0848",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0855",
+            "section-0856",
+            "section-0857",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0863",
+            "section-0867",
+            "section-0868",
+            "section-0869",
+            "section-0871",
+            "section-0872",
+            "section-0873",
+            "section-0874",
+            "section-0875",
+            "section-0876",
+            "section-0881",
+            "section-0885",
+            "section-0886",
+            "section-0887",
+            "section-0888",
+            "section-0889",
+            "section-0890",
+            "section-0891",
+            "section-0892",
+            "section-0893",
+            "section-0894",
+            "section-0895",
+            "section-0896",
+            "section-0897",
+            "section-0898",
+            "section-0899",
+            "section-0900",
+            "section-0901",
+            "section-0902",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0908",
+            "section-0909",
+            "section-0910",
+            "section-0911",
+            "section-0912",
+            "section-0913",
+            "section-0914",
+            "section-0915",
+            "section-0916",
+            "section-0922",
+            "section-0923",
+            "section-0924",
+            "section-0925",
+            "section-0926",
+            "section-0927",
+            "section-0928",
+            "section-0929",
+            "section-0930",
+            "section-0931",
+            "section-0932",
+            "section-0933",
+            "section-0937"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-e1378be74bf6cc830e83b055:workpaper:extract",
+          "request_hash": "a552f847f4c0ebc5b2ba9ae2c2dd017947844328917671f9e004e89c6ba20fd0",
+          "response_hash": "ad7001d1b40e7e429e3c1232b0b5a89f08f894a9d36a2fc42802e82f9caa2a13",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10009,
+            "output_tokens": 4467,
+            "total_tokens": 14476
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0023",
+            "section-0026",
+            "section-0037",
+            "section-0079"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            24,
+            25
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "0fb4605d9133bb333bb696dc2b1ec75195bea34c3af700dafdc52b0fc9cbacf6",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "superseded_by_review_successor"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0002",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司所处的行业情况"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 921,
+              "quote": "                                                  陕西省国际信托股份有限公司        2025年年度报告全文\n\n\n月末，全行业信托资产规模余额               32.43万亿元，与上年末相比，增加了               2.87万亿元，增幅      9.73%；\n与上年同期相比，增加了             5.43万亿元，同比增长          20.11%。\n\n\n    展望   2026年，随着一系列新规的逐步实施，信托公司将更加注重合规管理与风险管理，\n不断探索创新服务模式，在支持科技创新、绿色转型等国家战略领域发挥更大作用。同时，\n信托业有望通过数字化转型提升运营效能，优化客户体验，满足客户日益增长的个性化需求，\n实现更高质量的发展目标。\n\n\n    （二）公司的行业地位\n\n\n    作为中西部地区唯一的上市信托公司、国内首家上市的非银行金融机构，多年来，公司\n坚持稳中求进工作总基调，牢牢把握服务实体经济的根本定位，积极响应监管政策导向，深\n入推进创新发展，经营质效进一步提升。\n\n\n    报告期内，公司综合实力与发展潜力进一步增强，在全国信托行业第一梯队的地位进一\n步巩固。公司坚决贯彻落实为实体经济减负让利的要求，主动压降融资成本，固有业务投资\n效益稳步释放，风险防控体系运行有效，整体经营保持稳健态势。截至报告期末，全年实现\n营业总收入      29.52亿元，同比增长         0.85%；实现营业利润         19.10亿元，同比增长         4.04%；实现\n利润总额     19.08亿元，同比增长         4.48%；实现净利润        14.33亿元，同比增长         5.25%。在当前信\n托行业加速转型、对投研能力、数字化水平和主动管理能力提出更高要求的背景下，公司启\n动不超过     38亿元的定增计划，实施完成后，将显著提升公司的资本实力和净资产规模，为公\n司抢抓战略机遇、夯实发展基础、实现高质量可持续发展提供有力支撑，在激烈的市场竞争\n中抢占先机。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "二、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 921,
+              "end": 1258,
+              "quote": "二、报告期内公司从事的主要业务\n\n\n    （一）经营范围\n\n\n    公司现持有西安市市场监督管理局于                      2026 年  1 月  29 日 新发的统一社会信用代码\n91610000220530273T  的《营业执照》，以及国家金融监督管理总局陕西监管局于                              2025 年  10\n月 31 日颁发的     K0068H261010001   号《金融许可证》。公司经营范围包括：资金信托；动产\n信托；不动产信托；有价证券信托；其他财产或财产权信托；作为投资基金或者基金管理公\n\n\n\n                                          11"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "二、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1144,
+              "quote": "                                               陕西省国际信托股份有限公司       2025年年度报告全文\n\n\n司的发起人从事投资基金业务；经营企业资产的重组、购并及项目融资、公司理财、财务顾\n问等业务；受托经营国务院有关部门批准的证券承销业务；办理居间、咨询、资信调查等业\n务；代保管及保管箱业务；以存放同业、拆放同业、贷款、租赁、投资方式运用固有财产；\n以固有财产为他人提供担保；从事同业拆借；法律法规规定或中国银行业监督管理委员会批\n准的其他业务。（依法须经批准的项目，经相关部门批准后方可开展经营活动）\n\n\n    （二）主要业务\n\n\n    报告期内，公司经营的主要业务包括信托业务、固有业务和投资顾问等中介业务。\n    1.信托业务\n    信托业务是指公司以营业和收取报酬为目的，以受托人身份承诺信托和处理信托事务的\n经营行为。主要包括资产服务信托、资产管理信托、公益慈善信托三大类。资产服务信托是\n公司依据信托法律关系，接受委托人委托，并根据委托人需求为其量身定制财富规划以及代\n际传承、托管、破产隔离和风险处置等专业信托服务，分为财富管理服务信托、行政管理服\n务信托、资产证券化服务信托、风险处置服务信托和新型资产服务信托五类、共                                    19个业务品\n种。资产管理信托是公司依据信托法律关系，为投资者提供投资和管理金融服务的自益信托，\n适用《关于规范金融机构资产管理业务的指导意见》（银发〔2018〕106                              号），分为固定收\n益类信托计划、权益类信托计划、商品及金融衍生品类信托计划、混合类信托计划共                                       4个业\n务品种。公益慈善信托是基于公共利益目的，按照委托人的意愿开展公益慈善活动，分为慈\n善信托和其他公益信托          2 个业务品种。\n    2.固有业务\n    固有业务主要包括自有资金贷款及投资业务（金融产品投资、金融股权投资等），该类\n业务由公司内设的投资管理部、资本市场投资部负责。其中，公司的利息收入主要来源于运\n用自有资金向客户发放贷款产生的利息，公司的投资收益主要来源于金融产品投资、股权投\n资等。\n    3.投资顾问等中介业务\n    投资顾问等中介业务主要包括为企业提供投融资、重组并购等一揽子全生命周期金融顾\n问服务；针对客户的资产配置需求，为高净值客户提供动态的资产管理服务等。\n\n\n\n\n\n\n\n\n                                        12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 867,
+              "end": 1116,
+              "quote": "四、主营业务分析\n\n\n    （一）概述\n\n\n   本报告期，公司坚持稳字当头、稳中求进工作总基调，抓创新、服实体、防风险，在安\n全稳健运营基础上，转型成效逐步显现、经营质效稳步提升、重塑再造持续升级，实现了业\n绩指标稳中有进、进中向优的良好局面。截至2025年12月末，公司信托管理规模6245.85亿元、\n同比增长8.01%，全年实现营业收入29.52亿元，同比增长0.85%，实现净利润14.33亿元，同\n\n                                        13"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 0,
+              "end": 1198,
+              "quote": "                                               陕西省国际信托股份有限公司       2025年年度报告全文\n\n\n比增长5.25%，稳居行业第一梯队。\n\n\n   1.全面加强党的领导，引领企业高质量发展。一是将学深悟透习近平新时代中国特色社会\n主义思想作为重要政治任务，健全“四个以学”长效机制，落实“第一议题”制度，制定《理\n论学习中心组学习要点》，召开党委理论学习中心组学习会和党委会60次，学习习近平总书\n记相关重要论述200余项。二是深入开展中央八项规定精神学习教育，推进作风建设常态化长\n效化，公司党委及各党支部分层举办专题读书班38次，开展全员警示教育3次，分层通报警示\n教育相关案例与纪律要求42次。三是健全党委抓改革、推转型、防风险工作机制，充分发挥\n把关定向作用。平稳完成党委换届，强化党委下设各专项委员会职能，推动科技架构重塑，\n为公司稳健运营和高质量发展筑牢政治保障。\n\n\n   2.信托业务多点突破，发展质效持续提升。一是积极推动资产管理信托迭代升级，全力推\n进传统业务优化升级，完成债券、股票、商品、衍生品全品类资产管理产品体系的搭建，拓\n展跨境投资路径实现海外资产配置，打造跨周期、跨市场、多策略产品矩阵，实现了标品规\n模和收益的双增长。二是资产服务信托创新拓展特色业务场景，公司深耕“服务信托+”新模\n式，担保品服务信托业务破冰落地，设立陕西省内首单企业破产服务信托，落地中西部首单\n“双标识”（专精特新、中小微企业支持）知识产权资产证券化业务。三是公益慈善信托聚\n焦“国之大者”与社会治理，新成立黄河流域生态保护和高质量发展以及助学助残等公益慈\n善信托，携手西安高新公安局设立警康守护慈善信托。\n\n\n   3.固有业务配置结构优化，协同效能不断增强。一是持续优化固有业务结构，增加证券、\n资管产品投资比重，强化资金流动性管理，分散投资风险，提升投资收益。二是发力股权投\n资，围绕“两重”“两新”国家战略，聚焦航空航天、创新医药、新能源、低空经济、数字\n经济、文旅经济等产业领域积极布局，发挥固有长期耐心资本优势投资优质赛道，已投项目\n发展前景良好。三是积极配置高流动性产品，做好收益和流动性的平衡。\n\n\n   4.全面升级财富管理构架，品牌赋能跨越式发展。一是持续强化发行能力，全年新增发行\n规模1600亿元，超额完成千亿目标。二是深耕“海百合”财富管理品牌，以家族、家庭信托\n和保险金信托为发力点，打造综合化、个性化财富管家服务品牌。三是深化财富管理事业群\n改制，与优质服务机构合作增加非金融综合服务，打通资金资产端两端，打造敏捷财富管理\n体系。四是拓宽财富产品渠道与发行渠道，新增16家金融机构准入合作，外采产品涵盖指数\n\n\n\n                                        14"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 1859,
+              "quote": "                                                              陕西省国际信托股份有限公司             2025 年年度报告全文\n\n\n增强、CTA、可转债、市场中性等多样化产品。\n\n\n    5.强化合规风险运营管理，推动风险防控进阶升级。一是以中国特色金融文化为核心，牢\n固树立要为强国出力、要给行业添彩、要促公司提质、要为客户创富的“四要”风险文化。\n二是持续深化全面风险管理能力建设，落实风险防范“四早”要求，针对不同业务类型打造\n差异化全链条风险合规管控机制，稳步推动重点领域风险化解。三是深化“大运营”建设，\n推进系统化、模块化管理整合，依托数智化手段构建事前预警、事中管控、事后整改的闭环\n管理体系，降低操作风险，提升运营管理质效。四是健全“大监督”体系，全面落实全面从\n严治党“五责协同”机制，强化内部监督形成常态长效合力，坚定构筑“三道防线”，筑牢\n高质量发展的安全屏障。\n\n\n     6.持续优化组织治理建设，重塑再造提质增效。一是制定公司“十五五”规划，实施“一\n六八”战略全面深化改革，推动公司新一轮增资扩股工作，引领信托主业转型高质量发展之\n路。二是围绕信托行业新规，聚焦业务转型，探索“四梁八柱”经营管理体系，推进信托事\n业部制改革，优化契合高质量发展要求的绩效考核机制和薪酬激励机制。三是推动公司数字\n化转型，加快科技系统和数据治理体系建设。四是全面优化预算管理，提升计划财务在资源\n配置中的先导作用。\n\n\n\n     （二）收入与成本\n\n    1.营业收入构成\n                                                                                                   单位：元\n                               2025年                               2024年\n                        金额            占营业收入比                金额           占营业收入比              同比增减\n                                           重                                   重\n营业收入合计               2,952,464,974.09         100%      2,927,639,556.38          100%               0.85%\n分行业\n金融信托业务               2,952,464,974.09       100.00%     2,927,639,556.38       100.00%               0.85%\n分产品\n金融信托业务               2,952,464,974.09       100.00%     2,927,639,556.38       100.00%               0.85%\n分地区\n西北                   2,539,278,644.36        86.01%     2,481,374,460.57        84.76%               2.33%\n\n华中                              0.00          0.00%         6,459,474.78         0.22%            -100.00%\n\n华南                       8,047,276.10         0.27%        36,882,181.99         1.26%             -78.18%\n华东                      20,907,116.00         0.71%        44,478,570.73         1.52%             -53.00%\n\n\n                                                    15"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1981,
+              "quote": "                                                                        陕西省国际信托股份有限公司                  2025 年年度报告全文\n\n\n华北                        369,723,163.84            12.52%         321,098,973.53             10.97%                15.14%\n\n西南                          14,508,773.79            0.49%          37,345,894.78              1.28%                -61.15%\n\n分销售模式\n\n金融信托业务                   2,952,464,974.09          100.00%        2,927,639,556.38           100.00%                  0.85%\n\n     2.占公司营业收入或营业利润                      10%以上的行业、产品、地区、销售模式的情况\n     适用      □不适用\n                                                                                                                  单位：元\n\n                           营业收入               营业成本          毛利率        营业收入比上年              营业成本比上           毛利率比上年\n                                                                           同期增减              年同期增减              同期增减\n\n分行业\n\n金融信托业务                    2,952,464,974.09                                        0.85%\n\n分产品\n\n金融信托业务                    2,952,464,974.09                                        0.85%\n\n分地区\n\n西北                        2,539,278,644.36                                        2.33%\n\n华北                          369,723,163.84                                       15.14%\n\n分销售模式\n\n金融信托业务                    2,952,464,974.09                                        0.85%\n\n     公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                                  1 年按报告期末口径调整后的主营\n业务数据\n     □适用     不适用\n     3.公司实物销售收入是否大于劳务收入\n     □是    否\n     4.公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n     □适用     不适用\n     5.营业成本构成\n     公司属金融信托业，无法按行业计算对应营业成本。\n     6.报告期内合并范围是否发生变动\n     是    □否\n     本年增加了本公司实施控制的                       28 个结构化主体；期初纳入合并的                         43  个结构化主体中             14 个本期不再\n纳入合并。\n     7.公司报告期内业务、产品或服务发生重大变化或调整有关情况\n     □适用     不适用\n     8.主要销售客户和主要供应商情况\n     □适用     不适用\n\n\n\n                                                             16"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 820,
+              "quote": "                                                                         陕西省国际信托股份有限公司                  2025 年年度报告全文\n\n      （三）费用\n\n                                                                                                                    单位：元\n\n                              2025 年              2024 年           同比增减                        重大变动说明\n管理费用                       876,934,350.96       828,467,005.74           5.85%    主要是本期经营场所相关费用、信息化投\n                                                                                  入费用及人工成本等增加\n\n      （四）研发投入\n\n     适用      □不适用\n\n 主要研发项目名称                      项目目的                      项目进展                   拟达到的目标               预计对公司未来发展\n                                                                                                            的影响\n\n          "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "十一、公司未来发展的展望"
+          ],
+          "physical_pages": [
+            25
+          ],
+          "source_spans": [
+            {
+              "page": 25,
+              "start": 0,
+              "end": 702,
+              "quote": "                                                  陕西省国际信托股份有限公司         2025年年度报告全文\n\n\n及省内万亿级产业集群建设，强化产融协同，搭建“全市场覆盖、跨品类联动”的投研体系\n推动转型发展，持续提升服务实体经济的能力。同时提升标品业务的主动管理能力，丰富跨\n周期多策略产品矩阵，实现规模与收益双提升。资产服务信托聚焦实体经济与民生需求，持\n续深耕知识产权、担保品、数据资产、风险处置等创新品类，构建特色化、差异化产品体系。\n\n\n    聚焦客户需求，做强财富服务。持续完善产品供给体系，从“产品销售渠道”向“资产\n配置平台”转型，构建“产品筛选—组合构建—动态调整”的管理能力。顺应居民财富管理\n与传承需求，以家庭、家族、保险金信托为抓手，推动营销思维向“需求挖掘+定制服务”转\n型，提供“信托+”综合解决方案。加速“海百合”财富管理平台迭代建设，构建专业化客户\n会员管理体系，打造“稳健创新、值得托付”的品牌形象，实现财富管理业务高质量发展。\n\n\n    深化机制改革，激发发展活力。开展第七轮机构改革与全员竞争上岗，聚焦业务转型，\n持续深化“四梁八柱”经营管理体系建设，推动条线运营和分级管理等改革，构建资管、服\n务、财富、固有四大核心业务体系，做强治理、组织、风控、运营、科技、财务、监督、保\n障等八大经营保障框架。加速数字化转型，搭建智能服务与标品投资管理系统，实现业务全\n生命周期数字化管控。通过前台与中后台人员跨部门双向交流培养复合型人才，建立任期契\n约化管理考核机制，夯实创新转型的组织与人才基础。\n\n     "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    },
+    {
+      "work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "workpaper_sha256": "168604ee0876e115f697556e2b26c2dc68f8c1f8e5645c915bdcd7418bae69ee",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_recovery": {
+        "base_work_id": "bp-work-e1378be74bf6cc830e83b055",
+        "base_workpaper_sha256": "0fb4605d9133bb333bb696dc2b1ec75195bea34c3af700dafdc52b0fc9cbacf6",
+        "plan_sha256": "164a192a7d61a386af334eda84d62007f5c2208527ae9f469caf7c4efc69961d",
+        "report": {
+          "document_type": "annual_report",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "instrument_id": "000563.SZ",
+          "published_at": "2026-02-09T16:00:00+00:00",
+          "report_id": "asset_496a38b2046429fbe2bad5e2499ee74e",
+          "report_period": "2025-12-31"
+        },
+        "request_id": "6eu-000563-review"
+      },
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0023",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司所处的行业情况"
+            ],
+            "start_page": 11,
+            "end_page": 12,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          },
+          {
+            "section_id": "section-0026",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "二、报告期内公司从事的主要业务"
+            ],
+            "start_page": 12,
+            "end_page": 14,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          },
+          {
+            "section_id": "section-0037",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 14,
+            "end_page": 18,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          },
+          {
+            "section_id": "section-0079",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "十一、公司未来发展的展望"
+            ],
+            "start_page": 24,
+            "end_page": 25,
+            "rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0005（公司简介和主要财务指标）与section-0016（主要会计数据和财务指标）可提供总量财务摘要，但section-0037/0045已覆盖经营与收入，故不重复扩读",
+          "section-0060（资产及负债状况分析）与section-0066（投资状况分析）属资产结构细节，非收入来源核心，暂不纳入",
+          "section-0324至section-0347（信托财务报告）为信托项目汇总表，属受托资产口径，不能替代公司营业收入，故不选",
+          "section-0433（财务报告）及附注仅在有实质缺口时定向补充，不整体扩读"
+        ],
+        "selection_rationale": "本报告为信托公司年报。选择逻辑：section-0026（主要业务）及其子节section-0028（信托业务、固有业务、投资顾问等中介业务）说明公司做什么、产品/服务用途与经营模式；section-0037（主营业务分析）为经营综述，section-0038（概述）提供本期业务进展与经营变化；section-0045（收入与成本）及section-0046（营业收入构成）提供收入总额与主要业务权重，是货币化与收入结构的关键；section-0023（行业情况）与section-0079（未来发展展望）用于解释经营因素与本期重要变化，属次要但有助于公司层面解读。未选纯治理、董事会明细、财务报告附注等大篇幅非经营内容。",
+        "stop_reason": "已覆盖业务结构、产品服务、经营模式、收入构成与主要业务权重、经营变化与展望等核心问题；剩余为治理、财务附注与信托项目汇总等非必要范围，可在不扩读的情况下停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "营业收入构成表仅按“金融信托业务”单一类别列示，未拆分信托业务、固有业务、投资顾问等中介业务的收入金额或占比，主要业务权重无法从收入口径进一步细化。",
+        "主要销售客户和主要供应商情况标注为不适用，未披露客户集中度或供应商信息。",
+        "信托业务报酬计费方式、定增实施进度等细节在所选章节未披露。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-e1378be74bf6cc830e83b055:workpaper:sections",
+          "request_hash": "064959f9f92e79841d047094cb25fc537d1b3cefb999ae5888ca263c867149f3",
+          "response_hash": "f44295d8a44ccc40fceeee8eb1bc046d5752b2723ebfdf52dd75a4ba45560c24",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 22261,
+            "output_tokens": 418,
+            "total_tokens": 22679
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 843,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0283",
+            "section-0287",
+            "section-0288",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0301",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0440",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0474",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0611",
+            "section-0612",
+            "section-0613",
+            "section-0614",
+            "section-0615",
+            "section-0616",
+            "section-0617",
+            "section-0623",
+            "section-0624",
+            "section-0625",
+            "section-0626",
+            "section-0627",
+            "section-0628",
+            "section-0629",
+            "section-0630",
+            "section-0631",
+            "section-0632",
+            "section-0633",
+            "section-0634",
+            "section-0635",
+            "section-0638",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0650",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0661",
+            "section-0662",
+            "section-0663",
+            "section-0664",
+            "section-0665",
+            "section-0666",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0670",
+            "section-0671",
+            "section-0672",
+            "section-0673",
+            "section-0674",
+            "section-0675",
+            "section-0676",
+            "section-0677",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0681",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0690",
+            "section-0691",
+            "section-0692",
+            "section-0693",
+            "section-0694",
+            "section-0695",
+            "section-0696",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0702",
+            "section-0704",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0710",
+            "section-0712",
+            "section-0713",
+            "section-0714",
+            "section-0715",
+            "section-0716",
+            "section-0717",
+            "section-0718",
+            "section-0719",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0730",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0735",
+            "section-0737",
+            "section-0739",
+            "section-0740",
+            "section-0741",
+            "section-0742",
+            "section-0744",
+            "section-0746",
+            "section-0747",
+            "section-0748",
+            "section-0749",
+            "section-0750",
+            "section-0751",
+            "section-0752",
+            "section-0753",
+            "section-0755",
+            "section-0757",
+            "section-0758",
+            "section-0759",
+            "section-0760",
+            "section-0762",
+            "section-0764",
+            "section-0765",
+            "section-0766",
+            "section-0767",
+            "section-0768",
+            "section-0769",
+            "section-0770",
+            "section-0771",
+            "section-0772",
+            "section-0773",
+            "section-0774",
+            "section-0775",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0779",
+            "section-0785",
+            "section-0786",
+            "section-0787",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0795",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0824",
+            "section-0825",
+            "section-0826",
+            "section-0827",
+            "section-0828",
+            "section-0829",
+            "section-0830",
+            "section-0831",
+            "section-0832",
+            "section-0833",
+            "section-0834",
+            "section-0835",
+            "section-0836",
+            "section-0837",
+            "section-0838",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0844",
+            "section-0845",
+            "section-0846",
+            "section-0847",
+            "section-0848",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0855",
+            "section-0856",
+            "section-0857",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0863",
+            "section-0867",
+            "section-0868",
+            "section-0869",
+            "section-0871",
+            "section-0872",
+            "section-0873",
+            "section-0874",
+            "section-0875",
+            "section-0876",
+            "section-0881",
+            "section-0885",
+            "section-0886",
+            "section-0887",
+            "section-0888",
+            "section-0889",
+            "section-0890",
+            "section-0891",
+            "section-0892",
+            "section-0893",
+            "section-0894",
+            "section-0895",
+            "section-0896",
+            "section-0897",
+            "section-0898",
+            "section-0899",
+            "section-0900",
+            "section-0901",
+            "section-0902",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0908",
+            "section-0909",
+            "section-0910",
+            "section-0911",
+            "section-0912",
+            "section-0913",
+            "section-0914",
+            "section-0915",
+            "section-0916",
+            "section-0922",
+            "section-0923",
+            "section-0924",
+            "section-0925",
+            "section-0926",
+            "section-0927",
+            "section-0928",
+            "section-0929",
+            "section-0930",
+            "section-0931",
+            "section-0932",
+            "section-0933",
+            "section-0937"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-e1378be74bf6cc830e83b055:workpaper:extract",
+          "request_hash": "a552f847f4c0ebc5b2ba9ae2c2dd017947844328917671f9e004e89c6ba20fd0",
+          "response_hash": "ad7001d1b40e7e429e3c1232b0b5a89f08f894a9d36a2fc42802e82f9caa2a13",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10009,
+            "output_tokens": 4467,
+            "total_tokens": 14476
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0023",
+            "section-0026",
+            "section-0037",
+            "section-0079"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            24,
+            25
+          ]
+        }
+      },
+      "review_status": "completed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "0fb4605d9133bb333bb696dc2b1ec75195bea34c3af700dafdc52b0fc9cbacf6",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_execution_completed"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-65749055bbf3b93ecbe32a09:workpaper:review",
+          "request_hash": "fcdf3c00b07c8dd4432f847e62649844af69e1af51b8ecc5720ad12edbe79206",
+          "response_hash": "604e0f5df61244d994a0cda78f221c3a39d12019249c2177e676db6d1812d914",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14664,
+            "output_tokens": 424,
+            "total_tokens": 31804
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0023",
+            "section-0026",
+            "section-0037",
+            "section-0079"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            24,
+            25
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-65749055bbf3b93ecbe32a09:workpaper:repair",
+          "request_hash": "5d80ab995fa9c5b4a19c1f406fc2da0cd003455f7a6ebd765e3e8b208ac908f3",
+          "response_hash": "4c1d874c519d3c024cd1f9ce346c25712a65579de9ba766f80ac2d3ef2846acc",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 7166,
+            "output_tokens": 184,
+            "total_tokens": 7350
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0023",
+            "section-0026",
+            "section-0037",
+            "section-0079"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            24,
+            25
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-65749055bbf3b93ecbe32a09:workpaper:repair-verify",
+          "request_hash": "cbc808ba8708965f1bf88515320da44dc08626ae724b8b1a412fe2d17a005fea",
+          "response_hash": "b39dddad6ca7b7e7f9cf169fc7b56af967c07a0cfddb6eb5be0548862944f39b",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 8545,
+            "output_tokens": 174,
+            "total_tokens": 9906
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0023",
+            "section-0026",
+            "section-0037",
+            "section-0079"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            24,
+            25
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0002",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司所处的行业情况"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 921,
+              "quote": "                                                  陕西省国际信托股份有限公司        2025年年度报告全文\n\n\n月末，全行业信托资产规模余额               32.43万亿元，与上年末相比，增加了               2.87万亿元，增幅      9.73%；\n与上年同期相比，增加了             5.43万亿元，同比增长          20.11%。\n\n\n    展望   2026年，随着一系列新规的逐步实施，信托公司将更加注重合规管理与风险管理，\n不断探索创新服务模式，在支持科技创新、绿色转型等国家战略领域发挥更大作用。同时，\n信托业有望通过数字化转型提升运营效能，优化客户体验，满足客户日益增长的个性化需求，\n实现更高质量的发展目标。\n\n\n    （二）公司的行业地位\n\n\n    作为中西部地区唯一的上市信托公司、国内首家上市的非银行金融机构，多年来，公司\n坚持稳中求进工作总基调，牢牢把握服务实体经济的根本定位，积极响应监管政策导向，深\n入推进创新发展，经营质效进一步提升。\n\n\n    报告期内，公司综合实力与发展潜力进一步增强，在全国信托行业第一梯队的地位进一\n步巩固。公司坚决贯彻落实为实体经济减负让利的要求，主动压降融资成本，固有业务投资\n效益稳步释放，风险防控体系运行有效，整体经营保持稳健态势。截至报告期末，全年实现\n营业总收入      29.52亿元，同比增长         0.85%；实现营业利润         19.10亿元，同比增长         4.04%；实现\n利润总额     19.08亿元，同比增长         4.48%；实现净利润        14.33亿元，同比增长         5.25%。在当前信\n托行业加速转型、对投研能力、数字化水平和主动管理能力提出更高要求的背景下，公司启\n动不超过     38亿元的定增计划，实施完成后，将显著提升公司的资本实力和净资产规模，为公\n司抢抓战略机遇、夯实发展基础、实现高质量可持续发展提供有力支撑，在激烈的市场竞争\n中抢占先机。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "二、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 921,
+              "end": 1258,
+              "quote": "二、报告期内公司从事的主要业务\n\n\n    （一）经营范围\n\n\n    公司现持有西安市市场监督管理局于                      2026 年  1 月  29 日 新发的统一社会信用代码\n91610000220530273T  的《营业执照》，以及国家金融监督管理总局陕西监管局于                              2025 年  10\n月 31 日颁发的     K0068H261010001   号《金融许可证》。公司经营范围包括：资金信托；动产\n信托；不动产信托；有价证券信托；其他财产或财产权信托；作为投资基金或者基金管理公\n\n\n\n                                          11"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "二、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1144,
+              "quote": "                                               陕西省国际信托股份有限公司       2025年年度报告全文\n\n\n司的发起人从事投资基金业务；经营企业资产的重组、购并及项目融资、公司理财、财务顾\n问等业务；受托经营国务院有关部门批准的证券承销业务；办理居间、咨询、资信调查等业\n务；代保管及保管箱业务；以存放同业、拆放同业、贷款、租赁、投资方式运用固有财产；\n以固有财产为他人提供担保；从事同业拆借；法律法规规定或中国银行业监督管理委员会批\n准的其他业务。（依法须经批准的项目，经相关部门批准后方可开展经营活动）\n\n\n    （二）主要业务\n\n\n    报告期内，公司经营的主要业务包括信托业务、固有业务和投资顾问等中介业务。\n    1.信托业务\n    信托业务是指公司以营业和收取报酬为目的，以受托人身份承诺信托和处理信托事务的\n经营行为。主要包括资产服务信托、资产管理信托、公益慈善信托三大类。资产服务信托是\n公司依据信托法律关系，接受委托人委托，并根据委托人需求为其量身定制财富规划以及代\n际传承、托管、破产隔离和风险处置等专业信托服务，分为财富管理服务信托、行政管理服\n务信托、资产证券化服务信托、风险处置服务信托和新型资产服务信托五类、共                                    19个业务品\n种。资产管理信托是公司依据信托法律关系，为投资者提供投资和管理金融服务的自益信托，\n适用《关于规范金融机构资产管理业务的指导意见》（银发〔2018〕106                              号），分为固定收\n益类信托计划、权益类信托计划、商品及金融衍生品类信托计划、混合类信托计划共                                       4个业\n务品种。公益慈善信托是基于公共利益目的，按照委托人的意愿开展公益慈善活动，分为慈\n善信托和其他公益信托          2 个业务品种。\n    2.固有业务\n    固有业务主要包括自有资金贷款及投资业务（金融产品投资、金融股权投资等），该类\n业务由公司内设的投资管理部、资本市场投资部负责。其中，公司的利息收入主要来源于运\n用自有资金向客户发放贷款产生的利息，公司的投资收益主要来源于金融产品投资、股权投\n资等。\n    3.投资顾问等中介业务\n    投资顾问等中介业务主要包括为企业提供投融资、重组并购等一揽子全生命周期金融顾\n问服务；针对客户的资产配置需求，为高净值客户提供动态的资产管理服务等。\n\n\n\n\n\n\n\n\n                                        12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 867,
+              "end": 1116,
+              "quote": "四、主营业务分析\n\n\n    （一）概述\n\n\n   本报告期，公司坚持稳字当头、稳中求进工作总基调，抓创新、服实体、防风险，在安\n全稳健运营基础上，转型成效逐步显现、经营质效稳步提升、重塑再造持续升级，实现了业\n绩指标稳中有进、进中向优的良好局面。截至2025年12月末，公司信托管理规模6245.85亿元、\n同比增长8.01%，全年实现营业收入29.52亿元，同比增长0.85%，实现净利润14.33亿元，同\n\n                                        13"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 0,
+              "end": 1198,
+              "quote": "                                               陕西省国际信托股份有限公司       2025年年度报告全文\n\n\n比增长5.25%，稳居行业第一梯队。\n\n\n   1.全面加强党的领导，引领企业高质量发展。一是将学深悟透习近平新时代中国特色社会\n主义思想作为重要政治任务，健全“四个以学”长效机制，落实“第一议题”制度，制定《理\n论学习中心组学习要点》，召开党委理论学习中心组学习会和党委会60次，学习习近平总书\n记相关重要论述200余项。二是深入开展中央八项规定精神学习教育，推进作风建设常态化长\n效化，公司党委及各党支部分层举办专题读书班38次，开展全员警示教育3次，分层通报警示\n教育相关案例与纪律要求42次。三是健全党委抓改革、推转型、防风险工作机制，充分发挥\n把关定向作用。平稳完成党委换届，强化党委下设各专项委员会职能，推动科技架构重塑，\n为公司稳健运营和高质量发展筑牢政治保障。\n\n\n   2.信托业务多点突破，发展质效持续提升。一是积极推动资产管理信托迭代升级，全力推\n进传统业务优化升级，完成债券、股票、商品、衍生品全品类资产管理产品体系的搭建，拓\n展跨境投资路径实现海外资产配置，打造跨周期、跨市场、多策略产品矩阵，实现了标品规\n模和收益的双增长。二是资产服务信托创新拓展特色业务场景，公司深耕“服务信托+”新模\n式，担保品服务信托业务破冰落地，设立陕西省内首单企业破产服务信托，落地中西部首单\n“双标识”（专精特新、中小微企业支持）知识产权资产证券化业务。三是公益慈善信托聚\n焦“国之大者”与社会治理，新成立黄河流域生态保护和高质量发展以及助学助残等公益慈\n善信托，携手西安高新公安局设立警康守护慈善信托。\n\n\n   3.固有业务配置结构优化，协同效能不断增强。一是持续优化固有业务结构，增加证券、\n资管产品投资比重，强化资金流动性管理，分散投资风险，提升投资收益。二是发力股权投\n资，围绕“两重”“两新”国家战略，聚焦航空航天、创新医药、新能源、低空经济、数字\n经济、文旅经济等产业领域积极布局，发挥固有长期耐心资本优势投资优质赛道，已投项目\n发展前景良好。三是积极配置高流动性产品，做好收益和流动性的平衡。\n\n\n   4.全面升级财富管理构架，品牌赋能跨越式发展。一是持续强化发行能力，全年新增发行\n规模1600亿元，超额完成千亿目标。二是深耕“海百合”财富管理品牌，以家族、家庭信托\n和保险金信托为发力点，打造综合化、个性化财富管家服务品牌。三是深化财富管理事业群\n改制，与优质服务机构合作增加非金融综合服务，打通资金资产端两端，打造敏捷财富管理\n体系。四是拓宽财富产品渠道与发行渠道，新增16家金融机构准入合作，外采产品涵盖指数\n\n\n\n                                        14"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 1859,
+              "quote": "                                                              陕西省国际信托股份有限公司             2025 年年度报告全文\n\n\n增强、CTA、可转债、市场中性等多样化产品。\n\n\n    5.强化合规风险运营管理，推动风险防控进阶升级。一是以中国特色金融文化为核心，牢\n固树立要为强国出力、要给行业添彩、要促公司提质、要为客户创富的“四要”风险文化。\n二是持续深化全面风险管理能力建设，落实风险防范“四早”要求，针对不同业务类型打造\n差异化全链条风险合规管控机制，稳步推动重点领域风险化解。三是深化“大运营”建设，\n推进系统化、模块化管理整合，依托数智化手段构建事前预警、事中管控、事后整改的闭环\n管理体系，降低操作风险，提升运营管理质效。四是健全“大监督”体系，全面落实全面从\n严治党“五责协同”机制，强化内部监督形成常态长效合力，坚定构筑“三道防线”，筑牢\n高质量发展的安全屏障。\n\n\n     6.持续优化组织治理建设，重塑再造提质增效。一是制定公司“十五五”规划，实施“一\n六八”战略全面深化改革，推动公司新一轮增资扩股工作，引领信托主业转型高质量发展之\n路。二是围绕信托行业新规，聚焦业务转型，探索“四梁八柱”经营管理体系，推进信托事\n业部制改革，优化契合高质量发展要求的绩效考核机制和薪酬激励机制。三是推动公司数字\n化转型，加快科技系统和数据治理体系建设。四是全面优化预算管理，提升计划财务在资源\n配置中的先导作用。\n\n\n\n     （二）收入与成本\n\n    1.营业收入构成\n                                                                                                   单位：元\n                               2025年                               2024年\n                        金额            占营业收入比                金额           占营业收入比              同比增减\n                                           重                                   重\n营业收入合计               2,952,464,974.09         100%      2,927,639,556.38          100%               0.85%\n分行业\n金融信托业务               2,952,464,974.09       100.00%     2,927,639,556.38       100.00%               0.85%\n分产品\n金融信托业务               2,952,464,974.09       100.00%     2,927,639,556.38       100.00%               0.85%\n分地区\n西北                   2,539,278,644.36        86.01%     2,481,374,460.57        84.76%               2.33%\n\n华中                              0.00          0.00%         6,459,474.78         0.22%            -100.00%\n\n华南                       8,047,276.10         0.27%        36,882,181.99         1.26%             -78.18%\n华东                      20,907,116.00         0.71%        44,478,570.73         1.52%             -53.00%\n\n\n                                                    15"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1981,
+              "quote": "                                                                        陕西省国际信托股份有限公司                  2025 年年度报告全文\n\n\n华北                        369,723,163.84            12.52%         321,098,973.53             10.97%                15.14%\n\n西南                          14,508,773.79            0.49%          37,345,894.78              1.28%                -61.15%\n\n分销售模式\n\n金融信托业务                   2,952,464,974.09          100.00%        2,927,639,556.38           100.00%                  0.85%\n\n     2.占公司营业收入或营业利润                      10%以上的行业、产品、地区、销售模式的情况\n     适用      □不适用\n                                                                                                                  单位：元\n\n                           营业收入               营业成本          毛利率        营业收入比上年              营业成本比上           毛利率比上年\n                                                                           同期增减              年同期增减              同期增减\n\n分行业\n\n金融信托业务                    2,952,464,974.09                                        0.85%\n\n分产品\n\n金融信托业务                    2,952,464,974.09                                        0.85%\n\n分地区\n\n西北                        2,539,278,644.36                                        2.33%\n\n华北                          369,723,163.84                                       15.14%\n\n分销售模式\n\n金融信托业务                    2,952,464,974.09                                        0.85%\n\n     公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                                  1 年按报告期末口径调整后的主营\n业务数据\n     □适用     不适用\n     3.公司实物销售收入是否大于劳务收入\n     □是    否\n     4.公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n     □适用     不适用\n     5.营业成本构成\n     公司属金融信托业，无法按行业计算对应营业成本。\n     6.报告期内合并范围是否发生变动\n     是    □否\n     本年增加了本公司实施控制的                       28 个结构化主体；期初纳入合并的                         43  个结构化主体中             14 个本期不再\n纳入合并。\n     7.公司报告期内业务、产品或服务发生重大变化或调整有关情况\n     □适用     不适用\n     8.主要销售客户和主要供应商情况\n     □适用     不适用\n\n\n\n                                                             16"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 820,
+              "quote": "                                                                         陕西省国际信托股份有限公司                  2025 年年度报告全文\n\n      （三）费用\n\n                                                                                                                    单位：元\n\n                              2025 年              2024 年           同比增减                        重大变动说明\n管理费用                       876,934,350.96       828,467,005.74           5.85%    主要是本期经营场所相关费用、信息化投\n                                                                                  入费用及人工成本等增加\n\n      （四）研发投入\n\n     适用      □不适用\n\n 主要研发项目名称                      项目目的                      项目进展                   拟达到的目标               预计对公司未来发展\n                                                                                                            的影响\n\n          "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "十一、公司未来发展的展望"
+          ],
+          "physical_pages": [
+            25
+          ],
+          "source_spans": [
+            {
+              "page": 25,
+              "start": 0,
+              "end": 702,
+              "quote": "                                                  陕西省国际信托股份有限公司         2025年年度报告全文\n\n\n及省内万亿级产业集群建设，强化产融协同，搭建“全市场覆盖、跨品类联动”的投研体系\n推动转型发展，持续提升服务实体经济的能力。同时提升标品业务的主动管理能力，丰富跨\n周期多策略产品矩阵，实现规模与收益双提升。资产服务信托聚焦实体经济与民生需求，持\n续深耕知识产权、担保品、数据资产、风险处置等创新品类，构建特色化、差异化产品体系。\n\n\n    聚焦客户需求，做强财富服务。持续完善产品供给体系，从“产品销售渠道”向“资产\n配置平台”转型，构建“产品筛选—组合构建—动态调整”的管理能力。顺应居民财富管理\n与传承需求，以家庭、家族、保险金信托为抓手，推动营销思维向“需求挖掘+定制服务”转\n型，提供“信托+”综合解决方案。加速“海百合”财富管理平台迭代建设，构建专业化客户\n会员管理体系，打造“稳健创新、值得托付”的品牌形象，实现财富管理业务高质量发展。\n\n\n    深化机制改革，激发发展活力。开展第七轮机构改革与全员竞争上岗，聚焦业务转型，\n持续深化“四梁八柱”经营管理体系建设，推动条线运营和分级管理等改革，构建资管、服\n务、财富、固有四大核心业务体系，做强治理、组织、风控、运营、科技、财务、监督、保\n障等八大经营保障框架。加速数字化转型，搭建智能服务与标品投资管理系统，实现业务全\n生命周期数字化管控。通过前台与中后台人员跨部门双向交流培养复合型人才，建立任期契\n约化管理考核机制，夯实创新转型的组织与人才基础。\n\n     "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F03",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F04",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F07",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F08",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F09",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F10",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F11",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F12",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F13",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F15",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F16",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F17",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F18",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F19",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F20",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F21",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F22",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F23",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003",
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F24",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F25",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F26",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F27",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F28",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F29",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F30",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F31",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F32",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F33",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F34",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F35",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F36",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F37",
+      "element": "position",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F38",
+      "element": "upstream_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009",
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F39",
+      "element": "downstream_customers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F40",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "fact_id": "F41",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司经营的主要业务包括信托业务、固有业务和投资顾问等中介业务三大板块。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "信托业务以受托人身份承诺信托和处理信托事务，分为资产服务信托、资产管理信托、公益慈善信托三大类。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F03",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "固有业务主要包括自有资金贷款及投资业务（金融产品投资、金融股权投资等），由公司内设的投资管理部、资本市场投资部负责。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F04",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "投资顾问等中介业务主要包括为企业提供投融资、重组并购等全生命周期金融顾问服务，以及为高净值客户提供动态资产管理服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "资产服务信托按委托人需求提供财富规划、代际传承、托管、破产隔离和风险处置等专业信托服务，分为财富管理服务信托、行政管理服务信托、资产证券化服务信托、风险处置服务信托和新型资产服务信托五类、共19个业务品种。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "资产管理信托为投资者提供投资和管理金融服务的自益信托，分为固定收益类、权益类、商品及金融衍生品类、混合类信托计划共4个业务品种。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F07",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "公益慈善信托基于公共利益目的按委托人意愿开展公益慈善活动，分为慈善信托和其他公益信托2个业务品种。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F08",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "报告期内公司完成债券、股票、商品、衍生品全品类资产管理产品体系搭建，拓展跨境投资路径实现海外资产配置，打造跨周期、跨市场、多策略产品矩阵。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F09",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "资产服务信托创新拓展特色场景：担保品服务信托业务破冰落地，设立陕西省内首单企业破产服务信托，落地中西部首单“双标识”（专精特新、中小微企业支持）知识产权资产证券化业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F10",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F10",
+        "text": "信托业务以营业和收取报酬为目的，以受托人身份承诺信托和处理信托事务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F11",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "公司利息收入主要来源于运用自有资金向客户发放贷款产生的利息，投资收益主要来源于金融产品投资、股权投资等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F12",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F12",
+        "text": "公司属金融信托业，无法按行业计算对应营业成本。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F13",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F13",
+        "text": "2025年公司实现营业总收入29.52亿元，同比增长0.85%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "营业总收入",
+            "raw_value": "29.52",
+            "value": "29.52",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长0.85%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "2025年公司实现净利润14.33亿元，同比增长5.25%；实现营业利润19.10亿元，同比增长4.04%；实现利润总额19.08亿元，同比增长4.48%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "净利润",
+            "raw_value": "14.33",
+            "value": "14.33",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长5.25%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业利润",
+            "raw_value": "19.10",
+            "value": "19.10",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长4.04%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利润总额",
+            "raw_value": "19.08",
+            "value": "19.08",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长4.48%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F15",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "截至2025年12月末，公司信托管理规模6245.85亿元，同比增长8.01%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "信托管理规模",
+            "raw_value": "6245.85",
+            "value": "6245.85",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": "同比增长8.01%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F16",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "营业收入构成中，营业收入合计2,952,464,974.09元，占营业收入比重100%，同比增减0.85%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入合计",
+            "raw_value": "2,952,464,974.09",
+            "value": "2952464974.09",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增减0.85%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F17",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "分行业看，金融信托业务营业收入2,952,464,974.09元，占营业收入比重100.00%，同比增减0.85%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "金融信托业务营业收入（分行业）",
+            "raw_value": "2,952,464,974.09",
+            "value": "2952464974.09",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减0.85%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F18",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "分产品看，金融信托业务营业收入2,952,464,974.09元，占营业收入比重100.00%，同比增减0.85%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "金融信托业务营业收入（分产品）",
+            "raw_value": "2,952,464,974.09",
+            "value": "2952464974.09",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减0.85%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F19",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "分地区看，西北地区营业收入2,539,278,644.36元，占营业收入比重86.01%，同比增减2.33%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "西北地区营业收入",
+            "raw_value": "2,539,278,644.36",
+            "value": "2539278644.36",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减2.33%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F20",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "分地区看，华北地区营业收入369,723,163.84元，占营业收入比重12.52%，同比增减15.14%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "华北地区营业收入",
+            "raw_value": "369,723,163.84",
+            "value": "369723163.84",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减15.14%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F21",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "分地区看，华东地区营业收入20,907,116.00元，占营业收入比重0.71%，同比增减-53.00%；华南地区营业收入8,047,276.10元，占营业收入比重0.27%，同比增减-78.18%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "华东地区营业收入",
+            "raw_value": "20,907,116.00",
+            "value": "20907116.00",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减-53.00%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "华南地区营业收入",
+            "raw_value": "8,047,276.10",
+            "value": "8047276.10",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减-78.18%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F22",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F22",
+        "text": "分地区看，西南地区营业收入14,508,773.79元，占营业收入比重0.49%，同比增减-61.15%；华中地区营业收入0.00元，占营业收入比重0.00%，同比增减-100.00%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "西南地区营业收入",
+            "raw_value": "14,508,773.79",
+            "value": "14508773.79",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减-61.15%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "华中地区营业收入",
+            "raw_value": "0.00",
+            "value": "0.00",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增减-100.00%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F23",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003",
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "公司经营范围包括资金信托、动产信托、不动产信托、有价证券信托、其他财产或财产权信托，作为投资基金或基金管理公司发起人从事投资基金业务，经营企业资产重组、购并及项目融资、公司理财、财务顾问等业务，以及以存放同业、拆放同业、贷款、租赁、投资方式运用固有财产等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003",
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F24",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "公司持有西安市市场监督管理局2026年1月29日新发的统一社会信用代码91610000220530273T的《营业执照》，以及国家金融监督管理总局陕西监管局2025年10月31日颁发的K0068H261010001号《金融许可证》。",
+        "subject_scope": "issuer",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F25",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F25",
+        "text": "报告期内合并范围发生变动：本年增加本公司实施控制的28个结构化主体；期初纳入合并的43个结构化主体中14个本期不再纳入合并。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F26",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F26",
+        "text": "公司深耕“海百合”财富管理品牌，以家族、家庭信托和保险金信托为发力点，打造综合化、个性化财富管家服务品牌。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F27",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "公司深化财富管理事业群改制，与优质服务机构合作增加非金融综合服务，打通资金资产端两端；全年新增发行规模1600亿元，超额完成千亿目标。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "全年新增发行规模",
+            "raw_value": "1600",
+            "value": "1600",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F28",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F28",
+        "text": "公司拓宽财富产品渠道与发行渠道，新增16家金融机构准入合作，外采产品涵盖指数增强、CTA、可转债、市场中性等多样化产品。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007",
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "新增金融机构准入合作家数",
+            "raw_value": "16",
+            "value": "16",
+            "unit": "家",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F29",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F29",
+        "text": "公司营业收入分地区以西北为主（占86.01%），其次为华北（占12.52%），其余华东、华南、西南、华中占比均不足1%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F30",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F30",
+        "text": "信托业务方面，公司积极推动资产管理信托迭代升级，推进传统业务优化升级，实现标品规模和收益的双增长。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F31",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F31",
+        "text": "固有业务方面，公司持续优化配置结构，增加证券、资管产品投资比重，强化资金流动性管理；发力股权投资，聚焦航空航天、创新医药、新能源、低空经济、数字经济、文旅经济等产业领域布局。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F32",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F32",
+        "text": "公司坚决贯彻落实为实体经济减负让利要求，主动压降融资成本，固有业务投资效益稳步释放。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F33",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F33",
+        "text": "2025年管理费用876,934,350.96元，同比增长5.85%，主要是本期经营场所相关费用、信息化投入费用及人工成本等增加。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "管理费用",
+            "raw_value": "876,934,350.96",
+            "value": "876934350.96",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长5.85%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F34",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F34",
+        "text": "公司启动不超过38亿元的定增计划，实施完成后将提升公司资本实力和净资产规模。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "定增计划规模上限",
+            "raw_value": "38",
+            "value": "38",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F35",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F35",
+        "text": "公司制定“十五五”规划，实施“一六八”战略全面深化改革，推动新一轮增资扩股工作。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F36",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F36",
+        "text": "公司报告期内业务、产品或服务发生重大变化或调整有关情况标注为不适用。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F37",
+      "element": "position",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F37",
+        "text": "公司作为受托人开展信托业务，以营业和收取报酬为目的承诺信托和处理信托事务；同时以自有资金开展贷款及投资等固有业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F38",
+      "element": "upstream_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009",
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F38",
+        "text": "公司属金融信托业，无法按行业计算对应营业成本；主要资源为自有资金及受托管理的信托财产。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009",
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F39",
+      "element": "downstream_customers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F39",
+        "text": "公司客户涵盖有财富规划与代际传承需求的委托人、资产管理信托投资者、高净值客户，以及有投融资、重组并购需求的企业。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F40",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F40",
+        "text": "公司为中西部地区唯一的上市信托公司、国内首家上市的非银行金融机构，在全国信托行业第一梯队的地位进一步巩固。",
+        "subject_scope": "issuer",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "fact_id": "F41",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F41",
+        "text": "2026年经营计划提出，开展第七轮机构改革与全员竞争上岗，持续深化“四梁八柱”经营管理体系建设，构建资管、服务、财富、固有四大核心业务体系，做强治理、组织、风控、运营、科技、财务、监督、保障等八大经营保障框架。",
+        "subject_scope": "consolidated_group",
+        "period": "2026年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：信托业务报酬的具体计费方式（费率、计提基准）在所选章节未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "营业收入构成表按分行业、分产品、分销售模式均仅列示“金融信托业务”单一类别，未进一步拆分信托业务、固有业务、投资顾问等中介业务的收入金额或占比。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：信托业务人员规模、网点数量等运营资源细节在所选章节未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：主要销售客户和主要供应商情况在报告中标注为不适用，未披露具体客户名单或集中度。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：定增计划的实施进度与完成时点在所选章节未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：作为金融机构，公司未披露制造业意义上的原材料或能源采购。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-e1378be74bf6cc830e83b055",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：具体客户名称及客户集中度未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "active": true,
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：信托业务报酬的具体计费方式（费率、计提基准）在所选章节未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "active": true,
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "营业收入构成表按分行业、分产品、分销售模式均仅列示“金融信托业务”单一类别，未进一步拆分信托业务、固有业务、投资顾问等中介业务的收入金额或占比。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "active": true,
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：信托业务人员规模、网点数量等运营资源细节在所选章节未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "active": true,
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：主要销售客户和主要供应商情况在报告中标注为不适用，未披露具体客户名单或集中度。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "active": true,
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：定增计划的实施进度与完成时点在所选章节未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "active": true,
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：作为金融机构，公司未披露制造业意义上的原材料或能源采购。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "active": true,
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取成功：具体客户名称及客户集中度未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

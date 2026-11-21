@@ -1,0 +1,14 @@
+{
+  "research/change_watermarks.py": {
+    "sha256": "d23f91295dfd339037b701df1bc9d3869cb678e9c208d270502370aa2c244673",
+    "matches_HEAD": true
+  },
+  "research/announcement_assets/repository.py": {
+    "sha256": "802c9fea7824e2fc7d391722d6ae97c7f9d4a276768a76368e6772a5fdbe6d32",
+    "matches_HEAD": true
+  },
+  "research/announcement_assets/service.py": {
+    "sha256": "127e28bfd795b3974cb8993b0ba640c11498be1c13582a372ab89ae9b890eafa",
+    "matches_HEAD": true
+  }
+}

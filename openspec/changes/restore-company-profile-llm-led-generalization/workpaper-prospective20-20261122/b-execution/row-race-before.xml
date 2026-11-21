@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="1.726" timestamp="2026-11-22T01:04:24.286525+08:00" hostname="ComputeR"><testcase classname="tests.unit.test_research.test_change_watermark_initialization" name="test_parallel_initializers_can_observe_the_same_missing_column" time="0.965"><failure message="sqlite3.OperationalError: duplicate column name: row_version">tests/unit/test_research/test_change_watermark_initialization.py:44: in test_parallel_initializers_can_observe_the_same_missing_column
+    result.result(timeout=10)
+../miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+../miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+../miniconda3/envs/Quote/lib/python3.11/concurrent/futures/thread.py:58: in run
+    result = self.fn(*self.args, **self.kwargs)
+tests/unit/test_research/test_change_watermark_initialization.py:39: in initialize
+    ensure_row_version_column(connection, "observations")
+research/change_watermarks.py:64: in ensure_row_version_column
+    conn.execute(
+tests/unit/test_research/test_change_watermark_initialization.py:29: in execute
+    cursor = super().execute(sql, parameters)
+E   sqlite3.OperationalError: duplicate column name: row_version</failure></testcase><testcase classname="tests.unit.test_research.test_change_watermark_initialization" name="test_unrelated_sqlite_errors_are_not_suppressed" time="0.132" /><testcase classname="tests.unit.test_research.test_change_watermark_initialization" name="test_missing_table_and_unsafe_table_name_still_fail" time="0.099" /></testsuite></testsuites>

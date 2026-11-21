@@ -1,0 +1,13 @@
+{
+  "instrument_id": "000070",
+  "shared_store": "/home/python/Quote/data/research.db",
+  "original_log_sha256": "5d471b132d6c0b2dca7fc4231d5f448fd58da5e68fafd4c5c2e4c318000ea540",
+  "original_cli_started_marker_exists": false,
+  "budget_exists": false,
+  "result_exists": false,
+  "model_calls": 0,
+  "first_result_preserved": true,
+  "original_failure": "duplicate column name: row_version",
+  "reported_location": "data_manager.py::_initialize_research_storage -> main.py::initialize_lightweight",
+  "inferred_owner": "research/change_watermarks.py::ensure_row_version_column (concurrent PRAGMA/ALTER); original log does not identify the exact table"
+}

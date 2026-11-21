@@ -1,0 +1,32 @@
+{
+  "run_id": "6eu-000070-first_read",
+  "action": "first_read",
+  "started_epoch": 1795279712.1578176,
+  "finished_epoch": 1795279719.736258,
+  "command_wall_seconds": 7.578,
+  "process_returncode": 1,
+  "absolute_deadline_timeout": false,
+  "allocated_budget": {
+    "seconds": 3000,
+    "tokens": 500000,
+    "physical_requests": 4,
+    "recoveries": 1,
+    "logical_seconds": 2450,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "result_path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/000070/executions/6eu-000070-first_read/result.json",
+  "result_state": "missing",
+  "usage": {
+    "physical_requests": 0,
+    "recoveries": 0,
+    "charged_tokens": 0,
+    "known_supplier_total": 0,
+    "unknown_usage_reservation": 0,
+    "priced_cost_cny": "0",
+    "fees": "no_model_call",
+    "budget_path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/000070/executions/6eu-000070-first_read/budget.json",
+    "attempts": []
+  },
+  "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6eu-b-3YUSDBLW/6eu-000070-first_read.log"
+}

@@ -1,0 +1,79 @@
+{
+  "task": "6.EU",
+  "delivery": {
+    "companies": 19,
+    "objects": 592,
+    "metrics": 775,
+    "root": "/home/python/Quote/data/research/company_profile_prospective20_release_20261122",
+    "files": {
+      "json": "/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.json",
+      "markdown": "/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.md"
+    },
+    "same_api_json_export_fresh_instance": true
+  },
+  "first_read17_and_successor2_separate": true,
+  "resource_path": "resource-validation.json",
+  "failure_path": "failure-index.json",
+  "tests": [
+    {
+      "path": "owner-fixes-tests.xml",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "seconds": 49.525,
+      "note": "Final valid scoped evidence; overlapping cases are not added into a new quality score."
+    },
+    {
+      "path": "row-final-tests.xml",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "seconds": 2.876,
+      "note": "Final valid scoped evidence; overlapping cases are not added into a new quality score."
+    },
+    {
+      "path": "source-replay-tests.xml",
+      "tests": 2,
+      "passed": 1,
+      "failed": 1,
+      "seconds": 162.253,
+      "note": "Old terminal replay pass reused; the new test initially had an incorrect literal assertion, corrected against existing owner and rerun green separately."
+    },
+    {
+      "path": "source-replay-final-tests.xml",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "seconds": 82.709,
+      "note": "Final valid scoped evidence; overlapping cases are not added into a new quality score."
+    }
+  ],
+  "review": {
+    "blocking_fixes": [
+      "Concurrent research initialization duplicate-column race",
+      "Historical source body hidden by later empty failed download"
+    ],
+    "remaining_new_blocking_defects": [],
+    "nonblocking": "No new framework/semantic gates, optional content completeness, supplier prices, existing unrelated dirty changes deferred",
+    "source_semantics": "A reviewed8 companies/26 actually adopted repairs separately; B does not claim full-report99%/formal acceptance."
+  },
+  "code_and_test_sha256": {
+    "research/change_watermarks.py": "e73c0608feaab243c619e8ee5e74b7170b71c4ccab1ecdb642d61c0ec5794263",
+    "research/announcement_assets/repository.py": "f42700674bd44333aa44d8644acc34ed1011ce85a12435d04d83d5ebbddeb0ef",
+    "research/announcement_assets/service.py": "3eb8a1e1020b06fe687620f5bc59a05bd30d975b515daa0d15a6d80215cc0388",
+    "docs/development/company_profile_task_usage.md": "4b4662645c5ec423327061405d1242993a694aefb35d9fe93aab6a97ca788692",
+    "tests/unit/test_research/test_change_watermark_initialization.py": "31cb03c1c86b91fe3d8561efdb92a750deef3dfda176e12e16badf78b58bf812",
+    "tests/unit/test_research/test_announcement_assets_failed_observation.py": "999d9518c288e2f34550214dc9f4d6a97000fb61c3c996ef9c83d0067743d20d",
+    "tests/unit/test_research/test_company_profile_source_replay.py": "e82bc5b52aaca24347a00f98a6752ffa523021fab451182f96d2e96b906a0754"
+  },
+  "new_legacy_first_result_edits": 0,
+  "new_production_authorization": false,
+  "command_examples": [
+    "python -m pytest tests/unit/test_research/test_change_watermark_initialization.py -q",
+    "python -m pytest tests/unit/test_research/test_announcement_assets_failed_observation.py tests/unit/test_research/test_announcement_assets_access.py::test_cutoff_effective_read_reconstructs_original_before_correction -q",
+    "python -m pytest tests/unit/test_research/test_company_profile_source_replay.py -q",
+    "python main.py job --job-id company_profile_common_core --action <first_read|review_batch> --execution-plan-file <b-execution/plans/*.json> (PAID: completed; same run_id only reads cached result; never treat this as a new authorization)"
+  ],
+  "git": "B did not stage/commit/push; only seven isolated files above, A owns final specification/review/commit closure",
+  "B_active_development_seconds": "unknown; command/first-read/review/business elapsed are not active development time"
+}

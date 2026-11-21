@@ -1,0 +1,4 @@
+[INFO][2026-11-22 00:48:38][main.py:81] - [Main] Initializing Quote System (lightweight mode)...
+[WARNING][2026-11-22 00:48:38][data_manager.py:1657] - [DataManager] Research storage initialization failed, continuing without research storage: duplicate column name: row_version
+[ERROR][2026-11-22 00:48:38][main.py:95] - [Main] Failed to initialize system: research storage is not initialized
+[ERROR][2026-11-22 00:48:38][main.py:1385] - [Main] System error: research storage is not initialized

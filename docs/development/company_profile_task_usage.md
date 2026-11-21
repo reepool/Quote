@@ -75,6 +75,8 @@ python main.py job --job-id company_profile_common_core --action export --execut
 
 每个`run_id`的参数hash、结果和账本保存到`checkpoint_root/executions/<run_id>/`。完成后以相同文件重提会直接返回原结果，不创建新模型或预算；相同ID改股票、模型或额度会拒绝。已开始但未留下完整结果的ID不自动续发；先检查原状态、账本及待办，确需新执行时使用新的明确有界授权/计划，保留已有成功阶段。请保留该检查点目录，删除目录不等于恢复旧授权。
 
+初始化失败和来源绑定失败应与LLM失败分开：若失败发生在模型预算/客户端构造前，可能没有执行账本或`result.json`，应保留必要初始化错误日志；`pages_not_bound`也不表示报告未披露。固定知识截止日读取只使用当时可见的附件正文，较晚一次无正文的失败下载不会遮住已有正文；有新字节但校验不合格的版本不能借旧正文洗成有效，采集诊断仍保留最新失败。恢复前须核原来源/失败阶段，已成功的抽取或复核不得重跑；必要后继使用原累计时间、请求和账本的实际余额，换文件或`run_id`不增加授权。
+
 导出后优先阅读`annual_profiles.md`：这是与同目录`annual_profiles.json`同一投影的当前公司画像，包括多轮有效补读和复核后继，按八要素/可选供应链/公司特色呈现，附缺项、实际模型及章节/物理页/原文。状态仍分已核、待核及保真限用，不把约数变精确值；已替代、隔离或仅源参考的原正文不会重新混入当前结论。不同批次相似内容保归属，不自动语义去重或加总，不宣称全报告完整。
 
 原`profiles.md`及单股`.md`继续是**所选单轮底稿**，适合回看历史；不要用它们替代当前合并版。新的合并人读版也进入原`export_manifest.json`，不调用模型或改写研究数据；无底稿的旧路径不虚构合并版。
@@ -100,3 +102,37 @@ python main.py job --job-id company_profile_common_core --action export --execut
 ```
 
 精读沿原应用完成选章、抽取和源复核，原稿保留，新增内容以独立阅读批次进入同报告API及`annual_profiles.json`；未找到的内容仍标缺项，不要求全部补齐。源/原稿hash过期、跨股跨报告或计划与动作不符会拒绝；同`run_id`重提只读原结果。需要第二轮时先按当前画像生成新问题计划，再给新执行文件及明确预算，不通过修改旧文件续额。复核未完成时可按已有`review-plan`→`review_batch`接续，无需重新选章/抽取；这也需要对应的新有限授权。
+
+## 6.EU整组研究交付：显式根只读使用
+
+本批首发20家，17家有稿；两个零模型工程失败经原窗口内必要后继后，当前研究根可读19家，圆通速递600233.SH仍无稿。数量是可读内容范围，不是正式质量通过；初核/终核、独立有限核查和缺项仍分别保留。原首发失败不改，未切换默认研究配置或共享API服务，未启生产。
+
+可直接复制运行下列只读调用（不排队、不调用模型、不写画像）：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python - <<'PY'
+import json
+from research.company_profile.reads import CompanyProfileReadService
+
+reader = CompanyProfileReadService(
+    "/home/python/Quote/data/research/company_profile_prospective20_release_20261122"
+)
+stocks = [
+    "600176.SH", "600115.SH", "601288.SH", "600163.SH", "600183.SH",
+    "601319.SH", "600170.SH", "000070.SZ", "600258.SH", "002500.SZ",
+    "000037.SZ", "000568.SZ", "000089.SZ", "000563.SZ", "000402.SZ",
+    "920008.BJ", "000524.SZ", "920016.BJ", "002558.SZ",
+]
+print(json.dumps(reader.research_profiles(stocks), ensure_ascii=False, indent=2))
+PY
+```
+
+API复用现有`POST /api/v1/research/company/annual-profiles/query`，请求体为`{"instrument_ids":["600176.SH","000070.SZ","002500.SZ"]}`等明确清单；它与上述ReadService投影一致。使用该根时，只在独立研究API进程启动前显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_prospective20_release_20261122`。这不修改共享配置，也不会替已经运行的默认服务切根。请求600233.SH会明确列为本地未找到画像，不表示年报未披露或零业务。
+
+本批唯一整组导出：
+
+- JSON：`/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.json`
+- 人读版：`/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.md`
+
+000037/F14的原文电价单位有疑点，经独立有源决定保留原值并标`limited`，不能直接用于确定电价计算；其余事实、来源和已有缺项照常读取。读取者须同时消费每条事实的状态/限制，不能仅取裸数值。

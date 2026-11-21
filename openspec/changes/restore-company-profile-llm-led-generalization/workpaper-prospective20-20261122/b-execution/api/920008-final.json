@@ -1,0 +1,3977 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "920008.BJ",
+  "report": {
+    "instrument_id": "920008.BJ",
+    "report_id": "asset_9c7faa47ae11b59c1ab286ec72fb0803",
+    "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-26T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+  "latest_reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+  "readings": [
+    {
+      "work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "workpaper_sha256": "cc9dcd5a8ca96cfc42d3153651dd1dd30a0c60a637310566e455a8833f9e17d3",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0013",
+            "section_path": [
+              "第三节 会计数据和财务指标"
+            ],
+            "start_page": 8,
+            "end_page": 11,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          },
+          {
+            "section_id": "section-0026",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "一、 业务概要"
+            ],
+            "start_page": 11,
+            "end_page": 11,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          },
+          {
+            "section_id": "section-0028",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "二、 经营情况回顾"
+            ],
+            "start_page": 11,
+            "end_page": 16,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          },
+          {
+            "section_id": "section-0059",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "境外资产占比较高的情况"
+            ],
+            "start_page": 16,
+            "end_page": 20,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0136 未来展望：属计划性内容，非本期经营事实，暂不纳入",
+          "section-0295 财务会计报告：体量过大，仅在收入附注存在实质缺口时定向补充",
+          "section-0255 行业信息：纯行业背景，对本期公司层面解释力有限"
+        ],
+        "selection_rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。",
+        "stop_reason": "已覆盖业务结构、产品用途、收入构成与主要业务权重、经营变化及公司层面财务概览；行业背景与未来展望为次要，财务附注仅在存在实质缺口时定向补充，故在此停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取分产品销量、单价及在手订单金额明细。",
+        "未获取主要原材料具体品类、采购单价及产能产量数据。",
+        "未获取各驱动因素对收入变动的量化拆分。",
+        "未获取重大股权投资、重大资产处置等事项的完整清单。",
+        "未获取具体终端装备型号与客户对应关系。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-f6048b3ecbb3032e5833f602:workpaper:sections",
+          "request_hash": "b85a5a1523f23ee12359e570ea769867adefaaecab6ff32872fc41c16d892b38",
+          "response_hash": "b1576ed6b4f204ea327e28759c4f506349bce1c54069ed288c4d5af881e6b11a",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 13927,
+            "output_tokens": 305,
+            "total_tokens": 14232
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 496,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0074",
+            "section-0075",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0141",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0211",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0337",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0431",
+            "section-0432",
+            "section-0435",
+            "section-0439",
+            "section-0440",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0457",
+            "section-0459",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0477",
+            "section-0483",
+            "section-0486",
+            "section-0487",
+            "section-0494",
+            "section-0497",
+            "section-0502",
+            "section-0503",
+            "section-0505",
+            "section-0506",
+            "section-0509",
+            "section-0512",
+            "section-0513",
+            "section-0515",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0524",
+            "section-0526",
+            "section-0527",
+            "section-0529",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0535",
+            "section-0536",
+            "section-0539",
+            "section-0542",
+            "section-0543",
+            "section-0545",
+            "section-0548",
+            "section-0549",
+            "section-0551",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0559",
+            "section-0560",
+            "section-0562",
+            "section-0563",
+            "section-0566",
+            "section-0570",
+            "section-0572",
+            "section-0573",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0603",
+            "section-0608",
+            "section-0610",
+            "section-0611",
+            "section-0612",
+            "section-0614",
+            "section-0616",
+            "section-0617",
+            "section-0618",
+            "section-0619",
+            "section-0620",
+            "section-0621",
+            "section-0625",
+            "section-0626",
+            "section-0629",
+            "section-0633",
+            "section-0634",
+            "section-0636",
+            "section-0637",
+            "section-0638",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0647",
+            "section-0648",
+            "section-0649",
+            "section-0650",
+            "section-0651",
+            "section-0652"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-f6048b3ecbb3032e5833f602:workpaper:extract",
+          "request_hash": "25b1343c0da0876e16533cfc5a2a192ff249705b32136563bffbd5d9b339313b",
+          "response_hash": "c6cfef497f34fe523362943af367c807a28134f71787a367fc196d9ceb166749",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14539,
+            "output_tokens": 5804,
+            "total_tokens": 20343
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0013",
+            "section-0026",
+            "section-0028",
+            "section-0059"
+          ],
+          "physical_pages": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "cc9dcd5a8ca96cfc42d3153651dd1dd30a0c60a637310566e455a8833f9e17d3",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "superseded_by_review_successor"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第三节 会计数据和财务指标"
+          ],
+          "physical_pages": [
+            8
+          ],
+          "source_spans": [
+            {
+              "page": 8,
+              "start": 43,
+              "end": 4121,
+              "quote": "第三节                 会计数据和财务指标\n\n一、           盈利能力\n\n                                                                                                                                     单位：元\n                                                      2025    年                 2024   年             本年比上年增                       2023    年\n                                                                                                            减%\n营业收入                                             171,344,694.25            278,912,669.80                -38.57%              216,099,609.26\n毛利率%                                                  41.86%                    44.41%                        -                    48.68%\n归属于上市公司股东的净利润                                     16,214,562.93             50,296,094.97                -67.76%              45,044,724.92\n归属于上市公司股东的扣除非                                     15,611,032.07             46,894,722.62                -66.71%              42,072,277.07\n经常性损益后的净利润\n加权平均净资产收益率%（依据\n归属于上市公司股东的净利润                                          5.14%                    22.79%                        -                    30.79%\n计算）\n加权平均净资产收益率%（依据\n归属于上市公司股东的扣除非                                          4.94%                    21.25%                        -                    28.76%\n经常性损益后的净利润计算）\n基本每股收益                                                 0.2543                    0.8889                  -71.39%                   0.8500\n\n\n\n二、           营运情况\n\n                                                                                                                                     单位：元\n                                                     2025   年末                 2024   年末              本年末比上年                     2023    年末\n                                                                                                          末增减%\n资产总计                                               510,037,339.75           448,896,130.85                       13.62%       324,655,219.87\n负债总计                                               185,883,465.39           142,117,187.55                       30.80%       158,883,065.41\n归属于上市公司股东的净资产                                      324,153,874.36           306,778,943.30                        5.66%       165,772,154.46\n归属于上市公司股东的每股净                                                    5.08                      4.81                   5.61%                      3.12\n资产\n资产负债率%（母公司）                                                  36.45%                    31.66%                  -                        48.94%\n资产负债率%（合并）                                                   36.45%                    31.66%                  -                        48.94%\n流动比率                                                             4.45                      4.10                   8.54%                      2.61\n                                                      2025    年                 2024    年             本年比上年增                       2023   年\n                                                                                                             减%\n利息保障倍数                                                           7.79                    16.30                 -                           16.05\n经营活动产生的现金流量净额                                         5,305,837.72           -26,514,011.28                    120.01%         -27,863,021.24\n应收账款周转率                                                          0.60                      1.35                -                             2.21\n存货周转率                                                            0.88                      1.34                -                             1.03\n总资产增长率%                                                      13.62%                    38.27%                  -                        40.22%\n营业收入增长率%                                                    -38.57%                    29.07%                  -                        27.72%\n\n                                                                        8\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "一、 业务概要"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 51,
+              "end": 998,
+              "quote": "一、      业务概要\n\n商业模式报告期内变化情况：\n    公司为专用网络航电系统及显示系统的综合解决方案提供商，技术密集型高新技术企业，所属行业\n为计算机、通信和其他电子设备制造业。\n    公司主营业务为网络总线产品和特种显示产品的研发、生产及销售。主要产品为高速网络通信组件、\n航电网络仿真、监控、测试设备、特种LED                   显示产品、液晶加固显示产品等。公司尤其重视技术和产品\n核心竞争力的可持续性，积极参与各主体所新的重点项目，始终坚持新的技术投入，紧跟各重要型号的\n研制进程。报告期内，公司业务正常开展，一方面重点推进TSN                            等新一代网络技术产品的研制任务，一\n方面向具有特殊应用场景的特种训练模拟器整机研制及集成延伸发展。受特种显示类产品相关配套的列\n装型号的交付任务、新型号的研制任务以及市场竞争加剧等因素影响，业绩短期承压。后续随着多个新\n型号的陆续定型批产，订单、营收和利润有望得到修复。\n    公司客户集中于中航工业、中船、中电科等特大型国有集团下属各研究所和生产单位，在营销上采\n取直接销售的模式：销售产品及提供相应技术解决方案的同时，协助客户进行二次开发，以挖掘后续有\n效需求并建立紧密合作关系。现阶段，公司产品覆盖服务型号的全生命周期，部分产品实现批产。\n    公司的商业模式是以核心技术为基础，紧跟型号需求提供定制化产品和技术服务，并积极配合研究\n所共同完成研制任务，以定型列装为最终目的。公司通过销售产品及提供技术服务获得收入，销售收入\n为主要的收入来源。\n    2025年，公司全体员工攻坚克难、奋勇拼搏，面对复杂严峻的外部市场环境与日趋激烈的行业竞争，\n工作中虽有亮点突破，但也面临了诸多挑战，年度经营目标完成情况不及预期。公司后续将会结合市场\n情况继续丰富激励措施，引入新的人才团队，积极调动全体员工主观能动性，激发核心人员斗志及创造\n力，持续提升团队业务能力，完善服务体系，深入挖掘现有市场，积极开拓新市场，补齐市场短板。\n    报告期内公司商业模式和主营业务无重大变化，也未对公司经营情况产生重大影响。\n\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 2251,
+              "quote": "推进研发效率和管理效率的提升。公司在保障现有产品的生产交付及质量控制，优化各方面管理流程的\n同时，重点推进       TSN  等新一代网络技术产品的研制任务，并向具有特殊应用场景的特种训练模拟器整机\n研制及集成     等 延伸，向虚拟现实等方向拓展，力争形成公司主营业务的未来增长点，为公司中长期发展\n提升业务规模打下基础。\n    报告期内受特种显示类产品相关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧\n等综合因素影响，公司经营业绩短期承压，经营计划部分执行情况低于预期。\n    1、市场开拓方面\n    2025年公司全市场销售渠道和覆盖区域趋于完善，各大军工集团主机厂/所和系统所客户群体稳定，\n维护现有客户的同时开拓了部分新客户，报告期内新签订单                             20,550.40万元，较上年同期略有增长。\n    公司球幕产品在         2025 年的交付验收主要集中在新型号项目，总体数量同期有所下降，但产品技术\n参数的突破和先进性均得到了客户进一步认可；特种训练方向，首套空间定向障碍模拟器于报告期顺利\n研制完成，多名资深飞行员体验反馈评价较高；机载、舰载通信接口模                                  块及舰载交换设备交付数量季度\n略有波动，全年订单持续稳步推进，已列装多个重点型号装备；综合处理设备方面                                        报告期内已配合客户\n适配多个型号任务的试飞，并获取了新订单；TSN、无损以太等新一代网络技术产品正配套相关重点研\n制任务正常推进。\n    2、经营业绩方面\n    受军方采购计划、特种显示类产品相关配套的列装型号的交付任务、新型号的研制任                                         务以及市场竞\n争加剧等综合因素影响，公司经营业绩短期承压。\n    报告期内，公司实现营业收入               17,134.47万元，同比下降        38.57%，公司营收阶段性下滑的主要原因\n为：1）特种显示产品方面，鉴于公司前期参与配套                        的某个球幕列装型号的交付任务已于                  2024 年基本完\n成，2025  年交付数量较少，对总体收入金额影响较大，后续随着多个新型号的陆续定型批产，订单和营\n收有望得到修复；2）网络总线方面，受采购计划的影响存在季度波动，FC                                   网络数据通信卡全年交付量\n与上年相比基本稳定，TSN            等新一代网络技术产品正在持续推进研制任务，交付规模对公司业绩增长影\n响有限。\n    报告期内，公司营业成本为             9,961.63万元，同比下降         35.75%，营业成本降幅低于营业收入，主要因\n为本期交付验收的球幕产品多为新型号、定制类产品，周期长，研发难度大，成本较高，使得特种显示\n类产品综合毛利率较上年同期下降幅度较大。\n    公司报告期内继续实施全面预算管理，强化成本、费用管控，全年费用较                                    2024  年有所下降，但营\n业收入的大幅下降导致营业费用率仍有所上升，对全年利润影响有限。\n    上述各项因素综合导致公司全年实现净利润                     1,621.46万元，处于近几年阶段性低谷。\n    报告期内，由于国家相关政策的实施，客户回款情况有所好转，经营活动产生的现金流量净额由负\n转正，金额为       530.58万元。目前公司仍在积极协调客户，清理长账龄回款，努力持续改善现金流。\n    3、创新研发方面\n    公司秉承创新驱动发展的理念，高度重视技术研发工作，报告期内持续加强研发创新以保障企业核\n心生产力，报告期内获发明专利授权                  3项、实用新型专利授权            4项、外观设计专利授权            2 项。2025  年公\n司在新一代航电网络总线方向持续加强研发投入，报告期内研发费用投入                                    1,078.67万元，占公司营业收\n入的  6.30%。\n    公司紧跟市场趋势和客户需求，加快研发步伐，结合用                           户反馈持续优化提升新研产品性能。公司在\n产品研发中对标行业领先的技术标准，结合积累多年的经验技术，秉承匠心造精品的理念，以持续增强\n公司产品在行业中的综合竞争力。\n    4、质量管理方面\n    面对复杂多变的宏观经济环境与日趋激烈的行业竞争格局，公司始终坚守质量发展初心，聚焦核心\n能力提升与内生动力强化，以产品质量为立身之本，以客户需求为行动导向，扎实推进各项经营管理工\n作稳步开展。公司严格遵循             GJB9001C  -2017质量管理体系标准要求，紧紧围绕产品质量可靠性、可追溯\n                                              12\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1560,
+              "quote": "性及全流程过程管控核心要点，持续优化质量管理体系运行机制，全力保障产品保质保量按期交付，持\n续提升客户满意度与品牌认可度。报告期内，公司实现重大质量事故零发生，圆满完成各项阶段性质量\n管控目标。\n    公司持续深化精细化管理体系建设，全面提升运营管理质效与体系管控水平。构建“内审+管审+外\n审”三位一体的监督与改进体系：通过内部审核全面排查体系运行短板并完成整改闭环；依托管理评审统\n筹审视体系适宜性与有效性；顺利通过第三方监督审核，实现内外部监督双向赋能，形成持续改进的管\n理闭环。通过强化设计研发、生产制造全过程精细化管控，有效提升研发创新与生产运营效能；依托多\n维监督机制精准识别薄弱环节，落实常态化持续改进；通过常态化专业质量培训与全员质量文化宣贯，\n全面筑牢全员质量责任意识。健全完善的                    GJB 质量管理体系实现平稳、高效、规范运行，为公司产品高\n质量交付、实现可持续高质量发展提供了坚实可靠的体系保障。\n    5、资本市场与外部环境方面\n    融资方面：鉴于日常经营周转所需，公司报告期内归还银行贷款                             3,040.00万元，新增银行贷款8,350.00\n万元。\n    外部环境方面：2025        年国际形势严峻，地缘紧张局势持续升级，进出口贸易政策、情况复杂多变。\n我国军工行业已基本实现国产化自主可控，国家军贸出口业务的发展对公司中长期业务发展有积极影\n响。\n    报告期内，公司重视市场开拓、研发与质量管理，生产经营正常，所处行业、主营业务、客户、供\n应商、销售渠道、核心团队、成本结构、收入模式均未发生重大变化。\n\n\n\n(二)     行业情况\n\n    公司属军工电子信息领域，主营业务为网络总线产品和特种显示产品的研发、生产及销售。根据财\n政部数据，2010      年我国国防开支为         4,265亿元，2024     年增长至    1.67 万亿元，同比增长         7.2%，2025  年增\n长至  1.81 万亿元，同比增长         7.2%，2026   年国防支出预算进一步达到              1.94万亿元，同比继续增长            7%。\n目前我国仍处于国防和军队信息化的高速发展阶段，2021                          年 3 月《中华人民共和国国民经济和社会发展\n第十四个五年规划和          2035 年远景目标纲要》发布，2026             年  3 月《中华人民共和国国民经济和社会发展\n第十五个五年规划纲要》发布，明确国防军工行业发展方向及目标：“如期实现建军一百年奋斗目标，高\n质量推进国防和军队现代化”，核心围绕先进战斗力建设、军事治理现代化、一体化国家战略体系和能力\n三大方向展开，强调机械化信息化智能化融合发展，目标是提高捍卫国家主权、安全、发展利益的战略\n能力。\n    公司业务及产品主要服务于国家重点国防装备相关项目，自网络总体理论设计研发阶段至装备最终\n列装服役阶段，以国产化为基石，重点围绕“无人智能作战力量规模化、实战化、体系化；传统作战力量\n升级改造；构建智能化军事体系；加快先进武器装备发展”等领域，在“推动军地协同，促进军民融合深\n度发展”的大政策下抓住历史机遇。\n    报告期内，行业整体竞争更加激烈，但发展趋势依然向好，未发生重大不利变化，国家军贸出口业\n务的发展对公司中长期业务发展有较为积极的影响。\n\n\n\n\n\n\n\n\n                                              13\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 5895,
+              "quote": "(三)            财务分析\n\n1.     资产负债结构分析\n                                                                                                                                                                单位：元\n                                              2025     年末                                             2024     年末\n        项目                           金额                    占总资产的                             金额                  占总资产的比                              变动比例%\n                                                                比重%                                                       重%\n货币资金                          97,933,152.95                         19.20%            55,934,622.70                         12.46%                                 75.09%\n应收票据                            1,713,459.97                          0.34%             6,639,545.47                          1.48%                               -74.19%\n应收账款                        262,202,929.00                          51.41%          256,083,044.61                          57.05%                                   2.39%\n预付款项                            1,385,994.95                          0.27%             5,127,228.25                          1.14%                               -72.97%\n其他应收款                           3,252,711.40                          0.64%             2,386,129.45                          0.53%                                36.32%\n存货                            99,875,841.69                         19.58%            86,805,019.66                         19.34%                                 15.06%\n合同资产                               281,525.00                         0.06%                  53,370.00                        0.01%                              427.50%\n其他流动资产                             187,545.28                         0.04%                413,557.69                         0.09%                               -54.65%\n固定资产                          28,464,782.62                           5.58%           24,134,687.72                           5.38%                                17.94%\n使用权资产                           3,750,220.56                          0.74%             2,057,308.26                          0.46%                                82.29%\n无形资产                            2,239,024.75                          0.44%                992,853.57                         0.22%                              125.51%\n长期待摊费用                             138,537.07                         0.03%                417,933.27                         0.09%                               -66.85%\n递延所得税资                          7,995,407.96                          1.57%             6,919,559.59                          1.54%                                15.55%\n产\n其他非流动资                             616,206.55                         0.12%                931,270.61                         0.21%                               -33.83%\n产\n短期借款                            6,377,583.33                          1.25%                           0.00                    0.00%\n应付票据                          21,375,763.62                           4.19%             5,529,352.00                          1.23%                              286.59%\n应付账款                          24,730,924.41                           4.85%           38,248,109.26                           8.52%                               -35.34%\n合同负债                            2,341,300.89                          0.46%             8,203,147.47                          1.83%                               -71.46%\n应付职工薪酬                          5,931,886.80                          1.16%           13,962,297.59                           3.11%                               -57.51%\n应交税费                            9,275,805.29                          1.82%             8,624,178.85                          1.92%                                  7.56%\n其他应付款                           2,887,427.05                          0.57%             5,216,984.58                          1.16%                               -44.65%\n一年内到期的                        31,754,421.92                           6.23%           21,048,309.14                           4.69%                                50.86%\n非流动负债\n其他流动负债                             348,240.43                         0.07%                           0.00                    0.00%\n长期借款                          78,100,000.00                         15.31%            40,000,000.00                           8.91%                                95.25%\n租赁负债                            2,197,578.54                          0.43%                976,212.41                         0.22%                               125.11%\n递延所得税负                             562,533.11                         0.11%                308,596.25                         0.07%                                82.29%\n债\n股本                            63,750,000.00                         12.50%            63,750,000.00                         14.20%                                        0%\n资本公积                          95,428,846.24                         18.71%            95,376,228.11                         21.25%                                   0.06%\n减：库存股                           1,477,000.00                          0.29%             2,584,750.00                          0.58%                               -42.86%\n盈余公积                          21,469,707.26                           4.21%           19,848,250.97                           4.42%                                  8.17%\n未分配利润                       144,982,320.86                          28.43%          130,389,214.22                          29.05%                                 11.19%\n\n                                                                                     14\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 0,
+              "end": 2441,
+              "quote": "资产负债项目重大变动原因：\n1、货币资金：报告期末余额较期初增加                      4,199.85万元，增长       75.09%，主要系本年公司新增贷款                 5,310.00\n万元，同时客户回款情况有所改善所致；\n2、应收票据：报告期末余额较期初减少                      492.61 万元，降低       74.19%，主要系上年收到客户支付的商业汇\n票已于报告期内到期，而本年收到的银行/商业汇票较少所致；\n3、预付款项：报告期末余额较期初减少                      374.12 万元，降低       72.97%，主要系上年期末因正常备货而支付\n给供应商的预付款已于报告期内完成验收入库所致；\n4、其他应收款：报告期末余额较期初增加                       86.66 万元，增长       36.32%，主要系本年新增应收退税款                  268.33\n万元所致；\n5、合同资产：报告期末余额较期初增加                       22.82万元，增长        427.50%，主要系销售合同质保金                31.93 万元\n到期日截至报告期末为一年以内，由其他非流动资产重分类至合同资产所致；\n6、其他流动资产：报告期末余额较期初减少                         22.60 万元，降低        54.65%，主要系期初部分合同取得成本\n在报告期内确认收入后，对应金额减少                      25.55 万元所致；\n7、使用权资产：报告期末余额较期初增加                        169.29 万元，增长       82.29%，主要系本年续租经营场地，使用\n权资产增加       319.72 万元，同时计提折旧            150.43 万元所致；\n8、无形资产：报告期末余额较期初增加                      124.62 万元，增长      125.51%，主要系本年采购信息化软件                   172.16\n万元所致；\n9、长期待摊费用：报告期末较期初减少                       27.94 万元，减少       66.85%，主要系经营场所装修费用本年摊销\n所致；\n10、其他非流动资产：报告期末较期初减少                        31.51 万元，减少       33.83%，主要系销售合同质保金                31.93 万\n元到期日截至报告期末为一年以内，由其他非流动资产重分类至合同资产所致；\n11、短期借款：报告期末较期初                增加    637.76 万元，主要系本年为补充经营流动资金，新增一年期银行借\n款 500 万元，同时贴现未到期票据                 137.3万元所致；\n12、应付票据：报告期末较期初增加                    1,584.64万元，增长       286.59%，主要系公司结合经营现金流的情况，\n逐渐增多以票据方式支付货款所致；\n13、应付账款：报告期末较期初减少                    1,351.72万元，减少       35.34%，主要系报告期初公司已完成入库但尚\n未向供应商结算的特种显示类订单款项已于报告期内完成支付，同时本年加大以票据向供应商结算款项\n所致；\n14、合同负债：报告期末较期初减少                    586.18  万元，降低       71.46%，主要系客户过往年度向公司支付的预\n付款对应合同已于报告期完成验收确认收入，合同负债                               相应减少，而本年新增预收货款较少所致；\n15、应付职工薪酬：报告期末较期初减少                       803.04 万元，降低        57.51%，主要系本年经营业绩不及预期，\n全员年终奖大幅下调所致；\n16、其他应付款：报告期末较期初减少                     232.96 万元，降低       44.65%，主要系两方面所致：1）应向中介机\n构支付的部分发行费已于报告期内支付；2）部分股权激励计划限制性股票已于报告期内完成限售解除；\n17、一年内到期的非流动负债：报告期末较期初增加                             1,070.61 万元，增长       50.86%，主要系两方面所致：\n1）3,000.00  万长期借款到期日截至报告期末不足一年，重分类至一年内到期的非流动负债；2）该科目\n期初列示的       2,000万元长期借款已于报告期内偿还；\n18、长期借款：报告期末较期初增加                    3,810 万元，增长       95.25%，主要系公司报告期内因经营活动所需增\n加了   6,850万元长期银行借款所致；\n19、租赁负债：报告期末较期初增加                    122.14 万元，增长       125.11%，主要系本年续租经营场地，租赁负债\n增加所致；\n20、递延所得税负债：报告期末较期初增加                        25.39 万元，增长       82.29%，主要系本年因续租经营场地，使\n                                                  15\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 186,
+              "end": 4185,
+              "quote": "境外资产占比较高的情况\n□适用 √不适用\n2.    营业情况分析\n(1)   利润构成\n                                                                                                                                    单位：元\n                                       2025    年                                      2024   年\n       项目                     金额                占营业收入                       金额                 占营业收入                       变动比例%\n                                                   的比重%                                          的比重%\n营业收入                   171,344,694.25                   -            278,912,669.80                   -                               -38.57%\n营业成本                     99,616,273.82                  58.14%       155,044,863.71                   55.59%                          -35.75%\n毛利率                               41.86%                -                       44.41%                -                          -\n税金及附加                      1,454,586.76                   0.85%          1,847,660.20                   0.66%                         -21.27%\n销售费用                       9,602,572.17                   5.60%        11,982,416.72                    4.30%                         -19.86%\n管理费用                     11,249,573.38                    6.57%        13,164,577.27                    4.72%                         -14.55%\n研发费用                     10,786,688.86                    6.30%        16,379,905.11                    5.87%                         -34.15%\n财务费用                       2,493,966.50                   1.46%          2,641,418.72                   0.95%                          -5.58%\n信用减值损失                    -6,914,181.93                  -4.04%       -12,753,116.04                   -4.57%                         -45.78%\n资产减值损失                    -8,968,038.33                  -5.23%       -12,841,873.40                   -4.60%                         -30.17%\n其他收益                       1,251,273.60                   0.73%          4,641,874.58                   1.66%                         -73.04%\n投资收益                                      0                   0%                        0                   0%                              0%\n公允价值变动                                    0                   0%                        0                   0%                              0%\n收益\n资产处置收益                         13,219.04                  0.01%                         0                   0%\n汇兑收益                                      0                   0%                        0                   0%                              0%\n营业利润                     21,523,305.14                  12.56%         56,898,713.21                  20.40%                          -62.17%\n营业外收入                          31,674.66                  0.02%                  556.48                 0.00%                      5,591.97%\n营业外支出                        547,785.53                   0.32%              23,333.96                  0.01%                      2,247.59%\n利润总额                     21,007,194.27                  12.26%         56,875,935.73                  20.39%                          -63.06%\n所得税费用                      4,792,631.34                   2.80%          6,579,840.76                   2.36%                         -27.16%\n净利润                      16,214,562.93                    9.46%        50,296,094.97                  18.03%                          -67.76%\n\n\n项目重大变动原因：\n1、营业收入：本年较上年减少                             10,756.80     万元，降低            38.57%，主要系公司因前期参与配套的某个列装型\n号的交付任务已于上年基本完成，本年交付批产类                                                 LED    球幕视景显示系统数量减少较多所致；\n2、营业成本：本年较上年减少                             5,542.86     万元，降低           35.75%，主要系随营业收入减少而减少所致，其中，\n本年交付的           LED     球幕视景显示系统多为新型号、定制类产品，毛利率相对较低，导致营业成本降幅低于\n营业收入；\n3、研发费用：本年较上年减少                              559.32    万元，降低            34.15%，主要系本年自研项目研发投入阶段性减少，\n                                                                      16\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 3239,
+              "quote": "人员工时投入及在研数量较上年减少所致；\n4、信用减值损失：本年较上年减少                        583.89  万元，降低        45.78%，主要系本年收入减少，同时客户回款情\n况有所改善，坏账计提减值金额减少所致；\n5、资产减值损失：本年较上年减少                        387.38  万元，降低        30.17%，主要系上年某新型号特种显示类产品研\n制合同因预计亏损，存在单笔较大金额减值计提而本年类似计提金额较小所致；\n6、其他收益：本年较上年减少                     339.06  万元，降低         73.04%，主要系两方面所致：1）本年增值税加计扣\n除抵减金额较上年减少                98.27 万元；2）本年收到的政府补助较上年减少                              240.91 万元；\n7、营业利润：本年较上年减少                     3,537.54  万元，降低        62.17%，主要系受军方采购计划、特种显示类产品\n相关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧等综合因素影响所致；\n8、营业外收入：本年较上年增加                      3.11  万元，增长        5,591.97%，主要系本年固定资产报废取得收益所致；\n9、营业外支出：本年较上年增加                       52.45 万元，增加         2,247.59%，主要系本年因过往年度研发费用加计扣\n除鉴定事项计提补税滞纳金所致；\n10、利润总额：本年较上年减少                     3,586.87 万元，降低         63.06%，主要系受军方采购计划、特种显示类产品\n相关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧等综合因素影响所致                                                               ；\n11、净利润：本年较上年减少                   3,408.15  万元，降低        67.76%，主要系受军方采购计划、特种显示类产品相\n关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧等综合因素影响所致                                                             。\n\n(2)  收入构成\n                                                                                                         单位：元\n          项目                          2025  年                       2024  年                     变动比例%\n主营业务收入                                  171,344,694.25                278,912,669.80                       -38.57%\n其他业务收入                                                 0                            0\n主营业务成本                                   99,616,273.82                155,044,863.71                       -35.75%\n其他业务成本                                                 0                            0\n\n\n按产品分类分析：\n                                                                                                         单位：元\n                                                                   营业收入比            营业成本比           毛利率比上年\n  分产品              营业收入              营业成本             毛利率%           上年同期            上年同期             同期增减\n                                                                       增减%             增减%\n网络总线产           118,813,095.27     48,765,642.01        58.96%           -6.12%          18.20%     减少   8.44 个百\n品                                                                                                             分点\n特种显示产            52,225,303.29     50,653,100.76          3.01%         -65.53%         -55.27%      减少   22.25  个\n品                                                                                                           百分点\n其他                  306,295.69        197,531.05        35.51%          -63.43%         -64.01%     增加   1.05 个百\n                                                                                                              分点\n    合计          171,344,694.25     99,616,273.82         -               -                -                -\n\n\n按区域分类分析：\n                                                                                                         单位：元\n  分地区              营业收入              营业成本             毛利率%         营业收入比            营业成本比           毛利率比上年\n\n                                                        17\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 3341,
+              "quote": "                                                                          上年同期             上年同期              同期增减\n                                                                            增减%              增减%\n四川省内              33,565,634.00      29,462,612.68          12.22%           -73.81%          -66.43%       减少    19.29  个\n                                                                                                                   百分点\n四川省外             137,779,060.25      70,153,661.14          49.08%             -8.61%            4.27%     减少    6.29 个百\n                                                                                                                      分点\n    合计           171,344,694.25      99,616,273.82           -                -                 -                 -\n\n收入构成变动的原因：\n1、 按产品分类分析：\n     特种显示产品本年收入下降                      65.53%、成本下降           55.27%，毛利率下降              22.25  个百分点，主要系两方面\n所致：1）LED         球幕视景显示系统鉴于公司前期参与配套的某个列装型号的交付任务已于                                                         2024  年基本完\n成，批产型号           2025  年交付数量较少，导致营业收入、营业成本降幅较大；2）本年公司交付验收的                                                            LED\n球幕视景显示系统多为新型号                      、定制类产品，周期长，研发难度大，成本较高，毛利率                                            较低，从而导致\n营业成本降幅小于营业收入的降幅；\n     其他产品本年收入下降                   63.43%，成本下降            64.01%，主要系本年承接、交付的其他类产品或技术服\n务与去年存在较大差异，收入和成本年度波动较大所致；\n2、 按区域分类分析：\n     省内收入下降           73.81%，成本下降            66.43%，毛利率下降             19.29  个百分点，主要系受不同地区客户的配\n套型号任务研制进程和采购计划影响所致。\n\n(3)  主要客户情况\n                                                                                                                单位：元\n序号                          客户                               销售金额               年度销售占比%              是否存在关联关系\n  1     中国航空工业集团公司                                          148,309,065.07               86.56%     否\n  2     中国电子科技集团公司                                           10,321,606.29                 6.02%    否\n  3     中国船舶集团有限公司                                            6,587,983.49                 3.84%    否\n  4     中国兵器工业集团有限公司                                          1,420,353.98                 0.83%    否\n  5     北京未尔锐创科技有限公司                                          1,101,769.91                 0.64%    否\n                        合计                                  167,740,778.74               97.89%                -\n\n\n(4)  主要供应商情况\n                                                                                                                单位：元\n序号                         供应商                               采购金额               年度采购占比%              是否存在关联关系\n  1     深圳市艾森视讯科技有限公司                                        13,916,056.97               11.68%     否\n  2     深圳市洲明科技股份有限公司                                         8,823,093.47                 7.40%    否\n  3     上海复旦微电子集团股份有限公司                                       8,630,550.00                 7.24%    否\n  4     沈阳润航科技有限责任公司                                          7,365,000.00                 6.18%    否\n  5     广东盈纳精密制造技术有限公司                                        5,920,358.28                 4.97%    否\n                        合计                                   44,655,058.72               37.47%                -\n\n\n\n                                                            18\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0014",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "source_spans": [
+            {
+              "page": 19,
+              "start": 0,
+              "end": 2407,
+              "quote": "(5)  报告期内公司贸易业务收入占营业收入比例超过                                    10%情况\n □适用 √不适用\n3.   现金流量状况\n                                                                                                              单位：元\n                项目                                 2025  年                       2024  年                 变动比例%\n 经营活动产生的现金流量净额                                         5,305,837.72               -26,514,011.28               120.01%\n 投资活动产生的现金流量净额                                       -11,569,289.82                -7,214,051.18               -60.37%\n 筹资活动产生的现金流量净额                                        48,806,711.95                52,115,286.92                 -6.35%\n\n\n现金流量分析：\n1、经营活动产生的现金流量净额：本年                             530.58  万元，而去年-2,651.40            万元，主要系两方面所致：1）本\n年客户回款情况有所改善；2）本年支付的货款及各项税费同比减少                                                  11.39%；\n2、投资活动产生的现金流量净额：本年较去年减少                                      60.37%，主要系本年处置老旧车辆后购置新车支付\n车款    436.79  万元，更新信息化系统支付                     188.08  万元所致。\n\n\n(四)       投资状况分析\n\n1、   总体情况\n√适用 □不适用\n                                                                                                           单位：元\n           报告期投资额                                  上年同期投资额                                     变动比例%\n            5,263,523.92                             4,072,547.00                                29.24%\n\n\n2、   报告期内获取的重大的股权投资情况\n□适用 √不适用\n3、   报告期内正在进行的重大的非股权投资情况\n√适用 □不适用\n                                                                                                              单位：元\n                                                                                              截止报告           是否达到\n项目名称           本期投入情            累计实际投            资金来源           项目进度           预计收益           期末累计           计划进度\n                    况             入情况                                                         实现的收           和预计收\n                                                                                                  益          益的原因\nFC  网络总                                         募集资金\n线及      LED    3,453,969.12    7,418,919.12     及自筹资35.38%                               -              -   -\n球幕产业                                            金\n化项目\n总部大楼1,809,554.80               1,917,151.80     募集资金           30.54%                    -              -   -\n及研发中\n\n                                                           19\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    },
+    {
+      "work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "workpaper_sha256": "f2a547670aa8028e8a610f41aebd53c44f193dbefb1975253a6ef016f798b92c",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_recovery": {
+        "base_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+        "base_workpaper_sha256": "cc9dcd5a8ca96cfc42d3153651dd1dd30a0c60a637310566e455a8833f9e17d3",
+        "plan_sha256": "91bb3926a77e2cbb1dfa11e5a8cea74f04256ec7fd4cda170b6f03550e5087a4",
+        "report": {
+          "document_type": "annual_report",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "instrument_id": "920008.BJ",
+          "published_at": "2026-04-26T16:00:00+00:00",
+          "report_id": "asset_9c7faa47ae11b59c1ab286ec72fb0803",
+          "report_period": "2025-12-31"
+        },
+        "request_id": "6eu-920008-review"
+      },
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0013",
+            "section_path": [
+              "第三节 会计数据和财务指标"
+            ],
+            "start_page": 8,
+            "end_page": 11,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          },
+          {
+            "section_id": "section-0026",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "一、 业务概要"
+            ],
+            "start_page": 11,
+            "end_page": 11,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          },
+          {
+            "section_id": "section-0028",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "二、 经营情况回顾"
+            ],
+            "start_page": 11,
+            "end_page": 16,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          },
+          {
+            "section_id": "section-0059",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "境外资产占比较高的情况"
+            ],
+            "start_page": 16,
+            "end_page": 20,
+            "rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0136 未来展望：属计划性内容，非本期经营事实，暂不纳入",
+          "section-0295 财务会计报告：体量过大，仅在收入附注存在实质缺口时定向补充",
+          "section-0255 行业信息：纯行业背景，对本期公司层面解释力有限"
+        ],
+        "selection_rationale": "选择公司业务概要（section-0026）说明产品/服务与经营模式；经营情况回顾（section-0028）及其财务分析（section-0036）覆盖经营计划、行业情况与资产负债结构；境外资产占比较高的情况（section-0059）实际承载营业情况分析（收入、成本、利润变动）；按产品分类（section-0074）与按区域分类（section-0075）提供收入构成与主要业务权重；会计数据和财务指标（section-0013）及盈利能力（section-0014）提供公司层面收入总额与盈利概览，避免仅依赖明细表。",
+        "stop_reason": "已覆盖业务结构、产品用途、收入构成与主要业务权重、经营变化及公司层面财务概览；行业背景与未来展望为次要，财务附注仅在存在实质缺口时定向补充，故在此停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取分产品销量、单价及在手订单金额明细。",
+        "未获取主要原材料具体品类、采购单价及产能产量数据。",
+        "未获取各驱动因素对收入变动的量化拆分。",
+        "未获取重大股权投资、重大资产处置等事项的完整清单。",
+        "未获取具体终端装备型号与客户对应关系。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-f6048b3ecbb3032e5833f602:workpaper:sections",
+          "request_hash": "b85a5a1523f23ee12359e570ea769867adefaaecab6ff32872fc41c16d892b38",
+          "response_hash": "b1576ed6b4f204ea327e28759c4f506349bce1c54069ed288c4d5af881e6b11a",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 13927,
+            "output_tokens": 305,
+            "total_tokens": 14232
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 496,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0074",
+            "section-0075",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0141",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0211",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0337",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0431",
+            "section-0432",
+            "section-0435",
+            "section-0439",
+            "section-0440",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0457",
+            "section-0459",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0477",
+            "section-0483",
+            "section-0486",
+            "section-0487",
+            "section-0494",
+            "section-0497",
+            "section-0502",
+            "section-0503",
+            "section-0505",
+            "section-0506",
+            "section-0509",
+            "section-0512",
+            "section-0513",
+            "section-0515",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0524",
+            "section-0526",
+            "section-0527",
+            "section-0529",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0535",
+            "section-0536",
+            "section-0539",
+            "section-0542",
+            "section-0543",
+            "section-0545",
+            "section-0548",
+            "section-0549",
+            "section-0551",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0559",
+            "section-0560",
+            "section-0562",
+            "section-0563",
+            "section-0566",
+            "section-0570",
+            "section-0572",
+            "section-0573",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0603",
+            "section-0608",
+            "section-0610",
+            "section-0611",
+            "section-0612",
+            "section-0614",
+            "section-0616",
+            "section-0617",
+            "section-0618",
+            "section-0619",
+            "section-0620",
+            "section-0621",
+            "section-0625",
+            "section-0626",
+            "section-0629",
+            "section-0633",
+            "section-0634",
+            "section-0636",
+            "section-0637",
+            "section-0638",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0647",
+            "section-0648",
+            "section-0649",
+            "section-0650",
+            "section-0651",
+            "section-0652"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-f6048b3ecbb3032e5833f602:workpaper:extract",
+          "request_hash": "25b1343c0da0876e16533cfc5a2a192ff249705b32136563bffbd5d9b339313b",
+          "response_hash": "c6cfef497f34fe523362943af367c807a28134f71787a367fc196d9ceb166749",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14539,
+            "output_tokens": 5804,
+            "total_tokens": 20343
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0013",
+            "section-0026",
+            "section-0028",
+            "section-0059"
+          ],
+          "physical_pages": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        }
+      },
+      "review_status": "completed_with_open_findings",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "cc9dcd5a8ca96cfc42d3153651dd1dd30a0c60a637310566e455a8833f9e17d3",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_execution_completed"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-e540ffe0c012ff23127fedcc:workpaper:review",
+          "request_hash": "9e250bc733b535de9621bb27563b7d592b93c1d003113a67b249eda632045844",
+          "response_hash": "2b47b9743ae573067679ebd678e432bc4a3f94bcb4b731acb35c3851d47b4238",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 21459,
+            "output_tokens": 526,
+            "total_tokens": 40428
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0013",
+            "section-0026",
+            "section-0028",
+            "section-0059"
+          ],
+          "physical_pages": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-e540ffe0c012ff23127fedcc:workpaper:repair",
+          "request_hash": "bbdcfde0486b19c041f0939a56861c56726069858e97d58e91408270a284df6b",
+          "response_hash": "58974d4b5c37b3bdbfbbf820406524e4fc28131189df3c1cd084f87ac0aad7f7",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 11913,
+            "output_tokens": 1123,
+            "total_tokens": 13036
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0013",
+            "section-0026",
+            "section-0028",
+            "section-0059"
+          ],
+          "physical_pages": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第三节 会计数据和财务指标"
+          ],
+          "physical_pages": [
+            8
+          ],
+          "source_spans": [
+            {
+              "page": 8,
+              "start": 43,
+              "end": 4121,
+              "quote": "第三节                 会计数据和财务指标\n\n一、           盈利能力\n\n                                                                                                                                     单位：元\n                                                      2025    年                 2024   年             本年比上年增                       2023    年\n                                                                                                            减%\n营业收入                                             171,344,694.25            278,912,669.80                -38.57%              216,099,609.26\n毛利率%                                                  41.86%                    44.41%                        -                    48.68%\n归属于上市公司股东的净利润                                     16,214,562.93             50,296,094.97                -67.76%              45,044,724.92\n归属于上市公司股东的扣除非                                     15,611,032.07             46,894,722.62                -66.71%              42,072,277.07\n经常性损益后的净利润\n加权平均净资产收益率%（依据\n归属于上市公司股东的净利润                                          5.14%                    22.79%                        -                    30.79%\n计算）\n加权平均净资产收益率%（依据\n归属于上市公司股东的扣除非                                          4.94%                    21.25%                        -                    28.76%\n经常性损益后的净利润计算）\n基本每股收益                                                 0.2543                    0.8889                  -71.39%                   0.8500\n\n\n\n二、           营运情况\n\n                                                                                                                                     单位：元\n                                                     2025   年末                 2024   年末              本年末比上年                     2023    年末\n                                                                                                          末增减%\n资产总计                                               510,037,339.75           448,896,130.85                       13.62%       324,655,219.87\n负债总计                                               185,883,465.39           142,117,187.55                       30.80%       158,883,065.41\n归属于上市公司股东的净资产                                      324,153,874.36           306,778,943.30                        5.66%       165,772,154.46\n归属于上市公司股东的每股净                                                    5.08                      4.81                   5.61%                      3.12\n资产\n资产负债率%（母公司）                                                  36.45%                    31.66%                  -                        48.94%\n资产负债率%（合并）                                                   36.45%                    31.66%                  -                        48.94%\n流动比率                                                             4.45                      4.10                   8.54%                      2.61\n                                                      2025    年                 2024    年             本年比上年增                       2023   年\n                                                                                                             减%\n利息保障倍数                                                           7.79                    16.30                 -                           16.05\n经营活动产生的现金流量净额                                         5,305,837.72           -26,514,011.28                    120.01%         -27,863,021.24\n应收账款周转率                                                          0.60                      1.35                -                             2.21\n存货周转率                                                            0.88                      1.34                -                             1.03\n总资产增长率%                                                      13.62%                    38.27%                  -                        40.22%\n营业收入增长率%                                                    -38.57%                    29.07%                  -                        27.72%\n\n                                                                        8\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "一、 业务概要"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 51,
+              "end": 998,
+              "quote": "一、      业务概要\n\n商业模式报告期内变化情况：\n    公司为专用网络航电系统及显示系统的综合解决方案提供商，技术密集型高新技术企业，所属行业\n为计算机、通信和其他电子设备制造业。\n    公司主营业务为网络总线产品和特种显示产品的研发、生产及销售。主要产品为高速网络通信组件、\n航电网络仿真、监控、测试设备、特种LED                   显示产品、液晶加固显示产品等。公司尤其重视技术和产品\n核心竞争力的可持续性，积极参与各主体所新的重点项目，始终坚持新的技术投入，紧跟各重要型号的\n研制进程。报告期内，公司业务正常开展，一方面重点推进TSN                            等新一代网络技术产品的研制任务，一\n方面向具有特殊应用场景的特种训练模拟器整机研制及集成延伸发展。受特种显示类产品相关配套的列\n装型号的交付任务、新型号的研制任务以及市场竞争加剧等因素影响，业绩短期承压。后续随着多个新\n型号的陆续定型批产，订单、营收和利润有望得到修复。\n    公司客户集中于中航工业、中船、中电科等特大型国有集团下属各研究所和生产单位，在营销上采\n取直接销售的模式：销售产品及提供相应技术解决方案的同时，协助客户进行二次开发，以挖掘后续有\n效需求并建立紧密合作关系。现阶段，公司产品覆盖服务型号的全生命周期，部分产品实现批产。\n    公司的商业模式是以核心技术为基础，紧跟型号需求提供定制化产品和技术服务，并积极配合研究\n所共同完成研制任务，以定型列装为最终目的。公司通过销售产品及提供技术服务获得收入，销售收入\n为主要的收入来源。\n    2025年，公司全体员工攻坚克难、奋勇拼搏，面对复杂严峻的外部市场环境与日趋激烈的行业竞争，\n工作中虽有亮点突破，但也面临了诸多挑战，年度经营目标完成情况不及预期。公司后续将会结合市场\n情况继续丰富激励措施，引入新的人才团队，积极调动全体员工主观能动性，激发核心人员斗志及创造\n力，持续提升团队业务能力，完善服务体系，深入挖掘现有市场，积极开拓新市场，补齐市场短板。\n    报告期内公司商业模式和主营业务无重大变化，也未对公司经营情况产生重大影响。\n\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 2251,
+              "quote": "推进研发效率和管理效率的提升。公司在保障现有产品的生产交付及质量控制，优化各方面管理流程的\n同时，重点推进       TSN  等新一代网络技术产品的研制任务，并向具有特殊应用场景的特种训练模拟器整机\n研制及集成     等 延伸，向虚拟现实等方向拓展，力争形成公司主营业务的未来增长点，为公司中长期发展\n提升业务规模打下基础。\n    报告期内受特种显示类产品相关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧\n等综合因素影响，公司经营业绩短期承压，经营计划部分执行情况低于预期。\n    1、市场开拓方面\n    2025年公司全市场销售渠道和覆盖区域趋于完善，各大军工集团主机厂/所和系统所客户群体稳定，\n维护现有客户的同时开拓了部分新客户，报告期内新签订单                             20,550.40万元，较上年同期略有增长。\n    公司球幕产品在         2025 年的交付验收主要集中在新型号项目，总体数量同期有所下降，但产品技术\n参数的突破和先进性均得到了客户进一步认可；特种训练方向，首套空间定向障碍模拟器于报告期顺利\n研制完成，多名资深飞行员体验反馈评价较高；机载、舰载通信接口模                                  块及舰载交换设备交付数量季度\n略有波动，全年订单持续稳步推进，已列装多个重点型号装备；综合处理设备方面                                        报告期内已配合客户\n适配多个型号任务的试飞，并获取了新订单；TSN、无损以太等新一代网络技术产品正配套相关重点研\n制任务正常推进。\n    2、经营业绩方面\n    受军方采购计划、特种显示类产品相关配套的列装型号的交付任务、新型号的研制任                                         务以及市场竞\n争加剧等综合因素影响，公司经营业绩短期承压。\n    报告期内，公司实现营业收入               17,134.47万元，同比下降        38.57%，公司营收阶段性下滑的主要原因\n为：1）特种显示产品方面，鉴于公司前期参与配套                        的某个球幕列装型号的交付任务已于                  2024 年基本完\n成，2025  年交付数量较少，对总体收入金额影响较大，后续随着多个新型号的陆续定型批产，订单和营\n收有望得到修复；2）网络总线方面，受采购计划的影响存在季度波动，FC                                   网络数据通信卡全年交付量\n与上年相比基本稳定，TSN            等新一代网络技术产品正在持续推进研制任务，交付规模对公司业绩增长影\n响有限。\n    报告期内，公司营业成本为             9,961.63万元，同比下降         35.75%，营业成本降幅低于营业收入，主要因\n为本期交付验收的球幕产品多为新型号、定制类产品，周期长，研发难度大，成本较高，使得特种显示\n类产品综合毛利率较上年同期下降幅度较大。\n    公司报告期内继续实施全面预算管理，强化成本、费用管控，全年费用较                                    2024  年有所下降，但营\n业收入的大幅下降导致营业费用率仍有所上升，对全年利润影响有限。\n    上述各项因素综合导致公司全年实现净利润                     1,621.46万元，处于近几年阶段性低谷。\n    报告期内，由于国家相关政策的实施，客户回款情况有所好转，经营活动产生的现金流量净额由负\n转正，金额为       530.58万元。目前公司仍在积极协调客户，清理长账龄回款，努力持续改善现金流。\n    3、创新研发方面\n    公司秉承创新驱动发展的理念，高度重视技术研发工作，报告期内持续加强研发创新以保障企业核\n心生产力，报告期内获发明专利授权                  3项、实用新型专利授权            4项、外观设计专利授权            2 项。2025  年公\n司在新一代航电网络总线方向持续加强研发投入，报告期内研发费用投入                                    1,078.67万元，占公司营业收\n入的  6.30%。\n    公司紧跟市场趋势和客户需求，加快研发步伐，结合用                           户反馈持续优化提升新研产品性能。公司在\n产品研发中对标行业领先的技术标准，结合积累多年的经验技术，秉承匠心造精品的理念，以持续增强\n公司产品在行业中的综合竞争力。\n    4、质量管理方面\n    面对复杂多变的宏观经济环境与日趋激烈的行业竞争格局，公司始终坚守质量发展初心，聚焦核心\n能力提升与内生动力强化，以产品质量为立身之本，以客户需求为行动导向，扎实推进各项经营管理工\n作稳步开展。公司严格遵循             GJB9001C  -2017质量管理体系标准要求，紧紧围绕产品质量可靠性、可追溯\n                                              12\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1560,
+              "quote": "性及全流程过程管控核心要点，持续优化质量管理体系运行机制，全力保障产品保质保量按期交付，持\n续提升客户满意度与品牌认可度。报告期内，公司实现重大质量事故零发生，圆满完成各项阶段性质量\n管控目标。\n    公司持续深化精细化管理体系建设，全面提升运营管理质效与体系管控水平。构建“内审+管审+外\n审”三位一体的监督与改进体系：通过内部审核全面排查体系运行短板并完成整改闭环；依托管理评审统\n筹审视体系适宜性与有效性；顺利通过第三方监督审核，实现内外部监督双向赋能，形成持续改进的管\n理闭环。通过强化设计研发、生产制造全过程精细化管控，有效提升研发创新与生产运营效能；依托多\n维监督机制精准识别薄弱环节，落实常态化持续改进；通过常态化专业质量培训与全员质量文化宣贯，\n全面筑牢全员质量责任意识。健全完善的                    GJB 质量管理体系实现平稳、高效、规范运行，为公司产品高\n质量交付、实现可持续高质量发展提供了坚实可靠的体系保障。\n    5、资本市场与外部环境方面\n    融资方面：鉴于日常经营周转所需，公司报告期内归还银行贷款                             3,040.00万元，新增银行贷款8,350.00\n万元。\n    外部环境方面：2025        年国际形势严峻，地缘紧张局势持续升级，进出口贸易政策、情况复杂多变。\n我国军工行业已基本实现国产化自主可控，国家军贸出口业务的发展对公司中长期业务发展有积极影\n响。\n    报告期内，公司重视市场开拓、研发与质量管理，生产经营正常，所处行业、主营业务、客户、供\n应商、销售渠道、核心团队、成本结构、收入模式均未发生重大变化。\n\n\n\n(二)     行业情况\n\n    公司属军工电子信息领域，主营业务为网络总线产品和特种显示产品的研发、生产及销售。根据财\n政部数据，2010      年我国国防开支为         4,265亿元，2024     年增长至    1.67 万亿元，同比增长         7.2%，2025  年增\n长至  1.81 万亿元，同比增长         7.2%，2026   年国防支出预算进一步达到              1.94万亿元，同比继续增长            7%。\n目前我国仍处于国防和军队信息化的高速发展阶段，2021                          年 3 月《中华人民共和国国民经济和社会发展\n第十四个五年规划和          2035 年远景目标纲要》发布，2026             年  3 月《中华人民共和国国民经济和社会发展\n第十五个五年规划纲要》发布，明确国防军工行业发展方向及目标：“如期实现建军一百年奋斗目标，高\n质量推进国防和军队现代化”，核心围绕先进战斗力建设、军事治理现代化、一体化国家战略体系和能力\n三大方向展开，强调机械化信息化智能化融合发展，目标是提高捍卫国家主权、安全、发展利益的战略\n能力。\n    公司业务及产品主要服务于国家重点国防装备相关项目，自网络总体理论设计研发阶段至装备最终\n列装服役阶段，以国产化为基石，重点围绕“无人智能作战力量规模化、实战化、体系化；传统作战力量\n升级改造；构建智能化军事体系；加快先进武器装备发展”等领域，在“推动军地协同，促进军民融合深\n度发展”的大政策下抓住历史机遇。\n    报告期内，行业整体竞争更加激烈，但发展趋势依然向好，未发生重大不利变化，国家军贸出口业\n务的发展对公司中长期业务发展有较为积极的影响。\n\n\n\n\n\n\n\n\n                                              13\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 5895,
+              "quote": "(三)            财务分析\n\n1.     资产负债结构分析\n                                                                                                                                                                单位：元\n                                              2025     年末                                             2024     年末\n        项目                           金额                    占总资产的                             金额                  占总资产的比                              变动比例%\n                                                                比重%                                                       重%\n货币资金                          97,933,152.95                         19.20%            55,934,622.70                         12.46%                                 75.09%\n应收票据                            1,713,459.97                          0.34%             6,639,545.47                          1.48%                               -74.19%\n应收账款                        262,202,929.00                          51.41%          256,083,044.61                          57.05%                                   2.39%\n预付款项                            1,385,994.95                          0.27%             5,127,228.25                          1.14%                               -72.97%\n其他应收款                           3,252,711.40                          0.64%             2,386,129.45                          0.53%                                36.32%\n存货                            99,875,841.69                         19.58%            86,805,019.66                         19.34%                                 15.06%\n合同资产                               281,525.00                         0.06%                  53,370.00                        0.01%                              427.50%\n其他流动资产                             187,545.28                         0.04%                413,557.69                         0.09%                               -54.65%\n固定资产                          28,464,782.62                           5.58%           24,134,687.72                           5.38%                                17.94%\n使用权资产                           3,750,220.56                          0.74%             2,057,308.26                          0.46%                                82.29%\n无形资产                            2,239,024.75                          0.44%                992,853.57                         0.22%                              125.51%\n长期待摊费用                             138,537.07                         0.03%                417,933.27                         0.09%                               -66.85%\n递延所得税资                          7,995,407.96                          1.57%             6,919,559.59                          1.54%                                15.55%\n产\n其他非流动资                             616,206.55                         0.12%                931,270.61                         0.21%                               -33.83%\n产\n短期借款                            6,377,583.33                          1.25%                           0.00                    0.00%\n应付票据                          21,375,763.62                           4.19%             5,529,352.00                          1.23%                              286.59%\n应付账款                          24,730,924.41                           4.85%           38,248,109.26                           8.52%                               -35.34%\n合同负债                            2,341,300.89                          0.46%             8,203,147.47                          1.83%                               -71.46%\n应付职工薪酬                          5,931,886.80                          1.16%           13,962,297.59                           3.11%                               -57.51%\n应交税费                            9,275,805.29                          1.82%             8,624,178.85                          1.92%                                  7.56%\n其他应付款                           2,887,427.05                          0.57%             5,216,984.58                          1.16%                               -44.65%\n一年内到期的                        31,754,421.92                           6.23%           21,048,309.14                           4.69%                                50.86%\n非流动负债\n其他流动负债                             348,240.43                         0.07%                           0.00                    0.00%\n长期借款                          78,100,000.00                         15.31%            40,000,000.00                           8.91%                                95.25%\n租赁负债                            2,197,578.54                          0.43%                976,212.41                         0.22%                               125.11%\n递延所得税负                             562,533.11                         0.11%                308,596.25                         0.07%                                82.29%\n债\n股本                            63,750,000.00                         12.50%            63,750,000.00                         14.20%                                        0%\n资本公积                          95,428,846.24                         18.71%            95,376,228.11                         21.25%                                   0.06%\n减：库存股                           1,477,000.00                          0.29%             2,584,750.00                          0.58%                               -42.86%\n盈余公积                          21,469,707.26                           4.21%           19,848,250.97                           4.42%                                  8.17%\n未分配利润                       144,982,320.86                          28.43%          130,389,214.22                          29.05%                                 11.19%\n\n                                                                                     14\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 0,
+              "end": 2441,
+              "quote": "资产负债项目重大变动原因：\n1、货币资金：报告期末余额较期初增加                      4,199.85万元，增长       75.09%，主要系本年公司新增贷款                 5,310.00\n万元，同时客户回款情况有所改善所致；\n2、应收票据：报告期末余额较期初减少                      492.61 万元，降低       74.19%，主要系上年收到客户支付的商业汇\n票已于报告期内到期，而本年收到的银行/商业汇票较少所致；\n3、预付款项：报告期末余额较期初减少                      374.12 万元，降低       72.97%，主要系上年期末因正常备货而支付\n给供应商的预付款已于报告期内完成验收入库所致；\n4、其他应收款：报告期末余额较期初增加                       86.66 万元，增长       36.32%，主要系本年新增应收退税款                  268.33\n万元所致；\n5、合同资产：报告期末余额较期初增加                       22.82万元，增长        427.50%，主要系销售合同质保金                31.93 万元\n到期日截至报告期末为一年以内，由其他非流动资产重分类至合同资产所致；\n6、其他流动资产：报告期末余额较期初减少                         22.60 万元，降低        54.65%，主要系期初部分合同取得成本\n在报告期内确认收入后，对应金额减少                      25.55 万元所致；\n7、使用权资产：报告期末余额较期初增加                        169.29 万元，增长       82.29%，主要系本年续租经营场地，使用\n权资产增加       319.72 万元，同时计提折旧            150.43 万元所致；\n8、无形资产：报告期末余额较期初增加                      124.62 万元，增长      125.51%，主要系本年采购信息化软件                   172.16\n万元所致；\n9、长期待摊费用：报告期末较期初减少                       27.94 万元，减少       66.85%，主要系经营场所装修费用本年摊销\n所致；\n10、其他非流动资产：报告期末较期初减少                        31.51 万元，减少       33.83%，主要系销售合同质保金                31.93 万\n元到期日截至报告期末为一年以内，由其他非流动资产重分类至合同资产所致；\n11、短期借款：报告期末较期初                增加    637.76 万元，主要系本年为补充经营流动资金，新增一年期银行借\n款 500 万元，同时贴现未到期票据                 137.3万元所致；\n12、应付票据：报告期末较期初增加                    1,584.64万元，增长       286.59%，主要系公司结合经营现金流的情况，\n逐渐增多以票据方式支付货款所致；\n13、应付账款：报告期末较期初减少                    1,351.72万元，减少       35.34%，主要系报告期初公司已完成入库但尚\n未向供应商结算的特种显示类订单款项已于报告期内完成支付，同时本年加大以票据向供应商结算款项\n所致；\n14、合同负债：报告期末较期初减少                    586.18  万元，降低       71.46%，主要系客户过往年度向公司支付的预\n付款对应合同已于报告期完成验收确认收入，合同负债                               相应减少，而本年新增预收货款较少所致；\n15、应付职工薪酬：报告期末较期初减少                       803.04 万元，降低        57.51%，主要系本年经营业绩不及预期，\n全员年终奖大幅下调所致；\n16、其他应付款：报告期末较期初减少                     232.96 万元，降低       44.65%，主要系两方面所致：1）应向中介机\n构支付的部分发行费已于报告期内支付；2）部分股权激励计划限制性股票已于报告期内完成限售解除；\n17、一年内到期的非流动负债：报告期末较期初增加                             1,070.61 万元，增长       50.86%，主要系两方面所致：\n1）3,000.00  万长期借款到期日截至报告期末不足一年，重分类至一年内到期的非流动负债；2）该科目\n期初列示的       2,000万元长期借款已于报告期内偿还；\n18、长期借款：报告期末较期初增加                    3,810 万元，增长       95.25%，主要系公司报告期内因经营活动所需增\n加了   6,850万元长期银行借款所致；\n19、租赁负债：报告期末较期初增加                    122.14 万元，增长       125.11%，主要系本年续租经营场地，租赁负债\n增加所致；\n20、递延所得税负债：报告期末较期初增加                        25.39 万元，增长       82.29%，主要系本年因续租经营场地，使\n                                                  15\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 186,
+              "end": 4185,
+              "quote": "境外资产占比较高的情况\n□适用 √不适用\n2.    营业情况分析\n(1)   利润构成\n                                                                                                                                    单位：元\n                                       2025    年                                      2024   年\n       项目                     金额                占营业收入                       金额                 占营业收入                       变动比例%\n                                                   的比重%                                          的比重%\n营业收入                   171,344,694.25                   -            278,912,669.80                   -                               -38.57%\n营业成本                     99,616,273.82                  58.14%       155,044,863.71                   55.59%                          -35.75%\n毛利率                               41.86%                -                       44.41%                -                          -\n税金及附加                      1,454,586.76                   0.85%          1,847,660.20                   0.66%                         -21.27%\n销售费用                       9,602,572.17                   5.60%        11,982,416.72                    4.30%                         -19.86%\n管理费用                     11,249,573.38                    6.57%        13,164,577.27                    4.72%                         -14.55%\n研发费用                     10,786,688.86                    6.30%        16,379,905.11                    5.87%                         -34.15%\n财务费用                       2,493,966.50                   1.46%          2,641,418.72                   0.95%                          -5.58%\n信用减值损失                    -6,914,181.93                  -4.04%       -12,753,116.04                   -4.57%                         -45.78%\n资产减值损失                    -8,968,038.33                  -5.23%       -12,841,873.40                   -4.60%                         -30.17%\n其他收益                       1,251,273.60                   0.73%          4,641,874.58                   1.66%                         -73.04%\n投资收益                                      0                   0%                        0                   0%                              0%\n公允价值变动                                    0                   0%                        0                   0%                              0%\n收益\n资产处置收益                         13,219.04                  0.01%                         0                   0%\n汇兑收益                                      0                   0%                        0                   0%                              0%\n营业利润                     21,523,305.14                  12.56%         56,898,713.21                  20.40%                          -62.17%\n营业外收入                          31,674.66                  0.02%                  556.48                 0.00%                      5,591.97%\n营业外支出                        547,785.53                   0.32%              23,333.96                  0.01%                      2,247.59%\n利润总额                     21,007,194.27                  12.26%         56,875,935.73                  20.39%                          -63.06%\n所得税费用                      4,792,631.34                   2.80%          6,579,840.76                   2.36%                         -27.16%\n净利润                      16,214,562.93                    9.46%        50,296,094.97                  18.03%                          -67.76%\n\n\n项目重大变动原因：\n1、营业收入：本年较上年减少                             10,756.80     万元，降低            38.57%，主要系公司因前期参与配套的某个列装型\n号的交付任务已于上年基本完成，本年交付批产类                                                 LED    球幕视景显示系统数量减少较多所致；\n2、营业成本：本年较上年减少                             5,542.86     万元，降低           35.75%，主要系随营业收入减少而减少所致，其中，\n本年交付的           LED     球幕视景显示系统多为新型号、定制类产品，毛利率相对较低，导致营业成本降幅低于\n营业收入；\n3、研发费用：本年较上年减少                              559.32    万元，降低            34.15%，主要系本年自研项目研发投入阶段性减少，\n                                                                      16\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 3239,
+              "quote": "人员工时投入及在研数量较上年减少所致；\n4、信用减值损失：本年较上年减少                        583.89  万元，降低        45.78%，主要系本年收入减少，同时客户回款情\n况有所改善，坏账计提减值金额减少所致；\n5、资产减值损失：本年较上年减少                        387.38  万元，降低        30.17%，主要系上年某新型号特种显示类产品研\n制合同因预计亏损，存在单笔较大金额减值计提而本年类似计提金额较小所致；\n6、其他收益：本年较上年减少                     339.06  万元，降低         73.04%，主要系两方面所致：1）本年增值税加计扣\n除抵减金额较上年减少                98.27 万元；2）本年收到的政府补助较上年减少                              240.91 万元；\n7、营业利润：本年较上年减少                     3,537.54  万元，降低        62.17%，主要系受军方采购计划、特种显示类产品\n相关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧等综合因素影响所致；\n8、营业外收入：本年较上年增加                      3.11  万元，增长        5,591.97%，主要系本年固定资产报废取得收益所致；\n9、营业外支出：本年较上年增加                       52.45 万元，增加         2,247.59%，主要系本年因过往年度研发费用加计扣\n除鉴定事项计提补税滞纳金所致；\n10、利润总额：本年较上年减少                     3,586.87 万元，降低         63.06%，主要系受军方采购计划、特种显示类产品\n相关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧等综合因素影响所致                                                               ；\n11、净利润：本年较上年减少                   3,408.15  万元，降低        67.76%，主要系受军方采购计划、特种显示类产品相\n关配套的列装型号的交付任务、新型号的研制任务以及市场竞争加剧等综合因素影响所致                                                             。\n\n(2)  收入构成\n                                                                                                         单位：元\n          项目                          2025  年                       2024  年                     变动比例%\n主营业务收入                                  171,344,694.25                278,912,669.80                       -38.57%\n其他业务收入                                                 0                            0\n主营业务成本                                   99,616,273.82                155,044,863.71                       -35.75%\n其他业务成本                                                 0                            0\n\n\n按产品分类分析：\n                                                                                                         单位：元\n                                                                   营业收入比            营业成本比           毛利率比上年\n  分产品              营业收入              营业成本             毛利率%           上年同期            上年同期             同期增减\n                                                                       增减%             增减%\n网络总线产           118,813,095.27     48,765,642.01        58.96%           -6.12%          18.20%     减少   8.44 个百\n品                                                                                                             分点\n特种显示产            52,225,303.29     50,653,100.76          3.01%         -65.53%         -55.27%      减少   22.25  个\n品                                                                                                           百分点\n其他                  306,295.69        197,531.05        35.51%          -63.43%         -64.01%     增加   1.05 个百\n                                                                                                              分点\n    合计          171,344,694.25     99,616,273.82         -               -                -                -\n\n\n按区域分类分析：\n                                                                                                         单位：元\n  分地区              营业收入              营业成本             毛利率%         营业收入比            营业成本比           毛利率比上年\n\n                                                        17\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 3341,
+              "quote": "                                                                          上年同期             上年同期              同期增减\n                                                                            增减%              增减%\n四川省内              33,565,634.00      29,462,612.68          12.22%           -73.81%          -66.43%       减少    19.29  个\n                                                                                                                   百分点\n四川省外             137,779,060.25      70,153,661.14          49.08%             -8.61%            4.27%     减少    6.29 个百\n                                                                                                                      分点\n    合计           171,344,694.25      99,616,273.82           -                -                 -                 -\n\n收入构成变动的原因：\n1、 按产品分类分析：\n     特种显示产品本年收入下降                      65.53%、成本下降           55.27%，毛利率下降              22.25  个百分点，主要系两方面\n所致：1）LED         球幕视景显示系统鉴于公司前期参与配套的某个列装型号的交付任务已于                                                         2024  年基本完\n成，批产型号           2025  年交付数量较少，导致营业收入、营业成本降幅较大；2）本年公司交付验收的                                                            LED\n球幕视景显示系统多为新型号                      、定制类产品，周期长，研发难度大，成本较高，毛利率                                            较低，从而导致\n营业成本降幅小于营业收入的降幅；\n     其他产品本年收入下降                   63.43%，成本下降            64.01%，主要系本年承接、交付的其他类产品或技术服\n务与去年存在较大差异，收入和成本年度波动较大所致；\n2、 按区域分类分析：\n     省内收入下降           73.81%，成本下降            66.43%，毛利率下降             19.29  个百分点，主要系受不同地区客户的配\n套型号任务研制进程和采购计划影响所致。\n\n(3)  主要客户情况\n                                                                                                                单位：元\n序号                          客户                               销售金额               年度销售占比%              是否存在关联关系\n  1     中国航空工业集团公司                                          148,309,065.07               86.56%     否\n  2     中国电子科技集团公司                                           10,321,606.29                 6.02%    否\n  3     中国船舶集团有限公司                                            6,587,983.49                 3.84%    否\n  4     中国兵器工业集团有限公司                                          1,420,353.98                 0.83%    否\n  5     北京未尔锐创科技有限公司                                          1,101,769.91                 0.64%    否\n                        合计                                  167,740,778.74               97.89%                -\n\n\n(4)  主要供应商情况\n                                                                                                                单位：元\n序号                         供应商                               采购金额               年度采购占比%              是否存在关联关系\n  1     深圳市艾森视讯科技有限公司                                        13,916,056.97               11.68%     否\n  2     深圳市洲明科技股份有限公司                                         8,823,093.47                 7.40%    否\n  3     上海复旦微电子集团股份有限公司                                       8,630,550.00                 7.24%    否\n  4     沈阳润航科技有限责任公司                                          7,365,000.00                 6.18%    否\n  5     广东盈纳精密制造技术有限公司                                        5,920,358.28                 4.97%    否\n                        合计                                   44,655,058.72               37.47%                -\n\n\n\n                                                            18\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0014",
+          "document_version": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "source_spans": [
+            {
+              "page": 19,
+              "start": 0,
+              "end": 2407,
+              "quote": "(5)  报告期内公司贸易业务收入占营业收入比例超过                                    10%情况\n □适用 √不适用\n3.   现金流量状况\n                                                                                                              单位：元\n                项目                                 2025  年                       2024  年                 变动比例%\n 经营活动产生的现金流量净额                                         5,305,837.72               -26,514,011.28               120.01%\n 投资活动产生的现金流量净额                                       -11,569,289.82                -7,214,051.18               -60.37%\n 筹资活动产生的现金流量净额                                        48,806,711.95                52,115,286.92                 -6.35%\n\n\n现金流量分析：\n1、经营活动产生的现金流量净额：本年                             530.58  万元，而去年-2,651.40            万元，主要系两方面所致：1）本\n年客户回款情况有所改善；2）本年支付的货款及各项税费同比减少                                                  11.39%；\n2、投资活动产生的现金流量净额：本年较去年减少                                      60.37%，主要系本年处置老旧车辆后购置新车支付\n车款    436.79  万元，更新信息化系统支付                     188.08  万元所致。\n\n\n(四)       投资状况分析\n\n1、   总体情况\n√适用 □不适用\n                                                                                                           单位：元\n           报告期投资额                                  上年同期投资额                                     变动比例%\n            5,263,523.92                             4,072,547.00                                29.24%\n\n\n2、   报告期内获取的重大的股权投资情况\n□适用 √不适用\n3、   报告期内正在进行的重大的非股权投资情况\n√适用 □不适用\n                                                                                                              单位：元\n                                                                                              截止报告           是否达到\n项目名称           本期投入情            累计实际投            资金来源           项目进度           预计收益           期末累计           计划进度\n                    况             入情况                                                         实现的收           和预计收\n                                                                                                  益          益的原因\nFC  网络总                                         募集资金\n线及      LED    3,453,969.12    7,418,919.12     及自筹资35.38%                               -              -   -\n球幕产业                                            金\n化项目\n总部大楼1,809,554.80               1,917,151.80     募集资金           30.54%                    -              -   -\n及研发中\n\n                                                           19\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F03",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "程序显示说明：F08正文17134.47万元为营业收入171,344,694.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文9961.63万元为营业成本99,616,273.82元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文1621.46万元为净利润16,214,562.93元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F11",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F12",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F13",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F15",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "程序显示说明：F16正文1078.67万元为研发费用10,786,688.86元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F17",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F18",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F19",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F20",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F21",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F22",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F23",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F24",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F25",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F26",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F27",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F28",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F29",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007",
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F30",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0014"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F31",
+      "element": "position",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F32",
+      "element": "upstream_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F33",
+      "element": "downstream_customers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F34",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "fact_id": "F35",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司为专用网络航电系统及显示系统的综合解决方案提供商，属计算机、通信和其他电子设备制造业的技术密集型高新技术企业；主营业务为网络总线产品和特种显示产品的研发、生产及销售。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "公司商业模式以核心技术为基础，紧跟型号需求提供定制化产品和技术服务，配合研究所共同完成研制任务，以定型列装为最终目的；通过销售产品及提供技术服务获得收入，销售收入为主要收入来源。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F03",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "报告期内公司商业模式和主营业务无重大变化，也未对公司经营情况产生重大影响；所处行业、主营业务、客户、供应商、销售渠道、核心团队、成本结构、收入模式均未发生重大变化。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "主要产品为高速网络通信组件、航电网络仿真、监控、测试设备、特种LED显示产品、液晶加固显示产品等；公司重点推进TSN等新一代网络技术产品研制，并向具有特殊应用场景的特种训练模拟器整机研制及集成延伸。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "公司产品覆盖服务型号的全生命周期，部分产品实现批产；机载、舰载通信接口模块及舰载交换设备已列装多个重点型号装备，综合处理设备已配合客户适配多个型号任务试飞并获取新订单。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "特种训练方向首套空间定向障碍模拟器于报告期研制完成；球幕产品2025年交付验收主要集中在新型号项目，总体数量同期有所下降。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "公司通过销售产品及提供技术服务获得收入，销售收入为主要收入来源；营销上采取直接销售模式，销售产品及提供技术解决方案的同时协助客户进行二次开发。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F08正文17134.47万元为营业收入171,344,694.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文9961.63万元为营业成本99,616,273.82元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文1621.46万元为净利润16,214,562.93元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "2025年公司实现营业收入17,134.47万元，同比下降38.57%；营业成本9,961.63万元，同比下降35.75%；净利润1,621.46万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "171,344,694.25",
+            "value": "171344694.25",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "-38.57%",
+            "value": "-38.57",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业成本",
+            "raw_value": "99,616,273.82",
+            "value": "99616273.82",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "净利润",
+            "raw_value": "16,214,562.93",
+            "value": "16214562.93",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F08正文17134.47万元为营业收入171,344,694.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文9961.63万元为营业成本99,616,273.82元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文1621.46万元为净利润16,214,562.93元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F11",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "按产品分类，其他产品营业收入306,295.69元，毛利率35.51%，收入同比下降63.43%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "其他产品营业收入",
+            "raw_value": "306,295.69",
+            "value": "306295.69",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他产品毛利率",
+            "raw_value": "35.51%",
+            "value": "35.51",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他产品营业收入同比增减",
+            "raw_value": "-63.43%",
+            "value": "-63.43",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F12",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F12",
+        "text": "2025年公司营业收入171,344,694.25元，其中主营业务收入171,344,694.25元，其他业务收入为0；主营业务成本99,616,273.82元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "主营业务收入",
+            "raw_value": "171,344,694.25",
+            "value": "171344694.25",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他业务收入",
+            "raw_value": "0",
+            "value": "0",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "主营业务成本",
+            "raw_value": "99,616,273.82",
+            "value": "99616273.82",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F13",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F13",
+        "text": "按区域分类，四川省内营业收入33,565,634.00元，毛利率12.22%，收入同比下降73.81%；四川省外营业收入137,779,060.25元，毛利率49.08%，收入同比下降8.61%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "四川省内营业收入",
+            "raw_value": "33,565,634.00",
+            "value": "33565634.00",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "四川省内毛利率",
+            "raw_value": "12.22%",
+            "value": "12.22",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "四川省内营业收入同比增减",
+            "raw_value": "-73.81%",
+            "value": "-73.81",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "四川省外营业收入",
+            "raw_value": "137,779,060.25",
+            "value": "137779060.25",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "四川省外毛利率",
+            "raw_value": "49.08%",
+            "value": "49.08",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "四川省外营业收入同比增减",
+            "raw_value": "-8.61%",
+            "value": "-8.61",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "2025年末公司资产总计510,037,339.75元，负债总计185,883,465.39元，归属于上市公司股东的净资产324,153,874.36元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "资产总计",
+            "raw_value": "510,037,339.75",
+            "value": "510037339.75",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "负债总计",
+            "raw_value": "185,883,465.39",
+            "value": "185883465.39",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净资产",
+            "raw_value": "324,153,874.36",
+            "value": "324153874.36",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F15",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "公司严格遵循GJB9001C-2017质量管理体系标准要求，报告期内实现重大质量事故零发生；通过“内审+管审+外审”三位一体监督体系运行质量管理。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "limited",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F16正文1078.67万元为研发费用10,786,688.86元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "2025年公司研发费用投入1,078.67万元，占营业收入的6.30%，同比下降34.15%，主要系自研项目研发投入阶段性减少、人员工时投入及在研数量较上年减少所致；报告期获发明专利授权3项、实用新型专利授权4项、外观设计专利授权2项。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "研发费用",
+            "raw_value": "10,786,688.86",
+            "value": "10786688.86",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "研发费用占营业收入比重",
+            "raw_value": "6.30%",
+            "value": "6.30",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "研发费用同比增减",
+            "raw_value": "-34.15%",
+            "value": "-34.15",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F16正文1078.67万元为研发费用10,786,688.86元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F17",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "公司主要供应商采购情况：前五名供应商合计采购金额44,655,058.72元，年度采购占比37.47%，包括深圳市艾森视讯科技有限公司、深圳市洲明科技股份有限公司、上海复旦微电子集团股份有限公司、沈阳润航科技有限责任公司、广东盈纳精密制造技术有限公司。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "前五名供应商合计采购金额",
+            "raw_value": "44,655,058.72",
+            "value": "44655058.72",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名供应商合计采购占比",
+            "raw_value": "37.47%",
+            "value": "37.47",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F18",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "报告期内公司归还银行贷款3,040.00万元，新增银行贷款8,350.00万元；2025年末长期借款78,100,000.00元，较期初增长95.25%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007",
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "长期借款",
+            "raw_value": "78,100,000.00",
+            "value": "78100000.00",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "长期借款变动比例",
+            "raw_value": "95.25%",
+            "value": "95.25",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F19",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "公司客户集中于中航工业、中船、中电科等特大型国有集团下属各研究所和生产单位，营销上采取直接销售模式。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F20",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "2025年前五名客户合计销售金额167,740,778.74元，年度销售占比97.89%；其中中国航空工业集团公司销售148,309,065.07元，占比86.56%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "前五名客户合计销售金额",
+            "raw_value": "167,740,778.74",
+            "value": "167740778.74",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名客户合计销售占比",
+            "raw_value": "97.89%",
+            "value": "97.89",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中国航空工业集团公司销售金额",
+            "raw_value": "148,309,065.07",
+            "value": "148309065.07",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中国航空工业集团公司销售占比",
+            "raw_value": "86.56%",
+            "value": "86.56",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F21",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "2025年公司新签订单20,550.40万元，较上年同期略有增长；全市场销售渠道和覆盖区域趋于完善，各大军工集团主机厂/所和系统所客户群体稳定，维护现有客户的同时开拓了部分新客户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "新签订单金额",
+            "raw_value": "20,550.40万元",
+            "value": "20550.40",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F22",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F22",
+        "text": "公司业务及产品主要服务于国家重点国防装备相关项目，自网络总体理论设计研发阶段至装备最终列装服役阶段，以国产化为基石。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F23",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "营业收入同比下降38.57%，主要系前期参与配套的某个列装型号交付任务已于上年基本完成，本年交付批产类LED球幕视景显示系统数量减少较多所致。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F24",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006",
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "营业成本降幅低于营业收入，主要因本期交付验收的球幕产品多为新型号、定制类产品，周期长、研发难度大、成本较高，使特种显示类产品综合毛利率较上年同期下降幅度较大。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0011"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F25",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F25",
+        "text": "网络总线方面，受采购计划影响存在季度波动，FC网络数据通信卡全年交付量与上年相比基本稳定，TSN等新一代网络技术产品正在持续推进研制任务，交付规模对公司业绩增长影响有限。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F26",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F26",
+        "text": "公司经营业绩短期承压，受军方采购计划、特种显示类产品相关配套的列装型号交付任务、新型号研制任务以及市场竞争加剧等综合因素影响；后续随着多个新型号陆续定型批产，订单、营收和利润有望得到修复。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F27",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "报告期内公司商业模式和主营业务无重大变化；所处行业、主营业务、客户、供应商、销售渠道、核心团队、成本结构、收入模式均未发生重大变化。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F28",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F28",
+        "text": "报告期内公司重点推进TSN等新一代网络技术产品研制任务，并向具有特殊应用场景的特种训练模拟器整机研制及集成延伸，向虚拟现实等方向拓展。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F29",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007",
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F29",
+        "text": "报告期内公司归还银行贷款3,040.00万元，新增银行贷款8,350.00万元；2025年末货币资金97,933,152.95元，较期初增长75.09%，主要系新增贷款及客户回款改善所致。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007",
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "货币资金",
+            "raw_value": "97,933,152.95",
+            "value": "97933152.95",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "货币资金变动比例",
+            "raw_value": "75.09%",
+            "value": "75.09",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F30",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006",
+        "source-0014"
+      ],
+      "fact": {
+        "fact_id": "F30",
+        "text": "报告期内经营活动产生的现金流量净额由负转正，金额为5,305,837.72元，主要系客户回款情况改善及支付的货款及各项税费同比减少所致。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0014"
+        ],
+        "metrics": [
+          {
+            "name": "经营活动产生的现金流量净额",
+            "raw_value": "5,305,837.72",
+            "value": "5305837.72",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F31",
+      "element": "position",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F31",
+        "text": "公司主营业务为网络总线产品和特种显示产品的研发、生产及销售，属计算机、通信和其他电子设备制造业，处于军工电子信息产业链的研发生产环节。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F32",
+      "element": "upstream_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F32",
+        "text": "公司主要供应商包括深圳市艾森视讯科技有限公司、深圳市洲明科技股份有限公司、上海复旦微电子集团股份有限公司、沈阳润航科技有限责任公司、广东盈纳精密制造技术有限公司，前五名供应商合计采购占比37.47%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "前五名供应商合计采购占比",
+            "raw_value": "37.47%",
+            "value": "37.47",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F33",
+      "element": "downstream_customers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F33",
+        "text": "公司产品主要服务于国家重点国防装备相关项目，客户集中于中航工业、中船、中电科等特大型国有集团下属各研究所和生产单位。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F34",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F34",
+        "text": "公司为技术密集型高新技术企业，积极参与各主体所新的重点项目，始终坚持新的技术投入，紧跟各重要型号的研制进程，以定型列装为最终目的。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "fact_id": "F35",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F35",
+        "text": "公司产品覆盖服务型号的全生命周期，部分产品实现批产；报告期内机载、舰载通信接口模块及舰载交换设备已列装多个重点型号装备。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未获取各产品具体技术参数、型号清单及分产品销量数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取分产品销量、单价及在手订单金额明细。",
+        "事实F09已隔离，未作为结论采用：uncertain metric original wording is absent from cited source: 网络总线产品毛利率同比增减",
+        "事实F10已隔离，未作为结论采用：uncertain metric original wording is absent from cited source: 特种显示产品毛利率同比增减"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "未获取分产品收入占比的官方披露数值，仅可按分产品金额与合计金额理解结构。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取主要原材料具体品类、采购单价及产能产量数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取分客户类型或分区域的客户数量及渠道结构明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未获取各驱动因素对收入变动的量化拆分。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取重大股权投资、重大资产处置等事项的完整清单。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取具体原材料品类、采购数量及主要供应商对应物料明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f6048b3ecbb3032e5833f602",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取具体终端装备型号与客户对应关系。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未获取各产品具体技术参数、型号清单及分产品销量数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取分产品销量、单价及在手订单金额明细。",
+        "事实F09已隔离，未作为结论采用：uncertain metric original wording is absent from cited source: 网络总线产品毛利率同比增减",
+        "事实F10已隔离，未作为结论采用：uncertain metric original wording is absent from cited source: 特种显示产品毛利率同比增减"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "未获取分产品收入占比的官方披露数值，仅可按分产品金额与合计金额理解结构。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取主要原材料具体品类、采购单价及产能产量数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取分客户类型或分区域的客户数量及渠道结构明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未获取各驱动因素对收入变动的量化拆分。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取重大股权投资、重大资产处置等事项的完整清单。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取具体原材料品类、采购数量及主要供应商对应物料明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取具体终端装备型号与客户对应关系。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "finding_id": "WF01",
+      "element": "revenue_model",
+      "severity": "material",
+      "reason": "按产品分类的主营收入构成缺失网络总线产品。来源已列示2025年营业收入118,813,095.27元、营业成本48,765,642.01元、毛利率58.96%，营业收入同比下降6.12%，营业成本同比增加18.20%，毛利率减少8.44个百分点。草稿仅有公司营业收入或主营业务收入合计，以及金额很小的其他产品，不能替代该主营品类。毛利率变动须按百分点表述，不得写成百分比增速；来源未单列官方收入占比，不应自行计算占比充当披露值。因毛利率同比措辞被隔离的整条品类，应恢复上述有来源支持的核心金额。",
+      "evidence_ids": [
+        "source-0012"
+      ]
+    },
+    {
+      "reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "active": true,
+      "finding_id": "WF02",
+      "element": "revenue_model",
+      "severity": "material",
+      "reason": "按产品分类的另一主营品类特种显示产品构成金额缺失。来源已列示2025年营业收入52,225,303.29元、营业成本50,653,100.76元、毛利率3.01%，营业收入同比下降65.53%，营业成本同比下降55.27%，毛利率减少22.25个百分点。该品类收入大幅下降且毛利率处于低位，是理解营收下滑和盈利结构的关键；公司合计、网络总线产品或其他尾项均不能代替。草稿仅有定性描述。毛利率变动应按百分点记录，且不要编造来源未披露的官方收入占比。",
+      "evidence_ids": [
+        "source-0012",
+        "source-0013"
+      ]
+    }
+  ],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

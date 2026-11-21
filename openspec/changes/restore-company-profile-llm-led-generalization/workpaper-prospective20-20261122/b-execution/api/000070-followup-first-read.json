@@ -1,0 +1,2539 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "000070.SZ",
+  "report": {
+    "instrument_id": "000070.SZ",
+    "report_id": "asset_f14636070bb3e2ca562e1e7ea7d17d4e",
+    "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-21T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-a7471d9e754af37bd6985336",
+  "latest_reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+  "readings": [
+    {
+      "work_id": "bp-work-a7471d9e754af37bd6985336",
+      "workpaper_sha256": "dbc8f4372d6a16a15d464e0f98dc12364579b23d50a6346f79b70c356b584ec2",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0017",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的主要业务"
+            ],
+            "start_page": 11,
+            "end_page": 13,
+            "rationale": "选择公司主要业务（section-0017）及其四个板块子节，完整覆盖线缆、智慧服务、融合、物业资产经营的产品/服务与经营模式；选择主营业务分析（section-0037）及其概述（section-0038）和收入与成本（section-0044），获取公司营业收入总额、分业务收入构成与成本结构，满足“怎么赚钱、收入与主要业务权重”的核心问题。这些子节信息密度高、互不重叠，且未同时选择父子节。"
+          },
+          {
+            "section_id": "section-0037",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 18,
+            "end_page": 24,
+            "rationale": "选择公司主要业务（section-0017）及其四个板块子节，完整覆盖线缆、智慧服务、融合、物业资产经营的产品/服务与经营模式；选择主营业务分析（section-0037）及其概述（section-0038）和收入与成本（section-0044），获取公司营业收入总额、分业务收入构成与成本结构，满足“怎么赚钱、收入与主要业务权重”的核心问题。这些子节信息密度高、互不重叠，且未同时选择父子节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0022行业情况与section-0032核心竞争力：属行业背景与泛化竞争力，非公司层面经营实质，暂不选",
+          "section-0053客户情况、section-0054供应商情况：供应链与客户为可选补充，核心经营与收入已覆盖，暂不扩读",
+          "section-0086未来发展展望：计划性内容，非本期经营事实，暂不选",
+          "section-0270财务报告及附注：仅在分部/收入附注存在实质缺口时定向补充，当前不扩读"
+        ],
+        "selection_rationale": "选择公司主要业务（section-0017）及其四个板块子节，完整覆盖线缆、智慧服务、融合、物业资产经营的产品/服务与经营模式；选择主营业务分析（section-0037）及其概述（section-0038）和收入与成本（section-0044），获取公司营业收入总额、分业务收入构成与成本结构，满足“怎么赚钱、收入与主要业务权重”的核心问题。这些子节信息密度高、互不重叠，且未同时选择父子节。",
+        "stop_reason": "已覆盖业务结构、产品服务、经营模式、收入总额与分业务收入构成等核心经营信息，达到主要阅读目标；行业背景、供应链细节与财务附注属次要或定向补充范围，可在不扩读的情况下停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "选定章节未披露具体客户名称、客户集中度及供应商名称，供应链细节有限。",
+        "分行业与分产品收入口径存在差异，选定章节未说明原因。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-a7471d9e754af37bd6985336:workpaper:sections",
+          "request_hash": "a33fd2c70d25294c54ff41988f067ce2a8f01768517c7f4e7e361e4a85380351",
+          "response_hash": "058d85c0d8d974c482a7d0807b445d45da051633d412f6db3282076113a07f95",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 16350,
+            "output_tokens": 333,
+            "total_tokens": 16683
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 665,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0026",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0044",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0092",
+            "section-0098",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0226",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0282",
+            "section-0283",
+            "section-0291",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0400",
+            "section-0403",
+            "section-0409",
+            "section-0410",
+            "section-0413",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0441",
+            "section-0442",
+            "section-0446",
+            "section-0450",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0459",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0469",
+            "section-0472",
+            "section-0477",
+            "section-0478",
+            "section-0481",
+            "section-0487",
+            "section-0490",
+            "section-0494",
+            "section-0497",
+            "section-0501",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0524",
+            "section-0530",
+            "section-0535",
+            "section-0544",
+            "section-0548",
+            "section-0549",
+            "section-0552",
+            "section-0558",
+            "section-0559",
+            "section-0562",
+            "section-0563",
+            "section-0568",
+            "section-0569",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0593",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0601",
+            "section-0604",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0609",
+            "section-0612",
+            "section-0613",
+            "section-0614",
+            "section-0615",
+            "section-0619",
+            "section-0621",
+            "section-0622",
+            "section-0623",
+            "section-0628",
+            "section-0630",
+            "section-0631",
+            "section-0632",
+            "section-0633",
+            "section-0636",
+            "section-0638",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0644",
+            "section-0646",
+            "section-0647",
+            "section-0648",
+            "section-0649",
+            "section-0654",
+            "section-0660",
+            "section-0664",
+            "section-0665",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0671",
+            "section-0674",
+            "section-0675",
+            "section-0676",
+            "section-0677",
+            "section-0679",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0687",
+            "section-0689",
+            "section-0690",
+            "section-0691",
+            "section-0692",
+            "section-0694",
+            "section-0696",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0700",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0704",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0708",
+            "section-0709",
+            "section-0710",
+            "section-0711",
+            "section-0712",
+            "section-0713",
+            "section-0717",
+            "section-0723",
+            "section-0724",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0735",
+            "section-0736",
+            "section-0737",
+            "section-0738",
+            "section-0741",
+            "section-0742",
+            "section-0743",
+            "section-0744",
+            "section-0748",
+            "section-0752",
+            "section-0755",
+            "section-0756",
+            "section-0758",
+            "section-0759",
+            "section-0760",
+            "section-0762",
+            "section-0763",
+            "section-0764",
+            "section-0765",
+            "section-0766",
+            "section-0767",
+            "section-0769",
+            "section-0770",
+            "section-0771",
+            "section-0772",
+            "section-0773",
+            "section-0774",
+            "section-0775",
+            "section-0776",
+            "section-0778",
+            "section-0783",
+            "section-0784",
+            "section-0787",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0797",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0824",
+            "section-0825",
+            "section-0826",
+            "section-0827",
+            "section-0830",
+            "section-0831",
+            "section-0837",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0845",
+            "section-0846",
+            "section-0850",
+            "section-0851",
+            "section-0854",
+            "section-0856",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0865",
+            "section-0872",
+            "section-0876",
+            "section-0877",
+            "section-0878",
+            "section-0879",
+            "section-0880",
+            "section-0881",
+            "section-0887",
+            "section-0890",
+            "section-0899",
+            "section-0900",
+            "section-0901",
+            "section-0902",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0911",
+            "section-0913",
+            "section-0915",
+            "section-0917",
+            "section-0920",
+            "section-0921",
+            "section-0922",
+            "section-0923",
+            "section-0925",
+            "section-0927",
+            "section-0928",
+            "section-0929",
+            "section-0930",
+            "section-0931",
+            "section-0932",
+            "section-0933",
+            "section-0934",
+            "section-0935",
+            "section-0936",
+            "section-0937",
+            "section-0938",
+            "section-0939",
+            "section-0940",
+            "section-0941",
+            "section-0942",
+            "section-0943",
+            "section-0944",
+            "section-0953",
+            "section-0956",
+            "section-0957",
+            "section-0958",
+            "section-0959",
+            "section-0960",
+            "section-0961",
+            "section-0962",
+            "section-0963",
+            "section-0964",
+            "section-0965",
+            "section-0966",
+            "section-0967",
+            "section-0970",
+            "section-0971",
+            "section-0972",
+            "section-0973",
+            "section-0974",
+            "section-0975",
+            "section-0976",
+            "section-0977",
+            "section-0980",
+            "section-0981",
+            "section-0984",
+            "section-0985",
+            "section-0986",
+            "section-0991",
+            "section-0992",
+            "section-0993",
+            "section-0994",
+            "section-1000",
+            "section-1004",
+            "section-1005",
+            "section-1008",
+            "section-1009",
+            "section-1011",
+            "section-1012",
+            "section-1013",
+            "section-1014",
+            "section-1015",
+            "section-1016",
+            "section-1017",
+            "section-1021"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-a7471d9e754af37bd6985336:workpaper:extract",
+          "request_hash": "0d5149c1b915231462df3a961149d57101f453175065381637c307cec43ae31f",
+          "response_hash": "0d5394f42086476238f7933d98de537dbe6cb7aad9ec2a0865b881cb2f52b7dd",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10055,
+            "output_tokens": 5397,
+            "total_tokens": 15452
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0017",
+            "section-0037"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "dbc8f4372d6a16a15d464e0f98dc12364579b23d50a6346f79b70c356b584ec2",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 124,
+              "end": 1203,
+              "quote": "一、报告期内公司从事的主要业务\n\n\n    公司立足光通信领域，深耕光纤光缆、智能终端等业务领域，形成“产品+服务”双\n轮驱动模式，业务涵盖线缆、智慧服务、融合、物业资产经营四大核心板块。公司锚定\n“新一代信息技术产品和服务综合提供商”的战略定位，聚力深耕                             5G、大数据、云计算、\n物联网、人工智能等新一代信息技术研发和应用，为客户输出多领域、多维度信息化综合\n解决方案。\n\n    1、线缆板块\n\n    线缆产品作为能源传输与信息传递的核心载体，其应用场景覆盖电力传输、通信等关\n键领域。通信网络领域，国家“双千兆”、数据中心互联、FTTR                          等网络建设持续深化，数\n字经济与实体经济深度融合，算力网络、工业互联网等场景快速落地，正加快构建高速泛\n在、智能高效的新一代光纤宽带网络，对新一代高速光纤技术与产品提出迫切需求。电网\n建设领域，在新型电力系统战略下，为支撑大型清洁能源基地开发与远距离电力外送，特\n高压输电和智能电网建设持续推进，助力能源安全与“双碳”目标实现。\n\n    公司旨在构建“光纤光缆+电力传输+综合布线+光电组件”等产业链体系，线缆产品\n品类丰富，核心覆盖光纤、光缆、光纤连接器、配线产品、馈线电缆、数据线缆、架空裸\n导地线、光缆金具及附件等新一代信息技术产品。产品应用场景多元、市场覆盖面广，深\n度服务中国移动、中国联通、中国电信等国内主流电信运营商，同时广泛应用于电网、广\n播电视、公路、铁路、国防通信等行业专用网络，以及数据中心机房、人工智能算力基础\n设施等新型数字基建关键领域。\n\n    公司线缆板块已形成高效协同的产业链布局，协同主体包括深圳光纤、东莞光纤、光\n网科技、光电公司、特发华银、重庆光缆、特发光源、光缆制造中心等多家企业及业务单\n元，并根据业务需要设立了威海、东莞等多家分公司。公司在深圳、东莞、重庆、常州、\n赣州、枣庄、越南海防等地均建有规模化生产基地。板块配备生产与检测设备，构建从光\n纤到光缆及配套组件的完整制造能力，成功打造华南地区规模领先、技术先进的光纤光缆\n研发、生产及检测基地，为市场提供高品质的纤缆产品。\n\n    2、智慧服务板块\n\n    公司锚定政企数字化与新型数字基础设施建设核心赛道，聚焦智能化系统与数据中心\n领域，为客户提供集规划设计、建设施工、运营维护及配套产品供应于一体的定制化综合\n\n\n                                       11"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 1372,
+              "quote": "                                              深圳市特发信息股份有限公司       2025年年度报告全文\n\n\n服务。以推动“产品+工程+运维”平台建设深度融入数字经济，形成新基建、智慧城市、\n数据中心、智能终端产品协同格局，构建从智能终端产品制造到智能化系统交付、从算力\n集群方案设计到全周期运维管理的数字经济基础设施解决方案。同时具备电力全场景、油\n井、热力管道及各类关键基础设施运行状态的实时监测、数据采集、智能分析与风险预警\n能力，为关键基础设施正常运行提供保障。另外也具有光网络终端、机顶盒、路由器、交\n换机、智能网关、定制服务器等网络通信设备的研发生产能力，以及温度、张力、倾角、\n危险气体等物联网传感设备的研发生产能力。\n\n    板块内汇聚数据科技、西安特发千喜、技术服务、智慧科技、特发东智、在线监测分\n公司、新基建分公司等核心业务单元，形成数字基建业务协同发展格局。数据科技及西安\n特发千喜侧重数据中心的投资和资产运营，以自有机房为平台，构建算力服务和云服务业\n务。技术服务深耕智能化与信息化系统集成交付，发展设计、工程、运维交付能力。智慧\n科技专注智慧城市系统集成，拥有城市级智能化方案设计与项目实施能力，不断拓展智慧\n应用新场景。在线监测分公司依托光纤传感、电子传感及                          AI 算法核心技术，实现对关键\n基础设施的实时监测、智能诊断与风险预警，为监测目标稳定运行提供保障。特发东智专\n注智能终端产品的研发制造。新基建分公司牵头板块发展，构建业务平台，聚焦新型城市\n信息基础设施和新型算力基础设施建设，着力打造围绕数据中心、算力中心的系列产品定\n制、集成服务、运维运营的全场景业务能力，着力提升围绕智慧城市、智慧园区和智慧电\n网的智能化及信息化系统解决方案能力，以及发展相关的传输和传感产品业务。\n\n    公司智慧服务板块与国内多个头部通信、计算、网络安全、机器视觉等设备商建立深\n度战略合作关系，中标并参与多个国家级、省市级的算力基础设施和智慧城市、智慧园区、\n智慧场馆、智慧电网的标杆项目建设，示范效应突出，行业影响力显著提升。\n\n    3、融合板块\n\n    融合板块主要为相关科研院所配套信号采集与信号处理、嵌入式                              AI运算、嵌入式飞\n控计算机、测控仿真平台等产品研发与制造。聚焦视频图像处理、嵌入式                                AI、无人机航电、\n通用测控平台等数智融合赛道，可提供高可靠、定制化、自主可控的装备信息化产品与一\n体化解决方案。\n\n    板块内核心经营主体包括成都傅立叶、神州飞航，由融合事业部统筹板块协同工作。\n其中，成都傅立叶深耕航空通信设备、视频图像处理等核心领域，构建信号采集处理等产\n品研发、生产、销售、服务全链条能力，技术实力与行业资质突出。神州飞航紧扣融合发\n展定位，以嵌入式计算机为核心技术，为用户提供高可靠、专业化的平台解决方案，当前\n业务以装备测试与型号配套双轮驱动，形成稳定支撑与持续增长动能。\n\n\n                                       12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 358,
+              "quote": "                                                 深圳市特发信息股份有限公司        2025年年度报告全文\n\n\n    4、物业资产经营板块\n\n    公司从事经营性物业的租赁与管理，租赁物业主要位于深圳市南山区、福田区、罗湖\n区等。截至      2025 年底，公司经营性物业总面积约                 13.31 万㎡，业态包括办公写字楼、工\n业厂房、住宿和配套商业用房等。其中，位于深圳市南山区科技园中区的特发信息港，占\n地近  3 万㎡，建筑面积         9.78 万㎡，属于公司在营的集中性产业园区，目前入驻企业以新\n一代信息技术为主，公司为入驻企业提供全方位的物业服务，包括物业管理、设施维护、\n安全保障及绿色环保服务。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 748,
+              "end": 1214,
+              "quote": "四、主营业务分析\n\n1、概述\n    2025年，公司紧扣“十四五”战略规划，聚焦线缆、智慧服务、融合、物业资产经营\n四大板块业务，面对复杂市场环境，通过强化市场引导、发力科技创新、优化业务结构、\n加强内部协同、推进降本增效等举措，实现整体经营稳健发展。\n\n    报告期内，公司实现营业收入              44.17 亿元，同比增加        0.16%；实现净利润-3.76       亿元，\n同比减少    4.85%；归属于母公司的净利润-4.96             亿元，同比减少        23.11%。利润减少的原因：\n主要系对智慧城市创展基地项目、前期并购形成的商誉等相关资产计提减值准备所致。\n\n    （1）深耕主业赛道，主动谋变求进，抢抓市场先机\n\n    线缆板块\n\n    利用人工智能基础设施需求高速增长的有利时机，积极拓展互联网商算力业务，整体\n板块营业收入及利润均实现增长，表现亮眼。\n\n                                        18"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "source_spans": [
+            {
+              "page": 19,
+              "start": 0,
+              "end": 1133,
+              "quote": "                                              深圳市特发信息股份有限公司       2025年年度报告全文\n\n\n    报告期内国内外人工智能算力需求旺盛，互联网商数据中心机房业务出现爆发式增长。\n在运营商市场，光纤光缆收入保持稳定，中国移动和中国电信馈线电缆、数据电缆产品成\n为增量收入；在电力市场，电力光缆及金具产品在国网、南网和特高压中标份额均保持前\n列，但电网市场准入门槛降低，新增供方加剧了市场竞争，全年呈现量增价跌，毛利率下\n降态势，架空裸导地线产品在电网市场再次取得较大中标金额；在专网市场，石油等行业\n收入保持增长；在通讯设备商市场，ODN                 配线产品订单收入稳定增长；在海外市场，越南\n布点价值凸显，产能及产品线继续扩张，高端连接器产品在越南实现批量生产，收入、利\n润同比大幅增长。\n\n    智慧服务板块\n\n    构建“产品—工程—运维”服务平台，再造业务流程，强化联动效能，实现了提质增\n效的目标。\n\n    报告期内系统集成业务中标多个标志性项目，包括低空经济相关业务中标                                 2 个市级项\n目以及鹏城云脑三期服务等国家级项目；数据中心综合布线业务快速增长；在线监测电网\n签约额增长，报告期内公司积极拓展了非电网监测业务；西安特发千喜金融类客户取得突\n破；特发东智根据企业实际情况选择性接单导致收入规模有所降低。\n\n    融合板块\n\n    融合业务在面临行业新立项项目不足，市场竞争加剧的不利局面下，板块组建事业部\n管理团队，明确发展定位，强化客户拓展、技术开发、原材料采购内部协同，提质增效，\n总体业务保持稳定。\n\n    报告期内成都傅立叶重新坚守型号配套定位，强化研发人员在市场拓展方面的作用，\n聚焦核心业务，收入同比保持稳定，新配套研发立项项目增加，为后续业务拓展奠定基础。\n神州飞航国产化替代进展顺利，但前期重要项目本年度交付数量减少导致收入下滑，目前\n已实现一批新产品研发和转化，在新领域业务取得突破。\n\n    物业资产经营板块\n\n    一是优化物业租赁策略，根据市场需求调整租金水平及佣金政策，确保出租率保持稳\n定水平；二是加强园区设施维护和升级，提升硬件设施的竞争力；三是推进绿色园区建设，\n通过节能改造和环保措施，降低园区的碳排放；四是提升客户服务质量，通过保姆式管家\n及个性化服务，满足企业的多样化需求；五是加强与入驻企业的合作，定期举办交流活动，\n促进企业间的资源共享与合作。\n\n\n\n\n\n\n                                       19"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            20
+          ],
+          "source_spans": [
+            {
+              "page": 20,
+              "start": 0,
+              "end": 1329,
+              "quote": "                                               深圳市特发信息股份有限公司       2025年年度报告全文\n\n\n    同时通过专项奖励等激励机制推进全员营销，联动特发集团系统内单位探索组合营销。\n成功举办第三届特发信息港推介会，并全力推动空置房源改造，部分改造后的房源顺利出\n租。\n\n    （2）强化成本管控，深耕精益运营，驱动质效双升\n\n    建立常态化成本管控机制，全面开展提质增效工作。通过战略谈判、锁价备货、VMI\n（供应商管理库存）管理及关键材料签订框架协议等措施，有效降低主要原材料采购成本；\n精益生产助力效能提升，持续实施                TQM（全面质量管理）、IE          技术（聚焦效率提升）等精\n益管理项目，动态优化生产与物料计划，降低库存与呆滞品；引入自动化生产与监测设备，\n有序推进智能工厂建设。\n\n    （3）深化产学研协同，加速创新突破，提升智造能级\n\n    在创新载体建设与项目协同方面，公司持续深化产学研合作。与中国科学院深圳先进\n技术研究院光电工程研究中心紧密配合，在“特种光纤光缆及光纤传感联合实验室”重点\n推进光纤传感、空芯光纤技术攻关，在市级重大科研任务上共同完成局部放电光学麦克风\n关键技术研究，推动该成果规模化产业化；特发信息与深圳大学计软学院联合实验室完成\nIBMS平台建设及多场景测试与适配，搭建                  MES 系统工艺评价模型和时序分析能力，引入\nAI相关模型与算法平台。2025            年，公司国家企业技术中心顺利通过复评，特发信息、特\n发华银新增市级“绿色工厂”资质认证，山东光源获批省级“智能工厂”，特发信息、光\n网科技斩获市级“智能工厂”认证。\n\n    科技创新方面，公司按计划完成深圳市技术攻关重点项目和深圳市重大专项，各项指\n标满足项目要求，后续将在原有的研究基础上实现产品转化，为公司的高质量发展注入持\n续的动能。光网科技的“基于              CPO技术的高密度超薄多芯            MPO插芯关键技术研究”项目，\n成功入选深圳市国资委“2025            十大原创技术攻关项目”。\n\n    资质认定方面，截至报告期末，子公司重庆光缆、神州飞航、光网科技为国家专精特\n新“小巨人”企业，特发光源、广东特发为省级专精特新企业。\n\n    （4）筑牢合规基石，深化风险防控，淬炼内控效能\n\n    报告期内，公司以“强内控、防风险、促合规”为目标，系统性完善风险、合规与内\n控体系。在合规管理领域，出台《合规管理办法》等核心制度并编制《合规手册》，构建\n完整制度框架，并在年内成功通过                ISO 37301 国际合规管理体系认证，实现与国际标准接\n轨。全面风险管理方面，强化投资、销售、招标采购及生产管理等关键业务监督，完成重\n大风险排查评估，修订《全面风险管理办法》，深化风险监测防控机制。内部控制体系运\n\n\n\n\n                                        20"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            21
+          ],
+          "source_spans": [
+            {
+              "page": 21,
+              "start": 0,
+              "end": 2569,
+              "quote": "                                                                   深圳市特发信息股份有限公司               2025 年年度报告全文\n\n\n行方面，加大监督检查力度，定期核查公司及各所属企业内控运行，并将发现的问题持续\n跟踪整改闭环。\n\n     （5）强化党建引领，夯实发展根基，擦亮品牌底色\n\n     党建方面。特发信息党委坚持以习近平新时代中国特色社会主义思想为指导，全面贯\n彻落实党的二十大和二十届历次全会精神，深入学习贯彻习近平总书记关于国有企业改革\n发展和党的建设的重要论述，深入贯彻落实习近平总书记对广东、深圳系列重要讲话和重\n要指示精神，聚焦增强党组织政治功能和组织功能，年内扎实开展深入贯彻中央八项规定\n精神学习教育、规范完成党支部集中换届，持续抓牢党组织标准化规范化建设，并进一步\n深化实施“红‘芯’强链、创新强企”党建质量提升项目，推动特色党建品牌创建工作纵\n深开展，同时以党建引领群团建设，规范完成团委、工会换届选举，为公司深化改革发展\n提供坚实政治保障和组织保障。\n\n     企业文化和品牌方面。2025                      年创新活动形式，开展线上线下两场读书会活动和企业文\n化征文比赛，焕新公司整体精神面貌，构建学习型、创新型企业文化，营造积极向上的工\n作氛围。2025          年公司获“2025            年中国光通信最具综合竞争力企业十强”“2025                                       中国光纤\n光缆最具竞争力企业十强”以及“2025                              年中国光传输与网络接入设备最具竞争力企业十强”\n三项荣誉，这已经是公司连续                         19 年获得该类奖项。\n\n2、收入与成本\n\n（1）     营业收入构成\n\n\n                                                                                                        单位：元\n                                         2025年                                2024 年\n                                   金额             占营业收入                   金额               占营业收        同比增减\n                                                      比重                                    入比重\n营业收入合计                        4,416,543,075.00           100%         4,409,404,867.78         100%        0.16%\n分行业\n通信及相关设备制造业                    4,333,962,421.96         98.13%         4,325,142,427.23       98.09%        0.20%\n物业资产经营板块                          82,580,653.04         1.87%             84,262,440.55       1.91%       -2.00%\n分产品\n线缆板块                          3,521,794,829.40         79.74%         2,930,595,892.40       66.46%       20.17%\n融合板块                            218,232,197.59          4.94%            379,965,746.08       8.62%      -42.57%\n智慧服务板块                          460,651,653.76         10.43%            917,375,846.58      20.81%      -49.79%\n物业资产经营板块                          82,580,653.04         1.87%             84,262,440.55       1.91%       -2.00%\n材料销售及其他                         133,283,741.21          3.02%             97,204,942.17       2.20%       37.12%\n分地区\n国内                            3,299,679,220.15         74.71%         3,842,233,084.01       87.14%      -14.12%\n国外                            1,116,863,854.85         25.29%            567,171,783.77      12.86%       96.92%\n分销售模式\n直销                            4,416,543,075.00        100.00%         4,409,404,867.78      100.00%        0.16%\n\n                                                        21"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "source_spans": [
+            {
+              "page": 22,
+              "start": 0,
+              "end": 3905,
+              "quote": "                                                                                         深圳市特发信息股份有限公司                          2025  年年度报告全文\n\n（2）        占公司营业收入或营业利润                                    10%以上的行业、产品、地区、销售模式的情况\n\n\n       适用          □不适用\n                                                                                                                                            单位：元\n                           营业收入                         营业成本                  毛利率           营业收入比上               营业成本比上                毛利率比上\n                                                                                             年同期增减                 年同期增减               年同期增减\n分行业\n通信及相关                  4,200,678,680.75            3,502,660,966.53            16.62%                -0.64%               -1.66%                0.86%\n设备制造业\n物业资产经                      82,580,653.04               45,094,512.43           45.39%                -2.00%               23.58%             -11.30%\n营板块\n分产品\n线缆板块                   3,521,794,829.40            2,879,089,093.55            18.25%                20.17%               19.97%                0.14%\n融合板块                      218,232,197.59              174,219,890.80           20.17%              -42.57%               -32.15%             -12.25%\n智慧服务板                     460,651,653.76              449,351,982.18            2.45%              -49.79%               -50.36%                1.12%\n块\n物业资产经                      82,580,653.04               45,094,512.43           45.39%                -2.00%               23.58%             -11.30%\n营板块\n分地区\n国内                     3,166,395,478.94            2,780,042,837.70            12.20%              -15.45%               -13.14%              -2.34%\n国外                     1,116,863,854.85               767,712,641.26           31.26%                96.92%               93.00%                1.39%\n分销售模式\n直销                     4,283,259,333.79            3,547,755,478.96            17.17%                -0.67%               -1.40%                0.61%\n       公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                                                                    1  年按报告期末口\n径调整后的主营业务数据\n       □适用           不适用\n\n（3）        公司实物销售收入是否大于劳务收入\n\n\n       是       □否\n\n     行业分类                         项目                       单位                      2025   年                  2024   年                 同比增减\n                         销售量                       芯公里                          26,308,976.77             23,646,662.00                       11.26%\n光纤光缆                     生产量                       芯公里                          26,687,171.35             19,549,296.00                       36.51%\n                         库存量                       芯公里                            2,783,218.58              2,405,024.00                      15.73%\n\n\n                         销售量                       套                            17,582,000.00             18,766,959.00                       -6.31%\n通信设备                     生产量                       套                            17,715,160.00             18,065,049.00                       -1.94%\n                         库存量                       套                              6,272,287.00              6,139,127.00                        2.17%\n\n\n                         销售量                       套                                  18,236.00                 16,747.00                       8.89%\n电子设备                     生产量                       套                                  17,547.00                 25,068.00                    -30.00%\n                         库存量                       套                                  38,979.00                 39,668.00                     -1.74%\n\n\n       相关数据同比发生变动                              30%以上的原因说明\n\n\n\n                                                                           22"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            23
+          ],
+          "source_spans": [
+            {
+              "page": 23,
+              "start": 0,
+              "end": 2290,
+              "quote": "                                                                          深圳市特发信息股份有限公司                   2025 年年度报告全文\n\n\n      适用        □不适用\n\n      光纤光缆生产量同比变动主要是报告期内，线缆板块本期订单增加所致。\n\n（4）      公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n\n      □适用        不适用\n\n（5）      营业成本构成\n\n\n      行业分类\n\n                                                                                                                    单位：元\n\n                                              2025 年                                 2024 年\n  行业分类               项目                  金额              占营业成                 金额              占营业成本              同比增减\n                                                          本比重                                     比重\n通信及相关设            原材料             2,800,783,663.64          76.50%      2,930,681,484.06            79.73%            -4.43%\n备制造业\n通信及相关设            人工薪酬               256,990,381.49          7.02%        214,182,894.22             5.83%            19.99%\n备制造业\n通信及相关设            折旧                  82,763,076.17          2.26%         87,194,540.35             2.37%            -5.08%\n备制造业\n通信及相关设            能源                  47,914,335.62          1.31%         51,327,908.97             1.40%            -6.65%\n备制造业\n通信及相关设            其他                 427,509,504.13         11.68%        356,060,377.40             9.68%            20.07%\n备制造业\n物业资产经营            水电成本                    875,905.41         0.02%             698,309.56            0.02%            25.43%\n板块\n物业资产经营            人工薪酬                 4,459,340.11          0.12%           5,177,702.01            0.14%           -13.87%\n板块\n物业资产经营            折旧摊销                27,707,022.34          0.76%         20,904,564.59             0.57%            32.54%\n板块\n物业资产经营            其他                  12,052,244.57          0.33%           9,710,303.86            0.26%            24.12%\n板块\n      说明\n\n      2025   年物业资产经营板块中折旧摊销占总营业成本比重                                                 0.76%，较         2024   年同比增加\n32.54%，主要系本期泰科大厦回迁房及数字科技楼计提折旧所致。\n\n（6）      报告期内合并范围是否发生变动\n\n\n      是      □否\n\n      本报告期内，公司通过股权收购方式持有唐山唐兴纬业科技有限公司                                                                       51%股权，自\n2025   年   11  月起纳入合并财务报表范围。\n\n\n\n\n\n\n                                                               23"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 0,
+              "end": 212,
+              "quote": "                                                                         深圳市特发信息股份有限公司                  2025 年年度报告全文\n\n（7）      公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n\n      □适用        不适用\n\n（8）      主要销售客户和主要供应商情况\n\n\n      "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司立足光通信领域，形成“产品+服务”双轮驱动模式，业务涵盖线缆、智慧服务、融合、物业资产经营四大核心板块，战略定位为新一代信息技术产品和服务综合提供商。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "线缆板块协同主体包括深圳光纤、东莞光纤、光网科技、光电公司、特发华银、重庆光缆、特发光源、光缆制造中心等企业及业务单元，并在深圳、东莞、重庆、常州、赣州、枣庄、越南海防等地建有规模化生产基地。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F03",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "智慧服务板块汇聚数据科技、西安特发千喜、技术服务、智慧科技、特发东智、在线监测分公司、新基建分公司等核心业务单元；融合板块核心经营主体包括成都傅立叶、神州飞航，由融合事业部统筹。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "线缆板块构建“光纤光缆+电力传输+综合布线+光电组件”产业链体系，产品核心覆盖光纤、光缆、光纤连接器、配线产品、馈线电缆、数据线缆、架空裸导地线、光缆金具及附件等。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "智慧服务板块提供集规划设计、建设施工、运营维护及配套产品供应于一体的定制化综合服务，并具备光网络终端、机顶盒、路由器、交换机、智能网关、定制服务器等网络通信设备以及温度、张力、倾角、危险气体等物联网传感设备的研发生产能力。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "融合板块主要为相关科研院所配套信号采集与信号处理、嵌入式AI运算、嵌入式飞控计算机、测控仿真平台等产品研发与制造，聚焦视频图像处理、嵌入式AI、无人机航电、通用测控平台等数智融合赛道。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F07",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "物业资产经营板块从事经营性物业的租赁与管理，租赁物业主要位于深圳市南山区、福田区、罗湖区等，业态包括办公写字楼、工业厂房、住宿和配套商业用房等。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "公司以“产品+服务”双轮驱动获取收入：线缆板块销售光纤光缆及配套组件等产品；智慧服务板块提供智能化系统与数据中心的规划设计、建设施工、运营维护及配套产品；融合板块提供装备信息化产品与一体化解决方案；物业资产经营板块通过物业租赁及物业管理等服务收费。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002",
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F09",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "公司销售模式为直销，2025年直销收入占营业收入比重100.00%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "直销收入占营业收入比重",
+            "raw_value": "100.00%",
+            "value": "100.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F10",
+      "element": "scale_and_mix",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "程序显示说明：F10正文44.17亿元为营业收入合计4,416,543,075.00元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F10",
+        "text": "报告期内公司实现营业收入44.17亿元，同比增加0.16%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入合计",
+            "raw_value": "4,416,543,075.00",
+            "value": "4416543075.00",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "0.16%",
+            "value": "0.16",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F10正文44.17亿元为营业收入合计4,416,543,075.00元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F11",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "分产品营业收入构成中，线缆板块收入3,521,794,829.40元，占营业收入79.74%，同比增长20.17%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "线缆板块营业收入",
+            "raw_value": "3,521,794,829.40",
+            "value": "3521794829.40",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "线缆板块占营业收入比重",
+            "raw_value": "79.74%",
+            "value": "79.74",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "线缆板块营业收入同比增减",
+            "raw_value": "20.17%",
+            "value": "20.17",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F12",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F12",
+        "text": "分产品营业收入构成中，智慧服务板块收入460,651,653.76元，占营业收入10.43%，同比下降49.79%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "智慧服务板块营业收入",
+            "raw_value": "460,651,653.76",
+            "value": "460651653.76",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "智慧服务板块占营业收入比重",
+            "raw_value": "10.43%",
+            "value": "10.43",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "智慧服务板块营业收入同比增减",
+            "raw_value": "-49.79%",
+            "value": "-49.79",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F13",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F13",
+        "text": "分产品营业收入构成中，融合板块收入218,232,197.59元，占营业收入4.94%，同比下降42.57%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "融合板块营业收入",
+            "raw_value": "218,232,197.59",
+            "value": "218232197.59",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "融合板块占营业收入比重",
+            "raw_value": "4.94%",
+            "value": "4.94",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "融合板块营业收入同比增减",
+            "raw_value": "-42.57%",
+            "value": "-42.57",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "分产品营业收入构成中，物业资产经营板块收入82,580,653.04元，占营业收入1.87%，同比下降2.00%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "物业资产经营板块营业收入",
+            "raw_value": "82,580,653.04",
+            "value": "82580653.04",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物业资产经营板块占营业收入比重",
+            "raw_value": "1.87%",
+            "value": "1.87",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物业资产经营板块营业收入同比增减",
+            "raw_value": "-2.00%",
+            "value": "-2.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F15",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "分产品营业收入构成中，材料销售及其他收入133,283,741.21元，占营业收入3.02%，同比增长37.12%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "材料销售及其他营业收入",
+            "raw_value": "133,283,741.21",
+            "value": "133283741.21",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "材料销售及其他占营业收入比重",
+            "raw_value": "3.02%",
+            "value": "3.02",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "材料销售及其他营业收入同比增减",
+            "raw_value": "37.12%",
+            "value": "37.12",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F16",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "分地区营业收入构成中，国内收入3,299,679,220.15元，占营业收入74.71%，同比下降14.12%；国外收入1,116,863,854.85元，占营业收入25.29%，同比增长96.92%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "国内营业收入",
+            "raw_value": "3,299,679,220.15",
+            "value": "3299679220.15",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国内占营业收入比重",
+            "raw_value": "74.71%",
+            "value": "74.71",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国外营业收入",
+            "raw_value": "1,116,863,854.85",
+            "value": "1116863854.85",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国外占营业收入比重",
+            "raw_value": "25.29%",
+            "value": "25.29",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F17",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "报告期内公司实现净利润-3.76亿元，同比减少4.85%；归属于母公司的净利润-4.96亿元，同比减少23.11%，利润减少主要系对智慧城市创展基地项目、前期并购形成的商誉等相关资产计提减值准备所致。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "净利润",
+            "raw_value": "-3.76",
+            "value": "-3.76",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于母公司的净利润",
+            "raw_value": "-4.96",
+            "value": "-4.96",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F18",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "线缆板块配备生产与检测设备，构建从光纤到光缆及配套组件的完整制造能力，打造华南地区规模领先、技术先进的光纤光缆研发、生产及检测基地。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F19",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "公司通过战略谈判、锁价备货、VMI（供应商管理库存）管理及关键材料签订框架协议等措施降低主要原材料采购成本，并持续实施TQM、IE技术等精益管理项目，引入自动化生产与监测设备推进智能工厂建设。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F20",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "通信及相关设备制造业营业成本构成中，原材料2,800,783,663.64元占营业成本比重76.50%，人工薪酬256,990,381.49元占7.02%，折旧82,763,076.17元占2.26%，能源47,914,335.62元占1.31%，其他427,509,504.13元占11.68%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "通信及相关设备制造业原材料成本",
+            "raw_value": "2,800,783,663.64",
+            "value": "2800783663.64",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "通信及相关设备制造业原材料占营业成本比重",
+            "raw_value": "76.50%",
+            "value": "76.50",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "通信及相关设备制造业人工薪酬",
+            "raw_value": "256,990,381.49",
+            "value": "256990381.49",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "通信及相关设备制造业能源成本",
+            "raw_value": "47,914,335.62",
+            "value": "47914335.62",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F21",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "光纤光缆2025年销售量26,308,976.77芯公里、生产量26,687,171.35芯公里、库存量2,783,218.58芯公里；生产量同比变动36.51%主要系线缆板块本期订单增加所致。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "光纤光缆销售量",
+            "raw_value": "26,308,976.77",
+            "value": "26308976.77",
+            "unit": "芯公里",
+            "source_unit": "芯公里",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "光纤光缆生产量",
+            "raw_value": "26,687,171.35",
+            "value": "26687171.35",
+            "unit": "芯公里",
+            "source_unit": "芯公里",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "光纤光缆库存量",
+            "raw_value": "2,783,218.58",
+            "value": "2783218.58",
+            "unit": "芯公里",
+            "source_unit": "芯公里",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F22",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F22",
+        "text": "线缆产品深度服务中国移动、中国联通、中国电信等国内主流电信运营商，同时广泛应用于电网、广播电视、公路、铁路、国防通信等行业专用网络，以及数据中心机房、人工智能算力基础设施等新型数字基建关键领域。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F23",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "智慧服务板块与国内多个头部通信、计算、网络安全、机器视觉等设备商建立深度战略合作关系，中标并参与多个国家级、省市级算力基础设施和智慧城市、智慧园区、智慧场馆、智慧电网标杆项目。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F24",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "线缆板块在运营商市场光纤光缆收入保持稳定，中国移动和中国电信馈线电缆、数据电缆产品成为增量收入；在电力市场电力光缆及金具产品在国网、南网和特高压中标份额保持前列；在专网市场石油等行业收入保持增长；在通讯设备商市场ODN配线产品订单收入稳定增长；海外市场越南布点价值凸显，高端连接器产品在越南实现批量生产。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F25",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F25",
+        "text": "智慧服务板块报告期内系统集成业务中标低空经济相关2个市级项目以及鹏城云脑三期服务等国家级项目，数据中心综合布线业务快速增长，在线监测电网签约额增长并拓展非电网监测业务，西安特发千喜金融类客户取得突破。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F26",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F26",
+        "text": "线缆板块利用人工智能基础设施需求高速增长的有利时机，积极拓展互联网商算力业务，整体板块营业收入及利润均实现增长。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F27",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "电力市场电网准入门槛降低、新增供方加剧竞争，线缆板块全年呈现量增价跌、毛利率下降态势。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F28",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F28",
+        "text": "融合板块面临行业新立项项目不足、市场竞争加剧的不利局面，通过组建事业部管理团队、强化客户拓展与技术开发、原材料采购内部协同实现提质增效，总体业务保持稳定；神州飞航国产化替代进展顺利，但前期重要项目本年度交付数量减少导致收入下滑。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F29",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F29",
+        "text": "物业资产经营板块通过优化租赁策略、调整租金水平及佣金政策确保出租率稳定，加强园区设施维护升级、推进绿色园区建设、提升客户服务质量并加强与入驻企业合作。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F30",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F30",
+        "text": "线缆板块毛利率18.25%，同比增加0.14个百分点；融合板块毛利率20.17%，同比减少12.25个百分点；智慧服务板块毛利率2.45%，同比增加1.12个百分点；物业资产经营板块毛利率45.39%，同比减少11.30个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "线缆板块毛利率",
+            "raw_value": "18.25%",
+            "value": "18.25",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "融合板块毛利率",
+            "raw_value": "20.17%",
+            "value": "20.17",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "智慧服务板块毛利率",
+            "raw_value": "2.45%",
+            "value": "2.45",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物业资产经营板块毛利率",
+            "raw_value": "45.39%",
+            "value": "45.39",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F31",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F31",
+        "text": "本报告期内公司通过股权收购方式持有唐山唐兴纬业科技有限公司51%股权，自2025年11月起纳入合并财务报表范围。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "唐山唐兴纬业科技有限公司收购股权比例",
+            "raw_value": "51%",
+            "value": "51",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F32",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F32",
+        "text": "公司报告期内业务、产品或服务未发生重大变化或调整。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F33",
+      "element": "position",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F33",
+        "text": "公司业务覆盖线缆产品制造、智能化系统集成交付与运维、装备信息化产品研发制造以及物业租赁管理，形成从产品制造到工程交付、运维服务的经营链条。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F34",
+      "element": "upstream_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F34",
+        "text": "通信及相关设备制造业营业成本中原材料占比76.50%，公司通过战略谈判、锁价备货、VMI管理及关键材料签订框架协议等措施管控主要原材料采购成本。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F35",
+      "element": "downstream_customers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F35",
+        "text": "公司产品与服务下游覆盖国内主流电信运营商、电网、广播电视、公路、铁路、国防通信等行业专用网络、数据中心与算力基础设施，以及政企数字化、智慧城市、智慧园区等应用场景。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F36",
+      "element": "company_features",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F36",
+        "text": "公司经营性物业总面积约13.31万㎡，其中位于深圳市南山区科技园中区的特发信息港占地近3万㎡、建筑面积9.78万㎡，属公司在营的集中性产业园区，入驻企业以新一代信息技术为主。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "经营性物业总面积",
+            "raw_value": "约13.31",
+            "value": "13.31",
+            "unit": "万㎡",
+            "source_unit": "万㎡",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "特发信息港建筑面积",
+            "raw_value": "9.78",
+            "value": "9.78",
+            "unit": "万㎡",
+            "source_unit": "万㎡",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "fact_id": "F37",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F37",
+        "text": "公司持续深化产学研合作，与中国科学院深圳先进技术研究院光电工程研究中心在“特种光纤光缆及光纤传感联合实验室”推进光纤传感、空芯光纤技术攻关；光网科技“基于CPO技术的高密度超薄多芯MPO插芯关键技术研究”项目入选深圳市国资委2025十大原创技术攻关项目。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "分行业口径下通信及相关设备制造业收入4,333,962,421.96元与分产品口径各板块合计存在差异，未在选定章节中说明原因。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "选定章节未披露具体客户名称及客户集中度数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-a7471d9e754af37bd6985336",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "选定章节未披露具体原材料名称及供应商名称。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

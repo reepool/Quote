@@ -1,0 +1,55 @@
+{
+  "task": "6.EU",
+  "reference_type": "A_independent_source_first_not_model_input",
+  "scope": "Report-native concentrated business and revenue sections; optional amounts are audit targets, not new mandatory completion fields",
+  "companies": [
+    {
+      "instrument_id": "600176.SH",
+      "document_sha256": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+      "source_sections": [{"title": "第三节 管理层讨论与分析/一、报告期内公司从事的业务情况及行业产品说明", "physical_pages": [10,11]}, {"title": "第三节/主营业务分析/收入和成本分析", "physical_pages": [16,17]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "主要从事玻璃纤维及制品的生产、销售，不把风电或原料行业泛化成公司唯一主业", "pages": [10]},
+        {"id": "products_services", "expected": "主要产品覆盖玻纤粗纱及制品、电子纱/电子布；对复合材料增强/电子电路等应用形成实质说明，不只抄行业标签", "pages": [10,11]},
+        {"id": "revenue_model", "expected": "以玻纤纱及制品销售取得主要收入，直销和经销两种模式；少量风力发电收入可有源补充，不与玻纤混作同一生产产品", "pages": [10,16,17]}
+      ],
+      "audit_targets": {"company_revenue_CNY": "18880860110.36", "glass_products_revenue_CNY": "18345083876.74", "other_wind_revenue_CNY": "183547580.76", "glass_share_main_business_percent": "99.01", "direct_revenue_CNY": "14188696385.61", "distribution_revenue_CNY": "4339935071.89"},
+      "pitfalls": ["主营业务产品/地区/销售渠道为不同轴，不相互加总", "其他主营风电不是公司全部收入", "行业原料/玻纤性能与公司实际采购断言区分", "不适用勾选不能变成未发生事件"]
+    },
+    {
+      "instrument_id": "600115.SH",
+      "document_sha256": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+      "source_sections": [{"title": "第三节/一、报告期内公司从事的业务情况", "physical_pages": [15]}, {"title": "第三节/五、报告期内主要经营情况/主营业务分析", "physical_pages": [23,24]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "国内、国际及地区航空运输经营，主要客运并涵盖货邮/行李及运输延伸服务，不把所有获准经营范围写成已实际开展", "pages": [15]},
+        {"id": "products_services", "expected": "向旅客和客户提供航空客货邮及延伸服务，国内/国际/地区航线网络是自身运输产品而非全球行业需求数据", "pages": [15,24]},
+        {"id": "revenue_model", "expected": "航空运输服务取得主要收入，航空运输与其他业务分开；国内、国际、地区收入保持地域轴，不能把行业周转量或其他收益当票款收入", "pages": [23,24]}
+      ],
+      "audit_targets": {"unit": "人民币百万元", "total_revenue": "139941", "aviation_transport_revenue": "137114", "other_revenue": "2827", "domestic_revenue": "90419", "international_revenue": "45733", "regional_revenue": "3789"},
+      "pitfalls": ["获准维修/制造/代理/电商不等于现行主业务", "公司机队/旅客量与行业统计分开", "利润为负不误正，人民币百万元不误亿元", "跨页表头毛利率增减PTS为百分点"]
+    },
+    {
+      "instrument_id": "601288.SH",
+      "document_sha256": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+      "source_sections": [{"title": "5.3 财务报表分析/利润表分析", "physical_pages": [25,26,29]}, {"title": "5.4 业务综述/公司金融、个人金融、资金、资产管理及综合化经营", "physical_pages": [43,44,45,48,49,58]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "商业银行面向公司和个人提供综合金融服务，涵盖资金/资产管理，县域三农特色可补充；不将基金保险子公司业务写成银行本体唯一主业", "pages": [43,45,48,49,58]},
+        {"id": "products_services", "expected": "公司及个人存贷、支付结算/财富等银行服务，资金投资/交易与理财资产管理有实质解释；附属机构基金、租赁、人寿、投资、理财按主体区分", "pages": [43,44,45,48,49,58]},
+        {"id": "revenue_model", "expected": "以利息净收入为主要收入来源，另有手续费佣金净收入与其他非利息收入；利息支出、客户存款/贷款余额和资管规模不是收入", "pages": [25,26,29]}
+      ],
+      "audit_targets": {"unit": "人民币百万元", "operating_revenue": "725306", "net_interest_income": "569594", "net_fee_commission": "88085", "other_noninterest_income": "67627", "net_interest_share_percent": "78.5"},
+      "pitfalls": ["客户/理财余额不是营业收入", "银行本体和农银理财等子公司主体不混", "付息负债利息成本不当取得收入", "乡村服务/网络金融是业务特色不强制全目录齐全"]
+    },
+    {
+      "instrument_id": "600163.SH",
+      "document_sha256": "7490159ce0a0e480425765959996f86c6d5cb36b1c7e690ecb638b8763c0d846",
+      "source_sections": [{"title": "第三节/一、报告期内公司从事的业务情况", "physical_pages": [8]}, {"title": "第三节/五、主要经营情况/主营业务分析与分产品收入", "physical_pages": [13,14]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "投资、开发、建设、运营新能源发电项目，风电主导、另光伏/生物质发电，不是设备制造或全国电网业务", "pages": [8,14]},
+        {"id": "products_services", "expected": "将风能/太阳能等转换成电力，风电（含陆上/海上）、光伏与生物质对应发电产出；不把行业全国装机当公司装机", "pages": [8,14]},
+        {"id": "revenue_model", "expected": "销售新能源项目所发电力取得收入，风力发电是主要业绩来源；装机/资源/上网电价影响收入，不能把投资理财收益当电力主营", "pages": [8,13,14]}
+      ],
+      "audit_targets": {"total_revenue_CNY": "1607275122.97", "electricity_revenue_CNY": "1578134211.21", "wind_revenue_CNY": "1526434304.68", "PV_revenue_CNY": "11912162.78", "biomass_revenue_CNY": "39787743.75", "installed_capacity_10k_kW": "99.93"},
+      "pitfalls": ["电力主营与利润表营业收入总额不同", "生物质负毛利原文保留", "公司当期下降与全国行业增长不同", "公司有明示未发生重大变化原句，可保，不仅凭不适用勾选推断"]
+    }
+  ]
+}

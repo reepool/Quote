@@ -1,0 +1,12 @@
+{
+  "status": "authorized",
+  "approval_reference": "human-20261122-prospective20-A6EU",
+  "launch_basis": "A explicitly froze source-reference-batch5.json before these first calls; fixed global order and <=4 active companies apply.",
+  "instrument_ids": ["920008.BJ", "000524.SZ", "920016.BJ", "002558.SZ"],
+  "reference_files": {
+    "920008.BJ": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch5.json",
+    "000524.SZ": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch5.json",
+    "920016.BJ": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch5.json",
+    "002558.SZ": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch5.json"
+  }
+}

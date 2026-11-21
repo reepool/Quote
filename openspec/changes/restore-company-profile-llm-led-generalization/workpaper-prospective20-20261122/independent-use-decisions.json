@@ -1,0 +1,19 @@
+{
+  "task": "6.EU",
+  "reviewer": "A independent source reader",
+  "scope": "One source-faithful but economically ambiguous unit; not an extraction-error correction or a new company rule",
+  "decisions": [
+    {
+      "instrument_id": "000037.SZ",
+      "reading_work_id": "bp-work-c53bd58fc39eed1151cab68c",
+      "document_version": "0119ae1bd0cf86167b0c945f2a0f661c0b5d782a1204766caeec34f85c29c28e",
+      "fact_id": "F14",
+      "fact_sha256": "7b663841c536a88b7b1612827b3e88fe7ec80f3152dda94d7df5c35da10ce807",
+      "disposition": "source_checked",
+      "evidence_ids": ["source-0001"],
+      "reason": "已对本报告第三节一、公司主要业务/主要生产经营信息表（物理第10页）核原文：发电量2.84/5.12亿千瓦时、上网电量2.82/5.10亿千瓦时、平均用电率4.42%/3.85%、利用小时517/933均有据；该表结算电价原生文字自身标成元/亿千瓦时，数值0.824/0.817。模型忠实转录，但原表单位与通常电价量纲存在疑点，不能据此自行改成元/千瓦时。",
+      "limitation": "保留原文和引用，结算电价的单位尚待核实；本对象不作为确定电价或精确测算输入。此限制不是报告未披露、不是确定错误，也不影响其他已有业务画像内容。"
+    }
+  ],
+  "application": "Bind only to the exact current report/work/fact hash via existing WorkpaperUseReview and writer in a separate delivery snapshot. Do not edit original first-read/review writers, values, evidence or scores."
+}

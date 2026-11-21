@@ -1,0 +1,12 @@
+{
+  "status": "authorized",
+  "approval_reference": "human-20261122-prospective20-A6EU",
+  "launch_basis": "A explicitly released the four pre-read source references in the current user message before launch. Reference file is hash checked only, not provided to models.",
+  "instrument_ids": ["600176.SH", "600115.SH", "601288.SH", "600163.SH"],
+  "reference_files": {
+    "600176.SH": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch1.json",
+    "600115.SH": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch1.json",
+    "601288.SH": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch1.json",
+    "600163.SH": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch1.json"
+  }
+}

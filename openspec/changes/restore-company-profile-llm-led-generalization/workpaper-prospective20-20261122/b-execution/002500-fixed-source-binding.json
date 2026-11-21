@@ -1,0 +1,40 @@
+{
+  "work_id": "bp-work-e212dceb8b93eeca6fc2a23c",
+  "original_status": "machine_rework",
+  "original_error": "machine_rework:pages_not_bound",
+  "report": {
+    "instrument_id": "002500.SZ",
+    "report_id": "asset_3a3ac47089129b86eab234ea8bf41c21",
+    "document_version": "b71a6038ee90f79c8b9d9590b3b8133faa7d0e4489b10f531b151c991f04623c",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "source_asset": {
+    "schema_version": "business_profile_source_asset.v1",
+    "source_file_id": "shared-asset:asset_3a3ac47089129b86eab234ea8bf41c21",
+    "source_asset_id": "asset_3a3ac47089129b86eab234ea8bf41c21",
+    "instrument_id": "002500.SZ",
+    "report_period": "2025-12-31",
+    "report_type": "annual_report",
+    "filing_id": "1225215361",
+    "source": "cninfo",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/b7/b71a6038ee90f79c8b9d9590b3b8133faa7d0e4489b10f531b151c991f04623c.pdf",
+    "content_hash": "b71a6038ee90f79c8b9d9590b3b8133faa7d0e4489b10f531b151c991f04623c",
+    "content_length": 9077298,
+    "published_at": "2026-04-27T16:00:00+00:00",
+    "status": "verified",
+    "integrity_status": "valid",
+    "metadata": {
+      "shared_asset_id": "asset_3a3ac47089129b86eab234ea8bf41c21",
+      "shared_attachment_id": "att_f091df205c5dbd6ee65afd1746a5a4fc",
+      "shared_observation_version": "ver_1a85a48fbc53df9acbe65a4804f55847",
+      "selector_kind": "bound_exact_observation"
+    }
+  },
+  "pages_bound": 298,
+  "source_body_sent_to_model": false,
+  "new_model_calls": 0,
+  "original_work_row_not_mutated": true,
+  "remaining_execution": "Existing queue force-replay owner is required to reopen only this failed acquire item; no new recovery framework."
+}

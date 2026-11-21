@@ -1,0 +1,59 @@
+{
+  "instrument_id": "000070.SZ",
+  "started_epoch": 1795279712.156765,
+  "absolute_deadline_epoch": 1795285712.156765,
+  "launch_reference": {
+    "launch_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/b-execution/launch-batch3.json",
+    "launch_sha256": "0ff193ccfb7a94121975bc7bd12b1a53255ecb48a0bc74de451c2aa6d31ba744",
+    "reference_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/source-reference-batch3.json",
+    "reference_sha256": "55d3c4fd34b6c0a8a1ba0ba10682bc638901353c8da661ba59059e94dde67ca1"
+  },
+  "source_reference_frozen_before_start": true,
+  "phases": [
+    {
+      "run_id": "6eu-000070-first_read",
+      "action": "first_read",
+      "started_epoch": 1795279712.1578176,
+      "finished_epoch": 1795279719.736258,
+      "command_wall_seconds": 7.578,
+      "process_returncode": 1,
+      "absolute_deadline_timeout": false,
+      "allocated_budget": {
+        "seconds": 3000,
+        "tokens": 500000,
+        "physical_requests": 4,
+        "recoveries": 1,
+        "logical_seconds": 2450,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "result_path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/000070/executions/6eu-000070-first_read/result.json",
+      "result_state": "missing",
+      "usage": {
+        "physical_requests": 0,
+        "recoveries": 0,
+        "charged_tokens": 0,
+        "known_supplier_total": 0,
+        "unknown_usage_reservation": 0,
+        "priced_cost_cny": "0",
+        "fees": "no_model_call",
+        "budget_path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/000070/executions/6eu-000070-first_read/budget.json",
+        "attempts": []
+      },
+      "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6eu-b-3YUSDBLW/6eu-000070-first_read.log"
+    }
+  ],
+  "state": "no_readable_profile",
+  "first_read_visible_seconds": 10.67,
+  "first_read_objects": 0,
+  "finished_epoch": 1795279722.826604,
+  "company_wall_seconds": 10.67,
+  "totals": {
+    "charged_tokens": 0,
+    "physical_requests": 0,
+    "recoveries": 0,
+    "known_supplier_total": 0,
+    "unknown_usage_reservation": 0,
+    "fees": "no_model_call"
+  }
+}

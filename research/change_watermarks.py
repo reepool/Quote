@@ -61,9 +61,21 @@ def ensure_row_version_column(conn: sqlite3.Connection, table_name: str) -> None
         for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
     }
     if "row_version" not in columns:
-        conn.execute(
-            f"ALTER TABLE {table_name} ADD COLUMN row_version INTEGER NOT NULL DEFAULT 1"
-        )
+        try:
+            conn.execute(
+                f"ALTER TABLE {table_name} ADD COLUMN row_version INTEGER NOT NULL DEFAULT 1"
+            )
+        except sqlite3.OperationalError as exc:
+            # Another initializer can add the same column after our PRAGMA.
+            # Only tolerate that specific race, never locks or other DDL errors.
+            if "duplicate column name: row_version" not in str(exc).lower():
+                raise
+            current = {
+                str(row["name"] if isinstance(row, sqlite3.Row) else row[1])
+                for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+            }
+            if "row_version" not in current:
+                raise
 
 
 def _coerce_bool(value: Any, default: bool) -> bool:

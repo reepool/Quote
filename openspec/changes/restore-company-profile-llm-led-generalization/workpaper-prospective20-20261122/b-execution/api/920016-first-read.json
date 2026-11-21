@@ -1,0 +1,2491 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "920016.BJ",
+  "report": {
+    "instrument_id": "920016.BJ",
+    "report_id": "asset_b5ff35dce0247da436a373c9473b2e1e",
+    "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-16T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-dc753c1772752e5550ded4cc",
+  "latest_reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+  "readings": [
+    {
+      "work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "workpaper_sha256": "1b03cfe1842c543be194925baf463d90a1b353d7b51b9b70c14b26d077d2eb45",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0027",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "一、 业务概要"
+            ],
+            "start_page": 12,
+            "end_page": 14,
+            "rationale": "选择逻辑：section-0027（业务概要，含盈利/采购/生产/销售/研发模式）完整说明公司做什么、产品用途与经营方式；section-0034（经营情况回顾）为管理层对经营计划、行业与财务的实质讨论，覆盖本期经营变化；section-0039（财务分析）含资产负债结构与营业情况分析，解释收入、成本、毛利率及利润变动；section-0084（本期投入情况）与主要控股参股公司分析补充投入与子公司经营；section-0853（合并营业收入/营业成本附注）提供收入成本分解信息，是货币化与业务结构的关键来源；section-0998（母公司营业收入/营业成本）补充母公司口径收入构成；section-0217（行业信息）作为行业背景与产品生产、原材料采购的补充，仅在解释公司层面时使用。未选纯TOC或标题碎片，也未选与父节重复的子项。"
+          },
+          {
+            "section_id": "section-0034",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "二、 经营情况回顾"
+            ],
+            "start_page": 14,
+            "end_page": 19,
+            "rationale": "选择逻辑：section-0027（业务概要，含盈利/采购/生产/销售/研发模式）完整说明公司做什么、产品用途与经营方式；section-0034（经营情况回顾）为管理层对经营计划、行业与财务的实质讨论，覆盖本期经营变化；section-0039（财务分析）含资产负债结构与营业情况分析，解释收入、成本、毛利率及利润变动；section-0084（本期投入情况）与主要控股参股公司分析补充投入与子公司经营；section-0853（合并营业收入/营业成本附注）提供收入成本分解信息，是货币化与业务结构的关键来源；section-0998（母公司营业收入/营业成本）补充母公司口径收入构成；section-0217（行业信息）作为行业背景与产品生产、原材料采购的补充，仅在解释公司层面时使用。未选纯TOC或标题碎片，也未选与父节重复的子项。"
+          },
+          {
+            "section_id": "section-0084",
+            "section_path": [
+              "第四节 管理层讨论与分析",
+              "本期投入情况"
+            ],
+            "start_page": 22,
+            "end_page": 25,
+            "rationale": "选择逻辑：section-0027（业务概要，含盈利/采购/生产/销售/研发模式）完整说明公司做什么、产品用途与经营方式；section-0034（经营情况回顾）为管理层对经营计划、行业与财务的实质讨论，覆盖本期经营变化；section-0039（财务分析）含资产负债结构与营业情况分析，解释收入、成本、毛利率及利润变动；section-0084（本期投入情况）与主要控股参股公司分析补充投入与子公司经营；section-0853（合并营业收入/营业成本附注）提供收入成本分解信息，是货币化与业务结构的关键来源；section-0998（母公司营业收入/营业成本）补充母公司口径收入构成；section-0217（行业信息）作为行业背景与产品生产、原材料采购的补充，仅在解释公司层面时使用。未选纯TOC或标题碎片，也未选与父节重复的子项。"
+          },
+          {
+            "section_id": "section-0217",
+            "section_path": [
+              "第九节 行业信息"
+            ],
+            "start_page": 55,
+            "end_page": 67,
+            "rationale": "选择逻辑：section-0027（业务概要，含盈利/采购/生产/销售/研发模式）完整说明公司做什么、产品用途与经营方式；section-0034（经营情况回顾）为管理层对经营计划、行业与财务的实质讨论，覆盖本期经营变化；section-0039（财务分析）含资产负债结构与营业情况分析，解释收入、成本、毛利率及利润变动；section-0084（本期投入情况）与主要控股参股公司分析补充投入与子公司经营；section-0853（合并营业收入/营业成本附注）提供收入成本分解信息，是货币化与业务结构的关键来源；section-0998（母公司营业收入/营业成本）补充母公司口径收入构成；section-0217（行业信息）作为行业背景与产品生产、原材料采购的补充，仅在解释公司层面时使用。未选纯TOC或标题碎片，也未选与父节重复的子项。"
+          },
+          {
+            "section_id": "section-0853",
+            "section_path": [
+              "第十一节 财务会计报告",
+              "五、合并财务报表项目注释",
+              "(三十四) 营业收入/营业成本"
+            ],
+            "start_page": 158,
+            "end_page": 160,
+            "rationale": "选择逻辑：section-0027（业务概要，含盈利/采购/生产/销售/研发模式）完整说明公司做什么、产品用途与经营方式；section-0034（经营情况回顾）为管理层对经营计划、行业与财务的实质讨论，覆盖本期经营变化；section-0039（财务分析）含资产负债结构与营业情况分析，解释收入、成本、毛利率及利润变动；section-0084（本期投入情况）与主要控股参股公司分析补充投入与子公司经营；section-0853（合并营业收入/营业成本附注）提供收入成本分解信息，是货币化与业务结构的关键来源；section-0998（母公司营业收入/营业成本）补充母公司口径收入构成；section-0217（行业信息）作为行业背景与产品生产、原材料采购的补充，仅在解释公司层面时使用。未选纯TOC或标题碎片，也未选与父节重复的子项。"
+          },
+          {
+            "section_id": "section-0998",
+            "section_path": [
+              "第十一节 财务会计报告",
+              "十六、母公司财务报表重要项目注释",
+              "(四) 营业收入/营业成本"
+            ],
+            "start_page": 190,
+            "end_page": 192,
+            "rationale": "选择逻辑：section-0027（业务概要，含盈利/采购/生产/销售/研发模式）完整说明公司做什么、产品用途与经营方式；section-0034（经营情况回顾）为管理层对经营计划、行业与财务的实质讨论，覆盖本期经营变化；section-0039（财务分析）含资产负债结构与营业情况分析，解释收入、成本、毛利率及利润变动；section-0084（本期投入情况）与主要控股参股公司分析补充投入与子公司经营；section-0853（合并营业收入/营业成本附注）提供收入成本分解信息，是货币化与业务结构的关键来源；section-0998（母公司营业收入/营业成本）补充母公司口径收入构成；section-0217（行业信息）作为行业背景与产品生产、原材料采购的补充，仅在解释公司层面时使用。未选纯TOC或标题碎片，也未选与父节重复的子项。"
+          }
+        ],
+        "unread_or_deferred": [
+          "第十一节财务会计报告其余附注（会计政策、金融工具风险、关联担保等）与第十二节备查文件：与公司经营结构、产品与收入解释关联度低，且篇幅巨大，按需定向补充即可，不整体扩读。",
+          "第八节董事高管薪酬、第十节公司治理与投资者保护：属治理与人事细节，不改变业务与货币化解释，故不纳入。",
+          "第四节风险因素与未来展望：仅在需要解释本期重大变化时参考，本次已由经营回顾覆盖主要变化，暂不单独选取。",
+          "物理页14布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        ],
+        "selection_rationale": "选择逻辑：section-0027（业务概要，含盈利/采购/生产/销售/研发模式）完整说明公司做什么、产品用途与经营方式；section-0034（经营情况回顾）为管理层对经营计划、行业与财务的实质讨论，覆盖本期经营变化；section-0039（财务分析）含资产负债结构与营业情况分析，解释收入、成本、毛利率及利润变动；section-0084（本期投入情况）与主要控股参股公司分析补充投入与子公司经营；section-0853（合并营业收入/营业成本附注）提供收入成本分解信息，是货币化与业务结构的关键来源；section-0998（母公司营业收入/营业成本）补充母公司口径收入构成；section-0217（行业信息）作为行业背景与产品生产、原材料采购的补充，仅在解释公司层面时使用。未选纯TOC或标题碎片，也未选与父节重复的子项。",
+        "stop_reason": "已覆盖业务模式、经营回顾、财务与收入成本分解、投入与子公司、行业背景等核心经营信息，足以解释公司业务结构、产品用途、货币化与本期变化；剩余为治理、会计政策与附录细节，继续扩读边际价值低，故在此停止。",
+        "transcription_version": "shared-pdf-layout-with-native-fallback.v2"
+      },
+      "limitations": [
+        "物理页14布局未恢复，相关表格列关系未核定，未据此推断金额或表头对应。",
+        "未获取分产品毛利率、产能利用率及主要客户销售占比等补充数据。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-dc753c1772752e5550ded4cc:workpaper:sections",
+          "request_hash": "7f9916e69dcdead803190bb15f73e830984aaa6dab59344053ba2c4549b66252",
+          "response_hash": "0d1d2530432a073c9ecf7cc5495d27ab5d9e73a187c7d30fd8d6cef0ceda4ba2",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 21015,
+            "output_tokens": 434,
+            "total_tokens": 21449
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 796,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0069",
+            "section-0070",
+            "section-0072",
+            "section-0073",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0092",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0117",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0343",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0529",
+            "section-0530",
+            "section-0535",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0567",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0575",
+            "section-0578",
+            "section-0581",
+            "section-0582",
+            "section-0584",
+            "section-0585",
+            "section-0589",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0600",
+            "section-0601",
+            "section-0602",
+            "section-0603",
+            "section-0607",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0612",
+            "section-0617",
+            "section-0618",
+            "section-0619",
+            "section-0620",
+            "section-0621",
+            "section-0622",
+            "section-0623",
+            "section-0624",
+            "section-0625",
+            "section-0626",
+            "section-0627",
+            "section-0628",
+            "section-0629",
+            "section-0631",
+            "section-0632",
+            "section-0633",
+            "section-0634",
+            "section-0635",
+            "section-0636",
+            "section-0637",
+            "section-0639",
+            "section-0640",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0649",
+            "section-0650",
+            "section-0651",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0660",
+            "section-0665",
+            "section-0671",
+            "section-0672",
+            "section-0677",
+            "section-0678",
+            "section-0679",
+            "section-0684",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0690",
+            "section-0691",
+            "section-0692",
+            "section-0693",
+            "section-0694",
+            "section-0695",
+            "section-0696",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0700",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0704",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0708",
+            "section-0709",
+            "section-0710",
+            "section-0711",
+            "section-0712",
+            "section-0713",
+            "section-0716",
+            "section-0717",
+            "section-0718",
+            "section-0719",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0731",
+            "section-0734",
+            "section-0735",
+            "section-0736",
+            "section-0737",
+            "section-0738",
+            "section-0739",
+            "section-0740",
+            "section-0741",
+            "section-0742",
+            "section-0743",
+            "section-0744",
+            "section-0745",
+            "section-0752",
+            "section-0753",
+            "section-0754",
+            "section-0757",
+            "section-0758",
+            "section-0759",
+            "section-0760",
+            "section-0761",
+            "section-0762",
+            "section-0772",
+            "section-0773",
+            "section-0774",
+            "section-0779",
+            "section-0780",
+            "section-0785",
+            "section-0786",
+            "section-0787",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0795",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0816",
+            "section-0822",
+            "section-0825",
+            "section-0826",
+            "section-0827",
+            "section-0828",
+            "section-0829",
+            "section-0832",
+            "section-0833",
+            "section-0834",
+            "section-0835",
+            "section-0836",
+            "section-0837",
+            "section-0838",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0844",
+            "section-0845",
+            "section-0846",
+            "section-0847",
+            "section-0848",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0855",
+            "section-0856",
+            "section-0857",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0865",
+            "section-0866",
+            "section-0867",
+            "section-0868",
+            "section-0869",
+            "section-0870",
+            "section-0871",
+            "section-0872",
+            "section-0875",
+            "section-0880",
+            "section-0884",
+            "section-0885",
+            "section-0889",
+            "section-0893",
+            "section-0894",
+            "section-0895",
+            "section-0896",
+            "section-0897",
+            "section-0898",
+            "section-0899",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0908",
+            "section-0909",
+            "section-0910",
+            "section-0911",
+            "section-0912",
+            "section-0916",
+            "section-0917",
+            "section-0918",
+            "section-0919",
+            "section-0920",
+            "section-0921",
+            "section-0922",
+            "section-0923",
+            "section-0924",
+            "section-0928",
+            "section-0933",
+            "section-0934",
+            "section-0935",
+            "section-0936",
+            "section-0937",
+            "section-0940",
+            "section-0941",
+            "section-0942",
+            "section-0943",
+            "section-0944",
+            "section-0945",
+            "section-0946",
+            "section-0947",
+            "section-0948",
+            "section-0949",
+            "section-0950",
+            "section-0951",
+            "section-0954",
+            "section-0956",
+            "section-0959",
+            "section-0960",
+            "section-0961",
+            "section-0962",
+            "section-0966",
+            "section-0967",
+            "section-0968",
+            "section-0970",
+            "section-0971",
+            "section-0972",
+            "section-0973",
+            "section-0974",
+            "section-0975",
+            "section-0976",
+            "section-0977",
+            "section-0980",
+            "section-0981",
+            "section-0982",
+            "section-0983",
+            "section-0984",
+            "section-0985",
+            "section-0986",
+            "section-0994",
+            "section-0995",
+            "section-0996",
+            "section-0997",
+            "section-0998",
+            "section-0999",
+            "section-1000",
+            "section-1001",
+            "section-1002",
+            "section-1003",
+            "section-1004",
+            "section-1005",
+            "section-1006",
+            "section-1007",
+            "section-1008",
+            "section-1012",
+            "section-1013",
+            "section-1014",
+            "section-1015"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-dc753c1772752e5550ded4cc:workpaper:extract",
+          "request_hash": "83e17c8ea70dd0c2354025840aa4da5b6b243f3cdf45497d600fa37ffe27d77e",
+          "response_hash": "15112befc7ea0517300541211748ac9da2103c470410ab4f53576a19a84fad90",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 20212,
+            "output_tokens": 4601,
+            "total_tokens": 24813
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0027",
+            "section-0034",
+            "section-0084",
+            "section-0217",
+            "section-0853",
+            "section-0998"
+          ],
+          "physical_pages": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            22,
+            23,
+            24,
+            25,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            158,
+            159,
+            160,
+            190,
+            191
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "1b03cfe1842c543be194925baf463d90a1b353d7b51b9b70c14b26d077d2eb45",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "一、 业务概要"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 52,
+              "end": 923,
+              "quote": "一、      业务概要\n\n商业模式报告期内变化情况：\n     公司是一家专业研发、生产和销售香料香精的国家高新技术企业，拥有稳定的技术团队、较强的\n\n 技术研发能力、产品分析技术以及规模化生产优势，能为下游客户提供优质、健康、安全的香料香精\n\n 产品。公司系安徽省专精特新中小企业，拥有省认定企业技术中心、安徽省企业研发中心、博士后科\n\n 研工作站（博士后创新实践基地），曾荣获“安徽十佳优秀品牌企业”、安徽省专利优秀奖、“安徽\n\n 省工业精品”等荣誉称号。\n\n     公司已通过了          ISO9001:2015  质量管理体系认证、ISO14001:2015               环境管理体系认证、\n\n ISO22000:2018 认证、FSSC22000    认证等管理体系认证及食安安徽品牌认证，公司部分产品通过BPJPH-\n\n HALAL认证、欧盟       REACH注册、美国       FDA注册、KOSHER    认证等。依托在技术研发、制造工艺、质量管\n\n 理等方面的优势，公司与德之馨、奇华顿、口味王等众多国内外知名公司建立了稳定合作关系，同时，\n\n 公司坚持自主研发，严格控制产品质量，品牌形象进一步提升。\n\n     公司主要产品可分为天然香料、合成香料、凉味剂等，产品主要作为配制香精的原料或直接作为\n\n 添加剂使用，终端产品可以应用于食品、烟草、日化、医药、饲料、化妆品、纺织                                        等行业，具有广泛\n\n 的下游应用领域和发展空间。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n     公司的主营业务主要采用传统的产研销一体化的商业模式，行业上游主要为农产品粗加工和精细\n\n 化工原料生产企业。公司的商业模式主要包括了盈利模式、采购模式、生产模式、销售模式和研发模\n\n 式五个部分。\n\n     1.盈利模式\n\n\n                                              12\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "一、 业务概要"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1120,
+              "quote": "     公司主要通过专注于香料香精的研发、生产和销售实现盈利，主要产品包括凉味剂、合成香料和\n\n 天然香料，可应用于食品饮料、日化、烟草、医药等行业，具有广泛的下游应用领域和发展空间。\n\n     2.采购模式\n\n     公司的原材料主要包括来源于香料植物的天然原料和来源于基础化工产品的合成原料。公司设立\n\n 采购部对采购工作实行统一管理，采购部结合生产计划、库存情况和市场行情等情况制定采购计划，\n\n 对于生产需求量较大的原材料，公司根据市场情况进行适当备货。\n\n     公司制定了严格的采购制度，对供应商产品质量、供货能力、报价等因素综合评价，符合条件的\n\n 供应商纳入合格供应商名录，并根据年度供货情况进行动态管理。公司通过对供应商开发与遴选、采\n\n 购计划制定、采购实施与流程管理等进行明确安排，规范采购行为，保证产品品质和供应及时性，降\n\n 低采购成本和采购风险。\n\n     3.生产模式\n\n     公司主要依据年度销售计划和在手订单情况，结合产品库存情况及设备产能，由生产部门制定年\n\n 度生产计划，并根据市场需求变化及客户订单实际情况，及时调整生产计划。在生产过程中，质量管\n\n 理科室负责全流程质量管控，保证产品品质，研发部门负责生产工艺的优化、生产流程的规范与改进。\n\n     4.销售模式\n\n     公司销售模式为直接销售，即公司（或子公司）直接与客户建立业务关系，直接将货物销售给客\n\n 户并进行结算。公司通过参加行业展会、行业会议以及行业介绍等方式进行业务拓展，并在建立一定\n\n 联系后通过商业谈判获取订单；此外，公司紧紧围绕客户特定的产品使用环境和技术要求开展研发、\n\n 生产工作，能够更加准确地把握客户需求，促进双方建立长期稳定的合作关系。\n\n     5.研发模式\n\n     公司的研发主要为新产品工艺研发与工艺优化试验，涉及到香料、香精、植物提取、医药中间体、\n\n 食品配料、食品添加剂等多个领域。公司以市场需求为出发点，把握市场动态和行业发展方向，始终\n\n 坚持以技术引领生产、指导生产，不断改进生产工艺和丰富产品结构。公司设立研发部负责研发项目\n\n 的管理，项目小组负责具体项目的执行，研发过程中由各相关部门反馈实际应用效果，项目组针对反\n\n 馈意见加以改进修正，最终实现项目的顺利运行。同时公司积极整合外部研发资源，通过产学研合作\n\n 进行技术开发，加快技术研发速度，增强公司研发实力。\n\n     报告期内公司商业模式未发生重大变化。\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n\n                                            13\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 62,
+              "end": 1099,
+              "quote": "二、 经营情况回顾\r\n(一) 经营计划\r\n2025 年我国经济顶住多重压力保持稳中有进发展态势，但外部环境变化影响加深，国内供强需弱\r\n矛盾突出，经济发展中老问题、新挑战仍然不少。面对复杂多变的外部环境与日趋激烈的产业竞争格\r\n局，公司在深耕香料香精领域的同时进行跨界技术储备，持续加大研发投入，2025 年公司申请发明专\r\n利 1 项，授权发明专利 1 项，凉味剂 SC-1、SC-2、WS-14、碳微线圈（CMC）等产品取得小试成功，促\r\n进了公司关键技术的提升与跨界技术的储备。\r\n报告期内，凉味剂产品市场尤其是中小规模客户领域市场竞争激烈，需求端价格敏感度持续提升。\r\n公司秉持“客户为先”的经营理念，充分发挥研发技术人员、应用技术人员与销售人员的协同优势，\r\n深入挖掘客户需求，持续优化客户体验，依托产品质量、成本管控、部分原材料自供等核心竞争优势，\r\n积极调整市场营销策略，实现产销量双增、营业收入的稳健增长的较好成绩，但因市场竞争激烈，部\r\n分产品市场价格同比下降较多。\r\n报告期内，公司以零缺陷通过美国食品药品监督管理局（FDA）现场检查，标志着公司在食品安全\r\n与卫生、质量管理、生产环境设施等方面符合 FDA 标准，为公司继续拓展美国等海外市场提供了坚实\r\n的保障，有助于提升公司产品的国际认可度和市场竞争力，对公司海外业务及未来经营业绩具有积极\r\n的影响。\r\n截至报告期末，公司总资产 62,860.62 万元，较期初增加了 5,913.82 万元，变动比例为 10.38%，\r\n净资产为 38,294.76 万元，较期初增加了 1,606.67 万元，变动比例为 4.38%。\r\n报告期内，公司实现营业收入 23,959.02 万元，较上年同期增长 7.85%；净利润 1,914.56 万元，\r\n较上年同期下降 47.73%；扣非净利润 1,499.13 万元，较上年同期下降 35.90%。公司产品产销量虽保\r\n持增长带动收入增长，但受市场竞争影响，产品销售价格持续降低，叠加中草新材料项目的固定资产\r\n折旧费用增加等原因，导致本报告期毛利率同比下降，进而影响扣非后净利润。\r\n综上，报告期内，公司通过强化人才梯队建设，优化运营管理机制，打造具有核心竞争力的产品，\r\n积极开拓新兴市场。通过一系列战略部署，在技术突破、市场拓展、运营提效及品牌建设等方面均取\r\n得了积极成效，公司整体经营能力与综合竞争实力显著增强，为未来的持续发展奠定了坚实基础。"
+            }
+          ],
+          "table_context": "物理页14布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 0,
+              "end": 1537,
+              "quote": "     报告期内，公司主营业务未发生变化。\n\n\n(二)     行业情况\n\n\n     1、所属行业及确定依据\n\n     公司专注于香料香精的研发、生产和销售。根据国家统计局颁布的《国民经济行业分类与代码》\n\n （GB/T 4754—2017），公司所属行业为制造业项下的“日用化学产品制造（C268）-香料、香精制造\n\n （C2684）”；根据中国证监会发布的《上市公司行业统计分类与代码》（JR/T 0020—2024），公司\n\n 属制造业项下的“化学原料和化学制品制造业（CE26）”。\n\n     2、行业发展情况\n\n     香料是一种能被嗅感嗅出气味或味感尝出香味的物质,是配置香精的主要原料；香精则是由多种\n\n 香料、溶剂或载体及其辅料调配而成的芳香类混合物                         ，通常直接用于增加各类终端产品的香气和香味。\n\n 按照香料来源及制备工艺的不同，香料可分为天然香料、合成香料等。                                   天然香料包括天然植物性香料\n\n 和天然动物性香料。天然植物性香料是以致香植物为原料，提炼成的精油、浸膏等；天然动物性香料\n\n 是以动物的分泌物等为原料，通过科学手段提取或收集的致香物质。对于天然香料各国定义不尽相同，\n\n 美国法规要求天然香料的原料来自动植物，未对生产过程等规定，而欧盟和中国的法规既要求原料来\n\n 自动植物，也对从原料中获得香料的生产过程进行了要求（适当的物理方法、酶法或微生物法）。\n\n  国家/地区                       天然香料定义                                  法律法规依据\n\n     美国         精油、油树脂、提取物、蛋白水解物、蒸馏                          美国联邦法规（CFR）21Part101          食\n\n                生成物，或烘焙、加热及酶解产物，它们含                                       品标注\n\n                有的香料成分是来自香辛料、水果或果汁、\n\n                蔬菜或蔬菜汁、可食用酵母、香草、植物的\n\n                皮根茎叶花果及类似植物原料、肉、海鲜、\n\n                家禽、蛋、奶制品及其发酵产品，其在食品\n\n                  中的主要作用是增香而不是提供营养。\n\n     欧盟         天然食品香料的原料是动、植物，这些原料                         欧洲议会和欧盟理事会《关于食用\n\n                可处于未加工的原始状态，也可以已经历了                         香料香精和某些具有香味性质的食\n\n                适合人类消费的传统的加工过程。从这些原                         品配料在食品中和食品上的应用》\n\n                料中获得的香料的方法是适当的物理过程或                         Regulation（EC）\n\n                    是从酶法或微生物工艺（过程）。                         No.1334/2008Article3.2（c）\n\n                                               15\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 2422,
+              "quote": " 长期借款                 46,387,847.90          7.38%     48,775,606.90          8.57%                 -4.90%\n 租赁负债                      84,811.91         0.01%        251,173.99          0.04%                -66.23%\n 递延所得税负债                   43,055.05         0.01%         69,267.88          0.01%                -37.84%\n 股本                   76,981,929.00        12.25%      76,981,929.00         13.52%                       -\n 资本公积                171,394,312.59        27.27%    171,394,312.59          30.10%                       -\n 专项储备                  6,811,737.19          1.08%      4,501,842.87          0.79%                 51.31%\n 盈余公积                 19,343,897.22          3.08%     17,007,230.27          2.99%                 13.74%\n\n资产负债项目重大变动原因：\n 1、报告期末，公司交易性金融资产较上年期末增加                                2,100.00  万元，主要系报告期内公司购买的银行\n 结构性存款期末尚未到期所致。\n 2、报告期末，公司应收票据较上年期末下降                           100.00%，主要系上年期末的承兑汇票本期已到期托收所\n 致。\n 3、报告期末，公司应收款项融资较上年期末下降                               29.31%，主要系报告期内收取的低风险银行承兑汇\n 票减少所致。\n 4、报告期末，公司预付款项较上年期末下降                            48.52%，主要系报告期末预付供应商的材料采购款减少\n 所致。\n 5、报告期末，公司其他应收款较上年期末下降                              49.89%，主要系公司根据会计政策对期末其他应收账\n 计提坏账准备增加所致。\n 6、报告期末，公司存货较上年期末增长                         75.37%，主要原因系：(1)子公司中草新材料的原材料、半成\n 品、成品库存随试生产及产能爬坡相应增加；(2)报告期公司业务开展顺利，公司在原料价格较低时适\n 当增加物料储备。\n 7、报告期末，公司固定资产较上年期末增长                           25.57%，主要系报告期内中草新材料部分项目开始投产，\n 相应在建工程完工转入固定资产所致。\n 8、报告期末，公司在建工程较上年期末下降                           46.08%，主要系报告期内中草新材料部分项目开始投产，\n 在建工程转入固定资产所致。\n 9、报告期末，公司使用权资产较上年期末下降                              40.60%，主要系租赁资产在租赁期内按期计提折旧所\n 致。\n 10、报告期末，公司无形资产较上年期末增长                           34.00%，主要系报告期内子公司百荷花新增土地使用权\n 所致。\n 11、报告期末，公司其他非流动资产较上年期末下降                                96.03%，主要系期初预付长期资产购置款本期到\n 货所致。\n 12、报告期末，公司合同负债较上年期末增长                            225.00%，主要系公司根据销售合同预收客户的销售款\n 增加所致。\n 13、报告期末，公司应交税费较上年期末下降                            60.50%，主要系报告期公司利润总额有所下降，期末企\n 业所得税相应减少所致。\n 14、报告期末，公司一年内到期的非流动负债较上年期末增长                                      513.43%，主要系报告期公司长期借款\n 增加，一年内到期重分类所致。\n 15、报告期末，公司其他流动负债较上年期末增长                               261.00%，主要系报告期末公司预收客户的销售款\n 增加，相应的待转销项税额增加所致。\n 16、报告期末，公司租赁负债较上年期末下降                            66.23%，主要系报告期随着租赁期的推进，租赁负债期\n 限结构逐步缩短，确认的租赁负债随之减少所致。\n 17、报告期末，公司递延所得税负债较上年期末下降                                37.84%，主要系期末应纳税暂时性差异减少，确\n 认的递延所得税负债随之减少所致。\n                                                     18\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "本期投入情况"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "source_spans": [
+            {
+              "page": 22,
+              "start": 1545,
+              "end": 2787,
+              "quote": "本期投入情况              累计实际投入情               资金来          项目进度           预计        累计实          进度和\n     称                                   况                源                         收益        现的收          预计收\n                                                                                                 益         益的原\n                                                                                                             因\n                                                                   项目一期        均\n 年产                                                                已调试完成\n 2600吨                                                 募投资         转固，项目\n 凉味剂          15,187,997.62       311,340,925.41 金、自有二期于                    2025         -            -   -\n 及香原                                                   资金、银        年   9 月进入\n 料项目                                                   行贷款         试   生   产   阶\n                                                                   段；部分产\n                                                                   线已投产。\n   合计         15,187,997.62       311,340,925.41           -              -              -            -       -\n\n                                                         22\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0014",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第九节 行业信息"
+          ],
+          "physical_pages": [
+            55
+          ],
+          "source_spans": [
+            {
+              "page": 55,
+              "start": 38,
+              "end": 1880,
+              "quote": "第九节           行业信息\n\n□环境治理公司□医药制造公司  □软件和信息技术服务公司\n□计算机、通信和其他电子设备制造公司  □专业技术服务公司  □零售公司  √化工公司\n□锂电池公司  □建筑公司  □其他行业\n\n是否自愿披露\n√是□否\n     公司专注于香料香精的研发、生产和销售。根据国家统计局颁布的《国民经济行业分类与代码》\n\n （GB/T4754—2017），公司所属行业为制造业项下的“日用化学产品制造（C268）-香料、香精制造\n\n （C2684）”；根据中国证监会发布的《上市公司行业统计分类与代码》（JR/T 0020—2024），公司\n\n 属制造业项下的“化学原料和化学制品制造业（CE26）”。\n\n化工公司\n\n一、     行业概况\n\n(一)      行业法规政策\n\n\n     目前，公司所处行业涉及到的主要法律、法规及政策如下：\n\n     1、主要法律法规\n    序号                 颁布机构                      颁布时间                        法律法规\n      1      全国人民代表大会常务委员会                    2025 年  9 月      《中华人民共和国食品安全法》\n                                                               （2025  年修正）\n      2      全国人民代表大会常务委员会                    2021 年  6 月      《中华人民共和国安全生产法》\n                                                               （2021  年修正）\n      3      全国人民代表大会常务委员会                    2018 年  12 月     《中华人民共和国产品质量法》\n                                                               （2018  年修正）\n      4      全国人民代表大会常务委员会                    2018 年  12 月     《中华人民共和国环境影响评价法》\n                                                               （2018  修正）\n      5      全国人民代表大会常务委员会                    2014 年  4 月      《中华人民共和国环境保护法》\n                                                               （2014  年修订）\n      6      国家市场监督管理总局                       2020 年  1 月      《食品生产许可管理办法》\n\n      7      国家市场监督管理总局                       2022 年  10 月     《食品生产许可审查通则》\n                                                               （2022  年修订）\n      8      卫生健康委员会                          2024 年  2 月      《食品安全国家标准食品添加剂使用\n                                                               标准》（GB2760-2024）\n      9      国家市场监督管理总局                       2025.12          《食品添加剂生产许可审查细则》\n                                                               （2025版）\n\n                                                  55\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0018",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第九节 行业信息"
+          ],
+          "physical_pages": [
+            59
+          ],
+          "source_spans": [
+            {
+              "page": 59,
+              "start": 0,
+              "end": 1193,
+              "quote": " 加，消费者偏好的改变，上述地区仍具有较大的增长潜力。而以中东、非洲以及亚太地区为代表的发\n\n 展中国家，随着当地消费水平不断提高，居民对于食品以及日用品品质的要求愈来愈高，香料香精行\n\n 业作为配套产业将进一步得到发展。\n\n     行业转移趋势将进一步持续。一方面，国际香精香料公司逐步将产业链的重心转向终端香精的配\n\n 制和产品创新，对于上游香料的生产业务则逐步进行优化或产业转移。中国、印度、东南亚等新兴发\n\n 展国家，主要利用 其自身的产业资源优势，承接香料行业生产的产业转移。另一方面，国际香精香料\n\n 公司将部分产品产能（包括香精加工）建设到中国、印度、东南亚等新兴发展国家，利用新兴发展国\n\n 家的资源优势提升盈利水平。\n\n     行业仍将继续呈现由国际香精香料公司为主导，中国等后发企业不断追赶的局面。一方面国际香\n\n 精香料公司通过掌握主要终端的市场和品牌渠道资源，以及作为产业出口端的香精配制产业而将继续\n\n 在行业中占据主导地位。另一方面中国等后发企业通过承接国际香精香料公司的产业转移，而逐步在\n\n 特定优势品种开始占据有利优势地位，并通过持续进行研发和技术突破形成新的产品突破，提升产业\n\n 价值链地位。\n\n     在全球消费升级与技术创新双轮驱动下，香精香料行业正经历从传统添加剂向高附加值功能性原\n\n 料的战略转型。行业已从单一的功能性需求转向“功能+体验”的复合需求，消费者对“清洁标签”的\n\n 追求推动天然香精需求激增，而生物科技与数字技术的融合正重塑产业链价值分配逻辑。随着消费者\n\n 对个性化、差异化产品的追求，香精香料企业纷纷推出定制化产品与服务，涵盖独特风味的食品香精、\n\n 个性化香调的香水香精以及具有特殊功效的功能性香精等。同时各企业也积极开拓新的应用领域，如\n\n 医疗保健、宠物食品、情绪香氛、服饰等，进一步扩大了市场边界。\n\n\n(三)     公司行业地位分析\n\n\n     自设立以来，公司专注于香料香精的研发、生产和销售，经过十余年的技术创新和市场开拓，在\n\n 香料香精领域拥有深厚的技术积累与稳定的客户基础。公司系国家高新技术企业、安徽省专精特新中\n\n 小企业，被认定为省认定技术中心、省企业研发中心，并获得安徽省农业产业化龙头企业、安徽十佳\n\n 优秀品牌企业、安徽省专利优秀奖等荣誉称号。依托在技术研发、制造工艺、质量管理等方面的优势，\n\n 公司与德之馨、奇华顿等众多国内外知名公司建立了稳定的合作关系。\n\n     （1）客户优势\n\n     依托在技术研发、制造工艺、质量管理等方面的优势，公司与德之馨、奇华顿、口味王等高端客\n\n 户建立了稳定的合作关系。优质客户为公司在行业竞争中带来以下有利条件：①提高公司声誉，有助\n\n                                            59\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0019",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第九节 行业信息"
+          ],
+          "physical_pages": [
+            60
+          ],
+          "source_spans": [
+            {
+              "page": 60,
+              "start": 0,
+              "end": 1099,
+              "quote": " 于公司开拓新的市场和客户；②与国内外知名品牌客户持续合作，推动公司销售稳步增长；③有助于\n\n 公司了解行业前沿信息，保持管理、生产技术的领先水平；④把握市场最新动向，从而快速响应市场\n\n 新需求。\n\n     （2）技术优势\n\n     公司自设立以来，专注于香料香精的研发、生产和销售。公司系国家高新技术企业、安徽省专精\n\n 特新中小企业，拥有省认定企业技术中心、安徽省企业研发中心、博士后科研工作站（博士后创新实\n\n 践基地），曾荣获“安徽十佳优秀品牌企业”、安徽省专利优秀奖等荣誉称号。\n\n     公司始终坚持自主研发、技术创新的发展理念，围绕着提高生产效率、优化产品质量、丰富产品\n\n 结构、降低生产成本等方面，不断加大在香\n\n 精香料领域的研发投入。公司已形成以新型\n\n 凉味剂    WS-23等产品生产技术、WS          系列中间\n\n 体生产技术、副产物中低含量凉味剂提取技\n\n 术等为核心的工艺技术体系，其中公司                    WS-\n\n 23 产品获得安徽省经济和信息化厅授予的\n\n “安徽工业精品”称号，为公司新工艺、新\n\n 产品的开发提供坚实基础。\n\n     （3）质量优势\n\n     自设立以来，公司始终重视产品质量及品牌声誉，制定并实施了严格的产品质量和环境管理控制，\n\n 已建立从原材料采购、产品生产、检验与仓储、销售与售后服务全过程的质量管理体系。公司已通过\n\n 了  ISO9001:2015  质量管理体系认证、ISO14001:2015             环境管理体系认证、ISO22000:2018             认证、\n\n FSSC22000 认证等管理体系认证及食安安徽品牌认证，公司部分产品通过                                 BPJPH-HALAL 认证、欧盟\n\n REACH 注册、美国      FDA注册、KOSHER     认证等。\n\n     （4）管理优势\n\n     公司自设立以来专注于香料香精行业，管理团队和核心人员在香精香料产品研发、工艺改进、生\n\n 产管理、品质控制、市场开拓等方面具有深刻理解和丰富的行业经验。有利于公司把握市场动向和技\n\n 术前沿，并根据市场趋势、国家政策变动及客户的最新需求迅速响应，从而保证公司的稳步增长                                               。\n\n\n\n\n\n\n\n                                              60\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0020",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第九节 行业信息"
+          ],
+          "physical_pages": [
+            61
+          ],
+          "source_spans": [
+            {
+              "page": 61,
+              "start": 0,
+              "end": 1266,
+              "quote": "二、    产品与生产\n\n(一)    主要产品情况\n\n√适用 □不适用\n    产品       所属细分         用途      运输与存储       主要上游原       主要下游应      产品价格的\n               行业                    方式           料         用领域       影响因素\n            香料、香精      食品、日化      主要为公路农产品粗加食品饮料、日原材料价格\n凉味剂         制造         产品等添       运输，常温存工产品、精细化等行业                   波动、市场\n                       加剂         储           化工原料                   供求等因素\n                                                                     影响\n            香料、香精      食品、日化主要为公路农产品粗加食品饮料、日原材料价格\n天然香料        制造         产品等添       运输，常温存工产品、精细化等行业                   波动、市场\n                       加剂         储           化工原料                   供求等因素\n                                                                     影响\n            香料、香精      食品、日化主要为公路农产品粗加食品饮料、日原材料价格\n合成香料        制造         产品等添       运输，常温存工产品、精细化等行业                   波动、市场\n                       加剂         储           化工原料                   供求等因素\n                                                                     影响\n\n\n\n(二)    主要技术和工艺\n\n\n   公司主要产品按生产工艺划分主要分为植物精油、液体香料和粉末香料，具体生产工艺流程如下：\n\n   （1）植物精油的工艺流程图\n\n     外购粗油                  精馏                 均质\n\n\n\n        入库                 包装                 过滤\n\n   （2）液体香料的工艺流程图\n\n\n\n\n\n\n\n\n\n\n                                       61\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0021",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第九节 行业信息"
+          ],
+          "physical_pages": [
+            62
+          ],
+          "source_spans": [
+            {
+              "page": 62,
+              "start": 0,
+              "end": 738,
+              "quote": "         原料                    合成                 碱洗、水                     精馏\n                                                       洗\n\n\n\n         入库                    包装                    过滤                    均质\n\n\n    （3）粉末香料的工艺流程图\n\n\n         原料                    合成                 碱洗、水                   真空蒸馏\n                                                       洗\n\n\n\n\n         离心                    结晶                    过滤                     溶解\n\n\n\n         烘干                 筛分、均                     包装                     入库\n                                质\n\n\n\n1.  报告期内技术和工艺重大调整情况\n□适用 √不适用\n2.  与国外先进技术工艺比较分析\n□适用 √不适用\n\n(三)     产能情况\n\n1.  产能与开工情况\n□适用 √不适用\n2.  非正常停产情况\n□适用 √不适用\n\n\n\n                                            62\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0023",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第九节 行业信息"
+          ],
+          "physical_pages": [
+            64
+          ],
+          "source_spans": [
+            {
+              "page": 64,
+              "start": 0,
+              "end": 1525,
+              "quote": "                                     溴酸行业             酸生产企业\n\n\n\n三、    主要原材料及能源采购\n\n(一)    主要原材料及能源情况\n\n√适用 □不适用\n 原材料及       耗用情况            采购模式           供应稳定       价格走势及变        价格波动对营业成本\n 能源名称                                       性分析        动情况分析              的影响\n                       公司统筹供应商资            长期合       受国内外需求价格波动会直接影响\n 农产品粗      合理范围        源，优化供应渠道，           作，供应等综合因素影产品成本，公司不断加\n 加工产品                  对大宗原材料进行集           稳定        响，价格会进强行情预判，通过整体\n                       中采购                           行相应波动          运营，规避风险\n                       公司统筹供应商资            长期合       受国内外需求价格波动会直接影响\n 大宗化学      合理范围        源，优化供应渠道，           作，供应等综合因素影产品成本，公司不断加\n 原料                    对大宗原材料进行集           稳定        响，价格会进强行情预判，通过整体\n                       中采购                           行相应波动          运营，规避风险\n 电         合理范围        电力部门供应              供应稳定      价格基本稳定         由于价格基本稳定，对\n                                                                    营业成本影响不大\n 蒸汽        合理范围        外购                  供应稳定      价格基本稳定         由于价格基本稳定，对\n                                                                    营业成本影响不大\n\n\n(二)    原材料价格波动风险应对措施\n\n\n1. 持有衍生品等金融产品情况\n□适用 √不适用\n2. 采用阶段性储备等其他方式情况\n√适用 □不适用\n    公司根据资金状况、外部市场、在手订单、自身库存及生产运输周期等适量储备原材料。\n\n\n四、    安全生产与环保\n\n(一)    安全生产及消防基本情况\n\n    公司成立了安全生产管理委员会、安全环保部并制定年度安全量化目标、细化的方针、措施等，\n\n 为强化责任落实，相关人员签署安全目标责任书，让安全生产人人有责的目标得以体现，形成了安全\n\n 目标众人挑，人人肩上有指标，将安全生产人人有责的安全原则落到实处，真正实现全员管理。\n\n    公司按要求配置了安全消防设备设施，并专人负责定期保养和维护，确保设备设施正常运行。公\n                                          64\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0027",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第十一节 财务会计报告",
+            "五、合并财务报表项目注释",
+            "(三十四) 营业收入/营业成本"
+          ],
+          "physical_pages": [
+            159
+          ],
+          "source_spans": [
+            {
+              "page": 159,
+              "start": 0,
+              "end": 3488,
+              "quote": "                                                       本期数                                                              上年数\n  项  目\n                                               收  入                             成  本                             收  入                            成  本\n\n  主营业务                            235,647,959.61                   172,344,796.15                  217,018,657.08                   150,009,028.25\n\n  其他业务                               3,942,200.90                     3,424,447.37                     5,133,953.96                    4,380,290.76\n\n  合  计                            239,590,160.51                   175,769,243.52                  222,152,611.04                   154,389,319.01\n\n       本期计入营业成本的政府补助情况详见本附注“政府补助”之说明。\n\n       2．营业收入、营业成本的分解信息\n\n                                                   香精香料分部                                                               合  计\n  合同分类\n                                            营业收入                           营业成本                              营业收入                               营业成本\n\n  业务类型\n\n     凉味剂                          161,164,973.90                 119,067,892.53                    161,164,973.90                     119,067,892.53\n\n     合成香料                           45,670,367.73                  26,787,868.64                     45,670,367.73                     26,787,868.64\n\n     天然香料                            9,509,004.39                    7,505,519.08                      9,509,004.39                      7,505,519.08\n\n     代加工                             1,696,907.11                    1,448,004.47                      1,696,907.11                      1,448,004.47\n\n     其他                             21,548,907.38                  20,959,958.80                     21,548,907.38                     20,959,958.80\n\n  合  计                            239,590,160.51                 175,769,243.52                    239,590,160.51                     175,769,243.52\n\n  按经营地区分类\n\n     境内地区                         194,932,102.54                 143,428,195.71                    194,932,102.54                     143,428,195.71\n\n     境外地区                           44,658,057.97                  32,341,047.81                     44,658,057.97                     32,341,047.81\n\n     合  计                         239,590,160.51                 175,769,243.52                    239,590,160.51                     175,769,243.52\n  按商品转让的时间\n  分类\n\n     在某一时点转让                      239,590,160.51                 175,769,243.52                    239,590,160.51                     175,769,243.52\n\n  按销售渠道分类\n\n     直接销售                         239,590,160.51                 175,769,243.52                    239,590,160.51                     175,769,243.52\n\n       3．试运行销售的相关收入和成本情况\n\n  产品名称                                                                                          收入                                                   成本\n\n  其他                                                                               2,212,765.59                                        2,200,294.16\n\n  凉味剂                                                                              1,231,764.77                                            750,534.47\n\n  合  计                                                                             3,444,530.36                                        2,950,828.62\n\n\n                                                                                    159\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0030",
+          "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+          "section_path": [
+            "第十一节 财务会计报告",
+            "十六、母公司财务报表重要项目注释",
+            "(四) 营业收入/营业成本"
+          ],
+          "physical_pages": [
+            191
+          ],
+          "source_spans": [
+            {
+              "page": 191,
+              "start": 0,
+              "end": 3381,
+              "quote": "                                                        本期数                                                             上年数\n  项  目\n                                               收  入                             成  本                             收  入                            成  本\n\n  主营业务                            203,187,146.94                   156,559,796.64                  216,685,866.12                   151,880,521.13\n\n  其他业务                               4,704,329.24                     4,226,414.62                     6,169,810.52                    5,439,630.14\n\n  合  计                            207,891,476.18                   160,786,211.26                  222,855,676.64                   157,320,151.27\n\n       2．营业收入、营业成本的分解信息\n\n                                                          香精香料分部                                                                      合  计\n  合同分类\n                                                     营业收入                               营业成本                               营业收入                                营业成本\n\n  商品类型\n\n   凉味剂                                     155,757,894.24                     120,598,090.58                     155,757,894.24                      120,598,090.58\n\n   合成香料                                      36,223,341.20                      27,018,340.13                      36,223,341.20                      27,018,340.13\n\n   天然香料                                       9,509,004.39                        7,515,195.63                       9,509,004.39                       7,515,195.63\n\n   代加工                                        1,696,907.11                        1,428,170.30                       1,696,907.11                       1,428,170.30\n\n   其他                                         4,704,329.24                        4,226,414.62                       4,704,329.24                       4,226,414.62\n\n  合  计                                     207,891,476.18                     160,786,211.26                     207,891,476.18                      160,786,211.26\n\n  按经营地区分类\n\n   境内地区                                    163,233,418.21                     126,491,819.29                     163,233,418.21                      126,491,819.29\n\n   境外地区                                      44,658,057.97                      34,294,391.97                      44,658,057.97                      34,294,391.97\n\n  合  计                                     207,891,476.18                     160,786,211.26                     207,891,476.18                      160,786,211.26\n  按商品转让的时间\n  分类\n\n   在某一时点转让                                 207,891,476.18                     160,786,211.26                     207,891,476.18                      160,786,211.26\n\n  按销售渠道分类\n\n   直接销售                                    207,891,476.18                     160,786,211.26                     207,891,476.18                      160,786,211.26\n\n       3．试运行销售的相关收入和成本情况\n\n  产品名称                                                                                          收入                                                  成本\n\n  凉味剂                                                                              1,231,764.77                                           815,054.91\n\n       [注]本期试运行销售系研发过程中产出的产品对外销售。\n\n\n\n\n\n                                                                                   191\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-BS-01",
+        "text": "公司为香料香精研发、生产和销售一体的国家高新技术企业，主营采用产研销一体化商业模式，由盈利、采购、生产、销售、研发五部分构成；报告期内商业模式未发生重大变化。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005",
+        "source-0014"
+      ],
+      "fact": {
+        "fact_id": "F-BS-02",
+        "text": "公司所属行业为制造业下日用化学产品制造（C268）—香料、香精制造（C2684），证监会行业分类为化学原料和化学制品制造业（CE26）。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005",
+          "source-0014"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-PS-01",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-PS-01",
+        "text": "公司主要产品分为天然香料、合成香料、凉味剂等，主要作为配制香精的原料或直接作为添加剂使用，终端可应用于食品、烟草、日化、医药、饲料、化妆品、纺织等行业。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-PS-02",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0020"
+      ],
+      "fact": {
+        "fact_id": "F-PS-02",
+        "text": "按产品与生产口径，凉味剂、天然香料、合成香料用途均为食品、日化产品等添加剂，主要上游原料为农产品粗加工产品、精细化工原料，主要下游应用领域为食品饮料、日化等行业。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0020"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-PS-03",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0020",
+        "source-0021"
+      ],
+      "fact": {
+        "fact_id": "F-PS-03",
+        "text": "公司主要产品按生产工艺划分为植物精油、液体香料和粉末香料，分别经精馏均质、合成碱洗水洗精馏、合成真空蒸馏结晶等流程生产。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0020",
+          "source-0021"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-RM-01",
+        "text": "公司主要通过专注于香料香精的研发、生产和销售实现盈利，主要产品包括凉味剂、合成香料和天然香料。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-RM-02",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-RM-02",
+        "text": "公司销售模式为直接销售，由公司或子公司直接与客户建立业务关系、销售货物并结算，通过参加行业展会、行业会议及行业介绍等方式拓展业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0027"
+      ],
+      "fact": {
+        "fact_id": "F-RM-03",
+        "text": "合并口径营业收入按业务类型分为凉味剂、合成香料、天然香料、代加工、其他五类，合计与营业收入总额一致。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0027"
+        ],
+        "metrics": [
+          {
+            "name": "凉味剂营业收入",
+            "raw_value": "161,164,973.90",
+            "value": "161164973.90",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "合成香料营业收入",
+            "raw_value": "45,670,367.73",
+            "value": "45670367.73",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "天然香料营业收入",
+            "raw_value": "9,509,004.39",
+            "value": "9509004.39",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "代加工营业收入",
+            "raw_value": "1,696,907.11",
+            "value": "1696907.11",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他营业收入",
+            "raw_value": "21,548,907.38",
+            "value": "21548907.38",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0027"
+      ],
+      "fact": {
+        "fact_id": "F-RM-04",
+        "text": "合并利润表口径营业收入合计239,590,160.51元，其中主营业务收入235,647,959.61元、其他业务收入3,942,200.90元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0027"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入合计",
+            "raw_value": "239,590,160.51",
+            "value": "239590160.51",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "主营业务收入",
+            "raw_value": "235,647,959.61",
+            "value": "235647959.61",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他业务收入",
+            "raw_value": "3,942,200.90",
+            "value": "3942200.90",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-RM-05",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0030"
+      ],
+      "fact": {
+        "fact_id": "F-RM-05",
+        "text": "母公司口径营业收入合计207,891,476.18元，其中主营业务收入203,187,146.94元、其他业务收入4,704,329.24元。",
+        "subject_scope": "issuer",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0030"
+        ],
+        "metrics": [
+          {
+            "name": "母公司营业收入合计",
+            "raw_value": "207,891,476.18",
+            "value": "207891476.18",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "issuer",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "母公司主营业务收入",
+            "raw_value": "203,187,146.94",
+            "value": "203187146.94",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "issuer",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "母公司其他业务收入",
+            "raw_value": "4,704,329.24",
+            "value": "4704329.24",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "issuer",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-SM-02",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-SM-02",
+        "text": "截至报告期末，公司总资产62,860.62万元，较期初增加5,913.82万元，变动比例10.38%；净资产38,294.76万元，较期初增加1,606.67万元，变动比例4.38%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "总资产",
+            "raw_value": "62,860.62",
+            "value": "62860.62",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "净资产",
+            "raw_value": "38,294.76",
+            "value": "38294.76",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-SM-03",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0027"
+      ],
+      "fact": {
+        "fact_id": "F-SM-03",
+        "text": "合并口径按经营地区分类，境内地区营业收入194,932,102.54元、境外地区营业收入44,658,057.97元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0027"
+        ],
+        "metrics": [
+          {
+            "name": "境内地区营业收入",
+            "raw_value": "194,932,102.54",
+            "value": "194932102.54",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "境外地区营业收入",
+            "raw_value": "44,658,057.97",
+            "value": "44658057.97",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-OI-01",
+        "text": "公司原材料主要包括来源于香料植物的天然原料和来源于基础化工产品的合成原料；采购部统一管理采购，结合生产计划、库存情况和市场行情制定采购计划，对需求量较大的原材料适当备货。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-OI-02",
+        "text": "公司主要依据年度销售计划和在手订单，结合库存及设备产能制定年度生产计划，并根据市场需求和订单情况及时调整；质量管理科室负责全流程质量管控。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0023"
+      ],
+      "fact": {
+        "fact_id": "F-OI-03",
+        "text": "主要原材料及能源包括农产品粗加工产品、大宗化学原料、电和蒸汽；农产品粗加工产品与大宗化学原料由公司统筹供应商资源集中采购，电由电力部门供应，蒸汽外购。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0023"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OI-04",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-OI-04",
+        "text": "公司研发主要为新产品工艺研发与工艺优化试验，涉及香料、香精、植物提取、医药中间体、食品配料、食品添加剂等领域，并整合外部研发资源开展产学研合作。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OI-05",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-OI-05",
+        "text": "年产2600吨凉味剂及香原料项目累计实际投入311,340,925.41元，本期投入15,187,997.62元，资金来源为募投资金、自有资金、银行贷款；项目一期已调试完成转固，二期于2025年9月进入试生产阶段，部分产线已投产。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "年产2600吨凉味剂及香原料项目本期投入",
+            "raw_value": "15,187,997.62",
+            "value": "15187997.62",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "年产2600吨凉味剂及香原料项目累计实际投入",
+            "raw_value": "311,340,925.41",
+            "value": "311340925.41",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-CC-01",
+        "text": "公司销售模式为直接销售，通过参加行业展会、行业会议及行业介绍等方式拓展业务，并在建立联系后通过商业谈判获取订单。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0018"
+      ],
+      "fact": {
+        "fact_id": "F-CC-02",
+        "text": "公司与德之馨、奇华顿、口味王等众多国内外知名公司建立了稳定合作关系。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0018"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-CC-03",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-CC-03",
+        "text": "公司产品终端可应用于食品、烟草、日化、医药、饲料、化妆品、纺织等行业，下游应用领域广泛。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-CC-04",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0027"
+      ],
+      "fact": {
+        "fact_id": "F-CC-04",
+        "text": "合并口径按销售渠道分类全部为直接销售，营业收入239,590,160.51元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0027"
+        ],
+        "metrics": [
+          {
+            "name": "直接销售营业收入",
+            "raw_value": "239,590,160.51",
+            "value": "239590160.51",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-OD-01",
+        "text": "报告期内凉味剂产品市场尤其是中小规模客户领域竞争激烈，需求端价格敏感度持续提升；公司通过调整市场营销策略实现产销量双增、营业收入稳健增长，但因市场竞争激烈部分产品市场价格同比下降较多。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OD-02",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-OD-02",
+        "text": "公司产品产销量虽保持增长带动收入增长，但受市场竞争影响产品销售价格持续降低，叠加中草新材料项目的固定资产折旧费用增加等原因，导致本报告期毛利率同比下降，进而影响扣非后净利润。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-OD-03",
+        "text": "2025年公司申请发明专利1项、授权发明专利1项，凉味剂SC-1、SC-2、WS-14、碳微线圈（CMC）等产品取得小试成功。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-OD-04",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-OD-04",
+        "text": "报告期内公司以零缺陷通过美国食品药品监督管理局（FDA）现场检查，为公司继续拓展美国等海外市场提供保障。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-MC-01",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-MC-01",
+        "text": "报告期内公司商业模式未发生重大变化，主营业务未发生变化。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-MC-02",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F-MC-02",
+        "text": "报告期末存货较上年期末增长75.37%，主要系子公司中草新材料原材料、半成品、成品库存随试生产及产能爬坡增加，以及公司在原料价格较低时适当增加物料储备。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "存货较上年期末变动比例",
+            "raw_value": "75.37",
+            "value": "75.37",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": "较上年期末",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-SC-P1",
+      "element": "position",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-SC-P1",
+        "text": "公司处于香料香精产业链的生产制造环节，主营香料香精的研发、生产和销售，上游为农产品粗加工和精细化工原料生产企业。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-SC-U1",
+      "element": "upstream_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0023"
+      ],
+      "fact": {
+        "fact_id": "F-SC-U1",
+        "text": "公司原材料主要包括来源于香料植物的天然原料和来源于基础化工产品的合成原料；主要能源为电和蒸汽。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0023"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-SC-D1",
+      "element": "downstream_customers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-SC-D1",
+        "text": "公司产品主要作为配制香精的原料或直接作为添加剂使用，终端应用于食品、烟草、日化、医药、饲料、化妆品、纺织等行业。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-CF-01",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0019"
+      ],
+      "fact": {
+        "fact_id": "F-CF-01",
+        "text": "公司系安徽省专精特新中小企业，拥有省认定企业技术中心、安徽省企业研发中心、博士后科研工作站，已形成以新型凉味剂WS-23等产品生产技术、WS系列中间体生产技术、副产物中低含量凉味剂提取技术等为核心的工艺技术体系，WS-23产品获“安徽工业精品”称号。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0019"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "fact_id": "F-CF-02",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0019"
+      ],
+      "fact": {
+        "fact_id": "F-CF-02",
+        "text": "公司已通过ISO9001、ISO14001、ISO22000、FSSC22000等管理体系认证及食安安徽品牌认证，部分产品通过BPJPH-HALAL认证、欧盟REACH注册、美国FDA注册、KOSHER认证。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0019"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未获取各产品具体型号、规格及细分用途的完整清单。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取各业务类型对应的毛利率明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "未获取各业务类型收入占比的明确披露，未自行计算。",
+        "事实F-SM-01已隔离，未作为结论采用：metric number is absent from cited source: 净利润同比变动率"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取产能、产量、库存量等具体数量数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取各客户具体销售金额及占比。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未获取毛利率的具体数值及分产品毛利率变动明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取其他资产负债项目变动的完整原因说明。",
+        "事实F-MC-03已隔离，未作为结论采用：metric number is absent from cited source: 在建工程较上年期末变动比例"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取具体供应商名称及采购金额。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-dc753c1772752e5550ded4cc",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取各下游行业的具体销售占比。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

@@ -56,6 +56,13 @@ New batch acceptance contracts MUST separate substantive principal-business, mai
 - **AND** necessary in-scope fixes and direct verification MUST continue within that work package without per-field or per-phase approval pauses; successful work MUST NOT be resent or cumulative budgets duplicated across first_read, review_batch and enrich files
 - **AND** technical delivery, substantive basic answers, review execution, independently audited content, missing information and resources MUST be reported separately; a useful graded research release MUST NOT be relabeled as a passed historical S2 or unauthorized unseen/production expansion
 
+#### Scenario: An explicitly authorized prospective batch follows a closed historical scheme
+- **WHEN** the user explicitly authorizes a new bounded twenty-company evaluation of the delivered two-phase workflow after the historical scheme has ended
+- **THEN** the new batch MUST have its own fixed unseen eligibility, source-first independent references, code/model/source identity, cumulative resources and stop conditions, without rewriting or pooling historical failures
+- **AND** source references MUST be frozen before that company's first semantic call and MUST NOT be model input; first_read, source-review completion, actual audited accuracy, remaining gaps and resources MUST be reported separately while failures stay in the fixed company denominator
+- **AND** the applicable eighteen-of-twenty initial, nineteen-of-twenty remedied, ninety-five-percent core macro recall, ninety-nine-percent audited unique-object accuracy and known-error isolation requirements MUST remain explicit; missing optional supply-chain or detailed fields MUST NOT introduce new company rejection gates
+- **AND** one bounded package MUST include implementation of real blockers, direct checks, any authorized in-budget continuation, persisted API/readable delivery, independent assessment, cleanup and a terminal expansion decision; it MUST NOT implicitly authorize a twenty-first company, another confirmation group, one hundred companies or production
+
 #### Scenario: Existing profiles contain useful basic answers and optional omissions
 - **WHEN** existing real profiles have source-linked substantive business answers but retain optional acquisition gaps
 - **THEN** the current research data remains readable with those gaps and limitations

@@ -1,0 +1,42 @@
+{
+  "attempts": [
+    {
+      "receipt": "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/002.json",
+      "receipt_sha256": "16932ccffeae57cc8563fcc6575d8098fd8a68afb3c78acd2f966886be826689",
+      "request_payload_sha256": "090ec65afc297cce55dd5a69b18b6f045d9806391e177b76946471db2c41eba2",
+      "response_id": "8077efac-55df-4588-82c4-575a623f6005",
+      "response_created": null,
+      "response_model": "deepseek-flash",
+      "response_text_sha256": "29fad702d944d8efde07c4e3233756fff27c73e0595f778714680fa824ce58f7",
+      "response_text_characters": 18025,
+      "finish_reason": "stop",
+      "message_count": 3,
+      "last_message_kind": null,
+      "json_error": null,
+      "parse_error": "Expecting ',' delimiter: line 1 column 18026 (char 18025)"
+    },
+    {
+      "receipt": "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/003.json",
+      "receipt_sha256": "24a1467b127884723cf7053a0ebbcac1905d845522bb9e6d4043a7ee82991a01",
+      "request_payload_sha256": "4780621c42c64b9beb08bcacfc61ecdecc1108c9ff9150125609b85ee8ec6e45",
+      "response_id": "b78bc8db-552b-43fd-aace-13bd20269ac1",
+      "response_created": null,
+      "response_model": "deepseek-flash",
+      "response_text_sha256": "29fad702d944d8efde07c4e3233756fff27c73e0595f778714680fa824ce58f7",
+      "response_text_characters": 18025,
+      "finish_reason": "stop",
+      "message_count": 4,
+      "last_message_kind": "schema_repair",
+      "json_error": {
+        "at_end_of_response": true,
+        "column": 18026,
+        "line": 1,
+        "message": "Expecting ',' delimiter",
+        "offset": 18025
+      },
+      "parse_error": "Expecting ',' delimiter: line 1 column 18026 (char 18025)"
+    }
+  ],
+  "conclusion": "Two actual provider sends: request payloads and provider response IDs differ; response content identical and invalid both times. Gateway model cache bypassed by current real execution. This proves failed provider format correction, not network loss or a repaired draft.",
+  "new_model_calls": 0
+}

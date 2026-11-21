@@ -1,0 +1,116 @@
+{
+  "plans": [
+    {
+      "instrument_id": "000037.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "000070.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "000089.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "000402.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "000524.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "000563.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "000568.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "002500.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "002558.SZ",
+      "valid": true
+    },
+    {
+      "instrument_id": "600115.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "600163.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "600170.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "600176.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "600183.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "600233.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "600258.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "601288.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "601319.SH",
+      "valid": true
+    },
+    {
+      "instrument_id": "920008.BJ",
+      "valid": true
+    },
+    {
+      "instrument_id": "920016.BJ",
+      "valid": true
+    }
+  ],
+  "profiles": [
+    {
+      "profile": "semantic_extraction__deepseek",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "physical_seconds": 600.0,
+      "logical_seconds": 2450,
+      "credentials_present": true
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "physical_seconds": 1200.0,
+      "logical_seconds": 2450,
+      "credentials_present": true
+    }
+  ],
+  "shared_config_changed": false,
+  "model_calls": 0,
+  "network_check": {
+    "environment": "require_escalated approved network",
+    "hosts": [
+      "api.deepseek.com",
+      "scorpio.reepool.com"
+    ],
+    "dns": true,
+    "tls": "TLSv1.3",
+    "certificate_validated": true
+  },
+  "source_verification_reused": "6.ET same unchanged CLI and owner:36 passed",
+  "notifications": "explicit configured manual job has no notification config"
+}

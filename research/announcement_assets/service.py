@@ -1233,6 +1233,7 @@ class AnnouncementAssetService:
             instrument_id=instrument_id,
             fiscal_year=fiscal_year,
             observation_cutoff=cutoff,
+            prefer_content_observation=True,
         )
         visible_rows = [
             row

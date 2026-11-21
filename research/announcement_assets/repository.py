@@ -1071,12 +1071,18 @@ class AnnouncementAssetRepository:
         attachment_ids: Iterable[str] | None = None,
         observation_cutoff: str | None = None,
         include_shadow: bool = False,
+        prefer_content_observation: bool = False,
     ) -> list[dict[str, Any]]:
         """Return attachment observations plus newest evidence visible at cutoff.
 
         A bootstrap must not let a later observation hide the last evidence
         visible at its fixed cutoff.  Without a cutoff this retains the legacy
         newest-observation behavior used by daily consumers.
+
+        Read-only report reconstruction may prefer the latest actual body:
+        a later empty failed download is not replacement content. A newer
+        observation with known bytes, even invalid, still takes precedence.
+        Acquisition diagnostics retain the newest attempt by default.
         """
         clauses: list[str] = []
         params: list[Any] = []
@@ -1115,6 +1121,10 @@ class AnnouncementAssetRepository:
                 "" if include_shadow else " AND v2.visibility_state='production'"
             )
             version_params: list[Any] = []
+            content_order = (
+                "CASE WHEN v2.content_hash IS NULL THEN 1 ELSE 0 END, "
+                if prefer_content_observation else ""
+            )
             if observation_cutoff is not None:
                 version_cutoff_clause += (
                     " AND julianday(v2.version_available_at)<=julianday(?)"
@@ -1152,7 +1162,7 @@ class AnnouncementAssetRepository:
                     SELECT v2.version_id FROM official_attachment_versions v2
                     WHERE v2.attachment_id=aa.attachment_id
                       {version_cutoff_clause}
-                    ORDER BY v2.version_available_at DESC, v2.observed_at DESC,
+                    ORDER BY {content_order}v2.version_available_at DESC, v2.observed_at DESC,
                              v2.version_id DESC LIMIT 1
                   )
                 LEFT JOIN official_document_blobs b ON b.content_hash=v.content_hash

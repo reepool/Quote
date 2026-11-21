@@ -1,0 +1,280 @@
+{
+  "release_root": "/home/python/Quote/data/research/company_profile_prospective20_release_20261122",
+  "current_companies": 19,
+  "first_observation_readable": 17,
+  "necessary_successor_readable": 2,
+  "missing_companies": [
+    "600233.SH"
+  ],
+  "http_boundary": "Existing FastAPI routes with explicit existing reader dependency; in-process ASGI, not a newly deployed server",
+  "batch_http_200_and_exact_reader_projection": true,
+  "single_stock_statuses": [
+    {
+      "instrument_id": "600176.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "600115.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "601288.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "600163.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "600183.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "600233.SH",
+      "status_code": 404
+    },
+    {
+      "instrument_id": "601319.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "600170.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "000070.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "600258.SH",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "002500.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "000037.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "000568.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "000089.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "000563.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "000402.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "920008.BJ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "000524.SZ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "920016.BJ",
+      "status_code": 200
+    },
+    {
+      "instrument_id": "002558.SZ",
+      "status_code": 200
+    }
+  ],
+  "query_export_fresh_equal": true,
+  "annual_json_exact_batch_projection": true,
+  "current_objects": 592,
+  "current_metrics": 775,
+  "companies": [
+    {
+      "instrument_id": "600176.SH",
+      "current_objects": 27,
+      "current_metrics": 37,
+      "latest_reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 6,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "600115.SH",
+      "current_objects": 30,
+      "current_metrics": 53,
+      "latest_reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "model_review_status": "completed",
+      "open_gap_count": 3,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "601288.SH",
+      "current_objects": 34,
+      "current_metrics": 6,
+      "latest_reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 11,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "600163.SH",
+      "current_objects": 22,
+      "current_metrics": 53,
+      "latest_reading_work_id": "bp-work-03c36e63638d56f9ee957f2c",
+      "model_review_status": "completed",
+      "open_gap_count": 7,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "600183.SH",
+      "current_objects": 27,
+      "current_metrics": 37,
+      "latest_reading_work_id": "bp-work-5599fbe1eacfc11859984fa3",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 5,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "601319.SH",
+      "current_objects": 24,
+      "current_metrics": 0,
+      "latest_reading_work_id": "bp-work-46742d3f87bc29c8d3afc798",
+      "model_review_status": "completed",
+      "open_gap_count": 11,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "600170.SH",
+      "current_objects": 38,
+      "current_metrics": 67,
+      "latest_reading_work_id": "bp-work-427690950486e5183624654c",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 2,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "000070.SZ",
+      "current_objects": 37,
+      "current_metrics": 38,
+      "latest_reading_work_id": "bp-work-3d087054cec493dd36f2b31e",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 3,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "600258.SH",
+      "current_objects": 28,
+      "current_metrics": 86,
+      "latest_reading_work_id": "bp-work-a56c6613d10f4e7c2d80a5cf",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 6,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "002500.SZ",
+      "current_objects": 34,
+      "current_metrics": 51,
+      "latest_reading_work_id": "bp-work-e8fe5fe01fbeee505ae293b4",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 7,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "000037.SZ",
+      "current_objects": 31,
+      "current_metrics": 74,
+      "latest_reading_work_id": "bp-work-c53bd58fc39eed1151cab68c",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 5,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "000568.SZ",
+      "current_objects": 28,
+      "current_metrics": 37,
+      "latest_reading_work_id": "bp-work-5e201fa1d22bbcbc089a03d2",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 7,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "000089.SZ",
+      "current_objects": 39,
+      "current_metrics": 63,
+      "latest_reading_work_id": "bp-work-37f47d2fe3307cc1723a78c5",
+      "model_review_status": "completed",
+      "open_gap_count": 0,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "000563.SZ",
+      "current_objects": 41,
+      "current_metrics": 18,
+      "latest_reading_work_id": "bp-work-65749055bbf3b93ecbe32a09",
+      "model_review_status": "completed",
+      "open_gap_count": 7,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "000402.SZ",
+      "current_objects": 24,
+      "current_metrics": 30,
+      "latest_reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 1,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "920008.BJ",
+      "current_objects": 33,
+      "current_metrics": 35,
+      "latest_reading_work_id": "bp-work-e540ffe0c012ff23127fedcc",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 9,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "000524.SZ",
+      "current_objects": 35,
+      "current_metrics": 47,
+      "latest_reading_work_id": "bp-work-5edbafc1a86ca9a739785fd7",
+      "model_review_status": "completed",
+      "open_gap_count": 9,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "920016.BJ",
+      "current_objects": 32,
+      "current_metrics": 19,
+      "latest_reading_work_id": "bp-work-3c987c279ee361063fde4f8e",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 9,
+      "source_model_unreviewed_scope": "not_assessed"
+    },
+    {
+      "instrument_id": "002558.SZ",
+      "current_objects": 28,
+      "current_metrics": 24,
+      "latest_reading_work_id": "bp-work-161a4440d588f350a479f66f",
+      "model_review_status": "completed_with_open_findings",
+      "open_gap_count": 7,
+      "source_model_unreviewed_scope": "not_assessed"
+    }
+  ],
+  "limited_F14_only_in_delivery_copy": true,
+  "original_281_files_unchanged": true,
+  "old_29_writers_and_release_23_unchanged": true,
+  "actual_api_root_not_changed": true,
+  "production_authorization": "not_authorized",
+  "paths": {
+    "json": "/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.json",
+    "markdown": "/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.md"
+  },
+  "interpretation": "Readable object/metric counts are not unique economic facts, formal usability, all-report accuracy or passed acceptance; A adjudicates independent semantics."
+}

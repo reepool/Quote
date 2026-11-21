@@ -1,0 +1,29 @@
+[
+  {
+    "instrument_id": "600233.SH",
+    "first_state": "no_readable_profile",
+    "first_physical_requests": 3,
+    "first_ledger": 75782,
+    "successor_state": "not_run_by_card",
+    "successor_api": null,
+    "reason": "real model format recovery returned same unclosed JSON; preserved, no paid rerun"
+  },
+  {
+    "instrument_id": "000070.SZ",
+    "first_state": "no_readable_profile",
+    "first_physical_requests": 0,
+    "first_ledger": 0,
+    "successor_state": "readable",
+    "successor_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/b-execution/api/000070-followup-final.json",
+    "reason": "research initialization duplicate row_version; zero-model engineering failure"
+  },
+  {
+    "instrument_id": "002500.SZ",
+    "first_state": "no_readable_profile",
+    "first_physical_requests": 0,
+    "first_ledger": 0,
+    "successor_state": "readable",
+    "successor_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/b-execution/api/002500-followup-final.json",
+    "reason": "cutoff official source observation hidden by later empty failed download; zero-model engineering failure"
+  }
+]

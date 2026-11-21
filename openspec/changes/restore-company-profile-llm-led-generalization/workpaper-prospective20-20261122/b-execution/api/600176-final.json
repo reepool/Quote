@@ -1,0 +1,4378 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "600176.SH",
+  "report": {
+    "instrument_id": "600176.SH",
+    "report_id": "asset_3c86ad61788e9c3a8a36f53c2bbe1ae9",
+    "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-19T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-f19719448496ac9a5d743a38",
+  "latest_reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+  "readings": [
+    {
+      "work_id": "bp-work-f19719448496ac9a5d743a38",
+      "workpaper_sha256": "c63cab939e94b60f896666f89f794cea4933597f1c2b71a81d79762af12f7ff6",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0037",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的业务情况"
+            ],
+            "start_page": 10,
+            "end_page": 10,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0043",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ],
+            "start_page": 13,
+            "end_page": 14,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0072",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "五、报告期内主要经营情况"
+            ],
+            "start_page": 15,
+            "end_page": 16,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0077",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分产品情况"
+            ],
+            "start_page": 16,
+            "end_page": 16,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0078",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分地区情况"
+            ],
+            "start_page": 16,
+            "end_page": 16,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0079",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分销售模式情况"
+            ],
+            "start_page": 16,
+            "end_page": 17,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0104",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、产销情况：全年产量大幅提升，内需市场快速增长"
+            ],
+            "start_page": 21,
+            "end_page": 23,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0113",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、行业经营情况：表面回暖与深层压力并存"
+            ],
+            "start_page": 24,
+            "end_page": 26,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0038 行业情况（玻纤产品介绍、全球主要生产企业、下游应用）属行业背景，非公司层面经营，暂缓",
+          "section-0061 核心竞争力分析偏泛化竞争力描述，暂缓",
+          "section-0087 主要客户及供应商情况篇幅大且含费用、研发、现金流等混合内容，暂缓",
+          "section-0386 财务报告及附注全文，仅在收入构成有缺口时定向补充，暂缓"
+        ],
+        "selection_rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。",
+        "stop_reason": "已覆盖业务描述、经营综述、收入与成本分析、分产品/分地区/分销售模式收入构成、产销与行业经营变化，足以解释业务结构、产品用途、盈利来源、规模与主要变化；剩余为行业背景、治理、财务附注等非核心或重复内容，可在不扩读全文的前提下停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取公司分产品（如粗纱、电子布等）的收入拆分，仅取得粗纱及制品与电子布的销量口径。",
+        "未获取主要原材料、能源的具体采购量、采购金额及供应商结构。",
+        "未获取具体客户名称、客户集中度及分客户销售数据。",
+        "行业数据为协会统计口径，非公司自身经营数据。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-f19719448496ac9a5d743a38:workpaper:sections",
+          "request_hash": "2512c8785638dc514a90c296733fa48d9e7859f7a48427214d95987d503de72f",
+          "response_hash": "c32afa07b638b774460149c944004decb4336f5a4a0ee53f03032b11f52e7804",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 22599,
+            "output_tokens": 415,
+            "total_tokens": 23014
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 814,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0083",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0135",
+            "section-0142",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0161",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0309",
+            "section-0311",
+            "section-0313",
+            "section-0315",
+            "section-0317",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0432",
+            "section-0433",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0602",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0611",
+            "section-0620",
+            "section-0621",
+            "section-0622",
+            "section-0623",
+            "section-0624",
+            "section-0629",
+            "section-0630",
+            "section-0633",
+            "section-0636",
+            "section-0637",
+            "section-0638",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0649",
+            "section-0652",
+            "section-0656",
+            "section-0659",
+            "section-0660",
+            "section-0665",
+            "section-0670",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0681",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0694",
+            "section-0700",
+            "section-0706",
+            "section-0709",
+            "section-0717",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0725",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0737",
+            "section-0743",
+            "section-0744",
+            "section-0745",
+            "section-0746",
+            "section-0749",
+            "section-0754",
+            "section-0755",
+            "section-0756",
+            "section-0757",
+            "section-0758",
+            "section-0759",
+            "section-0760",
+            "section-0761",
+            "section-0762",
+            "section-0765",
+            "section-0768",
+            "section-0770",
+            "section-0771",
+            "section-0772",
+            "section-0774",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0779",
+            "section-0781",
+            "section-0783",
+            "section-0784",
+            "section-0785",
+            "section-0786",
+            "section-0787",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0794",
+            "section-0795",
+            "section-0796",
+            "section-0799",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0809",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0825",
+            "section-0826",
+            "section-0832",
+            "section-0833",
+            "section-0835",
+            "section-0836",
+            "section-0838",
+            "section-0841",
+            "section-0843",
+            "section-0845",
+            "section-0846",
+            "section-0847",
+            "section-0848",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0855",
+            "section-0856",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0867",
+            "section-0868",
+            "section-0869",
+            "section-0871",
+            "section-0874",
+            "section-0875",
+            "section-0878",
+            "section-0879",
+            "section-0880",
+            "section-0881",
+            "section-0882",
+            "section-0883",
+            "section-0884",
+            "section-0885",
+            "section-0886",
+            "section-0887",
+            "section-0888",
+            "section-0889",
+            "section-0890",
+            "section-0892",
+            "section-0893",
+            "section-0894",
+            "section-0895",
+            "section-0896",
+            "section-0897",
+            "section-0898",
+            "section-0899",
+            "section-0900",
+            "section-0901",
+            "section-0902",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0910",
+            "section-0911",
+            "section-0915",
+            "section-0916",
+            "section-0918",
+            "section-0919",
+            "section-0920",
+            "section-0922",
+            "section-0923",
+            "section-0924",
+            "section-0925",
+            "section-0928",
+            "section-0931",
+            "section-0932",
+            "section-0933",
+            "section-0934",
+            "section-0935",
+            "section-0936",
+            "section-0937",
+            "section-0938",
+            "section-0939",
+            "section-0942",
+            "section-0943",
+            "section-0944",
+            "section-0946",
+            "section-0947",
+            "section-0948",
+            "section-0953",
+            "section-0954",
+            "section-0962",
+            "section-0963",
+            "section-0964",
+            "section-0965",
+            "section-0966",
+            "section-0967",
+            "section-0968",
+            "section-0969",
+            "section-0970",
+            "section-0971",
+            "section-0975",
+            "section-0976",
+            "section-0977",
+            "section-0981",
+            "section-0985",
+            "section-0986",
+            "section-0987",
+            "section-0988",
+            "section-0989",
+            "section-0990",
+            "section-0991",
+            "section-0992",
+            "section-0993",
+            "section-0994",
+            "section-0995",
+            "section-0996",
+            "section-0997",
+            "section-0998",
+            "section-0999",
+            "section-1000",
+            "section-1001",
+            "section-1002",
+            "section-1003",
+            "section-1004",
+            "section-1005",
+            "section-1006",
+            "section-1015",
+            "section-1019",
+            "section-1020",
+            "section-1021",
+            "section-1022",
+            "section-1025",
+            "section-1026",
+            "section-1027",
+            "section-1028",
+            "section-1029",
+            "section-1030",
+            "section-1031",
+            "section-1032",
+            "section-1035",
+            "section-1036",
+            "section-1037",
+            "section-1038",
+            "section-1039",
+            "section-1040",
+            "section-1041",
+            "section-1042",
+            "section-1043",
+            "section-1044",
+            "section-1047",
+            "section-1054",
+            "section-1055",
+            "section-1060",
+            "section-1061",
+            "section-1062",
+            "section-1063",
+            "section-1068",
+            "section-1070",
+            "section-1078",
+            "section-1081",
+            "section-1082",
+            "section-1083",
+            "section-1085",
+            "section-1086",
+            "section-1087",
+            "section-1088",
+            "section-1089",
+            "section-1090"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-f19719448496ac9a5d743a38:workpaper:extract",
+          "request_hash": "dfc1e7754cfa62862f50cf3b66d97653636e30399de41e736cc890cbfd0a2c7b",
+          "response_hash": "a33a73c5d24cb4c28cf46466250cfc41bdebf6512349dd5737532e9f51e2471b",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 11720,
+            "output_tokens": 5254,
+            "total_tokens": 16974
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0043",
+            "section-0072",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0104",
+            "section-0113"
+          ],
+          "physical_pages": [
+            10,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "c63cab939e94b60f896666f89f794cea4933597f1c2b71a81d79762af12f7ff6",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "superseded_by_review_successor"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 107,
+              "end": 446,
+              "quote": "一、报告期内公司从事的业务情况\n\n    公司主要从事玻璃纤维及制品的生产、销售。报告期内，公司实现粗纱及制品销量                                        320.26 万\n吨，电子布销量       10.62亿米，全年公司玻璃纤维及其制品业务合计实现营业收入                            1,834,508.39万元，\n占主营业务收入的         99.01%。淮安新能源并网发电量             5.62亿千瓦时,     实现营业收入        18,354.76万元，\n占主营业务收入的         0.99%。\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 562,
+              "end": 2291,
+              "quote": "三、经营情况讨论与分析\n\n    2025年是“十四五”收官之年。作为全球玻纤龙头企业，面对错综复杂的外部环境，在公司\n党委和董事会坚强领导与科学决策下，公司玻纤粗纱与电子布销量再创历史新高，分别突破                                          320\n万吨和   10 亿米，实现量价齐升、营业收入和利润同比增长。\n    2025年的重点工作开展如下：\n    （一）抓核心、优结构，实现效益增长\n    1、“三个核心”抓出实效。全面落实增量、复价、稳价、调价的销售策略，抢核心、拓市场、\n促增量，夯实了效益基本盘。抓住结构性增长机遇，优先抢占风能、汽车、电子电气、新能源、\n光伏等高端市场份额；筛选细分客户群，强化战略合作，推出定制化产品与精准服务；深入挖掘\n玻纤应用新场景，开发新产品，开拓新客户；加强制度体系建设，完善考评激励和定价决策机制，\n重构巨石特色的销售网络体系。\n    2、结构调整精准高效。聚焦“六大结构”、突出“三个核心”，始终以市场需求为导向，以\n销售优先为原则，全面做好“三调”工作，全力支持销售拓市场、增销量、稳价格。产销研技协\n同发力，统筹做好全球六大生产基地产销存动态优化，及时满足市场需求；同时发挥国际化布局\n优势，依托两大海外生产基地，高效灵活调配，为应对“双反”、特别关税等不利因素提供更多\n解决方案，保障全球供应链稳定。关注市场热点，提升高端产品比例。\n    （二）谋创新、固优势，培育新质生产力\n    1、科技创新成果丰硕。围绕关键核心技术和世界一流企业创建为重点，加强顶层设计和统筹\n谋划，完成“十五五”科技创新规划；持续推行“揭榜挂帅”，首次实施“点兵挂帅”行动；获\n得授权发明专利       75 件，申请国际发明专利           21件，参与制定国家、行业与团体标准                 16 项；一大批\n创新项目取得突破性进展，助力提质增效。\n    2、大研发体系深入推进。玻璃配方研发重实效，为生产稳定、成本下降、低碳环保作出了贡\n献。产品研发主要围绕独一无二、专精特新领域，受到行业代表客户青睐。细纱薄布全面突围，\n汽车专用布销量增长；部分超薄产品实现批量稳定交付；加大特种纤维电子布研发力度，相关产\n品的开发及认证正在有序推进中。\n    （三）扬智造、促转型，汇聚发展动能\n    1、以零碳智造为主线，推进项目建设增后劲。项目建设严格落实“七最”要求，点多面广齐\n发力。桐乡总部年产         12 万吨玻璃纤维池窑拉丝生产线冷修技改项目，实现高效优质投产；九江智\n能制造基地年产       40 万吨玻璃纤维生产线建设项目第二批年产                    20万吨生产线项目分区分期点火投\n产；淮安    10 万吨电子纱生产线进入全面安装阶段；淮安                    500MW  风电建设项目和成都智能制造基\n地新建年产     20 万吨高性能玻璃纤维生产线建设项目第一批年产10                       万吨生产线项目在        2025 年底正\n式开工；桐乡总部年产           20万吨玻璃纤维池窑拉丝生产线冷修技改项目全面启动。\n    2、深化数字赋能和绿色低碳转型。主动拥抱                    AI，发布并实施多个“AI+玻纤”课题项目；数\n字工厂、领航工厂创建纵深推进。SAP                 系统推进全球化运营，持续打通数据壁垒。桐乡总部、九\n江、成都三个基地均入选国家工信部卓越级智能工厂名单。淮安风电项目实现碳减排超                                        40 万吨。\n共筑“绿色产业链”，启动绿色物流合作。牵头编制并实施《E                             玻璃纤维电子布单位产品能源消\n耗限额》团体标准，填补了行业空白。\n                                        13/213"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 1467,
+              "quote": "                           中国巨石股份有限公司2025        年年度报告\n\n\n    （四）精管控、防风险，夯实管理基础\n    1、精准管控提升效能水平。构建“动态对标-精准改进”管理闭环，推进成本对标、质量贯\n标，实现多体系融合运行。以问题为导向，直面质量难题立项攻关，推进质量提升年活动取得初\n步成效；制定质量样板评定制度，创建质量样板；推广生产样板，优化样板制度。公司品牌价值\n连续  10 年蝉联行业第一，荣获长三角企业品牌建设标杆案例金舵奖。\n    2、降本增收稳固竞争优势。生产单位抓住重点降本任务，深挖潜力、多措并举，再次发挥降\n本主力军、压舱石的作用；技术部门与辅助单位持续加码新产品、新技术、新工艺、新供方、新\n材料、新配方，加快高价进口原料替代、国产和自制。抓住有利时机，拓宽低成本融资渠道，保\n持融资利率持续下降。\n    3、风险管控守牢安全底线。全员签订安全生产责任书，配强安全管理队伍，组织安全专题活\n动，创建区域安全样板，推广智能安防平台，实现安全管理精细化、智能化、可追溯。优化内控\n流程，确保项目建设合法合规。落实源头减量、过程管控、末端治理，三废排放达标率                                        100%。\n顺利通过    ISO37301 合规管理体系国际认证，为公司合规经营提供基础保障。\n    （五）强党建、兴文化，增强队伍合力\n    1、党建领航固本强基。始终以习近平新时代中国特色社会主义思想为指引，以高质量党建引\n领保障高质量发展。完善党建制度，促进党建规范化；强化基层党建考核，签订党建工作责任制。\n深入开展中央八项规定精神学习教育和二十届四中全会精神专题学习，做实规定动作，做精自选\n动作。召开年度党风廉政建设与反腐败工作会议，层层签订《党风廉政建设责任书》，分层分类\n开展警示教育。党建带群团，建立“三巨”工会品牌和“新石代”青年工作品牌，组织特色文体\n和青年联谊活动多场，解决员工急难愁盼问题，全年群团工作顾全大局、服务中心、有声有色、\n成效明显。\n    2、文化宣传聚心塑形。内外宣传紧扣热点、突出主题、凝心聚力，全年在央视、新华社、人\n民日报等权威媒体刊登报道             60余篇，亮相央视纪录片，进一步提升了巨石品牌知名度。围绕“四\n学四建”，举办“巨能强音”专题宣讲。ESG                    建设实现重大突破，WindESG           评级提升至      AA，\nMSCI 评级跃升为      A，并获得多项      ESG  荣誉。全年开展乡村振兴物资采购               4次，组织慰问帮扶        1500\n人次，参与志愿服务         3000 余人次，持续擦亮“善达五洲”公益品牌。成功举办“绿智引领共链未\n来”第   31 届国际玻纤年会，创新形式、增加互动，拉近与全球合作伙伴的距离。回顾历史、与时\n俱进，发布新时期巨石释义“巨材厚德伟业基石”，成为指引巨石人前进的方向。\n    3、队伍培育提能砺新。深化“四支队伍建设”，构建“五石五才”人才培育评价体系，人才\n强企战略落地成效显著。完善英才评选制度，完成百名英才计划，搭建将才、帅才平台。组织各\n类职工技能比武，举办首届四地技能比武，进一步营造比学赶超氛围。继续推进职业技能、技术\n职称自主认定。推进流程优化、效率提升和机器换人工作。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 1752,
+              "end": 1949,
+              "quote": "五、报告期内主要经营情况\n\n    报告期内，公司实现营业收入              1,888,086.01万元，比上年同期增长           19.08%；归属于上市公司\n股东的净利润       328,546.10万元，比上年同期增长           34.38%。\n\n\n\n\n\n                                        15 /213"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 2191,
+              "quote": "                                               中国巨石股份有限公司2025             年年度报告\n\n\n            (一)    主营业务分析\n\n            1、   利润表及现金流量表相关科目变动分析表\n                                                                                            单位：元         币种：人民币\n                           科目                              本期数                     上年同期数                变动比例（%）\n            营业收入                                     18,880,860,110.36          15,855,766,997.99                 19.08\n            营业成本                                     12,627,832,919.21          11,887,682,064.62                   6.23\n            销售费用                                         211,094,362.60            198,705,377.65                   6.23\n            管理费用                                         742,632,238.21            343,653,044.65                116.10\n            财务费用                                         315,762,318.79            217,662,066.36                 45.07\n            研发费用                                         582,434,136.52            528,291,814.11                 10.25\n            经营活动产生的现金流量净额                              4,200,505,000.62          2,032,312,760.51                106.69\n            投资活动产生的现金流量净额                               -839,403,432.75           -977,214,274.93                不适用\n            筹资活动产生的现金流量净额                            -2,999,266,127.97          -1,059,229,317.19                不适用\n            营业收入变动原因说明：报告期产品销量增长、价格上升所致；\n            营业成本变动原因说明：报告期销量增长所致；\n            销售费用变动原因说明：报告期运输费和折旧费增长所致；\n            管理费用变动原因说明：上年同期超额利润分享计划不予兑现部分冲回导致上年基数低；\n            财务费用变动原因说明：报告期汇兑损失增加、利息收入减少所致；\n            研发费用变动原因说明：报告期研发投入增加所致；\n            经营活动产生的现金流量净额变动原因说明：报告期销售商品收到的现金和商业票据到期托收增\n            加所致；\n            投资活动产生的现金流量净额变动原因说明：报告期取得投资收益收到的现金增加所致；\n            筹资活动产生的现金流量净额变动原因说明：报告期新增债务减少所致。\n\n            本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n            □适用      √不适用\n\n            2、   收入和成本分析\n            □适用      √不适用\n\n            (1).   主营业务分行业、分产品、分地区、分销售模式情况\n\n                                                                                            单位：元         币种：人民币\n                                                      "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分产品情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 2191,
+              "end": 2845,
+              "quote": "主营业务分产品情况\n                                                                                营业收入           营业成本          毛利率比上年增减\n    分产品                 营业收入                  营业成本              毛利率（%）          比上年增           比上年增                 （%）\n                                                                                减（%）           减（%）\n玻纤及其制品             18,345,083,876.74      12,435,427,887.68            32.21         18.51           6.18     增加    7.87 个百分点\n其他                     183,547,580.76          54,358,987.20           70.38        194.61         210.46     减少    1.52 个百分点\n                                                      "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分地区情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 2845,
+              "end": 3496,
+              "quote": "主营业务分地区情况\n                                                                                营业收入           营业成本          毛利率比上年增减\n    分地区                 营业收入                  营业成本              毛利率（%）          比上年增           比上年增                 （%）\n                                                                                减（%）           减（%）\n国内地区               12,393,721,914.81       8,317,317,941.49            32.89         28.89          11.34    增加   10.58  个百分点\n国外地区                 6,134,909,542.69      4,172,468,933.39            31.99           3.52         -2.04     增加    3.86 个百分点\n                                                   "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分销售模式情况"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1720,
+              "quote": "                                            中国巨石股份有限公司2025          年年度报告\n\n\n                                                                          减（%）        减（%）\n 直销                14,188,696,385.61    9,505,251,073.95         33.01        30.24        16.89    增加   7.65 个百分点\n 经销                 4,339,935,071.89    2,984,535,800.93         31.23        -6.62       -17.04    增加   8.64 个百分点\n\n            主营业务分行业、分产品、分地区、分销售模式情况的说明\n                 公司产品收入主要是玻纤纱及制品的销售。2025                                年公司玻纤纱及制品实现营业收入\n            1,834,508.39 万元，占主营业务收入的比例为                   99.01%。与上年相比，玻纤纱及制品营业收入上升\n            18.51%，营业成本上升            6.18%，毛利率增加         7.87 个百分点；主要原因是              2025 年公司全面落实增\n            量、复价、稳价、调价的销售策略，玻纤及其制品销量增长、价格上升，毛利率提升。其他列示\n            的是公司风力发电业务，全年实现营业收入                          18,354.76 万元，毛利率达          70.38%。\n                 公司主营业务中，国内收入占                 66.89%，较上年上升        5.02 个百分点。国内收入同比上升                 28.89%，\n            国外收入同比上升            3.52%。主要原因是玻纤行业需求持续呈稳定上升趋势，内需市场快速增长，\n            产品结构调整，电子布占比提升，同时淮安风力发电业务全年运营，发电量较上年显著提升，国\n            内收入及毛利率增长均高于国外。\n                 公司主营业务中，直销占               76.58%，较上年上升         6.48 个百分点。2025        年受玻纤产品结构调整、\n            价格上升和风力发电业务增长影响，直销和经销的毛利率均有一定幅度提升。\n\n            (2).   产销量情况分析表\n            √适用      □不适用\n            产销量情况说明\n                 报告期内，公司产量随着产能的提升有一定幅度的增长；同时，公司始终坚持以市场需求为\n            导向，通过制订灵活的营销策略，全力以赴开拓市场，保存量、谋增量，玻纤粗纱与电子布销量\n            再创历史新高。\n\n            (3).   重大采购合同、重大销售合同的履行情况\n\n            □适用      √不适用\n\n            (4).   成本分析表\n\n                                                                                    单位：元        币种：人民币\n                                                     "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、产销情况：全年产量大幅提升，内需市场快速增长"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "source_spans": [
+            {
+              "page": 22,
+              "start": 0,
+              "end": 1723,
+              "quote": "                              中国巨石股份有限公司2025         年年度报告\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n            图  4   2011 年以来我国玻璃纤维及制品国内表观消费量及变化趋势\n    （1）电子用玻璃纤维毡布制品\n    经协会统计，2025        年我国玻璃纤维电子纱总产量为                  88.6 万吨，同比增长         9.6%，国内电子用\n玻璃纤维毡布制品表观消费量约为                  81.9 万吨，同比增长         10.1%。2025   年我国集成电路产量同比增\n长 10.9%，家用电器和音像器材同比增长                  11.0%，新能源汽车产量同比增长                25.1%，家电及汽车电\n子市场需求稳定增长。特别是                2025 年，因信息化产业迭代发展，特种电子玻纤成为投资热点，其\n建设热潮一定程度上挤占了常规电子玻纤的供应，推动普通电子布供应趋紧。部分企业甚至逐步\n减少普通电子纱及电子布产能规模，进而将更多精力和设备资源转向低介电、低膨胀等高端玻纤\n电子纱及电子布的研发与生产。\n    （2）工业用玻璃纤维毡布制品\n    经协会统计，2025        年我国玻璃纤维工业纱总产量为                  65.1 万吨，同比下降         2.4%，国内工业用\n玻璃纤维毡布制品表观消费量约为                  40.5 万吨，同比下降         3.8%。2025   年我国房地产开发投资总额\n同比下降     17.2%，其中住宅投资总额下降               16.3%，此外我国道路运输投资下降                 6.0%，公共设施投\n资下降    8.2%，房地产与基建市场持续深度调整，导致国内玻纤网格布等各类建筑与基建领域用玻\n璃纤维毡布制品市场需求持续低迷。亮点是外需市场相对稳定，尤其是安全防护、电工绝缘等领\n域用玻纤毡布制品外贸出口稳中有增。\n    （3）增强用玻纤毡布制品及玻纤增强塑料制品\n    经协会统计，2025        我国玻璃纤维普通热固直接纱、合股纱、高模量纱和热塑纱总产量分别达\n到 251.3 万吨、110.1    万吨、143.6    万吨和    184.3 万吨，国内热固、热塑增强用玻璃纤维纱表观消费\n分别约为     379.7 万吨和    156.5万吨，同比增长         22.6%和   13.4%。据此测算，2025        年我国玻纤增强塑\n料制品总产量约为          889 万吨，同比增长         18.5%。其中：玻纤增强热固类塑料制品总产量约为                          451\n万吨，同比增长         24.1%；玻纤增强热塑类塑料制品总产量约为                      438 万吨，同比增长         13.5%。\n    2025 年全国风电新增装机容量              120GW，同比增长         51%，全国光伏新增装机            317GW，同比增\n长 14%。此外     2025 年全国汽车产量为           3478 万辆，同比增长         9.8%，其中新能源汽车为            1652 万辆，\n同比增长     25.1%。在风电、汽车等主要市场需求稳步增长的带动下，各类玻纤增强塑料制品产量\n实现较快增长。同时，玻纤增强塑料制品在光伏、储能、低空经济及智慧物流、海洋开发、建筑\n门窗等领域稳步扩大市场规模，为行业后续发展不断提供新的成长空间。\n\n\n\n\n\n\n\n\n\n\n\n                                           22 /213"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、行业经营情况：表面回暖与深层压力并存"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 61,
+              "end": 1317,
+              "quote": "三、行业经营情况：表面回暖与深层压力并存\n    从经营数据看，2025        年行业整体效益有所修复。主要企业受益于产品价格的部分恢复及销量\n增长，营业收入普遍实现同比增长，行业平均毛利率同比亦有明显提升。然而，这份“成绩单”\n背后潜藏风险。首先，粗细纱较大的新增产能正在持续输入市场，对供需平衡构成长期压力，但\n是由于铂金价格快速上涨等因素，导致产能增长存在不确定性。其次，普通产品年内价格已处于\n低位，叠加铂金价格上涨等因素，整体判断                    2026 年玻纤价格稳中有升。再者，市场增长动力过度\n依赖国内需求，而地产等传统领域需求依然疲软，风电、汽车等增长市场的容量能否持续消化新\n增供给，尚需观察。\n    1、营收与利润\n    2025年规模以上玻璃纤维及制品制造企业（不含玻璃纤维增强复合材料制品企业）主营业务\n收入同比增长      11.0%。然而，房地产与基建市场依然低迷，外贸出口小幅萎缩。行业营收及盈利\n水平的持续改善，更多是行业新质生产力正在蓄能起势。高模、热塑、超细及低介电、低膨胀、\n高硅氧等高性能玻纤及制品成为行业利润主要增长点。从企业端来看，近年来坚持科技创新不断\n探索实施绿色化、智能化、高端化发展的企业，整体经营状况正在持续好转，而部分仍坚持传统\n细分市场和跟随发展模式的企业则面临压力。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        图  7   2011年以来玻纤及制品行业主营业务收入与利润总额增速变化趋势\n    2、价格与库存\n    2025年在行业整体经营效益大幅改善的背景下，不同细分市场差异化表现明显，市场价格走\n势呈现分化与承压态势。普通直接纱全年均价虽较                       2024 年有所上浮，但价格中枢自年初起逐季下\n移，包括中碱纱、热固直接纱在内的各类传统产品面临新市场培育缓慢等问题，反映出中低端产\n品面临的持续竞争压力。风电、汽车、电子等产业不断进行技术迭代升级并对玻纤材料应用提出\n新门槛、新要求，市场规模持续扩张的同时产品附加值水平也在不断提升。风电用高模/超高模玻\n纤、新能源汽车用高品质热塑玻纤、电子用玻纤等高端产品产能规模和市场占有率快速提升，并\n带动细分市场产品整体价格持续走高。\n    与此同时，2025      年，因信息化产业迭代发展，特种电子玻纤成为投资热点，其建设热潮一定\n程度上挤占了常规电子玻纤的供应，推动普通电子布供应趋紧，价格有所上升。然而，产能的结\n构性过热需警惕。截至           2025年底，行业内在建/拟建的特种电子玻纤项目投资额已累计达                            133.8\n亿元，其产能预计在          2027年迎来集中释放，未来可能加剧该细分领域的竞争。\n\n\n\n\n\n\n                                        24/213"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    },
+    {
+      "work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "workpaper_sha256": "e21071250b837602415c866437a670d5c77de4bb050a5e3a6682686392f153db",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_recovery": {
+        "base_work_id": "bp-work-f19719448496ac9a5d743a38",
+        "base_workpaper_sha256": "c63cab939e94b60f896666f89f794cea4933597f1c2b71a81d79762af12f7ff6",
+        "plan_sha256": "0ad92ca18f6fc143f7f92bbeb807bc417284f857548eaee4860840a304bbef81",
+        "report": {
+          "document_type": "annual_report",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "instrument_id": "600176.SH",
+          "published_at": "2026-03-19T16:00:00+00:00",
+          "report_id": "asset_3c86ad61788e9c3a8a36f53c2bbe1ae9",
+          "report_period": "2025-12-31"
+        },
+        "request_id": "6eu-600176-review"
+      },
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0037",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的业务情况"
+            ],
+            "start_page": 10,
+            "end_page": 10,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0043",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ],
+            "start_page": 13,
+            "end_page": 14,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0072",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "五、报告期内主要经营情况"
+            ],
+            "start_page": 15,
+            "end_page": 16,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0077",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分产品情况"
+            ],
+            "start_page": 16,
+            "end_page": 16,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0078",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分地区情况"
+            ],
+            "start_page": 16,
+            "end_page": 16,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0079",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分销售模式情况"
+            ],
+            "start_page": 16,
+            "end_page": 17,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0104",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、产销情况：全年产量大幅提升，内需市场快速增长"
+            ],
+            "start_page": 21,
+            "end_page": 23,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          },
+          {
+            "section_id": "section-0113",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、行业经营情况：表面回暖与深层压力并存"
+            ],
+            "start_page": 24,
+            "end_page": 26,
+            "rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0038 行业情况（玻纤产品介绍、全球主要生产企业、下游应用）属行业背景，非公司层面经营，暂缓",
+          "section-0061 核心竞争力分析偏泛化竞争力描述，暂缓",
+          "section-0087 主要客户及供应商情况篇幅大且含费用、研发、现金流等混合内容，暂缓",
+          "section-0386 财务报告及附注全文，仅在收入构成有缺口时定向补充，暂缓"
+        ],
+        "selection_rationale": "本报告为中国巨石（玻纤龙头）年报。选择逻辑：section-0037说明公司从事的业务；section-0043经营情况讨论与分析提供公司层面经营综述与本期变化；section-0072/0073/0074构成主要经营情况与利润表、现金流量表科目变动分析，是收入与盈利的核心；section-0077/0078/0079分别给出主营业务分产品、分地区、分销售模式的收入构成，直接回答收入来源与主要业务权重；section-0104产销情况说明产量与内需市场变化，section-0113行业经营情况（营收利润、价格库存）补充本期经营驱动。未选纯行业背景（section-0038）与核心竞争力（section-0061）作为次要；未选财务报告附注全文，仅保留必要经营分析。",
+        "stop_reason": "已覆盖业务描述、经营综述、收入与成本分析、分产品/分地区/分销售模式收入构成、产销与行业经营变化，足以解释业务结构、产品用途、盈利来源、规模与主要变化；剩余为行业背景、治理、财务附注等非核心或重复内容，可在不扩读全文的前提下停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取公司分产品（如粗纱、电子布等）的收入拆分，仅取得粗纱及制品与电子布的销量口径。",
+        "未获取主要原材料、能源的具体采购量、采购金额及供应商结构。",
+        "未获取具体客户名称、客户集中度及分客户销售数据。",
+        "行业数据为协会统计口径，非公司自身经营数据。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-f19719448496ac9a5d743a38:workpaper:sections",
+          "request_hash": "2512c8785638dc514a90c296733fa48d9e7859f7a48427214d95987d503de72f",
+          "response_hash": "c32afa07b638b774460149c944004decb4336f5a4a0ee53f03032b11f52e7804",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 22599,
+            "output_tokens": 415,
+            "total_tokens": 23014
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 814,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0083",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0135",
+            "section-0142",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0161",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0309",
+            "section-0311",
+            "section-0313",
+            "section-0315",
+            "section-0317",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0432",
+            "section-0433",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0602",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0611",
+            "section-0620",
+            "section-0621",
+            "section-0622",
+            "section-0623",
+            "section-0624",
+            "section-0629",
+            "section-0630",
+            "section-0633",
+            "section-0636",
+            "section-0637",
+            "section-0638",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0649",
+            "section-0652",
+            "section-0656",
+            "section-0659",
+            "section-0660",
+            "section-0665",
+            "section-0670",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0681",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0694",
+            "section-0700",
+            "section-0706",
+            "section-0709",
+            "section-0717",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0725",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0737",
+            "section-0743",
+            "section-0744",
+            "section-0745",
+            "section-0746",
+            "section-0749",
+            "section-0754",
+            "section-0755",
+            "section-0756",
+            "section-0757",
+            "section-0758",
+            "section-0759",
+            "section-0760",
+            "section-0761",
+            "section-0762",
+            "section-0765",
+            "section-0768",
+            "section-0770",
+            "section-0771",
+            "section-0772",
+            "section-0774",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0779",
+            "section-0781",
+            "section-0783",
+            "section-0784",
+            "section-0785",
+            "section-0786",
+            "section-0787",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0794",
+            "section-0795",
+            "section-0796",
+            "section-0799",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0809",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0825",
+            "section-0826",
+            "section-0832",
+            "section-0833",
+            "section-0835",
+            "section-0836",
+            "section-0838",
+            "section-0841",
+            "section-0843",
+            "section-0845",
+            "section-0846",
+            "section-0847",
+            "section-0848",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0855",
+            "section-0856",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0867",
+            "section-0868",
+            "section-0869",
+            "section-0871",
+            "section-0874",
+            "section-0875",
+            "section-0878",
+            "section-0879",
+            "section-0880",
+            "section-0881",
+            "section-0882",
+            "section-0883",
+            "section-0884",
+            "section-0885",
+            "section-0886",
+            "section-0887",
+            "section-0888",
+            "section-0889",
+            "section-0890",
+            "section-0892",
+            "section-0893",
+            "section-0894",
+            "section-0895",
+            "section-0896",
+            "section-0897",
+            "section-0898",
+            "section-0899",
+            "section-0900",
+            "section-0901",
+            "section-0902",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0910",
+            "section-0911",
+            "section-0915",
+            "section-0916",
+            "section-0918",
+            "section-0919",
+            "section-0920",
+            "section-0922",
+            "section-0923",
+            "section-0924",
+            "section-0925",
+            "section-0928",
+            "section-0931",
+            "section-0932",
+            "section-0933",
+            "section-0934",
+            "section-0935",
+            "section-0936",
+            "section-0937",
+            "section-0938",
+            "section-0939",
+            "section-0942",
+            "section-0943",
+            "section-0944",
+            "section-0946",
+            "section-0947",
+            "section-0948",
+            "section-0953",
+            "section-0954",
+            "section-0962",
+            "section-0963",
+            "section-0964",
+            "section-0965",
+            "section-0966",
+            "section-0967",
+            "section-0968",
+            "section-0969",
+            "section-0970",
+            "section-0971",
+            "section-0975",
+            "section-0976",
+            "section-0977",
+            "section-0981",
+            "section-0985",
+            "section-0986",
+            "section-0987",
+            "section-0988",
+            "section-0989",
+            "section-0990",
+            "section-0991",
+            "section-0992",
+            "section-0993",
+            "section-0994",
+            "section-0995",
+            "section-0996",
+            "section-0997",
+            "section-0998",
+            "section-0999",
+            "section-1000",
+            "section-1001",
+            "section-1002",
+            "section-1003",
+            "section-1004",
+            "section-1005",
+            "section-1006",
+            "section-1015",
+            "section-1019",
+            "section-1020",
+            "section-1021",
+            "section-1022",
+            "section-1025",
+            "section-1026",
+            "section-1027",
+            "section-1028",
+            "section-1029",
+            "section-1030",
+            "section-1031",
+            "section-1032",
+            "section-1035",
+            "section-1036",
+            "section-1037",
+            "section-1038",
+            "section-1039",
+            "section-1040",
+            "section-1041",
+            "section-1042",
+            "section-1043",
+            "section-1044",
+            "section-1047",
+            "section-1054",
+            "section-1055",
+            "section-1060",
+            "section-1061",
+            "section-1062",
+            "section-1063",
+            "section-1068",
+            "section-1070",
+            "section-1078",
+            "section-1081",
+            "section-1082",
+            "section-1083",
+            "section-1085",
+            "section-1086",
+            "section-1087",
+            "section-1088",
+            "section-1089",
+            "section-1090"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-f19719448496ac9a5d743a38:workpaper:extract",
+          "request_hash": "dfc1e7754cfa62862f50cf3b66d97653636e30399de41e736cc890cbfd0a2c7b",
+          "response_hash": "a33a73c5d24cb4c28cf46466250cfc41bdebf6512349dd5737532e9f51e2471b",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 11720,
+            "output_tokens": 5254,
+            "total_tokens": 16974
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0043",
+            "section-0072",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0104",
+            "section-0113"
+          ],
+          "physical_pages": [
+            10,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        }
+      },
+      "review_status": "completed_with_open_findings",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "c63cab939e94b60f896666f89f794cea4933597f1c2b71a81d79762af12f7ff6",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_execution_completed"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-792fc67e440aef2f0e11ff58:workpaper:review",
+          "request_hash": "43490b66c35f679601e01470fd1fc2d98e2f89e4f86037e7af199520d3a3148c",
+          "response_hash": "8b5f8e281d45f5782cb79c51c766acea1b9d2bd1e0e741755ecf2e92a1974df0",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 16267,
+            "output_tokens": 980,
+            "total_tokens": 32394
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0043",
+            "section-0072",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0104",
+            "section-0113"
+          ],
+          "physical_pages": [
+            10,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-792fc67e440aef2f0e11ff58:workpaper:repair",
+          "request_hash": "a12596412a14761137cce9a4d397a58a317158b23e6af5eaaf0b65bcf7725082",
+          "response_hash": "7bf5891d246c18e6fde1017b9502b598baa6dc732053b0c62245f1b2e4deddd4",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 8948,
+            "output_tokens": 702,
+            "total_tokens": 9650
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0043",
+            "section-0072",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0104",
+            "section-0113"
+          ],
+          "physical_pages": [
+            10,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-792fc67e440aef2f0e11ff58:workpaper:repair-verify",
+          "request_hash": "a42c7ccf3259592d7d8b04283a5a34a5cbffa911ec9281d5b980ffaf94a58a6c",
+          "response_hash": "45a0465348b3e6e30a8497afc82ab4405d7688f14f2c89b3c782a0d667fa4e3f",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10553,
+            "output_tokens": 494,
+            "total_tokens": 16110
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0037",
+            "section-0043",
+            "section-0072",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0104",
+            "section-0113"
+          ],
+          "physical_pages": [
+            10,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 107,
+              "end": 446,
+              "quote": "一、报告期内公司从事的业务情况\n\n    公司主要从事玻璃纤维及制品的生产、销售。报告期内，公司实现粗纱及制品销量                                        320.26 万\n吨，电子布销量       10.62亿米，全年公司玻璃纤维及其制品业务合计实现营业收入                            1,834,508.39万元，\n占主营业务收入的         99.01%。淮安新能源并网发电量             5.62亿千瓦时,     实现营业收入        18,354.76万元，\n占主营业务收入的         0.99%。\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 562,
+              "end": 2291,
+              "quote": "三、经营情况讨论与分析\n\n    2025年是“十四五”收官之年。作为全球玻纤龙头企业，面对错综复杂的外部环境，在公司\n党委和董事会坚强领导与科学决策下，公司玻纤粗纱与电子布销量再创历史新高，分别突破                                          320\n万吨和   10 亿米，实现量价齐升、营业收入和利润同比增长。\n    2025年的重点工作开展如下：\n    （一）抓核心、优结构，实现效益增长\n    1、“三个核心”抓出实效。全面落实增量、复价、稳价、调价的销售策略，抢核心、拓市场、\n促增量，夯实了效益基本盘。抓住结构性增长机遇，优先抢占风能、汽车、电子电气、新能源、\n光伏等高端市场份额；筛选细分客户群，强化战略合作，推出定制化产品与精准服务；深入挖掘\n玻纤应用新场景，开发新产品，开拓新客户；加强制度体系建设，完善考评激励和定价决策机制，\n重构巨石特色的销售网络体系。\n    2、结构调整精准高效。聚焦“六大结构”、突出“三个核心”，始终以市场需求为导向，以\n销售优先为原则，全面做好“三调”工作，全力支持销售拓市场、增销量、稳价格。产销研技协\n同发力，统筹做好全球六大生产基地产销存动态优化，及时满足市场需求；同时发挥国际化布局\n优势，依托两大海外生产基地，高效灵活调配，为应对“双反”、特别关税等不利因素提供更多\n解决方案，保障全球供应链稳定。关注市场热点，提升高端产品比例。\n    （二）谋创新、固优势，培育新质生产力\n    1、科技创新成果丰硕。围绕关键核心技术和世界一流企业创建为重点，加强顶层设计和统筹\n谋划，完成“十五五”科技创新规划；持续推行“揭榜挂帅”，首次实施“点兵挂帅”行动；获\n得授权发明专利       75 件，申请国际发明专利           21件，参与制定国家、行业与团体标准                 16 项；一大批\n创新项目取得突破性进展，助力提质增效。\n    2、大研发体系深入推进。玻璃配方研发重实效，为生产稳定、成本下降、低碳环保作出了贡\n献。产品研发主要围绕独一无二、专精特新领域，受到行业代表客户青睐。细纱薄布全面突围，\n汽车专用布销量增长；部分超薄产品实现批量稳定交付；加大特种纤维电子布研发力度，相关产\n品的开发及认证正在有序推进中。\n    （三）扬智造、促转型，汇聚发展动能\n    1、以零碳智造为主线，推进项目建设增后劲。项目建设严格落实“七最”要求，点多面广齐\n发力。桐乡总部年产         12 万吨玻璃纤维池窑拉丝生产线冷修技改项目，实现高效优质投产；九江智\n能制造基地年产       40 万吨玻璃纤维生产线建设项目第二批年产                    20万吨生产线项目分区分期点火投\n产；淮安    10 万吨电子纱生产线进入全面安装阶段；淮安                    500MW  风电建设项目和成都智能制造基\n地新建年产     20 万吨高性能玻璃纤维生产线建设项目第一批年产10                       万吨生产线项目在        2025 年底正\n式开工；桐乡总部年产           20万吨玻璃纤维池窑拉丝生产线冷修技改项目全面启动。\n    2、深化数字赋能和绿色低碳转型。主动拥抱                    AI，发布并实施多个“AI+玻纤”课题项目；数\n字工厂、领航工厂创建纵深推进。SAP                 系统推进全球化运营，持续打通数据壁垒。桐乡总部、九\n江、成都三个基地均入选国家工信部卓越级智能工厂名单。淮安风电项目实现碳减排超                                        40 万吨。\n共筑“绿色产业链”，启动绿色物流合作。牵头编制并实施《E                             玻璃纤维电子布单位产品能源消\n耗限额》团体标准，填补了行业空白。\n                                        13/213"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 1467,
+              "quote": "                           中国巨石股份有限公司2025        年年度报告\n\n\n    （四）精管控、防风险，夯实管理基础\n    1、精准管控提升效能水平。构建“动态对标-精准改进”管理闭环，推进成本对标、质量贯\n标，实现多体系融合运行。以问题为导向，直面质量难题立项攻关，推进质量提升年活动取得初\n步成效；制定质量样板评定制度，创建质量样板；推广生产样板，优化样板制度。公司品牌价值\n连续  10 年蝉联行业第一，荣获长三角企业品牌建设标杆案例金舵奖。\n    2、降本增收稳固竞争优势。生产单位抓住重点降本任务，深挖潜力、多措并举，再次发挥降\n本主力军、压舱石的作用；技术部门与辅助单位持续加码新产品、新技术、新工艺、新供方、新\n材料、新配方，加快高价进口原料替代、国产和自制。抓住有利时机，拓宽低成本融资渠道，保\n持融资利率持续下降。\n    3、风险管控守牢安全底线。全员签订安全生产责任书，配强安全管理队伍，组织安全专题活\n动，创建区域安全样板，推广智能安防平台，实现安全管理精细化、智能化、可追溯。优化内控\n流程，确保项目建设合法合规。落实源头减量、过程管控、末端治理，三废排放达标率                                        100%。\n顺利通过    ISO37301 合规管理体系国际认证，为公司合规经营提供基础保障。\n    （五）强党建、兴文化，增强队伍合力\n    1、党建领航固本强基。始终以习近平新时代中国特色社会主义思想为指引，以高质量党建引\n领保障高质量发展。完善党建制度，促进党建规范化；强化基层党建考核，签订党建工作责任制。\n深入开展中央八项规定精神学习教育和二十届四中全会精神专题学习，做实规定动作，做精自选\n动作。召开年度党风廉政建设与反腐败工作会议，层层签订《党风廉政建设责任书》，分层分类\n开展警示教育。党建带群团，建立“三巨”工会品牌和“新石代”青年工作品牌，组织特色文体\n和青年联谊活动多场，解决员工急难愁盼问题，全年群团工作顾全大局、服务中心、有声有色、\n成效明显。\n    2、文化宣传聚心塑形。内外宣传紧扣热点、突出主题、凝心聚力，全年在央视、新华社、人\n民日报等权威媒体刊登报道             60余篇，亮相央视纪录片，进一步提升了巨石品牌知名度。围绕“四\n学四建”，举办“巨能强音”专题宣讲。ESG                    建设实现重大突破，WindESG           评级提升至      AA，\nMSCI 评级跃升为      A，并获得多项      ESG  荣誉。全年开展乡村振兴物资采购               4次，组织慰问帮扶        1500\n人次，参与志愿服务         3000 余人次，持续擦亮“善达五洲”公益品牌。成功举办“绿智引领共链未\n来”第   31 届国际玻纤年会，创新形式、增加互动，拉近与全球合作伙伴的距离。回顾历史、与时\n俱进，发布新时期巨石释义“巨材厚德伟业基石”，成为指引巨石人前进的方向。\n    3、队伍培育提能砺新。深化“四支队伍建设”，构建“五石五才”人才培育评价体系，人才\n强企战略落地成效显著。完善英才评选制度，完成百名英才计划，搭建将才、帅才平台。组织各\n类职工技能比武，举办首届四地技能比武，进一步营造比学赶超氛围。继续推进职业技能、技术\n职称自主认定。推进流程优化、效率提升和机器换人工作。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 1752,
+              "end": 1949,
+              "quote": "五、报告期内主要经营情况\n\n    报告期内，公司实现营业收入              1,888,086.01万元，比上年同期增长           19.08%；归属于上市公司\n股东的净利润       328,546.10万元，比上年同期增长           34.38%。\n\n\n\n\n\n                                        15 /213"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 2191,
+              "quote": "                                               中国巨石股份有限公司2025             年年度报告\n\n\n            (一)    主营业务分析\n\n            1、   利润表及现金流量表相关科目变动分析表\n                                                                                            单位：元         币种：人民币\n                           科目                              本期数                     上年同期数                变动比例（%）\n            营业收入                                     18,880,860,110.36          15,855,766,997.99                 19.08\n            营业成本                                     12,627,832,919.21          11,887,682,064.62                   6.23\n            销售费用                                         211,094,362.60            198,705,377.65                   6.23\n            管理费用                                         742,632,238.21            343,653,044.65                116.10\n            财务费用                                         315,762,318.79            217,662,066.36                 45.07\n            研发费用                                         582,434,136.52            528,291,814.11                 10.25\n            经营活动产生的现金流量净额                              4,200,505,000.62          2,032,312,760.51                106.69\n            投资活动产生的现金流量净额                               -839,403,432.75           -977,214,274.93                不适用\n            筹资活动产生的现金流量净额                            -2,999,266,127.97          -1,059,229,317.19                不适用\n            营业收入变动原因说明：报告期产品销量增长、价格上升所致；\n            营业成本变动原因说明：报告期销量增长所致；\n            销售费用变动原因说明：报告期运输费和折旧费增长所致；\n            管理费用变动原因说明：上年同期超额利润分享计划不予兑现部分冲回导致上年基数低；\n            财务费用变动原因说明：报告期汇兑损失增加、利息收入减少所致；\n            研发费用变动原因说明：报告期研发投入增加所致；\n            经营活动产生的现金流量净额变动原因说明：报告期销售商品收到的现金和商业票据到期托收增\n            加所致；\n            投资活动产生的现金流量净额变动原因说明：报告期取得投资收益收到的现金增加所致；\n            筹资活动产生的现金流量净额变动原因说明：报告期新增债务减少所致。\n\n            本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n            □适用      √不适用\n\n            2、   收入和成本分析\n            □适用      √不适用\n\n            (1).   主营业务分行业、分产品、分地区、分销售模式情况\n\n                                                                                            单位：元         币种：人民币\n                                                      "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分产品情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 2191,
+              "end": 2845,
+              "quote": "主营业务分产品情况\n                                                                                营业收入           营业成本          毛利率比上年增减\n    分产品                 营业收入                  营业成本              毛利率（%）          比上年增           比上年增                 （%）\n                                                                                减（%）           减（%）\n玻纤及其制品             18,345,083,876.74      12,435,427,887.68            32.21         18.51           6.18     增加    7.87 个百分点\n其他                     183,547,580.76          54,358,987.20           70.38        194.61         210.46     减少    1.52 个百分点\n                                                      "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分地区情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 2845,
+              "end": 3496,
+              "quote": "主营业务分地区情况\n                                                                                营业收入           营业成本          毛利率比上年增减\n    分地区                 营业收入                  营业成本              毛利率（%）          比上年增           比上年增                 （%）\n                                                                                减（%）           减（%）\n国内地区               12,393,721,914.81       8,317,317,941.49            32.89         28.89          11.34    增加   10.58  个百分点\n国外地区                 6,134,909,542.69      4,172,468,933.39            31.99           3.52         -2.04     增加    3.86 个百分点\n                                                   "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分销售模式情况"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1720,
+              "quote": "                                            中国巨石股份有限公司2025          年年度报告\n\n\n                                                                          减（%）        减（%）\n 直销                14,188,696,385.61    9,505,251,073.95         33.01        30.24        16.89    增加   7.65 个百分点\n 经销                 4,339,935,071.89    2,984,535,800.93         31.23        -6.62       -17.04    增加   8.64 个百分点\n\n            主营业务分行业、分产品、分地区、分销售模式情况的说明\n                 公司产品收入主要是玻纤纱及制品的销售。2025                                年公司玻纤纱及制品实现营业收入\n            1,834,508.39 万元，占主营业务收入的比例为                   99.01%。与上年相比，玻纤纱及制品营业收入上升\n            18.51%，营业成本上升            6.18%，毛利率增加         7.87 个百分点；主要原因是              2025 年公司全面落实增\n            量、复价、稳价、调价的销售策略，玻纤及其制品销量增长、价格上升，毛利率提升。其他列示\n            的是公司风力发电业务，全年实现营业收入                          18,354.76 万元，毛利率达          70.38%。\n                 公司主营业务中，国内收入占                 66.89%，较上年上升        5.02 个百分点。国内收入同比上升                 28.89%，\n            国外收入同比上升            3.52%。主要原因是玻纤行业需求持续呈稳定上升趋势，内需市场快速增长，\n            产品结构调整，电子布占比提升，同时淮安风力发电业务全年运营，发电量较上年显著提升，国\n            内收入及毛利率增长均高于国外。\n                 公司主营业务中，直销占               76.58%，较上年上升         6.48 个百分点。2025        年受玻纤产品结构调整、\n            价格上升和风力发电业务增长影响，直销和经销的毛利率均有一定幅度提升。\n\n            (2).   产销量情况分析表\n            √适用      □不适用\n            产销量情况说明\n                 报告期内，公司产量随着产能的提升有一定幅度的增长；同时，公司始终坚持以市场需求为\n            导向，通过制订灵活的营销策略，全力以赴开拓市场，保存量、谋增量，玻纤粗纱与电子布销量\n            再创历史新高。\n\n            (3).   重大采购合同、重大销售合同的履行情况\n\n            □适用      √不适用\n\n            (4).   成本分析表\n\n                                                                                    单位：元        币种：人民币\n                                                     "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、行业经营情况：表面回暖与深层压力并存"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 61,
+              "end": 1317,
+              "quote": "三、行业经营情况：表面回暖与深层压力并存\n    从经营数据看，2025        年行业整体效益有所修复。主要企业受益于产品价格的部分恢复及销量\n增长，营业收入普遍实现同比增长，行业平均毛利率同比亦有明显提升。然而，这份“成绩单”\n背后潜藏风险。首先，粗细纱较大的新增产能正在持续输入市场，对供需平衡构成长期压力，但\n是由于铂金价格快速上涨等因素，导致产能增长存在不确定性。其次，普通产品年内价格已处于\n低位，叠加铂金价格上涨等因素，整体判断                    2026 年玻纤价格稳中有升。再者，市场增长动力过度\n依赖国内需求，而地产等传统领域需求依然疲软，风电、汽车等增长市场的容量能否持续消化新\n增供给，尚需观察。\n    1、营收与利润\n    2025年规模以上玻璃纤维及制品制造企业（不含玻璃纤维增强复合材料制品企业）主营业务\n收入同比增长      11.0%。然而，房地产与基建市场依然低迷，外贸出口小幅萎缩。行业营收及盈利\n水平的持续改善，更多是行业新质生产力正在蓄能起势。高模、热塑、超细及低介电、低膨胀、\n高硅氧等高性能玻纤及制品成为行业利润主要增长点。从企业端来看，近年来坚持科技创新不断\n探索实施绿色化、智能化、高端化发展的企业，整体经营状况正在持续好转，而部分仍坚持传统\n细分市场和跟随发展模式的企业则面临压力。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        图  7   2011年以来玻纤及制品行业主营业务收入与利润总额增速变化趋势\n    2、价格与库存\n    2025年在行业整体经营效益大幅改善的背景下，不同细分市场差异化表现明显，市场价格走\n势呈现分化与承压态势。普通直接纱全年均价虽较                       2024 年有所上浮，但价格中枢自年初起逐季下\n移，包括中碱纱、热固直接纱在内的各类传统产品面临新市场培育缓慢等问题，反映出中低端产\n品面临的持续竞争压力。风电、汽车、电子等产业不断进行技术迭代升级并对玻纤材料应用提出\n新门槛、新要求，市场规模持续扩张的同时产品附加值水平也在不断提升。风电用高模/超高模玻\n纤、新能源汽车用高品质热塑玻纤、电子用玻纤等高端产品产能规模和市场占有率快速提升，并\n带动细分市场产品整体价格持续走高。\n    与此同时，2025      年，因信息化产业迭代发展，特种电子玻纤成为投资热点，其建设热潮一定\n程度上挤占了常规电子玻纤的供应，推动普通电子布供应趋紧，价格有所上升。然而，产能的结\n构性过热需警惕。截至           2025年底，行业内在建/拟建的特种电子玻纤项目投资额已累计达                            133.8\n亿元，其产能预计在          2027年迎来集中释放，未来可能加剧该细分领域的竞争。\n\n\n\n\n\n\n                                        24/213"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-PS-01",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-PS-02",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-RM-02",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-SM-01",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-SM-02",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-SM-03",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-SM-04",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-MC-01",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-MC-02",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-MC-03",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-SC-P-01",
+      "element": "position",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-SC-U-01",
+      "element": "upstream_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-SC-D-01",
+      "element": "downstream_customers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-CF-01",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "fact_id": "F-CF-02",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58"
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-BS-01",
+        "text": "公司主要从事玻璃纤维及制品的生产、销售，业务以玻纤纱及制品为核心，另含风力发电业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-BS-02",
+        "text": "公司玻璃纤维及其制品业务合计实现营业收入1,834,508.39万元，占主营业务收入的99.01%；淮安新能源并网发电实现营业收入18,354.76万元，占主营业务收入的0.99%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "玻璃纤维及其制品业务营业收入",
+            "raw_value": "1,834,508.39",
+            "value": "1834508.39",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "玻璃纤维及其制品业务占主营业务收入比例",
+            "raw_value": "99.01",
+            "value": "99.01",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "淮安新能源发电业务营业收入",
+            "raw_value": "18,354.76",
+            "value": "18354.76",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "淮安新能源发电业务占主营业务收入比例",
+            "raw_value": "0.99",
+            "value": "0.99",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-PS-01",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-PS-01",
+        "text": "公司主要产品为玻璃纤维粗纱及制品、电子布，报告期内粗纱及制品销量320.26万吨，电子布销量10.62亿米。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "粗纱及制品销量",
+            "raw_value": "320.26",
+            "value": "320.26",
+            "unit": "万吨",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "电子布销量",
+            "raw_value": "10.62",
+            "value": "10.62",
+            "unit": "亿米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-PS-02",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-PS-02",
+        "text": "公司产品面向风能、汽车、电子电气、新能源、光伏等应用领域；细纱薄布全面突围，汽车专用布销量增长，部分超薄产品实现批量稳定交付，特种纤维电子布相关产品的开发及认证正在有序推进中。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-RM-01",
+        "text": "公司实现营业收入1,888,086.01万元，比上年同期增长19.08%；归属于上市公司股东的净利润328,546.10万元，比上年同期增长34.38%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "1,888,086.01",
+            "value": "1888086.01",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "19.08",
+            "value": "19.08",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润",
+            "raw_value": "328,546.10",
+            "value": "328546.10",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润同比增减",
+            "raw_value": "34.38",
+            "value": "34.38",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-RM-02",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-RM-02",
+        "text": "主营业务分产品中，玻纤及其制品营业收入18,345,083,876.74元，营业成本12,435,427,887.68元，毛利率32.21%，毛利率比上年增加7.87个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "玻纤及其制品营业收入",
+            "raw_value": "18,345,083,876.74",
+            "value": "18345083876.74",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "玻纤及其制品营业成本",
+            "raw_value": "12,435,427,887.68",
+            "value": "12435427887.68",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "玻纤及其制品毛利率",
+            "raw_value": "32.21",
+            "value": "32.21",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "玻纤及其制品毛利率比上年增减",
+            "raw_value": "7.87",
+            "value": "7.87",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-RM-03",
+        "text": "主营业务分产品中“其他”列示的是公司风力发电业务，营业收入183,547,580.76元，营业成本54,358,987.20元，毛利率70.38%，毛利率比上年减少1.52个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "其他（风力发电业务）营业收入",
+            "raw_value": "183,547,580.76",
+            "value": "183547580.76",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他（风力发电业务）营业成本",
+            "raw_value": "54,358,987.20",
+            "value": "54358987.20",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他（风力发电业务）毛利率",
+            "raw_value": "70.38",
+            "value": "70.38",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他（风力发电业务）毛利率比上年增减",
+            "raw_value": "1.52",
+            "value": "1.52",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-RM-04",
+        "text": "公司营业收入变动原因为报告期产品销量增长、价格上升所致；营业成本变动原因为报告期销量增长所致。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-SM-01",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-SM-01",
+        "text": "主营业务分地区中，国内地区营业收入12,393,721,914.81元，毛利率32.89%，毛利率比上年增加10.58个百分点；国外地区营业收入6,134,909,542.69元，毛利率31.99%，毛利率比上年增加3.86个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "国内地区营业收入",
+            "raw_value": "12,393,721,914.81",
+            "value": "12393721914.81",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国内地区毛利率",
+            "raw_value": "32.89",
+            "value": "32.89",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国内地区毛利率比上年增减",
+            "raw_value": "10.58",
+            "value": "10.58",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国外地区营业收入",
+            "raw_value": "6,134,909,542.69",
+            "value": "6134909542.69",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国外地区毛利率",
+            "raw_value": "31.99",
+            "value": "31.99",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国外地区毛利率比上年增减",
+            "raw_value": "3.86",
+            "value": "3.86",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-SM-02",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-SM-02",
+        "text": "公司主营业务中，国内收入占66.89%，较上年上升5.02个百分点；国内收入同比上升28.89%，国外收入同比上升3.52%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "国内收入占主营业务收入比例",
+            "raw_value": "66.89",
+            "value": "66.89",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国内收入占比比上年增减",
+            "raw_value": "5.02",
+            "value": "5.02",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国内收入同比增减",
+            "raw_value": "28.89",
+            "value": "28.89",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国外收入同比增减",
+            "raw_value": "3.52",
+            "value": "3.52",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-SM-03",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-SM-03",
+        "text": "主营业务分销售模式中，直销营业收入14,188,696,385.61元，毛利率33.01%，毛利率比上年增加7.65个百分点；经销营业收入4,339,935,071.89元，毛利率31.23%，毛利率比上年增加8.64个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "直销营业收入",
+            "raw_value": "14,188,696,385.61",
+            "value": "14188696385.61",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "直销毛利率",
+            "raw_value": "33.01",
+            "value": "33.01",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "直销毛利率比上年增减",
+            "raw_value": "7.65",
+            "value": "7.65",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经销营业收入",
+            "raw_value": "4,339,935,071.89",
+            "value": "4339935071.89",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经销毛利率",
+            "raw_value": "31.23",
+            "value": "31.23",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经销毛利率比上年增减",
+            "raw_value": "8.64",
+            "value": "8.64",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-SM-04",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-SM-04",
+        "text": "公司主营业务中，直销占76.58%，较上年上升6.48个百分点。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "直销占主营业务收入比例",
+            "raw_value": "76.58",
+            "value": "76.58",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "直销占比比上年增减",
+            "raw_value": "6.48",
+            "value": "6.48",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-OI-01",
+        "text": "公司统筹全球六大生产基地产销存动态优化，并依托两大海外生产基地灵活调配，以应对“双反”、特别关税等不利因素，保障全球供应链稳定。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-OI-02",
+        "text": "项目建设方面，桐乡总部年产12万吨玻璃纤维池窑拉丝生产线冷修技改项目投产；九江智能制造基地年产40万吨玻璃纤维生产线建设项目第二批年产20万吨生产线分区分期点火投产；淮安10万吨电子纱生产线进入全面安装阶段；淮安500MW风电建设项目和成都智能制造基地新建年产20万吨高性能玻璃纤维生产线建设项目第一批年产10万吨生产线项目于2025年底正式开工；桐乡总部年产20万吨玻璃纤维池窑拉丝生产线冷修技改项目全面启动。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F-OI-03",
+        "text": "公司推进高价进口原料替代、国产和自制，并拓宽低成本融资渠道，保持融资利率持续下降。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-CC-01",
+        "text": "公司销售以直销为主、经销为辅，2025年直销占主营业务收入76.58%，经销为其余部分；销售策略为增量、复价、稳价、调价，并优先抢占风能、汽车、电子电气、新能源、光伏等高端市场份额。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-CC-02",
+        "text": "公司主营业务收入中，国内收入占66.89%，国外收入占其余部分；内需市场快速增长，产品结构调整、电子布占比提升，同时淮安风力发电业务全年运营，国内收入及毛利率增长均高于国外。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-OD-01",
+        "text": "2025年公司全面落实增量、复价、稳价、调价的销售策略，玻纤及其制品销量增长、价格上升，毛利率提升。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F-OD-03",
+        "text": "行业经营方面，2025年规模以上玻璃纤维及制品制造企业（不含玻璃纤维增强复合材料制品企业）主营业务收入同比增长11.0%；普通直接纱全年均价较2024年有所上浮但价格中枢逐季下移，风电用高模/超高模玻纤、新能源汽车用高品质热塑玻纤、电子用玻纤等高端产品价格持续走高。上述为行业情况，非公司自身经营数据。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "规模以上玻璃纤维及制品制造企业（不含玻璃纤维增强复合材料制品企业）主营业务收入同比增减",
+            "raw_value": "11.0",
+            "value": "11.0",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-MC-01",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-MC-01",
+        "text": "报告期内公司玻纤粗纱与电子布销量再创历史新高，分别突破320万吨和10亿米，实现量价齐升、营业收入和利润同比增长。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-MC-02",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-MC-02",
+        "text": "公司主营业务中，国内收入占66.89%，较上年上升5.02个百分点；直销占76.58%，较上年上升6.48个百分点。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-MC-03",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-MC-03",
+        "text": "报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明：不适用。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-SC-P-01",
+      "element": "position",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-SC-P-01",
+        "text": "公司处于玻璃纤维及制品的生产与销售环节，拥有桐乡、九江、成都等国内生产基地及两大海外生产基地，形成从池窑拉丝到电子布等制品的制造体系。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-SC-U-01",
+      "element": "upstream_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F-SC-U-01",
+        "text": "公司技术部门与辅助单位持续加码新产品、新技术、新工艺、新供方、新材料、新配方，加快高价进口原料替代、国产和自制。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-SC-D-01",
+      "element": "downstream_customers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-SC-D-01",
+        "text": "公司抓住结构性增长机遇，优先抢占风能、汽车、电子电气、新能源、光伏等高端市场份额。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-CF-01",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-CF-01",
+        "text": "公司为全球玻纤龙头企业，2025年玻纤粗纱与电子布销量分别突破320万吨和10亿米，均创历史新高。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "fact_id": "F-CF-02",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F-CF-02",
+        "text": "公司品牌价值连续10年蝉联行业第一，桐乡总部、九江、成都三个基地均入选国家工信部卓越级智能工厂名单。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未获取各细分玻纤产品（如高模纱、热塑纱、电子纱等）的公司层面收入拆分，仅取得粗纱及制品与电子布的销量口径。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取主要原材料、能源的具体采购量、采购金额及供应商结构。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取具体客户名称、客户集中度及分客户销售数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "行业数据为协会统计口径，非公司自身经营数据。",
+        "指标格式隔离：事实F-OD-02未作为结论采用；metrics.3: Value error, metric qualifier must match original raw value; metrics.5: Value error, metric qualifier must match original raw value；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取具体原材料名称、采购金额及主要供应商信息。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-f19719448496ac9a5d743a38",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取具体下游客户名称及客户集中度。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "active": true,
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未获取各细分玻纤产品（如高模纱、热塑纱、电子纱等）的公司层面收入拆分，仅取得粗纱及制品与电子布的销量口径。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "active": true,
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取主要原材料、能源的具体采购量、采购金额及供应商结构。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "active": true,
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取具体客户名称、客户集中度及分客户销售数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "active": true,
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "行业数据为协会统计口径，非公司自身经营数据。",
+        "指标格式隔离：事实F-OD-02未作为结论采用；metrics.3: Value error, metric qualifier must match original raw value; metrics.5: Value error, metric qualifier must match original raw value；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "active": true,
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取具体原材料名称、采购金额及主要供应商信息。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "active": true,
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取具体下游客户名称及客户集中度。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [
+    {
+      "reading_work_id": "bp-work-792fc67e440aef2f0e11ff58",
+      "active": true,
+      "finding_id": "REV-006",
+      "element": "products_services",
+      "severity": "minor",
+      "reason": "业务概况在披露淮安新能源营业收入的同时给出并网发电量5.62亿千瓦时。现有发电收入及占比表述正确，但缺少这一并列的主要经营规模指标。建议补充该发电量，不因此否定已支持的收入事实。",
+      "evidence_ids": [
+        "source-0001"
+      ]
+    }
+  ],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

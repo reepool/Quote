@@ -1,0 +1,2886 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "000089.SZ",
+  "report": {
+    "instrument_id": "000089.SZ",
+    "report_id": "asset_81f8fdf951892d1209e71d38aa28bc4d",
+    "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-23T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+  "latest_reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+  "readings": [
+    {
+      "work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "workpaper_sha256": "0e46d452f00c344cf22bba045c122819496deb62c19ef81b6624e83fe8b7946f",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0021",
+            "section_path": [
+              "第三节 管理层讨论与分析"
+            ],
+            "start_page": 10,
+            "end_page": 32,
+            "rationale": "选择管理层讨论与分析主节（section-0021）以覆盖公司业务、经营综述与收入成本分析的整体框架；section-0035为2025年工作业绩的实质经营回顾，section-0037航空市场与业务、section-0038经营与管理分别说明业务结构与经营驱动；section-0047含收入构成明细（航空性、地面服务、租赁特许、物流、广告等收入及占比），是货币化与收入结构的关键来源；section-0055客户情况与section-0056供应商情况补充客户渠道与资源投入；section-0080主要控股参股公司分析补充子公司经营与业务板块。以上共同解释业务结构、产品服务、收入来源与规模、客户与经营变化，避免选取纯行业背景、治理、财务报告附注等冗余范围。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0023 行业情况：属纯行业背景，对解释公司层面经营非必需",
+          "section-0024 核心竞争力分析：偏泛化竞争力描述，非经营实质",
+          "section-0302 财务报告及附注：仅在有明确缺口时定向补充，不整体纳入",
+          "section-0099 公司治理、环境和社会：与经营分析无关"
+        ],
+        "selection_rationale": "选择管理层讨论与分析主节（section-0021）以覆盖公司业务、经营综述与收入成本分析的整体框架；section-0035为2025年工作业绩的实质经营回顾，section-0037航空市场与业务、section-0038经营与管理分别说明业务结构与经营驱动；section-0047含收入构成明细（航空性、地面服务、租赁特许、物流、广告等收入及占比），是货币化与收入结构的关键来源；section-0055客户情况与section-0056供应商情况补充客户渠道与资源投入；section-0080主要控股参股公司分析补充子公司经营与业务板块。以上共同解释业务结构、产品服务、收入来源与规模、客户与经营变化，避免选取纯行业背景、治理、财务报告附注等冗余范围。",
+        "stop_reason": "已覆盖公司业务、经营回顾、收入构成、客户与供应商及主要子公司等核心经营信息，足以回答业务模式、货币化与主要变化；行业背景、治理、财务报告附注及债券等非核心范围不再扩展，故在此停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "行业背景（section-0023）、核心竞争力分析（section-0024）、财务报告附注（section-0302）及公司治理（section-0099）未纳入阅读范围，相关细节未获取。",
+        "主要子公司经营数据（营业收入、利润总额等）在source-0016及source-0017中有披露，但本工作底稿以合并层面核心业务解释为主，未逐项列示子公司财务数据。",
+        "分产品、分地区、分销售模式收入均与营业收入合计相同（均为100%），未提供更细颗粒度的产品收入拆分。",
+        "研发费用2025年为0.00元，同比下降100.00%，但研发投入情况标注为“不适用”，具体研发活动细节未获取。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-af712f3cfc13ce2c01da967f:workpaper:sections",
+          "request_hash": "6ee5785a41170212eddb35607bd3690bd6b180c322edba8813c8db997d2429ca",
+          "response_hash": "31d816146dc395d38ac280cdb65d1dd057f8d97a9ddd467363857835da2da2da",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 18699,
+            "output_tokens": 365,
+            "total_tokens": 19064
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 713,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0170",
+            "section-0175",
+            "section-0176",
+            "section-0181",
+            "section-0186",
+            "section-0191",
+            "section-0194",
+            "section-0197",
+            "section-0198",
+            "section-0202",
+            "section-0206",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0253",
+            "section-0254",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0516",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0527",
+            "section-0530",
+            "section-0531",
+            "section-0535",
+            "section-0544",
+            "section-0545",
+            "section-0551",
+            "section-0556",
+            "section-0559",
+            "section-0562",
+            "section-0565",
+            "section-0568",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0584",
+            "section-0587",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0596",
+            "section-0601",
+            "section-0604",
+            "section-0605",
+            "section-0609",
+            "section-0610",
+            "section-0611",
+            "section-0614",
+            "section-0615",
+            "section-0616",
+            "section-0617",
+            "section-0618",
+            "section-0621",
+            "section-0624",
+            "section-0627",
+            "section-0630",
+            "section-0632",
+            "section-0634",
+            "section-0636",
+            "section-0637",
+            "section-0639",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0648",
+            "section-0649",
+            "section-0650",
+            "section-0654",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0660",
+            "section-0663",
+            "section-0666",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0671",
+            "section-0674",
+            "section-0675",
+            "section-0676",
+            "section-0677",
+            "section-0680",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0688",
+            "section-0691",
+            "section-0692",
+            "section-0693",
+            "section-0694",
+            "section-0696",
+            "section-0698",
+            "section-0699",
+            "section-0700",
+            "section-0701",
+            "section-0703",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0708",
+            "section-0712",
+            "section-0717",
+            "section-0719",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0728",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0735",
+            "section-0737",
+            "section-0738",
+            "section-0739",
+            "section-0740",
+            "section-0742",
+            "section-0744",
+            "section-0745",
+            "section-0746",
+            "section-0750",
+            "section-0753",
+            "section-0754",
+            "section-0755",
+            "section-0756",
+            "section-0759",
+            "section-0762",
+            "section-0763",
+            "section-0764",
+            "section-0765",
+            "section-0767",
+            "section-0769",
+            "section-0770",
+            "section-0771",
+            "section-0772",
+            "section-0775",
+            "section-0776",
+            "section-0782",
+            "section-0783",
+            "section-0787",
+            "section-0790",
+            "section-0793",
+            "section-0794",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0803",
+            "section-0804",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0810",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0824",
+            "section-0825",
+            "section-0826",
+            "section-0827",
+            "section-0828",
+            "section-0829",
+            "section-0830",
+            "section-0831",
+            "section-0832",
+            "section-0833",
+            "section-0834",
+            "section-0835",
+            "section-0838",
+            "section-0842",
+            "section-0843",
+            "section-0845",
+            "section-0846",
+            "section-0847",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0853",
+            "section-0855",
+            "section-0857",
+            "section-0858",
+            "section-0860",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0865",
+            "section-0866",
+            "section-0871",
+            "section-0873",
+            "section-0878",
+            "section-0879",
+            "section-0880",
+            "section-0881",
+            "section-0882",
+            "section-0883",
+            "section-0884",
+            "section-0885",
+            "section-0886",
+            "section-0887",
+            "section-0891",
+            "section-0892",
+            "section-0894",
+            "section-0896",
+            "section-0899",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0909",
+            "section-0910",
+            "section-0911",
+            "section-0912",
+            "section-0913",
+            "section-0914",
+            "section-0915",
+            "section-0916",
+            "section-0917",
+            "section-0918",
+            "section-0919",
+            "section-0920",
+            "section-0921",
+            "section-0922",
+            "section-0923",
+            "section-0924",
+            "section-0925",
+            "section-0933",
+            "section-0936",
+            "section-0937",
+            "section-0938",
+            "section-0939",
+            "section-0940",
+            "section-0943",
+            "section-0944",
+            "section-0945",
+            "section-0946",
+            "section-0947",
+            "section-0948",
+            "section-0949",
+            "section-0950",
+            "section-0953",
+            "section-0954",
+            "section-0957",
+            "section-0958",
+            "section-0959",
+            "section-0962",
+            "section-0963",
+            "section-0964",
+            "section-0965",
+            "section-0968",
+            "section-0972",
+            "section-0975",
+            "section-0978",
+            "section-0979",
+            "section-0980",
+            "section-0981",
+            "section-0982",
+            "section-0983",
+            "section-0984"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-af712f3cfc13ce2c01da967f:workpaper:extract",
+          "request_hash": "56b764057ab37b10d4d97f42e9667f9fb3facf33a62b5e1c9d4b91ba5da2f8a7",
+          "response_hash": "d5988cbe37c602a8661a3daadf2d49b2c02c61ab23131887e2d2cd104dbe2a89",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 19779,
+            "output_tokens": 7137,
+            "total_tokens": 26916
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0021"
+          ],
+          "physical_pages": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "0e46d452f00c344cf22bba045c122819496deb62c19ef81b6624e83fe8b7946f",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 200,
+              "end": 1414,
+              "quote": "第三节 管理层讨论与分析\n\n\n一、报告期内公司从事的主要业务\n\n\n        2025 年世界经济动能疲弱，国际经贸环境急剧变化。我国经济顶压前行、展现强大韧性，经济运\n\n行总体平稳、稳中有进，主要目标任务顺利完成，现代化建设迈出坚实步伐。民航业坚持稳中求进工作\n\n总基调，积极服务构建新发展格局，民航高质量发展再上新台阶，总体保持了稳中有进、稳中向好的发\n\n展态势。2025年全行业共完成运输总周转量 1640.8 亿吨公里、旅客运输量7.7 亿人次、货邮运输量\n\n1017.2万吨，同比分别增长10.5%、5.5%、13.3%。全行业实现盈利65亿元，经营效益进一步向好。\n\n二、报告期内公司所处行业情况\n\n\n        公司为深圳宝安国际机场的运营管理机构，主要经营航空服务业务及其延伸出的非航空业务。\n\n        航空服务业指以各航空公司的定期和不定期航班、旅客和货主（物）为服务对象，提供的航空地面\n\n保障及航空地面代理服务业务，主要包括飞机起降及停场保障，机场飞行控制区的维护与运营管理，旅\n\n客的乘机、候机及进出港服务，航空器的维护及辅助服务，航空货物的地面处理服务等。\n\n        非航空业务包括航空物流业务、商业租赁和广告业务。航空物流业务是指依托于航空主业延伸出的\n\n物流增值服务，主要包括航空货物过站处理服务、航空物流园租赁与管理业务、航空货运代理服务业务\n\n等。\n\n三、核心竞争力分析\n\n\n        （一）独特的区位优势\n\n        深圳作为改革开放先锋城市，承载着粤港澳大湾区、先行示范区、综合改革试点、全面深化前海合\n\n作改革开放等重大国家战略，具有强大的城市影响力、吸引力和竞争力，高质量发展的要素条件不断集\n\n聚增多。深圳机场地处粤港澳大湾区“黄金内湾”核心位置，是联动大湾区、辐射国内外的枢纽节点，\n\n是广深港澳科技创新走廊、深中产业拓展走廊的战略交汇处，是中国境内集海、陆、空、铁联运为一体\n\n的现代化大型国际空港。深圳机场及周边片区30平方公里已纳入前海合作区，周边30—40公里内布局\n\n了广州南沙新区、东莞滨海湾新区、中山翠亨新区和火炬高新区等大湾区城市群的核心发展极，随着深\n\n中通道通车运营、深江铁路加快建设，深圳机场正加速成为高效联运、以点带面的湾区服务新核。新时\n\n代赋予新使命，在多领域民航强国建设的新征程上，深圳机场将牢牢把握区位门户复合型航空枢纽定位，\n\n\n\n                                                                                                                                                                                            10"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 0,
+              "end": 1575,
+              "quote": "                                                                                                                    深圳市机场股份有限公司2025年年度报告全文\n\n\n锚定建设世界一流机场目标，持续保持奋进姿态，助力深圳加快打造更具全球影响力的经济中心城市和\n\n现代化国际大都市。\n\n        （二）强大的资源保障\n\n        面对复杂多变的市场环境，深圳机场始终重视和把握基础性资源、战略资源的获取、调配和开发。\n\n发达的航线网络，充足的运行资源储备和完善的配套设施是公司航空主业平稳发展的强大保障。高品质\n\n创新型国际航空枢纽试点成功验收，年内新开墨尔本、万象等 14条国际客运航线，国际及地区客运航\n\n点达61个；新开13条国内航线，国内客运航点达131个。空港型国家物流枢纽加快建设，吸引14家\n\n航司在深增加运力投放，新开加密19条国际及地区货运航线，国际及地区货运通航点达43个；新设越\n\n南前置仓，设置乌鲁木齐等3个异地货站，打造国内首个24小时通关运作的“智慧化、远程化”国际\n\n货站。截至2025年底，深圳机场高峰小时容量标准65架次。全年累计实现航班起降44.8万架次、旅\n\n客吞吐量6,648.5万人次、货邮吞吐量205.1万吨，全国排名分别为第三、第四、第三，以上指标均刷\n\n新历史最高纪录。当前，深圳机场范围已规划建设成为“海、陆、空、高铁、城际、地铁”六位一体的\n\n国际性综合交通枢纽，正在运行的基础设施包括1个航站楼、1个卫星厅及3条跑道。\n\n        （三）先进的创新理念\n\n        深圳机场生于改革，成于创新，是国内首批由地方政府筹建、实施属地化运营的机场，是全国民航\n\n最早实现市场化、企业化运营管理的机场之一。公司自成立以来，始终坚持开放意识和国际视野，以创\n\n新驱动可持续发展。公司紧跟深圳敢闯敢试、率先示范的改革步伐，聚焦四型机场建设，立足先行示范，\n\n把创新作为高质量发展的核心动能，全面提升自主创新能力，为深圳加速形成新质生产力蓄势赋能。近\n\n年来，深圳机场持续完善创新管理机制，强化顶层设计，将创新融入公司发展战略，搭建高效的创新管\n\n理体系，培育良好创新环境；广泛应用新技术，引领行业变革，全球首创利用 AI技术用于机位自动分\n\n配，入选国际航空运输协会全球首个新旅行体验技术（NEXTT）典型案例；在飞行区开展5G应用创新实\n\n践，获全球5G应用优秀场景奖；全球首个航空箱CT安检机成功试用，开创航空货物安检国际新标准；\n\n瑞鹏科技公司自主研发无动力设备新型尾销，从技术根源上消除无动力设备牵引脱销风险，操作时间缩\n\n短到2至3秒，效率提高3至10倍。\n\n        （四）卓越的管理体系\n\n        始终坚持打造科学高效的管理体系和市场化机制，致力于成为航空运输安全运行秩序的管理者、优\n\n质服务的提供者、社会效益的创造者。公司扎实开展深入贯彻中央八项规定精神学习教育，促进作风建\n\n设持续向好发展；持续完善合规制度与审查机制，建立权责清晰、闭环管控的风险管理机制，统筹防范\n\n各类风险；扎实推进作风建设，精准运用监督执纪“四种形态”，多维度厚植廉洁文化根基；努力追求\n\n                                                                                                                                                                                         11"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 1605,
+              "quote": "                                                                                                                      深圳市机场股份有限公司2025年年度报告全文\n\n\n管理效率最大化，根据战略发展需要，搭建了适合现代化、国际化大型机场运作要求的组织体系，建立\n\n与现有管控模式相匹配的经营业绩考核体系，形成对所属单位和谐有序、规范高效的管控体系，加速打\n\n造成产品卓越、品牌卓著、创新领先、治理现代的世界一流企业。深圳机场近年来连续荣膺广东省政府\n\n质量奖、深圳市市长质量奖及“深圳市十佳质量提升国企”等荣誉称号，成为全国首家获得市场质量信\n\n用AAA级服务示范企业的标杆机场。\n\n        （五）最佳的机场体验\n\n        始终坚持“以人民为中心”，践行“真情服务”理念，展现先行示范窗口和城市门户的品牌形象，\n\n不断提升服务“美誉度”。坚持以客户视角来管理机场理念，以旅客需求为导向，全链条、全流程优化\n\n服务品质、提升运行效率，努力为广大旅客提供最安全、最便捷、最优质的出行服务。2025 年，航班\n\n放行正常率达 91.19%。持续提升旅客服务品质，启用境外来宾综合服务中心，国内航班截载时间缩短\n\n至 38分钟；完善便利化及无障碍服务，推动成立机场简化手续委员会，不断优化现场服务流程。持续\n\n开展“一老一小”服务监察，积极推广“深爱银发、深爱童行”服务子品牌；提升民生诉求处置水平，\n\n融合机场“一号通”热线和民生诉求平台，全渠道接收客户诉求。2025 年，荣获 SKYTRAX 6000—7000\n\n万量级最佳机场，连续六年获 ACI 亚太地区4000 万级最佳机场奖，连续九年蝉联 CAPSE 年度“最佳\n\n机场”，并获评CAPSE 创新先锋、质量提升先锋双第一，“深爱全程”服务品牌再登CAPSE 2025年度\n\n中国内地机场榜首。深圳机场行业认可度、旅客满意度、品牌美誉度、全球知名度全面提升。\n\n        （六）领先的数字变革\n\n        新一轮科技革命和产业变革正在全方位重塑民航业的形态、模式和格局。深圳机场以“一屏、三图、\n\n八平台、N系统”为核心的智慧机场新架构基本形成，在自主研发、数据治理、新技术应用及行业试点\n\n上持续发力。全面参与“机场场面智能运行管控关键技术研究与示范”国家重点研发项目，“一体化主\n\n动运控”、安全质量监管等核心平台相继上线，初步实现了全场运行态势的“可监、可管、可控”；旅\n\n客服务方面，在行业率先完成电子身份证一码通关验证，打造国内首个民航国际中转服务系统，行业首\n\n创出租车短途单优先积分制，上线动态交通信息指引等多项功能。围绕客流、行李流等维度，上线 AI\n\n智能客服、AI 乘机助理、机器人配餐、托运行李异常提醒等创新服务产品，极大提升旅客的出行体验\n\n和效率；物流运输上引进AGV搬运机器人、采用无人驾驶牵引车、AMR智能驳运等无人化设备，实现自\n\n动化、标准化的高效作业。\n\n        （七）积极的文化引领\n\n        深圳机场以“服务社会、助飞深圳”为使命，始终将品牌及企业文化建设作为支撑战略目标实现、\n\n引领主业高质量发展的关键举措，持续提升企业形象和品牌影响力。大力倡导和践行“同一个空港，同\n\n                                                                                                                                                                                            12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1382,
+              "quote": "                                                                                                                         深圳市机场股份有限公司2025年年度报告全文\n\n\n一个梦想”理念，携手深圳民航各单位，形成了发展共商、平台共建、资源共享的格局，共同助推深圳\n\n民航事业高质量发展。打造辨识度高、特色鲜明的品牌视觉识别体系，发挥机场“城市平台，文化中心”\n\n的载体功能，体现“从心出发，连通世界”的理想情怀。构建企业文化理念体系，提炼新时期深圳机场\n\n发展的愿景、使命和核心价值观，推进企业文化落地深植，激励全员在统一的精神和价值引领下，为共\n\n同的愿景目标而奋斗。坚持以事业奋斗者为本，深挖基层典型人物和先进事迹，进一步强化员工对公司\n\n的认同感、自豪感和归属感，为深圳机场高质量发展凝心聚力。公司把握机遇主动进取，凝神聚智狠抓\n\n落实，形成了向好向上加速发展的良好势头。\n\n四、主营业务分析\n\n1、概述\n\n\n        一、概述\n\n        2025 年世界经济动能疲弱，国际经贸环境急剧变化。我国经济顶压前行，向新向优发展，展现强\n\n大韧性。我国民航稳中求进，安全态势平稳可控，发展质效不断提升。一年来，公司牢牢把握区位门户\n\n复合型国际航空枢纽定位，抢抓机遇、笃行实干，聚力推动安全治理增效、服务运行提质、枢纽能级跃\n\n升、经济效益增长、改革创新攻坚，为实现“十五五”良好开局奠定坚实基础，世界一流机场建设迈出\n\n坚定步伐。\n\n        三大指标刷新历史纪录，报告期内，深圳机场完成航班起降44.8万架次，同比增长4.6%，排名全\n\n国第三。旅客吞吐量6,648.5万人次，同比增长8.1%，排名全国第四；其中国内旅客量6,014.4人次，\n\n同比增长6.8%，排名全国第二；国际及地区旅客量634.1万人次，同比增长22.4%。货邮吞吐量205.1\n\n万吨，同比增长9%，稳居全国第三；其中国际及地区货邮量106.1万吨，同比增长10%。全年实现营业\n\n收入51.3亿元，同比增长8.2%，利润总额6.7亿元。\n\n        二、2025年工作业绩\n\n        （一）安全、运行与服务\n\n        ——安全\n\n        筑牢安全生产根基，全域安全防线更加牢固。安全管理体系日益完善。新增、修订岗位安全责任清\n\n单及体系文件，安全责任链条进一步压实。开展航空地面服务商年度安全评价，安全监管效能持续提升。\n\n安全过程管控更加精细。组织鸟击航空器专项整治及迁徙季专项行动，建设鸟击残留物鉴定实验室。强\n\n化净空保护，设立固定及流动净空观察哨54个，高效完成三跑道相关超高障碍物处置。升级航空箱CT\n\n\n\n\n                                                                                                                                                                                                 13"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 1657,
+              "quote": "                                                                                                                      深圳市机场股份有限公司2025年年度报告全文\n\n\n安检系统，优化升级系统图像；上线运行升级版跨境电商特种货物管理系统，实现敏感品全品类运输。\n\n安全文化建设深入人心。成功创建运输机场消防救援“淬火讲堂”品牌，荣获民航中南局先进单位称号。\n\n开展安全作风警示教育、民航重大隐患判定标准等安全培训700余场次，有力提升从业人员安全素养。\n\n荣获深圳市质量大赛QC成果金奖1个、银奖4个、铜奖1个。应急救援能力全面提升。开发启用“民\n\n航中南消防战训信息系统”，为机场消防战训信息化管理提供平台支撑。率先成立行业内首家胸痛单元，\n\n创新构建空地协同救治体系，成功处置胸痛患者 87 例。圆满完成三跑道航空器应急救援综合实战演练，\n\n检验多跑道运行下的应急响应与协同处置效能。\n\n        ——运行\n\n        精耕运行保障效率，航班运行品质持续向好。着力优化航班运行品质。上线一体化主动运控系统，\n\n行业内首批实现从被动响应转换为主动运控。发布新版航延预案，完善“一航班一专班”机制。优化卫\n\n星厅航班波与机位分配，创新采用摆渡车分流捷运压力，旅客站台等待超3.5分钟比例降至0.07%。在\n\n6000万级机场中率先实现国内航班截载时间缩短至38分钟。充分利用客运航班间隙放行货运航班，在\n\n保障准点率的基础上提升货运航班出港效率。圆满完成重大任务保障。高标准、高质量开展十五运会和\n\n残特奥会保障工作，组建300余人志愿者队伍，开展综合演练和赛事保障，全年顺利完成十五运会抵离、\n\n春运暑运等重大保障任务。顺利实现三跑道投产运行。建立全周期任务管控机制，紧盯关键节点实施动\n\n态跟踪预警，圆满完成飞行程序设计、校飞试飞保障等核心工作，成功迈入“三跑道时代”。\n\n        ——服务\n\n        全面聚焦旅客关切，旅客出行体验更加美好。加速构建智慧服务生态。推出国际全流程无纸化登机，\n\n创新“一闸双门双查验”模式，通过精准布控提升通关效率，旅客最快5秒通关。上线AI智能客服、\n\nAI乘机助理、机器人配餐、托运行李异常提醒等创新服务产品。深化中转便利化政策，9.2万名过境旅\n\n客享受免办边检手续便利。全面升级暖心服务配置。启用外籍人员一站式综合服务中心，西翼廊新增特\n\n色座椅、淋浴间、充电设施、多语种标识，主要窗口岗位配备 AI翻译器。完善适老化、无障碍设施配\n\n置，完成GTC及P5停车场盲道、T3无障碍洗手间等21项升级改造，启用轮椅旅客登机连接装置。推\n\n出4项“航延+经济”服务举措，航延电子餐券拓展6家航司，提升航延保障水平。扎实推进服务品牌\n\n建设。“深爱全程”再次跃居CAPSE年度品牌榜榜首，入选“中国品牌优秀典型案例”；发布“深机E\n\n物流 SZX E-cargo”航空货运服务品牌理念体系及品牌架构方案，创建物流服务品牌。报告期内，获评\n\n“第七届全国文明单位”，ACI排名全球第一、CAPSE排名全国第二，荣获SKYTRAX 6000—7000万量级\n\n最佳机场，连续六年获ACI亚太地区4000万级最佳机场奖，连续九年蝉联CAPSE年度“最佳机场”，\n\n并获评CAPSE创新先锋、质量提升先锋双第一，深圳机场服务品牌的行业影响力与认可度持续攀升。\n\n                                                                                                                                                                                            14"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 0,
+              "end": 1646,
+              "quote": "                                                                                                                    深圳市机场股份有限公司2025年年度报告全文\n\n\n        （二）航空市场与业务\n\n        ——航空市场\n\n        2025 年，我国民航坚持稳中求进，积极服务构建新发展格局，有效应对外部冲击挑战，服务保障\n\n能力不断增强，行业发展质效不断提升，新质生产力加快培育，安全态势总体平稳。全年完成运输总周\n\n转量1,640.8亿吨公里、旅客运输量7.7亿人次、货邮运输量1,017.2万吨，同比分别增长10.5%、\n\n5.5%、13.3%。2026年，民航业将牢牢守住安全发展底线，持续推进深化改革，因地制宜发展民航领域\n\n新质生产力，推动民航发展实现质的有效提升和量的合理增长，确保实现“十五五”良好开局。\n\n        2025 年，深圳机场立足粤港澳大湾区长期向好的发展态势，深入把握民航增量提质的良好机遇，\n\n加大运力引入，为客流量增长注入了新动能，助推暑运、国庆等多个节假日旅客量创新高。持续织密国\n\n内外航线网络。积极拓展国际航线，叠加免签政策利好，推动国际客运业务实现跃升。报告期内，深圳\n\n机场国际及地区旅客量达634.1万人次，同比增长22.4%，创历史新高。结合公商务与旅游出行需求，\n\n新开国内旅游支线航点，进一步加密北京、上海等8条“深快线”航班频次。多维度拓展客源市场。持\n\n续吸引珠江西岸城市旅客，聚焦港澳旅客“经深飞”，开通启德体育场文旅专线，携手信德集团开通深\n\n圳机场码头至澳门外港码头航线，实现“海陆空”多式联运无缝衔接，提升旅客集散效率，持续深化粤\n\n港澳大湾区交通互联互通。加快建设高水平空港型国家物流枢纽，聚焦服务深圳产业发展和深圳制造出\n\n海，发力国际业务拓展，提升枢纽中转能力。全年新开、加密 19条国际及地区货运航线，其中“一带\n\n一路”共建国家货运航线9条。国际及地区货量106.1万吨，首次突破百万吨大关。优化航空物流生态，\n\n打造“全球123快货物流圈”，持续为粤港澳大湾区与全球经贸往来“拓通道、提速度”。未来，深圳\n\n机场将继续锚定建设世界一流机场的宏伟目标，在航线网络拓展、区域协同联动等方面持续发力，不断\n\n提升枢纽能级与国际竞争力，为粤港澳大湾区世界级机场群建设注入更强动力。\n\n        ——客运业务\n\n        持续优化发展布局，枢纽辐射能级显著跃升。着力增强枢纽辐射能力。新开墨尔本、万象等 14条\n\n国际客运航线，加密墨西哥城、利雅得、新加坡等14条国际客运航线，国际及地区客运航点突破61个，\n\n超过历史峰值水平，实现与全球主要枢纽的互联互通。新开13条国内航线，国内客运航点达131个。\n\n推动航司开通 20 条国际转国内通程中转航线，实施行李全委托保障，提高国际旅客中转效率。大力拓\n\n展湾区市场。新开香港启德城市候机楼，配合 OTA平台打造升级深港“机+车”联运产品，实现“一票\n\n双城”免费乘车，港澳旅客同比增长超 13%。打造“航空+文旅”融合发展新范式，推出“深圳+中山+\n\n江门”主题旅游线路，有效服务珠江西岸旅客约110万人次，同比增长超30%。不断优化快线网络。加\n\n密北京、上海、成都、重庆等8条“深快线”航班频次，实现“公交化”运营模式。上线“深沪快线”\n\n                                                                                                                                                                                        15"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 1524,
+              "quote": "                                                                                                                 深圳市机场股份有限公司2025年年度报告全文\n\n\n跨航司自愿签转服务，“深圳-虹桥”跻身全球最繁忙航线前十。持续深化外部合作。成功与爱丁堡机\n\n场、多哈机场建立友好机场关系，引进阿联酋航空等全球知名航司开通“深圳=迪拜”直飞客运航线，\n\n国际合作迈出坚实步伐。\n\n       ——货运业务\n\n       不断挖掘增长动能，空港型国家物流枢纽加快建设。航线网络持续拓展，吸引阿特拉斯航空、UPS、\n\n顺丰等14家航司在深增加运力投放，新开迈阿密、德里、雅加达3条国际货运航线，加密芝加哥、曼\n\n谷等16个国际货运航点，国际及地区通航点达43个。口岸营商环境不断优化。国际货站实现闸口24\n\n小时通关，成为全国首个24 小时运作的“智慧化、远程化”国际货站。新设越南前置仓，降低跨境运\n\n输成本。跨境电商服务创新落地。在深圳海关统筹下打造全国首个 AI辅助监管作业区，构建跨境包裹\n\n智能化监管新模式。扩大跨境电商业务覆盖范围，新增SHOPEE、AliExpress、TikTok3家头部平台企业\n\n开展跨境电商敏感品运输。成功开通6个跨境电商转关站点，实现货物“一次申报、两地通关”，全年\n\n空运跨境电商业务量达35.4万吨，同比增长8.6%。\n\n       （三）经营与管理\n\n       ——经营发展\n\n       持续激发经营活力，企业经营质效稳步增强。加快科技赋能转型。制定人工智能场景应用管理实施\n\n方案，引入代步机器人项目。签署民航智能网联和低空经济产业发展三方战略合作协议。向西藏机场集\n\n团捐赠自主研发新型安全快捷尾销及航空轮椅连接桥，切实践行科技援藏使命。有效盘活资源价值。优\n\n化 T3航站楼免税点位，提升免税资源价值。调整航站楼柜台及卫星厅办公用房功能，降低资源空置率。\n\n航站楼内新引进品牌首店10 家，路易威登、爱马仕等一批国际名品开业，率先在国内机场上线智能机\n\n器人送餐服务。联合中免集团设立市内免税店机场提货点，编制第三方航空地面服务商运营管理等方案，\n\n成功打造东航高端旅客专属服务项目。加快户外广告媒体建设，积极拓展户外广告媒体资源；优化调整\n\n航站楼广告经营费计收模式，促进广告业务稳定经营。完成快件监管中心 1%股权收购，增强协同效应，\n\n完善深圳机场“货”板块战略布局。\n\n       报告期内，公司实现营业收入 512,835万元，同比增长 8.2%，利润总额 66,786 万元，同比增长\n\n15.3%;归属于母公司所有者净利润 52,521 万元；归属于母公司所有者的扣除非经常性损益的净利润\n\n42,375万元；加权平均净资产收益率4.57%，基本每股收益0.26元。\n\n       ——企业管理\n\n       增强治理核心水平，企业管理效能稳健提升。公司治理水平进一步完善。合规完成公司章程修订，\n\n厘清各治理主体权责边界，推动管理决策更加科学高效，筑牢持续稳健发展的制度基础。组织人力效能\n\n                                                                                                                                                                                   16"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1545,
+              "quote": "                                                                                                                      深圳市机场股份有限公司2025年年度报告全文\n\n\n进一步增强。全力保障三跑道投运，制定人员配置与运营准备培训方案，通过校招、社招等方式引进补\n\n充人才。在节假日客流高峰开展共享支援 3,129人次，人均保障旅客吞吐量指标同比提升 4%。加大优\n\n秀干部选聘力度，组建公司青年人才梯队，推出经理级人员“三年轮训”计划、青年人才“启航计划”\n\n训练营等培养项目，有效激发队伍内生动力。财务管理进一步精细。以增收节支为目标，搭建各生产保\n\n障部门模拟独立核算基本框架；统筹预算中期调整，完善预算考核评价及运用，实现全年可控成本费用\n\n增幅低于收入增幅。资产管理效能进一步释放。系统梳理闲置老旧设备，盘活存量资源；建立车辆技术\n\n档案，实现“一车辆，一档案”精细化管理。内控合规体系进一步完善。聚焦重点领域，深化外包管理、\n\n车辆维修、中介服务、股权管理等方面监督效能。数智赋能合同管理，修编规范合同 78 份。梳理识别\n\n制度“立改废”61项，常态化开展制度和重大决策合规审核 105项，完成合规管理贯标认证与系列制\n\n度修订。绿色低碳理念进一步深化。顺利通过碳管理体系认证，获评最高等级的四星级“双碳机场”，\n\n绿色电力消费占比提升至100%，场内新能源车辆占比超61%，连续两年荣获民用机场碳排放管理能力提\n\n升优秀案例奖。\n\n        （四）党的建设\n\n        党建引领凝聚合力，高质量发展动力更加强劲。党的政治建设全面加强。深入学习贯彻党的二十届\n\n四中全会精神，推动学习成果有机转化为公司“十五五”发展规划的思路举措；扎实开展深入贯彻中央\n\n八项规定精神学习教育，持续精文简会，推行走动式管理，制定厉行节约反对浪费系列举措，促进队伍\n\n作风建设持续向好发展。创新开展沉浸式红色教育、红色电影鉴赏等“红色绽放季”特色党建活动，持\n\n续提升思政工作水平。党建引领基层治理向新提质。策划开展“我为发展献一策”党员提案活动，征集\n\n安全、服务、经营、队伍建设等方面提案 50份，助力公司高质量发展。承办中南民航安检员岗位技能\n\n大赛，被民航中南局授予特别贡献奖。3个工作室获评中南民航等地市级劳模和工匠人才创新工作室，\n\n“青年策”多项课题获全国绩效改进最佳实践典范奖等奖项。企业文化建设用心用情。积极做好节假日\n\n慰问、困难帮扶、防暑降温等关爱服务，开展“点亮心光”心理关爱行动，促进员工身心健康。精心举\n\n办空港公益月、中秋喜乐会、体育文化节等喜闻乐见的文化活动，增强队伍凝聚力和向心力。高标准推\n\n进“千人安居”工程，提升改造平安居，切实改善员工居住环境。监督执纪效能不断提升。健全联合监\n\n督体系，统筹监督力量，聚焦重点工作和关键领域开展监督检查400余次。厚植廉洁文化根基，深化廉\n\n政宣传教育，组织开展“送廉课”活动 60 余次，传递崇廉尚洁正能量。创新开展企商廉洁共建交流活\n\n动，筑牢关键领域廉洁风险防线，营造风清气正的干事创业环境。\n\n\n\n\n\n\n\n                                                                                                                                                                                           17"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 9493,
+              "quote": "                                                                                                                                                                                                                                                                                              深圳市机场股份有限公司2025年年度报告全文\n\n           2、收入与成本\n\n           （1） 营业收入构成\n\n                                                                                                                                                                                                                                                                                                                                                                                                                               单位：元\n                                                                                                                                                    2025年                                                                                                                                                    2024年                                                                                                     同比增减\n                                                                                                                     金额                                                       占营业收入比重                                                                                         金额                                                     占营业收入比重\n                营业收入合计                                                                         5,128,350,945.52                                                                                                          100%                         4,739,308,234.91                                                                                                           100%                                                           8.21%\n                分行业\n                1.航空性收入       2,253,189,175.09                                                                                                                                                                   43.94%                               2,095,618,917.89                                                                                                  44.22%                                                                  7.52%\n                2.地面服务收入       809,694,099.26                                                                                                                                                                    15.79%                                        768,986,362.97                                                                                           16.23%                                                                  5.29%\n                3.租赁及特许经                                                                       1,016,861,525.67                                                                                                  19.83%                                        963,686,927.06                                                                                           20.33%                                                                  5.52%\n                营收入\n                4.物流收入           563,162,086.95                                                                                                                                                                  10.98%                                        410,940,274.59                                                                                               8.67%                                                           37.04%\n                5.广告收入           372,155,495.51                                                                                                                                                                      7.26%                                     390,199,448.72                                                                                               8.23%                                                           -4.62%\n                6.其它非航收入       113,288,563.04                                                                                                                                                                        2.21%                                     109,876,303.68                                                                                               2.32%                                                               3.11%\n                分产品\n                航空及相关服务     5,128,350,945.52                                                                                                                                                                 100.00%                                  4,739,308,234.91                                                                                              100.00%                                                                     8.21%\n                分地区\n                深圳               5,128,350,945.52                                                                                                                                                            100.00%                                  4,739,308,234.91                                                                                              100.00%                                                                     8.21%\n                分销售模式\n                直销               5,128,350,945.52                                                                                                                                                            100.00%                                  4,739,308,234.91                                                                                              100.00%                                                                     8.21%\n\n\n           （2） 占公司营业收入或营业利润10%以上的行业、产品、地区、销售模式的情况\n\n\n           □适用                          不适用\n\n\n           （3） 公司实物销售收入是否大于劳务收入\n\n           □是                  否\n\n\n           （4） 公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n           □适用                          不适用\n\n\n           （5） 营业成本构成\n\n\n           行业分类\n           行业分类\n\n                                                                                                                                                                                                                                                                                                                                                                                                                               单位：元\n\n    行业分类                                                                      项目                                                                                                        2025年                                                                                                                                                  2024年                                                                                              同比增减\n                                                                                                                                                         金额                                                     占营业成本比重                                                                                         金额                                                     占营业成本比重\n航空服务业      人工成本      1,663,724,116.72                                                                                                                                                                                           41.21%       1,483,497,886.48                                                                                                                           39.77%        12.15%\n航空服务业    折旧摊销成本     846,200,316.10       20.96%        823,047,074.99        22.07%         2.81%\n航空服务业   使用权资产折旧                                                                                                                      211,646,974.05        5.24%        193,694,263.38        5.19%         9.27%\n航空服务业   运行及其它成本                                                                                                                 1,315,779,167.10                                                                                32.59%       1,229,831,490.31                                                                                                                           32.97%         6.99%\n            合计                       4,037,350,573.97                                                                                                                                                                         100.00%      3,730,070,715.16                                                                                                                           100.00%        8.24%\n\n\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                 18"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "source_spans": [
+            {
+              "page": 19,
+              "start": 0,
+              "end": 8456,
+              "quote": "                                                                                                                                                                                                                                                                 深圳市机场股份有限公司2025年年度报告全文\n\n\n说明\n\n\n无\n\n\n（6） 报告期内合并范围是否发生变动\n\n是 □否\n\n本公司子公司深圳市赛易达保税物流有限公司于报告期内清算。\n\n\n（7） 公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n□适用                        不适用\n\n\n（8） 主要销售客户和主要供应商情况\n\n公司主要销售客户情况\n\n    前五名客户合计销售金额（元）                                                                                                                                                                                                                                                                                                                                            2,238,276,623.06\n    前五名客户合计销售金额占年度销售总额比例                                                                                                                                                                                                                                                                                                                                                                              43.65%\n    前五名客户销售额中关联方销售额占年度销售总额比例                                                                                                                                                                                                                                                                                                                                                                             0.00%\n\n公司前5大客户资料\n\n                                            序号                                                                                               客户名称                                                                                            销售额（元）                                                                                       占年度销售总额比例\n                                                  1                                                          深圳航空有限责任公司                 655,489,756.08                                                                                                                                                                                                                                                12.78%\n                                                  2              中国南方航空股份有限公司                                                                                                                                                                                 619,799,421.73                                                                                                                          12.09%\n                                                  3                                                          海南航空控股股份有限公司                                                                                                                                     374,628,659.13                                                                                                                             7.31%\n                                                  4                                                          广州德高空港广告有限公司                                                                                                                                     366,470,220.71                                                                                                                             7.15%\n                                                  5              中国东方航空股份有限公司                                                                                                                                                                                 221,888,565.41                                                                                                                             4.33%\n                                            合计                                                                                                          --                                                                                            2,238,276,623.06                                                                                                                                43.65%\n\n主要客户其他情况说明\n□适用                        不适用\n公司主要供应商情况\n    前五名供应商合计采购金额（元）                                                                                                                                                                                                                                                                                                                                           1,025,493,822.76\n    前五名供应商合计采购金额占年度采购总额比例                                                        24.51%\n    前五名供应商采购额中关联方采购额占年度采购总额比例                                                                                                                                                                                                                                                                                                                                                                         20.12%\n公司前5名供应商资料\n                   序号                                                                                                   供应商名称                                                                                                                         采购额（元）                                                                              占年度采购总额比例\n                        1                                 深圳市机场集团有限公司                            727,008,142.35                                                                                                                                                                                                                                                                                       17.38%\n                        2                                 深圳市万物空港服务有限公司                        114,447,014.19                                                                                                                                                                                                                                                                                            2.74%\n                        3                                 深圳市南深人力资源股份有限公司                     63,762,493.48                                                                                                                                                                                                                                                                                              1.52%\n                        4       范德兰德物流自动化系统（上海）有限公司             63,293,139.29                                                                                                                                                                                                                                                                                                                            1.51%\n                        5                                 广东万事通航空地勤服务有限公司                     56,983,033.45                                                                                                                                                                                                                                                                                              1.36%\n                   合计                                                                                                                   --                          1,025,493,822.76                                                                                                                                                                                                                  24.51%\n\n主要供应商其他情况说明\n□适用                        不适用\n\n                                                                                                                                                                                                                                                                                                                                                                                                                          19"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0016",
+          "document_version": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+          "section_path": [
+            "第三节 管理层讨论与分析"
+          ],
+          "physical_pages": [
+            25
+          ],
+          "source_spans": [
+            {
+              "page": 25,
+              "start": 0,
+              "end": 15418,
+              "quote": "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 深圳市机场股份有限公司2025年年度报告全文\n                         九、主要控股参股公司分析\n\n\n                         适用 □不适用\n                         主要子公司及对公司净利润影响达10%以上的参股公司情况\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           单位：元\n\n                             公司名称                                                                                           公司类型                                                                              主要业务                                                                                                        注册资本                                                                                                                        总资产                                                                                                                    净资产                                                                                                              营业收入                                                                                                                营业利润                                                                                                          净利润\n深圳市机场广告有限                                                                                                                                                                                    广告业务；打\n公司                                                                                                                      子公司                                                                  字、复印、晒图                                                                                         10,000,000.00            33,583,118.07                                                                                                                                                                                                                                    31,818,242.20                                                                                                                3,695,036.52                                                                                                     3,495,471.31                                                                                   1,736,791.46\n                                                                                                                                                                                             服务\n深圳市机场国内货站                                                                                                                                                                                    航空货物理货、\n有限公司                                                                                                                    子公司                                                                  配运、仓储、分                                                                                         25,000,000.00           795,556,107.22                                                                                                                                                                                                                               148,532,264.98                                                                                                        269,351,824.39                                                                                                         69,072,425.38                                                                                  54,633,173.57\n                                                                                                                                                                                             拨、查询等服务\n深圳机场现代物流有                                                                                                               子公司                                                                  物流园区物业管                                                                                         120,000,000.00          931,119,446.84                                                                                                                                                                                                                               485,579,506.34                                                                                                        133,362,929.30                                                                                                         47,492,240.72                                                                                  34,350,577.54\n限公司                                                                                                                                                                                          理、租赁等\n深圳市深畅航空货运                                                                                                                                                                                    运输货物打包服\n有限公司                                                                                                                    子公司                                                                  务、装卸搬运、                                                                                         100,000,000.00          448,040,599.23                                                                                                                                                                                                                               165,355,960.22                                                                                                        201,302,831.29                                                                                                         70,575,996.85                                                                                  59,748,871.67\n                                                                                                                                                                                             租赁等\n成都双流国际机场股                                                                                                                                                                                    提供机场地面服                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                -\n份有限公司                                                                                                                   参股公司                                                                 务                                                                                               1,251,162,691.00      4,351,191,662.88                                                                                                                                                                                                                   1,598,146,134.09                                                                                                       1,548,540,399.68                                                                                                      -155,449,273.41                                                                                            128,059,529.6\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    1\n深圳机场国际货站有                                                                                                               参股公司   航空物流        32,000,000.00           406,058,195.97                                                                                                                                                                                                                                                                                                                                                                                 252,067,720.33                                                                                                        590,334,119.89                                                                                                   214,682,317.60                                                                                       161,563,827.3\n限公司                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 7\n深圳市机场国际快件                                                                                                                                                                                    提供海关监管的\n海关监管中心有限公                                                                                                               参股公司                                                                 设备服务                                                                                            60,000,000.00           402,837,778.47                                                                                                                                                                                                                               175,954,461.83                                                                                                        187,160,394.73                                                                                                         80,126,803.27                                                                                  60,087,019.01\n司\n深圳市鹏盛空港免税                                                                                                               参股公司                                                                 国内贸易、经营                                                                                         100,000,000.00          116,322,874.53                                                                                                                                                                                                                                    65,264,885.96                                                                                                    232,291,333.75                                                                                                               1,727,548.98                                                                                   1,730,264.98\n品有限公司                                                                                                                                                                                        进出口业务等\n                         报告期内取得和处置子公司的情况\n                         □适用                                      不适用\n\n\n\n\n\n\n\n\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    25"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司为深圳宝安国际机场的运营管理机构，主要经营航空服务业务及其延伸出的非航空业务；非航空业务包括航空物流业务、商业租赁和广告业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "航空服务业以各航空公司定期和不定期航班、旅客和货主（物）为服务对象，提供航空地面保障及航空地面代理服务，主要包括飞机起降及停场保障、机场飞行控制区维护与运营管理、旅客乘机候机及进出港服务、航空器维护及辅助服务、航空货物地面处理服务等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F03",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "航空物流业务依托航空主业延伸，主要包括航空货物过站处理服务、航空物流园租赁与管理业务、航空货运代理服务业务等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F04",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "报告期内合并范围发生变动，子公司深圳市赛易达保税物流有限公司于报告期内清算。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "公司收入按行业分为航空性收入、地面服务收入、租赁及特许经营收入、物流收入、广告收入、其它非航收入六类；分产品口径为航空及相关服务，分地区为深圳，分销售模式为直销。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "公司主要子公司及参股公司覆盖广告、国内货站、物流园区、航空货运、国际货站、快件监管、免税品等业务：机场广告公司从事广告及打字复印晒图服务；国内货站提供航空货物理货、配运、仓储、分拨、查询等服务；现代物流公司从事物流园区物业管理、租赁等；深畅航空货运从事运输货物打包、装卸搬运、租赁等；国际货站从事航空物流；快件监管中心提供海关监管的设备服务；鹏盛空港免税品公司从事国内贸易、经营进出口业务等。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0016"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "2025年公司营业收入合计5,128,350,945.52元，占营业收入比重100%，同比增长8.21%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入合计",
+            "raw_value": "5,128,350,945.52",
+            "value": "5128350945.52",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入合计同比增减",
+            "raw_value": "8.21",
+            "value": "8.21",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "航空性收入2,253,189,175.09元，占营业收入比重43.94%，同比增长7.52%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "航空性收入",
+            "raw_value": "2,253,189,175.09",
+            "value": "2253189175.09",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "航空性收入占营业收入比重",
+            "raw_value": "43.94",
+            "value": "43.94",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "航空性收入同比增减",
+            "raw_value": "7.52",
+            "value": "7.52",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F09",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "地面服务收入809,694,099.26元，占营业收入比重15.79%，同比增长5.29%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "地面服务收入",
+            "raw_value": "809,694,099.26",
+            "value": "809694099.26",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "地面服务收入占营业收入比重",
+            "raw_value": "15.79",
+            "value": "15.79",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "地面服务收入同比增减",
+            "raw_value": "5.29",
+            "value": "5.29",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F10",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F10",
+        "text": "租赁及特许经营收入1,016,861,525.67元，占营业收入比重19.83%，同比增长5.52%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "租赁及特许经营收入",
+            "raw_value": "1,016,861,525.67",
+            "value": "1016861525.67",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "租赁及特许经营收入占营业收入比重",
+            "raw_value": "19.83",
+            "value": "19.83",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "租赁及特许经营收入同比增减",
+            "raw_value": "5.52",
+            "value": "5.52",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F11",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "物流收入563,162,086.95元，占营业收入比重10.98%，同比增长37.04%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "物流收入",
+            "raw_value": "563,162,086.95",
+            "value": "563162086.95",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物流收入占营业收入比重",
+            "raw_value": "10.98",
+            "value": "10.98",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物流收入同比增减",
+            "raw_value": "37.04",
+            "value": "37.04",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F12",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F12",
+        "text": "广告收入372,155,495.51元，占营业收入比重7.26%，同比下降4.62%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "广告收入",
+            "raw_value": "372,155,495.51",
+            "value": "372155495.51",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广告收入占营业收入比重",
+            "raw_value": "7.26",
+            "value": "7.26",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广告收入同比增减",
+            "raw_value": "-4.62",
+            "value": "-4.62",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F13",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F13",
+        "text": "其它非航收入113,288,563.04元，占营业收入比重2.21%，同比增长3.11%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "其它非航收入",
+            "raw_value": "113,288,563.04",
+            "value": "113288563.04",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其它非航收入占营业收入比重",
+            "raw_value": "2.21",
+            "value": "2.21",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其它非航收入同比增减",
+            "raw_value": "3.11",
+            "value": "3.11",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F14",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "营业成本合计4,037,350,573.97元，同比增长8.24%；其中人工成本1,663,724,116.72元占41.21%，折旧摊销成本846,200,316.10元占20.96%，使用权资产折旧211,646,974.05元占5.24%，运行及其它成本1,315,779,167.10元占32.59%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "营业成本合计",
+            "raw_value": "4,037,350,573.97",
+            "value": "4037350573.97",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "人工成本",
+            "raw_value": "1,663,724,116.72",
+            "value": "1663724116.72",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "人工成本占营业成本比重",
+            "raw_value": "41.21",
+            "value": "41.21",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "折旧摊销成本",
+            "raw_value": "846,200,316.10",
+            "value": "846200316.10",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "使用权资产折旧",
+            "raw_value": "211,646,974.05",
+            "value": "211646974.05",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "运行及其它成本",
+            "raw_value": "1,315,779,167.10",
+            "value": "1315779167.10",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F15",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "2025年公司实现营业收入512,835万元，同比增长8.2%；利润总额66,786万元，同比增长15.3%；归属于母公司所有者净利润52,521万元；扣除非经常性损益的净利润42,375万元；加权平均净资产收益率4.57%，基本每股收益0.26元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "512,835",
+            "value": "512835",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "8.2",
+            "value": "8.2",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利润总额",
+            "raw_value": "66,786",
+            "value": "66786",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利润总额同比增减",
+            "raw_value": "15.3",
+            "value": "15.3",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于母公司所有者净利润",
+            "raw_value": "52,521",
+            "value": "52521",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于母公司所有者的扣除非经常性损益的净利润",
+            "raw_value": "42,375",
+            "value": "42375",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "加权平均净资产收益率",
+            "raw_value": "4.57",
+            "value": "4.57",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "基本每股收益",
+            "raw_value": "0.26",
+            "value": "0.26",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F16",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "2025年深圳机场完成航班起降44.8万架次，同比增长4.6%，排名全国第三；旅客吞吐量6,648.5万人次，同比增长8.1%，排名全国第四；货邮吞吐量205.1万吨，同比增长9%，稳居全国第三。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "航班起降架次",
+            "raw_value": "44.8",
+            "value": "44.8",
+            "unit": "万架次",
+            "source_unit": "万架次",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "航班起降架次同比增减",
+            "raw_value": "4.6",
+            "value": "4.6",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "旅客吞吐量",
+            "raw_value": "6,648.5",
+            "value": "6648.5",
+            "unit": "万人次",
+            "source_unit": "万人次",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "旅客吞吐量同比增减",
+            "raw_value": "8.1",
+            "value": "8.1",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "货邮吞吐量",
+            "raw_value": "205.1",
+            "value": "205.1",
+            "unit": "万吨",
+            "source_unit": "万吨",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "货邮吞吐量同比增减",
+            "raw_value": "9",
+            "value": "9",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F17",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "2025年国内旅客量6,014.4万人次，同比增长6.8%，排名全国第二；国际及地区旅客量634.1万人次，同比增长22.4%；国际及地区货邮量106.1万吨，同比增长10%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "国内旅客量",
+            "raw_value": "6,014.4",
+            "value": "6014.4",
+            "unit": "万人次",
+            "source_unit": "万人次",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国内旅客量同比增减",
+            "raw_value": "6.8",
+            "value": "6.8",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际及地区旅客量",
+            "raw_value": "634.1",
+            "value": "634.1",
+            "unit": "万人次",
+            "source_unit": "万人次",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际及地区旅客量同比增减",
+            "raw_value": "22.4",
+            "value": "22.4",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际及地区货邮量",
+            "raw_value": "106.1",
+            "value": "106.1",
+            "unit": "万吨",
+            "source_unit": "万吨",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际及地区货邮量同比增减",
+            "raw_value": "10",
+            "value": "10",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F18",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "截至2025年底，深圳机场高峰小时容量标准65架次；正在运行的基础设施包括1个航站楼、1个卫星厅及3条跑道，报告期内顺利实现三跑道投产运行。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "高峰小时容量标准",
+            "raw_value": "65",
+            "value": "65",
+            "unit": "架次",
+            "source_unit": "架次",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F19",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "公司营业成本以人工成本、折旧摊销成本、使用权资产折旧和运行及其它成本构成，其中人工成本占比最高（41.21%），体现机场运营的劳动与资产密集特征。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F20",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003",
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "公司推进智慧机场建设，以“一屏、三图、八平台、N系统”为核心架构，上线一体化主动运控系统，并在物流运输引进AGV搬运机器人、无人驾驶牵引车、AMR智能驳运等无人化设备。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003",
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F21",
+      "element": "operations_and_inputs",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "公司绿色低碳方面通过碳管理体系认证，获评四星级“双碳机场”，绿色电力消费占比提升至100%，场内新能源车辆占比超61%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "绿色电力消费占比",
+            "raw_value": "100",
+            "value": "100",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "场内新能源车辆占比",
+            "raw_value": "超61",
+            "value": "61",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "greater_than",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F22",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F22",
+        "text": "公司前五名客户合计销售金额2,238,276,623.06元，占年度销售总额比例43.65%，其中关联方销售额占年度销售总额比例0.00%；前五大客户为深圳航空有限责任公司（12.78%）、中国南方航空股份有限公司（12.09%）、海南航空控股股份有限公司（7.31%）、广州德高空港广告有限公司（7.15%）、中国东方航空股份有限公司（4.33%）。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "前五名客户合计销售金额",
+            "raw_value": "2,238,276,623.06",
+            "value": "2238276623.06",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名客户合计销售金额占年度销售总额比例",
+            "raw_value": "43.65",
+            "value": "43.65",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F23",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "公司前五名供应商合计采购金额1,025,493,822.76元，占年度采购总额比例24.51%，其中关联方采购额占年度采购总额比例20.12%；第一大供应商为深圳市机场集团有限公司，采购额727,008,142.35元，占17.38%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "前五名供应商合计采购金额",
+            "raw_value": "1,025,493,822.76",
+            "value": "1025493822.76",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名供应商合计采购金额占年度采购总额比例",
+            "raw_value": "24.51",
+            "value": "24.51",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "深圳市机场集团有限公司采购额",
+            "raw_value": "727,008,142.35",
+            "value": "727008142.35",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F24",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "航线网络方面，年内新开墨尔本、万象等14条国际客运航线，国际及地区客运航点达61个；新开13条国内航线，国内客运航点达131个；新开加密19条国际及地区货运航线，国际及地区货运通航点达43个。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F25",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F25",
+        "text": "公司持续吸引珠江西岸城市旅客，聚焦港澳旅客“经深飞”，开通启德体育场文旅专线，携手信德集团开通深圳机场码头至澳门外港码头航线；全年空运跨境电商业务量达35.4万吨，同比增长8.6%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "空运跨境电商业务量",
+            "raw_value": "35.4",
+            "value": "35.4",
+            "unit": "万吨",
+            "source_unit": "万吨",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "空运跨境电商业务量同比增减",
+            "raw_value": "8.6",
+            "value": "8.6",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "2024年度",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F26",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F26",
+        "text": "2025年民航全行业完成运输总周转量1,640.8亿吨公里、旅客运输量7.7亿人次、货邮运输量1,017.2万吨，同比分别增长10.5%、5.5%、13.3%；全行业实现盈利65亿元。",
+        "subject_scope": "unclear",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "全行业运输总周转量",
+            "raw_value": "1,640.8",
+            "value": "1640.8",
+            "unit": "亿吨公里",
+            "source_unit": "亿吨公里",
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全行业旅客运输量",
+            "raw_value": "7.7",
+            "value": "7.7",
+            "unit": "亿人次",
+            "source_unit": "亿人次",
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全行业货邮运输量",
+            "raw_value": "1,017.2",
+            "value": "1017.2",
+            "unit": "万吨",
+            "source_unit": "万吨",
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F27",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "公司加大运力引入，吸引14家航司在深增加运力投放，助推暑运、国庆等多个节假日旅客量创新高；国际及地区旅客量创历史新高，主要受国际航线拓展及免签政策利好推动。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F28",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F28",
+        "text": "公司物流收入同比增长37.04%，主要受空港型国家物流枢纽加快建设、国际货运航线拓展及跨境电商业务增长带动；全年新开、加密19条国际及地区货运航线，其中“一带一路”共建国家货运航线9条。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006",
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F29",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F29",
+        "text": "公司广告收入同比下降4.62%，公司优化调整航站楼广告经营费计收模式以促进广告业务稳定经营。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007",
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F30",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F30",
+        "text": "报告期内公司合并范围发生变动，子公司深圳市赛易达保税物流有限公司于报告期内清算。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F31",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F31",
+        "text": "公司完成快件监管中心1%股权收购，增强协同效应，完善深圳机场“货”板块战略布局。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F32",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F32",
+        "text": "公司顺利实现三跑道投产运行，成功迈入“三跑道时代”。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F33",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F33",
+        "text": "公司报告期内业务、产品或服务未发生重大变化或调整。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F34",
+      "element": "position",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F34",
+        "text": "公司作为深圳宝安国际机场的运营管理机构，处于航空运输服务运营环节，提供航空地面保障及代理服务，并延伸发展航空物流、商业租赁和广告等非航业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F35",
+      "element": "upstream_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F35",
+        "text": "公司主要供应商包括深圳市机场集团有限公司（采购额727,008,142.35元，占17.38%）、深圳市万物空港服务有限公司、深圳市南深人力资源股份有限公司、范德兰德物流自动化系统（上海）有限公司、广东万事通航空地勤服务有限公司；前五名供应商合计采购金额占年度采购总额24.51%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F36",
+      "element": "downstream_customers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F36",
+        "text": "公司航空服务业务的服务对象为各航空公司的定期和不定期航班、旅客和货主（物）；主要客户包括深圳航空、南方航空、海南航空、东方航空等航空公司及广州德高空港广告有限公司。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F37",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F37",
+        "text": "深圳机场地处粤港澳大湾区“黄金内湾”核心位置，是集海、陆、空、铁联运为一体的现代化大型国际空港；深圳机场及周边片区30平方公里已纳入前海合作区，随着深中通道通车运营、深江铁路加快建设，公司正加速成为湾区服务新核。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-af712f3cfc13ce2c01da967f",
+      "fact_id": "F38",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003",
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F38",
+        "text": "2025年公司航班放行正常率达91.19%，国内航班截载时间缩短至38分钟；荣获SKYTRAX 6000—7000万量级最佳机场，连续六年获ACI亚太地区4000万级最佳机场奖，连续九年蝉联CAPSE年度“最佳机场”。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003",
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "航班放行正常率",
+            "raw_value": "91.19",
+            "value": "91.19",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

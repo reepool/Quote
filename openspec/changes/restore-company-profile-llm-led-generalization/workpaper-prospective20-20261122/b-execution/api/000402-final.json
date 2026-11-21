@@ -1,0 +1,3668 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "000402.SZ",
+  "report": {
+    "instrument_id": "000402.SZ",
+    "report_id": "asset_b6061f684a18e3d1c154c6e424041bf2",
+    "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-bccdcfd387c88d977344576a",
+  "latest_reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+  "readings": [
+    {
+      "work_id": "bp-work-bccdcfd387c88d977344576a",
+      "workpaper_sha256": "9435e7a0e3c68b3cc6d43247987eae6930d0bfc2d1466ba4117f83d5b0ee8100",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0032",
+            "section_path": [
+              "第三节 董事会报告",
+              "二、 公司主营业务分析",
+              "（一）公司总体经营状况分析"
+            ],
+            "start_page": 11,
+            "end_page": 13,
+            "rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0037",
+            "section_path": [
+              "第三节 董事会报告",
+              "二、 公司主营业务分析",
+              "（二）公司项目开发建设分析"
+            ],
+            "start_page": 13,
+            "end_page": 18,
+            "rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0045",
+            "section_path": [
+              "第三节 董事会报告",
+              "二、 公司主营业务分析",
+              "（三）公司持有项目经营分析"
+            ],
+            "start_page": 18,
+            "end_page": 20,
+            "rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0014公司经营环境及行业形势分析：属行业背景，非公司层面经营实质，且不改变公司收入结构解读，故不选",
+          "section-0031公司主营业务分析父级：其子节已分别选取，避免父子重复",
+          "section-0048融资成本期限、section-0052现金流分析：属财务分析细节，非业务结构与收入来源核心，暂不扩读",
+          "第八节财务报告收入附注section-0745：主营业务分析已提供收入构成，暂不重复"
+        ],
+        "selection_rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。",
+        "stop_reason": "已覆盖业务结构、产品与服务、收入来源与毛利率、客户供应商、项目储备与销售、持有物业经营等核心经营信息，足以解释公司经营与收入来源；行业背景与财务附注属次要或重复范围，可在不扩读的情况下停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取成功：公司总体营业收入总额（合并利润表口径）未在选定章节中直接列示，仅有分行业、分地区收入构成。",
+        "未获取成功：房产开发业务分产品（住宅、商务）的营业成本及毛利率未单独披露。",
+        "未获取成功：物业租赁、物业经营的具体租金水平、出租物业收入明细未在选定章节披露。",
+        "未获取成功：上游原材料/能源等具体采购类别未披露，仅有供应商集中度数据。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-bccdcfd387c88d977344576a:workpaper:sections",
+          "request_hash": "130d5649767ededc76971c739f1f4f774584c1c36640456a7333158746baadd5",
+          "response_hash": "4afbb278a5d6b5b16b2c388ab6f4ed31273aeaff0a755d2590e761e05c49f0a5",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 18879,
+            "output_tokens": 376,
+            "total_tokens": 19255
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 664,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0037",
+            "section-0038",
+            "section-0041",
+            "section-0042",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0137",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0500",
+            "section-0506",
+            "section-0509",
+            "section-0510",
+            "section-0513",
+            "section-0521",
+            "section-0522",
+            "section-0526",
+            "section-0530",
+            "section-0536",
+            "section-0537",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0556",
+            "section-0559",
+            "section-0560",
+            "section-0563",
+            "section-0568",
+            "section-0574",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0594",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0601",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0613",
+            "section-0614",
+            "section-0615",
+            "section-0616",
+            "section-0619",
+            "section-0620",
+            "section-0621",
+            "section-0624",
+            "section-0626",
+            "section-0627",
+            "section-0628",
+            "section-0632",
+            "section-0633",
+            "section-0634",
+            "section-0635",
+            "section-0636",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0647",
+            "section-0648",
+            "section-0650",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0660",
+            "section-0661",
+            "section-0662",
+            "section-0663",
+            "section-0664",
+            "section-0665",
+            "section-0666",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0670",
+            "section-0671",
+            "section-0672",
+            "section-0675",
+            "section-0677",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0681",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0690",
+            "section-0691",
+            "section-0692",
+            "section-0693",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0700",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0704",
+            "section-0705",
+            "section-0709",
+            "section-0711",
+            "section-0712",
+            "section-0714",
+            "section-0715",
+            "section-0716",
+            "section-0717",
+            "section-0720",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0735",
+            "section-0736",
+            "section-0737",
+            "section-0738",
+            "section-0739",
+            "section-0740",
+            "section-0741",
+            "section-0742",
+            "section-0743",
+            "section-0744",
+            "section-0745",
+            "section-0746",
+            "section-0747",
+            "section-0748",
+            "section-0749",
+            "section-0750",
+            "section-0751",
+            "section-0752",
+            "section-0753",
+            "section-0754",
+            "section-0755",
+            "section-0756",
+            "section-0757",
+            "section-0758",
+            "section-0761",
+            "section-0770",
+            "section-0772",
+            "section-0773",
+            "section-0774",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0781",
+            "section-0782",
+            "section-0783",
+            "section-0785",
+            "section-0786",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0795",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0802",
+            "section-0803",
+            "section-0805",
+            "section-0806",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0832",
+            "section-0835",
+            "section-0836",
+            "section-0837",
+            "section-0838",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0848",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0857",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0865",
+            "section-0866",
+            "section-0867"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-bccdcfd387c88d977344576a:workpaper:extract",
+          "request_hash": "07942df007323dd387e008bbe7469fe0f4b89107c5ba0cc7ab83788f79f9286a",
+          "response_hash": "d40bbc3dbccc3e36bcc23686e156420794179b8115986b73fd08e9f5cd5be62b",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10548,
+            "output_tokens": 3797,
+            "total_tokens": 14345
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0037",
+            "section-0045"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "9435e7a0e3c68b3cc6d43247987eae6930d0bfc2d1466ba4117f83d5b0ee8100",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "superseded_by_review_successor"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（一）公司总体经营状况分析"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 1013,
+              "end": 1304,
+              "quote": "（一） 公司总体经营状况分析\n\n    2025年，公司立足稳定、发展战略，围绕“保障安全，强化转型，完善机制，稳健发展”的经营思\n路，严谨决策，强调资金安全和经营稳健，保证公司平稳经营。受房地产行业持续调整影响，公司                                             2025\n年归属于上市公司股东的净利润为负，但较                    2024年实现明显减亏。\n\n    1．公司收入来源、营业成本及毛利率\n\n\n\n\n\n\n\n\n\n                                             10\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（一）公司总体经营状况分析"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 3007,
+              "quote": "                                                                                         金融街控股股份有限公司                 2025  年年度报告\n\n\n                                                                                                                            单位：元\n\n                                                                              营业收入             营业成本                  毛利率较\n                   营业收入                   营业成本                 毛利率             比上年              比上年                上年同期增减\n                                                                              同期增减             同期增减\n\n                                                                分行业\n\n房产开发            5,923,257,034.78        6,469,843,490.39          -9.23%          -64.57%          -63.57%       下降     3.02 个百分点\n\n物业租赁            1,492,219,945.84          276,328,650.35         81.48%           -13.70%            5.81%       下降     3.42 个百分点\n\n物业经营              394,719,411.64          238,628,838.00         39.54%           -14.54%          -29.94%      上升    13.29  个百分点\n\n其他                188,168,853.91          182,556,811.40           2.98%           14.96%           29.03%      下降    10.58  个百分点\n\n                                                                分地区\n\n京津冀             4,285,208,044.19        3,316,621,445.54         22.60%           -34.81%          -43.11%      上升    11.30  个百分点\n\n长三角             1,617,975,752.03        1,350,688,010.45         16.52%           -81.89%          -83.89%      上升    10.37  个百分点\n\n成渝                862,699,155.30          837,807,846.28           2.89%          -22.38%          -36.77%      上升    22.11  个百分点\n\n长江中游              721,032,793.79          911,154,814.11        -26.37%           -30.81%            -9.11%     下降    30.18  个百分点\n\n大湾区               511,449,500.86          751,085,673.76        -46.85%           -63.89%          -61.72%       下降     8.32 个百分点\n\n      报告期内，公司房产开发业务实现营业收入59.23                                        亿元，同比下降               64.57%，其中，住宅产品实现收\n入   53.43   亿元，商务产品收入                  5.80  亿元。报告期内，公司房产开发业务加强调度，促进项目销售去化，\n根据项目工程进度和结算进度，结算收入减少。\n      报告期内，公司物业租赁业务实现营业收入14.92                                        亿元，同比下降               13.70%。报告期内，公司及时评\n估市场趋势，因地制宜市场化调整项目经营策略，根据客户需求提供服务资源，加强客户挖掘及渠道拓\n展，全力保障各项目出租率稳定。\n      报告期内，公司物业经营业务实现营业收入3.95                                        亿元，同比下降              14.54%，主要原因是公司报告期内\n完成天津瑞吉酒店、惠州喜来登酒店的转让。公司物业经营业务积极推动现有项目的整体规划以及内容\n建设，挖掘项目内在价值和运营特色，提升服务水平和客户体验。\n\n       2．主要客户和供应商情况\n\n       （1）公司主要客户情况\n\n 前五名客户合计结算金额（元）                                                                                                       514,234,889.47\n\n 前五名客户合计结算金额占年度营业收入比例                                                                                                           6.43%\n\n 前五名客户中关联方合计结算金额占年度营业收入比例                                                                                                          0%\n\n\n\n\n                                                                   11\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（一）公司总体经营状况分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 2454,
+              "quote": "                                                                                         金融街控股股份有限公司                 2025  年年度报告\n\n\n  序号                                客户名称                                       结算收入（元）                     占年度营业收入比例\n\n    1      客户一                                                                         293,577,981.65                           3.67%\n\n    2      客户二                                                                         120,832,704.35                           1.51%\n\n    3      客户三                                                                          35,129,190.96                           0.44%\n\n    4      客户四                                                                          34,434,466.20                           0.43%\n\n    5      客户五                                                                          30,260,546.31                           0.38%\n\n                                 合计                                                    514,234,889.47                           6.43%\n\n\n      （2）公司主要供应商情况\n\n前五名供应商合计采购金额（元）                                                                                                       590,150,116.35\n\n前五名供应商合计采购金额占年度采购总额比例                                                                                                          37.34%\n\n前五名供应商采购额中关联方采购额占年度采购总额比例                                                                                                             0\n\n\n\n   序号                              供应商名称                                       采购额（元）                      占年度采购总额比例\n\n     1       供应商一                                                                        373,032,781                           23.60%\n\n     2       供应商二                                                                          73,175,572                           4.63%\n\n     3       供应商三                                                                          49,537,499                           3.13%\n\n     4       供应商四                                                                          47,985,732                           3.04%\n\n     5       供应商五                                                                          46,418,532                           2.94%\n\n                                 合计                                                      590,150,116                          37.34%\n\n     报告期内，公司不存在对主要客户和主要供应商的依赖。\n\n       "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（二）公司项目开发建设分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 2454,
+              "end": 3082,
+              "quote": "（二） 公司项目开发建设分析\n\n      1．公司房地产项目储备情况\n\n     （1）新增项目储备一览表\n\n    城市              项目名称                 规划            项目土地面积                项目规划建筑面积                        项目            获得权益\n                                         用途               （平米）                    （平米）                    取得方式                比例\n    北京          北京融尚未来                住宅、办                        27,393                   123,102      参与公开挂                    51%\n                                      公、商业                                                                 牌转让\n\n\n                                                                  12\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（二）公司项目开发建设分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 3517,
+              "quote": "                                                                                           金融街控股股份有限公司                  2025  年年度报告\n\n\n   城                                                                    权益             项目           项目规划                 报告期末\n   市                            项目名称                                    比例          土地面积            建筑面积            可结算建筑面积\n                                                                                                                     （地上+地下）\n\n          成都春熙路融御                                                          90%            5,030          71,730                  35,004\n\n          成都成华融府                                                         100%           36,443         108,414                   30,787\n\n          武汉金融街·金悦府                                                        80%         197,011         835,740                  399,570\n\n          武汉金融街（东湖）中心                                                      50%         102,246         229,448                  229,448\n\n   武      武汉光谷融御                                                           85%          21,639         144,958                  144,958\n   汉\n          武昌金悦府                                                            85%          33,207         112,508                  112,508\n\n          武汉金融街·融御滨江                                                       60%          28,712         111,010                   57,822\n\n                                      合计                                           10,519,709       24,035,963              11,187,198\n\n      截至     2025   年底，公司拥有项目总体可结算规划建筑面积为1,119                                             万平米（对应权益规划建筑面积为\n922  万平米）。\n\n       2．公司房地产项目开发情况\n      报告期内，公司根据市场形势变化和自身可售货量情况，统筹安排项目工程进度。公司实现开复工面\n积   219.9  万平米，其中，公司实现新开工面积                                 31.7   万平米。公司实现竣工面积                         38.0  万平米。\n      主要开发项目情况如下：\n\n              项目             项目        权益        开发      土地面积            规划            本期             累计          预计总             累计\n城市            名称             业态        比例        进度       （㎡）         建筑面积           竣工面积          竣工面积          投资金额          投资金额\n                                                                        （㎡）           （㎡）           （㎡）          （万元）          （万元）\n北京     房山金悦郡                 住宅、       100%      在建          59,994       194,366       168,129       168,129       316,642       299,693\n                             商业\n\n       3．公司房地产项目销售情况\n\n      （1）总体销售情况\n\n                          区域                            2025   年销售面积                  2025  年销售金额                   销售金额\n                                                             （平米）                         （万元）                      所占比例\n\n                        京津冀                                            205,922                      402,175                    55%\n\n                        长三角                                             59,356                      123,735                    17%\n\n                          成渝                                            81,903                        76,872                   11%\n\n                        大湾区                                            109,774                        71,518                   10%\n\n                       长江中游                                             41,117                        50,962                    7%\n\n\n\n                                                                    16\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（二）公司项目开发建设分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 1133,
+              "quote": "                                                                                            金融街控股股份有限公司                2025 年年度报告\n\n\n                               区域                          2025   年销售面积                2025  年销售金额                  销售金额\n                                                                （平米）                       （万元）                     所占比例\n\n                               合计                                        498,072                    725,262                 100%\n\n             （2）主要项目销售情况\n\n            项目           项目       权益        规划          累计           累计            本期           本期           累计           本期            本期\n城市          名称           业态       比例     建筑面积        可售面积          销售面积         销售面积         销售金额         结算面积          结算面积         结算金额\n                                          （㎡）          （㎡）          （㎡）          （㎡）         （万元）           （㎡）          （㎡）         （万元）\n北京    房山金悦郡             住宅、       100%     194,366      149,179        90,410       53,907       57,289        90,321       90,321       99,328\n                         商业\n\n              "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（三）公司持有项目经营分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 1133,
+              "end": 3526,
+              "quote": "（三） 公司持有项目经营分析\n\n             报告期内，公司在重点城市持有写字楼、商业、公寓/酒店等物业。从城市分布看，公司持有项目主\n       要集中于北京、上海、天津、重庆等国家中心城市；从业态结构看，公司持有项目主要集中于写字楼和\n       商业业态。\n\n          1．公司出租物业资产状况\n\n                                                                                                                   单位：平米\n\n           城市            主要                          项目名称                           权益              可出租                 出租率\n                         业态                                                                          面积\n\n                                      北京金融街中心                                         100%             111,160                  90%\n\n                                      北京金融街（月坛）中心部分                                   100%               21,956                 64%\n                                      （不含金融集）\n\n                                      北京金融街公寓（商务长租）                                   100%               13,131                 88%\n\n                        写字楼           北京金融大厦                                          100%               11,358                100%\n\n                                      其他零散写字楼                                         100%                6,600                100%\n\n                                      北京金融街（月坛）中心-金融集                                 100%                5,581                100%\n\n           北京                         北京通泰大厦                                          100%                1,785                100%\n\n                                      北京金融街购物中心                                       100%               88,384                 88%\n\n                                      北京金融街（西单）购物中心                                   100%               48,414                100%\n\n                                      北京门头沟融悦中心                                        80%               32,605                 90%\n                         商业\n                                      北京金树街                                           100%               14,771                 89%\n\n                                      北京金熙汇                                            80%               12,571                  4%\n\n                                      北京    E2  四合院      5/7 号院                       100%                2,577                100%\n\n\n                                                                       17\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（三）公司持有项目经营分析"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "source_spans": [
+            {
+              "page": 19,
+              "start": 0,
+              "end": 3558,
+              "quote": "                                                                                          金融街控股股份有限公司                   2025  年年度报告\n\n\n 城市             主要                             项目名称                              权益                可出租                   出租率\n                业态                                                                                  面积\n\n                               北京    E2  四合院       4/6  号院                          100%                  2,235                 100%\n\n                               北京    C3   四合院                                       100%                  2,081                 100%\n\n             车位配套                                                                                      139,387\n\n                               上海金融街海伦中心                                            100%                89,618                    89%\n\n               写字楼             上海金融街（融悦）中心                      A  栋                100%                78,198                  100%\n\n                               上海金融街（融悦）中心                      B  栋                100%                24,704                      ---\n 上海\n                商业             上海金融街购物中心                                            100%                57,144                    91%\n\n                住宅             上海青浦西郊宸章                                              50%                  7,446                 100%\n\n             车位配套                                                                                       79,111\n\n               写字楼             天津金融街南开中心                                            100%                83,374                    54%\n\n 天津            写字楼             天津环球金融中心                                             100%                97,971                    53%\n\n             车位配套                                                                                       16,881\n\n                商业             重庆磁器口后街（一二期）                                         100%                87,643                    61%\n\n 重庆         商业、住宅              重庆嘉粼融府                                               100%                15,659                    14%\n\n             车位配套                                                                                       60,815\n\n 武汉             商业             武汉融御滨江                                                60%                20,531                    31%\n\n                办公             成都融御                                                  90%                18,997                  100%\n 成都\n             车位配套                                                                                         2,434\n\n                                合计（含车位配套）                                                                                  1,255,122\n\n 2．公司主要经营物业资产状况\n\n                                                                                                                       单位：平米\n\n      城市                                       项目名称                                           权益                 规划建筑面积\n\n                     北京金融街公寓（经营部分）                                                                100%                         35,717\n\n      北京             北京体育活动中心                                                                     100%                          6,422\n\n                     慕田峪长城酒店                                                                        70%                         3,985\n\n\n\n\n                                                                   18\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（三）公司持有项目经营分析"
+          ],
+          "physical_pages": [
+            20
+          ],
+          "source_spans": [
+            {
+              "page": 20,
+              "start": 0,
+              "end": 1145,
+              "quote": "                                                                                               金融街控股股份有限公司                    2025  年年度报告\n\n\n          城市                                       项目名称                                            权益                 规划建筑面积\n\n          唐山             遵化金融街古泉皇冠假日酒店                                                                 100%                          43,712\n\n                         天津南开体育中心                                                                      100%                           1,735\n          天津\n                         天津津塔体育中心                                                                      100%                           1,553\n\n                         重庆融御体育中心                                                                      100%                           3,300\n          重庆\n                         重庆融景体育中心                                                                      100%                           1,233\n\n                                                      合计                                                                             97,657\n\n\n        "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    },
+    {
+      "work_id": "bp-work-930fef406d6b049b9b04881f",
+      "workpaper_sha256": "50f01d4a0d8f5fc4dc8cfc25efce70c56d3647dbf37ff3f22cac9c0c94d051c1",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_recovery": {
+        "base_work_id": "bp-work-bccdcfd387c88d977344576a",
+        "base_workpaper_sha256": "9435e7a0e3c68b3cc6d43247987eae6930d0bfc2d1466ba4117f83d5b0ee8100",
+        "plan_sha256": "aaf1b2958ba44920de8cc12cbe012ca26e4b57325ce0c2f6a3c5e98bc3fdc551",
+        "report": {
+          "document_type": "annual_report",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "instrument_id": "000402.SZ",
+          "published_at": "2026-04-28T16:00:00+00:00",
+          "report_id": "asset_b6061f684a18e3d1c154c6e424041bf2",
+          "report_period": "2025-12-31"
+        },
+        "request_id": "6eu-000402-review"
+      },
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0032",
+            "section_path": [
+              "第三节 董事会报告",
+              "二、 公司主营业务分析",
+              "（一）公司总体经营状况分析"
+            ],
+            "start_page": 11,
+            "end_page": 13,
+            "rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0037",
+            "section_path": [
+              "第三节 董事会报告",
+              "二、 公司主营业务分析",
+              "（二）公司项目开发建设分析"
+            ],
+            "start_page": 13,
+            "end_page": 18,
+            "rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0045",
+            "section_path": [
+              "第三节 董事会报告",
+              "二、 公司主营业务分析",
+              "（三）公司持有项目经营分析"
+            ],
+            "start_page": 18,
+            "end_page": 20,
+            "rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0014公司经营环境及行业形势分析：属行业背景，非公司层面经营实质，且不改变公司收入结构解读，故不选",
+          "section-0031公司主营业务分析父级：其子节已分别选取，避免父子重复",
+          "section-0048融资成本期限、section-0052现金流分析：属财务分析细节，非业务结构与收入来源核心，暂不扩读",
+          "第八节财务报告收入附注section-0745：主营业务分析已提供收入构成，暂不重复"
+        ],
+        "selection_rationale": "所选章节构成公司经营与收入的核心链条：section-0032总体经营状况分析配合section-0033收入来源、营业成本及毛利率，直接回答公司如何赚钱、收入总额与业务权重；section-0034主要客户和供应商补充客户与供应链位置；section-0037项目开发建设分析下的section-0038项目储备、section-0042项目销售情况说明房地产开发业务的规模、资源与销售去化；section-0045持有项目经营分析及section-0046出租物业资产状况说明持有型物业的经营与租金收入来源。这些均为公司层面实质经营讨论，信息密度高且互不重叠，避免选择仅含标题的父级或纯行业背景章节。",
+        "stop_reason": "已覆盖业务结构、产品与服务、收入来源与毛利率、客户供应商、项目储备与销售、持有物业经营等核心经营信息，足以解释公司经营与收入来源；行业背景与财务附注属次要或重复范围，可在不扩读的情况下停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取成功：公司总体营业收入总额（合并利润表口径）未在选定章节中直接列示，仅有分行业、分地区收入构成。",
+        "未获取成功：房产开发业务分产品（住宅、商务）的营业成本及毛利率未单独披露。",
+        "未获取成功：物业租赁、物业经营的具体租金水平、出租物业收入明细未在选定章节披露。",
+        "未获取成功：上游原材料/能源等具体采购类别未披露，仅有供应商集中度数据。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-bccdcfd387c88d977344576a:workpaper:sections",
+          "request_hash": "130d5649767ededc76971c739f1f4f774584c1c36640456a7333158746baadd5",
+          "response_hash": "4afbb278a5d6b5b16b2c388ab6f4ed31273aeaff0a755d2590e761e05c49f0a5",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 18879,
+            "output_tokens": 376,
+            "total_tokens": 19255
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 664,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0037",
+            "section-0038",
+            "section-0041",
+            "section-0042",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0137",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0500",
+            "section-0506",
+            "section-0509",
+            "section-0510",
+            "section-0513",
+            "section-0521",
+            "section-0522",
+            "section-0526",
+            "section-0530",
+            "section-0536",
+            "section-0537",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0556",
+            "section-0559",
+            "section-0560",
+            "section-0563",
+            "section-0568",
+            "section-0574",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0594",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0601",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0613",
+            "section-0614",
+            "section-0615",
+            "section-0616",
+            "section-0619",
+            "section-0620",
+            "section-0621",
+            "section-0624",
+            "section-0626",
+            "section-0627",
+            "section-0628",
+            "section-0632",
+            "section-0633",
+            "section-0634",
+            "section-0635",
+            "section-0636",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0647",
+            "section-0648",
+            "section-0650",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0660",
+            "section-0661",
+            "section-0662",
+            "section-0663",
+            "section-0664",
+            "section-0665",
+            "section-0666",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0670",
+            "section-0671",
+            "section-0672",
+            "section-0675",
+            "section-0677",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0681",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0690",
+            "section-0691",
+            "section-0692",
+            "section-0693",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0700",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0704",
+            "section-0705",
+            "section-0709",
+            "section-0711",
+            "section-0712",
+            "section-0714",
+            "section-0715",
+            "section-0716",
+            "section-0717",
+            "section-0720",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0735",
+            "section-0736",
+            "section-0737",
+            "section-0738",
+            "section-0739",
+            "section-0740",
+            "section-0741",
+            "section-0742",
+            "section-0743",
+            "section-0744",
+            "section-0745",
+            "section-0746",
+            "section-0747",
+            "section-0748",
+            "section-0749",
+            "section-0750",
+            "section-0751",
+            "section-0752",
+            "section-0753",
+            "section-0754",
+            "section-0755",
+            "section-0756",
+            "section-0757",
+            "section-0758",
+            "section-0761",
+            "section-0770",
+            "section-0772",
+            "section-0773",
+            "section-0774",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0781",
+            "section-0782",
+            "section-0783",
+            "section-0785",
+            "section-0786",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0795",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0802",
+            "section-0803",
+            "section-0805",
+            "section-0806",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0832",
+            "section-0835",
+            "section-0836",
+            "section-0837",
+            "section-0838",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0848",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0857",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0865",
+            "section-0866",
+            "section-0867"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-bccdcfd387c88d977344576a:workpaper:extract",
+          "request_hash": "07942df007323dd387e008bbe7469fe0f4b89107c5ba0cc7ab83788f79f9286a",
+          "response_hash": "d40bbc3dbccc3e36bcc23686e156420794179b8115986b73fd08e9f5cd5be62b",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10548,
+            "output_tokens": 3797,
+            "total_tokens": 14345
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0037",
+            "section-0045"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        }
+      },
+      "review_status": "completed_with_open_findings",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "9435e7a0e3c68b3cc6d43247987eae6930d0bfc2d1466ba4117f83d5b0ee8100",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_execution_completed"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-930fef406d6b049b9b04881f:workpaper:review",
+          "request_hash": "2acebc5b937554856a4d4d6b7166be4e7552a752572b88c6f9c580f6395a7b05",
+          "response_hash": "0f3e3b0e6a158fb2463839a3933f3413c1e87894d1ad08beef3f7b0261de18c4",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 15873,
+            "output_tokens": 1261,
+            "total_tokens": 47262
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0037",
+            "section-0045"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-930fef406d6b049b9b04881f:workpaper:repair",
+          "request_hash": "8f6f2a4ed18f41521557598806ba07a38536c6ac7eaae5ff361c433e90624211",
+          "response_hash": "dedcd7c3b3a7f9378e22c9e1c6fe6fba583e96bee5e674edce4a158f68b9f0d9",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 9333,
+            "output_tokens": 922,
+            "total_tokens": 10255
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0037",
+            "section-0045"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-930fef406d6b049b9b04881f:workpaper:repair-verify",
+          "request_hash": "6869feae67acc1063c7351843c7fd95ff607de71304bb0abe4a2a49ab4f0bb02",
+          "response_hash": "e9310c2148f15f30274b44c5f07b8bcfec0e60eb760e8108557503d0401af5eb",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 11690,
+            "output_tokens": 780,
+            "total_tokens": 27247
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0032",
+            "section-0037",
+            "section-0045"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（一）公司总体经营状况分析"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 1013,
+              "end": 1304,
+              "quote": "（一） 公司总体经营状况分析\n\n    2025年，公司立足稳定、发展战略，围绕“保障安全，强化转型，完善机制，稳健发展”的经营思\n路，严谨决策，强调资金安全和经营稳健，保证公司平稳经营。受房地产行业持续调整影响，公司                                             2025\n年归属于上市公司股东的净利润为负，但较                    2024年实现明显减亏。\n\n    1．公司收入来源、营业成本及毛利率\n\n\n\n\n\n\n\n\n\n                                             10\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（一）公司总体经营状况分析"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 3007,
+              "quote": "                                                                                         金融街控股股份有限公司                 2025  年年度报告\n\n\n                                                                                                                            单位：元\n\n                                                                              营业收入             营业成本                  毛利率较\n                   营业收入                   营业成本                 毛利率             比上年              比上年                上年同期增减\n                                                                              同期增减             同期增减\n\n                                                                分行业\n\n房产开发            5,923,257,034.78        6,469,843,490.39          -9.23%          -64.57%          -63.57%       下降     3.02 个百分点\n\n物业租赁            1,492,219,945.84          276,328,650.35         81.48%           -13.70%            5.81%       下降     3.42 个百分点\n\n物业经营              394,719,411.64          238,628,838.00         39.54%           -14.54%          -29.94%      上升    13.29  个百分点\n\n其他                188,168,853.91          182,556,811.40           2.98%           14.96%           29.03%      下降    10.58  个百分点\n\n                                                                分地区\n\n京津冀             4,285,208,044.19        3,316,621,445.54         22.60%           -34.81%          -43.11%      上升    11.30  个百分点\n\n长三角             1,617,975,752.03        1,350,688,010.45         16.52%           -81.89%          -83.89%      上升    10.37  个百分点\n\n成渝                862,699,155.30          837,807,846.28           2.89%          -22.38%          -36.77%      上升    22.11  个百分点\n\n长江中游              721,032,793.79          911,154,814.11        -26.37%           -30.81%            -9.11%     下降    30.18  个百分点\n\n大湾区               511,449,500.86          751,085,673.76        -46.85%           -63.89%          -61.72%       下降     8.32 个百分点\n\n      报告期内，公司房产开发业务实现营业收入59.23                                        亿元，同比下降               64.57%，其中，住宅产品实现收\n入   53.43   亿元，商务产品收入                  5.80  亿元。报告期内，公司房产开发业务加强调度，促进项目销售去化，\n根据项目工程进度和结算进度，结算收入减少。\n      报告期内，公司物业租赁业务实现营业收入14.92                                        亿元，同比下降               13.70%。报告期内，公司及时评\n估市场趋势，因地制宜市场化调整项目经营策略，根据客户需求提供服务资源，加强客户挖掘及渠道拓\n展，全力保障各项目出租率稳定。\n      报告期内，公司物业经营业务实现营业收入3.95                                        亿元，同比下降              14.54%，主要原因是公司报告期内\n完成天津瑞吉酒店、惠州喜来登酒店的转让。公司物业经营业务积极推动现有项目的整体规划以及内容\n建设，挖掘项目内在价值和运营特色，提升服务水平和客户体验。\n\n       2．主要客户和供应商情况\n\n       （1）公司主要客户情况\n\n 前五名客户合计结算金额（元）                                                                                                       514,234,889.47\n\n 前五名客户合计结算金额占年度营业收入比例                                                                                                           6.43%\n\n 前五名客户中关联方合计结算金额占年度营业收入比例                                                                                                          0%\n\n\n\n\n                                                                   11\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（一）公司总体经营状况分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 2454,
+              "quote": "                                                                                         金融街控股股份有限公司                 2025  年年度报告\n\n\n  序号                                客户名称                                       结算收入（元）                     占年度营业收入比例\n\n    1      客户一                                                                         293,577,981.65                           3.67%\n\n    2      客户二                                                                         120,832,704.35                           1.51%\n\n    3      客户三                                                                          35,129,190.96                           0.44%\n\n    4      客户四                                                                          34,434,466.20                           0.43%\n\n    5      客户五                                                                          30,260,546.31                           0.38%\n\n                                 合计                                                    514,234,889.47                           6.43%\n\n\n      （2）公司主要供应商情况\n\n前五名供应商合计采购金额（元）                                                                                                       590,150,116.35\n\n前五名供应商合计采购金额占年度采购总额比例                                                                                                          37.34%\n\n前五名供应商采购额中关联方采购额占年度采购总额比例                                                                                                             0\n\n\n\n   序号                              供应商名称                                       采购额（元）                      占年度采购总额比例\n\n     1       供应商一                                                                        373,032,781                           23.60%\n\n     2       供应商二                                                                          73,175,572                           4.63%\n\n     3       供应商三                                                                          49,537,499                           3.13%\n\n     4       供应商四                                                                          47,985,732                           3.04%\n\n     5       供应商五                                                                          46,418,532                           2.94%\n\n                                 合计                                                      590,150,116                          37.34%\n\n     报告期内，公司不存在对主要客户和主要供应商的依赖。\n\n       "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（二）公司项目开发建设分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 2454,
+              "end": 3082,
+              "quote": "（二） 公司项目开发建设分析\n\n      1．公司房地产项目储备情况\n\n     （1）新增项目储备一览表\n\n    城市              项目名称                 规划            项目土地面积                项目规划建筑面积                        项目            获得权益\n                                         用途               （平米）                    （平米）                    取得方式                比例\n    北京          北京融尚未来                住宅、办                        27,393                   123,102      参与公开挂                    51%\n                                      公、商业                                                                 牌转让\n\n\n                                                                  12\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（二）公司项目开发建设分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 3517,
+              "quote": "                                                                                           金融街控股股份有限公司                  2025  年年度报告\n\n\n   城                                                                    权益             项目           项目规划                 报告期末\n   市                            项目名称                                    比例          土地面积            建筑面积            可结算建筑面积\n                                                                                                                     （地上+地下）\n\n          成都春熙路融御                                                          90%            5,030          71,730                  35,004\n\n          成都成华融府                                                         100%           36,443         108,414                   30,787\n\n          武汉金融街·金悦府                                                        80%         197,011         835,740                  399,570\n\n          武汉金融街（东湖）中心                                                      50%         102,246         229,448                  229,448\n\n   武      武汉光谷融御                                                           85%          21,639         144,958                  144,958\n   汉\n          武昌金悦府                                                            85%          33,207         112,508                  112,508\n\n          武汉金融街·融御滨江                                                       60%          28,712         111,010                   57,822\n\n                                      合计                                           10,519,709       24,035,963              11,187,198\n\n      截至     2025   年底，公司拥有项目总体可结算规划建筑面积为1,119                                             万平米（对应权益规划建筑面积为\n922  万平米）。\n\n       2．公司房地产项目开发情况\n      报告期内，公司根据市场形势变化和自身可售货量情况，统筹安排项目工程进度。公司实现开复工面\n积   219.9  万平米，其中，公司实现新开工面积                                 31.7   万平米。公司实现竣工面积                         38.0  万平米。\n      主要开发项目情况如下：\n\n              项目             项目        权益        开发      土地面积            规划            本期             累计          预计总             累计\n城市            名称             业态        比例        进度       （㎡）         建筑面积           竣工面积          竣工面积          投资金额          投资金额\n                                                                        （㎡）           （㎡）           （㎡）          （万元）          （万元）\n北京     房山金悦郡                 住宅、       100%      在建          59,994       194,366       168,129       168,129       316,642       299,693\n                             商业\n\n       3．公司房地产项目销售情况\n\n      （1）总体销售情况\n\n                          区域                            2025   年销售面积                  2025  年销售金额                   销售金额\n                                                             （平米）                         （万元）                      所占比例\n\n                        京津冀                                            205,922                      402,175                    55%\n\n                        长三角                                             59,356                      123,735                    17%\n\n                          成渝                                            81,903                        76,872                   11%\n\n                        大湾区                                            109,774                        71,518                   10%\n\n                       长江中游                                             41,117                        50,962                    7%\n\n\n\n                                                                    16\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（二）公司项目开发建设分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 1133,
+              "quote": "                                                                                            金融街控股股份有限公司                2025 年年度报告\n\n\n                               区域                          2025   年销售面积                2025  年销售金额                  销售金额\n                                                                （平米）                       （万元）                     所占比例\n\n                               合计                                        498,072                    725,262                 100%\n\n             （2）主要项目销售情况\n\n            项目           项目       权益        规划          累计           累计            本期           本期           累计           本期            本期\n城市          名称           业态       比例     建筑面积        可售面积          销售面积         销售面积         销售金额         结算面积          结算面积         结算金额\n                                          （㎡）          （㎡）          （㎡）          （㎡）         （万元）           （㎡）          （㎡）         （万元）\n北京    房山金悦郡             住宅、       100%     194,366      149,179        90,410       53,907       57,289        90,321       90,321       99,328\n                         商业\n\n              "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（三）公司持有项目经营分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 1133,
+              "end": 3526,
+              "quote": "（三） 公司持有项目经营分析\n\n             报告期内，公司在重点城市持有写字楼、商业、公寓/酒店等物业。从城市分布看，公司持有项目主\n       要集中于北京、上海、天津、重庆等国家中心城市；从业态结构看，公司持有项目主要集中于写字楼和\n       商业业态。\n\n          1．公司出租物业资产状况\n\n                                                                                                                   单位：平米\n\n           城市            主要                          项目名称                           权益              可出租                 出租率\n                         业态                                                                          面积\n\n                                      北京金融街中心                                         100%             111,160                  90%\n\n                                      北京金融街（月坛）中心部分                                   100%               21,956                 64%\n                                      （不含金融集）\n\n                                      北京金融街公寓（商务长租）                                   100%               13,131                 88%\n\n                        写字楼           北京金融大厦                                          100%               11,358                100%\n\n                                      其他零散写字楼                                         100%                6,600                100%\n\n                                      北京金融街（月坛）中心-金融集                                 100%                5,581                100%\n\n           北京                         北京通泰大厦                                          100%                1,785                100%\n\n                                      北京金融街购物中心                                       100%               88,384                 88%\n\n                                      北京金融街（西单）购物中心                                   100%               48,414                100%\n\n                                      北京门头沟融悦中心                                        80%               32,605                 90%\n                         商业\n                                      北京金树街                                           100%               14,771                 89%\n\n                                      北京金熙汇                                            80%               12,571                  4%\n\n                                      北京    E2  四合院      5/7 号院                       100%                2,577                100%\n\n\n                                                                       17\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（三）公司持有项目经营分析"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "source_spans": [
+            {
+              "page": 19,
+              "start": 0,
+              "end": 3558,
+              "quote": "                                                                                          金融街控股股份有限公司                   2025  年年度报告\n\n\n 城市             主要                             项目名称                              权益                可出租                   出租率\n                业态                                                                                  面积\n\n                               北京    E2  四合院       4/6  号院                          100%                  2,235                 100%\n\n                               北京    C3   四合院                                       100%                  2,081                 100%\n\n             车位配套                                                                                      139,387\n\n                               上海金融街海伦中心                                            100%                89,618                    89%\n\n               写字楼             上海金融街（融悦）中心                      A  栋                100%                78,198                  100%\n\n                               上海金融街（融悦）中心                      B  栋                100%                24,704                      ---\n 上海\n                商业             上海金融街购物中心                                            100%                57,144                    91%\n\n                住宅             上海青浦西郊宸章                                              50%                  7,446                 100%\n\n             车位配套                                                                                       79,111\n\n               写字楼             天津金融街南开中心                                            100%                83,374                    54%\n\n 天津            写字楼             天津环球金融中心                                             100%                97,971                    53%\n\n             车位配套                                                                                       16,881\n\n                商业             重庆磁器口后街（一二期）                                         100%                87,643                    61%\n\n 重庆         商业、住宅              重庆嘉粼融府                                               100%                15,659                    14%\n\n             车位配套                                                                                       60,815\n\n 武汉             商业             武汉融御滨江                                                60%                20,531                    31%\n\n                办公             成都融御                                                  90%                18,997                  100%\n 成都\n             车位配套                                                                                         2,434\n\n                                合计（含车位配套）                                                                                  1,255,122\n\n 2．公司主要经营物业资产状况\n\n                                                                                                                       单位：平米\n\n      城市                                       项目名称                                           权益                 规划建筑面积\n\n                     北京金融街公寓（经营部分）                                                                100%                         35,717\n\n      北京             北京体育活动中心                                                                     100%                          6,422\n\n                     慕田峪长城酒店                                                                        70%                         3,985\n\n\n\n\n                                                                   18\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+          "section_path": [
+            "第三节 董事会报告",
+            "二、 公司主营业务分析",
+            "（三）公司持有项目经营分析"
+          ],
+          "physical_pages": [
+            20
+          ],
+          "source_spans": [
+            {
+              "page": 20,
+              "start": 0,
+              "end": 1145,
+              "quote": "                                                                                               金融街控股股份有限公司                    2025  年年度报告\n\n\n          城市                                       项目名称                                            权益                 规划建筑面积\n\n          唐山             遵化金融街古泉皇冠假日酒店                                                                 100%                          43,712\n\n                         天津南开体育中心                                                                      100%                           1,735\n          天津\n                         天津津塔体育中心                                                                      100%                           1,553\n\n                         重庆融御体育中心                                                                      100%                           3,300\n          重庆\n                         重庆融景体育中心                                                                      100%                           1,233\n\n                                                      合计                                                                             97,657\n\n\n        "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F03",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F06",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F09",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F10",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F11",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F12",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F13",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F14",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F15",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F17",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F18",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F19",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F20",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F21",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F22",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F23",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F24",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F25",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F26",
+      "element": "position",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "fact_id": "F27",
+      "element": "downstream_customers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f"
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司主营业务按行业分为房产开发、物业租赁、物业经营及其他四类，形成开发销售与持有经营并行的业务结构。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "公司持有项目主要集中于北京、上海、天津、重庆等国家中心城市，从业态结构看主要集中于写字楼和商业业态。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F03",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "房产开发业务产品包括住宅产品和商务产品，报告期内住宅产品实现收入53.43亿元，商务产品收入5.80亿元。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "房产开发-住宅产品营业收入",
+            "raw_value": "53.43",
+            "value": "53.43",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "房产开发-商务产品营业收入",
+            "raw_value": "5.80",
+            "value": "5.80",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0010",
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "公司持有写字楼、商业、公寓/酒店等物业，出租物业包括北京金融街中心、北京金融街购物中心、上海金融街海伦中心、天津环球金融中心、重庆磁器口后街等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010",
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "公司主要经营物业包括北京金融街公寓（经营部分）、北京体育活动中心、慕田峪长城酒店、遵化金融街古泉皇冠假日酒店及天津、重庆的体育中心等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "公司物业租赁业务通过出租写字楼、商业等物业获取租金收入，报告期内加强客户挖掘及渠道拓展以保障出租率稳定。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "公司物业经营业务通过运营酒店、体育中心等持有物业获取收入，报告期内完成天津瑞吉酒店、惠州喜来登酒店的转让。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F09",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "分行业营业收入构成：房产开发营业收入5,923,257,034.78元，物业租赁营业收入1,492,219,945.84元，物业经营营业收入394,719,411.64元，其他营业收入188,168,853.91元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "房产开发营业收入",
+            "raw_value": "5,923,257,034.78",
+            "value": "5923257034.78",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物业租赁营业收入",
+            "raw_value": "1,492,219,945.84",
+            "value": "1492219945.84",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物业经营营业收入",
+            "raw_value": "394,719,411.64",
+            "value": "394719411.64",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他营业收入",
+            "raw_value": "188,168,853.91",
+            "value": "188168853.91",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F10",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F10",
+        "text": "分行业毛利率：房产开发毛利率-9.23%，物业租赁毛利率81.48%，物业经营毛利率39.54%，其他毛利率2.98%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "房产开发毛利率",
+            "raw_value": "-9.23%",
+            "value": "-9.23",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物业租赁毛利率",
+            "raw_value": "81.48%",
+            "value": "81.48",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物业经营毛利率",
+            "raw_value": "39.54%",
+            "value": "39.54",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他毛利率",
+            "raw_value": "2.98%",
+            "value": "2.98",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F11",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "分地区营业收入：京津冀4,285,208,044.19元，长三角1,617,975,752.03元，成渝862,699,155.30元，长江中游721,032,793.79元，大湾区511,449,500.86元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "京津冀营业收入",
+            "raw_value": "4,285,208,044.19",
+            "value": "4285208044.19",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "长三角营业收入",
+            "raw_value": "1,617,975,752.03",
+            "value": "1617975752.03",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "成渝营业收入",
+            "raw_value": "862,699,155.30",
+            "value": "862699155.30",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "长江中游营业收入",
+            "raw_value": "721,032,793.79",
+            "value": "721032793.79",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "大湾区营业收入",
+            "raw_value": "511,449,500.86",
+            "value": "511449500.86",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F12",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F12",
+        "text": "2025年公司销售面积合计498,072平米，销售金额合计725,262万元，其中京津冀销售金额占比55%、长三角17%、成渝11%、大湾区10%、长江中游7%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "2025年销售面积合计",
+            "raw_value": "498,072",
+            "value": "498072",
+            "unit": "平米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "2025年销售金额合计",
+            "raw_value": "725,262",
+            "value": "725262",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F13",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F13",
+        "text": "截至2025年底，公司拥有项目总体可结算规划建筑面积为1,119万平米，对应权益规划建筑面积为922万平米。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "项目总体可结算规划建筑面积",
+            "raw_value": "1,119",
+            "value": "1119",
+            "unit": "万平米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "权益规划建筑面积",
+            "raw_value": "922",
+            "value": "922",
+            "unit": "万平米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F14",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "报告期内公司实现开复工面积219.9万平米，其中新开工面积31.7万平米；公司实现竣工面积38.0万平米。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "开复工面积",
+            "raw_value": "219.9",
+            "value": "219.9",
+            "unit": "万平米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "新开工面积",
+            "raw_value": "31.7",
+            "value": "31.7",
+            "unit": "万平米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "竣工面积",
+            "raw_value": "38.0",
+            "value": "38.0",
+            "unit": "万平米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "公司出租物业合计（含车位配套）可出租面积1,255,122平米，主要出租物业出租率如北京金融街中心90%、北京金融街购物中心88%、上海金融街海伦中心89%、天津环球金融中心53%、重庆磁器口后街（一二期）61%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010",
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "出租物业合计可出租面积（含车位配套）",
+            "raw_value": "1,255,122",
+            "value": "1255122",
+            "unit": "平米",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F17",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "前五名客户合计结算金额514,234,889.47元，占年度营业收入比例6.43%，其中关联方合计结算金额占年度营业收入比例0%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "前五名客户合计结算金额",
+            "raw_value": "514,234,889.47",
+            "value": "514234889.47",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名客户合计结算金额占年度营业收入比例",
+            "raw_value": "6.43%",
+            "value": "6.43",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F18",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "前五名供应商合计采购金额590,150,116.35元，占年度采购总额比例37.34%，其中关联方采购额占年度采购总额比例0；报告期内公司不存在对主要客户和主要供应商的依赖。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "前五名供应商合计采购金额",
+            "raw_value": "590,150,116.35",
+            "value": "590150116.35",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名供应商合计采购金额占年度采购总额比例",
+            "raw_value": "37.34%",
+            "value": "37.34",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F19",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "公司销售区域覆盖京津冀、长三角、成渝、大湾区、长江中游，其中京津冀为最大销售区域，销售金额占比55%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F20",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "受房地产行业持续调整影响，公司2025年归属于上市公司股东的净利润为负，但较2024年实现明显减亏。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F21",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "房产开发业务营业收入同比下降64.57%，主要因公司根据项目工程进度和结算进度，结算收入减少。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "房产开发营业收入比上年同期增减",
+            "raw_value": "-64.57%",
+            "value": "-64.57",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F22",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F22",
+        "text": "物业租赁业务营业收入同比下降13.70%，公司因地制宜市场化调整项目经营策略，加强客户挖掘及渠道拓展，全力保障各项目出租率稳定。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "物业租赁营业收入比上年同期增减",
+            "raw_value": "-13.70%",
+            "value": "-13.70",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F23",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "物业经营业务营业收入同比下降14.54%，主要原因是报告期内完成天津瑞吉酒店、惠州喜来登酒店的转让。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "物业经营营业收入比上年同期增减",
+            "raw_value": "-14.54%",
+            "value": "-14.54",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F24",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "报告期内公司完成天津瑞吉酒店、惠州喜来登酒店的转让，导致物业经营业务收入下降。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F26",
+      "element": "position",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002",
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F26",
+        "text": "公司业务涵盖房地产开发建设与销售、物业租赁及物业经营，处于房地产开发与持有运营环节。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "fact_id": "F27",
+      "element": "downstream_customers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "公司下游客户包括房产开发产品的购房者及物业租赁、物业经营的租户与客户，前五名客户合计结算金额占年度营业收入6.43%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-bccdcfd387c88d977344576a",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "element": "upstream_inputs",
+      "status": "not_disclosed",
+      "reasons": [
+        "选定章节未披露具体原材料、能源或供应商类别等上游投入明细，仅列示前五名供应商采购金额及占比。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-930fef406d6b049b9b04881f",
+      "active": true,
+      "element": "upstream_inputs",
+      "status": "not_disclosed",
+      "reasons": [
+        "选定章节未披露具体原材料、能源或供应商类别等上游投入明细，仅列示前五名供应商采购金额及占比。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

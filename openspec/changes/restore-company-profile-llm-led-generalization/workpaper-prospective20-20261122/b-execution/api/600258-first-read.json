@@ -1,0 +1,3140 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "600258.SH",
+  "report": {
+    "instrument_id": "600258.SH",
+    "report_id": "asset_3c581583af0052015abfa30241bb333a",
+    "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-a52b753988d3c62e92d7428d",
+  "latest_reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+  "readings": [
+    {
+      "work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "workpaper_sha256": "a723cc5c6af877d509318c10d21f68e8442892623ba5980415498a380a9b59b4",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0034",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的业务情况"
+            ],
+            "start_page": 10,
+            "end_page": 10,
+            "rationale": "本报告为酒店集团年报。选择逻辑：section-0034说明公司从事的业务与经营模式；section-0039及子节section-0040、section-0048构成经营情况讨论与营收利润概述，覆盖规模扩张、品牌升级、会员渠道与本期经营变化；section-0056、section-0057、section-0058为主营业务分析与利润表科目变动，提供收入与成本口径；section-0092行业经营性信息分析下的section-0095品牌经营数据提供分品牌经营规模与结构；section-0929营业收入和营业成本附注提供收入构成与成本明细，补足收入来源与主要业务权重。以上共同解释业务结构、产品服务、变现方式、规模与主要构成、客户渠道及本期变化，且避免同时选取父子节。"
+          },
+          {
+            "section_id": "section-0039",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ],
+            "start_page": 11,
+            "end_page": 12,
+            "rationale": "本报告为酒店集团年报。选择逻辑：section-0034说明公司从事的业务与经营模式；section-0039及子节section-0040、section-0048构成经营情况讨论与营收利润概述，覆盖规模扩张、品牌升级、会员渠道与本期经营变化；section-0056、section-0057、section-0058为主营业务分析与利润表科目变动，提供收入与成本口径；section-0092行业经营性信息分析下的section-0095品牌经营数据提供分品牌经营规模与结构；section-0929营业收入和营业成本附注提供收入构成与成本明细，补足收入来源与主要业务权重。以上共同解释业务结构、产品服务、变现方式、规模与主要构成、客户渠道及本期变化，且避免同时选取父子节。"
+          },
+          {
+            "section_id": "section-0048",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "2.5 样板店在上海开业，以年轻化风格迎合了年轻客群的消费需求",
+              "（二）2025 年营收和利润概述"
+            ],
+            "start_page": 13,
+            "end_page": 14,
+            "rationale": "本报告为酒店集团年报。选择逻辑：section-0034说明公司从事的业务与经营模式；section-0039及子节section-0040、section-0048构成经营情况讨论与营收利润概述，覆盖规模扩张、品牌升级、会员渠道与本期经营变化；section-0056、section-0057、section-0058为主营业务分析与利润表科目变动，提供收入与成本口径；section-0092行业经营性信息分析下的section-0095品牌经营数据提供分品牌经营规模与结构；section-0929营业收入和营业成本附注提供收入构成与成本明细，补足收入来源与主要业务权重。以上共同解释业务结构、产品服务、变现方式、规模与主要构成、客户渠道及本期变化，且避免同时选取父子节。"
+          },
+          {
+            "section_id": "section-0056",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "五、报告期内主要经营情况"
+            ],
+            "start_page": 16,
+            "end_page": 16,
+            "rationale": "本报告为酒店集团年报。选择逻辑：section-0034说明公司从事的业务与经营模式；section-0039及子节section-0040、section-0048构成经营情况讨论与营收利润概述，覆盖规模扩张、品牌升级、会员渠道与本期经营变化；section-0056、section-0057、section-0058为主营业务分析与利润表科目变动，提供收入与成本口径；section-0092行业经营性信息分析下的section-0095品牌经营数据提供分品牌经营规模与结构；section-0929营业收入和营业成本附注提供收入构成与成本明细，补足收入来源与主要业务权重。以上共同解释业务结构、产品服务、变现方式、规模与主要构成、客户渠道及本期变化，且避免同时选取父子节。"
+          },
+          {
+            "section_id": "section-0092",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "A.公司主要销售客户及主要供应商情况",
+              "(四) 行业经营性信息分析"
+            ],
+            "start_page": 21,
+            "end_page": 25,
+            "rationale": "本报告为酒店集团年报。选择逻辑：section-0034说明公司从事的业务与经营模式；section-0039及子节section-0040、section-0048构成经营情况讨论与营收利润概述，覆盖规模扩张、品牌升级、会员渠道与本期经营变化；section-0056、section-0057、section-0058为主营业务分析与利润表科目变动，提供收入与成本口径；section-0092行业经营性信息分析下的section-0095品牌经营数据提供分品牌经营规模与结构；section-0929营业收入和营业成本附注提供收入构成与成本明细，补足收入来源与主要业务权重。以上共同解释业务结构、产品服务、变现方式、规模与主要构成、客户渠道及本期变化，且避免同时选取父子节。"
+          },
+          {
+            "section_id": "section-0929",
+            "section_path": [
+              "第八节 财务报告",
+              "二、将重分类进损益的其他综合收益 2,255,274.25 -1,503,795.47 -1,503,795.47 751,478.78",
+              "61、 营业收入和营业成本"
+            ],
+            "start_page": 171,
+            "end_page": 174,
+            "rationale": "本报告为酒店集团年报。选择逻辑：section-0034说明公司从事的业务与经营模式；section-0039及子节section-0040、section-0048构成经营情况讨论与营收利润概述，覆盖规模扩张、品牌升级、会员渠道与本期经营变化；section-0056、section-0057、section-0058为主营业务分析与利润表科目变动，提供收入与成本口径；section-0092行业经营性信息分析下的section-0095品牌经营数据提供分品牌经营规模与结构；section-0929营业收入和营业成本附注提供收入构成与成本明细，补足收入来源与主要业务权重。以上共同解释业务结构、产品服务、变现方式、规模与主要构成、客户渠道及本期变化，且避免同时选取父子节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0035行业整体情况与section-0114未来发展讨论：属行业背景与前瞻计划，非本期公司经营实质，暂不纳入",
+          "section-0070客户与供应商、section-0077资产负债分析：属可选供应链与资产细节，非收入来源核心，暂不纳入",
+          "section-0401财务报告其余附注：仅按需定向补充，不整体扩读"
+        ],
+        "selection_rationale": "本报告为酒店集团年报。选择逻辑：section-0034说明公司从事的业务与经营模式；section-0039及子节section-0040、section-0048构成经营情况讨论与营收利润概述，覆盖规模扩张、品牌升级、会员渠道与本期经营变化；section-0056、section-0057、section-0058为主营业务分析与利润表科目变动，提供收入与成本口径；section-0092行业经营性信息分析下的section-0095品牌经营数据提供分品牌经营规模与结构；section-0929营业收入和营业成本附注提供收入构成与成本明细，补足收入来源与主要业务权重。以上共同解释业务结构、产品服务、变现方式、规模与主要构成、客户渠道及本期变化，且避免同时选取父子节。",
+        "stop_reason": "已覆盖业务模式、经营综述、收入成本构成与分品牌经营数据等核心经营信息，剩余为行业背景、治理、承诺及财务附注明细，对解释公司业务与变现无实质增量，故在此停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取具体客户与供应商名称、会员规模及线上渠道占比等明细。",
+        "未逐一列示全部品牌的门店与房间明细，仅保留主要品牌类别汇总。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-a52b753988d3c62e92d7428d:workpaper:sections",
+          "request_hash": "338a3aaa4a8e83c40262f4b17a5fd546d9b7f1c0bd4e197ccdff59e9eee915d7",
+          "response_hash": "e9ada4862494a18125dfae0a8a70f4a61982280d08f12f8fe68769c21c7050f6",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 24124,
+            "output_tokens": 375,
+            "total_tokens": 24499
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 845,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0313",
+            "section-0315",
+            "section-0318",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0326",
+            "section-0327",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0438",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0603",
+            "section-0604",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0611",
+            "section-0612",
+            "section-0615",
+            "section-0616",
+            "section-0617",
+            "section-0618",
+            "section-0619",
+            "section-0622",
+            "section-0623",
+            "section-0624",
+            "section-0625",
+            "section-0630",
+            "section-0631",
+            "section-0632",
+            "section-0633",
+            "section-0636",
+            "section-0637",
+            "section-0638",
+            "section-0639",
+            "section-0642",
+            "section-0647",
+            "section-0648",
+            "section-0649",
+            "section-0650",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0666",
+            "section-0671",
+            "section-0673",
+            "section-0679",
+            "section-0680",
+            "section-0687",
+            "section-0690",
+            "section-0693",
+            "section-0700",
+            "section-0707",
+            "section-0715",
+            "section-0721",
+            "section-0722",
+            "section-0723",
+            "section-0724",
+            "section-0726",
+            "section-0730",
+            "section-0731",
+            "section-0733",
+            "section-0737",
+            "section-0738",
+            "section-0744",
+            "section-0745",
+            "section-0747",
+            "section-0748",
+            "section-0750",
+            "section-0753",
+            "section-0754",
+            "section-0755",
+            "section-0757",
+            "section-0758",
+            "section-0760",
+            "section-0762",
+            "section-0763",
+            "section-0764",
+            "section-0766",
+            "section-0771",
+            "section-0777",
+            "section-0781",
+            "section-0784",
+            "section-0786",
+            "section-0787",
+            "section-0788",
+            "section-0790",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0795",
+            "section-0797",
+            "section-0799",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0804",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0811",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0818",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0825",
+            "section-0827",
+            "section-0828",
+            "section-0829",
+            "section-0830",
+            "section-0831",
+            "section-0833",
+            "section-0834",
+            "section-0835",
+            "section-0836",
+            "section-0840",
+            "section-0846",
+            "section-0847",
+            "section-0853",
+            "section-0854",
+            "section-0855",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0862",
+            "section-0865",
+            "section-0869",
+            "section-0873",
+            "section-0875",
+            "section-0876",
+            "section-0877",
+            "section-0879",
+            "section-0880",
+            "section-0881",
+            "section-0882",
+            "section-0883",
+            "section-0885",
+            "section-0886",
+            "section-0887",
+            "section-0888",
+            "section-0889",
+            "section-0894",
+            "section-0895",
+            "section-0896",
+            "section-0897",
+            "section-0898",
+            "section-0900",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0910",
+            "section-0913",
+            "section-0914",
+            "section-0915",
+            "section-0916",
+            "section-0917",
+            "section-0918",
+            "section-0921",
+            "section-0922",
+            "section-0923",
+            "section-0924",
+            "section-0925",
+            "section-0926",
+            "section-0927",
+            "section-0928",
+            "section-0929",
+            "section-0935",
+            "section-0936",
+            "section-0937",
+            "section-0938",
+            "section-0939",
+            "section-0940",
+            "section-0941",
+            "section-0942",
+            "section-0943",
+            "section-0944",
+            "section-0945",
+            "section-0946",
+            "section-0947",
+            "section-0948",
+            "section-0949",
+            "section-0950",
+            "section-0951",
+            "section-0952",
+            "section-0953",
+            "section-0954",
+            "section-0955",
+            "section-0956",
+            "section-0957",
+            "section-0958",
+            "section-0959",
+            "section-0960",
+            "section-0961",
+            "section-0962",
+            "section-0965",
+            "section-0966",
+            "section-0970",
+            "section-0973",
+            "section-0975",
+            "section-0976",
+            "section-0977",
+            "section-0981",
+            "section-0982",
+            "section-0985",
+            "section-0986",
+            "section-0989",
+            "section-0993",
+            "section-0994",
+            "section-0995",
+            "section-0996",
+            "section-0997",
+            "section-0998",
+            "section-0999",
+            "section-1000",
+            "section-1001",
+            "section-1002",
+            "section-1003",
+            "section-1004",
+            "section-1005",
+            "section-1006",
+            "section-1007",
+            "section-1008",
+            "section-1009",
+            "section-1015",
+            "section-1016",
+            "section-1025",
+            "section-1026",
+            "section-1027",
+            "section-1028",
+            "section-1029",
+            "section-1030",
+            "section-1031",
+            "section-1032",
+            "section-1033",
+            "section-1037",
+            "section-1041",
+            "section-1045",
+            "section-1046",
+            "section-1047",
+            "section-1048",
+            "section-1049",
+            "section-1054",
+            "section-1057",
+            "section-1058",
+            "section-1059",
+            "section-1060",
+            "section-1061",
+            "section-1062",
+            "section-1063",
+            "section-1064",
+            "section-1065",
+            "section-1066",
+            "section-1067",
+            "section-1068",
+            "section-1069",
+            "section-1070",
+            "section-1071",
+            "section-1072",
+            "section-1073",
+            "section-1074",
+            "section-1075",
+            "section-1076",
+            "section-1077",
+            "section-1078",
+            "section-1079",
+            "section-1080",
+            "section-1081",
+            "section-1082",
+            "section-1083",
+            "section-1084",
+            "section-1093",
+            "section-1094",
+            "section-1095",
+            "section-1096",
+            "section-1099",
+            "section-1100",
+            "section-1101",
+            "section-1102",
+            "section-1105",
+            "section-1106",
+            "section-1107",
+            "section-1108",
+            "section-1109",
+            "section-1112",
+            "section-1113",
+            "section-1114",
+            "section-1117",
+            "section-1118",
+            "section-1119",
+            "section-1120",
+            "section-1121",
+            "section-1122",
+            "section-1123",
+            "section-1124",
+            "section-1125",
+            "section-1126",
+            "section-1129",
+            "section-1130",
+            "section-1131",
+            "section-1136",
+            "section-1137",
+            "section-1138",
+            "section-1139",
+            "section-1144",
+            "section-1146",
+            "section-1153",
+            "section-1160",
+            "section-1168",
+            "section-1171",
+            "section-1172",
+            "section-1173",
+            "section-1179",
+            "section-1180",
+            "section-1181",
+            "section-1182",
+            "section-1183",
+            "section-1184",
+            "section-1185"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-a52b753988d3c62e92d7428d:workpaper:extract",
+          "request_hash": "c62bf07080b9c1ef50279ff4db2d4dae4bd3ed69f341405f8d97fb8a31934d49",
+          "response_hash": "d9d3faeee51da23e77d832b922266902ba9a7ce2aa8b6184f1f8927f1d93fe55",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14678,
+            "output_tokens": 8368,
+            "total_tokens": 23046
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0034",
+            "section-0039",
+            "section-0048",
+            "section-0056",
+            "section-0092",
+            "section-0929"
+          ],
+          "physical_pages": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            16,
+            21,
+            22,
+            23,
+            24,
+            25,
+            171,
+            172,
+            173,
+            174
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "a723cc5c6af877d509318c10d21f68e8442892623ba5980415498a380a9b59b4",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 119,
+              "end": 1275,
+              "quote": "一、报告期内公司从事的业务情况\n\n    公司是全国三大连锁酒店集团之一，专注于中高端及经济型酒店运营管理，并兼有景区经营业务。\n    公司酒店业务包括酒店运营和酒店管理两种模式。第一，酒店运营业务主要指通过租赁物业来经营酒店。\n公司通过向顾客提供住宿及相关服务取得收入，并承担酒店房屋租金，装修及运营过程中的管理、维护、运\n营费用及相关税费后实现盈利。第二，酒店管理业务包括品牌加盟、输出管理和其他特许业务。其中：1.\n品牌加盟指公司与加盟酒店业主签约后协助其进行物业设计、工程改造、系统安装及人员培训等工作，使加\n盟酒店符合集团酒店标准。2.输出管理指公司通过对酒店日常管理取得收入。输出管理收入根据品牌不同分\n为按加盟酒店营业收入的一定比例收取，或按基本管理费加奖励（效益）管理费收取两种模式。3.其他特许\n业务指公司通过给加盟酒店提供服务取得收入，包括软件安装维护服务、预订中心服务和公司派驻加盟酒店\n管理人员的服务。\n    酒店运营模式是把经营酒店的收入全额确认为公司收入，酒店管理模式则是把向酒店业主收取的品牌及\n管理服务费确认为公司收入。报告期内，酒店运营模式的收入占比为                                 61.59%，酒店管理模式的收入占比为\n31.67%。截至报告期末，酒店运营模式的门店数量占比为                        7.1%；酒店管理模式的门店数量占比为                92.9%。由\n于酒店管理业务收入占比小，毛利率比较高，叠加公司重点发展酒店管理业务，公司业绩整体呈现出收入变\n动小，利润变动大的特征。\n    公司旗下酒店品牌丰富：如家、莫泰、驿居、雅客怡家、云上四季、欣燕都、华驿、云品牌（派柏云、\n睿柏云、素柏云、诗柏云）、如家商旅、如家精选、Yunik、艾扉、柏丽艾尚、扉缦、云上四季尚品、漫趣\n乐园、嘉虹、和颐、璞隐、逸扉、万信至格、建国铂萃、首旅京伦、首旅建国、首旅南苑、诺金、诺岚、安\n麓等，覆盖了从经济型、中高端到高端奢华的酒店品牌。产品涵盖了标准及非标准住宿，可以充分满足消费\n者在商务出行和旅游休闲中对良好住宿环境的需求。\n    景区业务：公司海南南山景区运营主要通过景区的门票、餐饮、商品、住宿、园区内交通等获得收入和\n利润。公司控股        74.8%的南山景区为公司唯一经营的               5A 级景区。\n    未来公司仍将以住宿为核心，充分利用自身品牌、规模、资源、平台、技术优势，继续加大资源整合力\n度，将“吃、住、行、游、娱、购”等板块的资源连接起来，打造“如旅随行”的顾客价值生态圈。\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 1006,
+              "end": 2942,
+              "quote": "三、经营情况讨论与分析\n\n（一）2025    年经营概述\n    2025 年，国内宏观经济发展稳中向好，商务出行需求延续渐进式复苏，休闲旅游出行需求持续旺盛。\n报告期内，公司不含轻管理酒店的全部酒店                      RevPAR 为  163 元，同比下降       2.7%；Occ  为  67.2%，同比下降      1.0\n个百分点；ADR      为  242 元，同比下降       1.3%，主要受行业整体价格端承压影响。进入                      2025 年第四季度，公司\n平均房价企稳转正，不含轻管理酒店的全部酒店                         RevPAR 实现同比转正。此外，公司在节假日期间的表现较\n为亮眼，在“五一”“十一”等长假期间，公司旗下酒店经营表现超越                                    2024 年同期。\n    公司持续推进“发展为先、产品为王、经营至上、全域用户运营”等核心战略，对外继续加快市场拓展\n步伐，对内继续强化精细化管理举措，坚持提质增效，不断提升宾客体验，在行业“弱恢复”的背景下，公\n司收入规模整体保持稳定，盈利实现稳健增长。报告期内，公司实现营业收入                                        760,679.73 万元，同比下降\n1.86%；实现归属于上市公司股东的净利润                   81,113.63 万元，同比上升         0.60%。\n1、 规模为先，全力发展标准管理酒店，持续推进结构升级\n    公司持续贯彻规模为先战略，全力发展标准管理酒店，优化产品结构。报告期内，公司新开店数量                                                1,510\n家，同比增长       11.6%，其中，标准管理酒店新开店                 832家，同比增长        17.2%，占全部新开店比例            55.1%，同\n比提升    2.6个百分点。公司积极签约储备店，截至报告期末，公司储备店为                                 1,584 家，其中标准管理酒店数\n量 1,181 家，同比增长        25.2%，储备店中标准管理酒店结构占比                   74.6%，同比提升       20.5 个百分点，为       2026\n年规模扩张及结构优化奠定坚实基础。\n    公司全力推进标准管理酒店发展，经济型酒店与中高端酒店规模均保持良好增长态势。经济型酒店方面，\n报告期内，公司新开经济型酒店                402 家，同比增长        34.0%。其中如家      4.0 自推出以来广受认可，报告期内新\n开 174 家，储备门店数达          257家。中高端酒店方面，报告期内，公司新开中高端酒店                            430 家，截至报告期末，\n中高端酒店房间量占比提升至               42.3%，同比增长       1.1 个百分点。其中，璞隐品牌展现出较好的发展势头，开\n店步伐加快，形成从一线城市到热门旅游目的地多地落子，截至报告期末，璞隐开业门店数达                                                67 家，储备\n门店数达     76家。\n    轻管理模式作为公司发展的重要组成部分，具有“投资小、赋能高、回报快”等特征，公司致力于持续\n提升轻管理酒店的发展质量与运营水平。报告期内，公司新开业轻管理酒店                                      668 家，占新开店比例为          44.2%。\n    公司始终贯彻以特许加盟店为主的扩张方式，并紧抓酒店业开店的下沉趋势，提升对三线及以下城市的\n开店拓展。报告期内，公司通过特许加盟方式新开店                          1,491 家，占整体新开店比例为             98.7%，截至报告期末，\n公司特许加盟方式运营的门店比例提升至                     92.9%。\n\n\n                                               11/224"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 798,
+              "quote": "                           北京首旅酒店（集团）股份有限公司2025            年年度报告\n\n\n2、 产品为王，稳步推进品牌升级，持续向年轻化和时尚化迭代\n    公司始终秉承“产品为王”的核心战略。在通过一体化供应链与品控管理以保障产品一致性的同时，对\n存量酒店坚持“常用常新”，通过持续的维护与焕新来维持和提升产品竞争力。此外，公司明确了同品牌升\n级迭代的统一标准，为后续产品升级奠定了扎实基础。报告期内，公司凭借强大的产品实力，成功蝉联中国\n旅游饭店业协会颁发的“2024            年度中国饭店集团         60强”前三名。\n    经济型酒店方面，公司持续通过产品迭代深化品牌竞争力。如家酒店                                4.0通过时尚焕新的设计、多元灵\n动的社交空间和客房质感的升级打造，进一步满足年轻一代消费者对酒店颜值、品质和体验感的追求，深受\n市场喜爱。报告期内，如家酒店               4.0更新全店设计标准与细则，升级客房家具工艺，进一步提高安装效率，\n降低造价成本，提升宾客体验。在新店开业与存量经济型产品升级的共同驱动下,截至报告期末，如家                                                3.0\n及以上产品占如家品牌店数比例从                2024年期末的     71.8%提升至    81.5%，有力提升了如家酒店品牌的整体形象。\n    中高端酒店方面，目前，公司已构建了以如家商旅、如家精选、璞隐、扉缦、和颐、逸扉等为核心的中\n高端品牌矩阵，其中，公司如家商旅                 2.5、如家精选      4.0以及璞隐     2.0 等核心产品升级有序推进，如家商旅\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "2.5 样板店在上海开业，以年轻化风格迎合了年轻客群的消费需求",
+            "（二）2025 年营收和利润概述"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 556,
+              "quote": "                           北京首旅酒店（集团）股份有限公司2025             年年度报告\n\n\n酒店管理业务收入同比增加              24,144.88 万元，上升      11.14%。景区运营业务营业收入             51,277.89 万元，较上\n年同期减少      365.61万元，下降      0.71%。\n    公司本年实现利润总额为            113,932.11 万元，较上年同期增加            1,927.30 万元。其中,公司酒店业务利润\n总额为   91,205.10 万元，较上年同期增加            1,893.38 万元；景区运营业务利润总额为                22,727.01 万元，较上\n年同期增加      33.91万元。公司归属于上市公司股东的净利润为                      81,113.63 万元，较上年增加         482.31 万元；\n扣除非经常性损益后的归属于上市公司股东的净利润为                          74,128.85 万元，较上年增加          805.47万元。\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "A.公司主要销售客户及主要供应商情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "physical_pages": [
+            21
+          ],
+          "source_spans": [
+            {
+              "page": 21,
+              "start": 639,
+              "end": 3697,
+              "quote": "(四)    行业经营性信息分析\n\n√适用        □不适用\n1.品牌市场数据\n     截至    2025   年  12  月  31  日，公司酒店数量为                 7,802  家（含境外          2 家），客房间数为               554,919    间。公司中\n高端酒店数量为             2,292  家，占比        29.4%，客房间数为              234,833   间，占总客房间数的                 42.3%。\n                                        截至     2025  年  12  月  31  日酒店数据统计表\n\n                                       酒店数量                                                  客房间数\n        品牌                         2025  年   12 月末                                       2025  年   12 月末\n                           合计           直营            特许                  合计                   直营                    特许\n经济型酒店                       2,059           304          1,755               164,475               32,898               131,577\n  如家                        1,639           284          1,355               139,178               31,137               108,041\n  莫泰                            52           11              41                 4,395               1,207                  3,188\n  驿居                           252             7            245               14,131                   403               13,728\n  云上四季                         113             -            113                 6,574                     -                6,574\n  雅客怡家                            1            -              1                     46                    -                    46\n  欣燕都                             2            2              -                   151                  151                      -\n中高端酒店                       2,292           246          2,046               234,833               33,993               200,840\n  如家商旅                         915          107             808               80,626               13,374                67,252\n  如家精选                         551           64             487               50,908                8,145                42,763\n  和颐                           149           25             124               16,474                4,006                12,468\n  璞隐                            67           11              56                 7,712               1,609                  6,103\n  扉缦                            12             5              7                 1,353                  674                    679\n  逸扉                            72             8             64               10,051                1,533                  8,518\n  艾扉                           205             2            203               13,920                   225               13,695\n  万信                            85             -             85                 9,271                     -                9,271\n  柏丽艾尚                          16             3             13                 1,507                  393                 1,114\n  云上四季尚品                        33             8             25                 2,488                  930                 1,558\n\n                                                             21 /224"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "A.公司主要销售客户及主要供应商情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "source_spans": [
+            {
+              "page": 22,
+              "start": 0,
+              "end": 4051,
+              "quote": "                                     北京首旅酒店（集团）股份有限公司2025                        年年度报告\n\n\n                                       酒店数量                                                  客房间数\n        品牌                         2025   年  12  月末                                      2025   年  12  月末\n                            合计          直营             特许                 合计                    直营                    特许\n  Yunik                          47            4             43                 1,613                   184                 1,429\n  嘉虹                              6            2               4                   842                  419                    423\n  建国铂萃                            9            1               8                1,301                   179                 1,122\n  首旅京伦                           12            1             11                 3,394                   601                 2,793\n  首旅建国                           62            2             60                19,527                   922               18,605\n  首旅南苑                           26            3             23                 5,039                   799                 4,240\n  诺岚                              1            -               1                   181                    -                    181\n  诺金*                             3            -               3                   980                    -                    980\n  凯宾斯基*                          21            -             21                 7,646                     -                 7,646\n轻管理                         3,429              -         3,429               154,392                      -              154,392\n  华驿                        1,945              -         1,945                 81,916                     -               81,916\n  云酒店                       1,484              -         1,484                 72,476                     -               72,476\n其他**                             22            7             15                 1,219                   464                    755\n小计                          7,802           557          7,245               554,919               67,355                487,564\n\n注*：诺金和凯宾斯基由公司持股                          50%的合资公司（未并表）运营管理。\n注**：其他包含管理输出等管理运营的酒店。\n2.品牌拓展数据\n     2025  年第四季度，公司新开店数量为                           459  家，其中直营店              7 家，特许加盟店             452  家。经济型酒店新开\n店数量为       114  家，中高端酒店新开店数量为                         121  家，轻管理酒店新开店数量为                        220  家，其他        4 家。\n     2025  年全年，公司新开店数量为                       1,510   家，其中直营店             19 家，特许加盟店              1,491   家。经济型酒店新开\n店数量为       402  家，中高端酒店新开店数量为                         430  家，轻管理酒店新开店数量为                        668  家，其他        10 家。\n     截至    2025   年  12  月  31  日，公司已签约未开业和正在签约店为                               1,584   家。\n                                                     新开店数量和储备店数量\n                           2025   年  10-12   月                 2025  年  1-12   月                截至    2025   年  12  月  31  日\n       品牌                        新开店                                新开店                                    储备店\n                       合计          直营         特许          合计         直营          特许              合计           直营             特许\n经济型酒店                     114           1        113         402           4        398            470            -            470\n中高端酒店                     121           3        118         430           9        421            711            3            708\n轻管理酒店                     220           -        220         668           -        668            398            -            398\n其他                           4          3           1         10           6           4              5           -              5\n     小计                   459           7        452      1,510           19     1,491          1,584             3         1,581\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                             22 / 224"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "A.公司主要销售客户及主要供应商情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 0,
+              "end": 5167,
+              "quote": "                                       北京首旅酒店（集团）股份有限公司2025                          年年度报告\n\n\n（3）2025       年年度经营数据：\n     2025   年   1 至   12 月，不含轻管理酒店的全部酒店                             RevPAR    163  元，同比下降             2.7%；平均房价             242  元，同\n比下降      1.3%；出租率           67.2%，同比下降            1.0   个百分点。全部酒店                  RevPAR    为  142  元，同比下降             3.4%；平均房\n价  225  元，同比下降             1.6%；出租率          63.0%，同比下降             1.2  个百分点。\n                                            2025  年   1 至   12  月酒店三项指标统计表\n\n                                      RevPAR                                  均价                                   出租率\n       项目                2025  年   1 至          同比%            2025   年  1  至          同比%            2025   年   1 至      同比增减百\n                             12  月                                  12 月                                   12  月               分点\n经济型酒店                               133             -0.3%                  193               0.5%              68.6%                -0.5\n  直营                                128               1.1%                 193               1.7%              66.5%                -0.4\n  特许管理                              134             -0.9%                  193               0.1%              69.2%                -0.7\n中高端酒店                               186             -5.7%                  281              -4.1%              66.2%                -1.2\n  直营                                218             -4.7%                  319              -3.7%              68.3%                -0.7\n  特许管理                              180             -5.5%                  273              -3.8%              65.8%                -1.2\n轻管理                                  82             -3.5%                  160              -1.2%              51.0%                -1.2\n  特许管理                               82             -3.5%                  160              -1.2%              51.0%                -1.2\n小计                                  142             -3.4%                  225              -1.6%              63.0%                -1.2\n  直营                                172             -0.9%                  256              -0.1%              67.4%                -0.5\n  特许管理                              137             -3.4%                  219              -1.5%              62.3%                -1.2\n\n注：不含由未并表合资公司运营管理的酒店和管理输出酒店的                                                     RevPAR    数据。\n（4）2025       年年度      18  个月以上成熟店的经营数据：\n     截至     2025   年  12  月   31  日，18     个月以上不含轻管理酒店的成熟酒店共有                                    3,130   家，18     个月以上全部成熟\n酒店共有        5,552   家。2025       年   1 至   12 月，不含轻管理酒店的成熟酒店                             RevPAR   为   162  元，同比下降             7.2%；平\n均房价      240  元，同比下降             3.4%；出租率          67.5%，同比下降             2.8  个百分点。2025             年  1  至  12  月，全部成熟酒店\nRevPAR   为   143  元，同比下降             7.3%；平均房价            224  元，同比下降             3.6%；出租率           63.7%，同比下降             2.5  个百分\n点。\n                                    2025  年   1 至   12  月开业      18  个月以上酒店三项指标统计表\n\n                                                 RevPAR                            均价                             出租率\n      项目               酒店数量             2025   年  1       同比%           2025  年   1       同比%          2025   年  1 至      同比增减\n                                         至  12  月                        至  12  月                          12  月           百分点\n经济型酒店                        1,487              130          -6.2%              191          -1.9%             68.2%             -3.1\n  直营                            299             128          -3.7%              192          -0.8%             66.6%             -2.0\n  特许管理                       1,188              131          -7.1%              190          -2.3%             68.8%             -3.5\n中高端酒店                        1,643              189          -7.7%              282          -4.2%             66.8%             -2.5\n  直营                            232             217          -5.8%              317          -4.6%             68.6%             -0.8\n  特许管理                       1,411              181          -8.3%              273          -4.3%             66.4%             -2.9\n轻管理                          2,422               80          -7.2%              155          -4.4%             51.5%             -1.6\n  特许管理                       2,422               80          -7.2%              155          -4.4%             51.5%             -1.6\n小计                           5,552              143          -7.3%              224          -3.6%             63.7%             -2.5\n  直营                            531             171          -5.1%              253          -3.1%             67.6%             -1.5\n  特许管理                       5,021              136          -7.9%              217          -3.9%             62.8%             -2.8\n\n注：不含由未并表合资公司运营管理的酒店和管理输出酒店的                                                     RevPAR    数据。\n\n\n                                                                24 / 224"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "A.公司主要销售客户及主要供应商情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "physical_pages": [
+            25
+          ],
+          "source_spans": [
+            {
+              "page": 25,
+              "start": 0,
+              "end": 1656,
+              "quote": "                                      北京首旅酒店（集团）股份有限公司2025                         年年度报告\n\n\n4.酒店区域分布\n     截至     2025  年   12  月  31  日，公司中国境内酒店家数                        7,800   家，客房间数            554,622    间。其中北京、上海、\n苏浙皖、津鲁冀、广东和川渝地区的酒店总数                                      4,678   家，占总数的            60.0%；客房间数            342,042    间，占总数的\n61.7%。\n\n省(或直辖市、                          直营酒店                        特许管理及管理输出酒店                                          合计\n    自治区)                酒店数量              客房间数               酒店数量                客房间数                 酒店数量               客房间数\n北京                                 43           6,174                  322             30,504                   365           36,678\n上海                                 67           9,297                  362             29,189                   429           38,486\n苏浙皖                                98          11,351               1,479              99,945                1,577           111,296\n津鲁冀                                81           8,913               1,743             106,433                1,824           115,346\n广东                                 47           5,869                  160             12,963                   207           18,832\n川渝                                 19           2,706                  257             18,698                   276           21,404\n其他                                202          23,045               2,920             189,535                3,122           212,580\n      合计                          557          67,355               7,243             487,267                7,800          554,622\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第八节 财务报告",
+            "二、将重分类进损益的其他综合收益 2,255,274.25 -1,503,795.47 -1,503,795.47 751,478.78",
+            "61、 营业收入和营业成本"
+          ],
+          "physical_pages": [
+            172
+          ],
+          "source_spans": [
+            {
+              "page": 172,
+              "start": 0,
+              "end": 1890,
+              "quote": "                                  北京首旅酒店（集团）股份有限公司2025                             年年度报告\n\n其他说明：\n√适用       □不适用\n(a)营业收入、成本按业务分类：\n                                                                                                 单位：元            币种：人民币\n                                      2025   年度                                                  2024   年度\n                    主营业务收入                        主营业务成本                        主营业务收入                       主营业务成本\n酒店运营             4,684,773,009.45              3,835,890,447.44               5,066,991,934.11             4,119,552,845.99\n酒店管理             2,409,245,372.17                 557,435,611.39              2,167,796,565.86                483,794,096.33\n景区业务                 512,778,926.04               179,807,017.66                 516,435,029.00               174,837,625.83\n   合计            7,606,797,307.66              4,573,133,076.49               7,751,223,528.97             4,778,184,568.15\n(b)本集团营业收入分解如下：\n                                                                                                 单位：元            币种：人民币\n                                                                              2025  年度\n主营业务收入                                     酒店运营                      酒店管理                   景区业务                      合计\n其中：在某一时点确认(i)                            338,154,134.81                             -     34,903,342.18          373,057,476.99\n        在某一时段内确认(ii)                   4,346,618,874.64         2,409,245,372.17        477,875,583.86        7,233,739,830.67\n              合计                       4,684,773,009.45         2,409,245,372.17        512,778,926.04        7,606,797,307.66\n(i)在某一时点确认的收入主要包含餐饮收入及商品销售收入。\n(ii)在某一时段确认的收入主要包含客房收入、特许经营管理收入、景区门票收入及房屋场地租\n赁收入等。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                            172/   224"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0014",
+          "document_version": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+          "section_path": [
+            "第八节 财务报告",
+            "二、将重分类进损益的其他综合收益 2,255,274.25 -1,503,795.47 -1,503,795.47 751,478.78",
+            "61、 营业收入和营业成本"
+          ],
+          "physical_pages": [
+            173
+          ],
+          "source_spans": [
+            {
+              "page": 173,
+              "start": 0,
+              "end": 4408,
+              "quote": "                                                                                  北京首旅酒店（集团）股份有限公司2025                                   年年度报告\n\n\n\n(c)营业成本按业务板块分类：\n                                                                                                                                                                                                      单位：元            币种：人民币\n                                                                                    2025    年度                                                                                       2024    年度\n                                                        合并                       其中：酒店业务                             景区业务                                合并                      其中：酒店业务                              景区业务\n折旧及摊销                                         1,815,398,882.31                 1,786,969,249.35                   28,429,632.96               1,940,008,705.41                  1,915,416,070.35                    24,592,635.06\n职工薪酬                                          1,571,327,414.94                 1,459,826,102.13                  111,501,312.81               1,564,220,662.24                  1,460,720,074.63                  103,500,587.61\n物料消耗                                              488,260,582.83                   471,629,391.69                 16,631,191.14                   537,104,846.89                   517,311,511.34                   19,793,335.55\n能源费                                               291,075,068.82                   286,376,907.91                   4,698,160.91                  307,368,142.10                   302,289,563.35                     5,078,578.75\n洗涤费                                               111,707,075.31                   111,153,727.60                       553,347.71                115,956,404.74                   115,360,951.66                        595,453.08\n日常修理及维护费                                           69,001,299.83                     61,819,964.61                  7,181,335.22                    71,672,459.58                    62,657,687.78                    9,014,771.80\n网络费                                                36,217,678.65                     36,156,177.41                        61,501.24                 37,947,918.85                    37,887,560.35                         60,358.50\n合同履约成本摊销(i)                                        28,779,470.97                     28,779,470.97                                      -           33,620,792.17                    33,620,792.17                                       -\n信息系统服务费                                            26,393,842.22                     26,315,385.05                        78,457.17                 24,600,334.93                    24,499,082.41                       101,252.52\n办公费                                                10,662,611.83                       8,433,642.45                 2,228,969.38                    12,515,280.75                      9,746,873.59                   2,768,407.16\n物业费                                                10,353,462.90                     10,353,462.90                                      -            7,700,116.24                      7,700,116.24                                      -\n有线电视费                                                8,703,361.24                      8,703,361.24                                     -            8,987,302.98                      8,987,302.98                                      -\n租赁费                                                  8,646,056.15                      8,646,056.15                                     -           19,326,621.12                    19,288,296.14                         38,324.98\n其他                                                 96,606,268.49                     88,163,159.37                  8,443,109.12                    97,154,980.15                    87,861,059.33                    9,293,920.82\n                 合计                           4,573,133,076.49                 4,393,326,058.83                  179,807,017.66               4,778,184,568.15                  4,603,346,942.32                  174,837,625.83\n(i)合同履约成本摊销为会员卡费用的摊销。\n(3).履约义务的说明\n□适用         √不适用\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                               173   / 224"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司是全国三大连锁酒店集团之一，专注于中高端及经济型酒店运营管理，并兼有景区经营业务；酒店业务分为酒店运营（租赁物业经营）与酒店管理（品牌加盟、输出管理及其他特许业务）两种模式。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "报告期内酒店运营模式收入占比61.59%，酒店管理模式收入占比31.67%；截至报告期末酒店运营模式门店数量占比7.1%，酒店管理模式门店数量占比92.9%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "酒店运营模式收入占比",
+            "raw_value": "61.59",
+            "value": "61.59",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理模式收入占比",
+            "raw_value": "31.67",
+            "value": "31.67",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店运营模式门店数量占比",
+            "raw_value": "7.1",
+            "value": "7.1",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理模式门店数量占比",
+            "raw_value": "92.9",
+            "value": "92.9",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F03",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "公司控股74.8%的南山景区为唯一经营的5A级景区，景区运营主要通过门票、餐饮、商品、住宿、园区内交通等获得收入和利润。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "南山景区持股比例",
+            "raw_value": "74.8",
+            "value": "74.8",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "公司旗下酒店品牌覆盖经济型、中高端到高端奢华，包括如家、莫泰、驿居、如家商旅、如家精选、璞隐、扉缦、和颐、逸扉、首旅建国、首旅南苑、诺金等；产品涵盖标准及非标准住宿，满足商务出行和旅游休闲住宿需求。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "截至2025年12月31日，公司酒店数量7,802家（含境外2家），客房间数554,919间；其中中高端酒店2,292家、占比29.4%，客房间数234,833间、占总客房间数42.3%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "酒店数量",
+            "raw_value": "7,802",
+            "value": "7802",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "客房间数",
+            "raw_value": "554,919",
+            "value": "554919",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中高端酒店数量",
+            "raw_value": "2,292",
+            "value": "2292",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中高端酒店数量占比",
+            "raw_value": "29.4",
+            "value": "29.4",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中高端酒店客房间数",
+            "raw_value": "234,833",
+            "value": "234833",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中高端酒店客房间数占比",
+            "raw_value": "42.3",
+            "value": "42.3",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "分品牌看，经济型酒店2,059家（直营304家、特许1,755家）、客房间数164,475间；中高端酒店2,292家（直营246家、特许2,046家）、客房间数234,833间；轻管理3,429家（全部特许）、客房间数154,392间；其他22家、客房间数1,219间。",
+        "subject_scope": "business_segment",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0007",
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "经济型酒店数量",
+            "raw_value": "2,059",
+            "value": "2059",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经济型酒店客房间数",
+            "raw_value": "164,475",
+            "value": "164475",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中高端酒店数量",
+            "raw_value": "2,292",
+            "value": "2292",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中高端酒店客房间数",
+            "raw_value": "234,833",
+            "value": "234833",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "轻管理酒店数量",
+            "raw_value": "3,429",
+            "value": "3429",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "轻管理酒店客房间数",
+            "raw_value": "154,392",
+            "value": "154392",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他酒店数量",
+            "raw_value": "22",
+            "value": "22",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他酒店客房间数",
+            "raw_value": "1,219",
+            "value": "1219",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "酒店运营业务通过租赁物业经营酒店，向顾客提供住宿及相关服务取得收入，并承担房屋租金、装修及运营过程中的管理、维护、运营费用及相关税费后实现盈利；酒店运营模式将经营酒店收入全额确认为公司收入。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "酒店管理业务包括品牌加盟、输出管理和其他特许业务；输出管理收入按品牌不同分为按加盟酒店营业收入一定比例收取，或按基本管理费加奖励（效益）管理费收取；酒店管理模式将向酒店业主收取的品牌及管理服务费确认为公司收入。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F09",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "按业务分类，2025年度酒店运营主营业务收入4,684,773,009.45元、成本3,835,890,447.44元；酒店管理收入2,409,245,372.17元、成本557,435,611.39元；景区业务收入512,778,926.04元、成本179,807,017.66元。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "酒店运营主营业务收入",
+            "raw_value": "4,684,773,009.45",
+            "value": "4684773009.45",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店运营主营业务成本",
+            "raw_value": "3,835,890,447.44",
+            "value": "3835890447.44",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理主营业务收入",
+            "raw_value": "2,409,245,372.17",
+            "value": "2409245372.17",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理主营业务成本",
+            "raw_value": "557,435,611.39",
+            "value": "557435611.39",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "景区业务主营业务收入",
+            "raw_value": "512,778,926.04",
+            "value": "512778926.04",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "景区业务主营业务成本",
+            "raw_value": "179,807,017.66",
+            "value": "179807017.66",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F10",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F10",
+        "text": "按收入确认时点，2025年度在某一时点确认收入373,057,476.99元（主要为餐饮收入及商品销售收入），在某一时段内确认收入7,233,739,830.67元（主要为客房收入、特许经营管理收入、景区门票收入及房屋场地租赁收入等）。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "在某一时点确认收入",
+            "raw_value": "373,057,476.99",
+            "value": "373057476.99",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "在某一时段内确认收入",
+            "raw_value": "7,233,739,830.67",
+            "value": "7233739830.67",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F11",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "2025年公司实现营业收入760,679.73万元，同比下降1.86%；实现归属于上市公司股东的净利润81,113.63万元，同比上升0.60%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "760,679.73",
+            "value": "760679.73",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比变动",
+            "raw_value": "-1.86",
+            "value": "-1.86",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润",
+            "raw_value": "81,113.63",
+            "value": "81113.63",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润同比变动",
+            "raw_value": "0.60",
+            "value": "0.60",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "2025年公司利润总额113,932.11万元，同比增加1,927.30万元；其中酒店业务利润总额91,205.10万元、同比增加1,893.38万元；扣除非经常性损益后的归属于上市公司股东的净利润74,128.85万元，同比增加805.47万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "利润总额",
+            "raw_value": "113,932.11",
+            "value": "113932.11",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利润总额同比增加额",
+            "raw_value": "1,927.30",
+            "value": "1927.30",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店业务利润总额",
+            "raw_value": "91,205.10",
+            "value": "91205.10",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店业务利润总额同比增加额",
+            "raw_value": "1,893.38",
+            "value": "1893.38",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "扣除非经常性损益后的归属于上市公司股东的净利润",
+            "raw_value": "74,128.85",
+            "value": "74128.85",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "扣非归母净利润同比增加额",
+            "raw_value": "805.47",
+            "value": "805.47",
+            "unit": "万元",
+            "source_unit": "万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F15",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "营业成本按业务板块分类，2025年度合并营业成本4,573,133,076.49元，其中酒店业务4,393,326,058.83元、景区业务179,807,017.66元；主要成本项目为折旧及摊销1,815,398,882.31元、职工薪酬1,571,327,414.94元、物料消耗488,260,582.83元、能源费291,075,068.82元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0014"
+        ],
+        "metrics": [
+          {
+            "name": "合并营业成本",
+            "raw_value": "4,573,133,076.49",
+            "value": "4573133076.49",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店业务营业成本",
+            "raw_value": "4,393,326,058.83",
+            "value": "4393326058.83",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "景区业务营业成本",
+            "raw_value": "179,807,017.66",
+            "value": "179807017.66",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "折旧及摊销",
+            "raw_value": "1,815,398,882.31",
+            "value": "1815398882.31",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "职工薪酬",
+            "raw_value": "1,571,327,414.94",
+            "value": "1571327414.94",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "物料消耗",
+            "raw_value": "488,260,582.83",
+            "value": "488260582.83",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "能源费",
+            "raw_value": "291,075,068.82",
+            "value": "291075068.82",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "公司通过一体化供应链与品控管理保障产品一致性，并对存量酒店坚持“常用常新”，通过持续维护与焕新维持和提升产品竞争力。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F17",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "公司酒店产品满足消费者在商务出行和旅游休闲中对良好住宿环境的需求；2025年国内商务出行需求延续渐进式复苏，休闲旅游出行需求持续旺盛。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F18",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "公司贯彻以特许加盟店为主的扩张方式，并紧抓酒店业开店下沉趋势，提升对三线及以下城市的开店拓展；报告期内通过特许加盟方式新开店1,491家，占整体新开店比例98.7%，截至报告期末特许加盟方式运营的门店比例提升至92.9%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "特许加盟方式新开店数量",
+            "raw_value": "1,491",
+            "value": "1491",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "特许加盟方式新开店占整体新开店比例",
+            "raw_value": "98.7",
+            "value": "98.7",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "特许加盟方式运营门店比例",
+            "raw_value": "92.9",
+            "value": "92.9",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F19",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "截至2025年12月31日，公司中国境内酒店7,800家、客房间数554,622间；其中北京、上海、苏浙皖、津鲁冀、广东和川渝地区酒店总数4,678家、占总数的60.0%，客房间数342,042间、占总数的61.7%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "中国境内酒店数量",
+            "raw_value": "7,800",
+            "value": "7800",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中国境内客房间数",
+            "raw_value": "554,622",
+            "value": "554622",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "重点区域酒店数量",
+            "raw_value": "4,678",
+            "value": "4678",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "重点区域酒店数量占比",
+            "raw_value": "60.0",
+            "value": "60.0",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "重点区域客房间数",
+            "raw_value": "342,042",
+            "value": "342042",
+            "unit": "间",
+            "source_unit": "间",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "重点区域客房间数占比",
+            "raw_value": "61.7",
+            "value": "61.7",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F20",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "2025年不含轻管理酒店的全部酒店RevPAR为163元、同比下降2.7%，Occ为67.2%、同比下降1.0个百分点，ADR为242元、同比下降1.3%，主要受行业整体价格端承压影响；第四季度平均房价企稳转正，不含轻管理酒店的全部酒店RevPAR同比转正。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "不含轻管理酒店RevPAR",
+            "raw_value": "163",
+            "value": "163",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "不含轻管理酒店RevPAR同比变动",
+            "raw_value": "-2.7",
+            "value": "-2.7",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "不含轻管理酒店Occ",
+            "raw_value": "67.2",
+            "value": "67.2",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "不含轻管理酒店Occ同比变动",
+            "raw_value": "-1.0",
+            "value": "-1.0",
+            "unit": "百分点",
+            "source_unit": "百分点",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "不含轻管理酒店ADR",
+            "raw_value": "242",
+            "value": "242",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "不含轻管理酒店ADR同比变动",
+            "raw_value": "-1.3",
+            "value": "-1.3",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F21",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "2025年全部酒店RevPAR为142元、同比下降3.4%，平均房价225元、同比下降1.6%，出租率63.0%、同比下降1.2个百分点。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "全部酒店RevPAR",
+            "raw_value": "142",
+            "value": "142",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全部酒店RevPAR同比变动",
+            "raw_value": "-3.4",
+            "value": "-3.4",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全部酒店平均房价",
+            "raw_value": "225",
+            "value": "225",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全部酒店平均房价同比变动",
+            "raw_value": "-1.6",
+            "value": "-1.6",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全部酒店出租率",
+            "raw_value": "63.0",
+            "value": "63.0",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全部酒店出租率同比变动",
+            "raw_value": "-1.2",
+            "value": "-1.2",
+            "unit": "百分点",
+            "source_unit": "百分点",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F22",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F22",
+        "text": "由于酒店管理业务收入占比小、毛利率比较高，叠加公司重点发展酒店管理业务，公司业绩整体呈现收入变动小、利润变动大的特征。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F23",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "报告期内公司新开店1,510家、同比增长11.6%，其中标准管理酒店新开店832家、同比增长17.2%、占全部新开店比例55.1%、同比提升2.6个百分点；新开经济型酒店402家、同比增长34.0%，新开中高端酒店430家，新开轻管理酒店668家、占新开店比例44.2%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "新开店数量",
+            "raw_value": "1,510",
+            "value": "1510",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "新开店数量同比变动",
+            "raw_value": "11.6",
+            "value": "11.6",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "标准管理酒店新开店数量",
+            "raw_value": "832",
+            "value": "832",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "标准管理酒店新开店数量同比变动",
+            "raw_value": "17.2",
+            "value": "17.2",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "标准管理酒店新开店占全部新开店比例",
+            "raw_value": "55.1",
+            "value": "55.1",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "新开经济型酒店数量",
+            "raw_value": "402",
+            "value": "402",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "新开中高端酒店数量",
+            "raw_value": "430",
+            "value": "430",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "新开轻管理酒店数量",
+            "raw_value": "668",
+            "value": "668",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "新开轻管理酒店占新开店比例",
+            "raw_value": "44.2",
+            "value": "44.2",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F24",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "截至报告期末公司储备店1,584家，其中标准管理酒店1,181家、同比增长25.2%，储备店中标准管理酒店结构占比74.6%、同比提升20.5个百分点。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "储备店数量",
+            "raw_value": "1,584",
+            "value": "1584",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "储备店中标准管理酒店数量",
+            "raw_value": "1,181",
+            "value": "1181",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "储备店中标准管理酒店数量同比变动",
+            "raw_value": "25.2",
+            "value": "25.2",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "储备店中标准管理酒店结构占比",
+            "raw_value": "74.6",
+            "value": "74.6",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "储备店中标准管理酒店结构占比同比变动",
+            "raw_value": "20.5",
+            "value": "20.5",
+            "unit": "百分点",
+            "source_unit": "百分点",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F25",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F25",
+        "text": "截至报告期末中高端酒店房间量占比提升至42.3%、同比增长1.1个百分点；如家3.0及以上产品占如家品牌店数比例从2024年期末的71.8%提升至81.5%；璞隐开业门店数达67家、储备门店数达76家。",
+        "subject_scope": "business_segment",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0002",
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "中高端酒店房间量占比",
+            "raw_value": "42.3",
+            "value": "42.3",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "中高端酒店房间量占比同比变动",
+            "raw_value": "1.1",
+            "value": "1.1",
+            "unit": "百分点",
+            "source_unit": "百分点",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": "上年同期",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "如家3.0及以上产品占如家品牌店数比例",
+            "raw_value": "81.5",
+            "value": "81.5",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "璞隐开业门店数",
+            "raw_value": "67",
+            "value": "67",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "璞隐储备门店数",
+            "raw_value": "76",
+            "value": "76",
+            "unit": "家",
+            "source_unit": "家",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F26",
+      "element": "position",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F26",
+        "text": "公司酒店业务以酒店运营（租赁物业经营）和酒店管理（品牌加盟、输出管理及其他特许业务）两种模式开展，景区业务通过运营南山景区获取收入。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F27",
+      "element": "upstream_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0014"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "酒店运营业务承担酒店房屋租金、装修及运营过程中的管理、维护、运营费用及相关税费；营业成本中披露的主要投入包括折旧及摊销、职工薪酬、物料消耗、能源费、洗涤费等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0014"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F28",
+      "element": "downstream_customers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F28",
+        "text": "公司酒店产品面向商务出行和旅游休闲消费者，景区业务通过门票、餐饮、商品、住宿、园区内交通等向游客提供服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "fact_id": "F29",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F29",
+        "text": "公司明确以住宿为核心，利用品牌、规模、资源、平台、技术优势加大资源整合，将“吃、住、行、游、娱、购”等板块资源连接起来，打造“如旅随行”的顾客价值生态圈。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未逐一列示全部品牌的门店与房间明细，仅保留主要品牌类别汇总。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "事实F12已隔离，未作为结论采用：metric number is absent from cited source: 酒店业务营业收入同比变动",
+        "事实F13已隔离，未作为结论采用：metric number is absent from cited source: 景区运营业务营业收入同比变动"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取具体供应商名称及采购集中度信息。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取具体客户名称、会员规模及线上渠道占比等明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取具体物料供应商名称及采购金额明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-a52b753988d3c62e92d7428d",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取具体客户名称及客户集中度信息。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

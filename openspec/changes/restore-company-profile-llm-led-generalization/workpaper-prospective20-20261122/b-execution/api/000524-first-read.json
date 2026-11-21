@@ -1,0 +1,2830 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "000524.SZ",
+  "report": {
+    "instrument_id": "000524.SZ",
+    "report_id": "asset_06cb2cd9742fca427053b6bc045b584d",
+    "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+  "latest_reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+  "readings": [
+    {
+      "work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "workpaper_sha256": "9d1f7910a9b8f4a75381be7f1faf0bf519c1d2888808b1b6fdfc24051f45d6db",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0018",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的主要业务"
+            ],
+            "start_page": 10,
+            "end_page": 13,
+            "rationale": "选择逻辑：section-0018（报告期内公司从事的主要业务）及其子节section-0020完整覆盖餐饮、景区、会服、新零售、旅运、科技六大业务板块的产品/服务与经营模式，是回答“做什么、怎么经营”的核心；section-0033（主营业务分析）为经营综述与业务回顾，含营收与扣非净利双增长、全国布局、产业融合、线上营销等经营因素与本期变化；section-0039（收入与成本）提供营业收入构成与成本分析，是“怎么赚钱、收入权重”的实质来源；section-0081（主要控股参股公司分析）补充广之旅、岭南酒店、花园酒店、中国大酒店、东方汽车等主要经营主体的业务定位与规模；section-0918（分部信息）为报告内分部收入/利润的量化补充，用于核对业务板块权重；section-0807（营业收入和营业成本附注）提供收入确认口径与分业务收入明细，弥补正文收入构成的口径缺口。未选纯行业背景（section-0027）与泛化核心竞争力（section-0028），因其对公司层面解释力较弱；未选管理层治理、承诺、关联交易等非经营章节。"
+          },
+          {
+            "section_id": "section-0033",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 15,
+            "end_page": 20,
+            "rationale": "选择逻辑：section-0018（报告期内公司从事的主要业务）及其子节section-0020完整覆盖餐饮、景区、会服、新零售、旅运、科技六大业务板块的产品/服务与经营模式，是回答“做什么、怎么经营”的核心；section-0033（主营业务分析）为经营综述与业务回顾，含营收与扣非净利双增长、全国布局、产业融合、线上营销等经营因素与本期变化；section-0039（收入与成本）提供营业收入构成与成本分析，是“怎么赚钱、收入权重”的实质来源；section-0081（主要控股参股公司分析）补充广之旅、岭南酒店、花园酒店、中国大酒店、东方汽车等主要经营主体的业务定位与规模；section-0918（分部信息）为报告内分部收入/利润的量化补充，用于核对业务板块权重；section-0807（营业收入和营业成本附注）提供收入确认口径与分业务收入明细，弥补正文收入构成的口径缺口。未选纯行业背景（section-0027）与泛化核心竞争力（section-0028），因其对公司层面解释力较弱；未选管理层治理、承诺、关联交易等非经营章节。"
+          },
+          {
+            "section_id": "section-0081",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "九、主要控股参股公司分析"
+            ],
+            "start_page": 29,
+            "end_page": 30,
+            "rationale": "选择逻辑：section-0018（报告期内公司从事的主要业务）及其子节section-0020完整覆盖餐饮、景区、会服、新零售、旅运、科技六大业务板块的产品/服务与经营模式，是回答“做什么、怎么经营”的核心；section-0033（主营业务分析）为经营综述与业务回顾，含营收与扣非净利双增长、全国布局、产业融合、线上营销等经营因素与本期变化；section-0039（收入与成本）提供营业收入构成与成本分析，是“怎么赚钱、收入权重”的实质来源；section-0081（主要控股参股公司分析）补充广之旅、岭南酒店、花园酒店、中国大酒店、东方汽车等主要经营主体的业务定位与规模；section-0918（分部信息）为报告内分部收入/利润的量化补充，用于核对业务板块权重；section-0807（营业收入和营业成本附注）提供收入确认口径与分业务收入明细，弥补正文收入构成的口径缺口。未选纯行业背景（section-0027）与泛化核心竞争力（section-0028），因其对公司层面解释力较弱；未选管理层治理、承诺、关联交易等非经营章节。"
+          },
+          {
+            "section_id": "section-0807",
+            "section_path": [
+              "第八节 财务报告",
+              "二、将重分",
+              "38、营业收入和营业成本"
+            ],
+            "start_page": 152,
+            "end_page": 154,
+            "rationale": "选择逻辑：section-0018（报告期内公司从事的主要业务）及其子节section-0020完整覆盖餐饮、景区、会服、新零售、旅运、科技六大业务板块的产品/服务与经营模式，是回答“做什么、怎么经营”的核心；section-0033（主营业务分析）为经营综述与业务回顾，含营收与扣非净利双增长、全国布局、产业融合、线上营销等经营因素与本期变化；section-0039（收入与成本）提供营业收入构成与成本分析，是“怎么赚钱、收入权重”的实质来源；section-0081（主要控股参股公司分析）补充广之旅、岭南酒店、花园酒店、中国大酒店、东方汽车等主要经营主体的业务定位与规模；section-0918（分部信息）为报告内分部收入/利润的量化补充，用于核对业务板块权重；section-0807（营业收入和营业成本附注）提供收入确认口径与分业务收入明细，弥补正文收入构成的口径缺口。未选纯行业背景（section-0027）与泛化核心竞争力（section-0028），因其对公司层面解释力较弱；未选管理层治理、承诺、关联交易等非经营章节。"
+          },
+          {
+            "section_id": "section-0918",
+            "section_path": [
+              "第八节 财务报告",
+              "十八、其他重要事项",
+              "1、分部信息"
+            ],
+            "start_page": 181,
+            "end_page": 182,
+            "rationale": "选择逻辑：section-0018（报告期内公司从事的主要业务）及其子节section-0020完整覆盖餐饮、景区、会服、新零售、旅运、科技六大业务板块的产品/服务与经营模式，是回答“做什么、怎么经营”的核心；section-0033（主营业务分析）为经营综述与业务回顾，含营收与扣非净利双增长、全国布局、产业融合、线上营销等经营因素与本期变化；section-0039（收入与成本）提供营业收入构成与成本分析，是“怎么赚钱、收入权重”的实质来源；section-0081（主要控股参股公司分析）补充广之旅、岭南酒店、花园酒店、中国大酒店、东方汽车等主要经营主体的业务定位与规模；section-0918（分部信息）为报告内分部收入/利润的量化补充，用于核对业务板块权重；section-0807（营业收入和营业成本附注）提供收入确认口径与分业务收入明细，弥补正文收入构成的口径缺口。未选纯行业背景（section-0027）与泛化核心竞争力（section-0028），因其对公司层面解释力较弱；未选管理层治理、承诺、关联交易等非经营章节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0027 行业情况：属行业背景，非公司层面经营实质，仅在需要解释行业驱动时再读",
+          "section-0028 核心竞争力分析：偏泛化竞争优势描述，与业务/收入解释重叠度低",
+          "section-0089 未来发展展望：含计划性表述，非本期实际经营变化，暂不纳入",
+          "section-0887 关联方及关联交易：仅在需要解释关联购销对收入影响时定向补充",
+          "section-0594 合并财务报表项目注释：范围过大，仅按需取收入/分部相关子节"
+        ],
+        "selection_rationale": "选择逻辑：section-0018（报告期内公司从事的主要业务）及其子节section-0020完整覆盖餐饮、景区、会服、新零售、旅运、科技六大业务板块的产品/服务与经营模式，是回答“做什么、怎么经营”的核心；section-0033（主营业务分析）为经营综述与业务回顾，含营收与扣非净利双增长、全国布局、产业融合、线上营销等经营因素与本期变化；section-0039（收入与成本）提供营业收入构成与成本分析，是“怎么赚钱、收入权重”的实质来源；section-0081（主要控股参股公司分析）补充广之旅、岭南酒店、花园酒店、中国大酒店、东方汽车等主要经营主体的业务定位与规模；section-0918（分部信息）为报告内分部收入/利润的量化补充，用于核对业务板块权重；section-0807（营业收入和营业成本附注）提供收入确认口径与分业务收入明细，弥补正文收入构成的口径缺口。未选纯行业背景（section-0027）与泛化核心竞争力（section-0028），因其对公司层面解释力较弱；未选管理层治理、承诺、关联交易等非经营章节。",
+        "stop_reason": "已覆盖业务结构、产品服务、经营模式、收入构成与主要业务权重、主要经营主体及分部量化信息，可完整回答公司经营与收入来源问题；剩余为行业背景、治理、承诺及财务附注细节，对解释公司业务与收入无实质增量，故在此停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-13ab3a1cf7e2b83d1145e0e6:workpaper:sections",
+          "request_hash": "64f483c1d9993054577b6ac2f9e4a46d3d4278ac09889d1e50480e73c11e318a",
+          "response_hash": "6fe4582a9e12678fbe0d2f241353cc843ca1cfce8851adcda78320c968af0143",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 20679,
+            "output_tokens": 500,
+            "total_tokens": 21179
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 743,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0184",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0525",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0543",
+            "section-0546",
+            "section-0547",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0566",
+            "section-0567",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0579",
+            "section-0583",
+            "section-0585",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0603",
+            "section-0605",
+            "section-0606",
+            "section-0609",
+            "section-0612",
+            "section-0613",
+            "section-0614",
+            "section-0615",
+            "section-0616",
+            "section-0617",
+            "section-0619",
+            "section-0620",
+            "section-0621",
+            "section-0625",
+            "section-0628",
+            "section-0629",
+            "section-0630",
+            "section-0631",
+            "section-0633",
+            "section-0636",
+            "section-0637",
+            "section-0638",
+            "section-0639",
+            "section-0641",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0647",
+            "section-0649",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0657",
+            "section-0659",
+            "section-0660",
+            "section-0661",
+            "section-0662",
+            "section-0664",
+            "section-0666",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0671",
+            "section-0673",
+            "section-0674",
+            "section-0675",
+            "section-0676",
+            "section-0677",
+            "section-0681",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0690",
+            "section-0692",
+            "section-0694",
+            "section-0695",
+            "section-0696",
+            "section-0697",
+            "section-0699",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0704",
+            "section-0706",
+            "section-0708",
+            "section-0709",
+            "section-0710",
+            "section-0714",
+            "section-0716",
+            "section-0717",
+            "section-0718",
+            "section-0719",
+            "section-0721",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0728",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0736",
+            "section-0742",
+            "section-0743",
+            "section-0748",
+            "section-0749",
+            "section-0750",
+            "section-0751",
+            "section-0752",
+            "section-0755",
+            "section-0756",
+            "section-0758",
+            "section-0759",
+            "section-0761",
+            "section-0762",
+            "section-0763",
+            "section-0764",
+            "section-0766",
+            "section-0767",
+            "section-0768",
+            "section-0769",
+            "section-0770",
+            "section-0771",
+            "section-0772",
+            "section-0774",
+            "section-0775",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0779",
+            "section-0780",
+            "section-0781",
+            "section-0783",
+            "section-0785",
+            "section-0787",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0795",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0824",
+            "section-0827",
+            "section-0828",
+            "section-0832",
+            "section-0833",
+            "section-0835",
+            "section-0836",
+            "section-0837",
+            "section-0839",
+            "section-0840",
+            "section-0842",
+            "section-0845",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0854",
+            "section-0855",
+            "section-0856",
+            "section-0860",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0865",
+            "section-0866",
+            "section-0867",
+            "section-0871",
+            "section-0874",
+            "section-0878",
+            "section-0879",
+            "section-0880",
+            "section-0881",
+            "section-0882",
+            "section-0884",
+            "section-0885",
+            "section-0886",
+            "section-0887",
+            "section-0888",
+            "section-0889",
+            "section-0890",
+            "section-0891",
+            "section-0892",
+            "section-0898",
+            "section-0901",
+            "section-0902",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0908",
+            "section-0910",
+            "section-0911",
+            "section-0912",
+            "section-0914",
+            "section-0915",
+            "section-0916",
+            "section-0917",
+            "section-0918",
+            "section-0921",
+            "section-0922",
+            "section-0923",
+            "section-0928",
+            "section-0930",
+            "section-0931",
+            "section-0934",
+            "section-0935",
+            "section-0937",
+            "section-0938",
+            "section-0939",
+            "section-0940",
+            "section-0941",
+            "section-0942"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-13ab3a1cf7e2b83d1145e0e6:workpaper:extract",
+          "request_hash": "966c7573881065f9c64f277eac42548e74ac0a4211ed407708a0d8406950773c",
+          "response_hash": "def36483f1a097ccf17bc184ac3d074a8866e23a5f91dee8dd067f858ac6f7d4",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 15775,
+            "output_tokens": 6662,
+            "total_tokens": 22437
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0018",
+            "section-0033",
+            "section-0081",
+            "section-0807",
+            "section-0918"
+          ],
+          "physical_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            29,
+            30,
+            152,
+            153,
+            154,
+            181,
+            182
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "9d1f7910a9b8f4a75381be7f1faf0bf519c1d2888808b1b6fdfc24051f45d6db",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 135,
+              "end": 1682,
+              "quote": "一、报告期内公司从事的主要业务\n\n    （一）公司介绍、所属行业及获奖情况\n\n    公司是一家集商旅出行（旅行社）业务、住宿（酒店）业务及其他旅游产业链相关业务为一体的综合\n\n性旅游集团。公司以创新和资本为双引擎，致力于构建规模领先、品质引领、业态多元的泛旅游生态圈，\n\n打造立足湾区、服务全国、链接全球的文旅产业运营商。根据中国上市公司协会发布的《2025                                          年上半年\n\n上市公司行业分类结果》，公司属于行业门类                     L 租赁和商务服务业中的            L72 商务服务业。报告期内，公\n\n司、旗下子分公司及管理项目获得国家、省、市及行业协会等各级荣誉超过                                  160 项。住宿（酒店）业务核\n\n心企业广州岭南国际酒店管理有限公司（以下简称“岭南酒店”）连续                                 2年位居“中国饭店集团            60强”\n\n第 14位，并位列《HOTELS》2024        年度全球酒店集团         205 强榜单的酒店数第         23位；商旅出行（旅行社）业\n\n务核心企业广州广之旅国际旅行社股份有限公司（以下简称“广之旅”）连续                                     7 年入选中国旅行社协会\n\n“旅行社品牌       20 强”，《深耕国际中转游，打造城市级宣传窗口》案例入选中国旅行社协会的“入境旅\n\n游服务精品案例”。\n\n    （二）报告期内公司从事的主要业务\n\n    1）商旅出行（旅行社）业务\n\n    公司商旅出行业务的核心企业是公司控股子公司广之旅。广之旅是国内旅行社行业的领先企业，主\n\n要经营国内游、出境游、入境游，兼营国际国内航空票务代理、景区开发与运营管理、目的地营销、旅游\n\n汽车租赁、信息技术咨询服务等业务，具备强大的品牌影响力，致力于打造全球卓越的综合旅游服务商。\n\n报告期内，广之旅先后获评“TOP50              我最喜爱的广东商标品牌”“广州红色研学十佳旅行社”等奖项，成\n\n为南非内政部认证的首批全球“可信赖旅行社（TTOS）”，蝉联澳大利亚“ADS                                 签证最佳代理人”，三项\n\n创新成果入选“广东省旅游协会会员单位经典案例”，彰显强大品牌影响力与行业认可度。\n\n    近年来，广之旅完成全国性战略布局，完善了全国市场目的地服务、产品供应及渠道销售“三体系”\n\n的建设，搭建起覆盖全国的多市场组团、多口岸出发、多签证中心的网络布局，形成了出境游、国内游、\n\n入境游相结合的立体化产品矩阵，构建了客源地与目的地“双地兼顾”、供应端与分销端“双端发力”的\n\n运营格局。\n\n    线上销售方面，广之旅自主开发运营“易起                     行”与“行走网”智慧旅游平台，并结合官方网站、小\n\n程序、微商城、微信视频号、微信公众号、抖音号、小红书及第三方OTA                                销售等线上渠道布局，与全国的\n\n线下渠道共同构建了完整的线上线下融合的全渠道销售体系。广之旅官网上线“易起购”本地生活频道，\n\n\n                                                                                            10"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 0,
+              "end": 1686,
+              "quote": "                                                     广州岭南集团控股股份有限公司           2025年年度报告全文\n\n\n微信上线“易起购旅游生活+”小程序，共同打造民生消费品类的购物平台。\n\n    2）住宿（酒店）业务\n\n    公司的住宿业主要包括酒店管理业务和酒店经营业务，通过做强品牌搭建体系、轻重资产结合和提\n\n升资本化运作能力三大举措，实现品牌发展与规模扩张。酒店管理业务的商业模式主要为向管理的酒店项\n\n目输出品牌标准、中央预订、客源推送等运营管理服务，从管理项目中收取相应的费用等以获得收入利润。\n\n酒店管理业务除以轻资产品牌管理输出外，也以租赁经营的方式运营部分酒店项目，并成功切入高端物业\n\n管理领域。酒店经营业务主要是经营自有产权酒店，为顾客提供酒店住宿、餐饮、会议及商业物业租赁等\n\n服务。\n\n    公司住宿业经营管理的核心企业是全资子公司岭南酒店                          。岭南酒店融合中国文化与国际化管理理念，\n\n是集旅游、休闲、商务于一体的国内领先的高品质全住宿综合运营商，管理规模连续2                                        年位居“中国饭店\n\n集团  60 强”第    14位，并位列《HOTELS》2024        年度全球酒店集团          205强榜单的酒店数第         23 位、客房数第\n\n27 位，业务区域实现“由南向北”延伸，初步形成全国战略布局。报告期内，岭南酒店先后获评“第二\n\n十五届中国文旅金马奖年度卓越影响力民族酒店管理公司”“年度卓越商旅酒店集团”。\n\n    岭南酒店旗下拥有“花园酒店”“岭南东方酒店”“中国大酒店”“岭南五号酒店”“岭南星光营\n\n地”“岭居创享公寓”“岭居臻享公寓”“岭业”等核心系列品牌，构建了适应大住宿业态发展趋势的多\n\n层次品牌体系。受托管理的山东星辉都市酒店管理集团有限公司（已更名为山东岭南都市酒店管理集团有\n\n限公司，以下简称“都市酒店”）拥有高端酒店品牌“含舍                             hotel”“含舍•简”、核心品牌“伊芙·美\n\n素”“含舍•美素酒店”“Urban Garden Hotel（都市花园酒店）”、经济酒店品牌“都市                                   118•精选酒\n\n店”“都市星联”“都市            MINI•精选酒店”“都市          118 连锁酒店”“青年•都市迷你酒店”“单色连锁酒\n\n店”、主题酒店品牌“我的地盘主题酒店”“我的地盘电竞酒店”等酒店品牌。\n\n    公司自有产权酒店广州花园酒店是中国创建白金五星级饭店首批三家酒店中唯一的本土品牌酒店，\n\n是“花园酒店”品牌的旗舰店。公司自有产权酒店广州东方宾馆、中国大酒店均是中国首批五星级酒店，\n\n其中广州东方宾馆是“岭南东方酒店”品牌的旗舰店。报告期内，广州花园酒店入选中国饭店协会《2025\n\n饭店业高质量发展案例汇编》；中国大酒店                    获评“中国杰出民族品牌酒店”“中国民族品牌饭店示范单\n\n位”；广州东方宾馆获评            2025中国民族品牌饭店“至樽”称号。\n\n    3）产业链相关业务\n\n    1、餐饮业务\n\n    公司以特色美食弘扬岭南文化，大力研发新菜式、制定新标准、开拓新模式，总结了一套体现“广州\n\n风韵、广东味道、岭南特色、中国风范”可推广的餐饮宴会标准，积极探寻激活“美食能量”之道，以\n\n“味在岭南”擦亮“食在广州”文化招牌。报告期内，广州花园酒店“桃园馆”、中国大酒店“四季中\n\n                                                                                            11"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "source_spans": [
+            {
+              "page": 12,
+              "start": 0,
+              "end": 1706,
+              "quote": "                                                     广州岭南集团控股股份有限公司           2025年年度报告全文\n\n\n国”、广州东方宾馆“南国宴乐宫”3                 家品牌餐厅荣膺“食在广州”五星认证餐厅；中国大酒店以“粤味\n\n无疆   世界共语”为主题的第五季“消失的名菜”亮相法国巴黎，以粤菜为媒介搭建东西方文化交流桥梁。\n\n    2、景区业务\n\n    根据“一主多元”和“旅游+”的发展规划，公司设立广州广之旅悦景目的地旅游发展有限公司（以\n\n下简称“广之旅悦景公司”），目前管理广州白云山鸣春谷和月溪书院等广东省内景区项目，并将业务范\n\n围延伸至省外。其中，鸣春谷景区和月溪书院位于国家                          5A 级景区广州白云山景区内。报告期内，广之旅\n\n悦景公司与贵州黄果树观瀑园苗医药森林康养基地达成运营合作协议，助力打造“食、住、康、养、游、\n\n乐、购”七位一体的康养度假目的地。\n\n    3、会服业务\n\n    公司拥有丰富的优质会议服务场地资源，多年来成功运营执行广东国际旅游产业博览会、广府文化嘉\n\n年华等展会，拥有中华老字号博览会、广东国际会奖旅游交                           流大会、中国国内旅游目的地供应商大会、中\n\n国大酒店德国啤酒节、粤菜师傅走进美丽乡村等自主                         IP。报告期内，公司及旗下企业全力服务保障                     2025\n\n年世界田联接力赛、全国第十五届运动会、2025                    粤港澳大湾区灯会等近            40场具有重大影响力的会议赛事\n\n活动，彰显卓越服务水平与组织接待能力。\n\n    4、新零售业务\n\n    公司新零售业务以“文创           +”为核心，融合岭南文化与现代生活方式，打造                       “旅游+”“酒店+”等新\n\n场景，构建覆盖家居衍生、旅行装备、烘焙手信、休闲食品等的产品矩阵，通过线上线下立体渠道网络，\n\n为客户提供高品质、沉浸式的消费体验。目前，公司已开发木棉枕、保温杯及斜挎包等零售商品，形成\n\n“小红花文创”“花园小羊”“消失的名菜”“鸣春谷小鸣”“白云山文创”等系列产品，并研发了花园\n\n曲奇饼、荔枝酥、东方鸡仔饼、蝴蝶酥等零售食品。\n\n    5、旅运业务\n\n    公司旗下广州市东方汽车有限公司                （以下简称“东方汽车”）             及广州广之旅旅运汽车服务有限公司\n\n（以下简称“广之旅旅运公司”）拥有各类大巴、中小型汽车、商务车和小轿车，具备旅客道路运输经营\n\n资质。广之旅子公司广州广之旅商旅服务有限公司（原名广州广之旅空运服务有限公司）拥有                                           120 多家国\n\n内外航空公司的客票销售代理授权，是经国际航空运输协会和中国航空运输协会认证的国际及国内客运销\n\n售代理。公司旗下广州市白云山旅游发展有限公司的游览观光车业务覆盖广州白云山                                       、广州越秀山及石门\n\n国家森林公园等知名风景区。报告期内，广之旅旅运公司获“2024                             年度优秀客运企业”称号。\n\n    6、科技业务\n\n    旅游科技业务是公司的重要成长性业务，公司致力于以数字赋能推动智慧商业模式创新，加快传统产\n\n业转型升级。广之旅旗下广州易起行信息技术有限公司（以下简称“易起行”）专注文旅信息化咨询、系\n\n                                                                                            12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 258,
+              "quote": "                                                     广州岭南集团控股股份有限公司           2025年年度报告全文\n\n\n统研发、项目实施、IT          运维服务等方面，先后通过国家高新技术企业、广东双软认证企业、广东省智慧\n\n旅游工程技术研究中心、科技部科技型中小企业及广东省专精特新中小企业等资质认证。报告期内，易起\n\n行研发的“易游旅游智能应用平台”入选“2024                     广东省智慧旅游培育项目”。\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 929,
+              "end": 1798,
+              "quote": "四、主营业务分析\n\n1、概述\n\n\n    报告期内，在消费升级与政策利好的双重驱动下，国内文旅产业                               迎来高质量发展的黄金期，公司凭借\n\n深耕行业的深厚积淀与前瞻布局，紧扣“拼经济、促发展、增效益、保安全”工作主题，大力拓经营、强\n\n管理、深融合、促创新、育文化、提效能，各项工作均取得了良好的成效，旗下多元业务协同发力，\n\n“2+X”泛文旅产业生态圈成效凸显。2025                  年度，公司实现营业收入             450,394.78  万元，比上年同期增长\n\n4.52%；实现归属于上市公司股东的净利润7,006.10                     万元，同比减少        53.34%，主要原因是上年公司获得\n\n参股企业（持股        3.92%）广州世界大观股份有限公司现金分红款等款项                        7,606.68 万元计入非经常性损益，\n\n而 2025 年度无此项非经常性收益；实现归属于上市公司股东扣除非经常性损益的净利润                                        6,147.65 万元，\n\n同比增长     1.66%；期末归属于上市公司股东的净资产为                    228,710.14 万元，比上年期末增长            0.87%；实现经\n\n营活动产生的现金流量净额为               24,019.80 万元，资产负债率为           40.28%，加权平均净资产收益率为              3.08%。\n\n公司各主业发展呈现“稳中有进、进中提质”的良好态势。\n\n\n\n                                                                                                15"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 1923,
+              "quote": "                                                     广州岭南集团控股股份有限公司            2025年年度报告全文\n\n\n    （一）旅游酒店业务稳中有进，促进公司营收与扣非净利双增长\n\n    商旅出行（旅行社）业务保持稳健增长。出境游业务方面，广之旅持续强化核心资源掌控力，与境\n\n内外航空公司、酒店集团、境外旅游局等资源端建立深度联动，成功落地南北极航线、布达佩斯首航等资\n\n源。国内游业务方面，“组团”与“地接”业务持续共同发展，“组团”业务聚焦体育旅游、银发康养、\n\n同龄旅行、猎奇小众等市场热点深化产品创新，面向银发群体打造“岭南号·银发专列”及“乐龄悦行”\n\n系列产品，聚焦年轻客群推出“跟着赛事去旅行”、音乐旅行、运动滑雪等主题产品，贴合Z                                            世代个性化\n\n消费偏好；“地接”业务持续做优大湾区超级地接，承办“国际旅游知名人士                                      花城广州幸福之旅”等国\n\n际推广活动，整合湾区文旅资源打造优质观赛产品，圆满完成十五运“双先”观摩团接待。入境游方面，\n\n广之旅抢抓免签政策红利再次中标成为广州市唯一一家为国际中转旅客提供一日游的旅行社，成功接待广\n\n东省侨联海外归侨、澳洲学生大湾区研学等重要入境团队。\n\n    报告期内，广之旅实现营业收入331,604.80                万元，同比上年增长6.26%，其中，出境游（不含港澳）\n\n实现营收     193,461.29  万元，国内游实现营收114,272.21               万元；实现归属于母公司所有者的净利润\n\n3,220.78万元，同比上年增长21.27%。\n\n    住宿（酒店）业务管理规模持续扩大，品牌矩阵进一步深化。2025                               年度，公司住宿业的营收同比上\n\n年保持增长，营收规模比2019              年度增长了      13.13%。酒店管理业务深化“南北协同”战略，以“豪华+中\n\n端+经济型”全品牌矩阵拓展项目约                 150 个，在广州、深圳、韶关、汕头、潮州、揭阳、茂名等地新增拓\n\n展酒店，进一步深化广东省及粤港澳大湾区战略布局，打造区域文旅酒店集群。岭南酒店设立广州岭南岭\n\n居公寓酒店管理有限公司，制定“臻享、创享、共享、乐享”四大公寓系列品牌标准，启动岭居公寓品牌\n\n规模化发展。报告期内，岭南酒店实现营业收入                         28,370.38  万元，同比上年增长           9.42%；实现净利润\n\n496.01 万元，同比上年减少           61.30%，主要原因是新增的直营项目陆续投入运营，项目前期投入及运营成\n\n本费用有所增长。\n\n    （二）主业深化全国布局，市场影响力持续攀升\n\n    商旅出行业务扩大全国业务联动的网络体系。                      广之旅深化“全国买全国卖”运营模式，华南                       总部和\n\n各地分子公司业务联动总量稳步提升，其中四川与湖南子公司共同设立欧洲项目组，武汉、山西、湛江等\n\n异地子公司以联运形式分销四川子公司出境产品，华南                          总部与湖北子公司建立产销对接机制，协助湖北子\n\n公司策划营销活动。截至            2025年末，广之旅在全国开设门店共                202家，其中广东省内开设门店共               122家，\n\n为“全国买全国卖”的旅游服务生态圈构建终端支点。报告期内，广之旅华南总部之外的分子公司实现营\n\n收合计   92,835.45 万元，占广之旅总营收的             28.00%。\n\n    住宿业务强化南北并进的格局。                公司成立岭南酒店北方总部、都市集团南方总部。报告期内，岭南\n\n酒店持续深化粤港澳大湾区及粤西地区战略布局，并积极拓展校园餐饮等多元服务领域，不断拓宽“岭业”\n\n                                                                                              16"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1808,
+              "quote": "                                                    广州岭南集团控股股份有限公司           2025年年度报告全文\n\n\n品牌的服务边界。都市酒店持续放大全国重点旅游目的地布局，采用“投资直营+特许加盟”模式，加速\n\n下沉市场，扩大加盟规模覆盖包括江苏和西藏在内的西北、西南、华东等重点区域，推动广州都市花园酒\n\n店和含舍共享空间等项目建设，都市酒店在南方的布局得以进一步扩大；同时，都市酒店优化下沉市场支\n\n持体系，提供专项运营培训超过               6,300场次，供应链服务覆盖超过             500 家加盟店。\n\n    （三）多产业融合聚合力，协同拓展生态版图\n\n    两大主业融合不断深化。            公司以“四个相互”（相互采购、优惠、引流、宣传）推进旗下商旅出行\n\n与住宿业两大主业持续融合，旅游、酒店两大事业部联合参与广州旅游展、国际旅游交易会等，举办“美\n\n好生活，尽在岭南”内购活动，联合推出“我在湾区看全运”“双花园品牌”粤西线路等“旅游+酒店”\n\n产品，超    30 家酒店产品已在岭客汇与易起行双平台上线，实现渠道与资源高效互补。\n\n    以岭南美食推动餐饮产业创新。               以“产品创新、文化融合、全渠道销售”为抓手，公司旗下酒店发\n\n力春节、清明、五一、端午、国庆等假期，年宵品、端午粽、中秋月饼等节令食品开启全渠道营销，实现\n\n节庆营收与品牌影响力双提升；旗下广州花园酒店、中国大酒店、广州东方宾馆、广州宾馆、爱群大酒店\n\n和广州流花宾馆成功入选首批”粤地优品”品鉴餐厅；广州东方宾馆的手工烘焙产品东方蝴蝶酥入选“粤\n\n食佳品”，成为第二批广州“必购必带”城市礼物。\n    打造政商客户服务标杆。            公司统筹旗下商旅出行与住宿业两大主业的集群资源，圆满完成第十五届\n\n全国运动会服务工作，旗下             10 家酒店作为第十五届全国运动会定点接待单位，此外圆满完成瑙鲁国家元\n\n首访粤、中非检察合作论坛等             200 多场重要活动的服务工作，展现湾区特色与岭南风韵。报告期内，公司\n\n将广州广之旅空运服务有限公司更名为广州广之旅商旅服务有限公司，战略切入差旅市场，打造“畅行差\n\n旅”专业    TMC 平台，加快构建差旅数智化综合服务平台，为企业客户提供一站式差旅解决方案。                                     白云国际\n\n会议中心引进系列明星演唱会和年度剧目，打造全季演艺矩阵，开创“演艺+”新赛道。\n\n    景区业态创新升级。         报告期内，广之旅悦景公司成功签约贵州观瀑园康养基地项目，并推动石门国\n\n家森林公园观光车项目落地；在白云山景区推出“山醒                          Lab”城市山系疗愈生活空间、白云山“云上驿\n\n站”、鸣春谷外骨骼机器人体验等新业态项目。鸣春谷景区以“活动引流+IP                                  联动”激活运营活力，发布\n\n“鸣星研学”品牌，创新推出“1234               研学基地新模式”，推动研学业务同比增长。\n\n    新零售商品与文化         IP培育新增长点。报告期内，公司深化文旅融合，深挖文化IP，形成“小红花”\n\n“花园小羊”“消失的名菜”“鸣春谷小鸣”“白云山文创”等系列文创产品，其中以“小红花”为基础、\n\n以“潮品”为思路开发首个自研产品木棉枕，并构建“文创零售门店+文创自助销售机+系统内酒店代销”\n\n的线下销售网络，与“岭客汇”“易起购”自有线上平台共同构建了线上线下的新零售销售网络。住宿业\n\n方面，以“文化       IP +  场景”驱动节庆营销，依托“广府醒狮”“手作技艺”等非遗活化项目，打造“灯\n\n会+”“走进非遗”“岭南粤菜小师傅”“邮历岭南”等特色节庆，岭南酒店推出“花开岭南‘印’新春”\n\n\n                                                                                           17"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 2036,
+              "quote": "                                                     广州岭南集团控股股份有限公司            2025年年度报告全文\n\n\n“巧手木偶·戏韵白云”等非遗品牌活动，积极塑造“岭南酒店走进非遗”这一文旅                                         IP；旗下多家星级\n\n酒店开设线下文创店，大力推介广州礼物和岭南手信；为进一步优化境外旅客商旅体验，旗下多家酒店支\n\n持离境退税，拓展消费新业态。\n\n    破局免税与科技新赛道。公司探索“科技+文旅”创新实践，与小马智行合作开发南沙智慧旅游专线\n\n及联名月饼，率先在广州花园酒店落地小马首条                       Robotaxi  专线站点。破局免税消费新场景，公司与中国\n\n免税品（集团）有限责任公司、广州市广百股份有限公司、广州白云国际机场股份有限公司共同投资设立\n\n中免市内免税品（广州）有限公司运营广州市市内免税                         店，联合筹建运营的广州首家市内免税店在天河区\n\n国际金融中心（广州友谊国金店一楼）开业，为出境旅客带来“不出国门，畅享免税”的全新购物体验。\n\n    （四）线上营销构建新矩阵，数字化科技赋能新发展\n\n    构建线上营销矩阵，强化新媒体赋能。报告期内，公司全年发布新媒体推文超                                     4,000 条，总观看量破\n\n千万，并举办首届“岭南直播营销大赛”，孵化企业自有主播人才，初步建立内生型主播孵化机制；与抖\n\n音本地生活合作，搭建视频号、小红书、美团等多平台营销矩阵，日均直播超                                    16小时，累计      GMV超亿元。\n\n商旅出行业务方面，深化“公众号+视频号+直播间”新媒体矩阵运营，“10                                  万+”短视频超过         20 条，全\n\n新策划“领队推荐”“产品经理分享”等种草短视频赋能产品转化，其中白俄罗斯种草视频被白俄罗斯旅\n\n游局小红书官方账号转载；联合岭南酒店打造“小红花                          Tan 广州”直播平台，结合岭南酒店资源输出探店\n\n短视频，夯实引客来穗基础。住宿业方面，策划“岭动全运”年度主题营销，融合全运会与湾区元素，形\n\n成“月月有热点、环环扣主题”传播矩阵，系列视频获数十家央媒、省媒及新媒体渠道转发传播                                             ；岭南酒\n\n店统筹旗下各酒店资源，与抖音达成战略合作，以“岭南酒店”账号为核                                  心，各酒店积极开展电商直播活\n\n动，打造实体直播间，实现每天常态化直播，对酒店产品、节令食品等进行全方位营销推广。\n\n    科技研发与数字化转型提速。公司加大研发投入力度，形成公司数字化发展规划、AI                                        智能体应用研\n\n发和一体化酒店管理平台研发规划，完成“岭南小智”AI                           应用、“数据分析助手”和“业财一体化”等\n\n近 10 个项目研发。\n\n    公司积极响应“人工智能              +”战略，旗下易起行以提升运营效率、改善用户体验为目标，开发\n\ntravelGPT易游   AI 平台，打造一支        AI数字员工团队。目前，AI            数字员工团队近        900名数字员工已在行程\n\n定制、销售问答、签证处理、知识问答等多个工作场景中投入使用，全天候在线工作，为用户提供无缝衔\n\n接式使用体验，开启人机协同的新型工作模式。易游                         AI平台成功入选       2024 年度广东省智慧旅游培育项目\n\n名单，并在     2025 年“数据要素×”大赛广东分赛中荣获三等奖。\n\n    为深化“数智加速”主题，提升酒店数智化精益运营管理能力，挖掘酒店业收益潜力，岭南酒店和易\n\n起行共同研发上线岭南酒店收益管理系统。系统以“提升酒店数智化精益运营管理能力、挖掘行业收益潜\n\n力”为核心目标，通过对接              PMS、CRS、宴会销售等业务系统归集数据，结合大数据算法与市场情报，构\n\n                                                                                             18"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "source_spans": [
+            {
+              "page": 19,
+              "start": 0,
+              "end": 4445,
+              "quote": "                                                                                          广州岭南集团控股股份有限公司                             2025   年年度报告全文\n\n\n建覆盖收益管理全流程的功能体系。\n\n       回顾      2025     年，公司凭借对主业的深耕细作、对多元协同的持续深化、对创新驱动的坚定践行，不仅\n\n巩固了在文旅行业的领先地位，更在品牌影响力、产业链整合能力、科技创新水平等方面实现了新突破，\n\n为“十五五”开局奠定了坚实的基础，也打开了更为广阔的发展空间。\n\n\n2、收入与成本\n\n（1） 营业收入构成\n\n\n                                                                                                                                                     单位：元\n                                                 2025   年                                                    2024  年                              同比增减\n                                     金额                    占营业收入比重                              金额                     占营业收入比重\n 营业收入合计                       4,503,947,783.38                              100%         4,309,032,285.69                              100%             4.52%\n 分行业\n 旅行社运营                        3,307,444,539.64                           73.44%          3,117,984,595.59                           72.36%              6.08%\n 酒店经营                            935,110,809.87                          20.76%             947,686,935.72                          21.99%            -1.33%\n 酒店管理                            246,006,466.30                           5.46%             227,337,907.77                            5.28%             8.21%\n 汽车服务                             15,385,967.57                           0.34%               16,022,846.61                           0.37%           -3.97%\n 分地区\n 广东省内                         1,288,143,517.58                           28.60%          1,387,731,060.53                           32.21%            -7.18%\n 广东省外                         1,186,337,807.82                           26.34%          1,285,712,118.79                           29.84%            -7.73%\n 港澳地区                             94,853,539.70                           2.11%               76,014,692.57                           1.76%           24.78%\n 境外                           1,934,612,918.28                           42.95%          1,559,574,413.80                           36.19%            24.05%\n\n（2） 占公司营业收入或营业利润                                     10%以上的行业、产品、地区、销售模式的情况\n\n\n适用 □不适用\n                                                                                                                                                     单位：元\n                                                                                                    营业收入比                 营业成本比                毛利率比上\n                             营业收入                       营业成本                      毛利率               上年同期增                 上年同期增                年同期增减\n                                                                                                          减                     减\n 分行业\n 旅行社运营                 3,307,444,539.64           2,894,460,697.48                     12.49%                6.08%                6.94%               -0.70%\n 酒店经营                     935,110,809.87             591,691,068.99                    36.73%               -1.33%               -3.02%                 1.10%\n 酒店管理                     246,006,466.30             189,455,203.47                    22.99%                8.21%               14.61%               -4.30%\n 汽车服务                      15,385,967.57                3,833,097.00                   75.09%               -3.97%               -0.79%               -0.80%\n 分地区\n 广东省内                  1,288,143,517.58              874,644,573.37                    32.10%               -7.18%               -5.89%               -0.93%\n 广东省外                  1,186,337,807.82           1,043,305,154.58                     12.06%               -7.73%               -5.75%               -1.85%\n 港澳地区                      94,853,539.70               85,728,629.18                    9.62%               24.78%               23.96%                 0.60%\n 境外                    1,934,612,918.28           1,675,761,709.81                     13.38%               24.05%               21.38%                 1.90%\n公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                                           1 年按报告期末口径调整后的主营业务数据\n□适用 不适用\n\n\n（3） 公司实物销售收入是否大于劳务收入\n\n\n□是 否\n\n\n                                                                                                                                                              19"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            20
+          ],
+          "source_spans": [
+            {
+              "page": 20,
+              "start": 0,
+              "end": 3284,
+              "quote": "                                                                                   广州岭南集团控股股份有限公司                          2025  年年度报告全文\n\n\n（4） 公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n\n□适用 不适用\n\n\n（5） 营业成本构成\n\n\n行业分类\n\n                                                                                                                                          单位：元\n\n    行业分类                 项目                            2025  年                                           2024  年                        同比增减\n                                             金额                占营业成本比重                         金额                占营业成本比重\n 旅行社业务                出境游            1,682,483,030.99                     45.73%       1,369,388,491.09                     39.28%         22.86%\n 旅行社业务                国内游            1,119,871,634.73                     30.44%       1,261,572,942.90                     36.19%       -11.23%\n 旅行社业务                入境游                12,311,871.25                      0.33%           7,788,762.96                     0.22%         58.07%\n 旅行社业务                订房                 14,218,977.78                      0.39%          11,197,233.96                     0.32%         26.99%\n 旅行社业务                其他                 65,575,182.73                      1.78%          56,780,946.58                     1.63%         15.49%\n 酒店经营业务               原材料               147,434,616.94                      4.01%        168,225,838.37                      4.83%       -12.36%\n 酒店经营业务               人工工资              213,660,403.85                      5.81%        212,552,726.18                      6.10%          0.52%\n 酒店经营业务               能源                 50,938,563.02                      1.38%          57,688,358.96                     1.65%       -11.70%\n 酒店经营业务               其他                179,657,485.18                      4.88%        171,644,450.03                      4.92%          4.67%\n 酒店管理业务               原材料                13,973,886.43                      0.38%          14,656,075.70                     0.42%         -4.65%\n 酒店管理业务               人工工资              144,821,401.32                      3.94%        121,781,336.36                      3.49%         18.92%\n 酒店管理业务               能源                   2,277,065.47                     0.06%           1,031,073.07                     0.03%       120.84%\n 酒店管理业务               其他                 28,382,850.25                      0.77%          27,830,693.37                     0.80%          1.98%\n 汽车服务业务               人工工资                 3,649,911.33                     0.10%           3,721,261.38                     0.11%         -1.92%\n 汽车服务业务               其他                     183,185.67                     0.00%              142,375.67                    0.00%         28.66%\n\n说明：\n\n\n      报告期内，旅行社业务中的入境游业务成本同比上年增加                                                         58.07%，主要原因是广之旅抢抓免签政策\n\n红利，入境游业务实现快速发展。酒店管理业务成本中的能源成本同比上年增加                                                                               120.84%，主要原因是本\n\n报告期新增以合作经营模式进行专业化运营管理的酒店项目，因此能源成本相应增加。\n\n\n（6） 报告期内合并范围是否发生变动\n\n\n是 □否\n\n      本报告期合并范围变动情况详见本报告“第八节                                                  财务报告”中的“九、合并范围的变更”相关内容。\n\n\n（7） 公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n\n□适用 不适用\n\n\n（8） 主要销售客户和主要供应商情况\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第八节 财务报告",
+            "二、将重分",
+            "38、营业收入和营业成本"
+          ],
+          "physical_pages": [
+            152
+          ],
+          "source_spans": [
+            {
+              "page": 152,
+              "start": 1601,
+              "end": 2652,
+              "quote": "38、营业收入和营业成本\n\n\n                                                                                                                                        单位：元\n            项目                                      本期发生额                                                      上期发生额\n                                         收入                            成本                           收入                            成本\n 主营业务                              4,487,628,476.08              3,677,529,597.82             4,293,911,697.02              3,485,391,708.11\n 其他业务                                  16,319,307.30                  1,910,469.12                15,120,588.67                     610,858.47\n 合计                                4,503,947,783.38              3,679,440,066.94             4,309,032,285.69              3,486,002,566.58\n\n公司报告期内经审计利润总额、净利润、扣除非经常性损益后的净利润三者孰低为负值\n□是 否\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                                               152"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0016",
+          "document_version": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+          "section_path": [
+            "第八节 财务报告",
+            "十八、其他重要事项",
+            "1、分部信息"
+          ],
+          "physical_pages": [
+            181
+          ],
+          "source_spans": [
+            {
+              "page": 181,
+              "start": 2007,
+              "end": 2394,
+              "quote": "1、分部信息\n\n（1） 报告分部的确定依据与会计政策\n\n\n     根据本公司的内部组织结构、管理要求及内部报告制度，本公司的经营业务划分为四个报告分部。这些报告分部是以\n公司日常内部管理要求的财务信息为基础确定的。公司的管理层定期评价这些报告分部的经营成果，以决定向其分配资源\n及评价其业绩。本公司报告分部包括酒店经营、酒店管理、旅行社运营、汽车服务业务四个分部。分部报告信息根据各分\n部向管理层报告时采用的会计政策及计量标准披露，这些会计政策及计量基础与编制财务报表时的会计政策及计量基础保\n持一致。\n\n（2） 报告分部的财务信息\n\n\n\n\n\n                                                                                                               181"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-BS-01",
+        "text": "公司为集商旅出行（旅行社）业务、住宿（酒店）业务及其他旅游产业链相关业务为一体的综合性旅游集团，按行业门类属L租赁和商务服务业中的L72商务服务业。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F-BS-02",
+        "text": "公司经营业务划分为酒店经营、酒店管理、旅行社运营、汽车服务业务四个报告分部，分部以公司日常内部管理要求的财务信息为基础确定。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0016"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-BS-03",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005",
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F-BS-03",
+        "text": "公司以“2+X”泛文旅产业生态圈组织业务，商旅出行与住宿为两大主业，餐饮、景区、会服、新零售、旅运、科技等为产业链相关业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005",
+          "source-0002",
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-PS-01",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-PS-01",
+        "text": "商旅出行（旅行社）业务核心企业为控股子公司广之旅，主要经营国内游、出境游、入境游，兼营国际国内航空票务代理、景区开发与运营管理、目的地营销、旅游汽车租赁、信息技术咨询服务等。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-PS-02",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-PS-02",
+        "text": "住宿业务包括酒店管理业务与酒店经营业务：酒店管理向受托管理酒店项目输出品牌标准、中央预订、客源推送等运营管理服务并收取费用，也以租赁经营方式运营部分酒店项目；酒店经营主要经营自有产权酒店，提供住宿、餐饮、会议及商业物业租赁等服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-PS-03",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-PS-03",
+        "text": "住宿业务旗下拥有“花园酒店”“岭南东方酒店”“中国大酒店”“岭南五号酒店”“岭南星光营地”“岭居创享公寓”“岭居臻享公寓”“岭业”等核心系列品牌；受托管理的都市酒店拥有“含舍hotel”“伊芙·美素”“都市花园酒店”“都市118”等多层次酒店品牌。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-PS-04",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003",
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-PS-04",
+        "text": "产业链相关业务包括：餐饮业务以岭南特色餐饮宴会标准运营品牌餐厅；景区业务由广之旅悦景公司管理广州白云山鸣春谷、月溪书院等景区项目；会服业务运营展会及自主IP活动；新零售业务以“文创+”为核心开发文创商品与零售食品；旅运业务由东方汽车、广之旅旅运公司提供道路旅客运输及观光车服务；科技业务由易起行从事文旅信息化咨询、系统研发、IT运维等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003",
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009",
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F-RM-01",
+        "text": "公司营业收入合计4,503,947,783.38元，其中主营业务收入4,487,628,476.08元、其他业务收入16,319,307.30元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009",
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入合计",
+            "raw_value": "4,503,947,783.38",
+            "value": "4503947783.38",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "主营业务收入",
+            "raw_value": "4,487,628,476.08",
+            "value": "4487628476.08",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他业务收入",
+            "raw_value": "16,319,307.30",
+            "value": "16319307.30",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-RM-02",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-RM-02",
+        "text": "分行业营业收入构成：旅行社运营3,307,444,539.64元，占营业收入比重73.44%；酒店经营935,110,809.87元，占20.76%；酒店管理246,006,466.30元，占5.46%；汽车服务15,385,967.57元，占0.34%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "旅行社运营营业收入",
+            "raw_value": "3,307,444,539.64",
+            "value": "3307444539.64",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "旅行社运营占营业收入比重",
+            "raw_value": "73.44",
+            "value": "73.44",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店经营营业收入",
+            "raw_value": "935,110,809.87",
+            "value": "935110809.87",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店经营占营业收入比重",
+            "raw_value": "20.76",
+            "value": "20.76",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理营业收入",
+            "raw_value": "246,006,466.30",
+            "value": "246006466.30",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理占营业收入比重",
+            "raw_value": "5.46",
+            "value": "5.46",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "汽车服务营业收入",
+            "raw_value": "15,385,967.57",
+            "value": "15385967.57",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "汽车服务占营业收入比重",
+            "raw_value": "0.34",
+            "value": "0.34",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-RM-03",
+        "text": "分行业毛利率：旅行社运营12.49%，酒店经营36.73%，酒店管理22.99%，汽车服务75.09%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "旅行社运营毛利率",
+            "raw_value": "12.49",
+            "value": "12.49",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店经营毛利率",
+            "raw_value": "36.73",
+            "value": "36.73",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理毛利率",
+            "raw_value": "22.99",
+            "value": "22.99",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "汽车服务毛利率",
+            "raw_value": "75.09",
+            "value": "75.09",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-RM-04",
+        "text": "分地区营业收入构成：广东省内1,288,143,517.58元，占28.60%；广东省外1,186,337,807.82元，占26.34%；港澳地区94,853,539.70元，占2.11%；境外1,934,612,918.28元，占42.95%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "广东省内营业收入",
+            "raw_value": "1,288,143,517.58",
+            "value": "1288143517.58",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广东省外营业收入",
+            "raw_value": "1,186,337,807.82",
+            "value": "1186337807.82",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "港澳地区营业收入",
+            "raw_value": "94,853,539.70",
+            "value": "94853539.70",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "境外营业收入",
+            "raw_value": "1,934,612,918.28",
+            "value": "1934612918.28",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SM-01",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-SM-01",
+        "text": "2025年度公司实现营业收入450,394.78万元，比上年同期增长4.52%；实现归属于上市公司股东的净利润7,006.10万元，同比减少53.34%；扣除非经常性损益的净利润6,147.65万元，同比增长1.66%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "450,394.78",
+            "value": "450394.78",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "4.52",
+            "value": "4.52",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润",
+            "raw_value": "7,006.10",
+            "value": "7006.10",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润同比增减",
+            "raw_value": "-53.34",
+            "value": "-53.34",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "扣除非经常性损益的净利润",
+            "raw_value": "6,147.65",
+            "value": "6147.65",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "扣除非经常性损益的净利润同比增减",
+            "raw_value": "1.66",
+            "value": "1.66",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SM-02",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-SM-02",
+        "text": "广之旅2025年度实现营业收入331,604.80万元，同比上年增长6.26%，其中出境游（不含港澳）营收193,461.29万元、国内游营收114,272.21万元；实现归属于母公司所有者的净利润3,220.78万元，同比上年增长21.27%。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "广之旅营业收入",
+            "raw_value": "331,604.80",
+            "value": "331604.80",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广之旅出境游（不含港澳）营业收入",
+            "raw_value": "193,461.29",
+            "value": "193461.29",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广之旅国内游营业收入",
+            "raw_value": "114,272.21",
+            "value": "114272.21",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广之旅归属于母公司所有者的净利润",
+            "raw_value": "3,220.78",
+            "value": "3220.78",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SM-03",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-SM-03",
+        "text": "岭南酒店2025年度实现营业收入28,370.38万元，同比上年增长9.42%；实现净利润496.01万元，同比上年减少61.30%。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "岭南酒店营业收入",
+            "raw_value": "28,370.38",
+            "value": "28370.38",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "岭南酒店净利润",
+            "raw_value": "496.01",
+            "value": "496.01",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SM-04",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-SM-04",
+        "text": "截至2025年末，广之旅在全国开设门店共202家，其中广东省内122家；报告期内广之旅华南总部之外的分子公司实现营收合计92,835.45万元，占广之旅总营收的28.00%。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "广之旅全国门店数",
+            "raw_value": "202",
+            "value": "202",
+            "unit": "家",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广之旅华南总部之外分子公司营收合计",
+            "raw_value": "92,835.45",
+            "value": "92835.45",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "广之旅华南总部之外分子公司营收占广之旅总营收比重",
+            "raw_value": "28.00",
+            "value": "28.00",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F-OI-01",
+        "text": "酒店管理业务以轻资产品牌管理输出为主，也以租赁经营方式运营部分酒店项目，并切入高端物业管理领域；酒店经营业务经营自有产权酒店。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-OI-02",
+        "text": "营业成本构成中，旅行社业务出境游成本1,682,483,030.99元（占营业成本45.73%）、国内游1,119,871,634.73元（30.44%）、入境游12,311,871.25元（0.33%）、订房14,218,977.78元（0.39%）、其他65,575,182.73元（1.78%）；酒店经营业务原材料147,434,616.94元、人工工资213,660,403.85元、能源50,938,563.02元、其他179,657,485.18元；酒店管理业务原材料13,973,886.43元、人工工资144,821,401.32元、能源2,277,065.47元、其他28,382,850.25元；汽车服务业务人工工资3,649,911.33元、其他183,185.67元。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "旅行社业务-出境游营业成本",
+            "raw_value": "1,682,483,030.99",
+            "value": "1682483030.99",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "旅行社业务-国内游营业成本",
+            "raw_value": "1,119,871,634.73",
+            "value": "1119871634.73",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店经营业务-人工工资",
+            "raw_value": "213,660,403.85",
+            "value": "213660403.85",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店经营业务-能源",
+            "raw_value": "50,938,563.02",
+            "value": "50938563.02",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理业务-人工工资",
+            "raw_value": "144,821,401.32",
+            "value": "144821401.32",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F-OI-03",
+        "text": "旅运业务方面，东方汽车及广之旅旅运公司拥有各类大巴、中小型汽车、商务车和小轿车，具备旅客道路运输经营资质；广之旅商旅服务公司拥有120多家国内外航空公司客票销售代理授权；白云山旅游发展公司游览观光车业务覆盖广州白云山、越秀山及石门国家森林公园等景区。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-CC-01",
+        "text": "广之旅自主开发运营“易起行”与“行走网”智慧旅游平台，并结合官方网站、小程序、微商城、微信视频号、微信公众号、抖音号、小红书及第三方OTA销售等线上渠道，与全国线下渠道共同构建线上线下融合的全渠道销售体系。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-CC-02",
+        "text": "广之旅完成全国性战略布局，搭建覆盖全国的多市场组团、多口岸出发、多签证中心的网络布局，形成出境游、国内游、入境游相结合的立体化产品矩阵，构建客源地与目的地“双地兼顾”、供应端与分销端“双端发力”的运营格局。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-CC-03",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-CC-03",
+        "text": "新零售业务构建“文创零售门店+文创自助销售机+系统内酒店代销”的线下销售网络，与“岭客汇”“易起购”自有线上平台共同构建线上线下新零售销售网络。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-CC-04",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-CC-04",
+        "text": "公司统筹商旅出行与住宿业资源服务政商客户，旗下10家酒店作为第十五届全国运动会定点接待单位，并完成瑙鲁国家元首访粤、中非检察合作论坛等200多场重要活动服务工作；战略切入差旅市场，打造“畅行差旅”专业TMC平台。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-OD-01",
+        "text": "商旅出行业务保持稳健增长：出境游与境内外航空公司、酒店集团、境外旅游局等资源端建立深度联动；国内游“组团”与“地接”共同发展，面向银发群体打造“岭南号·银发专列”等产品，聚焦年轻客群推出赛事、音乐、滑雪等主题产品；入境游抢抓免签政策红利，再次中标成为广州市唯一为国际中转旅客提供一日游的旅行社。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-OD-02",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-OD-02",
+        "text": "住宿业务管理规模持续扩大，酒店管理业务以“豪华+中端+经济型”全品牌矩阵拓展项目约150个，在广州、深圳、韶关、汕头、潮州、揭阳、茂名等地新增拓展酒店；2025年度住宿业营收同比保持增长，营收规模比2019年度增长13.13%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "酒店管理业务拓展项目数",
+            "raw_value": "约150",
+            "value": "150",
+            "unit": "个",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "住宿业营收规模较2019年度增长",
+            "raw_value": "13.13",
+            "value": "13.13",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-OD-03",
+        "text": "公司以“四个相互”（相互采购、优惠、引流、宣传）推进商旅出行与住宿业两大主业融合，超30家酒店产品已在岭客汇与易起行双平台上线。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "上线双平台的酒店产品数",
+            "raw_value": "超30",
+            "value": "30",
+            "unit": "家",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "greater_than",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-OD-04",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F-OD-04",
+        "text": "公司加大研发投入，完成“岭南小智”AI应用、“数据分析助手”和“业财一体化”等近10个项目研发；易起行开发travelGPT易游AI平台，AI数字员工团队近900名数字员工已在行程定制、销售问答、签证处理、知识问答等场景投入使用。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "完成研发项目数",
+            "raw_value": "近10",
+            "value": "10",
+            "unit": "个",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "AI数字员工数量",
+            "raw_value": "近900",
+            "value": "900",
+            "unit": "名",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-MC-01",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-MC-01",
+        "text": "2025年度归属于上市公司股东的净利润同比减少53.34%，主要原因是上年公司获得参股企业（持股3.92%）广州世界大观股份有限公司现金分红款等款项7,606.68万元计入非经常性损益，而2025年度无此项非经常性收益。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "上年参股企业现金分红款等非经常性收益",
+            "raw_value": "7,606.68",
+            "value": "7606.68",
+            "unit": "万元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2024年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-MC-02",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-MC-02",
+        "text": "报告期内旅行社业务入境游成本同比增加58.07%，主要原因是广之旅抢抓免签政策红利，入境游业务快速发展；酒店管理业务能源成本同比增加120.84%，主要原因是本期新增以合作经营模式进行专业化运营管理的酒店项目。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "旅行社业务-入境游营业成本同比增减",
+            "raw_value": "58.07",
+            "value": "58.07",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "酒店管理业务-能源成本同比增减",
+            "raw_value": "120.84",
+            "value": "120.84",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-MC-03",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-MC-03",
+        "text": "岭南酒店净利润同比减少61.30%，主要原因是新增的直营项目陆续投入运营，项目前期投入及运营成本费用有所增长。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-MC-04",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F-MC-04",
+        "text": "公司与中国免税品（集团）有限责任公司、广州市广百股份有限公司、广州白云国际机场股份有限公司共同投资设立中免市内免税品（广州）有限公司运营广州市市内免税店，联合筹建运营的广州首家市内免税店在天河区国际金融中心开业。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-MC-05",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-MC-05",
+        "text": "报告期内合并范围发生变动，详见财务报告“九、合并范围的变更”相关内容；公司报告期内业务、产品或服务未发生重大变化或调整。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SC-P1",
+      "element": "position",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F-SC-P1",
+        "text": "公司以旅游集团形态运营，商旅出行板块承担旅游产品组织与销售，住宿板块承担酒店运营与管理输出，产业链相关业务覆盖餐饮、景区、会服、新零售、旅运及科技服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002",
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SC-U1",
+      "element": "upstream_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-SC-U1",
+        "text": "酒店经营业务营业成本中列示原材料、人工工资、能源等投入；酒店管理业务同样列示原材料、人工工资、能源等成本项目。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SC-U2",
+      "element": "upstream_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F-SC-U2",
+        "text": "商旅出行业务与境内外航空公司、酒店集团、境外旅游局等资源端建立深度联动，落地南北极航线、布达佩斯首航等资源。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "fact_id": "F-SC-D1",
+      "element": "downstream_customers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002",
+        "source-0003",
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F-SC-D1",
+        "text": "旅行社业务面向国内游、出境游、入境游旅客，并服务政商客户差旅需求；酒店业务面向住宿、餐饮、会议及商业物业租赁客户；会服业务服务大型会议赛事活动主办方。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002",
+          "source-0003",
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "各产业链相关业务（餐饮、景区、会服、新零售、旅运、科技）未单独披露收入金额，无法量化其规模。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "产业链相关业务（餐饮、景区、会服、新零售、科技）未在收入构成表中单列，其收入未单独披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "分部信息表中对外营业收入合计与营业收入构成表存在口径差异（分部表列示分部间抵销-62,259,797.19元），本工作底稿以营业收入构成表及附注分解信息为准。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取各业务板块的产能、门店面积、客房数等运营量化指标。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未披露主要客户名称、客户集中度及分渠道销售占比。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未披露各驱动因素对收入增长的具体量化贡献。",
+        "指标格式隔离：事实F-OD-05未作为结论采用；metrics.2: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "合并范围变动的具体标的及影响未在选定章节披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未披露具体原材料供应商名称及采购集中度。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-13ab3a1cf7e2b83d1145e0e6",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未披露具体客户名称及客户集中度。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

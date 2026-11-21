@@ -1,0 +1,130 @@
+{
+  "task": "6.EU",
+  "reviewer": "A independent source reader",
+  "scope": "Purposive core and actual-revision checks after irreversible first-delivery failure; not a complete 400-object accuracy assessment",
+  "formal_accuracy": "not_evaluated",
+  "formal_macro_recall": "not_evaluated",
+  "reason_not_full_audit": "Three first-delivery failures make the frozen minimum 18/20 impossible even if all remaining companies succeed. Keep failures and denominator; do not spend on a meaningless full accuracy audit or fabricate 99%.",
+  "companies": [
+    {
+      "instrument_id": "600176.SH",
+      "api_sha256": "5f1a1af3facfd347f3a3df433e5c7fe8447dcf240af573920809a4b016c2b6fe",
+      "reference": "source-reference-batch1.json",
+      "core": {"principal_business": "supported", "products_services": "supported", "revenue_model": "supported"},
+      "core_basis": "F-BS-01/02, F-PS-01/02, F-RM-02/03 and F-CC-01 jointly explain glass-fibre manufacture, coarse yarn/electronic cloth, applications, direct/distributor sales and separate minor wind revenue. Amounts remain on their own product/channel axes.",
+      "checked_key_amounts": ["F-BS-02", "F-PS-01", "F-RM-01", "F-RM-02", "F-RM-03", "F-SM-03"],
+      "checked_actual_revisions": [
+        {"fact_id": "F-MC-03", "verdict": "supported", "basis": "Physical p16 only says this disclosure item is not applicable; revised wording no longer asserts absence of economic changes."},
+        {"fact_id": "F-SC-D-01", "verdict": "supported", "basis": "Physical p13 expressly gives company target markets; industry-only applications removed."},
+        {"fact_id": "F-PS-01", "verdict": "supported", "basis": "Physical p10 gives coarse-yarn/products sales 320.26 ten-thousand tonnes and electronic cloth 10.62 hundred-million metres; unsupported category equivalence removed."},
+        {"fact_id": "F-PS-02", "verdict": "supported", "basis": "Physical p13 distinguishes stable ultra-thin deliveries from special-fibre development/certification still in progress."},
+        {"fact_id": "F-OD-03", "verdict": "supported_as_explicit_industry_context", "basis": "Physical p24 is industry statistics and price discussion, now explicitly not company operating data. business_segment is coarse metadata, not a company industry-sales number."}
+      ],
+      "remaining_limits": ["No supplier/client-name completeness claim", "No fine product revenue decomposition", "Industry-only F-OD-02 remains format-isolated; not restored by hand"]
+    },
+    {
+      "instrument_id": "600115.SH",
+      "api_sha256": "c2637a05004d3edd3cbfde8cca96c956801c1738e802b9bc77fbd9cb930f2498",
+      "reference": "source-reference-batch1.json",
+      "core": {"principal_business": "supported", "products_services": "supported", "revenue_model": "supported"},
+      "core_basis": "F-BS-01/02, F-SC-P1, cargo/belly services and the own-route network explain passenger/cargo transport. F-BS-01 labels wider activities as authorized, not established current principal operations. F-RM-01..05 distinguish transport, other and geographic revenue.",
+      "checked_key_amounts": ["F-RM-01", "F-RM-02", "F-RM-03", "F-RM-04", "F-RM-05"],
+      "checked_actual_revisions": [
+        {"fact_id": "F-OD-02", "verdict": "supported_with_limitation", "basis": "Physical p17 does make the quoted international-market claim and domestic 60% statement. Final text attributes it to company discussion and retains the contradiction/absence-of-profit-data limitation; not accepted as independently verified profitability."}
+      ],
+      "remaining_limits": ["Passenger count and route-marketing objects rejected on metric format are not manually restored", "Company discussion is not an independent audit of profitability"]
+    },
+    {
+      "instrument_id": "601288.SH",
+      "api_sha256": "3404a374707fa15dd3d89afb7ce6cf9af9b2b0443a8d2d4778a1ae256e8a26fd",
+      "reference": "source-reference-batch1.json",
+      "core": {"principal_business": "supported", "products_services": "partial", "revenue_model": "supported"},
+      "core_basis": "Corporate/retail/rural banking, loans, settlement and deposit-funded net-interest income are substantively explained. The frozen products condition also covers funds/asset management and subsidiary comprehensive finance: bond investment and the general wealth-management slogan do not explain all those services. Keep this omission rather than reducing the frozen reference.",
+      "checked_key_amounts": ["F07", "F08", "F14", "review-add:R03", "review-add:R04"],
+      "checked_actual_revisions": [
+        {"fact_id": "F02", "verdict": "supported", "basis": "Physical p43/45/68 jointly support corporate, retail and rural-business descriptions; no unsupported new business taxonomy added."},
+        {"fact_id": "review-add:R03", "verdict": "supported", "basis": "Physical p72 county segment table labels RMB million: revenue 359669, net interest 318706, net fees 31724, other noninterest 9239."},
+        {"fact_id": "review-add:R04", "verdict": "supported_with_limitation", "basis": "Physical p72 footnote expressly explains internal transfer pricing; external interest revenue 314338, expense 185143 and internal income 189511 are not represented as group external revenue."}
+      ],
+      "remaining_limits": ["Unaccepted F29 repair not counted as current correct fact", "Missing funds/asset-management and subsidiary services are gaps, not fabricated answers", "This limited core check does not verify all banking metrics"]
+    },
+    {
+      "instrument_id": "600163.SH",
+      "api_sha256": "79e036f8daf1e75a2905352f9d0b483cd9b7cfc4ea48f829d5e5cf3849fd58f2",
+      "reference": "source-reference-batch1.json",
+      "core": {"principal_business": "supported", "products_services": "supported", "revenue_model": "supported"},
+      "core_basis": "F01..03 and F05..07 cover project investment/development/operation, wind/PV/biomass and electricity sales. Principal role is generation, not equipment manufacture or a national grid operator.",
+      "checked_key_amounts": ["F04", "F05", "F06", "F07", "F08", "F09", "F12", "F13", "F14"],
+      "checked_actual_revisions": [
+        {"fact_id": "F19", "verdict": "supported", "basis": "Physical p8 directly states no major change to principal business/model/drivers; p14 only marks a separate disclosure as not applicable. Final wording keeps this distinction."},
+        {"fact_id": "F12", "verdict": "supported", "basis": "Physical p20 gives 2846/3987/1515/949 hours and declines 2/357/571/472; segment scope replaces group-wide interpretation."},
+        {"fact_id": "F21", "verdict": "supported_with_reading_scope_limit", "basis": "Physical p8 gives generation process and resource drivers; unavailable specific vendors are now a selected-source limitation, not a made-up procurement conclusion."}
+      ],
+      "remaining_limits": ["No supplier-name or full customer-structure claim", "Rounded company revenue remains distinct from exact product revenues", "No assertion that every financial or operational number was independently checked"]
+    },
+    {
+      "instrument_id": "600183.SH",
+      "api_sha256": "54096fe61edeed9278d133d0dcb0a11871c74c29507e180c63d3ace44e1ab67b",
+      "reference": "source-reference-batch2.json",
+      "core": {"principal_business": "supported", "products_services": "supported", "revenue_model": "supported"},
+      "core_basis": "F01/F03/F05/F09 preserve both copper-clad laminate/prepreg and PCB businesses, uses and product sales; the smaller real-estate/recycling income rows remain separately labelled rather than replacing the manufacturing core.",
+      "checked_key_amounts": ["F07", "F08", "F09", "F15", "F20"],
+      "checked_actual_revisions": [
+        {"fact_id": "F20", "verdict": "supported", "basis": "Physical p13 supplies revenue/cost/operating-cash-flow growth 39.45/31.51/262.17%; p14 attributes only the cash-flow change to cash receipts. The final revised sentence no longer projects that explanation over every metric."}
+      ],
+      "remaining_limits": ["Open findings about earlier scope wording remain visible", "No full subsidiary or all-product completeness claim"]
+    },
+    {
+      "instrument_id": "601319.SH",
+      "api_sha256": "f30123d365aa3a0a4fc4946d9b6427de361c1ade307a0fc7d6db0a2316715c2f",
+      "reference": "source-reference-batch2.json",
+      "core": {"principal_business": "supported", "products_services": "supported", "revenue_model": "supported"},
+      "core_basis": "F01..06/F24 distinguish property insurance, life/health, investment/asset management and technology support; main insurance and investment income mechanism remains understandable without unreadable numbers. Assets under management are not represented as revenue.",
+      "checked_key_amounts": [],
+      "checked_actual_revisions": [
+        {"fact_id": "F15", "verdict": "supported_with_limitation", "basis": "Physical p40 native source lacks rating letters and numeric proportions. Final text explicitly marks them unreadable and keeps only source-supported industry allocation; it does not guess AAA or a high proportion."},
+        {"fact_id": "F09", "verdict": "supported_with_limitation", "basis": "Physical p21 supports property-insurer leadership but not a readable combined life/health market percentage. Named-subsidiary scope and unknown share are retained."},
+        {"fact_id": "F11", "verdict": "supported_with_reading_scope_limit", "basis": "Physical p24/25 narrative supports insurance service income and combined ratios by line; underwriting profit is asserted only for the three lines with readable prose. Missing table figures do not become zeros."},
+        {"fact_id": "F08", "verdict": "supported_with_limitation", "basis": "Physical p21/37/38 asset-manager disclosures distinguish subsidiaries' operating income from managed assets; unreadable group third-party AUM is no longer an asserted income source."},
+        {"fact_id": "F26", "verdict": "supported_with_limitation", "basis": "Physical p22 says platform serves over an unreadable coefficient times hundred-million visits. Final version removes the false definite lower bound and states coefficient unreadable."},
+        {"fact_id": "F05", "verdict": "supported", "basis": "Investment subsidiaries and their asset-management activities are described under business_segment instead of a consolidated-group metric; no new numerical claim."}
+      ],
+      "remaining_limits": ["Native PDF text loses many digits and rating glyphs; report itself is not treated as nondisclosing", "No exact financial scale accepted on the basis of missing glyphs", "This is a useful qualitative insurance profile, not a fully quantified one"]
+    },
+    {
+      "instrument_id": "000070.SZ",
+      "reading_phase": "authorized_followup_after_owner_fixes",
+      "api_path": "b-execution/api/000070-followup-final.json",
+      "api_sha256": "a403ed02207017a69269697b827d764e17135f18ed273975fa5ebc353a44a41f",
+      "reference": "source-reference-batch3.json",
+      "core": {"principal_business": "supported", "products_services": "supported", "revenue_model": "supported"},
+      "core_basis": "F01/F04..08 retain cables, smart services, convergence products and property operations, with their production/service/rental earning mechanisms. The small convergence business is not omitted merely because its weight is lower.",
+      "checked_key_amounts": [],
+      "checked_actual_revisions": [
+        {"fact_id": "F27", "verdict": "supported", "basis": "Physical p19 discusses volume growth/price and margin decline in the electricity-grid market, not the cable segment as a whole. Revision restores that subject."},
+        {"fact_id": "F28", "verdict": "supported", "basis": "Physical p19 supports weak new projects, competition and reduced deliveries at Shenzhou Feihang. Revision drops the unqualified stable-business conclusion rather than manufacturing a new quantitative trend."},
+        {"fact_id": "F32", "verdict": "supported", "basis": "Physical p24 marks only the business/product/service-change disclosure item as not applicable; revision no longer turns the checkbox into absence of economic changes."},
+        {"fact_id": "F34", "verdict": "supported", "basis": "Physical p23 cost table labels the denominator as total operating cost; the accompanying property depreciation note also expressly uses total operating cost. Raw-material 76.50% is no longer described as the communication segment's internal cost share."}
+      ],
+      "remaining_limits": ["Original zero-model initialization failure and first-run score remain unchanged", "Open scope/limitations findings are not represented as a completed full-report inventory", "No whole-profile numerical accuracy claim"]
+    },
+    {
+      "instrument_id": "002500.SZ",
+      "reading_phase": "authorized_followup_after_owner_fixes",
+      "api_path": "b-execution/api/002500-followup-final.json",
+      "api_sha256": "4c9aa894e2ed858949e53a187f00678a229e9f0060af2f194d41c0a44c80c973",
+      "reference": "source-reference-batch3.json",
+      "core": {"principal_business": "supported", "products_services": "supported", "revenue_model": "supported"},
+      "core_basis": "Business facts preserve wealth, corporate finance, asset management, investments and institutions, with subsidiaries separately identified. Fee/commission, interest and investment income are explained; the final added native business-income table gives major activity weights without turning asset-management balances into company revenue.",
+      "checked_key_amounts": ["F-SM-04", "review-add:FND-003"],
+      "checked_actual_revisions": [
+        {"fact_id": "F-MC-03", "verdict": "supported", "basis": "Physical p39 marks the business/product/service-change disclosure item as not applicable; the revision reports that label, not absence of economic change."},
+        {"fact_id": "F-SM-04", "verdict": "supported", "basis": "Physical p35 labels asset-management business scale 738.64 hundred-million CNY, growth 30.47%, and collective/single/special/public-fund balances 209.81/91.26/66.73/370.83. Revision consistently binds facts and measurements to business_segment, not group assets."},
+        {"fact_id": "review-add:FND-003", "verdict": "supported", "basis": "Physical p40 native business table gives revenue/profit margin/revenue growth by six lines. All eighteen reported values were checked against the table, including negative asset-management/investment-bank/commodity growth and negative investment-bank margin; the other-and-elimination row remains separate. This is one actual fact object, not eighteen independent correct objects."}
+      ],
+      "remaining_limits": ["Original zero-model pages_not_bound failure is retained", "Unaccepted F-OD-01 and F-SC-U1 revision candidates remain excluded and are not counted as accepted correct facts", "Open findings do not mean whole-report accuracy has been independently assessed"]
+    }
+  ],
+  "checked_actual_revised_objects": 26,
+  "not_an_accuracy_denominator": "Core/amount/revision lists overlap. No 99% ratio is inferred from these purposive checks or from model review completion. Remaining companies and supplemental sample are not independently assessed here."
+}

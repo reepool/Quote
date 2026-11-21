@@ -1,0 +1,1274 @@
+{
+  "task": "6.EU",
+  "phase": "prospective_two_phase_20",
+  "authorization": "human-20261122-prospective20-A6EU",
+  "frozen_at": "2026-11-22T00:37:34.403429+08:00",
+  "companies": [
+    {
+      "instrument_id": "600176.SH",
+      "name": "中国巨石",
+      "exchange": "SSE",
+      "layer": "manufacturing",
+      "source_industry": "制造业",
+      "sw_l1_name": "建筑材料",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "中国巨石2025年年度报告",
+      "pdf_pages": 213,
+      "directory_entry": {
+        "bookmark_count": 640,
+        "pages": [
+          {
+            "physical_page": 4,
+            "text_sha256": "ed6018573118f72e570e8d1fff309990617c8e7f6527e0855fbeeda5f036647e",
+            "characters": 1141
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_a1d8e9dea4f62432805d01fc1d7f2a02",
+      "version_available_at": "2026-08-14T19:49:56.040002+08:00",
+      "content_length": 1785295,
+      "asset": {
+        "instrument_id": "600176.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_3c86ad61788e9c3a8a36f53c2bbe1ae9",
+        "filing_id": "1225018682",
+        "source": "cninfo",
+        "published_at": "2026-03-19T16:00:00+00:00",
+        "content_hash": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/c7/c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600183.SH",
+      "name": "生益科技",
+      "exchange": "SSE",
+      "layer": "manufacturing",
+      "source_industry": "制造业",
+      "sw_l1_name": "电子",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "生益科技2025年年度报告",
+      "pdf_pages": 235,
+      "directory_entry": {
+        "bookmark_count": 979,
+        "pages": [
+          {
+            "physical_page": 4,
+            "text_sha256": "4699c6eae804406dd41239c21538e6250fc15731d5363e7e7ed3010487d5dbb0",
+            "characters": 1186
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_26a05bb570e788939b9341bc3786118a",
+      "version_available_at": "2026-08-14T19:50:08.928183+08:00",
+      "content_length": 1799800,
+      "asset": {
+        "instrument_id": "600183.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_60d093d6ed33862d637b158b9e44da95",
+        "filing_id": "1225195409",
+        "source": "cninfo",
+        "published_at": "2026-04-24T16:00:00+00:00",
+        "content_hash": "cf39d9c7014358ef47ff0e38d3ae91cb9827c22432309b501165eafa95f00435",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/cf/cf39d9c7014358ef47ff0e38d3ae91cb9827c22432309b501165eafa95f00435.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000070.SZ",
+      "name": "特发信息",
+      "exchange": "SZSE",
+      "layer": "manufacturing",
+      "source_industry": "C 制造业",
+      "sw_l1_name": "通信",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 228,
+      "directory_entry": {
+        "bookmark_count": 615,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "b358aea973eb900a0d6366bfd59122e049473e74525fe9bf8464c4c528271cc8",
+            "characters": 379
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_50d1cb975885de5aac2273c8cd048838",
+      "version_available_at": "2026-08-14T17:31:45.518768+08:00",
+      "content_length": 1322305,
+      "asset": {
+        "instrument_id": "000070.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_f14636070bb3e2ca562e1e7ea7d17d4e",
+        "filing_id": "1225139223",
+        "source": "cninfo",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "content_hash": "d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/d0/d03185dcb399cbf202b8462ac17b7557365e3aee3bce0c7e6f53cc9c2468f6c6.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000568.SZ",
+      "name": "泸州老窖",
+      "exchange": "SZSE",
+      "layer": "manufacturing",
+      "source_industry": "C 制造业",
+      "sw_l1_name": "食品饮料",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 183,
+      "directory_entry": {
+        "bookmark_count": 467,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "034588e99f424ec7122cbe93590dc31383990def4c43472877811cd41b7130c0",
+            "characters": 584
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_13c0c645717834082bd652c83ccb3748",
+      "version_available_at": "2026-08-14T17:33:05.364588+08:00",
+      "content_length": 2392572,
+      "asset": {
+        "instrument_id": "000568.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_1ac88489e6375788fd5c9fd44db84ab2",
+        "filing_id": "1225240660",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "7a2e321f049401fd34dfbf8c22964e804d16f077ece9382791cb2b2ce0c74676",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/7a/7a2e321f049401fd34dfbf8c22964e804d16f077ece9382791cb2b2ce0c74676.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "920008.BJ",
+      "name": "成电光信",
+      "exchange": "BSE",
+      "layer": "manufacturing",
+      "source_industry": "计算机、通信和其他电子设备制造业",
+      "sw_l1_name": "国防军工",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 123,
+      "directory_entry": {
+        "bookmark_count": 356,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "e981bc7b50c373426c2e1eaaec6efd542126ab7dd6ad59f5d539dd8a52aa74d8",
+            "characters": 824
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_c0752b001e35098ff19c3de16c87b75e",
+      "version_available_at": "2026-08-17T12:39:47.038312+08:00",
+      "content_length": 2700088,
+      "asset": {
+        "instrument_id": "920008.BJ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_9c7faa47ae11b59c1ab286ec72fb0803",
+        "filing_id": "1225222425",
+        "source": "cninfo",
+        "published_at": "2026-04-26T16:00:00+00:00",
+        "content_hash": "c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/c7/c7b0ad3f2fffe4746f505c08766acf51ce8d81eaf8f8f04bfeb6cbf3cc254ea3.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "920016.BJ",
+      "name": "中草香料",
+      "exchange": "BSE",
+      "layer": "manufacturing",
+      "source_industry": "化学原料和化学制品制造业",
+      "sw_l1_name": "基础化工",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 195,
+      "directory_entry": {
+        "bookmark_count": 315,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "b7a1c1214727be1a10f517880570b388b4bfa3d96240377fcd32a6740417ff4b",
+            "characters": 821
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_9a3e192de400751afd358eaee41e82c8",
+      "version_available_at": "2026-08-17T12:39:57.328608+08:00",
+      "content_length": 2574774,
+      "asset": {
+        "instrument_id": "920016.BJ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_b5ff35dce0247da436a373c9473b2e1e",
+        "filing_id": "1225121613",
+        "source": "cninfo",
+        "published_at": "2026-04-16T16:00:00+00:00",
+        "content_hash": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/27/2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600115.SH",
+      "name": "中国东航",
+      "exchange": "SSE",
+      "layer": "services",
+      "source_industry": "交通运输、仓储和邮政业",
+      "sw_l1_name": "交通运输",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "中国东方航空股份有限公司2025年度报告",
+      "pdf_pages": 236,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "84dc6c22ff470a84dac5847e755476cb999c2e79b91b568a2cabb93227eaec2c",
+            "characters": 130
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_076d177856d9c51bdff9f1d2ed31c194",
+      "version_available_at": "2026-08-19T00:28:37.956337+08:00",
+      "content_length": 17781019,
+      "asset": {
+        "instrument_id": "600115.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_022b0a3d7665ba69479270fb78ae8ae5",
+        "filing_id": "1225064850",
+        "source": "cninfo",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "content_hash": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/dd/dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600233.SH",
+      "name": "圆通速递",
+      "exchange": "SSE",
+      "layer": "services",
+      "source_industry": "交通运输、仓储和邮政业",
+      "sw_l1_name": "交通运输",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "圆通速递股份有限公司2025年年度报告",
+      "pdf_pages": 305,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "be19ea50b70edf6b7fe443c4d5055db72906ba906471137e96f4f3dfe8390016",
+            "characters": 270
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_619411994995aad129eef50485d9bff9",
+      "version_available_at": "2026-08-14T19:51:07.421311+08:00",
+      "content_length": 15233022,
+      "asset": {
+        "instrument_id": "600233.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_bb30ecbd490f9a0a6d6f798d6ea7e87c",
+        "filing_id": "1225153858",
+        "source": "cninfo",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "content_hash": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/d1/d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600258.SH",
+      "name": "首旅酒店",
+      "exchange": "SSE",
+      "layer": "services",
+      "source_industry": "住宿和餐饮业",
+      "sw_l1_name": "社会服务",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "北京首旅酒店（集团）股份有限公司2025年年度报告",
+      "pdf_pages": 224,
+      "directory_entry": {
+        "bookmark_count": 984,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "1aa1fa73a9427e1f702d99a141910cdf3fccf3d62acd265e18ae57598b69d2cd",
+            "characters": 1118
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_eaafa147a169da7e1b1b58533e15a914",
+      "version_available_at": "2026-08-14T19:51:34.628924+08:00",
+      "content_length": 1532876,
+      "asset": {
+        "instrument_id": "600258.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_3c581583af0052015abfa30241bb333a",
+        "filing_id": "1225063930",
+        "source": "cninfo",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "content_hash": "93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/93/93af871a09601e059ed0cdaa66641035eeed8eb39dd54fa5c8157a981d761992.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000089.SZ",
+      "name": "深圳机场",
+      "exchange": "SZSE",
+      "layer": "services",
+      "source_industry": "G 运输仓储",
+      "sw_l1_name": "交通运输",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 214,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "53e90e832df184df477f935a2ae3687544e0adbf97a2306debd8ee41bd27d41e",
+            "characters": 557
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_e5f62693377ac99d6d979900bed4c541",
+      "version_available_at": "2026-08-14T17:31:48.504725+08:00",
+      "content_length": 1956675,
+      "asset": {
+        "instrument_id": "000089.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_81f8fdf951892d1209e71d38aa28bc4d",
+        "filing_id": "1225169129",
+        "source": "cninfo",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "content_hash": "5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/59/5968d2bead752acb53d6a3cb2127e49319137bba39e074a691581c18299c4db4.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000524.SZ",
+      "name": "岭南控股",
+      "exchange": "SZSE",
+      "layer": "services",
+      "source_industry": "L 商务服务",
+      "sw_l1_name": "社会服务",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 190,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "d75b12c07f545e16e0f0a2a2f52ac572ac0f5948372dfb82a1a6f24c1171d988",
+            "characters": 494
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_93067fe4eb5b67806a184c6d1bf7c1a3",
+      "version_available_at": "2026-08-14T11:36:10.575186+08:00",
+      "content_length": 2992114,
+      "asset": {
+        "instrument_id": "000524.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_06cb2cd9742fca427053b6bc045b584d",
+        "filing_id": "1225045156",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/b9/b948fb6ae74117701510f8b1e586431c775ffb0e8657e4f86390353710699198.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "002558.SZ",
+      "name": "巨人网络",
+      "exchange": "SZSE",
+      "layer": "services",
+      "source_industry": "I 信息技术",
+      "sw_l1_name": "传媒",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 192,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "b46569c3d0af929e2549497bbeef4a1de1a6f02eb6cee018f0c05636c44767b0",
+            "characters": 471
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_4acb9db3dc631665cb3a4e80f670eaae",
+      "version_available_at": "2026-08-14T17:48:55.050683+08:00",
+      "content_length": 6014132,
+      "asset": {
+        "instrument_id": "002558.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_7a45cd7f5bd3a3351194bc6d89a39b66",
+        "filing_id": "1225190389",
+        "source": "cninfo",
+        "published_at": "2026-04-26T16:00:00+00:00",
+        "content_hash": "3458dcd075b96120633006a24d991f593debfac5f22c235a3bdf5babc3553429",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/34/3458dcd075b96120633006a24d991f593debfac5f22c235a3bdf5babc3553429.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "601288.SH",
+      "name": "农业银行",
+      "exchange": "SSE",
+      "layer": "financial",
+      "source_industry": "金融业",
+      "sw_l1_name": "银行",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "农业银行2025年度报告",
+      "pdf_pages": 418,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 4,
+            "text_sha256": "39eb0a578a62fc514121ddc9cadd935237ebafcbe7132c845057643873b9ab52",
+            "characters": 6632
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_63b37b292a6604a0a0bc70fa662fc7cf",
+      "version_available_at": "2026-08-14T21:59:18.166764+08:00",
+      "content_length": 5038004,
+      "asset": {
+        "instrument_id": "601288.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_c49da47b4cbb872a77858820aac7eade",
+        "filing_id": "1225056196",
+        "source": "cninfo",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "content_hash": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/93/9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "601319.SH",
+      "name": "中国人保",
+      "exchange": "SSE",
+      "layer": "financial",
+      "source_industry": "金融业",
+      "sw_l1_name": "非银金融",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "中国人保2025年年度报告",
+      "pdf_pages": 278,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 4,
+            "text_sha256": "dbe3df28df0f515e72e6404eaa9781e2d6b01bc9a5f425ba29f846c2dcdbde69",
+            "characters": 195
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_5bc039c7c9e1719244460b747da51434",
+      "version_available_at": "2026-08-14T21:59:26.827569+08:00",
+      "content_length": 12461533,
+      "asset": {
+        "instrument_id": "601319.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_ab3e9a94e3862d0173fbf46216d950c6",
+        "filing_id": "1225037867",
+        "source": "cninfo",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "content_hash": "c8e5ed5435197ff0c056ee9ad6aa630b6e7a655a47ba61e18d352e89745791fe",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/c8/c8e5ed5435197ff0c056ee9ad6aa630b6e7a655a47ba61e18d352e89745791fe.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "002500.SZ",
+      "name": "山西证券",
+      "exchange": "SZSE",
+      "layer": "financial",
+      "source_industry": "J 金融业",
+      "sw_l1_name": "非银金融",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 298,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "b73aaf7c0fb372f7e12935037d0af7927af6385d8ca0ef5e300274dcd8f767c6",
+            "characters": 823
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_1a85a48fbc53df9acbe65a4804f55847",
+      "version_available_at": "2026-08-13T02:37:54.617652+00:00",
+      "content_length": 9077298,
+      "asset": {
+        "instrument_id": "002500.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_21dbccbaa9e499d3aea04d2f46071f89",
+        "filing_id": "1225215361",
+        "source": "cninfo",
+        "published_at": "2026-04-27T16:00:00+00:00",
+        "content_hash": "b71a6038ee90f79c8b9d9590b3b8133faa7d0e4489b10f531b151c991f04623c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/b7/b71a6038ee90f79c8b9d9590b3b8133faa7d0e4489b10f531b151c991f04623c.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000563.SZ",
+      "name": "陕国投Ａ",
+      "exchange": "SZSE",
+      "layer": "financial",
+      "source_industry": "J 金融业",
+      "sw_l1_name": "非银金融",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 174,
+      "directory_entry": {
+        "bookmark_count": 303,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "d0e8b74b1e06d9ec7950c2f266c717c8fa6c6e841039b19c576d94f9c8e2de3c",
+            "characters": 600
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_30b6a45635d816290950c38c7a94fbcf",
+      "version_available_at": "2026-08-14T12:31:05.325816+08:00",
+      "content_length": 1412522,
+      "asset": {
+        "instrument_id": "000563.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_496a38b2046429fbe2bad5e2499ee74e",
+        "filing_id": "1224973751",
+        "source": "cninfo",
+        "published_at": "2026-02-09T16:00:00+00:00",
+        "content_hash": "43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/43/43600529a5c0692fb277e5b960af066e33b7fe7f57e04665fa3898b453d573ed.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600163.SH",
+      "name": "中闽能源",
+      "exchange": "SSE",
+      "layer": "other",
+      "source_industry": "电力、热力、燃气及水生产和供应业",
+      "sw_l1_name": "公用事业",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "中闽能源2025年年度报告",
+      "pdf_pages": 164,
+      "directory_entry": {
+        "bookmark_count": 748,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "d0cab03a63a08668f2303706667e95058cc95d8d1f7c9652ec41bbdb8b3db57b",
+            "characters": 721
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_6585c1d6dd7321362654fc7f3995328c",
+      "version_available_at": "2026-08-14T19:49:37.200540+08:00",
+      "content_length": 1383099,
+      "asset": {
+        "instrument_id": "600163.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_2da964250850ba40590d415fac675aef",
+        "filing_id": "1225231634",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "7490159ce0a0e480425765959996f86c6d5cb36b1c7e690ecb638b8763c0d846",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/74/7490159ce0a0e480425765959996f86c6d5cb36b1c7e690ecb638b8763c0d846.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600170.SH",
+      "name": "上海建工",
+      "exchange": "SSE",
+      "layer": "other",
+      "source_industry": "建筑业",
+      "sw_l1_name": "建筑装饰",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "上海建工2025年年度报告",
+      "pdf_pages": 235,
+      "directory_entry": {
+        "bookmark_count": 836,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "1208d6d1ca29034b7dfa66a4a1fc2a3e6003f2c663891faec3258942850c33b9",
+            "characters": 737
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_7df6ce9b57d54c9b81b6f837c70de424",
+      "version_available_at": "2026-08-14T19:49:50.042118+08:00",
+      "content_length": 1734008,
+      "asset": {
+        "instrument_id": "600170.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_4ccaa8233b524dd0edaf00bf8db2f3d4",
+        "filing_id": "1225104758",
+        "source": "cninfo",
+        "published_at": "2026-04-14T16:00:00+00:00",
+        "content_hash": "d1fe87aa3337456df5bd4114352d6db7cc29751470255eb147c9ce88b46015e4",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/d1/d1fe87aa3337456df5bd4114352d6db7cc29751470255eb147c9ce88b46015e4.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000037.SZ",
+      "name": "深南电A",
+      "exchange": "SZSE",
+      "layer": "other",
+      "source_industry": "D 水电煤气",
+      "sw_l1_name": "公用事业",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 195,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "6f58be6fec55e21ff07a77d2fdc27dd60c9729a7e0aebc9983dab09a6741bd3d",
+            "characters": 475
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_1733d28ad08fdb52d2cc75ac96f905b7",
+      "version_available_at": "2026-08-14T17:31:33.154316+08:00",
+      "content_length": 4113562,
+      "asset": {
+        "instrument_id": "000037.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_304fcf7df9fe568b84e57a2cda60ece0",
+        "filing_id": "1225101224",
+        "source": "cninfo",
+        "published_at": "2026-04-14T16:00:00+00:00",
+        "content_hash": "0119ae1bd0cf86167b0c945f2a0f661c0b5d782a1204766caeec34f85c29c28e",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/01/0119ae1bd0cf86167b0c945f2a0f661c0b5d782a1204766caeec34f85c29c28e.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000402.SZ",
+      "name": "金 融 街",
+      "exchange": "SZSE",
+      "layer": "other",
+      "source_industry": "K 房地产",
+      "sw_l1_name": "房地产",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 249,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "b696bd99ab668a115d42e55f0416723c9321582885adc26e81f640add6ded58b",
+            "characters": 1139
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_2258a45c42f7f179ce8636a76a9350b7",
+      "version_available_at": "2026-08-14T17:31:57.832652+08:00",
+      "content_length": 12766348,
+      "asset": {
+        "instrument_id": "000402.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_0ba1ad061c085a18114c8d0dc7c9b20f",
+        "filing_id": "1225240594",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/92/92a7cad1a78097becc43f8730c032048234b494d5f9aeb4cb6dce5ae60c6b71f.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    }
+  ],
+  "dispatch_order": [
+    "600176.SH",
+    "600115.SH",
+    "601288.SH",
+    "600163.SH",
+    "600183.SH",
+    "600233.SH",
+    "601319.SH",
+    "600170.SH",
+    "000070.SZ",
+    "600258.SH",
+    "002500.SZ",
+    "000037.SZ",
+    "000568.SZ",
+    "000089.SZ",
+    "000563.SZ",
+    "000402.SZ",
+    "920008.BJ",
+    "000524.SZ",
+    "920016.BJ",
+    "002558.SZ"
+  ],
+  "reserves": [
+    {
+      "instrument_id": "600585.SH",
+      "name": "海螺水泥",
+      "exchange": "SSE",
+      "layer": "manufacturing",
+      "source_industry": "制造业",
+      "sw_l1_name": "建筑材料",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年度报告",
+      "pdf_pages": 268,
+      "directory_entry": {
+        "bookmark_count": 64,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "135248a0bf6e5d9a4d058e3a59c324b0e7e1a297edb95da84e95b0aeeb09a51b",
+            "characters": 550
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_3133e1f69861312431b331dfa30a04fa",
+      "version_available_at": "2026-08-14T21:22:47.822578+08:00",
+      "content_length": 2859484,
+      "asset": {
+        "instrument_id": "600585.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_e0ea86161e7073ec373d9c4f7964cece",
+        "filing_id": "1225028852",
+        "source": "cninfo",
+        "published_at": "2026-03-24T16:00:00+00:00",
+        "content_hash": "a50f3e7f150954b2b45c44c50afdaa618c4184ebe4bb1e9b3a2b6475267c66d8",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/a5/a50f3e7f150954b2b45c44c50afdaa618c4184ebe4bb1e9b3a2b6475267c66d8.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000538.SZ",
+      "name": "云南白药",
+      "exchange": "SZSE",
+      "layer": "manufacturing",
+      "source_industry": "C 制造业",
+      "sw_l1_name": "医药生物",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 246,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "d8d7b75cea1c7ad396963e56a124b28b5176be4496fa9452729cd404ab4d15d9",
+            "characters": 628
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_d6c6043e46057748258d931f080bb229",
+      "version_available_at": "2026-08-14T11:36:12.731269+08:00",
+      "content_length": 8573501,
+      "asset": {
+        "instrument_id": "000538.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_145ab6e02cf657b16d6d91183ac881dd",
+        "filing_id": "1225067975",
+        "source": "cninfo",
+        "published_at": "2026-03-31T16:00:00+00:00",
+        "content_hash": "1c3315b22fa1ab1a619a80c412b071ef84acd219f347cc67dc2ee76866850184",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/1c/1c3315b22fa1ab1a619a80c412b071ef84acd219f347cc67dc2ee76866850184.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "name": "星昊医药",
+      "exchange": "BSE",
+      "layer": "manufacturing",
+      "source_industry": "医药制造业",
+      "sw_l1_name": "医药生物",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 198,
+      "directory_entry": {
+        "bookmark_count": 512,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "49dce87da5ba5372d460f438f84ba8775037d0ad9c1bd9a97124bb626863810b",
+            "characters": 824
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_4a25800d70992ae5e57b40e9ab6bf80b",
+      "version_available_at": "2026-08-17T12:39:59.415983+08:00",
+      "content_length": 2890694,
+      "asset": {
+        "instrument_id": "920017.BJ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_1335a764a0ab9e646e2806aa4eeb4511",
+        "filing_id": "1225196689",
+        "source": "cninfo",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "content_hash": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/aa/aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600593.SH",
+      "name": "大连圣亚",
+      "exchange": "SSE",
+      "layer": "services",
+      "source_industry": "水利、环境和公共设施管理业",
+      "sw_l1_name": "社会服务",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "公司2025年年度报告",
+      "pdf_pages": 240,
+      "directory_entry": {
+        "bookmark_count": 844,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "25d22b0ada20657de2167b8a5a41a36892615ab093e817f72ce53d52b723ec56",
+            "characters": 1171
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_277b30852b91ac7a324e944509dc3641",
+      "version_available_at": "2026-08-14T21:23:01.429800+08:00",
+      "content_length": 1428428,
+      "asset": {
+        "instrument_id": "600593.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_2b2153d59673963335183107f30927f6",
+        "filing_id": "1225094350",
+        "source": "cninfo",
+        "published_at": "2026-04-10T16:00:00+00:00",
+        "content_hash": "5478801028707e33c246b8b60622ffe8590e6f4fa7c5a2480eb02c88a8243829",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/54/5478801028707e33c246b8b60622ffe8590e6f4fa7c5a2480eb02c88a8243829.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "name": "华数传媒",
+      "exchange": "SZSE",
+      "layer": "services",
+      "source_industry": "I 信息技术",
+      "sw_l1_name": "传媒",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 208,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "69270d329705f5c39b59c57d8f4c767d8448cfbb1ae272db6cc85d4f6dfcb1c5",
+            "characters": 1010
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_d9de6e9aecc002b7c58afef2e7b56c92",
+      "version_available_at": "2026-08-14T11:35:16.164893+08:00",
+      "content_length": 4987216,
+      "asset": {
+        "instrument_id": "000156.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_cb5fba56cc5413413d17e154d6a86c15",
+        "filing_id": "1225023169",
+        "source": "cninfo",
+        "published_at": "2026-03-20T16:00:00+00:00",
+        "content_hash": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/7e/7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "601229.SH",
+      "name": "上海银行",
+      "exchange": "SSE",
+      "layer": "financial",
+      "source_industry": "金融业",
+      "sw_l1_name": "银行",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "上海银行2025年度报告",
+      "pdf_pages": 303,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "cd19848dba4ab5dbc8ac285c71f48a8504c92931bc684403d4cf4486cdf8c05a",
+            "characters": 2892
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_709553d43f629cd467d52d7cacb0944a",
+      "version_available_at": "2026-08-14T21:59:05.226025+08:00",
+      "content_length": 3791001,
+      "asset": {
+        "instrument_id": "601229.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_b488a5c06b4df26e4daef6a40e1cf475",
+        "filing_id": "1225173739",
+        "source": "cninfo",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "content_hash": "ee03fef968462982fd65e5f5f39aa77fe9cc7731bfb51f9b97e3feafdc271d3e",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/ee/ee03fef968462982fd65e5f5f39aa77fe9cc7731bfb51f9b97e3feafdc271d3e.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "601988.SH",
+      "name": "中国银行",
+      "exchange": "SSE",
+      "layer": "financial",
+      "source_industry": "金融业",
+      "sw_l1_name": "银行",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "中国银行股份有限公司2025年年度报告",
+      "pdf_pages": 360,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 4,
+            "text_sha256": "2ab258be84d2c9e85d599f0d0e3bfc834655f98624ada89571639737ae39de27",
+            "characters": 2611
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_8dfb838a9ea1570943016eaef5fc671a",
+      "version_available_at": "2026-08-14T22:03:14.315096+08:00",
+      "content_length": 9476604,
+      "asset": {
+        "instrument_id": "601988.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_fd015cce445ccfbadb065a9f9152c3b7",
+        "filing_id": "1225058470",
+        "source": "cninfo",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "content_hash": "e29e520cdbc46aa3e9502506bfe8d085bbe98fc5a2aaa5ce22fe73a92f5455ae",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e2/e29e520cdbc46aa3e9502506bfe8d085bbe98fc5a2aaa5ce22fe73a92f5455ae.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "002673.SZ",
+      "name": "西部证券",
+      "exchange": "SZSE",
+      "layer": "financial",
+      "source_industry": "J 金融业",
+      "sw_l1_name": "非银金融",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 304,
+      "directory_entry": {
+        "bookmark_count": 0,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "073efc801107e570b6b2e911ffe08d94a362b50915d55d35234434b2e7c0443f",
+            "characters": 872
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_6f259537178a6fe52922f5cb356fb7f2",
+      "version_available_at": "2026-08-13T02:37:54.617652+00:00",
+      "content_length": 18819626,
+      "asset": {
+        "instrument_id": "002673.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_ac98f8fa7a4016db6ce80ce9bb6357d7",
+        "filing_id": "1225073049",
+        "source": "cninfo",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "content_hash": "8b64ab88555eb93a38001608dd5e04cc5f9999c89d136be351c30aa97109c115",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/8b/8b64ab88555eb93a38001608dd5e04cc5f9999c89d136be351c30aa97109c115.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "600149.SH",
+      "name": "廊坊发展",
+      "exchange": "SSE",
+      "layer": "other",
+      "source_industry": "电力、热力、燃气及水生产和供应业",
+      "sw_l1_name": "公用事业",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "廊坊发展股份有限公司2025年年度报告全文",
+      "pdf_pages": 169,
+      "directory_entry": {
+        "bookmark_count": 816,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "b21ba04b15fbfc2b8d7d85026413e79127ee24712da8e5e1c9a7ad786a31dd78",
+            "characters": 1167
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_b5ee3773cd7b7436f54c0c3a616f33c3",
+      "version_available_at": "2026-08-14T19:49:06.294224+08:00",
+      "content_length": 1214621,
+      "asset": {
+        "instrument_id": "600149.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_340ad6d786d74fb940766ac1dc52972f",
+        "filing_id": "1225122028",
+        "source": "cninfo",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "content_hash": "c5df510b3e423d5f5777a07b4359a675c6e2e2b8585aadaa04d0b02671fe2331",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/c5/c5df510b3e423d5f5777a07b4359a675c6e2e2b8585aadaa04d0b02671fe2331.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "000155.SZ",
+      "name": "川能动力",
+      "exchange": "SZSE",
+      "layer": "other",
+      "source_industry": "D 水电煤气",
+      "sw_l1_name": "公用事业",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 219,
+      "directory_entry": {
+        "bookmark_count": 411,
+        "pages": [
+          {
+            "physical_page": 2,
+            "text_sha256": "4fefde68ba9a6ecbeeba8b3a786763e70c747ae9d266db7f8be88a11d3276032",
+            "characters": 469
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_6f3a802fa08c067432506b3b9de24f11",
+      "version_available_at": "2026-08-14T11:35:14.821012+08:00",
+      "content_length": 1483973,
+      "asset": {
+        "instrument_id": "000155.SZ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_fc94dcbbb02b79ed303d2cfa9816c8e7",
+        "filing_id": "1225089876",
+        "source": "cninfo",
+        "published_at": "2026-04-09T16:00:00+00:00",
+        "content_hash": "486d8c7c460d75a8da6a12fb36eb5b457f51deb101b6221ebcce42ece8151cdf",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/48/486d8c7c460d75a8da6a12fb36eb5b457f51deb101b6221ebcce42ece8151cdf.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    },
+    {
+      "instrument_id": "920010.BJ",
+      "name": "凯添燃气",
+      "exchange": "BSE",
+      "layer": "other",
+      "source_industry": "燃气生产和供应业",
+      "sw_l1_name": "公用事业",
+      "layer_basis": "Metadata-only stratum, not a company-semantic assessment",
+      "official_title": "2025年年度报告",
+      "pdf_pages": 150,
+      "directory_entry": {
+        "bookmark_count": 383,
+        "pages": [
+          {
+            "physical_page": 3,
+            "text_sha256": "fb240dbbf31f325c484cfbf2f1fde84efe87d5e010b45120421574f6b7e1de03",
+            "characters": 824
+          }
+        ]
+      },
+      "document_variant": "original",
+      "official_version_id": "ver_e964aeb6e04856ec3184cd5d5425caff",
+      "version_available_at": "2026-08-17T12:39:50.773302+08:00",
+      "content_length": 2938448,
+      "asset": {
+        "instrument_id": "920010.BJ",
+        "report_period": "2025-12-31",
+        "source_asset_id": "asset_a01c394d052e4a856acc742d98a469d6",
+        "filing_id": "1225234659",
+        "source": "cninfo",
+        "published_at": "2026-04-27T16:00:00+00:00",
+        "content_hash": "b2a9d46d981384dbc14e31f2cec55d21c2ffa9a2cc7d9124ec78441b8acec0c7",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/b2/b2a9d46d981384dbc14e31f2cec55d21c2ffa9a2cc7d9124ec78441b8acec0c7.pdf",
+        "report_type": "annual_report"
+      },
+      "business_text_read": false,
+      "model_preview": false,
+      "exclusion_hits": []
+    }
+  ],
+  "counts_by_layer": {
+    "manufacturing": 6,
+    "services": 6,
+    "financial": 4,
+    "other": 4
+  },
+  "counts_by_exchange": {
+    "SSE": 9,
+    "SZSE": 9,
+    "BSE": 2
+  },
+  "known_sw_l1_industries": [
+    "交通运输",
+    "传媒",
+    "公用事业",
+    "国防军工",
+    "基础化工",
+    "建筑材料",
+    "建筑装饰",
+    "房地产",
+    "电子",
+    "社会服务",
+    "通信",
+    "银行",
+    "非银金融",
+    "食品饮料"
+  ],
+  "historical_exclusion_count": 303,
+  "historical_exclusion_sha256": "ef980366ac59d4c1be2c602c2ed596ae6df686cf163485b37b3f6d534869b17f",
+  "no_selected_instrument_in_exclusions": true,
+  "metadata_source": "b-execution/metadata-shortlist.json",
+  "source_reference_required_before_each_semantic_call": true,
+  "old_S2_unchanged": true
+}

@@ -1,0 +1,13 @@
+{
+  "instrument_id": "002500",
+  "shared_store": "/home/python/Quote/data/research.db",
+  "original_log_sha256": "e415dd04b5e5a0024ecd675d6d3b267e0a16857ef40d2e6d68a7104588922688",
+  "original_cli_started_marker_exists": true,
+  "budget_exists": true,
+  "result_exists": true,
+  "model_calls": 0,
+  "first_result_preserved": true,
+  "original_failure": "machine_rework:pages_not_bound",
+  "reported_location": "research/company_profile/runtime.py::_acquire",
+  "inferred_owner": "official source asset resolution/binding, pending local read-only diagnosis"
+}

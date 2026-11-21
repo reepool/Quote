@@ -1,0 +1,26 @@
+{
+  "task": "6.EU",
+  "reference_type": "A_independent_source_first_not_model_input",
+  "companies": [
+    {"instrument_id": "600183.SH", "document_sha256": "cf39d9c7014358ef47ff0e38d3ae91cb9827c22432309b501165eafa95f00435", "source_sections": [{"title": "第三节/主要业务与经营模式", "physical_pages": [9]}, {"title": "主要经营情况/主营业务分析及分行业收入", "physical_pages": [13,14]}], "conditions": [
+      {"id":"principal_business","expected":"设计、生产销售覆铜板/粘结片和印制线路板，不能只剩覆铜板而漏PCB主要业务","pages":[9,13]},
+      {"id":"products_services","expected":"覆铜板/半固化片等电子材料用于单/双/多层PCB，印制线路板服务电子终端；AI服务器/通信/汽车电子等为产品应用不是自身终端制造","pages":[9]},
+      {"id":"revenue_model","expected":"制造销售覆铜板和粘结片及印制线路板取得主要收入，集团与生益电子等子公司金额区分；小额房地产/资源利用可补充不强求全抄","pages":[13,14]}],
+      "audit_targets":{"company_revenue_CNY":"28431138459.44","main_revenue_CNY":"27867432387.35","CCL_preprag_CNY":"17774100611.83","PCB_CNY":"9144009119.00"},"pitfalls":["表中主营合计不同于公司总额","子公司生益电子营收与集团PCB分行业口径不强求相同","平方米与米不可互换"]},
+    {"instrument_id":"600233.SH","document_sha256":"d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7","source_sections":[{"title":"第三节/公司经营模式及加盟模式","physical_pages":[14,16]},{"title":"主营业务分析/收入和成本分析","physical_pages":[30,31]}],"conditions":[
+      {"id":"principal_business","expected":"经营快递物流服务平台，自营枢纽中转/干线运输与加盟末端揽派结合，不能写成全链路直营或只有加盟授权费","pages":[14,16]},
+      {"id":"products_services","expected":"主要国内时效快递并有国际包裹/货代/航空与增值服务，面向发寄件客户和加盟网络，运输中转与揽派责任区分","pages":[14,16,30,31]},
+      {"id":"revenue_model","expected":"主要来自快递服务，另货代/航空货运、代收货款到付等手续费及其他业务；不要把全行业收入或加盟商全部揽件款升为公司收入","pages":[30,31]}],
+      "audit_targets":{"unit":"人民币万元","total_revenue":"7527684.74","main_revenue":"7433693.83","domestic_timeliness":"6758515.99","freight_forwarding":"228441.97","aviation":"176076.98"},"pitfalls":["主营其他与其他业务收入是不同类别","地区成本空栏不能借额","国内/国际和行业/产品不同轴不相加"]},
+    {"instrument_id":"601319.SH","document_sha256":"c8e5ed5435197ff0c056ee9ad6aa630b6e7a655a47ba61e18d352e89745791fe","source_sections":[{"title":"管理层讨论与分析/公司业务概要/主要业务","physical_pages":[20,21]},{"title":"投资组合及投资收益","physical_pages":[39]}],"conditions":[
+      {"id":"principal_business","expected":"综合保险金融集团，财产险、人身险（寿险和健康险）以及投资/资产管理主要板块，不能只列财险或把全集团当单一财险公司","pages":[21]},
+      {"id":"products_services","expected":"人保财险车险及非车险、人保寿险人身保障和人保健康健康险，保险资金投资与第三方资产管理服务按各主体表达","pages":[21,39]},
+      {"id":"revenue_model","expected":"保险保障/承保相关保险服务收入、资金投资收益与第三方资产管理等收入来源实质说明，保费/保险服务收入/总投资收益不同口径不混写","pages":[21,39]}],
+      "audit_targets":{"numeric_source_limitation":"Native PDF extraction of the concentrated overview omits many digit glyphs; no missing numeric value is invented or required as a fixed field. Any asserted exact amount must be checked against visible original PDF/table, not guessed from blank text."},"pitfalls":["原保费不等于IFRS保险服务收入","集团与财险/寿险/健康险主体区分","原生字体数字丢失不能当未披露或零"]},
+    {"instrument_id":"600170.SH","document_sha256":"d1fe87aa3337456df5bd4114352d6db7cc29751470255eb147c9ce88b46015e4","source_sections":[{"title":"第三节/公司从事业务/五大核心业务","physical_pages":[8,9,10,11]},{"title":"主要经营情况与分行业/产品收入","physical_pages":[19,21]}],"conditions":[
+      {"id":"principal_business","expected":"建筑施工为基础，设计咨询/建材工业支撑，房产开发/城市建设投资两翼的五大业务，不能缩成只做土建或只房地产开发","pages":[8,9,10,11]},
+      {"id":"products_services","expected":"工程建造与设计咨询、混凝土/预制构件等建材产品、房地产开发租售及城市基础设施投建服务，主要产业分工有实质内容","pages":[9,10,11]},
+      {"id":"revenue_model","expected":"施工承包与设计服务、建材销售、房产开发租售及基础设施投资建设等取得收入，合同新签额不当当期营业收入，PPP/BOT等投资合同不当普通商品销售","pages":[11,19,21]}],
+      "audit_targets":{"total_revenue_CNY":"205996611436.85","segment_table_unit":"人民币万元","construction":"17430072.80","design":"470981.84","building_materials":"1167028.57","property":"649907.27","infrastructure":"131285.11"},"pitfalls":["行业表与产品表不重复相加","合同额/营业收入、营业成本/收入不同","万元分部与亿元叙述保各自单位"]}
+  ]
+}

@@ -1,5 +1,9 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-22 [6.EU整卡已执行并裁决](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/result.md)：首发20入口交17稿、3失败，正式扩量不通过。原全组首发保护后只修并发初始化与截止源选择两处阻塞，两个原窗口必要后继交稿，统一19家研究根/API/JSON/人读版可消费，圆通JSON重试仍失败保留，不再付费重抽。A有限核8家/26修订及1源单位限用，不开展已无意义的400抽审，不以592记录/775指标或模型completed冒充95%/99%。累计95物理/1恢复/2377610已知total、3664.423业务秒/unknown费用，旧原件/52既有writer及并行保护；卡内Review/strict/本人Git和A/B垃圾清理收尾，不增平台/细目门槛、不自动20/100或生产。下一优先使用现有研究API和显式定向补读，不循环整池付费；新的正式规模范围仍须另定。
+
+2026-11-22用户明确同意并授权新验收整卡，当前[6.EU两阶段20家前瞻验证](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-prospective20-card.md)：A冻结未见资格/独立源参考并行独审，B子代理沿原日常CLI同版first_read→review_batch、必要修订/终核；20家制造6/服务6/金融4/其他4，候补/来源/固定分母首发前冻结，不载旧语义。每股累计6000秒/1m/10物理含3恢复、并发4，组30600秒/20m/200物理/有价200元无价unknown，获准联网、无实际通知/生产。95%/99%及18/20、19/20、400实际补充对象沿正式门槛，旧S2两组及原15家研究版/29writer不改。元数据资格/独立源参考前不调用，卡内P0—P3/验证/有限后继不逐项停等，最终一次交业务/独审/资源/扩量结论；先清前轮结束本人根、A/B QuoteBak、必要一套后清重复库/导出/日志脚本，原源/有效缓存/失败/attempt及并行保护，沿A/B v3。
+
 2026-11-21 [6.ET整卡已交](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/result.md)：按用户要求A规划/独审、B子代理连续实施，一次窗口完成研究版、两份真实日常首读/复核、京东方一次精读、新验收合同及扩量裁决。首读36.013/35.623秒可见，三链15物理/332655全已知total/0恢复/631.198业务墙钟/unknown费用；六修订独核，银河1行业背景局部只源参考。单一15家release交434可读/667指标、API/导出/新实例/HTTP一致，29原writer不变，36直接用例通过；研究版可交，正式20/100及生产不扩大，不改旧S2/95%与99%。先核前轮已清，A/B各自QuoteBak及无依赖一次性脚本在必要一套后清理，原源/缓存/失败/attempt与并行保护；不再将交付拆成逐字段小卡，沿A/B v3。
 
 2026-11-21 6.ES已交[当前完整研究画像人读版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-readable-annual-20261121/result.md)：原export从同一安全年度投影新增annual_profiles.md，保八要素/可选特色供应链、缺项/实际模型/来源，不复活已替代或隔离正文，不改旧单轮文件。原15家433/694及两阶段两稿54/75实际可读实物/API一致（唯一15家公司）、24writer不变；25不同用例最终通过，含1测试显示断言修正后复验。0新模型/外传/共享配置或生产，不重开S2；回到现有能力按需使用，不追齐尾项。开工核6.ER根已清，本轮company-profile-6es-jJGOtz3l在必要一套后清测试库/完整重复导出/脚本日志，两组各一对业务交付及正式源/缓存/旧失败/并行保护，沿A/B v3。

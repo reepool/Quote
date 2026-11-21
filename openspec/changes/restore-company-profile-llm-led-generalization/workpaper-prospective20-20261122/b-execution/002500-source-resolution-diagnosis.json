@@ -1,0 +1,217 @@
+{
+  "current": {
+    "asset_id": "asset_21dbccbaa9e499d3aea04d2f46071f89",
+    "source": "cninfo",
+    "source_announcement_id": "1225215361",
+    "content_hash": "b71a6038ee90f79c8b9d9590b3b8133faa7d0e4489b10f531b151c991f04623c",
+    "attachment_id": "att_f091df205c5dbd6ee65afd1746a5a4fc",
+    "observation_version": "ver_1a85a48fbc53df9acbe65a4804f55847",
+    "availability": "local_valid",
+    "published_at": "2026-04-27T16:00:00+00:00",
+    "variant": "original",
+    "version_available_at": "2026-08-13T02:37:54.617652+00:00",
+    "decision_evidence": null
+  },
+  "as_of": null,
+  "source_body_read": false,
+  "new_model_calls": 0,
+  "resolve_only": true,
+  "candidate_metadata": [
+    {
+      "announcement_id": "ann_5845d16ad750812b71989d8a45fcd87d",
+      "source_announcement_id": "1225215360",
+      "title": "山西证券：2025年年度报告摘要",
+      "classification": {
+        "correction_evidence": false,
+        "document_family": "annual_report",
+        "fiscal_year": 2025,
+        "is_eligible": false,
+        "is_full_report": false,
+        "policy_version": "formal_annual_report.v1",
+        "reasons": [
+          "excluded:摘要"
+        ],
+        "report_period": "2025-12-31",
+        "variant": "original",
+        "vocabulary_version": "official_document_classification.v1"
+      },
+      "published_at": "2026-04-27T16:00:00+00:00",
+      "version_id": null,
+      "version_available_at": null,
+      "canonical_path": null,
+      "content_hash": null,
+      "retrieval_status": null,
+      "integrity_status": null,
+      "blob_integrity_status": null,
+      "announcement_status": "observed"
+    },
+    {
+      "announcement_id": "ann_1622811c4d691d3ae7d8ea22a2467a02",
+      "source_announcement_id": "1225215360",
+      "title": "2025年年度报告摘要",
+      "classification": {
+        "correction_evidence": false,
+        "document_family": "annual_report",
+        "fiscal_year": 2025,
+        "is_eligible": false,
+        "is_full_report": false,
+        "policy_version": "formal_annual_report.v1",
+        "reasons": [
+          "excluded:摘要"
+        ],
+        "report_period": "2025-12-31",
+        "variant": "original",
+        "vocabulary_version": "official_document_classification.v1"
+      },
+      "published_at": "2026-04-27T16:00:00+00:00",
+      "version_id": null,
+      "version_available_at": null,
+      "canonical_path": null,
+      "content_hash": null,
+      "retrieval_status": null,
+      "integrity_status": null,
+      "blob_integrity_status": null,
+      "announcement_status": "observed"
+    },
+    {
+      "announcement_id": "ann_d29662898e36d911ca5f342795cfb7c9",
+      "source_announcement_id": "1225215361",
+      "title": "山西证券：2025年年度报告",
+      "classification": {
+        "correction_evidence": false,
+        "document_family": "annual_report",
+        "fiscal_year": 2025,
+        "is_eligible": true,
+        "is_full_report": true,
+        "policy_version": "formal_annual_report.v1",
+        "reasons": [
+          "eligible_complete_original"
+        ],
+        "report_period": "2025-12-31",
+        "variant": "original",
+        "vocabulary_version": "official_document_classification.v1"
+      },
+      "published_at": "2026-04-27T16:00:00+00:00",
+      "version_id": null,
+      "version_available_at": null,
+      "canonical_path": null,
+      "content_hash": null,
+      "retrieval_status": null,
+      "integrity_status": null,
+      "blob_integrity_status": null,
+      "announcement_status": "observed"
+    },
+    {
+      "announcement_id": "ann_3cf9d2c884b6642b78ff1ecfe74b4fa8",
+      "source_announcement_id": "1225215361",
+      "title": "2025年年度报告",
+      "classification": {
+        "correction_evidence": false,
+        "document_family": "annual_report",
+        "fiscal_year": 2025,
+        "is_eligible": true,
+        "is_full_report": true,
+        "policy_version": "formal_annual_report.v1",
+        "reasons": [
+          "eligible_complete_original"
+        ],
+        "report_period": "2025-12-31",
+        "variant": "original",
+        "vocabulary_version": "official_document_classification.v1"
+      },
+      "published_at": "2026-04-27T16:00:00+00:00",
+      "version_id": null,
+      "version_available_at": null,
+      "canonical_path": null,
+      "content_hash": null,
+      "retrieval_status": null,
+      "integrity_status": null,
+      "blob_integrity_status": null,
+      "announcement_status": "observed"
+    },
+    {
+      "announcement_id": "ann_3cf9d2c884b6642b78ff1ecfe74b4fa8",
+      "source_announcement_id": "1225215361",
+      "title": "2025年年度报告",
+      "classification": {
+        "correction_evidence": false,
+        "document_family": "annual_report",
+        "fiscal_year": 2025,
+        "is_eligible": true,
+        "is_full_report": true,
+        "policy_version": "formal_annual_report.v1",
+        "reasons": [
+          "legacy_verified_complete_original"
+        ],
+        "report_period": "2025-12-31",
+        "variant": "original",
+        "vocabulary_version": "official_document_classification.v1"
+      },
+      "published_at": "2026-04-27T16:00:00+00:00",
+      "version_id": "ver_9c4caedebd04fb7d50045fc08e998c8d",
+      "version_available_at": "2026-08-17T20:40:17.026132+08:00",
+      "canonical_path": null,
+      "content_hash": null,
+      "retrieval_status": "failed",
+      "integrity_status": "missing",
+      "blob_integrity_status": null,
+      "announcement_status": "observed"
+    },
+    {
+      "announcement_id": "ann_21ed16eb910909fc58deacb446bf4b7e",
+      "source_announcement_id": "1223320856",
+      "title": "2024年年度报告",
+      "classification": {
+        "correction_evidence": false,
+        "document_family": "annual_report",
+        "fiscal_year": 2024,
+        "is_eligible": true,
+        "is_full_report": true,
+        "policy_version": "formal_annual_report.v1",
+        "reasons": [
+          "legacy_verified_complete_original"
+        ],
+        "report_period": "2024-12-31",
+        "variant": "original",
+        "vocabulary_version": "official_document_classification.v1"
+      },
+      "published_at": "2025-04-25T16:00:00+00:00",
+      "version_id": "ver_5d793d64d1715df2682f9a73dc51f001",
+      "version_available_at": "2026-08-13T02:37:54.617652+00:00",
+      "canonical_path": "/home/python/Quote/data/filings/announcements/blobs/04/049673271da1af1c560e1b7b250f0239ea0559783249b3f6b9467a3fc1ada3d4.pdf",
+      "content_hash": "049673271da1af1c560e1b7b250f0239ea0559783249b3f6b9467a3fc1ada3d4",
+      "retrieval_status": "adopted",
+      "integrity_status": "valid",
+      "blob_integrity_status": "valid",
+      "announcement_status": "observed"
+    },
+    {
+      "announcement_id": "ann_0477ae3e83e52057da2ef9e4c3f05aa2",
+      "source_announcement_id": "1219915224",
+      "title": "2023年年度报告",
+      "classification": {
+        "correction_evidence": false,
+        "document_family": "annual_report",
+        "fiscal_year": 2023,
+        "is_eligible": true,
+        "is_full_report": true,
+        "policy_version": "formal_annual_report.v1",
+        "reasons": [
+          "legacy_verified_complete_original"
+        ],
+        "report_period": "2023-12-31",
+        "variant": "original",
+        "vocabulary_version": "official_document_classification.v1"
+      },
+      "published_at": "2024-04-29T16:00:00+00:00",
+      "version_id": "ver_eaf52627bc45a78ed2404510cb0ae326",
+      "version_available_at": "2026-08-13T02:37:54.617652+00:00",
+      "canonical_path": "/home/python/Quote/data/filings/announcements/blobs/04/046ea7d4232c86cd9049c52ea06e43bc948b83b32b27b706f03983e4f5dc429c.pdf",
+      "content_hash": "046ea7d4232c86cd9049c52ea06e43bc948b83b32b27b706f03983e4f5dc429c",
+      "retrieval_status": "adopted",
+      "integrity_status": "valid",
+      "blob_integrity_status": "valid",
+      "announcement_status": "observed"
+    }
+  ]
+}

@@ -1,0 +1,3819 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "600115.SH",
+  "report": {
+    "instrument_id": "600115.SH",
+    "report_id": "asset_022b0a3d7665ba69479270fb78ae8ae5",
+    "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-c6620adc9f1c397197b3754a",
+  "latest_reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+  "readings": [
+    {
+      "work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "workpaper_sha256": "8f4a285cf7bd53ea4d36eee4fe3a40ff6a219d8890185f847b9660691b49d914",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0030",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的业务情况"
+            ],
+            "start_page": 15,
+            "end_page": 15,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0032",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ],
+            "start_page": 15,
+            "end_page": 20,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0039",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "五、报告期内主要经营情况"
+            ],
+            "start_page": 23,
+            "end_page": 24,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0044",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分行业、分产品情况"
+            ],
+            "start_page": 24,
+            "end_page": 24,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0045",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分地区情况"
+            ],
+            "start_page": 24,
+            "end_page": 25,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0073",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "分产品情况",
+              "（三）航空运输业经营性信息分析"
+            ],
+            "start_page": 32,
+            "end_page": 36,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0033 核心竞争力分析：偏泛化竞争优势，非收入与经营结构核心，暂不选",
+          "section-0109 未来发展讨论：含计划性展望，非本期经营事实，暂不选",
+          "section-0065 资产负债分析：财务结构细节，非收入来源与业务结构核心，暂不选",
+          "section-0008 财务报告：范围过大，仅在收入附注出现实质缺口时定向补充"
+        ],
+        "selection_rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。",
+        "stop_reason": "已覆盖业务模式、经营综述、收入成本与分行业分地区构成、运营数据与机队等公司层面经营信息，足以解释业务结构、变现方式、规模与主要变化；其余为行业背景、治理、财务附注或计划性展望，非必要，故停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取成功：主营业务分产品（细分产品/服务类别）的收入构成明细未在选定章节中单独披露，仅有分行业（航空运输业务/其他业务）与分地区数据。",
+        "未获取成功：分地区营业成本及毛利率数据在来源表格中为空白（以“-”表示），未获取具体数值。",
+        "未获取成功：客运人公里收益、货邮吨公里收益的分航线明细仅部分摘录，完整分航线收益数据未全部纳入。",
+        "部分运营数据（如分航线ASK、RPK、货邮载运率等）仅选择性摘录，未逐行列示全部明细。",
+        "未归类要素字段未作结论采用，原内容保留在模型回执：company_features"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-c6620adc9f1c397197b3754a:workpaper:sections",
+          "request_hash": "9def024618cc8cd465e073973b5ea68467d777da869b745fd0030017621b9d33",
+          "response_hash": "71421ef4a61e708b16db93c9d21e4aab5288227b979b8cd676c075ec4edaa3a3",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 9218,
+            "output_tokens": 391,
+            "total_tokens": 9609
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 328,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0044",
+            "section-0045",
+            "section-0049",
+            "section-0050",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0330",
+            "section-0332",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-c6620adc9f1c397197b3754a:workpaper:extract",
+          "request_hash": "e5863d05bcb7fdacb45cd9ae82ca1d621e3b9693e1ca31a7126b4360de5164ec",
+          "response_hash": "82df0c72769897c895778bbc0fa2a3bbcd6863958305ec17557359d0a2628d20",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12062,
+            "output_tokens": 6910,
+            "total_tokens": 18972
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0030",
+            "section-0032",
+            "section-0039",
+            "section-0044",
+            "section-0045",
+            "section-0073"
+          ],
+          "physical_pages": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            23,
+            24,
+            25,
+            32,
+            33,
+            34,
+            35,
+            36
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "8f4a285cf7bd53ea4d36eee4fe3a40ff6a219d8890185f847b9660691b49d914",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "superseded_by_review_successor"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 35,
+              "end": 325,
+              "quote": "一、报告期内公司从事的业务情况\n\n    公司主要业务范围为国内和经批准的国际、地区航空客、货、邮、行李运输\n业务及延伸服务。此外，公司还获准开展以下业务经营：通用航空业务；航空器\n维修；航空设备制造与维修；国内外航空公司的代理业务；与航空运输有关的其\n他业务；保险兼业代理服务；电子商务；空中超市；商品批发、零售。\n\n    公司打造精简高效的现代化机队，通过运营                       826 架平均机龄约       9.4 年的客运\n飞机，围绕上海核心主枢纽、北京大兴主枢纽和西安、昆明区域枢纽，为全球旅\n客和客户提供优质便捷的航空运输及延伸服务。\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 915,
+              "end": 1259,
+              "quote": "三、经营情况讨论与分析\n\n    2025  年，公司上下齐心协力，在安全运行、市场经营、成本管控、品牌服\n务等方面持续发力、精准发力，推动各项工作取得新的进展和成效。全年安全飞\n行 274.62  万小时、105.04      万架次，同比分别增长            5.12%、2.05%；完成运输总\n周转量    279.81  亿吨公里、旅客运输量             1.5  亿人次，同比分别增长             10.82%、\n6.67%，实现营业收入人民币             1,399.41  亿元，同比增长         5.92%，利润总额为人\n\n\n   15    中国东方航空股份有限公司           2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 960,
+              "quote": "民币  2.74 亿元，实现扭亏为盈。\n\n  安全运行\n\n    安全是民航业的生命线。公司坚决贯彻落实习近平总书记关于民航安全工作\n的重要指示批示精神，坚持把安全作为头等大事来抓，在航班量持续增加、运行\n环境复杂多变的情况下，保证了安全形势总体平稳。\n\n    深化四大体系建设。完善安全管理体系，健全全员安全生产责任制；改进训\n练培训体系，加强飞行员全生命周期管理；建强运行控制体系，强化运力、飞机、\n机组“三环”匹配，加强生产组织；夯实机务维修体系，开展“固基”“强基”\n行动，强化现场管控。\n\n    压实安全生产责任。常态化开展六大安全领域隐患治理，开展双重预防机制\n与 SMS   融合自查，对重点单位进行长期帮扶。举办“全面落实安全责任”安全\n大讲堂，分层分级开展责任制宣贯，覆盖率达到                      100%。\n\n    夯实专业队伍基础。着力打造“政治过硬、业务精湛、作风优良、纪律严明”\n的新时代空勤队伍，推动安全管理与党建、思政等工作融合。着力提升关键队伍\n业务能力，举办飞行、机务、地服、签派等系统技能大赛。着力锤炼队伍作风建\n设，坚持严管厚爱，加强对员工身心健康的关心关爱。\n\n    强化安全文化建设。公司上下进一步牢固树立安全理念，坚持以“严的基调、\n细的举措、实的作风、韧的精神”抓安全，持续强化穿透力；坚持问题导向抓安\n全，对照“七问”“二十个是否”深刻检视安全问题，坚决抵制不良习气；坚持\n以文化人，发布公司首本安全文化手册，大力营造诚信文化，员工自愿报告意愿\n显著提升。\n\n  市场经营\n\n    公司坚持聚焦主责主业，抓市场开拓，增收创效，运输周转量、旅客运输量、\n货邮运输量均创历史新高，实现经营业绩显著改善。\n\n    坚持“三飞”战略，加强枢纽航网建设。公司坚持往远处飞、往国际飞、往\n新兴市场飞，持续做强枢纽，优化国内外航网布局。国际方面，新开                                24  条国际\n航线，国际（地区）航线达             249  条，覆盖     40 个国家、93     个境外航点，成为国\n\n\n   16   中国东方航空股份有限公司          2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1218,
+              "quote": "际通航点最多的境内航司；打造上海浦东至伦敦、悉尼、莫斯科、巴黎等国际远\n程干线以及至日韩新马泰等国际快线、准快线，开通“上海                            -奥克兰-布宜诺斯艾\n利斯”航线，战略性打开“南向通道”，为中国与南美往来搭建高效“空中丝\n路”。国内方面，持续加强枢纽航班波建设，2025                        年经上海中转旅客同比增长\n17.5%，上海市场份额升至            43%，北京、西安、昆明等枢纽份额进一步增长，\n国内“空中快线”拓展至            47  条，枢纽优势进一步增强；组建东北、新疆分公司，\n成立重庆、福州等基地，“南北畅联、东西贯通”的航网布局逐步形成。\n\n    坚持收益精细化管控，稳步提升经营质量。公司建立收益提升联动机制，强\n化总部与销售单位联动，形成收益管理闭环；加速数字化工具建设与应用，推进\n运价自动化和运力联调系统建设，智慧控舱覆盖国内                          60%航班，数字化赋能收\n益管理成效凸显；通过加强国际客源流向分析、舱位管控，深挖中转高价值潜力、\n创新国际两舱产品，国际市场量价双升，盈利能力明显增强。\n\n    坚持拓展“航空+”，扩展产品营销渠道。开展“民航服务提振消费年”主\n题活动，推出“China PASS”及“Shanghai              PASS”等创新产品；新兴渠道拓\n展，空地互联增收，“博物馆优享”产品服务超                       10  万人次；持续深化多式联运，\n空铁、空巴、空水等年服务联运旅客超                   265 万人次，居于行业领先地位。\n\n    坚持客货联动，提升客机腹舱收益。把握货运需求机遇，深耕欧洲，开拓东\n南亚，大力拓展“一带一路”市场；通过引入航季预售模式，优化腹舱货物装机\n效率，全年实现客机腹舱收入              54.57 亿元，同比增长        2.36%。\n\n  成本管控\n\n    公司强化预算源头管控，依托业财深度融合，不断挖掘降本潜力，持续夯实\n经营发展基础。\n\n    深化全面预算管理。稳步推进全面预算管理体系改革，夯实零基预算基础，\n细化定额标准并强化与业务动因关联；打通预算、报表与业务数据，实现全流程\n动态管理，推动内部市场化结算与预算考核深度融合。\n\n    持续推进业财融合。公司成立成本管理委员会，设立飞机全生命周期管理、\n航材管理优化、地面电气源设备使用、数字化转型                        IT 成本优化等      9 个专班，控\n大项、抠细项，多措并举降低座公里成本，进一步提升资源配置效率。\n\n\n   17   中国东方航空股份有限公司           2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 1196,
+              "quote": "    有效降低资金成本。深化内部资金融通，减少外部高成本融资；把握市场窗\n口期发行债券，全年发行            9 期超短融及       6 期中票，融资总额         305 亿元；充分发\n挥票据融资成本优势，全年贴现规模达到                    425  亿元；精准研判        LPR  下行趋势，\n前瞻布局低成本资金。            2025  年，公司     利息支出减少         9.63 亿元，同比降低\n18.71%。\n\n  品牌服务\n\n    公司升级“精心、精准、精致、精细”“四精”服务理念，更加突出精心，\n用心用情做好服务，进一步彰显品牌价值。\n\n    系统提升服务品质。建立全球服务支援体系，开通英法德俄日韩等外语客服\n专线；设立服务保障席位体系，建立分级协同与空地协调机制；聚焦服务触点，\n监测关键资源与节点，上线服务风险告警推送功能，加强特情处置；推行“先行\n服务、及时报备”，有效提升现场处置效率。全年航班正常率91.74%，高于全\n民航平均水平；旅客满意度同比提升                  2.76%，核心指标持续向好。\n\n    创新推行服务产品。推出线上选餐、宠物进客舱、E                         码通、“随到随走”等\n产品，升级“空港通”，启用“易登机”，首创旅客遗留物品信息系统，推出\n“上海两场联络线”“隔夜住宿”等                  5类中转增值产品，精准化解旅客体验痛点；\n搭建空中医疗急救平台，升级“孤独症人群星翼护航”及“适老化陪伴”专项服\n务，将人文关怀深度融入服务细节；实现国内宽体机全舱免费                              Wi-Fi 覆盖，为旅\n客打造更智能、便捷、增值的出行体验。\n\n    持续擦亮东航品牌。公司作为全球最大和首发国产民机                           C919 运营商，覆盖\n22条航线，并率先开通沪港定期航线，截至                     2025 年底，东航      C919  机队安全飞\n行超  4.5 万小时，运送旅客         260 万余人次，实现规模化、常态化运营；推动异业\n合作体系升级，与国家博物馆、上海博物馆、星巴克等开展的合作广受好评，扩\n大品牌传播力。在第八届中国企业论坛发布的                      2025  中国企业品牌价值榜单中，\n公司位居行业榜首。\n\n  改革创新\n\n    公司聚焦高质量发展要求，深化关键领域改革，扎实推进转型创新，按期完\n成国企改革深化提升行动任务。\n\n\n   18   中国东方航空股份有限公司           2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            23
+          ],
+          "source_spans": [
+            {
+              "page": 23,
+              "start": 246,
+              "end": 2040,
+              "quote": "五、报告期内主要经营情况\n\n（一）主营业务分析\n\n1.利润表及现金流量表相关科目变动分析表\n\n                                                                          单位：人民币 百万元\n\n               科目                       本期数            上年同期数              变动比例（%）\n 营业收入                                     139,941          132,120                        5.92\n\n 营业成本                                     132,655          126,498                        4.87\n\n 税金及附加                                         372              415                    -10.36\n\n 销售费用                                        6,196            5,524                     12.17\n\n 管理费用                                        3,902            4,061                      -3.92\n\n 研发费用                                          278              343                    -18.95\n\n 财务费用                                        3,963            5,840                    -32.14\n\n 资产减值损失                                         30               44                    -31.82\n\n 信用减值损失                                           4              38                    -89.47\n\n 公允价值变动收益                                       21               36                    -41.67\n\n 投资收益                                          900              309                    191.26\n\n 资产处置收益                                        207              394                    -47.46\n\n 其他收益                                        5,841            5,505                       6.10\n\n 营业利润                                         -490           -4,399                    不适用\n\n 营业外收入                                         788              566                     39.22\n\n 营业外支出                                          24               71                    -66.20\n\n\n\n    23     中国东方航空股份有限公司                  2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 0,
+              "end": 585,
+              "quote": "    利润总额                                              274            -3,904                       不适用\n\n    经营活动产生的现金流量净额                                 37,941             37,314                          1.68\n\n    投资活动产生的现金流量净额                                -10,768           -11,176                        不适用\n\n    筹资活动产生的现金流量净额                                -24,084           -33,928                        不适用\n\n  2.收入和成本分析\n\n  （1）主营业务分行业、分地区情况\n\n                                                                                    单位：人民币 百万元\n\n                                        "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分行业、分产品情况"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 585,
+              "end": 1198,
+              "quote": "主营业务分行业、分产品情况\n   分行业              营业收入            营业成本              毛利率          营业收入比上             营业成本比            毛利率比\n                                                      （％）            年增减(%)          上年增减(%)           上年增减\n航空运输业务                137,114         131,243              4.28              6.08             5.07      0.91PTS\n\n  其他业务                   2,827           1,412           50.05              -1.19          -11.31       5.70PTS\n\n     合计              139,941         132,655               5.21              5.92             4.87      0.95PTS\n\n                                            "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分地区情况"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 1198,
+              "end": 2107,
+              "quote": "主营业务分地区情况\n   分地区                营业收入          营业成本              毛利率          营业收入比上             营业成本比            毛利率比\n                                                      （％）            年增减(%)          上年增减(%)           上年增减\n     国内                 90,419                 -               -            -0.28                 -              -\n\n     国际                 45,733                 -               -           20.82                  -              -\n\n     地区                  3,789                 -               -             5.51                 -              -\n\n     合计              139,941         132,655               5.21              5.92             4.87      0.95PTS\n\n         公司主营业务收入的国际收入大幅增长，主要由于公司坚定不移往远处飞、\n  往国际飞、往新兴市场飞，新开多条国际航线，国际运输周转量同比增长\n  19.77%。\n\n  （2）产销量情况分析表\n         不适用\n\n\n  （3）重大采购合同、重大销售合同的履行情况\n         不适用\n\n\n\n\n       24      中国东方航空股份有限公司                     2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            32
+          ],
+          "source_spans": [
+            {
+              "page": 32,
+              "start": 392,
+              "end": 2158,
+              "quote": "（三）航空运输业经营性信息分析\n\n1.运营数据摘要\n\n                                                          截至    12  月   31 日止     12 个月\n                                               2025   年              2024   年               变动幅度\n客运数据\n可用座公里（ASK）（百万）                                   316,930.52           296,890.04                  6.75%\n－国内航线                                             206,516.11           202,432.66                 2.02%\n－国际航线                                             103,997.19             87,796.28               18.45%\n－地区航线                                                6,417.22             6,661.10               -3.66%\n客运人公里（           RPK）（旅客周转                       272,103.81           245,892.77                10.66%\n量，百万）\n－国内航线                                             180,244.89           170,123.47                 5.95%\n－国际航线                                              86,544.14             70,539.59               22.69%\n－地区航线                                                5,314.78             5,229.72                1.63%\n载运旅客人次（千）                                        149,944.44           140,565.95                  6.67%\n－国内航线                                             125,283.45           119,674.34                 4.69%\n－国际航线                                              20,836.26             17,164.65               21.39%\n－地区航线                                                3,824.72             3,726.96                2.62%\n客座率(%)                                                  85.86                 82.82             3.04pts\n－国内航线                                                    87.28                84.04              3.24pts\n\n\n\n1境外资产：主要为公司海外分支机构的存款余额\n\n    32      中国东方航空股份有限公司                     2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0014",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            33
+          ],
+          "source_spans": [
+            {
+              "page": 33,
+              "start": 0,
+              "end": 3279,
+              "quote": "－国际航线                                                        83.22                  80.34               2.88pts\n－地区航线                                                        82.82                  78.51               4.31pts\n客运人公里收益（人民币元）注                                              0.493                  0.512                -3.71%\n\n－国内航线                                                        0.491                  0.517               -5.03%\n\n－国际航线                                                        0.484                  0.490               -1.22%\n\n－地区航线                                                        0.702                  0.678                 3.54%\n\n                                                               截至    12  月   31  日止    12   个月\n                                                    2025    年               2024    年             变动幅度\n货运数据\n可用货邮吨公里（                  AFTK）（百                     10,248.62                9,514.39                  7.72%\n万）\n－国内航线                                                    3,732.99               3,676.49                  1.54%\n－国际航线                                                    6,354.84               5,653.89                12.40%\n－地区航线                                                      160.80                 184.01               -12.61%\n货邮载运吨公里（货邮周转量，                                          4,062.52               3,682.54                10.32%\nRFTK）（百万）\n－国内航线                                                    1,000.97                 952.31                  5.11%\n－国际航线                                                    3,033.58               2,700.33                12.34%\n－地区航线                                                        27.96                  29.90               -6.49%\n货邮载运量（百万公斤）                                             1,126.20               1,051.17                  7.14%\n－国内航线                                                      658.78                 624.07                  5.56%\n－国际航线                                                      444.20                 402.43                10.38%\n－地区航线                                                        23.22                  24.66               -5.84%\n货邮载运率(%)                                                    39.64                  38.70               0.94pts\n－国内航线                                                        26.81                  25.90               0.91pts\n－国际航线                                                        47.74                  47.76              -0.02pts\n－地区航线                                                        17.39                  16.25               1.14pts\n货邮吨公里收益（人民币元）注                                              1.343                  1.448                -7.25%\n\n－国内航线                                                        0.668                  0.705               -5.25%\n\n－国际航线                                                        1.534                  1.678               -8.58%\n\n－地区航线                                                        4.828                  4.281               12.78%\n\n                                                               截至    12  月   31  日止    12   个月\n\n\n    33       中国东方航空股份有限公司                       2025   年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0015",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            34
+          ],
+          "source_spans": [
+            {
+              "page": 34,
+              "start": 0,
+              "end": 2772,
+              "quote": "                                                 2025    年               2024    年               变动幅度\n综合数据\n可用吨公里（ATK）（百万）                                        38,772.37              36,234.50                  7.00%\n－国内航线                                                 22,319.44              21,895.43                  1.94%\n－国际航线                                                 15,714.59              13,555.55                 15.93%\n－地区航线                                                     738.35                 783.51                -5.76%\n收入吨公里（              运输总周转量，                          27,981.28              25,249.89                 10.82%\nRTK）（百万）\n－国内航线                                                 16,829.87              15,864.30                  6.09%\n－国际航线                                                 10,657.19                8,897.96                19.77%\n－地区航线                                                     494.22                 487.64                 1.35%\n综合载运率(%)                                                    72.17                 69.68               2.49pts\n－国内航线                                                       75.40                  72.45               2.95pts\n－国际航线                                                       67.82                  65.64               2.18pts\n－地区航线                                                       66.94                  62.24               4.70pts\n收入吨公里收益（人民币元）注                                              4.987                 5.201               -4.11%\n\n－国内航线                                                       5.293                  5.584               -5.21%\n\n－国际航线                                                       4.371                  4.391               -0.46%\n\n－地区航线                                                       7.826                  7.530                3.93%\n\n飞行小时（千）                                                2,746.17               2,612.29                  5.12%\n起降架次（千）                                                1,050.37               1,029.32                  2.05%\n日利用率（小时/日）                                                   9.34                   9.16                1.97%\n注：在计算单位收益指标时相应的收入包含合作航线收入和燃油附加费。\n\n2.机队结构\n\n      公司践行绿色发展理念，持续优化机队结构。2025                                                  年，公司围绕新型主力\n机型引进飞机合计                  48   架，退出飞机              26   架。截至          2025    年    12  月    31  日，公司共\n运营     826   架飞机，其中运营                   14   架   C919     飞机，正持续积累国产大飞机规模化运\n营经验。\n\n                               截至     2025     年   12   月   31   日机队情况\n\n                                                                                                    单位：架\n\n\n\n\n    34       中国东方航空股份有限公司                       2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0016",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            35
+          ],
+          "source_spans": [
+            {
+              "page": 35,
+              "start": 0,
+              "end": 2550,
+              "quote": "     序号                 机型            厂商        2025  年      小计         自有        融资租赁          经营租        平均机龄\n                                                  净增                                               赁        （年）\n      1            B777-300ER         波音            0         20         12           8            0          9.9\n      2             B787   系列         波音            5         17         3            14           0          4.3\n      3             A350-900          空客            0         20         7            13           0          4.6\n      4             A330   系列         空客            0         56         36           15           5         12.1\n宽体客机合计                                              5        113         58           50           5          9.2\n      5             A320   系列         空客            7        390        169          129           92         9.3\n      6             B737   系列         波音           -1        278        130           52           96        10.7\n      7                C919           商飞            4         14         4            10           0          1.3\n窄体客机合计                                             10        682        303          191          188         9.7\n      8                C909           商飞            7         31         15           16           0          2.6\n支线客机合计                                              7         31         15           16           0          2.6\n  客机合计                                             22        826        376          257          193         9.4\n     注：\n\n     1.A330    系列包含         A330-200      和   A330-300      等机型；\n     2.A320    系列包含         A319、A320、A320NEO、A321                      及   A321NEO       等机型；\n     3.B787    系列包含        B787-9     等机型；\n     4.B737    系列包含        B737-700、B737-800              及   B737-8    等机型；\n     5.商飞对       ARJ21    机型新增商业名称                C909。\n\n     3.报告期内飞机及相关设备的引进和融资计划\n\n     （1）报告期内引进飞机及相关设备的资金安排\n\n           2025    年，公司通过自有资金、银行贷款、发行债券、融资租赁及经营租赁\n     安排及其他融资方式支付公司报告期内引进飞机的款项及未来引进飞机的预付款。\n\n     （2）未来         3  年飞机及相关设备的资本开支计划\n\n           根据已签订的飞机及发动机协议，截至                                 2025    年  12  月   31  日，公司预计未来\n     3  年飞机及发动机的资本开支总额约为人民币                                       617.24     亿元，其中           2026     年至\n     2028    年预计资本开支分别约为人民币                            225.48     亿元、151.01          亿元、240.75           亿\n     元。\n\n           公司的上述资本开支计划可能根据发展战略和市场需求新签署飞机、发动机\n\n\n         35      中国东方航空股份有限公司                    2025 年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    },
+    {
+      "work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "workpaper_sha256": "7705f675fea383a2bd861a10894d4aef3a935e48619a929d421a7517e7bbdf4a",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_recovery": {
+        "base_work_id": "bp-work-c6620adc9f1c397197b3754a",
+        "base_workpaper_sha256": "8f4a285cf7bd53ea4d36eee4fe3a40ff6a219d8890185f847b9660691b49d914",
+        "plan_sha256": "1d2421e093400af07f10780d508203845a8e60ac8419c2c7652f5b894c68608b",
+        "report": {
+          "document_type": "annual_report",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "instrument_id": "600115.SH",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "report_id": "asset_022b0a3d7665ba69479270fb78ae8ae5",
+          "report_period": "2025-12-31"
+        },
+        "request_id": "6eu-600115-review"
+      },
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0030",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的业务情况"
+            ],
+            "start_page": 15,
+            "end_page": 15,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0032",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ],
+            "start_page": 15,
+            "end_page": 20,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0039",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "五、报告期内主要经营情况"
+            ],
+            "start_page": 23,
+            "end_page": 24,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0044",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分行业、分产品情况"
+            ],
+            "start_page": 24,
+            "end_page": 24,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0045",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分地区情况"
+            ],
+            "start_page": 24,
+            "end_page": 25,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          },
+          {
+            "section_id": "section-0073",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "分产品情况",
+              "（三）航空运输业经营性信息分析"
+            ],
+            "start_page": 32,
+            "end_page": 36,
+            "rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0033 核心竞争力分析：偏泛化竞争优势，非收入与经营结构核心，暂不选",
+          "section-0109 未来发展讨论：含计划性展望，非本期经营事实，暂不选",
+          "section-0065 资产负债分析：财务结构细节，非收入来源与业务结构核心，暂不选",
+          "section-0008 财务报告：范围过大，仅在收入附注出现实质缺口时定向补充"
+        ],
+        "selection_rationale": "选择公司业务情况（section-0030）说明主营业务与经营模式；经营情况讨论与分析（section-0032）提供经营综述与本期变化；主要经营情况（section-0039）及其主营业务分析（section-0040）、利润表及现金流量表变动分析（section-0041）覆盖收入成本与利润驱动；主营业务分行业/分产品（section-0044）与分地区（section-0045）说明收入构成与主要业务权重；航空运输业经营性信息分析（section-0073）含运营数据摘要（section-0074）与机队结构（section-0075），解释运力、载运率、机队等关键经营投入与规模。以上均为公司层面实质经营讨论，避免纯行业背景与治理章节。",
+        "stop_reason": "已覆盖业务模式、经营综述、收入成本与分行业分地区构成、运营数据与机队等公司层面经营信息，足以解释业务结构、变现方式、规模与主要变化；其余为行业背景、治理、财务附注或计划性展望，非必要，故停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.v1"
+      },
+      "limitations": [
+        "未获取成功：主营业务分产品（细分产品/服务类别）的收入构成明细未在选定章节中单独披露，仅有分行业（航空运输业务/其他业务）与分地区数据。",
+        "未获取成功：分地区营业成本及毛利率数据在来源表格中为空白（以“-”表示），未获取具体数值。",
+        "未获取成功：客运人公里收益、货邮吨公里收益的分航线明细仅部分摘录，完整分航线收益数据未全部纳入。",
+        "部分运营数据（如分航线ASK、RPK、货邮载运率等）仅选择性摘录，未逐行列示全部明细。",
+        "未归类要素字段未作结论采用，原内容保留在模型回执：company_features"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-c6620adc9f1c397197b3754a:workpaper:sections",
+          "request_hash": "9def024618cc8cd465e073973b5ea68467d777da869b745fd0030017621b9d33",
+          "response_hash": "71421ef4a61e708b16db93c9d21e4aab5288227b979b8cd676c075ec4edaa3a3",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 9218,
+            "output_tokens": 391,
+            "total_tokens": 9609
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 328,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0044",
+            "section-0045",
+            "section-0049",
+            "section-0050",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0330",
+            "section-0332",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-c6620adc9f1c397197b3754a:workpaper:extract",
+          "request_hash": "e5863d05bcb7fdacb45cd9ae82ca1d621e3b9693e1ca31a7126b4360de5164ec",
+          "response_hash": "82df0c72769897c895778bbc0fa2a3bbcd6863958305ec17557359d0a2628d20",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12062,
+            "output_tokens": 6910,
+            "total_tokens": 18972
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0030",
+            "section-0032",
+            "section-0039",
+            "section-0044",
+            "section-0045",
+            "section-0073"
+          ],
+          "physical_pages": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            23,
+            24,
+            25,
+            32,
+            33,
+            34,
+            35,
+            36
+          ]
+        }
+      },
+      "review_status": "completed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "8f4a285cf7bd53ea4d36eee4fe3a40ff6a219d8890185f847b9660691b49d914",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_execution_completed"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-bd32b1a55ce252e8234c590b:workpaper:review",
+          "request_hash": "6ba1ea1e08f63fbaaf83a7cf0960ebf3403bb4f29a277a913c5bd169b17ab364",
+          "response_hash": "f90226e96b40f7f2bb42acac2b6caa8756156708614f77e831ade87dd6d7318c",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 18846,
+            "output_tokens": 464,
+            "total_tokens": 50471
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0030",
+            "section-0032",
+            "section-0039",
+            "section-0044",
+            "section-0045",
+            "section-0073"
+          ],
+          "physical_pages": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            23,
+            24,
+            25,
+            32,
+            33,
+            34,
+            35,
+            36
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-bd32b1a55ce252e8234c590b:workpaper:repair",
+          "request_hash": "e3d30d865429c193d8ebfd7633ca864e58325e937d7691ba369dbda7cf439270",
+          "response_hash": "a073d1d38f01d50d99f047b60e89a912ad581c31f5ae6806036598db732949e0",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 8792,
+            "output_tokens": 244,
+            "total_tokens": 9036
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0030",
+            "section-0032",
+            "section-0039",
+            "section-0044",
+            "section-0045",
+            "section-0073"
+          ],
+          "physical_pages": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            23,
+            24,
+            25,
+            32,
+            33,
+            34,
+            35,
+            36
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-bd32b1a55ce252e8234c590b:workpaper:repair-verify",
+          "request_hash": "a56dc14e4ffc5163dad027a57ee1b71e3e848604095e58f2d8ac868c549532f6",
+          "response_hash": "ed114e743c2c938be0915b0f17923a0e8d4a047d1b832246488b827a91506518",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10726,
+            "output_tokens": 167,
+            "total_tokens": 14587
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0030",
+            "section-0032",
+            "section-0039",
+            "section-0044",
+            "section-0045",
+            "section-0073"
+          ],
+          "physical_pages": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            23,
+            24,
+            25,
+            32,
+            33,
+            34,
+            35,
+            36
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 35,
+              "end": 325,
+              "quote": "一、报告期内公司从事的业务情况\n\n    公司主要业务范围为国内和经批准的国际、地区航空客、货、邮、行李运输\n业务及延伸服务。此外，公司还获准开展以下业务经营：通用航空业务；航空器\n维修；航空设备制造与维修；国内外航空公司的代理业务；与航空运输有关的其\n他业务；保险兼业代理服务；电子商务；空中超市；商品批发、零售。\n\n    公司打造精简高效的现代化机队，通过运营                       826 架平均机龄约       9.4 年的客运\n飞机，围绕上海核心主枢纽、北京大兴主枢纽和西安、昆明区域枢纽，为全球旅\n客和客户提供优质便捷的航空运输及延伸服务。\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 915,
+              "end": 1259,
+              "quote": "三、经营情况讨论与分析\n\n    2025  年，公司上下齐心协力，在安全运行、市场经营、成本管控、品牌服\n务等方面持续发力、精准发力，推动各项工作取得新的进展和成效。全年安全飞\n行 274.62  万小时、105.04      万架次，同比分别增长            5.12%、2.05%；完成运输总\n周转量    279.81  亿吨公里、旅客运输量             1.5  亿人次，同比分别增长             10.82%、\n6.67%，实现营业收入人民币             1,399.41  亿元，同比增长         5.92%，利润总额为人\n\n\n   15    中国东方航空股份有限公司           2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 960,
+              "quote": "民币  2.74 亿元，实现扭亏为盈。\n\n  安全运行\n\n    安全是民航业的生命线。公司坚决贯彻落实习近平总书记关于民航安全工作\n的重要指示批示精神，坚持把安全作为头等大事来抓，在航班量持续增加、运行\n环境复杂多变的情况下，保证了安全形势总体平稳。\n\n    深化四大体系建设。完善安全管理体系，健全全员安全生产责任制；改进训\n练培训体系，加强飞行员全生命周期管理；建强运行控制体系，强化运力、飞机、\n机组“三环”匹配，加强生产组织；夯实机务维修体系，开展“固基”“强基”\n行动，强化现场管控。\n\n    压实安全生产责任。常态化开展六大安全领域隐患治理，开展双重预防机制\n与 SMS   融合自查，对重点单位进行长期帮扶。举办“全面落实安全责任”安全\n大讲堂，分层分级开展责任制宣贯，覆盖率达到                      100%。\n\n    夯实专业队伍基础。着力打造“政治过硬、业务精湛、作风优良、纪律严明”\n的新时代空勤队伍，推动安全管理与党建、思政等工作融合。着力提升关键队伍\n业务能力，举办飞行、机务、地服、签派等系统技能大赛。着力锤炼队伍作风建\n设，坚持严管厚爱，加强对员工身心健康的关心关爱。\n\n    强化安全文化建设。公司上下进一步牢固树立安全理念，坚持以“严的基调、\n细的举措、实的作风、韧的精神”抓安全，持续强化穿透力；坚持问题导向抓安\n全，对照“七问”“二十个是否”深刻检视安全问题，坚决抵制不良习气；坚持\n以文化人，发布公司首本安全文化手册，大力营造诚信文化，员工自愿报告意愿\n显著提升。\n\n  市场经营\n\n    公司坚持聚焦主责主业，抓市场开拓，增收创效，运输周转量、旅客运输量、\n货邮运输量均创历史新高，实现经营业绩显著改善。\n\n    坚持“三飞”战略，加强枢纽航网建设。公司坚持往远处飞、往国际飞、往\n新兴市场飞，持续做强枢纽，优化国内外航网布局。国际方面，新开                                24  条国际\n航线，国际（地区）航线达             249  条，覆盖     40 个国家、93     个境外航点，成为国\n\n\n   16   中国东方航空股份有限公司          2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1218,
+              "quote": "际通航点最多的境内航司；打造上海浦东至伦敦、悉尼、莫斯科、巴黎等国际远\n程干线以及至日韩新马泰等国际快线、准快线，开通“上海                            -奥克兰-布宜诺斯艾\n利斯”航线，战略性打开“南向通道”，为中国与南美往来搭建高效“空中丝\n路”。国内方面，持续加强枢纽航班波建设，2025                        年经上海中转旅客同比增长\n17.5%，上海市场份额升至            43%，北京、西安、昆明等枢纽份额进一步增长，\n国内“空中快线”拓展至            47  条，枢纽优势进一步增强；组建东北、新疆分公司，\n成立重庆、福州等基地，“南北畅联、东西贯通”的航网布局逐步形成。\n\n    坚持收益精细化管控，稳步提升经营质量。公司建立收益提升联动机制，强\n化总部与销售单位联动，形成收益管理闭环；加速数字化工具建设与应用，推进\n运价自动化和运力联调系统建设，智慧控舱覆盖国内                          60%航班，数字化赋能收\n益管理成效凸显；通过加强国际客源流向分析、舱位管控，深挖中转高价值潜力、\n创新国际两舱产品，国际市场量价双升，盈利能力明显增强。\n\n    坚持拓展“航空+”，扩展产品营销渠道。开展“民航服务提振消费年”主\n题活动，推出“China PASS”及“Shanghai              PASS”等创新产品；新兴渠道拓\n展，空地互联增收，“博物馆优享”产品服务超                       10  万人次；持续深化多式联运，\n空铁、空巴、空水等年服务联运旅客超                   265 万人次，居于行业领先地位。\n\n    坚持客货联动，提升客机腹舱收益。把握货运需求机遇，深耕欧洲，开拓东\n南亚，大力拓展“一带一路”市场；通过引入航季预售模式，优化腹舱货物装机\n效率，全年实现客机腹舱收入              54.57 亿元，同比增长        2.36%。\n\n  成本管控\n\n    公司强化预算源头管控，依托业财深度融合，不断挖掘降本潜力，持续夯实\n经营发展基础。\n\n    深化全面预算管理。稳步推进全面预算管理体系改革，夯实零基预算基础，\n细化定额标准并强化与业务动因关联；打通预算、报表与业务数据，实现全流程\n动态管理，推动内部市场化结算与预算考核深度融合。\n\n    持续推进业财融合。公司成立成本管理委员会，设立飞机全生命周期管理、\n航材管理优化、地面电气源设备使用、数字化转型                        IT 成本优化等      9 个专班，控\n大项、抠细项，多措并举降低座公里成本，进一步提升资源配置效率。\n\n\n   17   中国东方航空股份有限公司           2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "source_spans": [
+            {
+              "page": 18,
+              "start": 0,
+              "end": 1196,
+              "quote": "    有效降低资金成本。深化内部资金融通，减少外部高成本融资；把握市场窗\n口期发行债券，全年发行            9 期超短融及       6 期中票，融资总额         305 亿元；充分发\n挥票据融资成本优势，全年贴现规模达到                    425  亿元；精准研判        LPR  下行趋势，\n前瞻布局低成本资金。            2025  年，公司     利息支出减少         9.63 亿元，同比降低\n18.71%。\n\n  品牌服务\n\n    公司升级“精心、精准、精致、精细”“四精”服务理念，更加突出精心，\n用心用情做好服务，进一步彰显品牌价值。\n\n    系统提升服务品质。建立全球服务支援体系，开通英法德俄日韩等外语客服\n专线；设立服务保障席位体系，建立分级协同与空地协调机制；聚焦服务触点，\n监测关键资源与节点，上线服务风险告警推送功能，加强特情处置；推行“先行\n服务、及时报备”，有效提升现场处置效率。全年航班正常率91.74%，高于全\n民航平均水平；旅客满意度同比提升                  2.76%，核心指标持续向好。\n\n    创新推行服务产品。推出线上选餐、宠物进客舱、E                         码通、“随到随走”等\n产品，升级“空港通”，启用“易登机”，首创旅客遗留物品信息系统，推出\n“上海两场联络线”“隔夜住宿”等                  5类中转增值产品，精准化解旅客体验痛点；\n搭建空中医疗急救平台，升级“孤独症人群星翼护航”及“适老化陪伴”专项服\n务，将人文关怀深度融入服务细节；实现国内宽体机全舱免费                              Wi-Fi 覆盖，为旅\n客打造更智能、便捷、增值的出行体验。\n\n    持续擦亮东航品牌。公司作为全球最大和首发国产民机                           C919 运营商，覆盖\n22条航线，并率先开通沪港定期航线，截至                     2025 年底，东航      C919  机队安全飞\n行超  4.5 万小时，运送旅客         260 万余人次，实现规模化、常态化运营；推动异业\n合作体系升级，与国家博物馆、上海博物馆、星巴克等开展的合作广受好评，扩\n大品牌传播力。在第八届中国企业论坛发布的                      2025  中国企业品牌价值榜单中，\n公司位居行业榜首。\n\n  改革创新\n\n    公司聚焦高质量发展要求，深化关键领域改革，扎实推进转型创新，按期完\n成国企改革深化提升行动任务。\n\n\n   18   中国东方航空股份有限公司           2025年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            23
+          ],
+          "source_spans": [
+            {
+              "page": 23,
+              "start": 246,
+              "end": 2040,
+              "quote": "五、报告期内主要经营情况\n\n（一）主营业务分析\n\n1.利润表及现金流量表相关科目变动分析表\n\n                                                                          单位：人民币 百万元\n\n               科目                       本期数            上年同期数              变动比例（%）\n 营业收入                                     139,941          132,120                        5.92\n\n 营业成本                                     132,655          126,498                        4.87\n\n 税金及附加                                         372              415                    -10.36\n\n 销售费用                                        6,196            5,524                     12.17\n\n 管理费用                                        3,902            4,061                      -3.92\n\n 研发费用                                          278              343                    -18.95\n\n 财务费用                                        3,963            5,840                    -32.14\n\n 资产减值损失                                         30               44                    -31.82\n\n 信用减值损失                                           4              38                    -89.47\n\n 公允价值变动收益                                       21               36                    -41.67\n\n 投资收益                                          900              309                    191.26\n\n 资产处置收益                                        207              394                    -47.46\n\n 其他收益                                        5,841            5,505                       6.10\n\n 营业利润                                         -490           -4,399                    不适用\n\n 营业外收入                                         788              566                     39.22\n\n 营业外支出                                          24               71                    -66.20\n\n\n\n    23     中国东方航空股份有限公司                  2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 0,
+              "end": 585,
+              "quote": "    利润总额                                              274            -3,904                       不适用\n\n    经营活动产生的现金流量净额                                 37,941             37,314                          1.68\n\n    投资活动产生的现金流量净额                                -10,768           -11,176                        不适用\n\n    筹资活动产生的现金流量净额                                -24,084           -33,928                        不适用\n\n  2.收入和成本分析\n\n  （1）主营业务分行业、分地区情况\n\n                                                                                    单位：人民币 百万元\n\n                                        "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分行业、分产品情况"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 585,
+              "end": 1198,
+              "quote": "主营业务分行业、分产品情况\n   分行业              营业收入            营业成本              毛利率          营业收入比上             营业成本比            毛利率比\n                                                      （％）            年增减(%)          上年增减(%)           上年增减\n航空运输业务                137,114         131,243              4.28              6.08             5.07      0.91PTS\n\n  其他业务                   2,827           1,412           50.05              -1.19          -11.31       5.70PTS\n\n     合计              139,941         132,655               5.21              5.92             4.87      0.95PTS\n\n                                            "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分地区情况"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 1198,
+              "end": 2107,
+              "quote": "主营业务分地区情况\n   分地区                营业收入          营业成本              毛利率          营业收入比上             营业成本比            毛利率比\n                                                      （％）            年增减(%)          上年增减(%)           上年增减\n     国内                 90,419                 -               -            -0.28                 -              -\n\n     国际                 45,733                 -               -           20.82                  -              -\n\n     地区                  3,789                 -               -             5.51                 -              -\n\n     合计              139,941         132,655               5.21              5.92             4.87      0.95PTS\n\n         公司主营业务收入的国际收入大幅增长，主要由于公司坚定不移往远处飞、\n  往国际飞、往新兴市场飞，新开多条国际航线，国际运输周转量同比增长\n  19.77%。\n\n  （2）产销量情况分析表\n         不适用\n\n\n  （3）重大采购合同、重大销售合同的履行情况\n         不适用\n\n\n\n\n       24      中国东方航空股份有限公司                     2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            32
+          ],
+          "source_spans": [
+            {
+              "page": 32,
+              "start": 392,
+              "end": 2158,
+              "quote": "（三）航空运输业经营性信息分析\n\n1.运营数据摘要\n\n                                                          截至    12  月   31 日止     12 个月\n                                               2025   年              2024   年               变动幅度\n客运数据\n可用座公里（ASK）（百万）                                   316,930.52           296,890.04                  6.75%\n－国内航线                                             206,516.11           202,432.66                 2.02%\n－国际航线                                             103,997.19             87,796.28               18.45%\n－地区航线                                                6,417.22             6,661.10               -3.66%\n客运人公里（           RPK）（旅客周转                       272,103.81           245,892.77                10.66%\n量，百万）\n－国内航线                                             180,244.89           170,123.47                 5.95%\n－国际航线                                              86,544.14             70,539.59               22.69%\n－地区航线                                                5,314.78             5,229.72                1.63%\n载运旅客人次（千）                                        149,944.44           140,565.95                  6.67%\n－国内航线                                             125,283.45           119,674.34                 4.69%\n－国际航线                                              20,836.26             17,164.65               21.39%\n－地区航线                                                3,824.72             3,726.96                2.62%\n客座率(%)                                                  85.86                 82.82             3.04pts\n－国内航线                                                    87.28                84.04              3.24pts\n\n\n\n1境外资产：主要为公司海外分支机构的存款余额\n\n    32      中国东方航空股份有限公司                     2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0014",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            33
+          ],
+          "source_spans": [
+            {
+              "page": 33,
+              "start": 0,
+              "end": 3279,
+              "quote": "－国际航线                                                        83.22                  80.34               2.88pts\n－地区航线                                                        82.82                  78.51               4.31pts\n客运人公里收益（人民币元）注                                              0.493                  0.512                -3.71%\n\n－国内航线                                                        0.491                  0.517               -5.03%\n\n－国际航线                                                        0.484                  0.490               -1.22%\n\n－地区航线                                                        0.702                  0.678                 3.54%\n\n                                                               截至    12  月   31  日止    12   个月\n                                                    2025    年               2024    年             变动幅度\n货运数据\n可用货邮吨公里（                  AFTK）（百                     10,248.62                9,514.39                  7.72%\n万）\n－国内航线                                                    3,732.99               3,676.49                  1.54%\n－国际航线                                                    6,354.84               5,653.89                12.40%\n－地区航线                                                      160.80                 184.01               -12.61%\n货邮载运吨公里（货邮周转量，                                          4,062.52               3,682.54                10.32%\nRFTK）（百万）\n－国内航线                                                    1,000.97                 952.31                  5.11%\n－国际航线                                                    3,033.58               2,700.33                12.34%\n－地区航线                                                        27.96                  29.90               -6.49%\n货邮载运量（百万公斤）                                             1,126.20               1,051.17                  7.14%\n－国内航线                                                      658.78                 624.07                  5.56%\n－国际航线                                                      444.20                 402.43                10.38%\n－地区航线                                                        23.22                  24.66               -5.84%\n货邮载运率(%)                                                    39.64                  38.70               0.94pts\n－国内航线                                                        26.81                  25.90               0.91pts\n－国际航线                                                        47.74                  47.76              -0.02pts\n－地区航线                                                        17.39                  16.25               1.14pts\n货邮吨公里收益（人民币元）注                                              1.343                  1.448                -7.25%\n\n－国内航线                                                        0.668                  0.705               -5.25%\n\n－国际航线                                                        1.534                  1.678               -8.58%\n\n－地区航线                                                        4.828                  4.281               12.78%\n\n                                                               截至    12  月   31  日止    12   个月\n\n\n    33       中国东方航空股份有限公司                       2025   年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0015",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            34
+          ],
+          "source_spans": [
+            {
+              "page": 34,
+              "start": 0,
+              "end": 2772,
+              "quote": "                                                 2025    年               2024    年               变动幅度\n综合数据\n可用吨公里（ATK）（百万）                                        38,772.37              36,234.50                  7.00%\n－国内航线                                                 22,319.44              21,895.43                  1.94%\n－国际航线                                                 15,714.59              13,555.55                 15.93%\n－地区航线                                                     738.35                 783.51                -5.76%\n收入吨公里（              运输总周转量，                          27,981.28              25,249.89                 10.82%\nRTK）（百万）\n－国内航线                                                 16,829.87              15,864.30                  6.09%\n－国际航线                                                 10,657.19                8,897.96                19.77%\n－地区航线                                                     494.22                 487.64                 1.35%\n综合载运率(%)                                                    72.17                 69.68               2.49pts\n－国内航线                                                       75.40                  72.45               2.95pts\n－国际航线                                                       67.82                  65.64               2.18pts\n－地区航线                                                       66.94                  62.24               4.70pts\n收入吨公里收益（人民币元）注                                              4.987                 5.201               -4.11%\n\n－国内航线                                                       5.293                  5.584               -5.21%\n\n－国际航线                                                       4.371                  4.391               -0.46%\n\n－地区航线                                                       7.826                  7.530                3.93%\n\n飞行小时（千）                                                2,746.17               2,612.29                  5.12%\n起降架次（千）                                                1,050.37               1,029.32                  2.05%\n日利用率（小时/日）                                                   9.34                   9.16                1.97%\n注：在计算单位收益指标时相应的收入包含合作航线收入和燃油附加费。\n\n2.机队结构\n\n      公司践行绿色发展理念，持续优化机队结构。2025                                                  年，公司围绕新型主力\n机型引进飞机合计                  48   架，退出飞机              26   架。截至          2025    年    12  月    31  日，公司共\n运营     826   架飞机，其中运营                   14   架   C919     飞机，正持续积累国产大飞机规模化运\n营经验。\n\n                               截至     2025     年   12   月   31   日机队情况\n\n                                                                                                    单位：架\n\n\n\n\n    34       中国东方航空股份有限公司                       2025  年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0016",
+          "document_version": "dd6293baf3cdd9c53c95b154eed9fd58c042b4d05bf398c35cbe54490b5fb7d8",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况",
+            "（三）航空运输业经营性信息分析"
+          ],
+          "physical_pages": [
+            35
+          ],
+          "source_spans": [
+            {
+              "page": 35,
+              "start": 0,
+              "end": 2550,
+              "quote": "     序号                 机型            厂商        2025  年      小计         自有        融资租赁          经营租        平均机龄\n                                                  净增                                               赁        （年）\n      1            B777-300ER         波音            0         20         12           8            0          9.9\n      2             B787   系列         波音            5         17         3            14           0          4.3\n      3             A350-900          空客            0         20         7            13           0          4.6\n      4             A330   系列         空客            0         56         36           15           5         12.1\n宽体客机合计                                              5        113         58           50           5          9.2\n      5             A320   系列         空客            7        390        169          129           92         9.3\n      6             B737   系列         波音           -1        278        130           52           96        10.7\n      7                C919           商飞            4         14         4            10           0          1.3\n窄体客机合计                                             10        682        303          191          188         9.7\n      8                C909           商飞            7         31         15           16           0          2.6\n支线客机合计                                              7         31         15           16           0          2.6\n  客机合计                                             22        826        376          257          193         9.4\n     注：\n\n     1.A330    系列包含         A330-200      和   A330-300      等机型；\n     2.A320    系列包含         A319、A320、A320NEO、A321                      及   A321NEO       等机型；\n     3.B787    系列包含        B787-9     等机型；\n     4.B737    系列包含        B737-700、B737-800              及   B737-8    等机型；\n     5.商飞对       ARJ21    机型新增商业名称                C909。\n\n     3.报告期内飞机及相关设备的引进和融资计划\n\n     （1）报告期内引进飞机及相关设备的资金安排\n\n           2025    年，公司通过自有资金、银行贷款、发行债券、融资租赁及经营租赁\n     安排及其他融资方式支付公司报告期内引进飞机的款项及未来引进飞机的预付款。\n\n     （2）未来         3  年飞机及相关设备的资本开支计划\n\n           根据已签订的飞机及发动机协议，截至                                 2025    年  12  月   31  日，公司预计未来\n     3  年飞机及发动机的资本开支总额约为人民币                                       617.24     亿元，其中           2026     年至\n     2028    年预计资本开支分别约为人民币                            225.48     亿元、151.01          亿元、240.75           亿\n     元。\n\n           公司的上述资本开支计划可能根据发展战略和市场需求新签署飞机、发动机\n\n\n         35      中国东方航空股份有限公司                    2025 年度报告\n\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-PS-02",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-PS-03",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "程序显示说明：F-RM-01正文1399.41亿元为营业收入139,941百万元的等值换算；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0008"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-RM-02",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-RM-05",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-SM-02",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-SM-03",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013",
+        "source-0014"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-SM-04",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0015",
+        "source-0016"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0015"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OI-04",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": null,
+      "prior_state": "limited",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003",
+        "source-0011",
+        "source-0015"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OD-02",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-OD-04",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003",
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-MC-01",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-MC-02",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0015"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-MC-03",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-MC-04",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-SC-P1",
+      "element": "position",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-SC-U1",
+      "element": "upstream_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-SC-U2",
+      "element": "upstream_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "fact_id": "F-SC-D1",
+      "element": "downstream_customers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0014"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b"
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-BS-01",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-BS-01",
+        "text": "公司主要业务范围为国内和经批准的国际、地区航空客、货、邮、行李运输业务及延伸服务，并获准开展通用航空、航空器维修、航空设备制造与维修、国内外航空公司代理、保险兼业代理、电子商务、空中超市及商品批发零售等业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-BS-02",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-BS-02",
+        "text": "公司以客运飞机机队运营为核心，围绕上海核心主枢纽、北京大兴主枢纽和西安、昆明区域枢纽提供航空运输及延伸服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-PS-02",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "fact": {
+        "fact_id": "F-PS-02",
+        "text": "公司提供航空货运及客机腹舱运输服务，2025年货邮载运量1,126.20百万公斤，货邮周转量（RFTK）4,062.52百万。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0014"
+        ],
+        "metrics": [
+          {
+            "name": "货邮载运量",
+            "raw_value": "1,126.20",
+            "value": "1126.20",
+            "unit": "百万公斤",
+            "source_unit": "百万公斤",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "货邮载运吨公里（RFTK）",
+            "raw_value": "4,062.52",
+            "value": "4062.52",
+            "unit": "百万",
+            "source_unit": "百万",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-PS-03",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-PS-03",
+        "text": "公司全年实现客机腹舱收入54.57亿元，同比增长2.36%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "客机腹舱收入",
+            "raw_value": "54.57",
+            "value": "54.57",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长2.36%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-RM-01",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "程序显示说明：F-RM-01正文1399.41亿元为营业收入139,941百万元的等值换算；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F-RM-01",
+        "text": "公司2025年实现营业收入人民币1,399.41亿元，同比增长5.92%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "139,941",
+            "value": "139941",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长5.92%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F-RM-01正文1399.41亿元为营业收入139,941百万元的等值换算；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-RM-02",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-RM-02",
+        "text": "分行业看，航空运输业务营业收入137,114百万元，营业成本131,243百万元，毛利率4.28%，收入同比增长6.08%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "航空运输业务营业收入",
+            "raw_value": "137,114",
+            "value": "137114",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增长6.08%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "航空运输业务营业成本",
+            "raw_value": "131,243",
+            "value": "131243",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增长5.07%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "航空运输业务毛利率",
+            "raw_value": "4.28",
+            "value": "4.28",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "毛利率比上年增加0.91个百分点",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-RM-03",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-RM-03",
+        "text": "分行业看，其他业务营业收入2,827百万元，营业成本1,412百万元，毛利率50.05%，收入同比下降1.19%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "其他业务营业收入",
+            "raw_value": "2,827",
+            "value": "2827",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比下降1.19%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他业务营业成本",
+            "raw_value": "1,412",
+            "value": "1412",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比下降11.31%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "其他业务毛利率",
+            "raw_value": "50.05",
+            "value": "50.05",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "毛利率比上年增加5.70个百分点",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-RM-04",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F-RM-04",
+        "text": "分行业合计营业收入139,941百万元，营业成本132,655百万元，毛利率5.21%，收入同比增长5.92%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "分行业合计营业收入",
+            "raw_value": "139,941",
+            "value": "139941",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长5.92%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "分行业合计营业成本",
+            "raw_value": "132,655",
+            "value": "132655",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长4.87%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "分行业合计毛利率",
+            "raw_value": "5.21",
+            "value": "5.21",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "毛利率比上年增加0.95个百分点",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-RM-05",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F-RM-05",
+        "text": "分地区看，国内营业收入90,419百万元，同比下降0.28%；国际营业收入45,733百万元，同比增长20.82%；地区营业收入3,789百万元，同比增长5.51%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "国内营业收入",
+            "raw_value": "90,419",
+            "value": "90419",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比下降0.28%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际营业收入",
+            "raw_value": "45,733",
+            "value": "45733",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增长20.82%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "地区营业收入",
+            "raw_value": "3,789",
+            "value": "3789",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增长5.51%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-SM-02",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F-SM-02",
+        "text": "2025年公司可用座公里（ASK）316,930.52百万，同比增长6.75%；其中国际航线103,997.19百万，同比增长18.45%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [
+          {
+            "name": "可用座公里（ASK）",
+            "raw_value": "316,930.52",
+            "value": "316930.52",
+            "unit": "百万",
+            "source_unit": "百万",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长6.75%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "可用座公里（ASK）—国际航线",
+            "raw_value": "103,997.19",
+            "value": "103997.19",
+            "unit": "百万",
+            "source_unit": "百万",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增长18.45%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-SM-03",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013",
+        "source-0014"
+      ],
+      "fact": {
+        "fact_id": "F-SM-03",
+        "text": "2025年公司客座率85.86%，较上年提高3.04个百分点；其中国内航线客座率87.28%，国际航线83.22%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013",
+          "source-0014"
+        ],
+        "metrics": [
+          {
+            "name": "客座率",
+            "raw_value": "85.86",
+            "value": "85.86",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较上年提高3.04个百分点",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "客座率—国内航线",
+            "raw_value": "87.28",
+            "value": "87.28",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "客座率—国际航线",
+            "raw_value": "83.22",
+            "value": "83.22",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-SM-04",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0015"
+      ],
+      "fact": {
+        "fact_id": "F-SM-04",
+        "text": "2025年公司综合载运率72.17%，较上年提高2.49个百分点；收入吨公里收益4.987元，同比下降4.11%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0015"
+        ],
+        "metrics": [
+          {
+            "name": "综合载运率",
+            "raw_value": "72.17",
+            "value": "72.17",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "较上年提高2.49个百分点",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "收入吨公里收益",
+            "raw_value": "4.987",
+            "value": "4.987",
+            "unit": "元",
+            "source_unit": "人民币元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比下降4.11%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OI-01",
+      "element": "operations_and_inputs",
+      "state": "limited",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0015",
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F-OI-01",
+        "text": "截至2025年12月31日，公司共运营826架客运飞机，平均机龄约9.4年；2025年引进飞机48架，退出飞机26架。",
+        "subject_scope": "consolidated_group",
+        "period": "截至2025年12月31日",
+        "evidence_ids": [
+          "source-0001",
+          "source-0015",
+          "source-0016"
+        ],
+        "metrics": [
+          {
+            "name": "运营客运飞机数",
+            "raw_value": "826",
+            "value": "826",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "截至2025年12月31日",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "平均机龄",
+            "raw_value": "约9.4",
+            "value": "9.4",
+            "unit": "年",
+            "source_unit": "年",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "截至2025年12月31日",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "2025年引进飞机",
+            "raw_value": "48",
+            "value": "48",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "2025年退出飞机",
+            "raw_value": "26",
+            "value": "26",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OI-02",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F-OI-02",
+        "text": "机队结构方面，宽体客机113架（自有58架、融资租赁50架、经营租赁5架），窄体客机682架，支线客机31架；其中C919共14架。",
+        "subject_scope": "consolidated_group",
+        "period": "截至2025年12月31日",
+        "evidence_ids": [
+          "source-0016"
+        ],
+        "metrics": [
+          {
+            "name": "宽体客机合计",
+            "raw_value": "113",
+            "value": "113",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "截至2025年12月31日",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "窄体客机合计",
+            "raw_value": "682",
+            "value": "682",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "截至2025年12月31日",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "支线客机合计",
+            "raw_value": "31",
+            "value": "31",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "截至2025年12月31日",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "C919机队",
+            "raw_value": "14",
+            "value": "14",
+            "unit": "架",
+            "source_unit": "架",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "截至2025年12月31日",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OI-03",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002",
+        "source-0015"
+      ],
+      "fact": {
+        "fact_id": "F-OI-03",
+        "text": "2025年公司安全飞行274.62万小时、105.04万架次，同比分别增长5.12%、2.05%；日利用率9.34小时/日。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0015"
+        ],
+        "metrics": [
+          {
+            "name": "安全飞行小时",
+            "raw_value": "274.62",
+            "value": "274.62",
+            "unit": "万小时",
+            "source_unit": "万小时",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长5.12%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "起降架次",
+            "raw_value": "105.04",
+            "value": "105.04",
+            "unit": "万架次",
+            "source_unit": "万架次",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长2.05%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "日利用率",
+            "raw_value": "9.34",
+            "value": "9.34",
+            "unit": "小时/日",
+            "source_unit": "小时/日",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OI-04",
+      "element": "operations_and_inputs",
+      "state": "limited",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F-OI-04",
+        "text": "根据已签订飞机及发动机协议，截至2025年12月31日，公司预计未来3年飞机及发动机资本开支总额约人民币617.24亿元，其中2026年至2028年分别约225.48亿元、151.01亿元、240.75亿元。",
+        "subject_scope": "consolidated_group",
+        "period": "截至2025年12月31日",
+        "evidence_ids": [
+          "source-0016"
+        ],
+        "metrics": [
+          {
+            "name": "未来3年飞机及发动机资本开支总额",
+            "raw_value": "约617.24",
+            "value": "617.24",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "截至2025年12月31日",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "2026年预计资本开支",
+            "raw_value": "约225.48",
+            "value": "225.48",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2026年",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "2027年预计资本开支",
+            "raw_value": "约151.01",
+            "value": "151.01",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2027年",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "2028年预计资本开支",
+            "raw_value": "约240.75",
+            "value": "240.75",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2028年",
+            "comparison_basis": null,
+            "qualifier": "approximate",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-CC-01",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F-CC-01",
+        "text": "国际方面，公司新开24条国际航线，国际（地区）航线达249条，覆盖40个国家、93个境外航点，成为国际通航点最多的境内航司。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "新开国际航线",
+            "raw_value": "24",
+            "value": "24",
+            "unit": "条",
+            "source_unit": "条",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际（地区）航线数",
+            "raw_value": "249",
+            "value": "249",
+            "unit": "条",
+            "source_unit": "条",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "覆盖国家数",
+            "raw_value": "40",
+            "value": "40",
+            "unit": "个",
+            "source_unit": "个",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "境外航点数",
+            "raw_value": "93",
+            "value": "93",
+            "unit": "个",
+            "source_unit": "个",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-CC-02",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-CC-02",
+        "text": "国内方面，2025年经上海中转旅客同比增长17.5%，上海市场份额升至43%，国内“空中快线”拓展至47条。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "经上海中转旅客同比",
+            "raw_value": "17.5",
+            "value": "17.5",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "上海市场份额",
+            "raw_value": "43",
+            "value": "43",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国内空中快线",
+            "raw_value": "47",
+            "value": "47",
+            "unit": "条",
+            "source_unit": "条",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OD-01",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003",
+        "source-0011",
+        "source-0015"
+      ],
+      "fact": {
+        "fact_id": "F-OD-01",
+        "text": "公司坚持“三飞”战略，加强枢纽航网建设，国际运输周转量同比增长19.77%，推动国际收入大幅增长。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003",
+          "source-0011",
+          "source-0015"
+        ],
+        "metrics": [
+          {
+            "name": "国际收入吨公里（RTK）",
+            "raw_value": "10,657.19",
+            "value": "10657.19",
+            "unit": "百万",
+            "source_unit": "百万",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": "同比增长19.77%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OD-02",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [
+        "“国际市场量价双升、盈利能力明显增强”仅为公司讨论表述；报告国际航线单位收益同比下降（客运人公里收益-1.22%、货邮吨公里收益-8.58%、收入吨公里收益-0.46%），来源未提供国际航线利润数据，不能作为已核实经营事实。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-OD-02",
+        "text": "公司推进收益精细化管控，智慧控舱覆盖国内60%航班；公司表述称通过加强国际客源流向分析、舱位管控，深挖中转高价值潜力、创新国际两舱产品，国际市场量价双升，盈利能力明显增强。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "智慧控舱覆盖国内航班比例",
+            "raw_value": "60",
+            "value": "60",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "“国际市场量价双升、盈利能力明显增强”仅为公司讨论表述；报告国际航线单位收益同比下降（客运人公里收益-1.22%、货邮吨公里收益-8.58%、收入吨公里收益-0.46%），来源未提供国际航线利润数据，不能作为已核实经营事实。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OD-03",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004",
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-OD-03",
+        "text": "成本管控方面，公司成立成本管理委员会并设立9个专班，多措并举降低座公里成本；2025年利息支出减少9.63亿元，同比降低18.71%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004",
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "成本管理专班数",
+            "raw_value": "9",
+            "value": "9",
+            "unit": "个",
+            "source_unit": "个",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利息支出减少额",
+            "raw_value": "9.63",
+            "value": "9.63",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比降低18.71%",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-OD-04",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003",
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-OD-04",
+        "text": "2025年公司利润总额为人民币2.74亿元，实现扭亏为盈；营业利润为-490百万元，上年同期为-4,399百万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003",
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "利润总额",
+            "raw_value": "274",
+            "value": "274",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期-3,904百万元，扭亏为盈",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业利润",
+            "raw_value": "-490",
+            "value": "-490",
+            "unit": "百万元",
+            "source_unit": "人民币 百万元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "上年同期-4,399百万元",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-MC-01",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F-MC-01",
+        "text": "2025年公司营业收入同比增长5.92%，营业成本同比增长4.87%，利润总额实现扭亏为盈。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入同比变动",
+            "raw_value": "5.92",
+            "value": "5.92",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业成本同比变动",
+            "raw_value": "4.87",
+            "value": "4.87",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": "同比增长",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-MC-02",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0011",
+        "source-0015"
+      ],
+      "fact": {
+        "fact_id": "F-MC-02",
+        "text": "国际收入大幅增长主要由于公司新开多条国际航线，国际运输周转量同比增长19.77%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0011",
+          "source-0015"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-MC-03",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F-MC-03",
+        "text": "2025年公司组建东北、新疆分公司，成立重庆、福州等基地，“南北畅联、东西贯通”的航网布局逐步形成。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-MC-04",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F-MC-04",
+        "text": "公司作为全球最大和首发国产民机C919运营商，截至2025年底C919机队实现规模化、常态化运营，并率先开通沪港定期航线。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-SC-P1",
+      "element": "position",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F-SC-P1",
+        "text": "公司处于航空运输服务运营环节，以客运飞机机队为全球旅客和客户提供航空运输及延伸服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-SC-U1",
+      "element": "upstream_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F-SC-U1",
+        "text": "公司机队引进涉及飞机及发动机采购，2025年通过自有资金、银行贷款、发行债券、融资租赁及经营租赁等方式支付引进飞机款项及预付款。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0016"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-SC-U2",
+      "element": "upstream_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F-SC-U2",
+        "text": "公司机队由波音、空客及商飞等厂商机型构成，包括B777-300ER、B787系列、A350-900、A330系列、A320系列、B737系列、C919及C909。",
+        "subject_scope": "consolidated_group",
+        "period": "截至2025年12月31日",
+        "evidence_ids": [
+          "source-0016"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "fact_id": "F-SC-D1",
+      "element": "downstream_customers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002",
+        "source-0014"
+      ],
+      "fact": {
+        "fact_id": "F-SC-D1",
+        "text": "公司下游服务对象为全球旅客及客户，2025年载运旅客人次约1.5亿，货邮载运量1,126.20百万公斤。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0014"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "指标格式隔离：事实F-PS-01未作为结论采用；metrics.0: Value error, source_unit cannot relabel a numeric magnitude；原内容保留在模型回执。",
+        "指标格式隔离：事实F-PS-04未作为结论采用；metrics.0: Value error, metric values must be decimal strings; metrics.1: Value error, metric qualifier must match original raw value；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "指标格式隔离：事实F-SM-01未作为结论采用；metrics.0: Value error, source_unit cannot relabel a numeric magnitude；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-c6620adc9f1c397197b3754a",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "指标格式隔离：事实F-CC-03未作为结论采用；metrics.0: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "active": true,
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "指标格式隔离：事实F-PS-01未作为结论采用；metrics.0: Value error, source_unit cannot relabel a numeric magnitude；原内容保留在模型回执。",
+        "指标格式隔离：事实F-PS-04未作为结论采用；metrics.0: Value error, metric values must be decimal strings; metrics.1: Value error, metric qualifier must match original raw value；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "active": true,
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "指标格式隔离：事实F-SM-01未作为结论采用；metrics.0: Value error, source_unit cannot relabel a numeric magnitude；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-bd32b1a55ce252e8234c590b",
+      "active": true,
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "指标格式隔离：事实F-CC-03未作为结论采用；metrics.0: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

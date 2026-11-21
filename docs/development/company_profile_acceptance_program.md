@@ -1,5 +1,9 @@
 # 公司画像分阶段验收计划
 
+2026-11-22 [6.EU整卡结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/result.md)：固定20家首发全部结束，17非空源核稿/3失败，首发18/20不通过，核心召回最有利上限85%；95%/99%及400补充对象未完成评估，不伪造通过。两处通用调用前阻塞在首发保护后修复，原窗口两个必要后继均交稿，当前统一研究根19家592可读记录/775指标、模型/缺项/限制可读；这不是同版首发19/20或整体准确率。A有限独核8家/26实际采纳修订、另1原文单位限用，API/导出/新实例及原父文件一致。整卡95物理/94逻辑/1恢复、2377610已知供应商total及账本、3664.423业务秒、费用unknown，未续额/样本/生产。阶段结论：停止扩大、限研究使用，旧S2失败不改，不自动新20/100；临时物必要一套后清，详结果和§368。
+
+2026-11-22用户对新20家前瞻验收建议明确“同意你的建议，授权实施”，新[6.EU方案](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-prospective20-card.md)从未见资格/源参考冻结起单独记账；验证已交付的两阶段first_read/review_batch流程。旧S2首组/确认组失败及结束不可追改，不把新阶段合并成旧分数或借旧额；本次新范围裁决允许固定20家一次新方案，20到数或止损即结论，不自动加第21家/确认组或100家。正式18/20首发、19/20后继、95%核心宏召回/99%已审准确和独审补充实际400门槛/原分层底线仍适用；补充/供应链缺项不拒整稿。首读技术可读、复核执行、内容正确、缺项和资源分别核，失败/未交付仍占固定分母。A规划独审、B子代理连续运行；预算/限定既有模型外传及清理沿整卡冻结，未见源参考不送模型，末端给是否具备后续另100家准备条件，不自动启生产。
+
 2026-11-21 [6.ET连续交付整卡已结束](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/result.md)：A规划独审、B子代理实施，15家研究release交434记录/667指标；两份真实日常处理与京东方一次精读均完成，15物理/332655供应商total/0恢复/631.198业务墙钟/unknown。六项真实修订另核，银河一行业背景口径歧义局部源参考，29原writer不改；不是新未见S2/正式全稿99%。[新验收合同](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/acceptance-contract.md)分首读技术交付、基础业务、复核执行、已审质量/缺项和资源，补充/供应链缺项不拒整稿。A裁决限范围研究交付、暂不扩正式20/100或生产；旧S2两组失败、95%/99%及后续数量/权限保留，不加第41家或拼旧成绩，不把每阶段分额复制成新余额。
 
 2026-11-21 6.EN只增加[按股票清单的完整研究画像只读API](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-batch-query-20261121/result.md)。保存15稿433可读对象694指标及旧清单5未找到经HTTP/导出核对，20writer不变，41相关测试通过；没有新模型/新公司运行，不把缺失变为未披露或推算准确率。旧S2本方案结束、95%/99%、S3和生产边界不改，未自动部署共享服务。

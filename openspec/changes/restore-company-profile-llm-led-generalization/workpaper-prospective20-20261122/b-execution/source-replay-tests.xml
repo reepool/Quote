@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="162.253" timestamp="2026-11-22T01:22:21.812101+08:00" hostname="ComputeR"><testcase classname="tests.unit.test_research.test_company_profile_source_replay" name="test_explicit_force_replay_preserves_unbound_acquire_history_and_identity" time="78.462"><failure message="AssertionError: assert 'force_replay...point_rotated' == 'force_replay...oint_rotation'&#10;  &#10;  - force_replay_checkpoint_rotation&#10;  ?                              ^^^&#10;  + force_replay_checkpoint_rotated&#10;  ?                              ^^">tests/unit/test_research/test_company_profile_source_replay.py:31: in test_explicit_force_replay_preserves_unbound_acquire_history_and_identity
+    assert history[-1]["reason"] == "force_replay_checkpoint_rotated"
+E   AssertionError: assert 'force_replay...point_rotated' == 'force_replay...oint_rotation'
+E     
+E     - force_replay_checkpoint_rotation
+E     ?                              ^^^
+E     + force_replay_checkpoint_rotated
+E     ?                              ^^</failure></testcase><testcase classname="tests.unit.test_research.test_business_profile_async_production" name="test_force_requeues_terminal_item_without_changing_work_identity" time="82.217" /></testsuite></testsuites>

@@ -1,0 +1,3904 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "601288.SH",
+  "report": {
+    "instrument_id": "601288.SH",
+    "report_id": "asset_c49da47b4cbb872a77858820aac7eade",
+    "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+  "latest_reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+  "readings": [
+    {
+      "work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "workpaper_sha256": "62b413c81ebedf8e70057a8ae5d583ae074321a313830ba955d5b9f3e06e6a4f",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0002",
+            "section_path": [
+              "2.2 财务概要"
+            ],
+            "start_page": 9,
+            "end_page": 19,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0018",
+            "section_path": [
+              "5.3 财务报表分析"
+            ],
+            "start_page": 25,
+            "end_page": 29,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0044",
+            "section_path": [
+              "5.4 业务综述"
+            ],
+            "start_page": 43,
+            "end_page": 44,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0048",
+            "section_path": [
+              "投资银行业务",
+              "5.4.2 个人金融业务"
+            ],
+            "start_page": 45,
+            "end_page": 47,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0075",
+            "section_path": [
+              "5.5 县域金融业务"
+            ],
+            "start_page": 68,
+            "end_page": 73,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "5.4.2至5.4.12下各细分业务（投资银行、理财、资产托管、金融科技等）未逐一选取，因业务综述与公司/个人金融已覆盖主要收入来源，细分条目多为补充说明",
+          "5.6风险管理及5.7资本管理未选取，属风险与资本充足性分析，非本次经营与收入解释的核心",
+          "财务报表附注中的分部信息、利息净收入、手续费净收入等附注未展开，因利润表分析已提供收入构成，避免扩读整份财报",
+          "物理页73布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        ],
+        "selection_rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。",
+        "stop_reason": "已选取能解释公司业务结构、主要产品服务、收入来源与县域特色经营的完整子节，覆盖经营与盈利核心问题；剩余为风险、资本、治理及附注明细，超出本次经营解释范围，可在此停止。",
+        "transcription_version": "shared-pdf-layout-with-native-fallback.v2"
+      },
+      "limitations": [
+        "物理页73布局未恢复，相关表格列关系未核定，未据此提取数据。",
+        "未获取按业务条线划分的营业收入及利润贡献明细。",
+        "未获取部分细分产品（如理财、保险代销、投行等）的独立收入数据。",
+        "未获取2025年重大收购、处置或组织结构调整等事件的完整披露。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-a1d1b54a4df89564bd62712d:workpaper:sections",
+          "request_hash": "4a5ea662a45c0f9b9051e650efb17775e8d682f64e476019c5de487128142875",
+          "response_hash": "13c4d24dca6919d4f0c27e36280d2e1c07e7db62c9b21fce01bc8bd84bb34972",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12604,
+            "output_tokens": 353,
+            "total_tokens": 12957
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 454,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0390",
+            "section-0394",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0405",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0419",
+            "section-0423",
+            "section-0424",
+            "section-0427",
+            "section-0431",
+            "section-0433",
+            "section-0436",
+            "section-0438",
+            "section-0440",
+            "section-0442",
+            "section-0443",
+            "section-0446",
+            "section-0447",
+            "section-0450",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0488",
+            "section-0495",
+            "section-0499",
+            "section-0503",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0513",
+            "section-0516",
+            "section-0519",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0551",
+            "section-0552",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0571",
+            "section-0574",
+            "section-0575",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-a1d1b54a4df89564bd62712d:workpaper:extract",
+          "request_hash": "eec6c5e2d7105ff2ab85d250262485c11c28345323ba571ff13b6010e67b8397",
+          "response_hash": "d87b92b497077d7ec79070c0630c6c8ff5661a5c6a93c1b6baa1e51898af079d",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 18371,
+            "output_tokens": 3339,
+            "total_tokens": 21710
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0002",
+            "section-0018",
+            "section-0044",
+            "section-0048",
+            "section-0075"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            25,
+            26,
+            27,
+            28,
+            43,
+            44,
+            45,
+            46,
+            47,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "62b413c81ebedf8e70057a8ae5d583ae074321a313830ba955d5b9f3e06e6a4f",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "superseded_by_review_successor"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0002",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 0,
+              "end": 5443,
+              "quote": "2.2.1     主要财务数据\n\n                                                       2025    年   12  月    31  日      2024    年   12  月    31  日      2023   年    12  月   31   日\n报告期末数据（人民币百万元）\n资产总额                                                                48,784,674                      43,238,135                     39,872,989\n发放贷款和垫款总额                                                           27,134,834                      24,906,187                     22,614,621\n其中：公司类贷款                                                            15,485,867                      14,144,003                      12,791,116\n          票据贴现                                                       1,952,660                       1,507,921                       1,310,747\n          个人贷款                                                       9,262,676                       8,814,212                       8,059,915\n          境外及其他                                                         381,443                         390,115                         402,491\n发放贷款和垫款净额                                                           26,178,354                      23,977,013                     21,731,766\n金融投资                                                               16,321,315                       13,849,103                      11,213,713\n现金及存放中央银行款项                                                          2,801,985                       2,134,452                       2,922,047\n存放同业和拆出资金                                                            1,005,264                       1,101,723                       1,596,257\n买入返售金融资产                                                             1,564,991                       1,371,571                       1,809,559\n负债总额                                                                45,541,303                      40,140,862                     36,976,122\n吸收存款                                                                32,649,947                      30,305,357                     28,898,468\n其中：公司存款                                                             10,286,009                      10,059,292                     10,477,286\n          个人存款                                                      20,761,096                      18,692,180                     17,109,711\n          境外及其他                                                      1,098,602                       1,035,207                         852,298\n同业存放和拆入资金                                                            6,389,320                       5,031,583                       4,035,787\n卖出回购金融资产款                                                            1,453,842                          615,725                         100,521\n已发行债务证券                                                              3,263,887                       2,678,509                       2,295,921\n归属于母公司股东的权益                                                          3,237,182                       3,090,808                       2,889,248\n资本净额1                                                                4,448,690                       4,112,653                       3,828,171\n   核心一级资本净额1                                                         2,748,493                       2,582,305                       2,394,940\n   其他一级资本净额1                                                            469,775                         499,559                         480,009\n   二级资本净额1                                                           1,230,422                       1,030,789                          953,222\n风险加权资产1                                                             24,812,801                      22,603,866                     22,338,078\n                                                                        2025年                           2024年                           2023年\n年度经营业绩（人民币百万元）\n营业收入                                                                   725,306                         710,555                          694,828\n利息净收入                                                                  569,594                         580,692                          571,750\n手续费及佣金净收入                                                                88,085                          75,567                           80,093\n业务及管理费                                                                 255,131                         244,420                          235,296\n信用减值损失                                                                  127,189                         130,840                         135,707\n税前利润总额                                                                  323,689                         319,201                         307,419\n净利润                                                                     292,003                         282,671                         269,820\n归属于母公司股东的净利润                                                            291,041                         282,083                         269,356\n扣除非经常性损益后归属于母公司                                                         291,366                         281,561                         269,286\n   股东的净利润\n经营活动产生的现金流量净额                                                         2,112,907                      1,353,042                       1,825,282\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                         9"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 0,
+              "end": 3835,
+              "quote": "2.2.2   财务指标\n\n                                                                2025  年                    2024   年                     2023   年\n盈利能力         (%)\n平均总资产回报率                2                                           0.63                        0.68                         0.73\n加权平均净资产收益率                    3                                    10.16                      10.46                        10.91\n扣除非经常性损益后加权平均净资                                                    10.17                      10.44                        10.91\n   产收益率        3\n净利息收益率            4                                                 1.28                        1.42                         1.60\n净利差      5                                                          1.16                        1.27                         1.45\n风险加权资产收益率                  1,6                                      1.18                        1.25                         1.21\n手续费及佣金净收入比营业收入                                                     12.14                      10.63                        11.53\n成本收入比          7                                                   35.18                      34.40                        33.86\n每股数据（人民币元）\n基本每股收益            3                                                 0.78                        0.75                         0.72\n稀释每股收益            3                                                 0.78                        0.75                         0.72\n扣除非经常性损益后基本每股收益                             3                       0.78                        0.75                         0.72\n每股经营活动产生的现金流量净额                                                     6.04                        3.87                         5.22\n                                                 2025   年  12  月   31 日      2024  年   12  月   31 日     2023   年   12  月   31  日\n资产质量(%)\n不良贷款率          8                                                    1.27                        1.30                         1.33\n拨备覆盖率          9                                                 292.55                      299.61                      303.87\n贷款拨备率          10                                                   3.71                        3.88                         4.05\n资本充足情况             (%)\n核心一级资本充足率                  1                                       11.08                      11.42                        10.72\n一级资本充足率              1                                             12.97                      13.63                        12.87\n资本充足率          1                                                   17.93                      18.19                        17.14\n风险加权资产占总资产比率                        1                              50.86                      52.28                        56.02\n总权益对总资产比率                                                           6.65                        7.16                        7.27\n每股数据（人民币元）\n每股净资产          11                                                   7.91                        7.40                         6.88\n\n注：     1、2024   年  1 月  1 日起根据《商业银行资本管理办法》等相关规定计算，2024                                      年  1 月  1 日之前根据《商业银行资\n          本管理办法（试行）》等相关规定计算。\n       2、净利润除以期初和期末资产总额的平均值。\n       3、根据证监会《公开发行证券的公司信息披露编报规则第                                      9 号－净资产收益率和每股收益的计算及披露》（2010\n          年修订）的规定计算。\n       4、利息净收入除以生息资产平均余额。\n       5、生息资产平均收益率减付息负债平均付息率。\n       6、净利润除以期末风险加权资产，风险加权资产根据金融监管总局相关规定计算。\n       7、业务及管理费除以营业收入。\n       8、不良贷款余额（不含应计利息）除以发放贷款和垫款总额（不含应计利息）。\n       9、贷款减值准备余额除以不良贷款余额（不含应计利息），其中贷款减值准备余额包括核算至其他综合收益项\n          下的票据与福费廷的减值准备余额。\n       10、贷款减值准备余额除以发放贷款和垫款总额（不含应计利息），其中贷款减值准备余额包括核算至其他综合\n          收益项下的票据与福费廷的减值准备余额。\n       11、为期末归属于母公司普通股股东的权益（不含其他权益工具）除以期末普通股股本总数。\n\n\n\n\n\n\n\n                                                               10\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1211,
+              "quote": "3 董事长致辞\n\n    2025年是国家“十四五”规划收官之年，也是农业银行高质量发展取得新进展、\n\n迈出新步伐的一年。2025年，农业银行以习近平新时代中国特色社会主义思想为\n指导，坚持和加强党的全面领导，认真贯彻党中央、国务院各项决策部署，围绕\n防风险、促高质量发展，着力推进管理和服务改革创新，全年目标计划顺利完成，\n\n“十四五”各项任务圆满收官。\n    业务经营保持稳健增长态势，                经营底盘进一步夯实。经营效益稳健向好。净\n利润、营业收入延续“双正增长”态势。其中，净利润2,920亿元，同比增长3.3%；\n\n营业收入7,253亿元，同比增长             2.1%。资产质量保持优良。不良贷款率1.27%，较\n上年末下降3BP。逾期贷款率1.25%，保持可比同业较优水平。逾期贷款率低于不\n良贷款率，资产质量认定标准严格。贷款拨备余额保持万亿元以上，拨备覆盖率\n\n292.55%，保持较强的风险抵补能力。融资总量合理增长。总资产48.8万亿元，其\n中贷款总额27.13万亿元，新增2.23万亿元。金融投资16.3万亿元，新增2.47万亿元。\n存款稳定性不断提升。全口径客户存款余额38.69万亿元，新增3.71万亿元。本外\n\n币存款偏离度0.58%，可比同业最优且唯一连续7个季度低于3%。\n    金融服务乡村振兴更加聚焦扎实。                   县域贷款增速持续高于全行。全力支持乡\n村全面振兴和城乡融合发展，县域贷款余额10.9万亿元，增速11.0%，余额占境内\n\n贷款比重41.0%。连续5年在服务乡村振兴监管考核评估中获评最高等级“优秀”，\n为20家全国性金融机构中唯一一家。重点领域金融服务不断强化。聚焦保障国家\n\n粮食安全、乡村产业、乡村建设和农村改革等重点领域和薄弱环节，不断发挥金\n融强农惠农富农效能。粮食和重要农产品保供相关领域、乡村产业、乡村建设领\n域贷款余额分别为1.21万亿元、2.66万亿元、2.46万亿元，增速20.3%、19.5%、9.6%，\n高于全行11.4、10.6、0.7个百分点。“一县一档案                   ”“一县一策”做好重点帮扶地区\n\n金融服务，160个国家乡村振兴重点帮扶县贷款余额4,800亿元，增速9.9%。服务\n覆盖进一步拓展。向乡镇迁建网点179个，建成惠农服务站1,742个，乡镇服务覆\n\n盖率持续提升。县域手机银行月活客户数1.3亿户。“惠农e贷”余额1.84万亿元，增\n速22.9%，农户金融服务的便捷性和可得性不断提升。\n    服务实体经济力度更大、质效更优。服务稳投资、促消费力度大。聚焦“两\n\n重”“两新”等重点领域，加大融资投放，助力巩固拓展经济回升向好势头。新型政\n\n\n\n\n                                      12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 1227,
+              "quote": "策性金融工具、技术改造和设备更新、“两重”等清单项目配套融资规模均居可比\n同业前列。大力支持提振消费，积极拓展消费金融场景，含信用卡在内的个人消\n费贷款余额1.45万亿元，增速9.0%。全力支持培育壮大新质生产力。创新金融产\n\n品和服务机制，助力高水平科技自立自强。科技贷款余额4.7万亿元，增速20.1%。\n与全部AIC股权投资试点城市签署合作协议，累计设立27只试点基金。制造业贷\n款余额3.72万亿元，增速14.6%。绿色金融建设稳步推进。深入实施绿色金融战略，\n\n绿色贷款余额5.93万亿元，增速18.7%。发展多元化绿色投融资业务，境内发行660\n亿元绿色金融债，绿色债券投资余额超1,500亿元。普惠金融服务迈上新台阶。普\n惠贷款余额4.35万亿元，新增7,499亿元；普惠型小微企业有贷客户数524万户，新\n\n增66万户，普惠贷款余额、增量以及普惠小微有贷客户数、客户增量均居可比同\n业首位。加大民营经济支持力度，民营企业贷款余额7.57万亿元，新增1.03万亿元；\n有贷客户数823万户，新增78万户,               贷款余额以及有贷客户数均居可比同业首位。\n\n养老金融服务体系日益完善。持续助推养老金融“三大支柱”体系覆盖，实体社保\n卡和电子社保卡用户数分别达2.8亿户、2.1亿户，均居同业首位；养老金受托管理\n规模3,881.34亿元，增速22.6%；个人养老金服务客户数位居行业第一梯队。强化\n\n多层次产业支持，养老产业贷款余额231.6亿元。\n    客户基础与经营发展动能巩固提升。                  客户基础不断夯实。坚持以客户为中心，\n持续建设完善适应新时代客户需求的服务体系，客户服务水平不断提升。个人客\n\n户总量8.96亿户，居同业首位。对公客户超1,300万户。线上金融服务能力增强。\n手机银行月活客户数（MAU）超2.76亿户，保持可比同业领先。持续丰富场景生\n\n态，互联网高频场景数6.5万个。财富管理水平进一步提升。理财产品规模稳定增\n长，年末余额21,513亿元。代销业务延续良好发展态势，代销保险金额保持可比\n同业首位，增速17.9%；代销基金销量增速20.4%。智慧银行建设加快推进。大力\n\n推广人工智能技术，智慧银行重点应用落地见效，数字经营模式更加成熟，客户\n获得感和满意度明显提升。“现场+远程”调查模式减少客户经理现场调查22.5万人\n次，实现业务流程优化。推广网点新面客系统，相关交易柜面业务用时缩短超20%，\n\n客户服务质效不断提高。\n    风险防线更加稳固。          风险管控扎实有效。始终把防风险作为首要任务，有力\n有序有效防范化解各类风险，强化逾期贷款管控，优化政策加大不良处置，持续\n\n巩固资产质量优良态势。将合规管理要求嵌入业务发展全流程，案防合规堤坝持\n\n\n\n                                     13"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1238,
+              "quote": "向新质生产力、绿色发展、普惠小微等重点领域和薄弱环节，“五篇大文章”相关贷\n款增速均高于全行贷款平均增速。积极服务高水平对外开放。出台服务稳外资稳外\n贸工作方案，完善跨境金融综合服务体系，加强人民币国际化基础设施建设，积极\n\n支持人民币跨境使用，助力贸易市场多元化和内外贸一体化发展，国际结算业务量\n同比增长    8%。\n    坚持客户至上，在提升客户服务能力中拓展业务发展新空间。始终把客户建设\n\n作为一项基础性、战略性工程来抓，深入推进对公客户扩户提质和个人客户分群分\n层经营，健全完善“数字+模型”驱动的服务模式，持续提升客户精细化、综合化服\n务水平。客群规模不断扩大。个人客户                  8.96亿户，继续保持同业首位，管理个人客\n\n户金融资产     24.7 万亿元，较上年末增加           2.4万亿元；对公客户         1,329 万户，较上年\n末增加   116 万户，增量居可比同业前列。客户服务质效不断提升。以更好满足客户\n金融需求为出发点，丰富扩大存款、信贷、财富管理等产品供给，深化“商行+投行”、\n\n“本币+外币”、“金融+非金融”服务协同，扎实做好消费者权益保护，客户服务更加\n多元、更有温度。专业服务力量不断增强。完善员工培养培训体系，加强“饶才富\n式”客户经理队伍建设，为优化改进客户服务提供有力支撑。全行客户经理总量达\n\n11.9万人，较上年末增加          0.6万人。\n    深化改革创新，在“业技数”深度融合中塑造业务发展新动能。积极拥抱新一轮\n科技革命，深入推进智慧银行建设，持续深化数据赋能和                           AI 应用，推动经营管理\n\n效能向更高层级跃升。科技创新应用底座更加坚实。紧跟人工智能大模型发展动向，\n加快构建数据、技术、模型、生态、安全等“AI+”能力体系，有力支撑                              AI 在信贷、\n\n运营、办公等领域的规模化、普惠化应用。数智化经营打法更加成熟。借助多维数\n据实时分析客户需求、精准匹配产品与服务，以营销触达率和转化率的提升，带动\n客户粘性和价值贡献的提升。基层减负赋能效果更加明显。加快推动高耗能、重复\n\n性工作的自动化、线上化改造，创新推广智慧办贷、便捷用数和集中作业模式，有\n效破解基层痛点难点。\n    强化底线思维，在筑牢风险防控屏障中增厚业务发展安全垫。坚持把风险防控\n\n作为金融工作的永恒主题，坚决守住不发生系统性风险的底线，当好维护金融稳定\n的压舱石。健全全面风险管理体系。始终坚持稳健型风险偏好，不断优化信用、市\n场、国别、科技等各类风险全流程管控机制，将风险管理要求落实到全集团、各条\n\n线，嵌入业务全流程、各环节。加强风险前瞻识别和预研预判。动态调整信贷政策\n\n\n\n                                    16"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.3 财务报表分析"
+          ],
+          "physical_pages": [
+            25
+          ],
+          "source_spans": [
+            {
+              "page": 25,
+              "start": 0,
+              "end": 3003,
+              "quote": "5.3   财务报表分析\n\n\n5.3.1    利润表分析\n\n       2025年，本行实现净利润2,920.03亿元，较上年增加93.32亿元，增长3.3%。\n       利润表主要项目变动表\n\n                                                                                     人民币百万元，百分比除外\n\n                 项目                             2025年                2024年                  增减额                   增长率(%)\n\n利息净收入                                              569,594              580,692                   (11,098)                    -1.9\n手续费及佣金净收入                                            88,085               75,567                    12,518                   16.6\n其他非利息收入                                              67,627               54,296                    13,331                   24.6\n营业收入                                               725,306              710,555                     14,751                     2.1\n减：业务及管理费                                           255,131              244,420                     10,711                     4.4\n     税金及附加                                            7,840                7,548                        292                    3.9\n     信用减值损失                                        127,189              130,840                    (3,651)                    -2.8\n     其他资产减值损失                                             18                  267                    (249)                  -93.3\n     其他业务成本                                           9,866                7,699                     2,167                   28.1\n营业利润                                               325,262              319,781                      5,481                     1.7\n加：营业外收支净额                                           (1,573)                (580)                     (993)                        -\n税前利润                                               323,689              319,201                      4,488                     1.4\n减：所得税费用                                              31,686               36,530                   (4,844)                  -13.3\n净利润                                                292,003              282,671                      9,332                     3.3\n归属于：母公司股东                                          291,041              282,083                      8,958                     3.2\n            少数股东                                        962                   588                       374                  63.6\n\n\n利息净收入\n\n       利息净收入是本行营业收入的最大组成部分，占                                                       2025     年营业收入的                 78.5%。\n2025    年，本行实现利息净收入                             5,695.94      亿元，较上年下降                      110.98     亿元，其中，规\n\n模增长导致利息净收入增加                                440.49     亿元，利率变动导致利息净收入减少                                          551.47     亿\n元。净利息收益率                     1.28%，净利差                1.16%，分别下降                  14  个和       11  个基点，主要是由\n于受      LPR    下调、市场利率低位运行等因素影响，生息资产收益率下降。\n\n\n\n                                                              24\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.3 财务报表分析"
+          ],
+          "physical_pages": [
+            26
+          ],
+          "source_spans": [
+            {
+              "page": 26,
+              "start": 0,
+              "end": 3690,
+              "quote": "                 下表列示了生息资产与付息负债的平均余额、利息收入和支出、平均收益率和\n        平均付息率。\n\n                                                                              人民币百万元，百分比除外\n                                                          2025    年                                                        2024    年\n           项目                      平均余额                利息收入/               平均收益率/                   平均余额                利息收入/                平均收益率/\n                                                           支出             付息率（%）                                            支出              付息率（%）\n资产\n发放贷款和垫款                            26,163,780              752,296                      2.88        23,926,450               816,608                       3.41\n债券投资           1                   13,892,887              370,798                      2.67        12,041,470               360,219                       2.99\n\n 非重组类债券                            13,508,685              362,866                      2.69        11,657,259               350,578                       3.01\n 重组类债券              2                  384,202                7,932                     2.06            384,211                 9,641                      2.51\n\n存放中央银行款项                             2,609,436               39,816                     1.53          2,490,326                39,345                      1.58\n存拆放同业             3                  1,968,380               38,428                     1.95          2,471,020                59,508                      2.41\n\n总生息资产                              44,634,483           1,201,338                       2.69        40,929,266            1,275,680                        3.12\n减值准备                                 (746,168)                                                        (736,259)\n非生息资产                               1,900,221                                                         1,724,350\n总资产                                45,788,536                                                       41,917,357\n负债\n吸收存款                               30,715,539              412,528                      1.34        28,805,254               469,120                       1.63\n同业存拆放             4                 6,646,093              129,089                      1.94          5,221,861              128,403                       2.46\n其他付息负债                5             3,988,482                90,127                     2.26          3,617,599                97,465                      2.69\n\n总付息负债                              41,350,114              631,744                      1.53        37,644,714               694,988                       1.85\n非付息负债                               1,327,726                                                         1,274,686\n总负债                                42,677,840                                                       38,919,400\n利息净收入                                                      569,594                                                           580,692\n净利差                                                                                     1.16                                                               1.27\n净利息收益率                                                                                  1.28                                                               1.42\n\n   注：1、债券投资包括以公允价值计量且其变动计入其他综合收益的债券投资、以摊余成本计量的债券投资。\n\n          2、重组类债券包括应收财政部款项和特别国债。\n\n          3、存拆放同业主要包括存放同业及其他金融机构款项、拆出资金、买入返售金融资产。\n\n          4、同业存拆放主要包括同业及其他金融机构存放款项、拆入资金、卖出回购金融资产款。\n\n          5、其他付息负债主要包括已发行债务证券和向中央银行借款。\n\n\n\n\n\n\n\n\n\n\n\n                                                                               25"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0015",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.3 财务报表分析"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "source_spans": [
+            {
+              "page": 28,
+              "start": 0,
+              "end": 1803,
+              "quote": "                                                                               人民币百万元，百分比除外\n                                            2025年                                         2024年\n          项目                 平均余额           利息收入         平均收益率           平均余额            利息收入         平均收益率\n                                                           （%）                                           （%）\n公司类贷款                         15,078,811      434,913             2.88    13,975,369        466,683             3.34\n  短期公司类贷款                      4,039,432      114,257             2.83     3,667,634        120,325             3.28\n  中长期公司类贷款                    11,039,379      320,656             2.90    10,307,735        346,358             3.36\n票据贴现                           1,624,835       14,306             0.88     1,033,104         12,209             1.18\n个人贷款                           9,078,970      287,845             3.17     8,509,179        318,588             3.74\n境外及其他                            381,164       15,232             4.00       408,798         19,128             4.68\n发放贷款和垫款总额                     26,163,780      752,296             2.88   23,926,450         816,608             3.41\n\n\n    债券投资利息收入\n\n          债券投资利息收入为本行利息收入的第二大组成部分。2025年，本行债券投资\n\n    利息收入3,707.98亿元，较上年增加105.79亿元，主要是由于债券投资规模增加。\n\n    存放中央银行款项利息收入\n\n          存放中央银行款项利息收入                         398.16    亿元，较上年增加4.71亿元，主要是由于\n\n    存放中央银行款项平均余额增加。\n\n    存拆放同业利息收入\n\n          存拆放同业利息收入                   384.28   亿元，较上年减少210.80亿元，主要是由于存拆\n\n    放同业规模和平均收益率下降。\n\n    利息支出\n\n          利息支出6,317.44亿元，较上年减少632.44亿元，主要是由于付息负债付息率\n\n    下降。\n\n    吸收存款利息支出\n\n          吸收存款利息支出4,125.28亿元，较上年减少565.92亿元，主要是由于本行积\n\n    极落实存款利率市场化调整机制，优化存款结构，存款付息率下降。\n\n\n\n\n\n\n\n                                                         27"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0016",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.4 业务综述"
+          ],
+          "physical_pages": [
+            43
+          ],
+          "source_spans": [
+            {
+              "page": 43,
+              "start": 0,
+              "end": 1405,
+              "quote": "5.4业务综述\n\n\n5.4.1公司金融业务\n\n    报告期内，本行聚焦服务现代化产业体系建设，做实做优金融“五篇大文章”，加力\n支持培育新质生产力；充分发挥综合经营优势，加大对国家重大战略、重点领域和薄弱环\n节的金融支持力度；坚持以客户为中心，深化客户分层分群经营，加强科技赋能、智慧营\n\n销，推动公司金融业务高质量发展。截至                      2025 年末，本行境内公司存款余额                102,860.09\n亿元；境内公司类贷款和票据贴现余额合计                       174,385.27亿元，较上年末增加           17,866.03 亿\n\n元。截至     2025年末，本行拥有公司银行客户                1,329.47万户，其中有贷款余额的客户                64.76\n万户，较上年末增加           4.01万户。\n  贯彻落实制造强国战略。聚焦先进制造、产业转型升级、工业绿色发展、产业链供应\n\n   链等领域，强化政策支持和资源保障，优化金融产品和服务模式，助力大规模设备更\n   新、制造业转型升级和高质量发展。截至                       2025 年末，技术改造和设备更新项目签约\n   金额   4,035 亿元，贷款余额        1,730 亿元，余额较上年末增加             1,472亿元；制造业贷款余\n\n   额（按贷款投向）3.72          万亿元，较上年末增加            4,741 亿元，增长      14.6%。\n  服务国家区域发展战略。发挥全渠道、全产品、多牌照优势，加大差异化政策支持力\n   度，全面服务京津冀协同发展、长三角区域一体化发展、粤港澳大湾区、成渝地区双\n\n   城经济圈等国家区域发展战略，2025                  年新增对公贷款        1.09 万亿元。\n  支持民营经济高质量发展。制定提升服务民营企业质效行动方案，强化信贷资源保障，\n   加大对乡村振兴、科技、普惠、绿色转型等重点领域民营经济金融支持力度，支持民\n\n   营企业参与国家发改委投贷联动优质民间投资项目。截至                               2025 年末，民营企业贷款\n   余额   7.57 万亿元，较上年末增加            10,331亿元，增长       15.8%。\n  服务资本市场稳健运行。作为首批获准开展股票回购增持再贷款的银行，构建总分支\n\n   行高效联动机制，聚焦优质上市公司核心需求，靠前服务、源头营销，打造覆盖方案\n   设计到后续管理的全链条服务体系，实现多领域贷款投放，累计投放金额稳居同业第\n   一梯队。\n\n  推进数字化转型。完善智慧化营销管理平台和系列数字化支持工具，进一步提升金融\n   服务现代化产业能力。\n\n  持续深耕以账户服务和支付结算为基础的交易银行体系，推动交易银行业务高质量发\n   展。充分发挥科技赋能作用，从流程设计、外拓获客等维度提升账户服务水平，优化\n                                         42\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0017",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.4 业务综述"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "source_spans": [
+            {
+              "page": 44,
+              "start": 0,
+              "end": 96,
+              "quote": "   对公开户流程，满足客户多样需求。截至                        2025  年末，对公人民币结算账户                1,650.77\n   万户。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0018",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "投资银行业务",
+            "5.4.2 个人金融业务"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "source_spans": [
+            {
+              "page": 45,
+              "start": 102,
+              "end": 1068,
+              "quote": "5.4.2个人金融业务\n\n    本行坚持以高质量发展为主线，一以贯之遵循“一体两翼”发展战略（以客户建设为\n主体，坚定不移推进“大财富管理”和数字化转型），持续深化服务模式转型，着力构建\n精细化、综合化、数智化的个人客户服务体系，努力成为客户首选的主办银行。深化大财\n\n富管理全流程服务，助力增加居民财产性收入。加强个人信贷供给，做优全场景支付体验，\n增强扩内需、促消费服务质效。坚持民生为大，强化重点领域金融资源配置，不断助力实\n现人民对美好生活的向往。\n\n\n客户经营\n\n    本行始终坚持“以客户为中心”的经营理念，通过价值、改革、组织、数智“四轮驱\n动”，持续建设完善适应新时代客户需求的服务体系，进一步提升“金融+非金融”一体\n\n化服务能力。截至         2025年末，本行个人客户总量达             8.96 亿户，保持同业第一。\n  坚持价值驱动。以实现人民对美好生活的向往为出发点和落脚点，推动长辈、乡村、\n   新市民等重点客群服务持续升温。创新推出“农情颐养宝”按月领取型产品组合，举\n\n   办近   6,000场“农情敬老节”线下服务活动。组织全行近                      2 万支乡村振兴服务先锋队\n   进村入户，打通金融服务“最后一公里”。推出“美好生活”系列借记卡产品，拓展\n   新市民互联网金融服务项目覆盖面，开展主题关怀服务月活动，推动新市民服务不断\n\n   升温。\n  坚持改革驱动。践行“一个客户                一家银行”理念，构建分群维护、分层权益、分级\n   管户、综合经营、整合策略的服务体系。系统实施先分群、再分层精细服务策略，差\n\n   异化满足客户需求。全面重构客户星级体系，新版星享服务专区面客，客户权益服务\n   进一步完善。建设“人工+数智”协同管户服务网络，提升全量客户综合服务能力。\n   强化跨条线、多领域系统协同，持续提升响应效率和服务体验。\n\n  坚持组织驱动。持续推进新时代“饶才富式”零售服务队伍建设，分层级、分领域开\n   展专业能力培养。系统构建覆盖专题研究、案例分享和微课学习的知识体系，优化完\n\n\n\n\n\n                                       44"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0020",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "投资银行业务",
+            "5.4.2 个人金融业务"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "source_spans": [
+            {
+              "page": 47,
+              "start": 0,
+              "end": 701,
+              "quote": "   人贷款余额       92,626.76亿元，较上年末增加           4,484.64亿元，同业首家余额突破             9 万亿\n   元。\n  落实稳楼市工作要求，积极适应房地产市场供求关系的变化，支持高质量城市更新行\n\n   动，满足新市民、农民工等客群安居需求，助力巩固房地产市场止跌回稳态势。2025\n   年，个人住房贷款投放            5,473 亿元。\n  紧跟国家提振消费政策，聚焦教育、旅游、文化等消费场景融合与创新，优化金融服\n\n   务措施；支持消费品“以旧换新”工程，开展专项金融服务活动；稳妥有序推进消费贷\n   款财政贴息工作，全方位助力居民消费提振，促进释放消费潜力。截至                                     2025 年末，\n   个人消费类贷款（含信用卡透支）余额                    1.45万亿元，较上年末增加            1,196 亿元。\n\n  积极服务“三农”、普惠和实体经济发展，坚持“城市+县域”双轮驱动，落实小微企业融\n   资协调机制，积极响应小微企业主、个体工商户以及广大农户等客群融资需求。因地\n   制宜、因客制宜优化服务模式，持续完善商户贷、农户贷等拳头产品，加强数字化、\n\n   智能化技术深度应用，提升客户覆盖面和金融服务质效。截至                                2025 年末，个人经营\n   类贷款余额      2.99 万亿元，较上年末增加            4,969亿元。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0021",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            68
+          ],
+          "source_spans": [
+            {
+              "page": 68,
+              "start": 0,
+              "end": 357,
+              "quote": "5.5县域金融业务\n\n5.5.1管理架构和管理机制\n\n    本行通过三农金融事业部所有经营机构，向县域农村客户提供全方位金融服务。该类\n业务统称为县域金融业务，又称三农金融业务。报告期内，本行始终坚守服务“三农”主\n\n责主业，深入贯彻中央推进乡村全面振兴、加快建设农业强国决策部署，紧紧围绕“服务\n乡村振兴领军银行”战略定位，不断优化三农金融事业部运行体制机制，强化科技赋能，\n加强协同创新，持续巩固提升“三农”和县域业务差异化竞争优势。\n管理架构\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                           本行三农金融事业部管理架构图\n\n\n\n\n\n\n\n                                       67"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0022",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            69
+          ],
+          "source_spans": [
+            {
+              "page": 69,
+              "start": 0,
+              "end": 1093,
+              "quote": " 管理机制\n\n  倾斜配置县域业务政策资源。单独制定县域贷款、涉农贷款、脱贫县贷款等信贷计划，\n   倾斜配置信贷规模，优先保障“三农”和县域信贷投放需求。单独配置县域经济资本，\n\n   完善经济资本支持政策，强化“三农”县域FTP优惠和定价支持，引导经营行加大涉\n   农、县域重点领域贷款投放。优先保障“三农”县域资源投入，固定资产、财务费用\n   等资源向服务乡村振兴一线倾斜，全力支持“三农”县域业务高质量发展。\n\n  不断优化“三农”信贷管理机制。出台2025年“三农”信贷政策指引，明确30余项差\n   异化政策。优化乡村振兴重点领域信贷政策，因地制宜完善差异化区域信贷政策。对\n   接国家部委发布的重点项目及客户清单，加大乡村振兴重点领域信贷支持力度。优化\n\n   乡村振兴重点业务优先办结及快办机制，完善审查标准，强化AI应用，着力提升“三\n   农”县域信用审查审批效率。\n  积极打造线上线下协同服务渠道。加快推进数字化转型，完善“物理网点+自助设备+\n\n   手机银行+惠农服务站+流动服务车+远程银行”“六位一体”线上线下联动综合服务\n   渠道。持续优化县域网点布局，重点推动网点向乡镇迁建，下沉金融服务重心。升级\n   手机银行“乡村版”，完善特色功能，截至2025年末，手机银行乡村版月活跃客户数\n\n   超5,200万。\n  持续夯实“三农”金融人才基础。加强县域支行领导团队建设，深入实施县域青年英\n   才开发工程，着力培养“饶才富式”客户经理，统筹开展乡村振兴专题培训，持续打\n\n   造多层次、高素质“三农”金融人才队伍。加强“三农”县域员工补充，倾斜配置薪\n   酬资源，强化考核激励与约束机制，引导员工不断提升服务乡村振兴工作质效。\n\n\n5.5.2金融服务乡村全面振兴\n\n服务巩固拓展脱贫攻坚成果\n\n    2025 年是巩固拓展脱贫攻坚成果同乡村振兴有效衔接五年过渡期最后一年，本行聚\n焦脱贫地区和低收入人口，持续优化金融帮扶政策，加大信贷投放，加强产品创新和科技\n\n赋能，助力守牢不发生规模性返贫致贫底线。\n  加大重点地区信贷支持。持续加大对脱贫地区以及国家乡村振兴重点帮扶县、原“三\n   区三州”地区等重点帮扶地区信贷投放力度。倾斜配置资源，实施农户贷款利率优惠、\n\n   商户收单手续费减免等差异化政策。截至                    2025 年末，832    个脱贫县贷款余额         2.53 万\n\n\n\n\n\n                                       68"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0023",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            70
+          ],
+          "source_spans": [
+            {
+              "page": 70,
+              "start": 0,
+              "end": 1517,
+              "quote": "   亿元，较上年末增长           11.0%；160  个国家乡村振兴重点帮扶县贷款余额                    4,800亿元，较\n   上年末增长       9.9%。\n  强化重点人群金融服务。积极推广脱贫人口小额信贷、“富民贷”等特色产品，为广\n\n   大农户特别是脱贫户、边缘易致贫户增收致富提供金融支撑。巩固深化金融助残服务，\n   累计为    5.6 万户残疾人家庭授信           117 亿元。截至      2025 年末，精准帮扶贷款余额              5,808\n   亿元，直接支持脱贫人口              90.2万人，带动      370 余万脱贫人口就业增收；“富民贷”余\n\n   额  1,204亿元，较上年末增长            27.8%。\n  综合帮扶工作成效显著。主动对接地方政府东西部产业转移、项目引进工作安排，2025\n   年为   122 个地方政府东西部协作项目提供配套金融服务，为西部地区引进帮扶项目                                     87\n\n   个、引进资金        4亿元；全年直接采购和帮助销售脱贫地区农副产品                          27.1 亿元；持续开\n   展“金融人才驻县帮镇扶村富民行动”，派往脱贫地区乡村振兴干部超                                     2,000 人。\n\n服务乡村全面振兴\n\n    本行紧紧围绕国家乡村全面振兴战略部署，聚焦粮食安全和重要农产品稳产保供、乡\n村产业、乡村建设、农民增收等乡村振兴重点领域，加快金融产品和服务模式创新，持续\n强化科技赋能，不断拓展农村金融服务广度深度，为推进乡村全面振兴提供高质量金融服\n\n务。\n  持续加大乡村振兴重点领域金融支持力度。加强对耕地保护和质量提升的金融服务，\n\n   加大种业阵型企业金融服务力度，积极支持多元化食物供给，助力守牢粮食安全底线。\n   巩固提升农业产业化龙头企业服务覆盖面，支持乡村特色产业培育壮大，助力现代乡\n   村产业体系建设。发行             400亿元“三农”专项金融债券，支持城乡一体化基础设施等\n\n   涉农领域建设。截至            2025 年末，粮食和重要农产品保供相关领域贷款、乡村产业贷\n   款、乡村建设相关领域贷款余额分别为                     1.21万亿元、2.66     万亿元、2.46     万亿元，较上\n   年末增长      20.3%、19.5%、9.6%。\n\n  全面提升农户金融服务质效。加快产品服务创新，强化科技赋能，大力推广整村推进、\n   批量建档、集中审批、线上化办贷作业模式，形成以“惠农                               e 贷”为主、专项产品为\n   辅的农户贷款产品体系，着力解决农民贷款难问题，全面满足农民生产生活信贷需求。\n\n   截至   2025 年末，“惠农      e 贷”余额    1.84万亿元，较上年末增加            3,416亿元，增长      22.9%。\n  不断增强“三农”产品创新能力。制定年度“三农”金融产品创新工作意见，发挥“总\n   行统筹示范、分行主体创新、基地先行先试”协同作用，不断加大“三农”产品创新力\n\n\n\n                                         69"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0024",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            71
+          ],
+          "source_spans": [
+            {
+              "page": 71,
+              "start": 0,
+              "end": 2046,
+              "quote": "     度，确保“三农”产品覆盖所有乡村振兴重点领域。推出惠农网贷、智慧畜牧贷等产\n     品，进一步提升“三农”县域线上化数字化服务能力水平。截至                                                       2025   年末，全行“三\n     农”产品总数达              236   个。\n\n    深入实施数字乡村工程建设。持续推动“农银惠农云”平台功能迭代优化、一站式涉\n     农场景超市提质扩容，聚焦农业产业、乡村治理、民生服务三大领域，打造智慧粮仓、\n     “党建+信用村”、县域医共体等                             14  类特色应用场景，嵌入结算、信贷等金融服务，\n\n     实现“场景+金融”协同赋能。截至                               2025  年末，“农银惠农云”平台入驻机构                                 36.7  万\n     个，覆盖        2,682   个县（区），服务客户超                       680  万户。\n\n\n5.5.3  财务状况\n\n县域金融业务资产负债主要项目\n\n                                                                                    人民币百万元，百分比除外\n                    项目                               2025   年  12 月   31 日              2024  年   12 月   31 日\n                                                     金额             占比(%)               金额             占比(%)\n发放贷款和垫款总额                                           10,936,160                  -       9,854,954                  -\n贷款减值准备                                               (393,725)                  -       (387,450)                  -\n发放贷款和垫款净额                                           10,542,435              65.5        9,467,504              64.2\n存放系统内款项            1                                 4,218,171              26.2        4,077,192              27.6\n\n其他资产                                                 1,325,480               8.3        1,212,026               8.2\n资产合计                                                16,086,086             100.0      14,756,722              100.0\n吸收存款                                                14,381,965              96.1      13,153,343               95.8\n其他负债                                                   581,567               3.9          581,851               4.2\n负债合计                                                14,963,532             100.0      13,735,194              100.0\n\n注：1、存放系统内款项指县域金融业务分部通过内部资金往来向本行其他分部提供的资金。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                        70"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0025",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            72
+          ],
+          "source_spans": [
+            {
+              "page": 72,
+              "start": 0,
+              "end": 4392,
+              "quote": " 县域金融业务利润表主要项目\n\n                                                                                                               人民币百万元，百分比除外\n                                                          2025    年                    2024    年                 增减额                  增长率(%)\n外部利息收入                                                           314,338                      331,861                (17,523)                      -5.3\n减：外部利息支出                                                         185,143                      201,480                (16,337)                      -8.1\n内部利息收入                1                                          189,511                      181,944                    7,567                      4.2\n\n利息净收入                                                            318,706                      312,325                    6,381                      2.0\n手续费及佣金净收入                                                          31,724                       30,747                     977                      3.2\n其他非利息收入                                                              9,239                        6,146                  3,093                    50.3\n营业收入                                                             359,669                      349,218                  10,451                       3.0\n减：业务及管理费                                                         122,956                      117,137                    5,819                      5.0\n       税金及附加                                                         2,646                        2,514                    132                      5.3\n       信用减值损失                                                      45,200                       43,201                   1,999                      4.6\n       其他资产减值损失                                                          23                         134                  (111)                   -82.8\n       其他业务成本                                                             4                             1                      3                 300.0\n营业利润                                                             188,840                      186,231                    2,609                      1.4\n营业外收支净额                                                              (584)                        (292)                  (292)                         -\n税前利润总额                                                           188,256                      185,939                    2,317                      1.2\n\n 注：1、内部利息收入是指县域金融业务分部向本行其他分部提供的资金通过转移计价所取得的收入。本行内部资金转\n       移计价利率基于市场利率确定。\n\n 县域金融业务主要财务指标\n\n                                                                                                                                           单位：%\n\n 项目                                                                                              2025    年                          2024    年\n 贷款平均收益率                                                                                                        3.00                               3.54\n 存款平均付息率                                                                                                        1.28                               1.54\n 手续费及佣金净收入占营业收入比例                                                                                               8.82                               8.80\n 成本收入比                                                                                                         34.19                             33.54\n 项目                                                                                      2025    年   12   月   31   日        2024    年   12   月   31   日\n 贷存款比例                                                                                                         76.04                             74.92\n 不良贷款率                                                                                                          1.13                               1.21\n 拨备覆盖率                                                                                                       336.21                            338.33\n 贷款拨备率                                                                                                          3.80                               4.10\n\n\n\n\n\n\n\n\n\n\n\n                                                                           71"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    },
+    {
+      "work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "workpaper_sha256": "cbfff52da0c357e6f05d2bcd33852406dbdcb58946c8b2c287aee276dbd0cd61",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_recovery": {
+        "base_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+        "base_workpaper_sha256": "62b413c81ebedf8e70057a8ae5d583ae074321a313830ba955d5b9f3e06e6a4f",
+        "plan_sha256": "4e202e3b4ec09cbfb6b209aa50dda70e69007ba3eed040bc5678dd312c545f54",
+        "report": {
+          "document_type": "annual_report",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "instrument_id": "601288.SH",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "report_id": "asset_c49da47b4cbb872a77858820aac7eade",
+          "report_period": "2025-12-31"
+        },
+        "request_id": "6eu-601288-review"
+      },
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0002",
+            "section_path": [
+              "2.2 财务概要"
+            ],
+            "start_page": 9,
+            "end_page": 19,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0018",
+            "section_path": [
+              "5.3 财务报表分析"
+            ],
+            "start_page": 25,
+            "end_page": 29,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0044",
+            "section_path": [
+              "5.4 业务综述"
+            ],
+            "start_page": 43,
+            "end_page": 44,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0048",
+            "section_path": [
+              "投资银行业务",
+              "5.4.2 个人金融业务"
+            ],
+            "start_page": 45,
+            "end_page": 47,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          },
+          {
+            "section_id": "section-0075",
+            "section_path": [
+              "5.5 县域金融业务"
+            ],
+            "start_page": 68,
+            "end_page": 73,
+            "rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。"
+          }
+        ],
+        "unread_or_deferred": [
+          "5.4.2至5.4.12下各细分业务（投资银行、理财、资产托管、金融科技等）未逐一选取，因业务综述与公司/个人金融已覆盖主要收入来源，细分条目多为补充说明",
+          "5.6风险管理及5.7资本管理未选取，属风险与资本充足性分析，非本次经营与收入解释的核心",
+          "财务报表附注中的分部信息、利息净收入、手续费净收入等附注未展开，因利润表分析已提供收入构成，避免扩读整份财报",
+          "物理页73布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        ],
+        "selection_rationale": "本行年报中，2.2财务概要提供公司整体营业收入、净利润等总量数据；5.3财务报表分析及5.3.1利润表分析给出收入构成与利润驱动因素，是理解盈利模式的核心；5.4业务综述及公司金融、个人金融子节说明主要产品服务、客户与经营方式；5.5县域金融业务及5.5.3财务状况体现本行特色经营板块及其财务贡献。上述章节共同覆盖业务结构、产品用途、收入来源、规模与主要变化，且避免选择父子重叠或纯行业背景章节。",
+        "stop_reason": "已选取能解释公司业务结构、主要产品服务、收入来源与县域特色经营的完整子节，覆盖经营与盈利核心问题；剩余为风险、资本、治理及附注明细，超出本次经营解释范围，可在此停止。",
+        "transcription_version": "shared-pdf-layout-with-native-fallback.v2"
+      },
+      "limitations": [
+        "物理页73布局未恢复，相关表格列关系未核定，未据此提取数据。",
+        "未获取按业务条线划分的营业收入及利润贡献明细。",
+        "未获取部分细分产品（如理财、保险代销、投行等）的独立收入数据。",
+        "未获取2025年重大收购、处置或组织结构调整等事件的完整披露。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-a1d1b54a4df89564bd62712d:workpaper:sections",
+          "request_hash": "4a5ea662a45c0f9b9051e650efb17775e8d682f64e476019c5de487128142875",
+          "response_hash": "13c4d24dca6919d4f0c27e36280d2e1c07e7db62c9b21fce01bc8bd84bb34972",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12604,
+            "output_tokens": 353,
+            "total_tokens": 12957
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 454,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0390",
+            "section-0394",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0405",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0419",
+            "section-0423",
+            "section-0424",
+            "section-0427",
+            "section-0431",
+            "section-0433",
+            "section-0436",
+            "section-0438",
+            "section-0440",
+            "section-0442",
+            "section-0443",
+            "section-0446",
+            "section-0447",
+            "section-0450",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0472",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0488",
+            "section-0495",
+            "section-0499",
+            "section-0503",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0513",
+            "section-0516",
+            "section-0519",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0551",
+            "section-0552",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0571",
+            "section-0574",
+            "section-0575",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-a1d1b54a4df89564bd62712d:workpaper:extract",
+          "request_hash": "eec6c5e2d7105ff2ab85d250262485c11c28345323ba571ff13b6010e67b8397",
+          "response_hash": "d87b92b497077d7ec79070c0630c6c8ff5661a5c6a93c1b6baa1e51898af079d",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 18371,
+            "output_tokens": 3339,
+            "total_tokens": 21710
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0002",
+            "section-0018",
+            "section-0044",
+            "section-0048",
+            "section-0075"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            25,
+            26,
+            27,
+            28,
+            43,
+            44,
+            45,
+            46,
+            47,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73
+          ]
+        }
+      },
+      "review_status": "completed_with_open_findings",
+      "review_follow_up": {
+        "state": "not_needed",
+        "execution_started": false,
+        "next_purpose": null,
+        "resume_mode": null,
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 0,
+        "original_draft_sha256": "62b413c81ebedf8e70057a8ae5d583ae074321a313830ba955d5b9f3e06e6a4f",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_execution_completed"
+      },
+      "review_calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-6170f3946dfb9b4aea05cc44:workpaper:review",
+          "request_hash": "6c1c8296ae54dc0c527b6320019fe00ceb3c357d709fa2ee76ba9e4ae87cf3d8",
+          "response_hash": "4279f29fef6ee9be351b521f04ea480b7aa1d3c1a58f6105038d9ace7028ac25",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 23050,
+            "output_tokens": 773,
+            "total_tokens": 67127
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0002",
+            "section-0018",
+            "section-0044",
+            "section-0048",
+            "section-0075"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            25,
+            26,
+            27,
+            28,
+            43,
+            44,
+            45,
+            46,
+            47,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-6170f3946dfb9b4aea05cc44:workpaper:repair",
+          "request_hash": "af03de385eba8b8ca0d272342943d394984718b59375222a5b1f517d05ac9a39",
+          "response_hash": "f1875241669b4a7fc80f9a675b526acd8b1336171552a68d4e7e0da5d6b0a793",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 16183,
+            "output_tokens": 891,
+            "total_tokens": 17074
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0002",
+            "section-0018",
+            "section-0044",
+            "section-0048",
+            "section-0075"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            25,
+            26,
+            27,
+            28,
+            43,
+            44,
+            45,
+            46,
+            47,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-6170f3946dfb9b4aea05cc44:workpaper:repair-verify",
+          "request_hash": "365b6c47147151089efaa238aaa892cc7c8847e6f67f06d958b9f263a7d05f35",
+          "response_hash": "fb00debde53c59d73280dc7200ba7adb0af2e0839f9160f9be700e0fe1a57f75",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 19764,
+            "output_tokens": 524,
+            "total_tokens": 26382
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0002",
+            "section-0018",
+            "section-0044",
+            "section-0048",
+            "section-0075"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            25,
+            26,
+            27,
+            28,
+            43,
+            44,
+            45,
+            46,
+            47,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "source-0002",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 0,
+              "end": 5443,
+              "quote": "2.2.1     主要财务数据\n\n                                                       2025    年   12  月    31  日      2024    年   12  月    31  日      2023   年    12  月   31   日\n报告期末数据（人民币百万元）\n资产总额                                                                48,784,674                      43,238,135                     39,872,989\n发放贷款和垫款总额                                                           27,134,834                      24,906,187                     22,614,621\n其中：公司类贷款                                                            15,485,867                      14,144,003                      12,791,116\n          票据贴现                                                       1,952,660                       1,507,921                       1,310,747\n          个人贷款                                                       9,262,676                       8,814,212                       8,059,915\n          境外及其他                                                         381,443                         390,115                         402,491\n发放贷款和垫款净额                                                           26,178,354                      23,977,013                     21,731,766\n金融投资                                                               16,321,315                       13,849,103                      11,213,713\n现金及存放中央银行款项                                                          2,801,985                       2,134,452                       2,922,047\n存放同业和拆出资金                                                            1,005,264                       1,101,723                       1,596,257\n买入返售金融资产                                                             1,564,991                       1,371,571                       1,809,559\n负债总额                                                                45,541,303                      40,140,862                     36,976,122\n吸收存款                                                                32,649,947                      30,305,357                     28,898,468\n其中：公司存款                                                             10,286,009                      10,059,292                     10,477,286\n          个人存款                                                      20,761,096                      18,692,180                     17,109,711\n          境外及其他                                                      1,098,602                       1,035,207                         852,298\n同业存放和拆入资金                                                            6,389,320                       5,031,583                       4,035,787\n卖出回购金融资产款                                                            1,453,842                          615,725                         100,521\n已发行债务证券                                                              3,263,887                       2,678,509                       2,295,921\n归属于母公司股东的权益                                                          3,237,182                       3,090,808                       2,889,248\n资本净额1                                                                4,448,690                       4,112,653                       3,828,171\n   核心一级资本净额1                                                         2,748,493                       2,582,305                       2,394,940\n   其他一级资本净额1                                                            469,775                         499,559                         480,009\n   二级资本净额1                                                           1,230,422                       1,030,789                          953,222\n风险加权资产1                                                             24,812,801                      22,603,866                     22,338,078\n                                                                        2025年                           2024年                           2023年\n年度经营业绩（人民币百万元）\n营业收入                                                                   725,306                         710,555                          694,828\n利息净收入                                                                  569,594                         580,692                          571,750\n手续费及佣金净收入                                                                88,085                          75,567                           80,093\n业务及管理费                                                                 255,131                         244,420                          235,296\n信用减值损失                                                                  127,189                         130,840                         135,707\n税前利润总额                                                                  323,689                         319,201                         307,419\n净利润                                                                     292,003                         282,671                         269,820\n归属于母公司股东的净利润                                                            291,041                         282,083                         269,356\n扣除非经常性损益后归属于母公司                                                         291,366                         281,561                         269,286\n   股东的净利润\n经营活动产生的现金流量净额                                                         2,112,907                      1,353,042                       1,825,282\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                         9"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 0,
+              "end": 3835,
+              "quote": "2.2.2   财务指标\n\n                                                                2025  年                    2024   年                     2023   年\n盈利能力         (%)\n平均总资产回报率                2                                           0.63                        0.68                         0.73\n加权平均净资产收益率                    3                                    10.16                      10.46                        10.91\n扣除非经常性损益后加权平均净资                                                    10.17                      10.44                        10.91\n   产收益率        3\n净利息收益率            4                                                 1.28                        1.42                         1.60\n净利差      5                                                          1.16                        1.27                         1.45\n风险加权资产收益率                  1,6                                      1.18                        1.25                         1.21\n手续费及佣金净收入比营业收入                                                     12.14                      10.63                        11.53\n成本收入比          7                                                   35.18                      34.40                        33.86\n每股数据（人民币元）\n基本每股收益            3                                                 0.78                        0.75                         0.72\n稀释每股收益            3                                                 0.78                        0.75                         0.72\n扣除非经常性损益后基本每股收益                             3                       0.78                        0.75                         0.72\n每股经营活动产生的现金流量净额                                                     6.04                        3.87                         5.22\n                                                 2025   年  12  月   31 日      2024  年   12  月   31 日     2023   年   12  月   31  日\n资产质量(%)\n不良贷款率          8                                                    1.27                        1.30                         1.33\n拨备覆盖率          9                                                 292.55                      299.61                      303.87\n贷款拨备率          10                                                   3.71                        3.88                         4.05\n资本充足情况             (%)\n核心一级资本充足率                  1                                       11.08                      11.42                        10.72\n一级资本充足率              1                                             12.97                      13.63                        12.87\n资本充足率          1                                                   17.93                      18.19                        17.14\n风险加权资产占总资产比率                        1                              50.86                      52.28                        56.02\n总权益对总资产比率                                                           6.65                        7.16                        7.27\n每股数据（人民币元）\n每股净资产          11                                                   7.91                        7.40                         6.88\n\n注：     1、2024   年  1 月  1 日起根据《商业银行资本管理办法》等相关规定计算，2024                                      年  1 月  1 日之前根据《商业银行资\n          本管理办法（试行）》等相关规定计算。\n       2、净利润除以期初和期末资产总额的平均值。\n       3、根据证监会《公开发行证券的公司信息披露编报规则第                                      9 号－净资产收益率和每股收益的计算及披露》（2010\n          年修订）的规定计算。\n       4、利息净收入除以生息资产平均余额。\n       5、生息资产平均收益率减付息负债平均付息率。\n       6、净利润除以期末风险加权资产，风险加权资产根据金融监管总局相关规定计算。\n       7、业务及管理费除以营业收入。\n       8、不良贷款余额（不含应计利息）除以发放贷款和垫款总额（不含应计利息）。\n       9、贷款减值准备余额除以不良贷款余额（不含应计利息），其中贷款减值准备余额包括核算至其他综合收益项\n          下的票据与福费廷的减值准备余额。\n       10、贷款减值准备余额除以发放贷款和垫款总额（不含应计利息），其中贷款减值准备余额包括核算至其他综合\n          收益项下的票据与福费廷的减值准备余额。\n       11、为期末归属于母公司普通股股东的权益（不含其他权益工具）除以期末普通股股本总数。\n\n\n\n\n\n\n\n                                                               10\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 0,
+              "end": 1211,
+              "quote": "3 董事长致辞\n\n    2025年是国家“十四五”规划收官之年，也是农业银行高质量发展取得新进展、\n\n迈出新步伐的一年。2025年，农业银行以习近平新时代中国特色社会主义思想为\n指导，坚持和加强党的全面领导，认真贯彻党中央、国务院各项决策部署，围绕\n防风险、促高质量发展，着力推进管理和服务改革创新，全年目标计划顺利完成，\n\n“十四五”各项任务圆满收官。\n    业务经营保持稳健增长态势，                经营底盘进一步夯实。经营效益稳健向好。净\n利润、营业收入延续“双正增长”态势。其中，净利润2,920亿元，同比增长3.3%；\n\n营业收入7,253亿元，同比增长             2.1%。资产质量保持优良。不良贷款率1.27%，较\n上年末下降3BP。逾期贷款率1.25%，保持可比同业较优水平。逾期贷款率低于不\n良贷款率，资产质量认定标准严格。贷款拨备余额保持万亿元以上，拨备覆盖率\n\n292.55%，保持较强的风险抵补能力。融资总量合理增长。总资产48.8万亿元，其\n中贷款总额27.13万亿元，新增2.23万亿元。金融投资16.3万亿元，新增2.47万亿元。\n存款稳定性不断提升。全口径客户存款余额38.69万亿元，新增3.71万亿元。本外\n\n币存款偏离度0.58%，可比同业最优且唯一连续7个季度低于3%。\n    金融服务乡村振兴更加聚焦扎实。                   县域贷款增速持续高于全行。全力支持乡\n村全面振兴和城乡融合发展，县域贷款余额10.9万亿元，增速11.0%，余额占境内\n\n贷款比重41.0%。连续5年在服务乡村振兴监管考核评估中获评最高等级“优秀”，\n为20家全国性金融机构中唯一一家。重点领域金融服务不断强化。聚焦保障国家\n\n粮食安全、乡村产业、乡村建设和农村改革等重点领域和薄弱环节，不断发挥金\n融强农惠农富农效能。粮食和重要农产品保供相关领域、乡村产业、乡村建设领\n域贷款余额分别为1.21万亿元、2.66万亿元、2.46万亿元，增速20.3%、19.5%、9.6%，\n高于全行11.4、10.6、0.7个百分点。“一县一档案                   ”“一县一策”做好重点帮扶地区\n\n金融服务，160个国家乡村振兴重点帮扶县贷款余额4,800亿元，增速9.9%。服务\n覆盖进一步拓展。向乡镇迁建网点179个，建成惠农服务站1,742个，乡镇服务覆\n\n盖率持续提升。县域手机银行月活客户数1.3亿户。“惠农e贷”余额1.84万亿元，增\n速22.9%，农户金融服务的便捷性和可得性不断提升。\n    服务实体经济力度更大、质效更优。服务稳投资、促消费力度大。聚焦“两\n\n重”“两新”等重点领域，加大融资投放，助力巩固拓展经济回升向好势头。新型政\n\n\n\n\n                                      12"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 1227,
+              "quote": "策性金融工具、技术改造和设备更新、“两重”等清单项目配套融资规模均居可比\n同业前列。大力支持提振消费，积极拓展消费金融场景，含信用卡在内的个人消\n费贷款余额1.45万亿元，增速9.0%。全力支持培育壮大新质生产力。创新金融产\n\n品和服务机制，助力高水平科技自立自强。科技贷款余额4.7万亿元，增速20.1%。\n与全部AIC股权投资试点城市签署合作协议，累计设立27只试点基金。制造业贷\n款余额3.72万亿元，增速14.6%。绿色金融建设稳步推进。深入实施绿色金融战略，\n\n绿色贷款余额5.93万亿元，增速18.7%。发展多元化绿色投融资业务，境内发行660\n亿元绿色金融债，绿色债券投资余额超1,500亿元。普惠金融服务迈上新台阶。普\n惠贷款余额4.35万亿元，新增7,499亿元；普惠型小微企业有贷客户数524万户，新\n\n增66万户，普惠贷款余额、增量以及普惠小微有贷客户数、客户增量均居可比同\n业首位。加大民营经济支持力度，民营企业贷款余额7.57万亿元，新增1.03万亿元；\n有贷客户数823万户，新增78万户,               贷款余额以及有贷客户数均居可比同业首位。\n\n养老金融服务体系日益完善。持续助推养老金融“三大支柱”体系覆盖，实体社保\n卡和电子社保卡用户数分别达2.8亿户、2.1亿户，均居同业首位；养老金受托管理\n规模3,881.34亿元，增速22.6%；个人养老金服务客户数位居行业第一梯队。强化\n\n多层次产业支持，养老产业贷款余额231.6亿元。\n    客户基础与经营发展动能巩固提升。                  客户基础不断夯实。坚持以客户为中心，\n持续建设完善适应新时代客户需求的服务体系，客户服务水平不断提升。个人客\n\n户总量8.96亿户，居同业首位。对公客户超1,300万户。线上金融服务能力增强。\n手机银行月活客户数（MAU）超2.76亿户，保持可比同业领先。持续丰富场景生\n\n态，互联网高频场景数6.5万个。财富管理水平进一步提升。理财产品规模稳定增\n长，年末余额21,513亿元。代销业务延续良好发展态势，代销保险金额保持可比\n同业首位，增速17.9%；代销基金销量增速20.4%。智慧银行建设加快推进。大力\n\n推广人工智能技术，智慧银行重点应用落地见效，数字经营模式更加成熟，客户\n获得感和满意度明显提升。“现场+远程”调查模式减少客户经理现场调查22.5万人\n次，实现业务流程优化。推广网点新面客系统，相关交易柜面业务用时缩短超20%，\n\n客户服务质效不断提高。\n    风险防线更加稳固。          风险管控扎实有效。始终把防风险作为首要任务，有力\n有序有效防范化解各类风险，强化逾期贷款管控，优化政策加大不良处置，持续\n\n巩固资产质量优良态势。将合规管理要求嵌入业务发展全流程，案防合规堤坝持\n\n\n\n                                     13"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "2.2 财务概要"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1238,
+              "quote": "向新质生产力、绿色发展、普惠小微等重点领域和薄弱环节，“五篇大文章”相关贷\n款增速均高于全行贷款平均增速。积极服务高水平对外开放。出台服务稳外资稳外\n贸工作方案，完善跨境金融综合服务体系，加强人民币国际化基础设施建设，积极\n\n支持人民币跨境使用，助力贸易市场多元化和内外贸一体化发展，国际结算业务量\n同比增长    8%。\n    坚持客户至上，在提升客户服务能力中拓展业务发展新空间。始终把客户建设\n\n作为一项基础性、战略性工程来抓，深入推进对公客户扩户提质和个人客户分群分\n层经营，健全完善“数字+模型”驱动的服务模式，持续提升客户精细化、综合化服\n务水平。客群规模不断扩大。个人客户                  8.96亿户，继续保持同业首位，管理个人客\n\n户金融资产     24.7 万亿元，较上年末增加           2.4万亿元；对公客户         1,329 万户，较上年\n末增加   116 万户，增量居可比同业前列。客户服务质效不断提升。以更好满足客户\n金融需求为出发点，丰富扩大存款、信贷、财富管理等产品供给，深化“商行+投行”、\n\n“本币+外币”、“金融+非金融”服务协同，扎实做好消费者权益保护，客户服务更加\n多元、更有温度。专业服务力量不断增强。完善员工培养培训体系，加强“饶才富\n式”客户经理队伍建设，为优化改进客户服务提供有力支撑。全行客户经理总量达\n\n11.9万人，较上年末增加          0.6万人。\n    深化改革创新，在“业技数”深度融合中塑造业务发展新动能。积极拥抱新一轮\n科技革命，深入推进智慧银行建设，持续深化数据赋能和                           AI 应用，推动经营管理\n\n效能向更高层级跃升。科技创新应用底座更加坚实。紧跟人工智能大模型发展动向，\n加快构建数据、技术、模型、生态、安全等“AI+”能力体系，有力支撑                              AI 在信贷、\n\n运营、办公等领域的规模化、普惠化应用。数智化经营打法更加成熟。借助多维数\n据实时分析客户需求、精准匹配产品与服务，以营销触达率和转化率的提升，带动\n客户粘性和价值贡献的提升。基层减负赋能效果更加明显。加快推动高耗能、重复\n\n性工作的自动化、线上化改造，创新推广智慧办贷、便捷用数和集中作业模式，有\n效破解基层痛点难点。\n    强化底线思维，在筑牢风险防控屏障中增厚业务发展安全垫。坚持把风险防控\n\n作为金融工作的永恒主题，坚决守住不发生系统性风险的底线，当好维护金融稳定\n的压舱石。健全全面风险管理体系。始终坚持稳健型风险偏好，不断优化信用、市\n场、国别、科技等各类风险全流程管控机制，将风险管理要求落实到全集团、各条\n\n线，嵌入业务全流程、各环节。加强风险前瞻识别和预研预判。动态调整信贷政策\n\n\n\n                                    16"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.3 财务报表分析"
+          ],
+          "physical_pages": [
+            25
+          ],
+          "source_spans": [
+            {
+              "page": 25,
+              "start": 0,
+              "end": 3003,
+              "quote": "5.3   财务报表分析\n\n\n5.3.1    利润表分析\n\n       2025年，本行实现净利润2,920.03亿元，较上年增加93.32亿元，增长3.3%。\n       利润表主要项目变动表\n\n                                                                                     人民币百万元，百分比除外\n\n                 项目                             2025年                2024年                  增减额                   增长率(%)\n\n利息净收入                                              569,594              580,692                   (11,098)                    -1.9\n手续费及佣金净收入                                            88,085               75,567                    12,518                   16.6\n其他非利息收入                                              67,627               54,296                    13,331                   24.6\n营业收入                                               725,306              710,555                     14,751                     2.1\n减：业务及管理费                                           255,131              244,420                     10,711                     4.4\n     税金及附加                                            7,840                7,548                        292                    3.9\n     信用减值损失                                        127,189              130,840                    (3,651)                    -2.8\n     其他资产减值损失                                             18                  267                    (249)                  -93.3\n     其他业务成本                                           9,866                7,699                     2,167                   28.1\n营业利润                                               325,262              319,781                      5,481                     1.7\n加：营业外收支净额                                           (1,573)                (580)                     (993)                        -\n税前利润                                               323,689              319,201                      4,488                     1.4\n减：所得税费用                                              31,686               36,530                   (4,844)                  -13.3\n净利润                                                292,003              282,671                      9,332                     3.3\n归属于：母公司股东                                          291,041              282,083                      8,958                     3.2\n            少数股东                                        962                   588                       374                  63.6\n\n\n利息净收入\n\n       利息净收入是本行营业收入的最大组成部分，占                                                       2025     年营业收入的                 78.5%。\n2025    年，本行实现利息净收入                             5,695.94      亿元，较上年下降                      110.98     亿元，其中，规\n\n模增长导致利息净收入增加                                440.49     亿元，利率变动导致利息净收入减少                                          551.47     亿\n元。净利息收益率                     1.28%，净利差                1.16%，分别下降                  14  个和       11  个基点，主要是由\n于受      LPR    下调、市场利率低位运行等因素影响，生息资产收益率下降。\n\n\n\n                                                              24\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0013",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.3 财务报表分析"
+          ],
+          "physical_pages": [
+            26
+          ],
+          "source_spans": [
+            {
+              "page": 26,
+              "start": 0,
+              "end": 3690,
+              "quote": "                 下表列示了生息资产与付息负债的平均余额、利息收入和支出、平均收益率和\n        平均付息率。\n\n                                                                              人民币百万元，百分比除外\n                                                          2025    年                                                        2024    年\n           项目                      平均余额                利息收入/               平均收益率/                   平均余额                利息收入/                平均收益率/\n                                                           支出             付息率（%）                                            支出              付息率（%）\n资产\n发放贷款和垫款                            26,163,780              752,296                      2.88        23,926,450               816,608                       3.41\n债券投资           1                   13,892,887              370,798                      2.67        12,041,470               360,219                       2.99\n\n 非重组类债券                            13,508,685              362,866                      2.69        11,657,259               350,578                       3.01\n 重组类债券              2                  384,202                7,932                     2.06            384,211                 9,641                      2.51\n\n存放中央银行款项                             2,609,436               39,816                     1.53          2,490,326                39,345                      1.58\n存拆放同业             3                  1,968,380               38,428                     1.95          2,471,020                59,508                      2.41\n\n总生息资产                              44,634,483           1,201,338                       2.69        40,929,266            1,275,680                        3.12\n减值准备                                 (746,168)                                                        (736,259)\n非生息资产                               1,900,221                                                         1,724,350\n总资产                                45,788,536                                                       41,917,357\n负债\n吸收存款                               30,715,539              412,528                      1.34        28,805,254               469,120                       1.63\n同业存拆放             4                 6,646,093              129,089                      1.94          5,221,861              128,403                       2.46\n其他付息负债                5             3,988,482                90,127                     2.26          3,617,599                97,465                      2.69\n\n总付息负债                              41,350,114              631,744                      1.53        37,644,714               694,988                       1.85\n非付息负债                               1,327,726                                                         1,274,686\n总负债                                42,677,840                                                       38,919,400\n利息净收入                                                      569,594                                                           580,692\n净利差                                                                                     1.16                                                               1.27\n净利息收益率                                                                                  1.28                                                               1.42\n\n   注：1、债券投资包括以公允价值计量且其变动计入其他综合收益的债券投资、以摊余成本计量的债券投资。\n\n          2、重组类债券包括应收财政部款项和特别国债。\n\n          3、存拆放同业主要包括存放同业及其他金融机构款项、拆出资金、买入返售金融资产。\n\n          4、同业存拆放主要包括同业及其他金融机构存放款项、拆入资金、卖出回购金融资产款。\n\n          5、其他付息负债主要包括已发行债务证券和向中央银行借款。\n\n\n\n\n\n\n\n\n\n\n\n                                                                               25"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0015",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.3 财务报表分析"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "source_spans": [
+            {
+              "page": 28,
+              "start": 0,
+              "end": 1803,
+              "quote": "                                                                               人民币百万元，百分比除外\n                                            2025年                                         2024年\n          项目                 平均余额           利息收入         平均收益率           平均余额            利息收入         平均收益率\n                                                           （%）                                           （%）\n公司类贷款                         15,078,811      434,913             2.88    13,975,369        466,683             3.34\n  短期公司类贷款                      4,039,432      114,257             2.83     3,667,634        120,325             3.28\n  中长期公司类贷款                    11,039,379      320,656             2.90    10,307,735        346,358             3.36\n票据贴现                           1,624,835       14,306             0.88     1,033,104         12,209             1.18\n个人贷款                           9,078,970      287,845             3.17     8,509,179        318,588             3.74\n境外及其他                            381,164       15,232             4.00       408,798         19,128             4.68\n发放贷款和垫款总额                     26,163,780      752,296             2.88   23,926,450         816,608             3.41\n\n\n    债券投资利息收入\n\n          债券投资利息收入为本行利息收入的第二大组成部分。2025年，本行债券投资\n\n    利息收入3,707.98亿元，较上年增加105.79亿元，主要是由于债券投资规模增加。\n\n    存放中央银行款项利息收入\n\n          存放中央银行款项利息收入                         398.16    亿元，较上年增加4.71亿元，主要是由于\n\n    存放中央银行款项平均余额增加。\n\n    存拆放同业利息收入\n\n          存拆放同业利息收入                   384.28   亿元，较上年减少210.80亿元，主要是由于存拆\n\n    放同业规模和平均收益率下降。\n\n    利息支出\n\n          利息支出6,317.44亿元，较上年减少632.44亿元，主要是由于付息负债付息率\n\n    下降。\n\n    吸收存款利息支出\n\n          吸收存款利息支出4,125.28亿元，较上年减少565.92亿元，主要是由于本行积\n\n    极落实存款利率市场化调整机制，优化存款结构，存款付息率下降。\n\n\n\n\n\n\n\n                                                         27"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0016",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.4 业务综述"
+          ],
+          "physical_pages": [
+            43
+          ],
+          "source_spans": [
+            {
+              "page": 43,
+              "start": 0,
+              "end": 1405,
+              "quote": "5.4业务综述\n\n\n5.4.1公司金融业务\n\n    报告期内，本行聚焦服务现代化产业体系建设，做实做优金融“五篇大文章”，加力\n支持培育新质生产力；充分发挥综合经营优势，加大对国家重大战略、重点领域和薄弱环\n节的金融支持力度；坚持以客户为中心，深化客户分层分群经营，加强科技赋能、智慧营\n\n销，推动公司金融业务高质量发展。截至                      2025 年末，本行境内公司存款余额                102,860.09\n亿元；境内公司类贷款和票据贴现余额合计                       174,385.27亿元，较上年末增加           17,866.03 亿\n\n元。截至     2025年末，本行拥有公司银行客户                1,329.47万户，其中有贷款余额的客户                64.76\n万户，较上年末增加           4.01万户。\n  贯彻落实制造强国战略。聚焦先进制造、产业转型升级、工业绿色发展、产业链供应\n\n   链等领域，强化政策支持和资源保障，优化金融产品和服务模式，助力大规模设备更\n   新、制造业转型升级和高质量发展。截至                       2025 年末，技术改造和设备更新项目签约\n   金额   4,035 亿元，贷款余额        1,730 亿元，余额较上年末增加             1,472亿元；制造业贷款余\n\n   额（按贷款投向）3.72          万亿元，较上年末增加            4,741 亿元，增长      14.6%。\n  服务国家区域发展战略。发挥全渠道、全产品、多牌照优势，加大差异化政策支持力\n   度，全面服务京津冀协同发展、长三角区域一体化发展、粤港澳大湾区、成渝地区双\n\n   城经济圈等国家区域发展战略，2025                  年新增对公贷款        1.09 万亿元。\n  支持民营经济高质量发展。制定提升服务民营企业质效行动方案，强化信贷资源保障，\n   加大对乡村振兴、科技、普惠、绿色转型等重点领域民营经济金融支持力度，支持民\n\n   营企业参与国家发改委投贷联动优质民间投资项目。截至                               2025 年末，民营企业贷款\n   余额   7.57 万亿元，较上年末增加            10,331亿元，增长       15.8%。\n  服务资本市场稳健运行。作为首批获准开展股票回购增持再贷款的银行，构建总分支\n\n   行高效联动机制，聚焦优质上市公司核心需求，靠前服务、源头营销，打造覆盖方案\n   设计到后续管理的全链条服务体系，实现多领域贷款投放，累计投放金额稳居同业第\n   一梯队。\n\n  推进数字化转型。完善智慧化营销管理平台和系列数字化支持工具，进一步提升金融\n   服务现代化产业能力。\n\n  持续深耕以账户服务和支付结算为基础的交易银行体系，推动交易银行业务高质量发\n   展。充分发挥科技赋能作用，从流程设计、外拓获客等维度提升账户服务水平，优化\n                                         42\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0017",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.4 业务综述"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "source_spans": [
+            {
+              "page": 44,
+              "start": 0,
+              "end": 96,
+              "quote": "   对公开户流程，满足客户多样需求。截至                        2025  年末，对公人民币结算账户                1,650.77\n   万户。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0018",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "投资银行业务",
+            "5.4.2 个人金融业务"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "source_spans": [
+            {
+              "page": 45,
+              "start": 102,
+              "end": 1068,
+              "quote": "5.4.2个人金融业务\n\n    本行坚持以高质量发展为主线，一以贯之遵循“一体两翼”发展战略（以客户建设为\n主体，坚定不移推进“大财富管理”和数字化转型），持续深化服务模式转型，着力构建\n精细化、综合化、数智化的个人客户服务体系，努力成为客户首选的主办银行。深化大财\n\n富管理全流程服务，助力增加居民财产性收入。加强个人信贷供给，做优全场景支付体验，\n增强扩内需、促消费服务质效。坚持民生为大，强化重点领域金融资源配置，不断助力实\n现人民对美好生活的向往。\n\n\n客户经营\n\n    本行始终坚持“以客户为中心”的经营理念，通过价值、改革、组织、数智“四轮驱\n动”，持续建设完善适应新时代客户需求的服务体系，进一步提升“金融+非金融”一体\n\n化服务能力。截至         2025年末，本行个人客户总量达             8.96 亿户，保持同业第一。\n  坚持价值驱动。以实现人民对美好生活的向往为出发点和落脚点，推动长辈、乡村、\n   新市民等重点客群服务持续升温。创新推出“农情颐养宝”按月领取型产品组合，举\n\n   办近   6,000场“农情敬老节”线下服务活动。组织全行近                      2 万支乡村振兴服务先锋队\n   进村入户，打通金融服务“最后一公里”。推出“美好生活”系列借记卡产品，拓展\n   新市民互联网金融服务项目覆盖面，开展主题关怀服务月活动，推动新市民服务不断\n\n   升温。\n  坚持改革驱动。践行“一个客户                一家银行”理念，构建分群维护、分层权益、分级\n   管户、综合经营、整合策略的服务体系。系统实施先分群、再分层精细服务策略，差\n\n   异化满足客户需求。全面重构客户星级体系，新版星享服务专区面客，客户权益服务\n   进一步完善。建设“人工+数智”协同管户服务网络，提升全量客户综合服务能力。\n   强化跨条线、多领域系统协同，持续提升响应效率和服务体验。\n\n  坚持组织驱动。持续推进新时代“饶才富式”零售服务队伍建设，分层级、分领域开\n   展专业能力培养。系统构建覆盖专题研究、案例分享和微课学习的知识体系，优化完\n\n\n\n\n\n                                       44"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0020",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "投资银行业务",
+            "5.4.2 个人金融业务"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "source_spans": [
+            {
+              "page": 47,
+              "start": 0,
+              "end": 701,
+              "quote": "   人贷款余额       92,626.76亿元，较上年末增加           4,484.64亿元，同业首家余额突破             9 万亿\n   元。\n  落实稳楼市工作要求，积极适应房地产市场供求关系的变化，支持高质量城市更新行\n\n   动，满足新市民、农民工等客群安居需求，助力巩固房地产市场止跌回稳态势。2025\n   年，个人住房贷款投放            5,473 亿元。\n  紧跟国家提振消费政策，聚焦教育、旅游、文化等消费场景融合与创新，优化金融服\n\n   务措施；支持消费品“以旧换新”工程，开展专项金融服务活动；稳妥有序推进消费贷\n   款财政贴息工作，全方位助力居民消费提振，促进释放消费潜力。截至                                     2025 年末，\n   个人消费类贷款（含信用卡透支）余额                    1.45万亿元，较上年末增加            1,196 亿元。\n\n  积极服务“三农”、普惠和实体经济发展，坚持“城市+县域”双轮驱动，落实小微企业融\n   资协调机制，积极响应小微企业主、个体工商户以及广大农户等客群融资需求。因地\n   制宜、因客制宜优化服务模式，持续完善商户贷、农户贷等拳头产品，加强数字化、\n\n   智能化技术深度应用，提升客户覆盖面和金融服务质效。截至                                2025 年末，个人经营\n   类贷款余额      2.99 万亿元，较上年末增加            4,969亿元。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0021",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            68
+          ],
+          "source_spans": [
+            {
+              "page": 68,
+              "start": 0,
+              "end": 357,
+              "quote": "5.5县域金融业务\n\n5.5.1管理架构和管理机制\n\n    本行通过三农金融事业部所有经营机构，向县域农村客户提供全方位金融服务。该类\n业务统称为县域金融业务，又称三农金融业务。报告期内，本行始终坚守服务“三农”主\n\n责主业，深入贯彻中央推进乡村全面振兴、加快建设农业强国决策部署，紧紧围绕“服务\n乡村振兴领军银行”战略定位，不断优化三农金融事业部运行体制机制，强化科技赋能，\n加强协同创新，持续巩固提升“三农”和县域业务差异化竞争优势。\n管理架构\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                           本行三农金融事业部管理架构图\n\n\n\n\n\n\n\n                                       67"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0022",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            69
+          ],
+          "source_spans": [
+            {
+              "page": 69,
+              "start": 0,
+              "end": 1093,
+              "quote": " 管理机制\n\n  倾斜配置县域业务政策资源。单独制定县域贷款、涉农贷款、脱贫县贷款等信贷计划，\n   倾斜配置信贷规模，优先保障“三农”和县域信贷投放需求。单独配置县域经济资本，\n\n   完善经济资本支持政策，强化“三农”县域FTP优惠和定价支持，引导经营行加大涉\n   农、县域重点领域贷款投放。优先保障“三农”县域资源投入，固定资产、财务费用\n   等资源向服务乡村振兴一线倾斜，全力支持“三农”县域业务高质量发展。\n\n  不断优化“三农”信贷管理机制。出台2025年“三农”信贷政策指引，明确30余项差\n   异化政策。优化乡村振兴重点领域信贷政策，因地制宜完善差异化区域信贷政策。对\n   接国家部委发布的重点项目及客户清单，加大乡村振兴重点领域信贷支持力度。优化\n\n   乡村振兴重点业务优先办结及快办机制，完善审查标准，强化AI应用，着力提升“三\n   农”县域信用审查审批效率。\n  积极打造线上线下协同服务渠道。加快推进数字化转型，完善“物理网点+自助设备+\n\n   手机银行+惠农服务站+流动服务车+远程银行”“六位一体”线上线下联动综合服务\n   渠道。持续优化县域网点布局，重点推动网点向乡镇迁建，下沉金融服务重心。升级\n   手机银行“乡村版”，完善特色功能，截至2025年末，手机银行乡村版月活跃客户数\n\n   超5,200万。\n  持续夯实“三农”金融人才基础。加强县域支行领导团队建设，深入实施县域青年英\n   才开发工程，着力培养“饶才富式”客户经理，统筹开展乡村振兴专题培训，持续打\n\n   造多层次、高素质“三农”金融人才队伍。加强“三农”县域员工补充，倾斜配置薪\n   酬资源，强化考核激励与约束机制，引导员工不断提升服务乡村振兴工作质效。\n\n\n5.5.2金融服务乡村全面振兴\n\n服务巩固拓展脱贫攻坚成果\n\n    2025 年是巩固拓展脱贫攻坚成果同乡村振兴有效衔接五年过渡期最后一年，本行聚\n焦脱贫地区和低收入人口，持续优化金融帮扶政策，加大信贷投放，加强产品创新和科技\n\n赋能，助力守牢不发生规模性返贫致贫底线。\n  加大重点地区信贷支持。持续加大对脱贫地区以及国家乡村振兴重点帮扶县、原“三\n   区三州”地区等重点帮扶地区信贷投放力度。倾斜配置资源，实施农户贷款利率优惠、\n\n   商户收单手续费减免等差异化政策。截至                    2025 年末，832    个脱贫县贷款余额         2.53 万\n\n\n\n\n\n                                       68"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0023",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            70
+          ],
+          "source_spans": [
+            {
+              "page": 70,
+              "start": 0,
+              "end": 1517,
+              "quote": "   亿元，较上年末增长           11.0%；160  个国家乡村振兴重点帮扶县贷款余额                    4,800亿元，较\n   上年末增长       9.9%。\n  强化重点人群金融服务。积极推广脱贫人口小额信贷、“富民贷”等特色产品，为广\n\n   大农户特别是脱贫户、边缘易致贫户增收致富提供金融支撑。巩固深化金融助残服务，\n   累计为    5.6 万户残疾人家庭授信           117 亿元。截至      2025 年末，精准帮扶贷款余额              5,808\n   亿元，直接支持脱贫人口              90.2万人，带动      370 余万脱贫人口就业增收；“富民贷”余\n\n   额  1,204亿元，较上年末增长            27.8%。\n  综合帮扶工作成效显著。主动对接地方政府东西部产业转移、项目引进工作安排，2025\n   年为   122 个地方政府东西部协作项目提供配套金融服务，为西部地区引进帮扶项目                                     87\n\n   个、引进资金        4亿元；全年直接采购和帮助销售脱贫地区农副产品                          27.1 亿元；持续开\n   展“金融人才驻县帮镇扶村富民行动”，派往脱贫地区乡村振兴干部超                                     2,000 人。\n\n服务乡村全面振兴\n\n    本行紧紧围绕国家乡村全面振兴战略部署，聚焦粮食安全和重要农产品稳产保供、乡\n村产业、乡村建设、农民增收等乡村振兴重点领域，加快金融产品和服务模式创新，持续\n强化科技赋能，不断拓展农村金融服务广度深度，为推进乡村全面振兴提供高质量金融服\n\n务。\n  持续加大乡村振兴重点领域金融支持力度。加强对耕地保护和质量提升的金融服务，\n\n   加大种业阵型企业金融服务力度，积极支持多元化食物供给，助力守牢粮食安全底线。\n   巩固提升农业产业化龙头企业服务覆盖面，支持乡村特色产业培育壮大，助力现代乡\n   村产业体系建设。发行             400亿元“三农”专项金融债券，支持城乡一体化基础设施等\n\n   涉农领域建设。截至            2025 年末，粮食和重要农产品保供相关领域贷款、乡村产业贷\n   款、乡村建设相关领域贷款余额分别为                     1.21万亿元、2.66     万亿元、2.46     万亿元，较上\n   年末增长      20.3%、19.5%、9.6%。\n\n  全面提升农户金融服务质效。加快产品服务创新，强化科技赋能，大力推广整村推进、\n   批量建档、集中审批、线上化办贷作业模式，形成以“惠农                               e 贷”为主、专项产品为\n   辅的农户贷款产品体系，着力解决农民贷款难问题，全面满足农民生产生活信贷需求。\n\n   截至   2025 年末，“惠农      e 贷”余额    1.84万亿元，较上年末增加            3,416亿元，增长      22.9%。\n  不断增强“三农”产品创新能力。制定年度“三农”金融产品创新工作意见，发挥“总\n   行统筹示范、分行主体创新、基地先行先试”协同作用，不断加大“三农”产品创新力\n\n\n\n                                         69"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0024",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            71
+          ],
+          "source_spans": [
+            {
+              "page": 71,
+              "start": 0,
+              "end": 2046,
+              "quote": "     度，确保“三农”产品覆盖所有乡村振兴重点领域。推出惠农网贷、智慧畜牧贷等产\n     品，进一步提升“三农”县域线上化数字化服务能力水平。截至                                                       2025   年末，全行“三\n     农”产品总数达              236   个。\n\n    深入实施数字乡村工程建设。持续推动“农银惠农云”平台功能迭代优化、一站式涉\n     农场景超市提质扩容，聚焦农业产业、乡村治理、民生服务三大领域，打造智慧粮仓、\n     “党建+信用村”、县域医共体等                             14  类特色应用场景，嵌入结算、信贷等金融服务，\n\n     实现“场景+金融”协同赋能。截至                               2025  年末，“农银惠农云”平台入驻机构                                 36.7  万\n     个，覆盖        2,682   个县（区），服务客户超                       680  万户。\n\n\n5.5.3  财务状况\n\n县域金融业务资产负债主要项目\n\n                                                                                    人民币百万元，百分比除外\n                    项目                               2025   年  12 月   31 日              2024  年   12 月   31 日\n                                                     金额             占比(%)               金额             占比(%)\n发放贷款和垫款总额                                           10,936,160                  -       9,854,954                  -\n贷款减值准备                                               (393,725)                  -       (387,450)                  -\n发放贷款和垫款净额                                           10,542,435              65.5        9,467,504              64.2\n存放系统内款项            1                                 4,218,171              26.2        4,077,192              27.6\n\n其他资产                                                 1,325,480               8.3        1,212,026               8.2\n资产合计                                                16,086,086             100.0      14,756,722              100.0\n吸收存款                                                14,381,965              96.1      13,153,343               95.8\n其他负债                                                   581,567               3.9          581,851               4.2\n负债合计                                                14,963,532             100.0      13,735,194              100.0\n\n注：1、存放系统内款项指县域金融业务分部通过内部资金往来向本行其他分部提供的资金。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                        70"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0025",
+          "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+          "section_path": [
+            "5.5 县域金融业务"
+          ],
+          "physical_pages": [
+            72
+          ],
+          "source_spans": [
+            {
+              "page": 72,
+              "start": 0,
+              "end": 4392,
+              "quote": " 县域金融业务利润表主要项目\n\n                                                                                                               人民币百万元，百分比除外\n                                                          2025    年                    2024    年                 增减额                  增长率(%)\n外部利息收入                                                           314,338                      331,861                (17,523)                      -5.3\n减：外部利息支出                                                         185,143                      201,480                (16,337)                      -8.1\n内部利息收入                1                                          189,511                      181,944                    7,567                      4.2\n\n利息净收入                                                            318,706                      312,325                    6,381                      2.0\n手续费及佣金净收入                                                          31,724                       30,747                     977                      3.2\n其他非利息收入                                                              9,239                        6,146                  3,093                    50.3\n营业收入                                                             359,669                      349,218                  10,451                       3.0\n减：业务及管理费                                                         122,956                      117,137                    5,819                      5.0\n       税金及附加                                                         2,646                        2,514                    132                      5.3\n       信用减值损失                                                      45,200                       43,201                   1,999                      4.6\n       其他资产减值损失                                                          23                         134                  (111)                   -82.8\n       其他业务成本                                                             4                             1                      3                 300.0\n营业利润                                                             188,840                      186,231                    2,609                      1.4\n营业外收支净额                                                              (584)                        (292)                  (292)                         -\n税前利润总额                                                           188,256                      185,939                    2,317                      1.2\n\n 注：1、内部利息收入是指县域金融业务分部向本行其他分部提供的资金通过转移计价所取得的收入。本行内部资金转\n       移计价利率基于市场利率确定。\n\n 县域金融业务主要财务指标\n\n                                                                                                                                           单位：%\n\n 项目                                                                                              2025    年                          2024    年\n 贷款平均收益率                                                                                                        3.00                               3.54\n 存款平均付息率                                                                                                        1.28                               1.54\n 手续费及佣金净收入占营业收入比例                                                                                               8.82                               8.80\n 成本收入比                                                                                                         34.19                             33.54\n 项目                                                                                      2025    年   12   月   31   日        2024    年   12   月   31   日\n 贷存款比例                                                                                                         76.04                             74.92\n 不良贷款率                                                                                                          1.13                               1.21\n 拨备覆盖率                                                                                                       336.21                            338.33\n 贷款拨备率                                                                                                          3.80                               4.10\n\n\n\n\n\n\n\n\n\n\n\n                                                                           71"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0021"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016",
+        "source-0018",
+        "source-0021"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F03",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016",
+        "source-0017"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0018"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0020"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0023",
+        "source-0024"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F09",
+      "element": "revenue_model",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F11",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F12",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F13",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0025"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F15",
+      "element": "scale_and_mix",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0024"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0022"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F17",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F18",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F19",
+      "element": "operations_and_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F20",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009",
+        "source-0018"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F21",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F22",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0022"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F23",
+      "element": "customers_channels_markets",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0024"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F24",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F25",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F27",
+      "element": "operating_drivers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0025"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F28",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005",
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F29",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F30",
+      "element": "material_changes",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F31",
+      "element": "position",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013",
+        "source-0012"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F32",
+      "element": "upstream_inputs",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F33",
+      "element": "downstream_customers",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0015",
+        "source-0020",
+        "source-0021"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F34",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "fact_id": "F35",
+      "element": "company_features",
+      "state": "superseded",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": null,
+      "prior_state": "pending",
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0021"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "本行通过三农金融事业部所有经营机构向县域农村客户提供全方位金融服务，该类业务统称为县域金融业务，又称三农金融业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0021"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0016",
+        "source-0018",
+        "source-0021"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "本行业务分为公司金融业务、个人金融业务与县域金融业务等板块；公司金融涵盖公司存贷款、票据贴现与交易银行等服务，个人金融以客户建设为主体推进大财富管理与数字化转型。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0016",
+          "source-0018",
+          "source-0021"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F03",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0016",
+        "source-0017"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "公司金融业务方面，本行持续深耕以账户服务和支付结算为基础的交易银行体系，截至2025年末对公人民币结算账户1,650.77万户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0016",
+          "source-0017"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0018"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "个人金融业务遵循“一体两翼”发展战略，以客户建设为主体，推进“大财富管理”和数字化转型，构建精细化、综合化、数智化的个人客户服务体系。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0018"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0020"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "个人贷款产品包括个人住房贷款、个人消费类贷款（含信用卡透支）以及个人经营类贷款（含商户贷、农户贷等），2025年个人住房贷款投放5,473亿元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0020"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0023",
+        "source-0024"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "县域金融方面形成以“惠农e贷”为主、专项产品为辅的农户贷款产品体系，并推出惠农网贷、智慧畜牧贷等产品，截至2025年末全行“三农”产品总数达236个。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0023",
+          "source-0024"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F07",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "2025年本行实现营业收入725,306百万元，其中利息净收入569,594百万元，占营业收入的78.5%，为营业收入的最大组成部分。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "2025年本行手续费及佣金净收入88,085百万元，较上年增长16.6%；其他非利息收入67,627百万元，较上年增长24.6%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F09",
+      "element": "revenue_model",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "2025年本行实现净利润292,003百万元，较上年增加9,332百万元，增长3.3%；归属于母公司股东的净利润291,041百万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F11",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "截至2025年末，本行资产总额48,784,674百万元，发放贷款和垫款总额27,134,834百万元，吸收存款32,649,947百万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F12",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F12",
+        "text": "截至2025年末，发放贷款和垫款总额中，公司类贷款15,485,867百万元，票据贴现1,952,660百万元，个人贷款9,262,676百万元，境外及其他381,443百万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F13",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F13",
+        "text": "截至2025年末，吸收存款中，公司存款10,286,009百万元，个人存款20,761,096百万元，境外及其他1,098,602百万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0025"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "县域金融业务2025年实现营业收入359,669百万元，较上年增长3.0%；营业利润188,840百万元，税前利润总额188,256百万元。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0025"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F15",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0024"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "截至2025年末，县域金融业务资产合计16,086,086百万元，其中发放贷款和垫款净额10,542,435百万元（占比65.5%）；负债合计14,963,532百万元，其中吸收存款14,381,965百万元（占比96.1%）。",
+        "subject_scope": "business_segment",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0024"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "review-add:R03",
+      "element": "scale_and_mix",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0025"
+      ],
+      "fact": {
+        "fact_id": "review-add:R03",
+        "text": "县域金融业务2025年营业收入359,669百万元，其中利息净收入318,706百万元、手续费及佣金净收入31,724百万元、其他非利息收入9,239百万元。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0025"
+        ],
+        "metrics": [
+          {
+            "name": "县域金融业务利息净收入",
+            "raw_value": "318,706",
+            "value": "318706",
+            "unit": "人民币百万元",
+            "source_unit": "人民币百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "县域金融业务手续费及佣金净收入",
+            "raw_value": "31,724",
+            "value": "31724",
+            "unit": "人民币百万元",
+            "source_unit": "人民币百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "县域金融业务其他非利息收入",
+            "raw_value": "9,239",
+            "value": "9239",
+            "unit": "人民币百万元",
+            "source_unit": "人民币百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "review-add:R04",
+      "element": "scale_and_mix",
+      "state": "limited",
+      "label": "保真限用／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final",
+      "reasons": [
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0025"
+      ],
+      "fact": {
+        "fact_id": "review-add:R04",
+        "text": "县域金融业务2025年外部利息收入314,338百万元，外部利息支出185,143百万元，内部利息收入189,511百万元；内部利息收入为县域金融业务分部向本行其他分部提供资金通过转移计价取得的收入，非外部客户收入。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0025"
+        ],
+        "metrics": [
+          {
+            "name": "县域金融业务外部利息收入",
+            "raw_value": "314,338",
+            "value": "314338",
+            "unit": "人民币百万元",
+            "source_unit": "人民币百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "县域金融业务外部利息支出",
+            "raw_value": "185,143",
+            "value": "185143",
+            "unit": "人民币百万元",
+            "source_unit": "人民币百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "县域金融业务内部利息收入",
+            "raw_value": "189,511",
+            "value": "189511",
+            "unit": "人民币百万元",
+            "source_unit": "人民币百万元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "内部利息收入为分部间转移计价收入，非外部客户收入。"
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0022"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "本行构建“物理网点+自助设备+手机银行+惠农服务站+流动服务车+远程银行”六位一体线上线下联动综合服务渠道，并持续推动县域网点向乡镇迁建。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0022"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F17",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "本行主要资金来源为吸收存款，2025年吸收存款平均余额30,715,539百万元，平均付息率1.34%；总付息负债平均余额41,350,114百万元，平均付息率1.53%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F18",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "本行生息资产以发放贷款和垫款及债券投资为主，2025年发放贷款和垫款平均余额26,163,780百万元，平均收益率2.88%；债券投资平均余额13,892,887百万元，平均收益率2.67%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F19",
+      "element": "operations_and_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "本行推进智慧银行建设，加快构建数据、技术、模型、生态、安全等“AI+”能力体系，支撑AI在信贷、运营、办公等领域的规模化应用。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F20",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009",
+        "source-0018"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "截至2025年末，本行个人客户总量8.96亿户，保持同业第一；对公客户1,329万户，较上年末增加116万户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0009",
+          "source-0018"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F21",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "截至2025年末，本行拥有公司银行客户1,329.47万户，其中有贷款余额的客户64.76万户，较上年末增加4.01万户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0016"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F22",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0006",
+        "source-0022"
+      ],
+      "fact": {
+        "fact_id": "F22",
+        "text": "截至2025年末，本行手机银行月活客户数（MAU）超2.76亿户，互联网高频场景数6.5万个；县域手机银行月活客户数1.3亿户，手机银行乡村版月活跃客户数超5,200万。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0006",
+          "source-0022"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F23",
+      "element": "customers_channels_markets",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0024"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "本行服务渠道覆盖城乡，通过县域金融业务向县域农村客户提供金融服务，截至2025年末“农银惠农云”平台入驻机构36.7万个，覆盖2,682个县（区），服务客户超680万户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0024"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F24",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "2025年本行净利息收益率1.28%，净利差1.16%，分别下降14个和11个基点，主要是由于受LPR下调、市场利率低位运行等因素影响，生息资产收益率下降。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F25",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F25",
+        "text": "2025年本行成本收入比35.18%，手续费及佣金净收入比营业收入12.14%，平均总资产回报率0.63%，加权平均净资产收益率10.16%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F27",
+      "element": "operating_drivers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0025"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "县域金融业务2025年贷款平均收益率3.00%，存款平均付息率1.28%，不良贷款率1.13%，拨备覆盖率336.21%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0025"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F28",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F28",
+        "text": "2025年本行营业收入725,306百万元，较上年增长2.1%；净利润292,003百万元，较上年增长3.3%，延续“双正增长”态势。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005",
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F30",
+      "element": "material_changes",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F30",
+        "text": "2025年本行手续费及佣金净收入较上年增长16.6%，其他非利息收入较上年增长24.6%，非利息收入占比有所提升。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F31",
+      "element": "position",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "F31",
+        "text": "本行为商业银行，通过吸收存款获取资金，运用发放贷款和垫款、债券投资等生息资产获取利息收入，并通过手续费及佣金等中间业务获取非利息收入。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013",
+          "source-0012"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F32",
+      "element": "upstream_inputs",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0013"
+      ],
+      "fact": {
+        "fact_id": "F32",
+        "text": "本行主要资金来源为吸收存款，2025年吸收存款平均余额30,715,539百万元，占总付息负债平均余额的较大比重；同业存拆放平均余额6,646,093百万元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F33",
+      "element": "downstream_customers",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0015",
+        "source-0020",
+        "source-0021"
+      ],
+      "fact": {
+        "fact_id": "F33",
+        "text": "本行贷款投向覆盖公司类贷款（含短期和中长期）、票据贴现、个人贷款（含住房、消费、经营）以及境外及其他，服务对象包括公司客户、个人客户及县域农村客户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0015",
+          "source-0020",
+          "source-0021"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F34",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F34",
+        "text": "本行以服务“三农”为主责主业，县域金融业务为特色经营板块，2025年末县域贷款余额10.9万亿元，增速11.0%，余额占境内贷款比重41.0%，连续5年在服务乡村振兴监管考核评估中获评最高等级“优秀”。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "fact_id": "F35",
+      "element": "company_features",
+      "state": "reviewed",
+      "label": "已核（研究用途，非正式接受）／模型源核",
+      "review_basis": "model_source_check",
+      "model_review_stage": "initial",
+      "reasons": [],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F35",
+        "text": "本行个人客户总量8.96亿户、对公客户超1,300万户，客户基础规模居同业前列；2025年末管理个人客户金融资产24.7万亿元，较上年末增加2.4万亿元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "business_structure",
+      "status": "observed",
+      "reasons": [
+        "未逐一展开投资银行、理财、资产托管、金融科技等细分业务条目的组织与收入结构。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未获取各细分产品（如具体理财、保险代销、投行等）的独立收入贡献明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取按业务条线（公司金融、个人金融、县域金融等）划分的营业收入构成明细。",
+        "事实F10已隔离，未作为结论采用：narrative number is absent from cited source: 55,147百万元"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "未获取按公司金融、个人金融等业务板块划分的营业收入及利润贡献明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取物理网点总数、员工总数等详细运营资源数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取按地区（境内/境外）划分的营业收入或客户结构明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未获取净息差变动的完整归因分析（如资产结构、定价策略等细分因素）。",
+        "事实F26已隔离，未作为结论采用：narrative number is absent from cited source: 0.03个百分点"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取2025年重大收购、处置或组织结构调整等事件的完整披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取存款按客户类型（公司/个人/县域）的完整平均余额与付息率明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取按行业或客户类型划分的贷款余额明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-a1d1b54a4df89564bd62712d",
+      "active": false,
+      "superseded_by_review_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "element": "company_features",
+      "status": "observed",
+      "reasons": [
+        "未获取县域金融业务以外的其他特色板块（如绿色金融、普惠金融）的独立财务贡献明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "superseded_by_review"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "business_structure",
+      "status": "observed",
+      "reasons": [
+        "未逐一展开投资银行、理财、资产托管、金融科技等细分业务条目的组织与收入结构。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "未获取各细分产品（如具体理财、保险代销、投行等）的独立收入贡献明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "未获取按业务条线（公司金融、个人金融、县域金融等）划分的营业收入构成明细。",
+        "事实F10已隔离，未作为结论采用：narrative number is absent from cited source: 55,147百万元"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "未获取按公司金融、个人金融等业务板块划分的营业收入及利润贡献明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取物理网点总数、员工总数等详细运营资源数据。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未获取按地区（境内/境外）划分的营业收入或客户结构明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "未获取净息差变动的完整归因分析（如资产结构、定价策略等细分因素）。",
+        "事实F26已隔离，未作为结论采用：narrative number is absent from cited source: 0.03个百分点"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未获取2025年重大收购、处置或组织结构调整等事件的完整披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "未获取存款按客户类型（公司/个人/县域）的完整平均余额与付息率明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未获取按行业或客户类型划分的贷款余额明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "active": true,
+      "element": "company_features",
+      "status": "observed",
+      "reasons": [
+        "未获取县域金融业务以外的其他特色板块（如绿色金融、普惠金融）的独立财务贡献明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}
