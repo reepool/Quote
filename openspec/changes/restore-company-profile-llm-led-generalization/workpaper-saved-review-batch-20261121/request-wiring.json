@@ -1,0 +1,98 @@
+[
+  {
+    "sequence": 1,
+    "host": "scorpio.reepool.com",
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 241052,
+    "payload_sha256": "4223636ce1462eefacd91483348961778a0d505bf220abd40b68dca4fa379899",
+    "output_limits": {
+      "max_completion_tokens": 16384
+    },
+    "state": "returned",
+    "headers_or_private_material_recorded": false,
+    "status_code": 200,
+    "seconds": 287.069
+  },
+  {
+    "sequence": 2,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 214035,
+    "payload_sha256": "23c7d9510be8207f35e1b9efbaea00fb0dd741143f9f27bfc9750b5ce5ea8123",
+    "output_limits": {
+      "max_tokens": 16384
+    },
+    "state": "returned",
+    "headers_or_private_material_recorded": false,
+    "status_code": 200,
+    "seconds": 3.083
+  },
+  {
+    "sequence": 3,
+    "host": "scorpio.reepool.com",
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 210109,
+    "payload_sha256": "89327fef95d2e2032e6f69b53a8fb3d4ad655e3523763f36e9688fb4436e1311",
+    "output_limits": {
+      "max_completion_tokens": 16384
+    },
+    "state": "returned",
+    "headers_or_private_material_recorded": false,
+    "status_code": 200,
+    "seconds": 109.536
+  },
+  {
+    "sequence": 4,
+    "host": "scorpio.reepool.com",
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 66220,
+    "payload_sha256": "03e1cc3415e021ea0a5a203efb10e6b950622bdf47b0cde0c17c6a000c6129a8",
+    "output_limits": {
+      "max_completion_tokens": 16384
+    },
+    "state": "returned",
+    "headers_or_private_material_recorded": false,
+    "status_code": 200,
+    "seconds": 388.872
+  },
+  {
+    "sequence": 5,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 40969,
+    "payload_sha256": "9f28dae2b2b45f35abad19bb8caa51c99aa6e6415ffced853636cb3b33546dae",
+    "output_limits": {
+      "max_tokens": 16384
+    },
+    "state": "returned",
+    "headers_or_private_material_recorded": false,
+    "status_code": 200,
+    "seconds": 3.291
+  },
+  {
+    "sequence": 6,
+    "host": "scorpio.reepool.com",
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 40365,
+    "payload_sha256": "6b3674178290ec421021ccabbf1a1923c35595c54b82381c42dd2446b1a09f62",
+    "output_limits": {
+      "max_completion_tokens": 16384
+    },
+    "state": "returned",
+    "headers_or_private_material_recorded": false,
+    "status_code": 200,
+    "seconds": 58.847
+  }
+]

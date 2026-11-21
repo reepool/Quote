@@ -1,0 +1,23 @@
+{
+  "task": "6.EM execution",
+  "target": "/home/python/Quote/data/QuoteBak/company-profile-6em-run-ZP8ot6MZ",
+  "files": 23,
+  "file_bytes": 3331393,
+  "authoritative_evidence_checked_before_removal": true,
+  "removed": [
+    "temporary research database and checkpoints",
+    "captured model-content duplicates already in receipts",
+    "duplicate exports",
+    "inspection and execution scripts",
+    "intermediate change dump"
+  ],
+  "preserved": [
+    "formal PDFs and useful source caches",
+    "all original 18 writer records/current and historic research roots",
+    "new 20-file successor root",
+    "original failures and unique attempt marker",
+    "one current result/API/profile/review/receipt/accounting evidence set",
+    "pre-existing and concurrent worktree changes"
+  ],
+  "target_exists_after": false
+}

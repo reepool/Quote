@@ -1,0 +1,14 @@
+{
+  "task": "6.EM",
+  "status": "authorized",
+  "approval_reference": "2026-11-21 user: 批准，给予授权; preceding complete 6.EM two-report bounded review card and consolidated question",
+  "instruments": ["002027.SZ", "601111.SH"],
+  "allowed_purposes": ["review_profile_workpaper", "repair_profile_workpaper", "verify_profile_workpaper_repair"],
+  "allowed_routes": {"review_and_verify": "scorpio.reepool.com/grok-4.7/high", "repair_only": "official api.deepseek.com/deepseek-flash"},
+  "source_scope": "existing selected public 2025 annual-report sections and public derived drafts of only these two companies",
+  "limits": {"business_seconds": 12600, "conservative_tokens": 2000000, "physical_requests": 12, "recoveries": 6, "recoveries_per_logical": 1, "logical_seconds": 2450, "review_physical_seconds": 1200, "flash_physical_seconds": 600, "priced_cost_cny": "20", "unpriced_cost": "unknown"},
+  "no_extra_window_or_company": true,
+  "no_reselection_or_extraction": true,
+  "no_shared_configuration_change_or_recharge": true,
+  "production_authorization": "not_authorized"
+}

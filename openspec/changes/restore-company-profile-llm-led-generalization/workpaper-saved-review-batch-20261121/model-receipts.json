@@ -1,0 +1,526 @@
+[
+  {
+    "request_id": "bp-work-7c183d820fbfa220e24920bb:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "790bba9b9d892039814986af31acb1428ebf19e4b37b39e0297184543d0418de",
+    "response_hash": "850a78c4cb2d124e490faedaa2d9a2c987d5f67601ebf1bd7c02bfb075e33790",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"FND-MC-02\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-02\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"电梯海报自营小计112.9万个、电梯电视自营小计121.5万台位于2025/12/31列，不是2024年末；2024/12/31列分别为147.0万个、113.0万台。变动幅度列对应2024/12/31至2026/3/31：海报约(106.1-147.0)/147.0=-27.8%，电视约(122.3-113.0)/113.0=8.2%。草稿把2025年末存量写成2024年末，并与上述跨期幅度配对，比较基数和期间均错误。应改用2024/12/31的147.0万个、113.0万台为起点，或将112.9、121.5改标为2025年末并删除不匹配的-27.8%、8.2%。媒体类型指标不得继承公司整体口径，subject_scope应改为business_segment。\"},{\"finding_id\":\"FND-MC-01\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"F-MC-01\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"“公司报告期内业务、产品或服务发生重大变化或调整有关情况”勾选的是不适用，不能单独支持“未发生重大变化或调整”。不适用只是该披露项目的适用标记，不是经济事实上未发生变动。合并范围发生变动并参见第八节的表述有勾选“是”支持，应保留；后半句应改回该项标记为不适用。\"},{\"finding_id\":\"FND-BS-02\",\"element\":\"business_structure\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-BS-02\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"电梯电视自营122.3万台、电梯海报自营106.1万个是媒体类型行，不是公司媒体总量（自营合计228.4万台/个、总计272.9万台/个）。指标名称已保留来源类别，但subject_scope仍标为consolidated_group，属于产品行继承集团口径。应改为business_segment；自营合计与总计维持公司口径时可保留consolidated_group。正文数量与2026-03-31时点本身有依据，只需修正口径标签。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-PS-01\",\"F-PS-02\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-SM-01\",\"F-SM-03\",\"F-SM-04\",\"F-SM-05\",\"F-OI-01\",\"F-OI-02\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-MC-01\",\"F-MC-02\",\"F-SC-01\",\"F-SC-02\",\"F-SC-03\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "FND-MC-02",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "F-MC-02",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "电梯海报自营小计112.9万个、电梯电视自营小计121.5万台位于2025/12/31列，不是2024年末；2024/12/31列分别为147.0万个、113.0万台。变动幅度列对应2024/12/31至2026/3/31：海报约(106.1-147.0)/147.0=-27.8%，电视约(122.3-113.0)/113.0=8.2%。草稿把2025年末存量写成2024年末，并与上述跨期幅度配对，比较基数和期间均错误。应改用2024/12/31的147.0万个、113.0万台为起点，或将112.9、121.5改标为2025年末并删除不匹配的-27.8%、8.2%。媒体类型指标不得继承公司整体口径，subject_scope应改为business_segment。"
+        },
+        {
+          "finding_id": "FND-MC-01",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "F-MC-01",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "“公司报告期内业务、产品或服务发生重大变化或调整有关情况”勾选的是不适用，不能单独支持“未发生重大变化或调整”。不适用只是该披露项目的适用标记，不是经济事实上未发生变动。合并范围发生变动并参见第八节的表述有勾选“是”支持，应保留；后半句应改回该项标记为不适用。"
+        },
+        {
+          "finding_id": "FND-BS-02",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-BS-02",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "电梯电视自营122.3万台、电梯海报自营106.1万个是媒体类型行，不是公司媒体总量（自营合计228.4万台/个、总计272.9万台/个）。指标名称已保留来源类别，但subject_scope仍标为consolidated_group，属于产品行继承集团口径。应改为business_segment；自营合计与总计维持公司口径时可保留consolidated_group。正文数量与2026-03-31时点本身有依据，只需修正口径标签。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-PS-01",
+        "F-PS-02",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-SM-01",
+        "F-SM-03",
+        "F-SM-04",
+        "F-SM-05",
+        "F-OI-01",
+        "F-OI-02",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-MC-01",
+        "F-MC-02",
+        "F-SC-01",
+        "F-SC-02",
+        "F-SC-03"
+      ]
+    },
+    "usage": {
+      "input_tokens": 21698,
+      "output_tokens": 768,
+      "total_tokens": 46866
+    }
+  },
+  {
+    "request_id": "bp-work-7c183d820fbfa220e24920bb:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "46c94ff55b294ddbee72d165f04e3785fcdbb494f97d2fe9c20389ce2900bf3d",
+    "response_hash": "0a79d6475f79aedee80e60fa9f88b836976434deee6bb36b7402b0b34d0b5b5f",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F-MC-02\",\"text\":\"电梯海报媒体自营数量由2024年末147.0万个降至2026年3月末106.1万个，变动幅度-27.8%（以2024/12/31至2026/3/31计）；电梯电视媒体自营数量由2024年末113.0万台增至2026年3月末122.3万台，变动幅度8.2%。\",\"subject_scope\":\"business_segment\",\"period\":\"2024-12-31至2026-03-31\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"电梯海报媒体自营媒体数量变动幅度\",\"raw_value\":\"-27.8\",\"value\":\"-27.8\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2024-12-31至2026-03-31\",\"comparison_basis\":\"2024/12/31至2026/3/31\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电梯电视媒体自营媒体数量变动幅度\",\"raw_value\":\"8.2\",\"value\":\"8.2\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2024-12-31至2026-03-31\",\"comparison_basis\":\"2024/12/31至2026/3/31\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司合并范围发生变动，详见第八节财务报告/九、合并范围的变更；公司报告期内业务、产品或服务发生重大变化或调整有关情况勾选为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F-BS-02\",\"text\":\"公司自营媒体数量合计约228.4万台/个，其中电梯电视媒体自营约122.3万台、电梯海报媒体自营约106.1万个；另有加盟电梯电视媒体8.1万台、参股电梯海报媒体36.4万个，总计约272.9万台/个。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026-03-31\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"自营媒体数量合计\",\"raw_value\":\"228.4\",\"value\":\"228.4\",\"unit\":\"万台/个\",\"source_unit\":\"万台/个\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2026-03-31\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电梯电视媒体自营媒体数量\",\"raw_value\":\"122.3\",\"value\":\"122.3\",\"unit\":\"万台\",\"source_unit\":\"万台\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2026-03-31\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"电梯海报媒体自营媒体数量\",\"raw_value\":\"106.1\",\"value\":\"106.1\",\"unit\":\"万个\",\"source_unit\":\"万个\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2026-03-31\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"媒体数量总计\",\"raw_value\":\"272.9\",\"value\":\"272.9\",\"unit\":\"万台/个\",\"source_unit\":\"万台/个\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2026-03-31\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F-MC-02",
+          "text": "电梯海报媒体自营数量由2024年末147.0万个降至2026年3月末106.1万个，变动幅度-27.8%（以2024/12/31至2026/3/31计）；电梯电视媒体自营数量由2024年末113.0万台增至2026年3月末122.3万台，变动幅度8.2%。",
+          "subject_scope": "business_segment",
+          "period": "2024-12-31至2026-03-31",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "电梯海报媒体自营媒体数量变动幅度",
+              "raw_value": "-27.8",
+              "value": "-27.8",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2024-12-31至2026-03-31",
+              "comparison_basis": "2024/12/31至2026/3/31",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电梯电视媒体自营媒体数量变动幅度",
+              "raw_value": "8.2",
+              "value": "8.2",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2024-12-31至2026-03-31",
+              "comparison_basis": "2024/12/31至2026/3/31",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-MC-01",
+          "text": "报告期内公司合并范围发生变动，详见第八节财务报告/九、合并范围的变更；公司报告期内业务、产品或服务发生重大变化或调整有关情况勾选为不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-BS-02",
+          "text": "公司自营媒体数量合计约228.4万台/个，其中电梯电视媒体自营约122.3万台、电梯海报媒体自营约106.1万个；另有加盟电梯电视媒体8.1万台、参股电梯海报媒体36.4万个，总计约272.9万台/个。",
+          "subject_scope": "consolidated_group",
+          "period": "2026-03-31",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "自营媒体数量合计",
+              "raw_value": "228.4",
+              "value": "228.4",
+              "unit": "万台/个",
+              "source_unit": "万台/个",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2026-03-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电梯电视媒体自营媒体数量",
+              "raw_value": "122.3",
+              "value": "122.3",
+              "unit": "万台",
+              "source_unit": "万台",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2026-03-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电梯海报媒体自营媒体数量",
+              "raw_value": "106.1",
+              "value": "106.1",
+              "unit": "万个",
+              "source_unit": "万个",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2026-03-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "媒体数量总计",
+              "raw_value": "272.9",
+              "value": "272.9",
+              "unit": "万台/个",
+              "source_unit": "万台/个",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2026-03-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11895,
+      "output_tokens": 844,
+      "total_tokens": 12739
+    }
+  },
+  {
+    "request_id": "bp-work-7c183d820fbfa220e24920bb:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "8c05058eb595e896a58ae78acaea6d64d60136ff6c00283cfa5de3fdcc968688",
+    "response_hash": "2145698090a1efbc7bd8bcffdbb147cc2c49888ba903fb883499ca12a2ee7aeb",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-MC-02\",\"F-MC-01\",\"F-BS-02\"],\"checks\":[{\"fact_id\":\"F-MC-02\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"source-0002媒体数量表可区分2026/3/31、2025/12/31、2024/12/31及变动幅度列，变动幅度对应2024/12/31至2026/3/31。电梯海报自营小计分别为106.1、112.9、147.0万个，幅度-27.8%，与(106.1-147.0)/147.0一致；电梯电视自营小计分别为122.3、121.5、113.0万台，幅度8.2%，与(122.3-113.0)/113.0一致。候选以2024年末147.0万个、113.0万台为起点、2026年3月末106.1万个、122.3万台为终点并配对上述幅度，期间、比较基数、单位均与来源列一致，未再把2025年末112.9、121.5误作2024年末。媒体类型主体为business_segment，未继承公司整体口径，已解决错期与错口径。\"},{\"fact_id\":\"F-MC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"source-0006对“报告期内合并范围是否发生变动”勾选“是”，并指向第八节财务报告/九、合并范围的变更；对“公司报告期内业务、产品或服务发生重大变化或调整有关情况”勾选“不适用”。候选保留合并范围变动及参见表述，后半句只陈述该项勾选为不适用，没有把适用性标记写成经济上未发生重大变化。报告正文中的公司按合并集团口径，期间为2025年度报告期，与披露项一致。\"},{\"fact_id\":\"F-BS-02\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"source-0002截至2026年3月31日及同页2026/3/31列载明自营合计约228.4万台/个、总计272.9万台/个，电梯电视自营122.3万台、电梯海报自营106.1万个，加盟电梯电视8.1万台、参股电梯海报36.4万个。122.3与106.1之和为228.4，再加8.1与36.4为272.9，分类未混同。候选保留约数限定与时点；指标上将两类自营媒体行标为business_segment，自营合计与总计保持consolidated_group，未让媒体类型行继承集团口径，已解决错主体。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-MC-02",
+        "F-MC-01",
+        "F-BS-02"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-MC-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "source-0002媒体数量表可区分2026/3/31、2025/12/31、2024/12/31及变动幅度列，变动幅度对应2024/12/31至2026/3/31。电梯海报自营小计分别为106.1、112.9、147.0万个，幅度-27.8%，与(106.1-147.0)/147.0一致；电梯电视自营小计分别为122.3、121.5、113.0万台，幅度8.2%，与(122.3-113.0)/113.0一致。候选以2024年末147.0万个、113.0万台为起点、2026年3月末106.1万个、122.3万台为终点并配对上述幅度，期间、比较基数、单位均与来源列一致，未再把2025年末112.9、121.5误作2024年末。媒体类型主体为business_segment，未继承公司整体口径，已解决错期与错口径。"
+        },
+        {
+          "fact_id": "F-MC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "source-0006对“报告期内合并范围是否发生变动”勾选“是”，并指向第八节财务报告/九、合并范围的变更；对“公司报告期内业务、产品或服务发生重大变化或调整有关情况”勾选“不适用”。候选保留合并范围变动及参见表述，后半句只陈述该项勾选为不适用，没有把适用性标记写成经济上未发生重大变化。报告正文中的公司按合并集团口径，期间为2025年度报告期，与披露项一致。"
+        },
+        {
+          "fact_id": "F-BS-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "source-0002截至2026年3月31日及同页2026/3/31列载明自营合计约228.4万台/个、总计272.9万台/个，电梯电视自营122.3万台、电梯海报自营106.1万个，加盟电梯电视8.1万台、参股电梯海报36.4万个。122.3与106.1之和为228.4，再加8.1与36.4为272.9，分类未混同。候选保留约数限定与时点；指标上将两类自营媒体行标为business_segment，自营合计与总计保持consolidated_group，未让媒体类型行继承集团口径，已解决错主体。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 13825,
+      "output_tokens": 628,
+      "total_tokens": 24848
+    }
+  },
+  {
+    "request_id": "bp-work-f486411f7f36b5e068ceefa1:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "90dc1621ac9f5f3dd9952977735904d97d97e6ce29b6fca8afa3d66a5aae33b4",
+    "response_hash": "aa142f297fd82f1854bdfbeeeca5e0ac3e3d04fa35366c82f9ff6f6c9737805a",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"OM-PS-001\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0004\",\"source-0003\"],\"explanation\":\"分产品收入构成除已收录的航空客运154,855,779千元和航空货运及邮运7,778,380千元外，另有源生类别“其他”营业收入8,850,487千元，同比增加18.06%。三行合计等于营业收入171,484,646千元，且“其他”金额高于已写入的货运收入。底稿已有客运、货运、营业收入、主营业务收入1,690.64亿元及其他业务收入24.21亿元，但未收录该“其他”行。24.21亿元属于另一口径的其他业务收入，客运与货运之和也不能替代该构成项。补录时应沿用源表类别及金额，并保留其与营业收入合计的口径，不要改写成来源未列明的精确主体。\"},{\"finding_id\":\"OM-SM-002\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0003\",\"source-0007\"],\"explanation\":\"来源已列明本集团2025年营业成本162,647,280千元，即1,626.47亿元，同比增加44.58亿元、增幅2.82%。底稿已收录营业收入，但未保留这一公司成本总额；它与收入分属不同核算基础。选定章节没有完整成本分项，故仅建议补已支持的总额，不要求补航油、起降等未读明细。\"}],\"reviewed_fact_ids\":[\"F01\",\"F02\",\"F03\",\"F04\",\"F05\",\"F06\",\"F09\",\"F10\",\"F11\",\"F13\",\"F14\",\"F15\",\"F16\",\"F17\",\"F19\",\"F20\",\"F21\",\"F22\",\"F23\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "OM-PS-001",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0004",
+            "source-0003"
+          ],
+          "explanation": "分产品收入构成除已收录的航空客运154,855,779千元和航空货运及邮运7,778,380千元外，另有源生类别“其他”营业收入8,850,487千元，同比增加18.06%。三行合计等于营业收入171,484,646千元，且“其他”金额高于已写入的货运收入。底稿已有客运、货运、营业收入、主营业务收入1,690.64亿元及其他业务收入24.21亿元，但未收录该“其他”行。24.21亿元属于另一口径的其他业务收入，客运与货运之和也不能替代该构成项。补录时应沿用源表类别及金额，并保留其与营业收入合计的口径，不要改写成来源未列明的精确主体。"
+        },
+        {
+          "finding_id": "OM-SM-002",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0003",
+            "source-0007"
+          ],
+          "explanation": "来源已列明本集团2025年营业成本162,647,280千元，即1,626.47亿元，同比增加44.58亿元、增幅2.82%。底稿已收录营业收入，但未保留这一公司成本总额；它与收入分属不同核算基础。选定章节没有完整成本分项，故仅建议补已支持的总额，不要求补航油、起降等未读明细。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F09",
+        "F10",
+        "F11",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23"
+      ]
+    },
+    "usage": {
+      "input_tokens": 16535,
+      "output_tokens": 475,
+      "total_tokens": 48992
+    }
+  },
+  {
+    "request_id": "bp-work-f486411f7f36b5e068ceefa1:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "760f9604cbcd37653fbde83941b4a83ca3dad9b7c4b42fe3d498af3d0a509d02",
+    "response_hash": "7ac07872db2a57b9867c0a7ba55fe0783bb6c2d163573574e9c35515630014dc",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:OM-PS-001\",\"text\":\"主营业务分产品构成中，“其他”类别营业收入为8,850,487千元，营业成本为6,463,938千元，毛利率26.97%，营业收入比上年增加18.06%，营业成本比上年增加14.51%，毛利率比上年增加2.27个百分点；该表合计营业收入171,484,646千元、营业成本162,647,280千元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0003\"],\"metrics\":[{\"name\":\"主营业务分产品—其他—营业收入\",\"raw_value\":\"8,850,487\",\"value\":\"8850487\",\"unit\":\"千元\",\"source_unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"营业收入比上年增/(减)\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品—其他—营业成本\",\"raw_value\":\"6,463,938\",\"value\":\"6463938\",\"unit\":\"千元\",\"source_unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"营业成本比上年增/(减)\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品—其他—毛利率\",\"raw_value\":\"26.97%\",\"value\":\"26.97\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"毛利率比上年增/(减)\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品—其他—营业收入比上年增/(减)\",\"raw_value\":\"18.06%\",\"value\":\"18.06\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"主营业务分产品—其他—营业成本比上年增/(减)\",\"raw_value\":\"14.51%\",\"value\":\"14.51\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"主营业务分产品—其他—毛利率比上年增/(减)\",\"raw_value\":\"2.27个百分点\",\"value\":\"2.27\",\"unit\":\"个百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"主营业务分产品—合计—营业收入\",\"raw_value\":\"171,484,646\",\"value\":\"171484646\",\"unit\":\"千元\",\"source_unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"营业收入比上年增/(减)\",\"uncertainty_reason\":null},{\"name\":\"主营业务分产品—合计—营业成本\",\"raw_value\":\"162,647,280\",\"value\":\"162647280\",\"unit\":\"千元\",\"source_unit\":\"千元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"营业成本比上年增/(减)\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:OM-PS-001",
+          "text": "主营业务分产品构成中，“其他”类别营业收入为8,850,487千元，营业成本为6,463,938千元，毛利率26.97%，营业收入比上年增加18.06%，营业成本比上年增加14.51%，毛利率比上年增加2.27个百分点；该表合计营业收入171,484,646千元、营业成本162,647,280千元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务分产品—其他—营业收入",
+              "raw_value": "8,850,487",
+              "value": "8850487",
+              "unit": "千元",
+              "source_unit": "千元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "营业收入比上年增/(减)",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品—其他—营业成本",
+              "raw_value": "6,463,938",
+              "value": "6463938",
+              "unit": "千元",
+              "source_unit": "千元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "营业成本比上年增/(减)",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品—其他—毛利率",
+              "raw_value": "26.97%",
+              "value": "26.97",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "毛利率比上年增/(减)",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品—其他—营业收入比上年增/(减)",
+              "raw_value": "18.06%",
+              "value": "18.06",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品—其他—营业成本比上年增/(减)",
+              "raw_value": "14.51%",
+              "value": "14.51",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品—其他—毛利率比上年增/(减)",
+              "raw_value": "2.27个百分点",
+              "value": "2.27",
+              "unit": "个百分点",
+              "source_unit": "个百分点",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": null,
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品—合计—营业收入",
+              "raw_value": "171,484,646",
+              "value": "171484646",
+              "unit": "千元",
+              "source_unit": "千元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "营业收入比上年增/(减)",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务分产品—合计—营业成本",
+              "raw_value": "162,647,280",
+              "value": "162647280",
+              "unit": "千元",
+              "source_unit": "千元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "qualifier": "exact",
+              "comparison_basis": "营业成本比上年增/(减)",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 7786,
+      "output_tokens": 777,
+      "total_tokens": 8563
+    }
+  },
+  {
+    "request_id": "bp-work-f486411f7f36b5e068ceefa1:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "d4ae25010a29d7ea1fce503692ccb94d8a1c5f44bee87c1cd9915c2029bef90f",
+    "response_hash": "87d8a0bc5f49fc870c0db3cd86ff2bf7dc2c25af7251807932f6a8b87c88de15",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:OM-PS-001\"],\"checks\":[{\"fact_id\":\"review-add:OM-PS-001\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0003\"],\"explanation\":\"候选按源表分产品行补录“其他”，营业收入8,850,487千元、营业成本6,463,938千元、毛利率26.97%，以及营业收入、营业成本、毛利率同比变动18.06%、14.51%和2.27个百分点，均与source-0004对应列一致；千元及人民币单位由相邻source-0003表头确定。同时保留该表合计营业收入171,484,646千元、营业成本162,647,280千元的口径，未将其改写成其他业务收入24.21亿元或来源未列明的精确主体。产品行主体记为business_segment、期间为2025年度，符合报告期及源表，实质性解决漏录。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:OM-PS-001"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:OM-PS-001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0003"
+          ],
+          "explanation": "候选按源表分产品行补录“其他”，营业收入8,850,487千元、营业成本6,463,938千元、毛利率26.97%，以及营业收入、营业成本、毛利率同比变动18.06%、14.51%和2.27个百分点，均与source-0004对应列一致；千元及人民币单位由相邻source-0003表头确定。同时保留该表合计营业收入171,484,646千元、营业成本162,647,280千元的口径，未将其改写成其他业务收入24.21亿元或来源未列明的精确主体。产品行主体记为business_segment、期间为2025年度，符合报告期及源表，实质性解决漏录。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10155,
+      "output_tokens": 221,
+      "total_tokens": 15361
+    }
+  }
+]

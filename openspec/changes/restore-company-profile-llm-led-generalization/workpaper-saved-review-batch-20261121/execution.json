@@ -1,0 +1,24 @@
+{
+  "action": "review_batch",
+  "state": "completed",
+  "items": [
+    {
+      "instrument_id": "002027.SZ",
+      "request_id": "6-EM-002027-20261121",
+      "state": "completed",
+      "work_id": "bp-work-7c183d820fbfa220e24920bb",
+      "review_status": "completed"
+    },
+    {
+      "instrument_id": "601111.SH",
+      "request_id": "6-EM-601111-20261121",
+      "state": "completed",
+      "work_id": "bp-work-f486411f7f36b5e068ceefa1",
+      "review_status": "completed_with_open_findings"
+    }
+  ],
+  "stop_reason": null,
+  "remaining_request_ids": [],
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

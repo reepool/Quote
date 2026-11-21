@@ -1,0 +1,50 @@
+{
+  "task": "6.EM",
+  "state": "completed",
+  "exception": null,
+  "instruments": [
+    "002027.SZ",
+    "601111.SH"
+  ],
+  "entry_started": true,
+  "preparation_seconds": 32.811,
+  "business_seconds": 916.088,
+  "physical_requests": 6,
+  "charged_tokens": 157369,
+  "fee": "unknown",
+  "recoveries": 0,
+  "logical_requests": 6,
+  "purposes": [
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair",
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "stopped_reason": null,
+  "observations": [
+    {
+      "instrument_id": "002027.SZ",
+      "new_reading_work_ids": [
+        "bp-work-7c183d820fbfa220e24920bb"
+      ],
+      "visible_facts": 22,
+      "review_status": "completed",
+      "review_error": null
+    },
+    {
+      "instrument_id": "601111.SH",
+      "new_reading_work_ids": [
+        "bp-work-f486411f7f36b5e068ceefa1"
+      ],
+      "visible_facts": 18,
+      "review_status": "completed_with_open_findings",
+      "review_error": null
+    }
+  ],
+  "old_runtime_files_unchanged": true,
+  "code_unchanged": true,
+  "shared_config_unchanged": true,
+  "supervision_seconds": 959.178
+}

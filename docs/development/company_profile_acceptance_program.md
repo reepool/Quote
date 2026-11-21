@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-21 6.EM限定两稿真实接续已结束：[结果/限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saved-review-batch-20261121/result.md)。分众3修订终核接受且有限独核，24可读/61指标；国航1新增虽终核接受但独核发现集团合计错标分部及比较列标签错误，整对象仅源参考，17可读/36指标及原限制保留。6物理/0恢复/157369全部已知total、916.088业务秒/费用unknown。两次保存稿后段成功不回算旧S2/首发/95%与99%、不算新增公司或正式准确率；旧方案结束和S3/生产边界保持，无追加窗口或全池重抽。
+
 2026-11-21 6.EL已完成[批量先交/独立复核工程切片](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-deferred-batch-20261121/result.md)，12不同新用例＋132相关旧回归通过，0真实调用/新公司，15稿18writer及原API只读不变。待核稿、源复核状态与正式公司可用/内容质量分列，不改旧S2失败或95%/99%门槛；受控批量暂停/新实例接续/不重复发送不计真实LLM成功、未见或第三组S2。新付费/外传/批次及生产须另有明确有界授权。
 
 2026-11-20 6.EK已按新限定批准完成[顺丰五候选最终再核](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-sf-final-recovery-20261120/result.md)：五项实际接受并有限独核，新增5可读/8指标、当前28/68；原九独核决定保留，其他内容不冒称新全审。1物理/0恢复/17232供应商total及账本、96.205业务秒、费用unknown。原writer独立后继/API保历史且不重复计事实，旧S2失败/95%与99%/S3和生产边界不改；KLN口径补充及可选缺项不追满，不扩公司或续窗。

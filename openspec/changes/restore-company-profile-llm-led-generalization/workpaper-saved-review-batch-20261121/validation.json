@@ -1,0 +1,82 @@
+{
+  "task": "6.EM",
+  "production_code_modified": false,
+  "rows": [
+    {
+      "instrument_id": "002027.SZ",
+      "previous_visible_facts": 22,
+      "visible_facts": 24,
+      "visible_metrics": 61,
+      "states": {
+        "reviewed": 22,
+        "limited": 2
+      },
+      "current_review_status": "completed",
+      "active_gap_count": 7,
+      "suggested_acquisitions": 0,
+      "api_sha256": "8281e254b6ffe2cb5f949ca027fd1c8cc9a2d0dab6ef2071caaeedf48768a3ed"
+    },
+    {
+      "instrument_id": "601111.SH",
+      "previous_visible_facts": 17,
+      "visible_facts": 17,
+      "visible_metrics": 36,
+      "states": {
+        "reviewed": 13,
+        "source_only": 3,
+        "limited": 4
+      },
+      "current_review_status": "completed_with_open_findings",
+      "active_gap_count": 10,
+      "suggested_acquisitions": 1,
+      "api_sha256": "462c4c9c71c0c913a177332d396e99b2c428b6de1213f9f86d9d08f01bfe17d1"
+    }
+  ],
+  "model_final_accepted_objects": 4,
+  "independent_supported": 3,
+  "independent_source_only": 1,
+  "old_restrictions": "not auto-cleared; Focus two changed restricted objects independently rechecked after correction, Air two source-only rows retained unchanged",
+  "successor_root": "/home/python/Quote/data/research/company_profile_batch_reviewed_20261121",
+  "writer_files": 20,
+  "old_18_files_unchanged": true,
+  "old_18_successor_copies_identical": true,
+  "other_13_companies_preserved_by_writer_bytes": true,
+  "no_duplicate_ordinary_facts": true,
+  "query_export_fresh_instance_equal": true,
+  "http_detail_statuses": {
+    "002027.SZ": 200,
+    "601111.SH": 200
+  },
+  "http_catalog_status": 200,
+  "catalog_companies": 15,
+  "catalog_readable_objects": 433,
+  "catalog_readable_metrics": 694,
+  "new_model_requests": 6,
+  "recoveries": 0,
+  "supplier_total_and_conservative_ledger": 157369,
+  "fee": "unknown",
+  "business_seconds": 916.088,
+  "supervision_seconds": 959.178,
+  "original_new_model_workpaper_hash_before_local_use_decisions": {
+    "002027.SZ": "fa124013809f519566b18f235c07584dbdc4e294b4b9aa3d0cf98d9e4c478176",
+    "601111.SH": "ee0389531b788c0192b0648dc7c37ed205c6cb240560d79e72525ba7a17d4f55"
+  },
+  "reused_validation": "workpaper-deferred-batch-20261121/validation.json (same five source/test hashes, 12 distinct new +132 existing cases, not rerun)",
+  "runtime_files_sha256": {
+    "002027.SZ": "c33d1a3980b049145e1f45497e7adf8ee40543b805599b4474d4e876a82d2160",
+    "601111.SH": "7da739f6e8bd368100a7015905a066680a3d97bae501f7c9b401138d20e1c5d0"
+  },
+  "annual_api_sha256": "c1982c8da736f664b4e5e433dc6b014ad96c3cd63acdc94818b6bfe4d1d51ed2",
+  "code_and_shared_configuration_unchanged": true,
+  "review": {
+    "blocking_remaining": 0,
+    "actual_local_correction": "withhold accepted Air object due wrong aggregate scope/comparison metadata; bind three supported Focus revisions",
+    "nonblocking_deferred": [
+      "Air optional cost total and source-only other-row supplement",
+      "supply-chain detail"
+    ],
+    "unrelated": "pre-existing worktree modifications untouched"
+  },
+  "formal_accuracy_and_S2": "not_assessed/old_failures_unchanged",
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,193 @@
+"""Finite independent source decisions and original-owner read verification; no model."""
+import asyncio
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import sys
+import tempfile
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+C = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+D = C / 'workpaper-saved-review-batch-20261121'
+T = Path(__file__).parent
+PREVIOUS = ROOT / 'data/research/company_profile_sf_reviewed_20261120'
+OUTPUT = ROOT / 'data/research/company_profile_batch_reviewed_20261121'
+
+
+def read(path):
+    return json.loads(Path(path).read_text())
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + '\n')
+
+
+def main():
+    from pypdf import PdfReader
+    from fastapi import FastAPI
+    import httpx
+    from api.company_profile_routes import annual_profile_reader, router
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.runtime import CompanyProfileResearchWriter
+    from research.company_profile.workpaper import workpaper_elements, workpaper_fact_hash, render_workpaper
+    from research.company_profile.workpaper_delivery import bind_workpaper_use_review, project_workpaper_delivery
+    from research.company_profile.workpaper_review import workpaper_hash
+
+    summary = read(D / 'summary.json')
+    assert summary['state'] == 'completed' and summary['physical_requests'] == 6 and summary['recoveries'] == 0
+    readiness = read(D / 'readiness.json')
+    reader, prior_reader = CompanyProfileReadService(OUTPUT), CompanyProfileReadService(PREVIOUS)
+    assessments, records, changed_by_company = [], {}, {}
+    original_files = readiness['protected_writer_sha256']
+    original_new_model_hashes = {}
+    reasons = {
+        'F-BS-02': '分众第三节/一、主要业务，物理10：表头为2026/3/31、2025/12/31、2024/12/31和长周期变幅。2026-03-31自营合计228.4、总计272.9万台/个，电视122.3万台、海报106.1万个；两媒体行改business_segment，总量保集团，时点/约数原句保留。按来源显示精度使用，不作精确盘点。',
+        'F-MC-01': '分众第三节/主营业务分析相关披露，物理16：合并范围是否变动勾是并指第八节，重大业务/产品/服务变化项目勾不适用。候选仅保勾选状态，不再断言经济上无重大变化；2025报告期正确。',
+        'F-MC-02': '分众第三节/一、主要业务，物理10：2024-12-31电视113.0万台/海报147.0万个，2026-03-31电视122.3/海报106.1，原表变幅8.2%/-27.8%；121.5与112.9在2025-12-31列。候选已更正起点/期间和媒体行范围，按原表显示精度使用。',
+        'review-add:OM-PS-001': '国航第三章/五、主要经营情况/主营业务分析，物理16：其他行8850487/6463938千元、26.97%及18.06%/14.51%/2.27个百分点有据；但同对象把合计171484646收入与162647280成本标business_segment，而本页利润表及本集团收入原文为集团口径。金额/毛利率的comparison_basis又错挂各同比列名。模型终核接受不能解除该结构错误；整条仅源参考，不手工拆取正确其他行或再次付费修订。',
+    }
+    for observed, plan, item in zip(summary['observations'], readiness['plans'], readiness['items']):
+        instrument, code = plan['instrument_id'], plan['instrument_id'][:6]
+        work_id, = observed['new_reading_work_ids']
+        record = reader._latest_by_instrument(work_id=work_id)[instrument]
+        parent = prior_reader._latest_by_instrument(work_id=plan['reading_work_id'])[instrument]
+        paper = record.workpaper
+        facts = {f.fact_id: f for g in workpaper_elements(paper).values() for f in g.facts}
+        old = {f.fact_id: f for g in workpaper_elements(parent.workpaper).values() for f in g.facts}
+        changed = {fid for fid, fact in facts.items() if fid not in old or workpaper_fact_hash(fact) != workpaper_fact_hash(old[fid])}
+        expected = {'F-BS-02', 'F-MC-01', 'F-MC-02'} if code == '002027' else {'review-add:OM-PS-001'}
+        assert changed == expected and set(old) <= set(facts)
+        assert all(facts[fid] == old[fid] for fid in old if fid not in changed)
+        source = read(ROOT / item['source_binding_json'])
+        assert sha(source['asset']['archive_path']) == paper.report.document_version
+        pdf = PdfReader(source['asset']['archive_path'])
+        page_numbers = (10, 16) if code == '002027' else (16,)
+        texts = {n: pdf.pages[n - 1].extract_text() for n in page_numbers}
+        assert all(texts.values())
+        decisions = {d.fact_id: d.model_dump(mode='json') for d in paper.use_review.decisions}
+        prior_decisions = {d.fact_id: d for d in parent.workpaper.use_review.decisions}
+        inherited_checked = []
+        for fid, decision in prior_decisions.items():
+            if decision.disposition == 'source_checked' and fid not in changed:
+                assert workpaper_fact_hash(facts[fid]) == decision.fact_sha256
+                assert decisions[fid]['disposition'] == 'source_checked'
+                inherited_checked.append(fid)
+        actual = []
+        for fid in sorted(changed):
+            fact = facts[fid]
+            disposition = 'source_checked' if code == '002027' else 'source_only'
+            decision = {'fact_id': fid, 'fact_sha256': workpaper_fact_hash(fact), 'disposition': disposition,
+                'evidence_ids': list(fact.evidence_ids), 'reason': reasons[fid],
+                'limitation': ('原文约数/显示精度和2026-03-31时点保留，不当2025年末或额外精确值。' if fid == 'F-BS-02'
+                    else '合计主体/比较列标签有误，整对象退出普通正文和精确指标；原文和模型结果保留。' if code == '601111' else None)}
+            actual.append({**decision, 'model_final_accepted': True,
+                'prior_disposition': prior_decisions[fid].disposition if fid in prior_decisions else None,
+                'new_independent_decision_not_model_override': True})
+            decisions[fid] = decision
+        # Original restricted Air China rows were NOT revised or independently reapproved.
+        if code == '601111':
+            assert decisions['F02']['disposition'] == decisions['F03']['disposition'] == 'source_only'
+        assessments.append({'instrument_id': instrument, 'report': paper.report.model_dump(mode='json'),
+            'physical_pages_read': list(page_numbers), 'method': 'independent reading of original PDF headings/date columns/rows/applicability marks; compare actual changed objects',
+            'original_pages_text_sha256': {str(n): hashlib.sha256(text.encode()).hexdigest() for n, text in texts.items()},
+            'decisions': actual, 'unchanged_prior_source_checked': inherited_checked,
+            'scope': 'only actual four changed/new objects; unchanged prior decisions are hash inheritance, not a fresh whole-profile audit'})
+        records[instrument] = (record, list(decisions.values()))
+        changed_by_company[instrument] = sorted(changed)
+        original_new_model_hashes[instrument] = workpaper_hash(paper)
+    dump(D / 'independent-review.json', {'task': '6.EM', 'model_final_accepted_objects': 4,
+        'independently_supported_changes': 3, 'new_source_only_objects': 1, 'items': assessments,
+        'does_not_measure_whole_profile_accuracy': True})
+    writer = CompanyProfileResearchWriter(OUTPUT)
+    for instrument, (record, decisions) in records.items():
+        bound = bind_workpaper_use_review(record.workpaper, {'report': record.report.model_dump(mode='json'),
+            'reviewer': 'Codex finite independent original-source assessment; valid old decisions retained by hash',
+            'reference': str((D / 'independent-review.json').relative_to(ROOT)),
+            'reference_sha256': sha(D / 'independent-review.json'), 'decisions': decisions})
+        assert bound.quality_review == record.workpaper.quality_review and bound.generation == record.workpaper.generation
+        writer.persist(record.model_copy(update={'workpaper': bound}))
+        dump(D / (instrument[:6] + '-runtime.json'), record.model_copy(update={'workpaper': bound}).model_dump(mode='json'))
+        (D / (instrument[:6] + '-profile.md')).write_text(render_workpaper(bound, delivery=project_workpaper_delivery(bound)))
+    reader = CompanyProfileReadService(OUTPUT)
+    apis = [reader.research_profile(code) for code in summary['instruments']]
+    dump(D / 'annual-api.json', {'profiles': apis})
+    rows = []
+    for api, plan in zip(apis, readiness['plans']):
+        instrument = api['instrument_id']
+        visible = [r for r in api['facts'] if r['fact'] is not None]
+        assert all(row['fact'] is None for row in api['facts'] if row['reading_work_id'] == plan['reading_work_id'])
+        assert len({r['fact']['fact_id'] for r in visible}) == len(visible)
+        if instrument == '601111.SH':
+            assert 'review-add:OM-PS-001' not in {r['fact']['fact_id'] for r in visible}
+        else:
+            assert {'F-MC-01', 'F-MC-02', 'F-BS-02'} <= {r['fact']['fact_id'] for r in visible}
+        previous = prior_reader.research_profile(instrument)
+        rows.append({'instrument_id': instrument, 'previous_visible_facts': sum(r['fact'] is not None for r in previous['facts']),
+            'visible_facts': len(visible), 'visible_metrics': sum(len(r['fact']['metrics']) for r in visible),
+            'states': dict(Counter(r['state'] for r in api['facts'] if r['state'] != 'superseded')),
+            'current_review_status': api['readings'][-1]['review_status'],
+            'active_gap_count': sum(g.get('active', True) for g in api['information_gaps']),
+            'suggested_acquisitions': sum(s.get('active', True) for s in api['suggested_acquisitions']),
+            'api_sha256': hashlib.sha256(json.dumps(api, ensure_ascii=False, sort_keys=True).encode()).hexdigest()})
+    export_root = Path(tempfile.mkdtemp(prefix='export-verified-', dir=T)) / 'files'
+    exported = reader.export(summary['instruments'], export_root)
+    assert exported['profiles'] == reader.query(summary['instruments'])['profiles']
+    assert read(export_root / 'annual_profiles.json')['profiles'] == apis
+    assert [CompanyProfileReadService(OUTPUT).research_profile(i) for i in summary['instruments']] == apis
+    print('QUERY_EXPORT_FRESH_INSTANCE_PASSED', flush=True)
+    app = FastAPI()
+    app.include_router(router, prefix='/api/v1')
+    app.dependency_overrides[annual_profile_reader] = lambda: reader
+
+    async def http_checks():
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://local-test') as client:
+            statuses = {}
+            for api in apis:
+                instrument = api['instrument_id']
+                response = await client.get('/api/v1/research/company/' + instrument + '/annual-profile')
+                assert response.status_code == 200 and response.json() == api
+                statuses[instrument] = response.status_code
+            response = await client.get('/api/v1/research/company/annual-profiles')
+            assert response.status_code == 200 and response.json()['total'] == 15
+            return statuses, response.json()
+
+    statuses, catalog = asyncio.run(http_checks())
+    assert all(sha(ROOT / p) == h for p, h in original_files.items())
+    assert all(sha(OUTPUT / Path(p).relative_to('data/research/company_profile_sf_reviewed_20261120')) == h for p, h in original_files.items())
+    assert len(list((OUTPUT / 'company_profile_common_core.v1').glob('*.json'))) == 20
+    authorized = read(D / 'authorization.json')
+    assert all(sha(ROOT / p) == h for p, h in authorized['code_sha256'].items())
+    assert sha(ROOT / 'config/13_llm.json') == authorized['shared_llm_config_sha256']
+    receipts = read(D / 'model-receipts.json')
+    assert len(receipts) == 6 and sum(r['usage']['total_tokens'] for r in receipts) == 157369
+    validation = {'task': '6.EM', 'production_code_modified': False,
+        'rows': rows, 'model_final_accepted_objects': 4, 'independent_supported': 3, 'independent_source_only': 1,
+        'old_restrictions': 'not auto-cleared; Focus two changed restricted objects independently rechecked after correction, Air two source-only rows retained unchanged',
+        'successor_root': str(OUTPUT), 'writer_files': 20, 'old_18_files_unchanged': True,
+        'old_18_successor_copies_identical': True, 'other_13_companies_preserved_by_writer_bytes': True,
+        'no_duplicate_ordinary_facts': True, 'query_export_fresh_instance_equal': True, 'http_detail_statuses': statuses,
+        'http_catalog_status': 200, 'catalog_companies': 15,
+        'catalog_readable_objects': sum(p['visible_fact_count'] for p in catalog['profiles']),
+        'catalog_readable_metrics': sum(p['visible_metric_count'] for p in catalog['profiles']),
+        'new_model_requests': 6, 'recoveries': 0, 'supplier_total_and_conservative_ledger': 157369, 'fee': 'unknown',
+        'business_seconds': summary['business_seconds'], 'supervision_seconds': summary['supervision_seconds'],
+        'original_new_model_workpaper_hash_before_local_use_decisions': original_new_model_hashes,
+        'reused_validation': 'workpaper-deferred-batch-20261121/validation.json (same five source/test hashes, 12 distinct new +132 existing cases, not rerun)',
+        'runtime_files_sha256': {i: sha(D / (i[:6] + '-runtime.json')) for i in summary['instruments']},
+        'annual_api_sha256': sha(D / 'annual-api.json'), 'code_and_shared_configuration_unchanged': True,
+        'review': {'blocking_remaining': 0, 'actual_local_correction': 'withhold accepted Air object due wrong aggregate scope/comparison metadata; bind three supported Focus revisions',
+                  'nonblocking_deferred': ['Air optional cost total and source-only other-row supplement', 'supply-chain detail'],
+                  'unrelated': 'pre-existing worktree modifications untouched'},
+        'formal_accuracy_and_S2': 'not_assessed/old_failures_unchanged', 'production_authorization': 'not_authorized'}
+    dump(D / 'validation.json', validation)
+    print(json.dumps(validation, ensure_ascii=False), flush=True)
+
+
+if __name__ == '__main__':
+    main()

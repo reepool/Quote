@@ -1,0 +1,120 @@
+{
+  "task": "6.EM",
+  "model_final_accepted_objects": 4,
+  "independently_supported_changes": 3,
+  "new_source_only_objects": 1,
+  "items": [
+    {
+      "instrument_id": "002027.SZ",
+      "report": {
+        "instrument_id": "002027.SZ",
+        "report_id": "1225251512",
+        "document_version": "2c089c20fd280a3adbebee237ee1df7f13074d3fa57330127914c2082d8c6081",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "physical_pages_read": [
+        10,
+        16
+      ],
+      "method": "independent reading of original PDF headings/date columns/rows/applicability marks; compare actual changed objects",
+      "original_pages_text_sha256": {
+        "10": "a2fa339e0b4d9ebeae26d6b31f0c02ea64940163c438b365a55a4cd8708cf1fc",
+        "16": "801712e02f751101b880ce813f7b8c95f3311eff8827f8a0e116d2e889de5d0e"
+      },
+      "decisions": [
+        {
+          "fact_id": "F-BS-02",
+          "fact_sha256": "e254070e1e1af540fd1884fb50830f453165f2a3d6a7b1ceeb203e115534b411",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "reason": "分众第三节/一、主要业务，物理10：表头为2026/3/31、2025/12/31、2024/12/31和长周期变幅。2026-03-31自营合计228.4、总计272.9万台/个，电视122.3万台、海报106.1万个；两媒体行改business_segment，总量保集团，时点/约数原句保留。按来源显示精度使用，不作精确盘点。",
+          "limitation": "原文约数/显示精度和2026-03-31时点保留，不当2025年末或额外精确值。",
+          "model_final_accepted": true,
+          "prior_disposition": "source_checked",
+          "new_independent_decision_not_model_override": true
+        },
+        {
+          "fact_id": "F-MC-01",
+          "fact_sha256": "576262375d5f832764ec654f80e5c7df354b584ff76b93d7945ee88eff57b039",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "分众第三节/主营业务分析相关披露，物理16：合并范围是否变动勾是并指第八节，重大业务/产品/服务变化项目勾不适用。候选仅保勾选状态，不再断言经济上无重大变化；2025报告期正确。",
+          "limitation": null,
+          "model_final_accepted": true,
+          "prior_disposition": "source_only",
+          "new_independent_decision_not_model_override": true
+        },
+        {
+          "fact_id": "F-MC-02",
+          "fact_sha256": "aac3fd02157bc8951e68a1a3006fd69f21b10ca5fe2f2ec74ebe58209a01e36c",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "reason": "分众第三节/一、主要业务，物理10：2024-12-31电视113.0万台/海报147.0万个，2026-03-31电视122.3/海报106.1，原表变幅8.2%/-27.8%；121.5与112.9在2025-12-31列。候选已更正起点/期间和媒体行范围，按原表显示精度使用。",
+          "limitation": null,
+          "model_final_accepted": true,
+          "prior_disposition": "withheld",
+          "new_independent_decision_not_model_override": true
+        }
+      ],
+      "unchanged_prior_source_checked": [
+        "F-BS-01",
+        "F-PS-01",
+        "F-PS-02",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03"
+      ],
+      "scope": "only actual four changed/new objects; unchanged prior decisions are hash inheritance, not a fresh whole-profile audit"
+    },
+    {
+      "instrument_id": "601111.SH",
+      "report": {
+        "instrument_id": "601111.SH",
+        "report_id": "1225039287",
+        "document_version": "cb4637907c8edd85349a72e86e65c1b4581c42b17c69a4c5c6a88a15ea3c63ec",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "physical_pages_read": [
+        16
+      ],
+      "method": "independent reading of original PDF headings/date columns/rows/applicability marks; compare actual changed objects",
+      "original_pages_text_sha256": {
+        "16": "66d675fae7c9988fa6de956966c4e59b675061ebfa79f277456a8bb04a2dc926"
+      },
+      "decisions": [
+        {
+          "fact_id": "review-add:OM-PS-001",
+          "fact_sha256": "037a4ebf0590d5929df3e26306466fde9e62513d95487bf435fe8a6ea5a5fd1d",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0004",
+            "source-0003"
+          ],
+          "reason": "国航第三章/五、主要经营情况/主营业务分析，物理16：其他行8850487/6463938千元、26.97%及18.06%/14.51%/2.27个百分点有据；但同对象把合计171484646收入与162647280成本标business_segment，而本页利润表及本集团收入原文为集团口径。金额/毛利率的comparison_basis又错挂各同比列名。模型终核接受不能解除该结构错误；整条仅源参考，不手工拆取正确其他行或再次付费修订。",
+          "limitation": "合计主体/比较列标签有误，整对象退出普通正文和精确指标；原文和模型结果保留。",
+          "model_final_accepted": true,
+          "prior_disposition": null,
+          "new_independent_decision_not_model_override": true
+        }
+      ],
+      "unchanged_prior_source_checked": [
+        "F01",
+        "F04",
+        "F05",
+        "F06"
+      ],
+      "scope": "only actual four changed/new objects; unchanged prior decisions are hash inheritance, not a fresh whole-profile audit"
+    }
+  ],
+  "does_not_measure_whole_profile_accuracy": true
+}
