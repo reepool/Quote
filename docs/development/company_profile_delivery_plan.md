@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-21当前6.EM仅[两份保存稿的合并源复核卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-saved-review-batch-card.md)：分众002027／国航601111原稿、成功抽取回执、PDF/cache及源包本地绑定成立，24／19原对象，不重选章/抽取；前轮12新＋132旧证明按相同hash复用，当前18writer未变。新的公开材料/既有Grok high及必要DeepSeek修订、整组12600秒/2000000账本/12物理含6恢复有限授权已一次询问，明确回复前0真实发送，不借旧额。批准后冻结一次原execute_review_batch串行收尾，旧独立限制/失败及S2保护，不重跑顺丰/通威或整池；[准备/限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saved-review-batch-20261121/result.md)。必要一套后清待批脚本，批准后正式根也按卡收尾，源/有效缓存/并行不动。
+
 2026-11-21 6.EL已完成[批量先交画像、复核独立接续](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-deferred-batch-20261121/result.md)：显式defer_review保原首读/待核API，execute_review_batch复用原逐股接续；两次同因新失败只停复核、旧request不重发，跳过不伪造通道恢复。受控三首读→两复核失败停→第四首读仍交→新实例只接余项与原稿/隔离/导出成立；12不同新用例及132旧回归通过，保存15稿18writer/431对象692指标只读不变。本轮0真实调用/新公司/共享配置或生产；下一仅必要已存稿复核的整卡有界真实授权，不重抽、追供应链或重开S2。必要一套后清本人QuoteBak/测试库/重复输出/脚本，正式源/缓存/旧失败/attempt及并行保护。
 
 2026-11-20 6.EK已交[顺丰真实五候选终核及画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-sf-final-recovery-20261120/result.md)：原TaskService只补终核，1物理/0恢复、五接受/五项有限独核，新增5可读对象8指标、当前28/68；原九独核决定继承。后继研究根company_profile_sf_reviewed_20261120保父17writer，API/导出历史superseded不双计，KLN补充未采纳/缺项仍见；不重抽前段或整池。复用相同hash的6.EJ验证、不扩规则，必要一套后清本人QuoteBak/库/重复输出，正式源/缓存/旧失败/attempt和既有并行保护。窗口结束，下一回到已有画像的消费与失败接续主线，不为剩余细项加窗，旧S2/生产不改。
