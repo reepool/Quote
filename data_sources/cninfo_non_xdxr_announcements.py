@@ -10,10 +10,10 @@ import unicodedata
 
 POLICY_VERSION = "cninfo_non_xdxr_operator_decision_v1"
 REVIEWER = "operator_cninfo_non_xdxr_20260808"
-EXPECTED_DECISION_COUNT = 2
+EXPECTED_DECISION_COUNT = 3
 EXPECTED_MANIFEST_HASH = (
-    "c07fe5b001dd5b14ecb0ed07f45554da"
-    "8087048e9563971a38922a0e5fff1db6"
+    "7e6b0be1c25b72c0e783fc6a1e865e4b"
+    "1836ed7349f28170033287adad4848fc"
 )
 
 FROZEN_DECISIONS: tuple[Dict[str, str], ...] = (
@@ -44,6 +44,20 @@ FROZEN_DECISIONS: tuple[Dict[str, str], ...] = (
         ),
         "reviewer": REVIEWER,
         "approved_at": "2026-08-08",
+    },
+    {
+        "announcement_key": "cninfo:1225682148",
+        "source_announcement_id": "1225682148",
+        "instrument_id": "000034.SZ",
+        "expected_title": (
+            "关于关联共同投资进展暨实施业绩补偿的公告"
+        ),
+        "decision": "non_xdxr",
+        "decision_basis": (
+            "unlisted_target_equity_compensation_no_listed_share_capital_change"
+        ),
+        "reviewer": REVIEWER,
+        "approved_at": "2026-11-21",
     },
 )
 

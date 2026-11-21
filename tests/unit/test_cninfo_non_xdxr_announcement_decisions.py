@@ -15,7 +15,7 @@ def test_frozen_decision_manifest_and_exact_resolution():
     assert decisions.validate_decision_manifest() == (
         decisions.EXPECTED_MANIFEST_HASH
     )
-    assert len(decisions.FROZEN_DECISIONS) == 2
+    assert len(decisions.FROZEN_DECISIONS) == 3
 
     for item in decisions.FROZEN_DECISIONS:
         result = decisions.resolve_non_xdxr_announcement_decision(
@@ -164,10 +164,19 @@ def test_operator_application_is_preview_first_idempotent_and_bounded(tmp_path):
     finally:
         connection.close()
 
-    assert len(preview["state_changes"]) == 2
-    assert all("1225459113" in row[0] or "1225461628" in row[0] for row in pending_before)
-    assert first["removed_announcement_count"] == 2
-    assert first["cleared_candidate_ids"] == ["000652.SZ", "603169.SH"]
+    assert len(preview["state_changes"]) == 3
+    assert all(
+        "1225459113" in row[0]
+        or "1225461628" in row[0]
+        or "1225682148" in row[0]
+        for row in pending_before
+    )
+    assert first["removed_announcement_count"] == 3
+    assert first["cleared_candidate_ids"] == [
+        "000034.SZ",
+        "000652.SZ",
+        "603169.SH",
+    ]
     assert second["removed_announcement_count"] == 0
     assert second["state_update_count"] == 0
     assert second["audit_update_count"] == 0
