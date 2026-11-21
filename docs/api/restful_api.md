@@ -348,6 +348,20 @@ curl http://127.0.0.1:8000/api/v1/research/company/600104.SH/annual-profile
 
 以上假设本地API已启动且挂载当前代码；本轮不自动部署或重启服务。
 
+### POST /api/v1/research/company/annual-profiles/query
+
+按明确股票清单一次读取多份完整年报画像，只读本地，不调用模型、下载、排队或写文件。正文`{"instrument_ids":["002027.SZ","601111.SH","601881.SH"]}`，每次1—100项，沿原证券代码转换兼容`SZSE/SSE`后缀，去重后保持请求顺序；空清单、空白ID、超过100项或多余字段返回422，不把空清单当全市场查询。
+
+返回`requested_instrument_ids`、`delivered`、完整`profiles`、`missing_instrument_ids`及每个缺失股票的`missing[].reason=annual_report_profile_not_found`。profiles逐项与单股详情相同，保首读/精读/复核后继、实际模型、来源、information_gaps、suggested_acquisitions及局部隐藏事实；不是旧query的单次底稿投影。混合找到/缺失时`state=partial`，全找到为found、全缺失为not_found，均200。未找到只表示当前研究根无可读年报画像，不能据此判断是未生成、运行失败或报告未披露；单股接口404和目录契约不改。
+
+要读最新15家研究快照，可在独立API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_batch_reviewed_20261121`；本次不改共享配置或重启服务。该根433可读对象/694指标含跨轮重叠、局部限用和未核内容，不代表去重经济事实、正式质量达标或生产启用。
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/research/company/annual-profiles/query \
+  -H 'Content-Type: application/json' \
+  -d '{"instrument_ids":["002027.SZ","601111.SH","601881.SH"]}'
+```
+
 ### GET /api/v1/research/company/{instrument_id}/annual-profile
 
 读取原公司画像read owner的年报研究内容，不同于`/profile`公司档案快照。只读本地，不触发LLM、下载或生产写入；尚无年报画像返回404。默认读取根为既有`data/research/company_profile_common_core`，开发目录不会自动发布到这里；服务是否已部署以实际OpenAPI为准。

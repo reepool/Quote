@@ -2,6 +2,14 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Explicit stock lists return complete graded research profiles without execution
+The existing read owner MUST support a bounded explicit stock list and reuse the same annual-profile projection as single-stock detail reads. The HTTP query MUST retain local source/model identities, review continuations, gaps and fact-level restrictions, deduplicate canonical stock IDs in request order, and separately identify stocks without a saved annual workpaper. Missing records MUST NOT be described as undisclosed business, zero exposure or a diagnosed execution failure. This query MUST NOT call models, enqueue work, write files, silently select all stocks or grant trusted/production status. Existing single-stock, catalog and export contracts remain compatible.
+
+#### Scenario: A requested list mixes saved profiles and absent stocks
+- **WHEN** a caller supplies between one and one hundred stocks, including aliases and a stock without a saved annual workpaper
+- **THEN** the response contains each found stock once in request order with the same complete content as its single-stock API and a separate not-found entry for each absent stock
+- **AND** hidden/withheld facts remain hidden, same-report successor chains stay intact, all-absent lists return a readable not-found result, and invalid empty/over-limit lists are rejected before reading
+
 ### Requirement: Deferred source review does not block first-read research delivery
 An explicitly deferred-review workpaper MUST use the existing task/runtime/writer path to deliver its source-bound extraction without issuing review, repair or final-check requests. The deferred policy MUST be part of processing identity, preserve the default inline mode, and expose not-reviewed/deferred scope through the existing API and export. Useful missing or uncertain supplementary detail MUST NOT reject the draft; deferred content MUST NOT be counted as formally reviewed, accurate or production-approved.
 

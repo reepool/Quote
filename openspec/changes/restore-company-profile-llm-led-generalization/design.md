@@ -1,5 +1,11 @@
 ## Context
 
+### 6.EN 指定股票清单的只读API消费
+
+现有目录只给摘要，单股接口需要调用方逐股请求，原query又是单次底稿兼容投影。为消费现有多轮画像，在原ReadService增加research_profiles：显式1—100个股票，去重保顺序，选当前base并逐项复用_research_profile_from_record，不复制拼接/使用分级逻辑。返回完整profiles和missing_instrument_ids及原因not_found；不存在或仅有旧非底稿记录不伪装成年报画像，不把未找到推断成未披露/零业务/已发生运行失败。
+
+原HTTP提供POST /research/company/annual-profiles/query，正文instrument_ids，沿现有convert_to_database_format转换后交read owner；纯只读，无下载/LLM/队列/写入/新存储。found/partial/not_found只描述本次读取结果，不是正式质量。每份profiles与单股API及annual_profiles导出同形，源/模型/缺项/独立限用和review后继均保留，旧接口/默认研究根不改。此为现有API缺项/批量消费需求的有限切片，不新增数据采集平台或修订规则；旧S2/生产不改。
+
 ### 6.EL 首读与源复核分开推进，不另建调度链
 
 用户2026-11-21同意“批量先交画像、复核独立接续”。原workpaper_processing_identity增加显式defer_review选项，仅启用复核政策时可用，写入workpaper_review_execution=deferred及原处理hash；默认旧内联行为/旧序列化不变。原runtime完成选章/有源抽取及原writer发布后结束首读，不发送review/repair/final；API保not_reviewed与planned follow-up，不算正式可用。暂停高阶复核不会触发未发首读的付费调用或阻止另一次首读执行。

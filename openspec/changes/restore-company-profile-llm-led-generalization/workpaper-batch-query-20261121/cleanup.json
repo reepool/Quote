@@ -1,0 +1,21 @@
+{
+  "task": "6.EN",
+  "target": "/home/python/Quote/data/QuoteBak/company-profile-6en-SVVy4tXl",
+  "files": 60,
+  "file_bytes": 12002137,
+  "previous_6EM_temporary_root_absent_before_start": true,
+  "source_and_saved_record_hashes_checked_before_delete": true,
+  "removed": [
+    "unit-test workpaper fixtures and checkpoints",
+    "duplicate complete exports",
+    "test logs and local scripts"
+  ],
+  "preserved": [
+    "formal PDF/useful caches",
+    "all current/historical research roots and failures",
+    "attempt markers",
+    "one compact verification/JUnit set",
+    "pre-existing and concurrent worktree changes"
+  ],
+  "target_exists_after": false
+}

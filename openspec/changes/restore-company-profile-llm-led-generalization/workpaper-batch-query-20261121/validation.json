@@ -1,0 +1,55 @@
+{
+  "task": "6.EN",
+  "baseline_commit": "24c6eb8b",
+  "tests": {
+    "command": "python -m pytest tests/unit/test_research/test_company_profile_batch_reads.py tests/unit/test_research/test_company_profile_catalog.py tests/unit/test_research/test_company_profile_annual_export.py tests/unit/test_research/test_company_profile_review_recovery.py -x -q --basetemp=<task root>/pytest --junitxml=<task root>/tests.xml",
+    "passed": 41,
+    "new_cases": 9,
+    "existing_cases": 32,
+    "skipped": 0,
+    "junit_suite_seconds": 31.323,
+    "pytest_reported_seconds": 31.55,
+    "environment": "authorized local environment; no network/model calls"
+  },
+  "source_test_sha256": {
+    "api/company_profile_routes.py": "71885819185b78555071379eb623f65d50c0313e97d090680b78ea852315c0d7",
+    "research/company_profile/reads.py": "c3b1a585c1e6d8640603aa91c291a5b6d117abbbb1b90b41cb449089b94dfdf4",
+    "tests/unit/test_research/test_company_profile_batch_reads.py": "5bd26b9330f01f42432ef40d888e86fe5aaa0662d90866e439ada77cc8106771"
+  },
+  "saved_corpus_http": {
+    "requested": 20,
+    "found": 15,
+    "not_found": 5,
+    "http_status": 200,
+    "readable_objects": 433,
+    "metrics": 694,
+    "seconds": 60.243,
+    "writer_files_unchanged": 20,
+    "batch_equal_existing_export": true,
+    "not_a_new_company_run_or_accuracy_result": true
+  },
+  "review": {
+    "blocking_remaining": 0,
+    "direct_checks": [
+      "explicit bounded input and request order",
+      "shared detail projection and export",
+      "not-found separated from profile gaps",
+      "restricted content remains hidden",
+      "no download, model, queue or writer path",
+      "old single/catalog/plan routes compatible"
+    ],
+    "nonblocking_deferred": [
+      "full-market pagination",
+      "further field acquisition"
+    ],
+    "unrelated_untouched": "pre-existing core/config/market-data worktree changes"
+  },
+  "syntax_and_diff_check": "passed",
+  "openspec_strict": "passed",
+  "new_real_calls": 0,
+  "new_data_transfers": 0,
+  "current_research_root_modified": false,
+  "shared_api_restarted_or_deployed": false,
+  "old_S2_changed": false,
+  "production_authorization": "not_authorized"
+}

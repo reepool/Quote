@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 360. 6.EN按股票清单读取完整画像：现有内容可批量消费，缺项/未找到分开
+
+用户继续推进，按产品→验收→交付→A/B v3及OpenSpec/business-first技能，24c6eb8b/master开工、暂存空。先核6.EM执行根已清，仅本轮company-profile-6en-SVVy4tXl。当前两份真实后段已结束，不追国航“其他”或分众细项；下一直接业务缺口是目录仅摘要/详情逐股查询，调用方按股票清单无法一次取得含后继的完整分级画像。先同步设计/spec/产品/API，再在原ReadService加research_profiles，原HTTP加一个只读query，不增调度/模型/归档库或行业规则。
+
+1—100显式股票、去重保顺序，沿原代码转换兼容SSE/SZSE；每份profiles复用单股_research_profile_from_record，源/模型/复核/补读后继、缺项/建议和隐藏事实不丢。not_found/partial/found仅表示读取结果；旧非底稿或无记录明确annual_report_profile_not_found，不猜是否运行失败/未生成/报告未披露，不当零业务，也不因一股无稿丢其他内容。空/超限/空白/额外字段422，单股404及目录契约兼容；无默认全市场查、付费执行或隐式写入。接口与显式当前研究根用法见docs/api/restful_api.md。
+
+9新＋32旧共41passed/0skipped，31.55秒，覆盖别名/顺序、旧记录、补读父链、局部source_only、缺项及原单股/目录/接续/导出。另用当前15稿＋原确认未启5只作本地HTTP清单读取，200/15找到5未找到；433可读对象/694指标与现有annual_profiles全量一致，分众/国航与EM权威API相同，20writer hash不变，60.243秒；不是新20家运行、补旧五家或全稿准确率。既有单股消费只读抽核、完整导出比对不重复生成全文；必要逐家计数/hash见[结果](workpaper-batch-query-20261121/result.md)及saved-batch-verification.json。
+
+Review无剩余A类阻塞；B类全市场分页/进一步采集后置，C类既有核心/配置/市场并行未触碰。strict/语法/diff通过，未跑全仓大套；本轮0新模型/探针/外传/下载、0写研究根或共享API重启/生产，旧S2失败/95%与99%及S3不改。验证耗时不等于全部活跃开发。必要一套验证摘要/JUnit/来源hash后清本人测试库/重复导出/脚本/日志，量见cleanup.json，正式源/有效缓存/旧稿/失败/attempt与并行保护。本人块隔离正常commit/push，不带入混合既有文档段落。
+
 ## 359. 6.EM两份保存稿真实后段闭环：3支持/1源参考，停止尾项追补
 
 用户2026-11-21“批准，给予授权”对应上轮完整6.EM合并卡，6777ca8c/master开工、暂存空。按产品→验收→交付→A/B v3及OpenSpec/business-first技能，复用743ade29下6.EL同5源码/test hash的12不同新＋132旧证明，不重跑大套或修业务代码；准备根已清，本轮唯一company-profile-6em-run-ZP8ot6MZ。原两计划/抽取JSON/来源PDF/cache及18父writer复核，获准联网DNS/TLS、provider2450/Grok1200/Flash600冻结；原网关每请求的授权document_version按本卡两报告收窄，未绕过校验。唯一attempt后原TaskService.execute_review_batch串行执行，不重选章/抽取或调用其他股票。

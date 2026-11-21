@@ -39,12 +39,30 @@ class ReviewRecoveryPlanRequest(BaseModel):
     reading_work_id: str | None = Field(default=None, min_length=1)
 
 
+class AnnualProfileBatchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    instrument_ids: list[str] = Field(min_length=1, max_length=100)
+
+
 @router.get("/research/company/annual-profiles")
 async def get_annual_company_profile_catalog(
     reader: CompanyProfileReadService = Depends(annual_profile_reader),
 ):
     """Discover saved research content, review states and gap elements locally."""
     return await asyncio.to_thread(reader.research_profile_catalog)
+
+
+@router.post("/research/company/annual-profiles/query")
+async def query_annual_company_profiles(
+    request: AnnualProfileBatchRequest,
+    reader: CompanyProfileReadService = Depends(annual_profile_reader),
+):
+    """Read saved annual profiles for a stock list; no model or task execution."""
+    try:
+        instruments = [convert_to_database_format(item.strip()) for item in request.instrument_ids]
+        return await asyncio.to_thread(reader.research_profiles, instruments)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.get("/research/company/{instrument_id}/annual-profile")

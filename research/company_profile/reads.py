@@ -203,6 +203,35 @@ class CompanyProfileReadService:
             raise FileNotFoundError("annual-report company profile not found")
         return self._research_profile_from_record(root)
 
+    def research_profiles(self, instrument_ids: Sequence[str]) -> dict[str, Any]:
+        """Read an explicit stock list with the single-stock graded projection.
+
+        A missing local workpaper does not diagnose a failed run or absence of
+        disclosure. This method neither schedules work nor changes the records.
+        """
+        if (isinstance(instrument_ids, (str, bytes)) or not 1 <= len(instrument_ids) <= 100
+            or any(not isinstance(item, str) or not item.strip() for item in instrument_ids)):
+            raise ValueError("annual-profile batch requires 1 to 100 nonempty stock IDs")
+        requested = list(dict.fromkeys(item.strip() for item in instrument_ids))
+        selected = self._latest_by_instrument()
+        profiles, missing = [], []
+        for instrument_id in requested:
+            record = selected.get(instrument_id)
+            if isinstance(record, CompanyProfileRuntimeRecordV3):
+                profiles.append(self._research_profile_from_record(record))
+            else:
+                missing.append(instrument_id)
+        return {
+            "schema_version": "company_profile_research_batch.v1",
+            "state": "partial" if profiles and missing else "found" if profiles else "not_found",
+            "requested_instrument_ids": requested, "delivered": len(profiles),
+            "profiles": profiles, "missing_instrument_ids": missing,
+            "missing": [{"instrument_id": instrument_id, "reason": "annual_report_profile_not_found"}
+                        for instrument_id in missing],
+            "coverage_assessment": "selected_scope_only", "full_report_completeness": "not_assessed",
+            "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION,
+        }
+
     def _research_profile_from_record(self, root: CompanyProfileRuntimeRecordV3) -> dict[str, Any]:
         """Project one selected base and its exact supplemental-reading chain."""
         from .workpaper import workpaper_elements
