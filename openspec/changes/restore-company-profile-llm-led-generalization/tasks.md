@@ -1,5 +1,11 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.EO 两阶段动作接入统一应用入口（离线，零新模型）
+
+- [x] 6.EO1 同步设计/spec/本卡；execute_published_task与TaskService.execute公开first_read、review_batch，显式注入模型/预算/存储，不新增执行器或改变共享CLI默认配置。
+- [x] 6.EO2 first_read仅消费显式股票清单，复用原队列/首读/writer并强制延后复核；review_batch只分发保存计划，不重抽、不复制复核循环，保范围/有限预算/发布停止及冻结计划约束。
+- [x] 6.EO3 受控统一入口首读→落盘计划→新实例复核、重提不重发及当前run/resume内联兼容成立，23新＋12相关旧通过；扩展旧集两项既有失败与中断限制分列，不称全套绿。20writer hash不变，Review/strict/本人块Git及QuoteBak清理，0新真实调用/生产，见workpaper-task-entry-20261121/result.md及§361。
+
 ### 6.EN 按股票清单批量读取完整研究画像（零新模型）
 
 - [x] 6.EN1 原ReadService新增显式1—100股票的批量只读用例，复用同单股投影，去重保顺序；已有画像与未找到股票分列，保来源/审核/缺项/隔离及后继链，不猜缺失原因或新增语义分数。

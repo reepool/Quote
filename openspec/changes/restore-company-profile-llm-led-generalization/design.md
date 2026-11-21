@@ -1,5 +1,13 @@
 ## Context
 
+### 6.EO 两阶段动作在同一应用入口分发
+
+在既有execute_published_task与CompanyProfileTaskService.execute公开first_read和review_batch，不新增业务循环、运行器或默认模型工厂。内部调用方显式注入provider、processing_identity、execution_budget、storage及根目录；本卡不接通CLI共享模型配置，不新增HTTP付费执行。旧run/resume默认内联形态不变。
+
+first_read要求非空股票清单、有效章节底稿/复核身份和有限正预算，临时设置deferred并纳入原工作ID，结束恢复service原身份；仅入队并处理本次工作ID，不加载全市场registry或捞取旧队列。已有发布停止、M4显式计划及绑定仍生效，活动first-expansion模式拒绝该动作，不能绕过旧冻结合同。review_batch要求显式保存计划清单，若同时给股票范围必须完全相符，转既有execute_review_batch；已处理请求幂等、源/hash核对、失败暂停及余项接续均沿原实现。
+
+受控验证从同一公开函数首读到保存计划，再新实例执行复核；不以假响应证明真实模型质量。当前真实20writer只读保护，不重抽、新付费调用、重开S2或启生产。开工核前轮清理，只用本轮QuoteBak；交接保一套紧凑证据后删除测试库/日志/重复输出，保护原源、缓存、旧失败及并行改动。
+
 ### 6.EN 指定股票清单的只读API消费
 
 现有目录只给摘要，单股接口需要调用方逐股请求，原query又是单次底稿兼容投影。为消费现有多轮画像，在原ReadService增加research_profiles：显式1—100个股票，去重保顺序，选当前base并逐项复用_research_profile_from_record，不复制拼接/使用分级逻辑。返回完整profiles和missing_instrument_ids及原因not_found；不存在或仅有旧非底稿记录不伪装成年报画像，不把未找到推断成未披露/零业务/已发生运行失败。

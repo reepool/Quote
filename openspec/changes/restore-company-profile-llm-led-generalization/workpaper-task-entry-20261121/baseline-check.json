@@ -1,0 +1,27 @@
+{
+  "task": "6.EO",
+  "baseline_commit": "dd7a8f8c",
+  "legacy_run_expectation": {
+    "test": "test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer",
+    "application_source": "git show dd7a8f8c:research/company_profile/operations.py, executed in an isolated package namespace",
+    "same_provider_source_and_default_identity": true,
+    "fixture_db_layout": "same temporary SQLite path for domains to bound replay cost; no semantic overrides",
+    "baseline_state": "completed",
+    "baseline_extract_calls": 0,
+    "current_extract_calls": 0,
+    "old_test_expected_extract_calls": 1,
+    "baseline_also_fails_old_expectation": true,
+    "old_test_not_rewritten_to_pass": true
+  },
+  "scheduler_fixture": {
+    "test": "test_control_actions_reach_owner_while_run_holds_the_instance",
+    "error": "AttributeError: TaskScheduler object has no attribute config",
+    "cause": "old test constructs scheduler with object.__new__, omits config, and fails in _resolve_run_on_main_loop before calling its fake task",
+    "scheduler_source_equal_baseline": true,
+    "scheduler_test_body_equal_baseline": true,
+    "scheduler_test_body_sha256": "82947d4f22b817a005056509e304d2a6980e5c188de3948da706bdbffca22b2a",
+    "operations_entry_reached": false,
+    "changed_in_this_task": false
+  },
+  "classification": "C: pre-existing, outside the current two-phase application-entry slice; kept visible without expanding into legacy or scheduler repair"
+}

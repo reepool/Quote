@@ -1,0 +1,65 @@
+{
+  "task": "6.EO",
+  "baseline_commit": "dd7a8f8c",
+  "business_behavior": {
+    "entry": "research.company_profile.operations.execute_published_task",
+    "actions": ["first_read", "review_batch"],
+    "first_read": "explicit stocks, original queue/writer, deferred review, own work IDs only, no market registry",
+    "review_batch": "saved plans, original recovery owner, no re-extraction, persisted request idempotency",
+    "default_run_resume_inline_review": "verified with current workpaper identity",
+    "cli_default_model_wiring_changed": false,
+    "new_runner_or_business_loop": false
+  },
+  "verification": {
+    "command": "python -m pytest tests/unit/test_research/test_company_profile_task_entry_modes.py tests/unit/test_research/test_company_profile_deferred_review.py tests/unit/test_research/test_company_profile_operations.py::test_published_catalog_lists_verified_task_not_design_or_legacy_names tests/unit/test_research/test_company_profile_operations.py::test_control_actions_reach_owner_while_run_holds_the_instance tests/unit/test_research/test_company_profile_operations.py::test_cli_forwards_five_actions_to_execute_job_direct -k 'not original_task_batch_first_reads_review_pause_and_disk_restart and not saved_fifteen_research_profiles_keep_hashes_and_api_shape' -q --basetemp=<task root>/pytest-scoped --junitxml=<task root>/tests-scoped.xml",
+    "new_cases_passed": 23,
+    "related_existing_cases_passed": 12,
+    "selected": 36,
+    "passed": 35,
+    "preexisting_scheduler_fixture_failure": 1,
+    "skipped": 0,
+    "deselected_old_long_cases": 2,
+    "pytest_seconds": 134.69,
+    "junit_suite_seconds": 134.281,
+    "first_read_saved_plans_new_instance_test_call_seconds": 78.69,
+    "default_inline_run_resume_test_call_seconds": 39.30,
+    "all_repository_tests_passed_claim": false,
+    "expanded_legacy_attempt": {
+      "passed": 21,
+      "failed": 1,
+      "interrupted": true,
+      "pytest_seconds": 337.55,
+      "junit_suite_seconds": 337.185,
+      "reason": "old extraction-call expectation failed; slow temporary domain-database IO; stopped rather than expanding unrelated repairs",
+      "overlaps_primary_run_do_not_add_counts": true
+    }
+  },
+  "review": {
+    "new_blocking_defects_remaining": 0,
+    "checks": ["explicit stock and plan scope", "deferred identity hash and restoration", "only own queued work", "finite execution budget", "publication stop and frozen plan checks", "new-instance idempotency", "default inline review compatibility"],
+    "unrelated_existing_failures": "See baseline-check.json and both unaltered JUnit reports; no claim that the expanded old suite is green.",
+    "nonblocking_deferred": ["shared CLI model configuration", "background scheduling", "optional field acquisition"],
+    "preexisting_dirty_files_preserved": true
+  },
+  "source_test_sha256": {
+    "research/company_profile/operations.py": "920720a87d356a05176b4f7987252c3f61022e66ec6a18fa5f531d7cba6a6c79",
+    "tests/unit/test_research/test_company_profile_operations.py": "53698f8764406a31f213475e050822cc20afa429f4766b9567acb522dacce7fa",
+    "tests/unit/test_research/test_company_profile_task_entry_modes.py": "f0594deb79bf99fb74a1399b1e224b2f8c8907b54120e5aa8d1f17abad30b799"
+  },
+  "saved_research_protection": {
+    "root": "data/research/company_profile_batch_reviewed_20261121",
+    "baseline_hash_reference": "../workpaper-batch-query-20261121/saved-batch-verification.json#protected_20_writer_sha256",
+    "expected_writer_files": 20,
+    "current_writer_files": 20,
+    "changed_files": [],
+    "profiles_remain": 15
+  },
+  "syntax_and_diff_check": "passed",
+  "openspec_strict": "passed",
+  "new_real_calls": 0,
+  "new_data_transfers": 0,
+  "shared_configuration_changed": false,
+  "current_research_root_modified": false,
+  "old_S2_changed": false,
+  "production_authorization": "not_authorized"
+}

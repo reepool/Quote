@@ -131,6 +131,8 @@ PUBLISHED_ACTIONS = (
     "query",
     "export",
     "enrich",
+    "first_read",
+    "review_batch",
 )
 CONTROL_SCHEMA_VERSION = "company_profile_task_control.v1"
 DEFAULT_OUTPUT_ROOT = "data/research/company_profile_common_core"
@@ -147,7 +149,7 @@ LEGACY_TASK_NAMES_NOT_CONNECTED = (
 
 
 def published_task_catalog() -> dict[str, Any]:
-    """Return the verified operator catalog after the five actions are wired."""
+    """Return supported application actions; model dependencies stay explicit."""
 
     return {
         "task_name": PUBLISHED_TASK_NAME,
@@ -162,6 +164,7 @@ def published_task_catalog() -> dict[str, Any]:
             "reason": "operator_request",
             "output_directory": None,
             "enrichment_plan": None,
+            "review_plans": None,
         },
         "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
         "writer": COMMON_CORE_WRITER_NAME,
@@ -843,8 +846,12 @@ class CompanyProfileTaskService:
         work_id: str | None = None,
         plan_directory: str | Path | None = None,
         enrichment_plan: Mapping[str, Any] | None = None,
+        review_plans: Sequence[Mapping[str, Any]] | None = None,
     ) -> dict[str, Any]:
-        if self.execution_budget is not None and str(action or "").strip().lower() in {"run", "resume", "enrich"}:
+        normalized = str(action or "").strip().lower()
+        if normalized in {"first_read", "review_batch"} and not 0 < max_elapsed_seconds < float("inf"):
+            raise ValueError(f"{normalized} requires a finite positive time budget")
+        if self.execution_budget is not None and normalized in {"run", "resume", "enrich", "first_read", "review_batch"}:
             max_elapsed_seconds = min(
                 max_elapsed_seconds, self.execution_budget.remaining_time()
             )
@@ -853,7 +860,6 @@ class CompanyProfileTaskService:
             self.processing_identity_hash = _stable_hash(self.processing_identity)
         if plan_directory is not None:
             self.plan_directory = Path(plan_directory)
-        normalized = str(action or "").strip().lower()
         if normalized not in PUBLISHED_ACTIONS:
             raise ValueError(
                 "unsupported company-profile task action "
@@ -882,6 +888,41 @@ class CompanyProfileTaskService:
                 processing_identity=processing_identity,
                 work_id=work_id,
             )
+        if normalized == "review_batch":
+            if not review_plans:
+                raise ValueError("review batch requires explicit saved plans")
+            if instruments and set(instruments) != {plan.get("instrument_id") for plan in review_plans}:
+                raise ValueError("review batch stock scope differs from saved plans")
+            self._ensure_publication_allows_writes()
+            return await self.execute_review_batch(review_plans, knowledge_cutoff=cutoff,
+                max_elapsed_seconds=float(max_elapsed_seconds))
+        if normalized == "first_read":
+            if (not instruments or int(max_items) <= 0
+                or self.processing_identity.get("reading_strategy") != "chapter_workpaper_v1"
+                or not self.processing_identity.get("workpaper_review_policy") or self.provider is None
+                or self.token_budget <= 0 or max_elapsed_seconds <= 0):
+                raise ValueError("first_read requires explicit stocks, a workpaper review provider and finite budget")
+            if self.processing_identity.get("execution_mode") == "provider" and self.execution_budget is None:
+                raise ValueError("real first_read requires an explicit execution budget")
+            if (self.processing_identity.get("workpaper_review_execution") not in {None, "deferred"}
+                or any(key in self.processing_identity for key in (
+                    "workpaper_enrichment", "workpaper_review_recovery", "review_existing_draft_hash",
+                    "review_resume_hash", "workpaper_extraction_resume_hash"))):
+                raise ValueError("first_read requires a fresh reading identity, not a continuation")
+            if self.plan_directory is not None:
+                require_explicit_m4_plan(self.plan_directory)
+            self._ensure_publication_allows_writes()
+            if first_expansion_should_constrain_run(self.checkpoint_root):
+                raise ValueError("first_read cannot bypass an active first-expansion plan")
+            previous, previous_hash = self.processing_identity, self.processing_identity_hash
+            self.processing_identity = {**previous, "workpaper_review_execution": "deferred"}
+            self.processing_identity_hash = _stable_hash(self.processing_identity)
+            try:
+                return await self._run(knowledge_cutoff=cutoff, instrument_ids=tuple(dict.fromkeys(instruments)),
+                    max_items=int(max_items), max_elapsed_seconds=float(max_elapsed_seconds), enqueue=True,
+                    limit_drain_to_enqueued=True, action="first_read")
+            finally:
+                self.processing_identity, self.processing_identity_hash = previous, previous_hash
         if normalized == "enrich":
             from .workpaper_enrichment import WorkpaperEnrichmentPlan
             from .workpaper_review import workpaper_hash
@@ -1437,6 +1478,7 @@ class CompanyProfileTaskService:
         remember_work_ids: Callable[[Sequence[str]], None] | None = None,
         attach_result: Callable[[dict[str, Any], Mapping[str, Any]], None]
         | None = None,
+        action: str | None = None,
     ) -> dict[str, Any]:
         requested_ids = tuple(instrument_ids)
         from .workpaper_review import BATCH_STOP_POLICY
@@ -1462,7 +1504,7 @@ class CompanyProfileTaskService:
             )
         before_tokens = self.runtime.fresh_tokens()
         batch_blocked = bool(requested_ids) and not instrument_ids
-        action = "run" if enqueue else "resume"
+        action = action or ("run" if enqueue else "resume")
         run_id = f"{PUBLISHED_TASK_NAME}-{uuid.uuid4().hex[:12]}"
         parameters = {
             "knowledge_cutoff": knowledge_cutoff,
@@ -1966,6 +2008,7 @@ async def execute_published_task(
     plan_directory: str | Path | None = None,
     execution_budget: LlmRunBudget | None = None,
     enrichment_plan: Mapping[str, Any] | None = None,
+    review_plans: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
@@ -1973,7 +2016,9 @@ async def execute_published_task(
     if execution_budget is not None:
         execution_budget.remaining_time()
     normalized = str(action or "").strip().lower()
-    if normalized in {"run", "resume", "enrich"}:
+    if normalized in {"first_read", "review_batch"} and not 0 < max_elapsed_seconds < float("inf"):
+        raise ValueError(f"{normalized} requires a finite positive time budget")
+    if normalized in {"run", "resume", "enrich", "first_read", "review_batch"}:
         publication = load_publication_control(checkpoint_root)
         if not publication_allows_new_writes(publication):
             state = publication.state if publication is not None else "unknown"
@@ -2006,7 +2051,7 @@ async def execute_published_task(
         execution_budget=execution_budget,
     )
     logger.info("Company-profile entry: task service ready")
-    if normalized in {"run", "resume", "enrich"}:
+    if normalized in {"run", "resume", "enrich", "first_read", "review_batch"}:
         max_elapsed_seconds -= time.monotonic() - entry_started
         if max_elapsed_seconds <= 0:
             raise TimeoutError("company-profile entry budget exhausted before enqueue")
@@ -2025,6 +2070,7 @@ async def execute_published_task(
         work_id=work_id,
         plan_directory=plan_directory,
         enrichment_plan=enrichment_plan,
+        review_plans=review_plans,
     )
 
 

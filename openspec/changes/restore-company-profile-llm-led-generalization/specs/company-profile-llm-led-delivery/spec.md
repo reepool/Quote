@@ -2,6 +2,14 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: The published application entry dispatches both workpaper phases
+The existing published task application entry and TaskService execute method MUST expose first_read and review_batch with explicitly injected providers, identities, storage and bounded execution budgets. first_read MUST require an explicit nonempty stock list, use the existing queue/runtime/writer with deferred review, drain only its own enqueued work, and avoid loading a full-market registry. It MUST retain publication controls and frozen-plan constraints, reject active first-expansion mode and restore the original service identity afterwards. review_batch MUST require explicit saved plans and reject any separately supplied stock scope that differs from those plans before dispatching to the existing review-batch owner. Existing run/resume behavior MUST remain compatible. These actions MUST NOT create a model factory, parallel business loop, implicit paid authorization or production permission.
+
+#### Scenario: One caller submits first reads and later submits saved review plans
+- **WHEN** an authorized internal caller invokes first_read with explicit stocks and dependencies, saves the resulting pending-review plans, then invokes review_batch through a new application-entry instance
+- **THEN** the first action issues only selection/extraction requests and delivers source-bound pending drafts, while the second consumes the saved plans without repeating extraction
+- **AND** resubmitting the same first-read identity or processed review request does not resend completed work; invalid scope, exhausted budgets or stopped publication cannot initiate model sends
+
 ### Requirement: Explicit stock lists return complete graded research profiles without execution
 The existing read owner MUST support a bounded explicit stock list and reuse the same annual-profile projection as single-stock detail reads. The HTTP query MUST retain local source/model identities, review continuations, gaps and fact-level restrictions, deduplicate canonical stock IDs in request order, and separately identify stocks without a saved annual workpaper. Missing records MUST NOT be described as undisclosed business, zero exposure or a diagnosed execution failure. This query MUST NOT call models, enqueue work, write files, silently select all stocks or grant trusted/production status. Existing single-stock, catalog and export contracts remain compatible.
 

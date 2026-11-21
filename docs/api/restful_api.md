@@ -415,6 +415,26 @@ curl -X POST http://127.0.0.1:8000/api/v1/research/company/annual-profiles/query
 
 内部`await service.execute_review_batch(plans, knowledge_cutoff="YYYY-MM-DD", max_elapsed_seconds=...)`接收显式有限清单（一股一份上述完整计划），在现有有限预算内串行调用原逐股接续，不在HTTP端启动付费任务。返回每项request/股票、工作ID、执行state和独立review_status；两次相邻不同公司的同通道同因新失败暂停余项，余项为deferred并列入remaining_request_ids。completed仅表示清单处理结束，不表示全部复核通过或正式可用。以相同清单在新实例接续，已持久request返回already_processed且不重复调用，也不把它们的旧失败当新失败再次挡住余项；若需重试已失败项须新计划/有限授权，不自动生成新ID或额度。blocked/skipped计划不发送、不自动补修。复核清单暂停不会阻止独立执行的延后复核首读；已有控制暂停、源校验、预算和生产边界继续适用。
 
+6.EO将这两阶段接入原应用函数`research.company_profile.operations.execute_published_task`，也可在已配置的服务上调用`service.execute`。以下是**内部调用**，HTTP仍只提供查询/计划；CLI和scheduler未自动选择付费模型。`dependencies`须由受授权调用方显式提供storage、provider、processing_identity、execution_budget、output_root和checkpoint_root；身份须为启用源复核的章节底稿，真实模型须有显式有限执行预算，每次使用独立服务实例。
+
+```python
+first = await execute_published_task(
+    action="first_read", instrument_ids=["600000.SH", "600099.SH"],
+    knowledge_cutoff="2026-11-21", max_items=2,
+    token_budget=approved_tokens, max_elapsed_seconds=approved_seconds,
+    **first_read_dependencies,
+)
+# 由上述API或原ReadService取得并保存完整计划，再独立提交复核。
+review = await execute_published_task(
+    action="review_batch", review_plans=saved_plans,
+    knowledge_cutoff="2026-11-21",
+    token_budget=approved_tokens, max_elapsed_seconds=approved_seconds,
+    **review_dependencies,
+)
+```
+
+`first_read`强制延后复核，仅入队并处理明确清单中的工作ID，不加载全市场候选或处理其他待办；同身份重提沿原checkpoint复用，`max_items`仍是本次处理上限。旧`run/resume`默认行为不变。`review_batch`不重新选章/抽取，若同时给instrument_ids必须与保存计划的股票集合相同；以同清单重提只接未执行项。两动作保发布停止与原源/计划约束，first_read拒绝活动first-expansion模式及补读/复核接续身份；动作本身不授予新外传、额度或生产权限。
+
 接续期间继续提供父稿，不提前公开还原出的旧错项；完成后写独立后继。年报API/annual_profiles导出保留历史阅读，旧事实显示`state=superseded, fact=null`及`superseded_by_review_work_id`，只计后继普通内容；旧缺项/建议以`active=false`标历史，当前缺项仍可见。`review_recovery`给出父work/hash，不输出独立审核原始记录。原模型状态、原稿和原单次query/export兼容读取不改；模型终核不自动解除已有source_only/withheld/duplicate限制，修改过的事实不继承旧hash上的独核通过。
 
 6.EI的十五份保存稿核对使用`/home/python/Quote/data/research/company_profile_galaxy_v7_20261120`。若要读取该批内容，在独立研究API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`为此根；不改共享服务配置。该根含原十五家与银河后续阅读，跨版本内容不作为同版质量成绩；默认根不会自动切换。

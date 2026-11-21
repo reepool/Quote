@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 361. 6.EO统一应用入口分发首读与保存计划复核
+
+用户继续推进，沿产品→验收→交付→A/B v3及OpenSpec/business-first技能，dd7a8f8c/master开工，暂存空；前轮本人根已清，本轮仅company-profile-6eo-Bj17yAfG。主要矛盾是两阶段能力仍需内部调用方分别绕过分发；先同步设计/spec/任务卡，再在原execute_published_task/TaskService.execute公开first_read、review_batch，不新增运行器、共享CLI模型工厂或业务循环，0新真实调用/外传。
+
+首读要求显式股票、当前章节底稿/复核身份及有限预算，临时deferred入原hash，finally恢复；只入队并处理本次ID，不加载全市场registry或捞旧队列。发布停止、M4显式计划/绑定继续生效，活动first-expansion拒绝绕行。复核若给额外股票集合须匹配保存计划，转原execute_review_batch，原源/hash/幂等/两次新失败暂停/余项接续保留。新实例同请求不重发，原稿保留/后继不双计，默认run/resume内联复核有受控直接证明。
+
+23新增＋12相关旧用例通过；最终选36项35通过/1既有调度fixture错，134.69秒。扩大旧集21过/1错后中断337.55秒，两集重叠不累加。旧run预期extract_calls=1但实际0，开工前dd7a8f8c应用源码用同provider/源复现0（仅临时多域DB路径合一）；调度旧测试object.__new__漏config，进入应用入口前失败，测试体和scheduler源码与基线一致。必要JUnit/基线说明见[结果](workpaper-task-entry-20261121/result.md)，未为绿测试改预期或声称旧套件全过。Review无新增A类阻塞；B类CLI模型接线/后台/补充字段后置，C类旧失败及并行不动，strict/语法/diff通过。
+
+当前15家20writer全部与6.EN hash一致，未写真实研究根、启生产或改旧S2/95%与99%。仅持久紧凑摘要/JUnit/hash，核无活跃占用后清本人测试库、重放/重复输出及日志，量见cleanup.json；正式源/有效缓存/失败/attempt和既有改动保护。混合文档只隔离本轮新增块，正常commit/push；本卡结束不自动申请新公司或复核尾项。
+
 ## 360. 6.EN按股票清单读取完整画像：现有内容可批量消费，缺项/未找到分开
 
 用户继续推进，按产品→验收→交付→A/B v3及OpenSpec/business-first技能，24c6eb8b/master开工、暂存空。先核6.EM执行根已清，仅本轮company-profile-6en-SVVy4tXl。当前两份真实后段已结束，不追国航“其他”或分众细项；下一直接业务缺口是目录仅摘要/详情逐股查询，调用方按股票清单无法一次取得含后继的完整分级画像。先同步设计/spec/产品/API，再在原ReadService加research_profiles，原HTTP加一个只读query，不增调度/模型/归档库或行业规则。

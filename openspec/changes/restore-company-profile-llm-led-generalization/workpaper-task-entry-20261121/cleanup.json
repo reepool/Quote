@@ -1,0 +1,15 @@
+{
+  "task": "6.EO",
+  "previous_task_root": "company-profile-6en-SVVy4tXl",
+  "previous_task_root_absent_at_start": true,
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6eo-Bj17yAfG",
+  "active_open_fds_before_cleanup": [],
+  "files_removed": 63,
+  "logical_file_bytes_removed": 20420382,
+  "physical_reclaimed_bytes_measured": false,
+  "root_absent_after_cleanup": true,
+  "persistent_evidence": ["result.md", "validation.json", "baseline-check.json", "tests.xml", "expanded-tests.xml", "cleanup.json"],
+  "removed": ["temporary SQLite databases and checkpoints", "duplicate controlled runtime outputs", "temporary baseline replay script", "intermediate test reports"],
+  "retained": ["official source reports and useful caches", "20 current research writer files with unchanged hashes", "previous failures and attempt markers", "shared caches/logs and parallel or pre-existing work"],
+  "recovery": "temporary artifacts are reproducible from committed tests and the baseline commit; no original business data was deleted"
+}

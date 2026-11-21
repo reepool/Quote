@@ -77,6 +77,8 @@ def test_published_catalog_lists_verified_task_not_design_or_legacy_names():
         "query",
         "export",
         "enrich",
+        "first_read",
+        "review_batch",
     )
     assert catalog["parameters"]["action"] == list(PUBLISHED_ACTIONS)
     assert catalog["storage_namespace"] == COMMON_CORE_STORAGE_NAMESPACE
@@ -183,6 +185,8 @@ def test_status_reports_queue_control_and_published_catalog(tmp_path):
         "query",
         "export",
         "enrich",
+        "first_read",
+        "review_batch",
     ]
     assert "business_profile_backfill" in result["task"][
         "legacy_task_names_not_connected"
