@@ -1,6 +1,7 @@
 {
   "task": "6.EL",
-  "baseline_commit": "2d971c4a",
+  "baseline_commit": "2aa9d9f0",
+  "previous_company_profile_delivery_commit": "2d971c4a",
   "new_real_calls": 0,
   "new_data_transfers": 0,
   "current_research_root_written": false,

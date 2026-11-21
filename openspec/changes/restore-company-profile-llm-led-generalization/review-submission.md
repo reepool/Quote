@@ -2,7 +2,7 @@
 
 ## 357. 6.EL批量先交画像、复核独立接续：不建平台、不重抽、不追单股细项
 
-用户2026-11-21同意上一轮方案，2d971c4a/master开工、暂存空。按产品→验收→交付→A/B v3及OpenSpec/business-first技能先同步当前change/产品、任务卡和spec，再在原TaskService/runtime/read owner实现；前轮6.EK根已清，本轮唯一company-profile-6el-XZO237am。既有核心/共享配置/市场依赖及混合文档段落保护，非框架重构，不新造调度器、HTTP付费执行或writer/数据库。
+用户2026-11-21同意上一轮方案，2aa9d9f0/master开工、暂存空（前轮公司画像交付2d971c4a；其后既有公告修复提交不改）。按产品→验收→交付→A/B v3及OpenSpec/business-first技能先同步当前change/产品、任务卡和spec，再在原TaskService/runtime/read owner实现；前轮6.EK根已清，本轮唯一company-profile-6el-XZO237am。既有核心/共享配置/市场依赖及混合文档段落保护，非框架重构，不新造调度器、HTTP付费执行或writer/数据库。
 
 原workpaper_processing_identity的defer_review只在复核政策开启时启用，模式进入身份/hash；默认旧内联形态不改。原run完成选章/有源抽取及发布即结束首读，待核/模式/缺项随API/导出可见。原TaskService.execute_review_batch以显式一股一份计划及有限总时间/原预算，串行复用execute_review_recovery；执行复核暂去deferred、结束恢复原身份。旧成功阶段不重跑，同request已持久就already_processed；过期/坏计划blocked、已完成开放意见不自动修订。只对本次新复核连续两家同通道同因失败停余项，未执行项deferred/remaining可查；不是停止独立首读，硬预算/源/原控制边界继续生效。
 
