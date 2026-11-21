@@ -1,5 +1,11 @@
 ## Context
 
+### 6.ER 显式执行文件转原单股精读动作
+
+日常CLI已接首读/复核，按股精读仍需内部Python接线。本轮扩展同一task_entry文件适配的enrich动作：必须只有一个股票并附原API生成的WorkpaperEnrichmentPlan，report股票/version与文件一致；其他付费动作不接受该计划。既有TaskService继续核当前同报告父链、原稿hash、请求ID并选章/抽取/源复核，适配器不复制这些业务校验或循环。补读可有未获取项，不因此拒整稿；原writer追加及API/export多轮投影保持。
+
+main/scheduler仅扩动作白名单，沿既有显式文件的模型/预算构造及run_id检查点。单次补读内联复核，后段失败仍可沿原review-plan/review_batch接续；每次新执行有独立明确有限计划，不自动补满、不重开旧额度、不改共享配置或生产。先清前轮已结束临时物，本轮QuoteBak必要证据持久一套后删除测试库/生成PDF/重复输出；现有24writer、正式源/有效缓存、旧失败及并行保护。仅离线受控验证，0新真实外呼。
+
 ### 6.EQ 用现有job命令使用两阶段动作
 
 6.EP验证两阶段真实有效，但CLI仍不能注入模型/有限预算，只能每轮手写操作脚本。本轮增加execution-plan-file这个显式参数，main/scheduler仅薄转发到company_profile域的参数适配，再调用既有execute_published_task；不复制业务循环，不新增调度器或修改共享默认模型/配置。新文件只接受first_read/review_batch及当前研究用途：明确run_id、授权状态/引用、股票和报告版本、截止日、研究/检查点根、既有具体profile身份及本次有限预算。源版本在每个实际请求前核对；引用模型是配置中已启用、名称/host/model吻合的具体profile，禁止隐式换路由。

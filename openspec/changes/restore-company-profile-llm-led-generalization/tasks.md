@@ -1,5 +1,11 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.ER 日常入口接通单股按问题精读（离线开发）
+
+- [x] 6.ER1 同步设计/spec/用法，显式执行文件接受一股、同报告/hash绑定的enrichment_plan，目标沿API既有具体问题，不自动追满或新增业务循环。
+- [x] 6.ER2 原CLI/job→task_entry→原TaskService.enrich贯通，保有限预算、原文复核、逐轮writer及run_id幂等，错范围/版本/过期绑定拒绝，旧首读/复核/只读兼容。
+- [x] 6.ER3 受控实际入口验证非空补读/源复核、重复不重发、原稿保留及API/导出缺项，42不同直接/相关用例最终通过（含1测试ID修正后定向复验）；17保存稿计划/24writer保护、Review/strict/本人块Git及QuoteBak清理，0新真实调用/原研究根或生产改动。见workpaper-enrichment-job-20261121/result.md及§365。
+
 ### 6.EQ 日常job入口消费显式有界执行文件（离线开发）
 
 - [x] 6.EQ1 同步设计/spec和用法；原job支持first_read/review_batch及execution-plan-file，显式股票/源版本/模型/预算和研究根，不默认开模型或改共享配置。

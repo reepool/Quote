@@ -1185,7 +1185,7 @@ def create_parser():
     job_parser.add_argument('--job-id', required=True, help='任务ID')
     job_parser.add_argument(
         '--action',
-        choices=['preview', 'run', 'status', 'pause', 'resume', 'query', 'export', 'first_read', 'review_batch'],
+        choices=['preview', 'run', 'status', 'pause', 'resume', 'query', 'export', 'first_read', 'review_batch', 'enrich'],
         help='company_profile_common_core 等任务的操作',
     )
     job_parser.add_argument('--knowledge-cutoff', help='知识截止日 YYYY-MM-DD')
@@ -1229,9 +1229,9 @@ async def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    if args.command == 'job' and args.action in {'first_read', 'review_batch'}:
+    if args.command == 'job' and args.action in {'first_read', 'review_batch', 'enrich'}:
         if args.job_id != 'company_profile_common_core' or not args.execution_plan_file:
-            parser.error('first_read/review_batch requires the company-profile task and an execution plan file')
+            parser.error('first_read/review_batch/enrich requires the company-profile task and an execution plan file')
     if args.command == 'job' and args.execution_plan_file:
         if args.job_id != 'company_profile_common_core':
             parser.error('--execution-plan-file is only supported by company_profile_common_core')

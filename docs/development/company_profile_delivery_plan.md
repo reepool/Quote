@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-21 6.ER已交[日常单股精读入口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-enrichment-job-20261121/result.md)：显式文件enrich消费原API同报告/hash绑定问题，转原TaskService选章/抽取/源复核及writer，原稿保留、API/export逐轮读回及缺项成立，不自动补满。42不同直接/相关用例最终通过（含1测试请求ID修正后的定向复验），旧v1执行指纹兼容；17保存稿计划/15公司本地消费、24真实writer不变。0新真实调用/共享配置或生产，不重开S2；后续按需使用原入口。开工核6.EQ根已清，本轮company-profile-6er-hxHwFJOX在必要一套后清库/生成PDF/重复输出/脚本日志，正式源/有效缓存/旧失败/attempt及并行保护，流程沿A/B v3。
+
 2026-11-21 6.EQ已交[日常job两阶段入口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-configured-job-20261121/result.md)：execution-plan-file明确股票/版本/模型/有限预算和研究根，任务内构造依赖后转原应用/网关/队列/writer，不再需Python操作脚本。相同run_id复用结果不重置预算，控制/只读不建模型，CLI拒绝缺文件及混用范围/额度，旧默认/位置参数兼容；26受控直接/相关回归通过、24真实writer hash不变。用法及未授权模板见docs/development/company_profile_task_usage.md；0新真实调用/共享配置或生产，不重开S2。开工核6.EP两根已清，本轮company-profile-6eq-ytUFFXQw必要一套后清库/生成PDF缓存/重复测试输出/脚本日志，真实源/有效缓存/原稿/失败/attempt和并行保护。
 
 2026-11-21 6.EP已按用户明确批准交[两份真实两阶段画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-two-phase-observation-20261121/result.md)：原first_read在102.432秒交宁波/万达待核稿，再以保存计划/新实例review_batch收尾，全程861.363秒，9物理/1格式恢复/273436供应商total、unknown费用。首读51→最终54对象/75指标，宁波3新增4修订另核支持、非息收入候选仍缺，万达无新意见；原4writer/HTTP/导出/新实例及首读hash成立，旧20writer不变。窗口结束不追尾项或续额，不改旧S2/共享配置/生产；后续回日常批量使用与按需补读。准备根已清21文件，实际根company-profile-6ep-run-2WNv68pV在必要证据后清库/重复导出/捕获副本/脚本日志；真实研究根、正式源/有效缓存/失败/attempt和并行保护。

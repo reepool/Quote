@@ -18,6 +18,7 @@ from .models import PRODUCTION_AUTHORIZATION
 from .operations import execute_published_task
 from .publication import load_publication_control, publication_allows_new_writes
 from .stage5_provider import CommonGatewaySemanticProvider
+from .workpaper_enrichment import WorkpaperEnrichmentPlan
 from .workpaper_llm import workpaper_processing_identity
 from utils.config_manager import UnifiedConfigManager
 from utils.llm import LlmClient, load_project_environment
@@ -55,7 +56,7 @@ class CompanyProfileTaskPlan(_PlanModel):
     run_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
     authorization_status: Literal["planned", "authorized"] = "planned"
     approval_reference: str = ""
-    action: Literal["first_read", "review_batch"]
+    action: Literal["first_read", "review_batch", "enrich"]
     instrument_ids: tuple[str, ...] = Field(min_length=1, max_length=100)
     document_versions: dict[str, str]
     knowledge_cutoff: date
@@ -65,6 +66,7 @@ class CompanyProfileTaskPlan(_PlanModel):
     review: _Profile
     budget: _Budget
     review_plans: tuple[dict[str, Any], ...] = ()
+    enrichment_plan: WorkpaperEnrichmentPlan | None = None
 
     @model_validator(mode="after")
     def bound_scope(self):
@@ -81,8 +83,15 @@ class CompanyProfileTaskPlan(_PlanModel):
             or self.budget.recoveries > self.budget.physical_requests
             or any(p.attempt_seconds > self.budget.logical_seconds for p in (self.extract, self.review))):
             raise ValueError("task plan time/recovery limits are inconsistent")
-        if self.action == "first_read" and self.review_plans:
-            raise ValueError("first_read cannot load saved review plans")
+        if self.action != "review_batch" and self.review_plans:
+            raise ValueError("only review_batch can load saved review plans")
+        if self.action == "enrich":
+            plan = self.enrichment_plan
+            if (plan is None or self.instrument_ids != (plan.report.instrument_id,)
+                or self.document_versions[plan.report.instrument_id] != plan.report.document_version):
+                raise ValueError("enrich requires exactly its bound stock/report and enrichment plan")
+        elif self.enrichment_plan is not None:
+            raise ValueError("only enrich can load an enrichment plan")
         if self.action == "review_batch":
             if (len(self.review_plans) != len(self.instrument_ids)
                 or {p.get("instrument_id") for p in self.review_plans} != set(self.instrument_ids)
@@ -134,7 +143,10 @@ async def execute_configured_task(
             output_directory=output_directory, **arguments)
     if normalized != plan.action or plan.authorization_status != "authorized":
         raise ValueError("paid action requires a matching explicitly authorized task plan")
-    fingerprint = hashlib.sha256(json.dumps(plan.model_dump(mode="json"), sort_keys=True).encode()).hexdigest()
+    parameters = plan.model_dump(mode="json")
+    if plan.enrichment_plan is None:
+        parameters.pop("enrichment_plan")  # Preserve fingerprints of existing v1 execution files.
+    fingerprint = hashlib.sha256(json.dumps(parameters, sort_keys=True).encode()).hexdigest()
     run_root = checkpoint_root / "executions" / plan.run_id
     marker, result_path = run_root / "started.json", run_root / "result.json"
     if marker.exists():
@@ -187,7 +199,9 @@ async def execute_configured_task(
         result = await execute_published_task(action=normalized, provider=provider,
             processing_identity=identity, execution_budget=budget, token_budget=plan.budget.tokens,
             max_items=len(plan.instrument_ids), max_elapsed_seconds=budget.remaining_time(),
-            review_plans=plan.review_plans or None, **arguments)
+            review_plans=plan.review_plans or None,
+            enrichment_plan=plan.enrichment_plan.model_dump(mode="json") if plan.enrichment_plan else None,
+            **arguments)
         result["execution_plan"] = {"run_id": plan.run_id, "plan_sha256": fingerprint,
             "budget_path": str(run_root/"budget.json"), "production_authorization": PRODUCTION_AUTHORIZATION}
         _save_result(result_path, result)

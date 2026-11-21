@@ -1,0 +1,32 @@
+{
+  "task": "6.ER",
+  "baseline_commit": "397d5d6e",
+  "business_behavior": "Daily job consumes an API-generated stock-specific enrichment plan through the original TaskService and writer",
+  "full_test_command": "python -m pytest tests/unit/test_research/test_company_profile_configured_task.py tests/unit/test_research/test_company_profile_enrichment.py tests/unit/test_research/test_company_profile_operations.py::test_cli_forwards_five_actions_to_execute_job_direct tests/unit/test_research/test_company_profile_operations.py::test_scheduler_job_only_forwards_to_operations_owner tests/unit/test_research/test_company_profile_operations.py::test_scheduler_run_does_not_treat_zero_delivery_as_success tests/unit/test_research/test_company_profile_operations.py::test_published_catalog_lists_verified_task_not_design_or_legacy_names -q --basetemp=data/QuoteBak/company-profile-6er-hxHwFJOX/verified --junitxml=data/QuoteBak/company-profile-6er-hxHwFJOX/verified-tests.xml",
+  "first_full_result": {"passed": 41, "failed": 1, "skipped": 0, "elapsed_seconds": 188.58, "junit_seconds": 188.185},
+  "first_failure": "The test reused the prior enrichment request_id, so the original owner rejected a request conflict before the intended stale-hash assertion; no business rule was weakened",
+  "targeted_recheck_command": "python -m pytest 'tests/unit/test_research/test_company_profile_configured_task.py::test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_on_same_owner[enrich]' -q --basetemp=data/QuoteBak/company-profile-6er-hxHwFJOX/recheck --junitxml=data/QuoteBak/company-profile-6er-hxHwFJOX/recheck-tests.xml",
+  "targeted_result": {"passed": 1, "failed": 0, "skipped": 0, "elapsed_seconds": 64.35, "junit_seconds": 64.086},
+  "final_unique_passing_cases": 42,
+  "earlier_sandbox_run": "interrupted at the API thread call without a complete result; not counted",
+  "model_transport": "controlled ScriptedTransport, no live model request",
+  "daily_job_enrichment": {"nonempty_supplement": true, "source_review_completed": true, "old_record_unchanged": true, "new_instance_equal_export": true, "gaps_visible": true, "replay_no_new_client": true, "stale_hash_no_send": true},
+  "source_sha256": {
+    "main.py": "d6b4bc31801a2903756a7dd47581c228be0ac80e7a1a8779511f37f696066111",
+    "research/company_profile/task_entry.py": "18dd00439f94474e91fda09a820b1b033007cdb39cce12ee490a504e3ae5dcc3",
+    "tests/unit/test_research/test_company_profile_configured_task.py": "29e0acbedc6787ca08f2c81a6029aca549a5a950cfceee7df6b867333002101c",
+    "scheduler/tasks.py::ScheduledTasks.company_profile_common_core": "613b6bdbce2a7d38a2d011084dc92d4fd3a4c511e42e9e0be3c997d2c8d5a2aa"
+  },
+  "review": {"blocking_remaining": 0, "fixed": "Preserve existing v1 execution fingerprints when enrichment_plan is absent", "deferred": "Automatic gap filling and optional company detail", "unrelated_changes": "untouched"},
+  "syntax_and_diff": "passed",
+  "openspec_strict": "passed",
+  "protected_writer_files": 24,
+  "protected_writer_unchanged": true,
+  "saved_plans_validated": 17,
+  "saved_unique_stocks": 15,
+  "new_real_calls": 0,
+  "new_external_transfers": 0,
+  "old_S2_changed": false,
+  "shared_configuration_changed": false,
+  "production_authorization": "not_authorized"
+}

@@ -3,7 +3,13 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 ## ADDED Requirements
 
 ### Requirement: The existing job command accepts an explicit bounded workpaper plan
-The CLI and scheduled-task adapter MUST forward an explicitly supplied execution plan file to the company-profile application adapter. The adapter MUST reuse the existing configuration, gateway, budget, workpaper identity and published task owner for first_read or review_batch. It MUST require explicit authorized scope, stock/report versions, configured profile identities and finite limits before model construction; it MUST reject unknown plan fields, profile drift and out-of-scope report requests. Constructed model dependencies MUST remain local to this explicit invocation, without changing shared configuration, default routes or production schedules. It MUST NOT implement another extraction/review loop.
+The CLI and scheduled-task adapter MUST forward an explicitly supplied execution plan file to the company-profile application adapter. The adapter MUST reuse the existing configuration, gateway, budget, workpaper identity and published task owner for first_read, review_batch or enrich. It MUST require explicit authorized scope, stock/report versions, configured profile identities and finite limits before model construction; it MUST reject unknown plan fields, profile drift and out-of-scope report requests. Constructed model dependencies MUST remain local to this explicit invocation, without changing shared configuration, default routes or production schedules. It MUST NOT implement another extraction/review loop.
+
+#### Scenario: A saved API gap plan is executed through the daily job
+- **WHEN** a caller supplies an explicitly authorized enrich execution file containing exactly one stock and its existing report/hash-bound enrichment plan
+- **THEN** the adapter MUST reject mismatched stock/version or a missing plan, and forward the original concrete questions to TaskService.enrich for its existing lineage/hash checks, targeted selection/extraction and source review
+- **AND** the original writer MUST retain the first reading and append the supplementary reading, with content, remaining gaps and actual review state available through the existing API/export; repeated run_id submissions MUST NOT issue new model requests
+- **AND** first_read and review_batch files MUST reject enrichment plans, while later explicitly requested readings and review recovery continue through their existing owners without automatic gap-filling
 
 #### Scenario: An operator submits a bounded first-read or saved-review command
 - **WHEN** an authorized caller supplies a valid plan through the existing job command

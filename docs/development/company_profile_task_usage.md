@@ -1,4 +1,4 @@
-# 公司画像首读与独立复核：日常命令
+# 公司画像首读、复核与按需精读：日常命令
 
 当前为研究用途。使用原`company_profile_common_core`任务和原队列/writer；不需要写Python操作脚本，也不会自动新增调度。真实新调用须有对应的明确有限授权，示例是未授权模板，不复活历史窗口。联网执行遵循项目获准联网环境要求，开发命令先加载统一环境：
 
@@ -7,7 +7,7 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 python main.py job --job-id company_profile_common_core --action first_read --execution-plan-file /absolute/path/first-read.json
 ```
 
-文件负责股票/报告版本、模型、预算和读取根；不要再与`--instrument-ids`、`--knowledge-cutoff`、`--max-items`、`--token-budget`或`--max-elapsed-seconds`混用，CLI会拒绝这种歧义。无文件的旧动作保持原行为，新`first_read/review_batch`必须明确提供文件。
+文件负责股票/报告版本、模型、预算和读取根；不要再与`--instrument-ids`、`--knowledge-cutoff`、`--max-items`、`--token-budget`或`--max-elapsed-seconds`混用，CLI会拒绝这种歧义。无文件的旧动作保持原行为，新`first_read/review_batch/enrich`必须明确提供文件。
 
 ## 首读文件示例
 
@@ -73,4 +73,24 @@ python main.py job --job-id company_profile_common_core --action export --execut
 
 每个`run_id`的参数hash、结果和账本保存到`checkpoint_root/executions/<run_id>/`。完成后以相同文件重提会直接返回原结果，不创建新模型或预算；相同ID改股票、模型或额度会拒绝。已开始但未留下完整结果的ID不自动续发；先检查原状态、账本及待办，确需新执行时使用新的明确有界授权/计划，保留已有成功阶段。请保留该检查点目录，删除目录不等于恢复旧授权。
 
-`status/pause/query/export/preview`使用文件定位数据，但不创建模型客户端或占用这个run_id，即使文件仍为planned也可使用。`run/resume/enrich`仍沿原入口，当前文件适配只承担first_read/review_batch，不把它当通用任务或自动补满画像。
+`status/pause/query/export/preview`使用文件定位数据，但不创建模型客户端或占用这个run_id，即使文件仍为planned也可使用。`run/resume`仍沿原入口；显式文件不承担自动补满画像。
+
+## 按股票和具体问题精读
+
+先从年报API查看`information_gaps`及建议，再用已有接口生成计划。例如：
+
+```http
+POST /api/v1/research/company/002142.SZ/annual-profile/enrichment-plan
+Content-Type: application/json
+
+{"request_id":"002142-income-detail-1","targets":[{"element":"scale_and_mix","question":"公司的主要收入来源及本期金额是什么？请优先阅读收入构成相关章节，未取得的内容保留缺项。"}]}
+```
+
+该接口只生成计划，不启动读取。复制上面首读文件，保留对应研究根/检查点根及具体模型配置，使用新的`run_id`和本次明确有界预算，将`action`设为`enrich`，`instrument_ids`只保留目标股票，`document_versions`只保留同一报告版本，并把API返回的**完整`enrichment_plan`对象**放入文件的同名字段；不放`review_plans`。计划自带原工作ID、原稿hash、报告身份和具体问题，不手工改写绑定。获得本次授权后执行：
+
+```bash
+python main.py job --job-id company_profile_common_core --action enrich --execution-plan-file /absolute/path/enrich.json
+python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/enrich.json --output-directory /absolute/path/new-export-directory
+```
+
+精读沿原应用完成选章、抽取和源复核，原稿保留，新增内容以独立阅读批次进入同报告API及`annual_profiles.json`；未找到的内容仍标缺项，不要求全部补齐。源/原稿hash过期、跨股跨报告或计划与动作不符会拒绝；同`run_id`重提只读原结果。需要第二轮时先按当前画像生成新问题计划，再给新执行文件及明确预算，不通过修改旧文件续额。复核未完成时可按已有`review-plan`→`review_batch`接续，无需重新选章/抽取；这也需要对应的新有限授权。

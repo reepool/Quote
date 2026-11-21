@@ -1,0 +1,130 @@
+{
+  "task": "6.ER",
+  "protected_writer_files": 24,
+  "unchanged": true,
+  "saved_plan_round_trips": [
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "000725.SZ",
+      "element": "business_structure",
+      "base_work_id": "bp-work-39973bd61a38a0f69bf6e159",
+      "base_sha256": "792defb39d4c1faad0f8d227fd137d857269287da924199b5c11cb6285978d21"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "002027.SZ",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-7c183d820fbfa220e24920bb",
+      "base_sha256": "0f12fc4fb3b80310ec2dd0d512b456b5bbc054b521840cddd0528cb23d17c943"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "002142.SZ",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-b9c957eb2ed7cf1a2da0ca3e",
+      "base_sha256": "88bbefd352630b50faf7046d4dad62952e940ee448682b7989625bde87dcdef2"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "002352.SZ",
+      "element": "business_structure",
+      "base_work_id": "bp-work-01e30502f99867e63a3e7126",
+      "base_sha256": "5cf244378046497f684541d26e95714edb3036f41410edad95f21bcfe9b90ab5"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "002594.SZ",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-b94386f72fa9b8008e18090c",
+      "base_sha256": "bf8ca4934cf729d25fa4915044758c43f62d864b36bec1710a90b548986e7208"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "300144.SZ",
+      "element": "upstream_inputs",
+      "base_work_id": "bp-work-8a47bdc6129671bc9ca0fca1",
+      "base_sha256": "f2118ef7b2b0a93fece334e695be83710e996a0b677221c2d7d46b52d8da51c5"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "600309.SH",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-2829fcbafb318d193e68b256",
+      "base_sha256": "f8d5dbcd8d211be1fb6b3243da55a3ab03156784cfb7809bb6bd0475b53d4da6"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "600438.SH",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-b714e2a56fcb44d188cf3fee",
+      "base_sha256": "99a77bd7dcfdb0e8a3fee5ddbe5b50fdd512249880adf167433767b5619dcd6f"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "601021.SH",
+      "element": "downstream_customers",
+      "base_work_id": "bp-work-13b0c399f5b0c8150accfdcc",
+      "base_sha256": "f983a94587f063e3d6e031ecf463d65c248b06c9c6c990063a1b4fb2dfe2d519"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "601111.SH",
+      "element": "business_structure",
+      "base_work_id": "bp-work-f486411f7f36b5e068ceefa1",
+      "base_sha256": "ffbd5d3fd41ad32949a91094ee916601a164603ba4bac9213fb053be23b00309"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "601601.SH",
+      "element": "material_changes",
+      "base_work_id": "bp-work-e27361c6f6d02924c70764e2",
+      "base_sha256": "0985ef6ae26fd65accf7cf42eeadfd78ec88c45d076ebea50d90d493688146e7"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "601881.SH",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-58d1b361ac5dd345f0d4e2af",
+      "base_sha256": "219bfb4fd4674eb2f4c6edff8d42a3b286dce0bc92c240b518697c56774ef93d"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "601888.SH",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-245e7049d39a49cac0cd6996",
+      "base_sha256": "eb5c12ca9abaaaf10c9c76a4f23348a782b9ca9b32046621791e00ea2cfc465c"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "920002.BJ",
+      "element": "business_structure",
+      "base_work_id": "bp-work-35b3e51d85531e58dbebe54e",
+      "base_sha256": "27906c04a0d5faef6f5913d92124b2c24d4dfd5b8ca5e290152328366b5dfe53"
+    },
+    {
+      "root": "data/research/company_profile_batch_reviewed_20261121",
+      "instrument_id": "920005.BJ",
+      "element": "business_structure",
+      "base_work_id": "bp-work-7cd3e40c46bb206be0cd4234",
+      "base_sha256": "0719b1915ac0f0980ce0c559c104a6a3e6cdd5089e287aec0f1b96d9dc49d07b"
+    },
+    {
+      "root": "data/research/company_profile_two_phase_20261121",
+      "instrument_id": "002142.SZ",
+      "element": "customers_channels_markets",
+      "base_work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "base_sha256": "cfa88cb006f00846203dda3f42c6d92361f7be405f159d484e071734d66901d3"
+    },
+    {
+      "root": "data/research/company_profile_two_phase_20261121",
+      "instrument_id": "920002.BJ",
+      "element": "operating_drivers",
+      "base_work_id": "bp-work-493287c9bad4098c25e4f70c",
+      "base_sha256": "954e1018080e63e1e93eb29a54d1abf1f85149fa1dad109b8aab20d8494705f0"
+    }
+  ],
+  "actual_unique_stocks": 15,
+  "new_real_calls": 0,
+  "execution_started": false,
+  "source_quality_reassessed": false
+}

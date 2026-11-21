@@ -8874,8 +8874,8 @@ class ScheduledTasks:
                 result = await execute_configured_task(action=action, storage=storage,
                     execution_plan_file=execution_plan_file, shared_asset_access=shared_asset_access,
                     output_directory=output_directory, reason=reason)
-            elif str(action).strip().lower() in {"first_read", "review_batch"}:
-                raise ValueError("company-profile first_read/review_batch requires execution_plan_file")
+            elif str(action).strip().lower() in {"first_read", "review_batch", "enrich"}:
+                raise ValueError("company-profile first_read/review_batch/enrich requires execution_plan_file")
             else:
                 result = await execute_published_task(
                     action=action,

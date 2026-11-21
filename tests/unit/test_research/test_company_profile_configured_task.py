@@ -46,7 +46,34 @@ def config_for_test(monkeypatch):
     return config
 
 
-def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_on_same_owner(tmp_path,monkeypatch):
+@pytest.mark.parametrize('case',['missing','two_stocks','other_stock','other_version','empty_targets','first_read','review_batch'])
+def test_enrichment_plan_scope_is_checked_before_model_construction(tmp_path,monkeypatch,case):
+    from tests.unit.test_research.test_company_profile_workpaper import _report
+
+    plan=plan_for(tmp_path)
+    report=_report().model_dump(mode='json');report['document_version']='fixture-document'
+    plan.update(action='enrich',enrichment_plan=dict(schema_version='company_profile_enrichment.v1',
+        request_id='specific-question',base_work_id='original-reading',base_workpaper_sha256='a'*64,
+        report=report,targets=[dict(element='products_services',question='What services are provided?')]))
+    if case=='missing':plan.pop('enrichment_plan')
+    elif case=='two_stocks':
+        plan['instrument_ids'].append('600001.SH');plan['document_versions']['600001.SH']='fixture-document'
+    elif case=='other_stock':report['instrument_id']='600001.SH'
+    elif case=='other_version':report['document_version']='other-document'
+    elif case=='empty_targets':plan['enrichment_plan']['targets']=[]
+    elif case=='first_read':plan['action']='first_read'
+    elif case=='review_batch':plan.update(action='review_batch',review_plans=[dict(instrument_id='600000.SH',report=report)])
+    client=Mock(side_effect=AssertionError('invalid scope must not construct a client'))
+    monkeypatch.setattr(task_entry,'LlmClient',client)
+    with pytest.raises(ValueError):
+        asyncio.run(task_entry.execute_configured_task(action=plan['action'],storage=None,
+            execution_plan_file=save(tmp_path,plan)))
+    client.assert_not_called()
+    assert not (tmp_path/'checkpoints').exists()
+
+
+@pytest.mark.parametrize('continuation',['review_batch','enrich'])
+def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_on_same_owner(tmp_path,monkeypatch,continuation):
     content=_pdf_bytes(['1. Business', 'Company provides loans and settlement services with source-backed business information.'])
     pdf=tmp_path/'annual.pdf';pdf.write_bytes(content)
     plan=plan_for(tmp_path);plan['document_versions']['600000.SH']=hashlib.sha256(content).hexdigest()
@@ -57,19 +84,25 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     class Transport(ScriptedTransport):
         async def send(self,url,headers,payload,timeout_seconds):
             source=json.loads(payload['messages'][-1]['content'])
-            if len(self.calls)==0:
+            if len(self.calls)==0 or (continuation=='enrich' and len(self.calls)==2):
                 assert source['sections']
+                if len(self.calls)==2:
+                    assert source['targeted_reading']['targets'][0]['element']=='products_services'
                 selected=max(source['sections'],key=lambda row:row[3])[0]
                 reply=dict(selected_section_ids=[selected],rationale='Read the source business section.',deferred=[],stop_reason='Bounded selection.')
-            elif len(self.calls)==1:
+            elif len(self.calls)==1 or (continuation=='enrich' and len(self.calls)==3):
+                supplemental=len(self.calls)==3
                 elements={name:dict(status='unclear',facts=[],limitations=['Not obtained from this selected source.']) for name in ELEMENT_LABELS}
-                elements['business_structure']=dict(status='observed',facts=[dict(fact_id='main',
-                    text='Company provides loans and settlement services.',subject_scope='consolidated_group',
+                elements['products_services' if supplemental else 'business_structure']=dict(status='observed',facts=[dict(
+                    fact_id='supplement' if supplemental else 'main',
+                    text='Loans and settlement services.' if supplemental else 'Company provides loans and settlement services.',subject_scope='consolidated_group',
                     period='2025',evidence_ids=['source-0001'],metrics=[])],limitations=[])
+                if supplemental:
+                    assert source['targeted_reading']['targets'][0]['element']=='products_services'
                 reply=dict(schema_version='company_profile_workpaper_draft.v1',elements=elements)
             else:
-                assert len(self.calls)==2
-                reply=dict(reviewed_fact_ids=['main'],findings=[])
+                assert len(self.calls)==(4 if continuation=='enrich' else 2)
+                reply=dict(reviewed_fact_ids=['supplement' if continuation=='enrich' else 'main'],findings=[])
             self.responses.append(_response(reply))
             return await super().send(url,headers,payload,timeout_seconds)
 
@@ -110,23 +143,51 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     assert first['state']=='completed' and len(transport.calls)==2 and access.exact_calls
     reader=CompanyProfileReadService(tmp_path/'output')
     before=reader.research_profile('600000.SH')
+    base_path=tmp_path/'output/company_profile_common_core.v1'/f"{before['readings'][0]['work_id']}.json"
+    base_bytes=base_path.read_bytes()
     assert before['facts'][0]['fact']['text']=='Company provides loans and settlement services.'
     assert before['readings'][0]['review_execution']=='deferred' and before['readings'][0]['review_status']=='not_reviewed'
     assert asyncio.run(task_entry.execute_configured_task(action='first_read',storage=storage,
         execution_plan_file=file,llm_config=None))==first  # No configuration/client reloaded on replay.
     assert len(clients)==1 and len(transport.calls)==2
-    review=deepcopy(plan);review.update(run_id='review',action='review_batch',review_plans=[
-        reader.plan_review_recovery('600000.SH',request_id='job-review')])
+    review=deepcopy(plan);review.update(run_id='review',action=continuation)
+    if continuation=='enrich':
+        from api.company_profile_routes import EnrichmentPlanRequest, plan_annual_company_profile_enrichment
+
+        requested=EnrichmentPlanRequest(request_id='job-enrich',targets=[dict(
+            element='products_services',question='What products and services does the company provide?')])
+        response=asyncio.run(plan_annual_company_profile_enrichment('600000.SH',requested,reader))
+        review['enrichment_plan']=response['enrichment_plan']
+    else:
+        review['review_plans']=[reader.plan_review_recovery('600000.SH',request_id='job-review')]
     review_file=save(tmp_path,review)
-    final=invoke('review_batch',review_file)
-    assert final['state']=='completed' and len(transport.calls)==3 and len(clients)==2
-    current=reader.research_profile('600000.SH')
+    final=invoke(continuation,review_file)
+    assert final['state']=='completed' and len(transport.calls)==(5 if continuation=='enrich' else 3) and len(clients)==2
+    current=CompanyProfileReadService(tmp_path/'output').research_profile('600000.SH')
     assert current['readings'][-1]['review_status']=='completed'
-    assert len([f for f in current['facts'] if f['fact']])==1
-    assert current['facts'][0]['state']=='superseded'
-    assert asyncio.run(task_entry.execute_configured_task(action='review_batch',storage=storage,
+    assert len([f for f in current['facts'] if f['fact']])==(2 if continuation=='enrich' else 1)
+    assert base_path.read_bytes()==base_bytes
+    if continuation=='enrich':
+        assert current['facts'][0]['fact']['text']==before['facts'][0]['fact']['text']
+        assert any(f['element']=='products_services' and f['fact']['text']=='Loans and settlement services.'
+            for f in current['facts'] if f['fact'])
+        assert current['information_gaps']  # Acquiring one element does not claim all gaps closed.
+        exported=reader.export(('600000.SH',),export_directory=tmp_path/'export')
+        annual=next(Path(p) for p in exported['files'] if Path(p).name=='annual_profiles.json')
+        assert json.loads(annual.read_text())['profiles'][0]==current
+        stale=deepcopy(review);stale['run_id']='stale';stale['enrichment_plan']['base_workpaper_sha256']='0'*64
+        stale['enrichment_plan']['request_id']='stale-base'
+        with pytest.raises(ValueError,match='hash changed'):
+            asyncio.run(task_entry.execute_configured_task(action='enrich',storage=storage,
+                execution_plan_file=save(tmp_path,stale),llm_config=config,shared_asset_access=access))
+        assert len(transport.calls)==5 and base_path.read_bytes()==base_bytes
+        assert CompanyProfileReadService(tmp_path/'output').research_profile('600000.SH')==current
+    else:
+        assert current['facts'][0]['state']=='superseded'
+    count=len(clients)
+    assert asyncio.run(task_entry.execute_configured_task(action=continuation,storage=storage,
         execution_plan_file=review_file))==final
-    assert len(clients)==2
+    assert len(clients)==count
     assert (tmp_path/'checkpoints/executions/first/budget.json').is_file()
     assert (tmp_path/'checkpoints/executions/review/budget.json').is_file()
 
@@ -169,7 +230,8 @@ def test_control_actions_use_plan_roots_without_model_or_authorization(tmp_path,
 def test_started_plan_cannot_get_new_budget_or_change_parameters(tmp_path,monkeypatch):
     plan=plan_for(tmp_path);file=save(tmp_path,plan)
     parsed=task_entry.CompanyProfileTaskPlan.model_validate_json(file.read_text())
-    digest=hashlib.sha256(json.dumps(parsed.model_dump(mode='json'),sort_keys=True).encode()).hexdigest()
+    # A marker produced before enrich was added must still match an unchanged v1 file.
+    digest=hashlib.sha256(json.dumps(parsed.model_dump(mode='json',exclude={'enrichment_plan'}),sort_keys=True).encode()).hexdigest()
     root=tmp_path/'checkpoints/executions/first';root.mkdir(parents=True)
     (root/'started.json').write_text(json.dumps({'plan_sha256':digest}))
     monkeypatch.setattr(task_entry,'LlmClient',Mock(side_effect=AssertionError('no fresh client')))
@@ -216,10 +278,11 @@ def test_job_plan_is_thin_forwarding_and_new_actions_require_a_file(monkeypatch)
     assert task._send_task_report.await_args.kwargs['job_config'] is config
 
 
+@pytest.mark.parametrize('action',['first_read','enrich'])
 @pytest.mark.parametrize('extra',[['--token-budget','1'],['--job-id','another-job'],['missing-file']])
-def test_cli_rejects_ambiguous_scope_or_other_job_before_initialization(monkeypatch,extra):
+def test_cli_rejects_ambiguous_scope_or_other_job_before_initialization(monkeypatch,extra,action):
     import main
-    args=['quote','job','--job-id','company_profile_common_core','--action','first_read','--execution-plan-file','plan.json']
+    args=['quote','job','--job-id','company_profile_common_core','--action',action,'--execution-plan-file','plan.json']
     if extra[0]=='--job-id':args[3]=extra[1]
     elif extra[0]=='missing-file':args=args[:-2]
     else:args+=extra
