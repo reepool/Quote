@@ -1,5 +1,13 @@
 ## Context
 
+### 6.EL 首读与源复核分开推进，不另建调度链
+
+用户2026-11-21同意“批量先交画像、复核独立接续”。原workpaper_processing_identity增加显式defer_review选项，仅启用复核政策时可用，写入workpaper_review_execution=deferred及原处理hash；默认旧内联行为/旧序列化不变。原runtime完成选章/有源抽取及原writer发布后结束首读，不发送review/repair/final；API保not_reviewed与planned follow-up，不算正式可用。暂停高阶复核不会触发未发首读的付费调用或阻止另一次首读执行。
+
+原TaskService增加内部execute_review_batch，输入是有限、显式的一股一份保存计划清单和有限总时间/既有预算，串行调用已有execute_review_recovery，不复制模型/修订/writer循环。执行接续时去掉deferred标志，精确原稿/源/hash及独立限制仍逐项验证。同request已持久结果直接复用，旧失败不自动以新ID重试；新的有限调用仍须批准。仅本次实际新复核的连续不同公司同通道同因失败暂停后续复核，未执行项明确deferred并保原稿，成功新请求打断失败相邻性；复用/跳过/阻塞不算新请求，既不重计旧失败，也不伪造通道恢复。重启时复用同清单的已完成request，只处理未执行项。已完成但有开放意见不自动追补。
+
+全部沿原TaskService/队列/writer/read owner，不新增HTTP付费执行、后台调度器或数据库。原控制暂停、硬预算、源合同及不可隔离错误仍可停止；普通补充缺项不拒整稿。本卡只离线受控验证和既有十五稿只读核对，不新发模型/探针，不改当前研究根或共享配置；旧S2结束、正式95%/99%、S3和生产边界不改。
+
 ### 6.EJ 原TaskService执行只读计划，不再手工组装续跑答案
 
 在既有TaskService增加内部execute_review_recovery用例，不加HTTP付费执行、调度器或第二业务循环。计划和当前reading/report/hash完全匹配后，从本地保存的原抽取JSON重建seed并核原draft hash；已有初核/修订只按原hash回执复用。调用原_run限定单股票及原seed/resume路径，新request生成独立工作ID，同request不重复发送。复核接续已有可读父稿，故不先公开恢复的未经审查原稿；源/PDF仍在发送前核对。

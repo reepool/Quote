@@ -266,6 +266,7 @@ class CompanyProfileReadService:
                              "max_new_logical_requests": 0, "candidate_ids": [], "reason": "superseded_by_review_successor"}
             readings.append({"work_id": record.work_id, "workpaper_sha256": workpaper_hash(paper),
                 "enrichment": plan, "origin": paper.origin,
+                **({"review_execution": "deferred"} if _record_processing_identity(record).get("workpaper_review_execution") == "deferred" else {}),
                 **({"review_recovery": {key: value for key, value in recovery.items() if key != "prior_use_review"}} if recovery else {}),
                 **({"superseded_by_review_work_id": successor} if successor else {}),
                 "reading_scope": paper.reading_scope.model_dump(mode="json"),
@@ -315,7 +316,8 @@ class CompanyProfileReadService:
                 "visible_fact_count": len(visible),
                 "visible_metric_count": sum(len(fact["metrics"]) for fact in visible),
                 "fact_states": dict(sorted(Counter(entry["state"] for entry in profile["facts"]).items())),
-                "readings": [{key: reading[key] for key in ("work_id", "origin", "review_status")}
+                "readings": [{**{key: reading[key] for key in ("work_id", "origin", "review_status")},
+                              **({"review_execution": reading["review_execution"]} if "review_execution" in reading else {})}
                              for reading in profile["readings"]],
                 "information_gap_count": sum(gap.get("active", True) for gap in profile["information_gaps"]),
                 "information_gap_elements": sorted({gap["element"] for gap in profile["information_gaps"] if gap.get("active", True)}),

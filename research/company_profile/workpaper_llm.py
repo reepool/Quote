@@ -36,7 +36,10 @@ WORKPAPER_READING_STRATEGY = "chapter_workpaper_v1"
 
 def workpaper_processing_identity(
     *, real: bool = True, review: bool = False, review_profile: str | None = None,
+    defer_review: bool = False,
 ) -> dict[str, Any]:
+    if defer_review and not review:
+        raise ValueError("deferred workpaper review requires an enabled review policy")
     identity = {
         "semantic_policy": "company_profile_llm_led.v2",
         "reading_strategy": WORKPAPER_READING_STRATEGY,
@@ -63,6 +66,8 @@ def workpaper_processing_identity(
             quality_review_profile=review_profile,
             repair_profile="semantic_extraction__deepseek" if real else None,
         )
+        if defer_review:
+            identity["workpaper_review_execution"] = "deferred"
     return identity
 
 

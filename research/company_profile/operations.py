@@ -725,7 +725,8 @@ class CompanyProfileTaskService:
         old_identity, old_hash = self.processing_identity, self.processing_identity_hash
         old_source, old_runtime_source = self.page_source, self.runtime.page_source
         identity = {key: value for key, value in old_identity.items() if key not in {
-            "review_resume_hash", "workpaper_extraction_resume_hash", "workpaper_enrichment"}}
+            "review_resume_hash", "workpaper_extraction_resume_hash", "workpaper_enrichment",
+            "workpaper_review_execution"}}
         digest = lambda value: hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
         identity.update(workpaper_review_recovery=link.model_dump(mode="json"),
             review_existing_draft_hash=workpaper_hash(seed), review_seed_receipts_hash=digest(receipts))
@@ -752,6 +753,78 @@ class CompanyProfileTaskService:
         finally:
             self.processing_identity, self.processing_identity_hash = old_identity, old_hash
             self.page_source, self.runtime.page_source = old_source, old_runtime_source
+
+    async def execute_review_batch(
+        self, plans: Sequence[Mapping[str, Any]], *, knowledge_cutoff: str | None = None,
+        max_elapsed_seconds: float = DEFAULT_MAX_ELAPSED_SECONDS,
+    ) -> dict[str, Any]:
+        """Consume a bounded saved work list; never extract or mint retry IDs.
+
+        Persisted per-plan successors are the restart checkpoint. Reusing the
+        same list skips processed requests, even if their old review failed.
+        This pause concerns only the review list, not other first-read tasks.
+        """
+        from .workpaper_review import consecutive_review_failure
+
+        seconds = float(max_elapsed_seconds)
+        if not plans or not 0 < seconds < float("inf"):
+            raise ValueError("review batch requires explicit plans and finite time")
+        saved = [json.loads(json.dumps(dict(plan))) for plan in plans]
+        instruments = [plan.get("instrument_id") for plan in saved]
+        request_ids = [plan.get("request_id") for plan in saved]
+        if (any(not isinstance(value, str) or not value for value in [*instruments, *request_ids])
+            or len(set(instruments)) != len(saved) or len(set(request_ids)) != len(saved)):
+            raise ValueError("review batch requires one distinct bound request per stock")
+        if self.execution_budget is not None:
+            seconds = min(seconds, self.execution_budget.remaining_time())
+        if seconds <= 0:
+            raise ValueError("review batch budget is exhausted")
+        cutoff = _knowledge_cutoff(knowledge_cutoff)
+        deadline = time.monotonic() + seconds
+        self.control.begin(action="review_batch", run_id="review-batch-" + uuid.uuid4().hex[:12],
+            parameters={"request_ids": request_ids, "instrument_ids": instruments,
+                        "knowledge_cutoff": cutoff, "max_elapsed_seconds": seconds})
+        items, reviews, stop_reason = [], [], None
+        for plan in saved:
+            row = {key: plan[key] for key in ("instrument_id", "request_id")}
+            if stop_reason is None and (time.monotonic() >= deadline or self._should_stop_run()):
+                stop_reason = "review_batch_time_budget_or_stop_requested"
+            if stop_reason is not None:
+                items.append({**row, "state": "deferred", "reason": stop_reason})
+                continue
+            if plan.get("state") != "planned":
+                items.append({**row, "state": "skipped", "reason": "plan_not_executable",
+                              "plan_state": plan.get("state")})
+                continue
+            try:
+                result = await self.execute_review_recovery(plan, knowledge_cutoff=cutoff,
+                    max_elapsed_seconds=max(0.0, deadline - time.monotonic()))
+            except (ValueError, FileNotFoundError) as exc:
+                # Contract/source inspection is not a reviewer outage or a retry.
+                items.append({**row, "state": "blocked", "reason": "review_plan_or_source_invalid",
+                              "error_type": type(exc).__name__})
+                continue
+            work_ids = result.get("enqueue", {}).get("work_ids") or ()
+            work_id = result.get("work_id") or (work_ids[0] if len(work_ids) == 1 else None)
+            record = self.reads._latest_by_instrument(work_id=work_id, include_enrichments=True).get(
+                row["instrument_id"]) if work_id else None
+            paper = getattr(record, "workpaper", None)
+            review = paper.quality_review if paper is not None else None
+            items.append({**row, "state": result["state"], "work_id": work_id,
+                          "review_status": review.status if review is not None else "not_reviewed"})
+            if result["state"] != "already_processed":
+                # Reused/skipped requests are neither new failures nor evidence
+                # of a healthy channel; count adjacency among new reviews only.
+                reviews.append((row["instrument_id"], review))
+                stop_reason = consecutive_review_failure(tuple(reviews[-2:]))
+            if result["state"] in {"paused", "failed"}:
+                stop_reason = stop_reason or "review_task_" + result["state"]
+        result = {"action": "review_batch", "state": "paused" if stop_reason else "completed",
+                  "items": items, "stop_reason": stop_reason,
+                  "remaining_request_ids": [item["request_id"] for item in items if item["state"] == "deferred"],
+                  "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION}
+        self.control.finish(state=result["state"], result=result)
+        return result
 
     async def execute(
         self,

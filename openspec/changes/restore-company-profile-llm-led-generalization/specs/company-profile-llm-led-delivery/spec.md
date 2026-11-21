@@ -2,6 +2,20 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Deferred source review does not block first-read research delivery
+An explicitly deferred-review workpaper MUST use the existing task/runtime/writer path to deliver its source-bound extraction without issuing review, repair or final-check requests. The deferred policy MUST be part of processing identity, preserve the default inline mode, and expose not-reviewed/deferred scope through the existing API and export. Useful missing or uncertain supplementary detail MUST NOT reject the draft; deferred content MUST NOT be counted as formally reviewed, accurate or production-approved.
+
+#### Scenario: A batch completes first reads while the reviewer is unavailable
+- **WHEN** the caller explicitly enables deferred review for bounded first-read tasks
+- **THEN** each valid extraction remains readable with its gaps and a bound pending-review plan, without contacting the review channel
+- **AND** later review failures do not remove these drafts or stop a separately executed first-read task; known wrong facts and independent restrictions remain isolated
+
+#### Scenario: Saved review plans are consumed as one bounded work list
+- **WHEN** the original TaskService executes an explicit finite list of saved per-stock review plans
+- **THEN** it reuses the existing per-plan recovery path, original report/source/hash checks, persisted request idempotency and finite execution budget
+- **AND** two adjacent newly executed reviews for distinct companies with the same channel and execution cause pause only remaining review dispatch, retain processed results, and report every unattempted plan as deferred
+- **AND** resubmitting the same list after restart does not resend processed requests or count their old failures as fresh consecutive failures; blocked plans and completed open findings do not trigger automatic repair loops, new request IDs, budgets or production approval
+
 ### Requirement: Acceptance separates basic business answers from supplementary acquisition and resource policy
 New batch acceptance contracts MUST separate substantive principal-business, main-product/service and earning-mechanism answers from recommended supplementary detail. Missing detailed models, uses, subsidiary inventories, parallel income labels or fine-grained supply-chain information MUST NOT alone reject an otherwise supported basic research profile. Whole major business lines and known false assertions remain subject to the existing correctness requirements. Existing frozen conditions and results MUST NOT be rescored by removing inconvenient items. A current research-delivery assessment MUST NOT be reported as a same-version first-run success, a new source audit or measured accuracy.
 

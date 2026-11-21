@@ -1,5 +1,17 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 357. 6.EL批量先交画像、复核独立接续：不建平台、不重抽、不追单股细项
+
+用户2026-11-21同意上一轮方案，2d971c4a/master开工、暂存空。按产品→验收→交付→A/B v3及OpenSpec/business-first技能先同步当前change/产品、任务卡和spec，再在原TaskService/runtime/read owner实现；前轮6.EK根已清，本轮唯一company-profile-6el-XZO237am。既有核心/共享配置/市场依赖及混合文档段落保护，非框架重构，不新造调度器、HTTP付费执行或writer/数据库。
+
+原workpaper_processing_identity的defer_review只在复核政策开启时启用，模式进入身份/hash；默认旧内联形态不改。原run完成选章/有源抽取及发布即结束首读，待核/模式/缺项随API/导出可见。原TaskService.execute_review_batch以显式一股一份计划及有限总时间/原预算，串行复用execute_review_recovery；执行复核暂去deferred、结束恢复原身份。旧成功阶段不重跑，同request已持久就already_processed；过期/坏计划blocked、已完成开放意见不自动修订。只对本次新复核连续两家同通道同因失败停余项，未执行项deferred/remaining可查；不是停止独立首读，硬预算/源/原控制边界继续生效。
+
+原网关受控闭环实际通过：三首读6次受控发送、0复核；首家终核失败与次家初核失败各耗一次恢复后停第三复核，原稿/正确主营保留，错利润不复活、source_only继承。第四独立首读仍成功；新Service从磁盘重载原清单，前两request复用，只给第三份发1次受控初核，再次全清单0发送。API/annual_profiles/query/新实例一致且历史superseded不双计。原十五家18writer只读hash不变，431可读对象692指标含跨轮重叠，顺丰与EK权威API相同；不生成新真实画像/质量分数或公司数。
+
+新增不同用例12个：首次9完成151.99秒（原入口128.65、十五稿19.27），最终10快速完成7.34秒、与前7项重叠不累加；中间9/2 deselected、7.53秒也是重叠过程。另132不相交旧回归181.32秒全部通过，含原内联/源数值/复核/目录/API/接续计划/合并导出。首次旧集沙箱ASGI在4项后挂起、核准PID后SIGTERM停止，获准环境同集完整通过，0 skipped，不称全仓套件绿；两组并发时间不相加作墙钟，开发活跃未精确计量。详[结果与验证](workpaper-deferred-batch-20261121/result.md)及JUnit/hash。Review A类修正“跳过旧request伪造通道恢复”，针对两新失败夹旧请求的反例通过，无剩余阻塞；B类后台/性能/细项后置，C类既有并行不动。严格OpenSpec、语法/diff通过。
+
+本轮0新真实模型/探针/外传/付费、0写当前研究根，不改旧S2方案结束、95%/99%、S3或生产权限；受控成功不证明真实批量通道稳定。必要一套验证摘要/JUnit/源码及原数据hash后清本人测试库、沙箱中断残留、导出、脚本日志，确切文件数/字节见cleanup.json；正式PDF/有效缓存/旧失败/attempt/当前及旧研究根与并行保护。本人块隔离正常commit/push，不整文件提交混合既有段落。下一实际验证仅复用已有稿补必要未完成复核，须新有限整卡授权，不重抽整池/追顺丰KLN或供应链细节。
+
 ## 356. 6.EK顺丰五候选真实终核：不重抽前段，实际补回5条内容
 
 用户“批准继续推进”对应上一轮完整6.EK有限卡，6a71b570/master开工、暂存空。沿产品→验收→交付→A/B v3、OpenSpec/business-first技能，复用6.EJ相同10源码/测试hash下16+77有效用例，不扩大规则、框架或样本；前轮临时根已清，本轮唯一company-profile-6ek-Q1hyYx。源/原稿/14页16片段绑定不改，在获准联网环境核Scorpio DNS/TLS1.3、实际provider2450/profile2450与物理1200，冻结源码/共享配置/源及授权，唯一attempt后原TaskService.execute_review_recovery执行，未调用DeepSeek或前段。

@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-21 6.EL已完成[批量先交画像、复核独立接续](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-deferred-batch-20261121/result.md)：显式defer_review保原首读/待核API，execute_review_batch复用原逐股接续；两次同因新失败只停复核、旧request不重发，跳过不伪造通道恢复。受控三首读→两复核失败停→第四首读仍交→新实例只接余项与原稿/隔离/导出成立；12不同新用例及132旧回归通过，保存15稿18writer/431对象692指标只读不变。本轮0真实调用/新公司/共享配置或生产；下一仅必要已存稿复核的整卡有界真实授权，不重抽、追供应链或重开S2。必要一套后清本人QuoteBak/测试库/重复输出/脚本，正式源/缓存/旧失败/attempt及并行保护。
+
 2026-11-20 6.EK已交[顺丰真实五候选终核及画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-sf-final-recovery-20261120/result.md)：原TaskService只补终核，1物理/0恢复、五接受/五项有限独核，新增5可读对象8指标、当前28/68；原九独核决定继承。后继研究根company_profile_sf_reviewed_20261120保父17writer，API/导出历史superseded不双计，KLN补充未采纳/缺项仍见；不重抽前段或整池。复用相同hash的6.EJ验证、不扩规则，必要一套后清本人QuoteBak/库/重复输出，正式源/缓存/旧失败/attempt和既有并行保护。窗口结束，下一回到已有画像的消费与失败接续主线，不为剩余细项加窗，旧S2/生产不改。
 
 2026-11-20 6.EJ已完成[原TaskService保存复核计划执行](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-execution-20261120/result.md)：不重抽/不换业务循环，精确还原原稿及成功回执，单请求幂等、失败可用新有界计划接续；恢复原错稿不提前公开。原writer写独立后继，API/合并导出标superseded和历史缺项active=false，不重复计普通事实，独立限制不被模型解除。16新增原入口用例及77相关回归通过（两旧长用例明确排除）；当前真实研究根未写。顺丰5候选原稿/PDF/14页/16片段已零调用到最终发送接点，下一[6.EK有限卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-sf-final-recovery-card.md)已合并询问新授权，未批前不发/排队或借旧额，批准后冻结一次执行。原S2/正式阈值/生产及既有并行不改；必要一套后清本人QuoteBak/测试库/重复输出和中断残留，原源/缓存/失败/attempt保护。

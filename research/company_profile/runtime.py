@@ -209,6 +209,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "section_guide_version",
             "product_contract",
             "workpaper_review_policy",
+            "workpaper_review_execution",
             "review_existing_draft_hash",
             "review_resume_hash",
             "review_seed_receipts_hash",
@@ -633,6 +634,14 @@ class CompanyProfileStageRuntime:
         assert state.evidence is not None
         assert state.report is not None
         if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY:
+            review_execution = state.processing_identity.get("workpaper_review_execution")
+            if review_execution not in {None, "deferred"}:
+                raise ValueError("unknown workpaper review execution mode")
+            if review_execution == "deferred" and (
+                not state.processing_identity.get("workpaper_review_policy")
+                or state.processing_identity.get("workpaper_review_recovery") or state.review_seed is not None
+            ):
+                raise ValueError("deferred review is only valid for review-enabled first reads")
             resume_hash = state.processing_identity.get("workpaper_extraction_resume_hash")
             if resume_hash and (state.workpaper_extraction_resume is None or resume_hash != hashlib.sha256(
                 json.dumps(state.workpaper_extraction_resume, ensure_ascii=False, sort_keys=True).encode()
@@ -667,7 +676,7 @@ class CompanyProfileStageRuntime:
                     state.pages = result.pages
                     state.workpaper_receipts = [dict(item) for item in result.receipts]
                 self._persist_work(state)
-            if state.processing_identity.get("workpaper_review_policy"):
+            if state.processing_identity.get("workpaper_review_policy") and review_execution != "deferred":
                 from .workpaper_review import REVIEW_POLICY, review_workpaper
 
                 if state.processing_identity["workpaper_review_policy"] != REVIEW_POLICY:

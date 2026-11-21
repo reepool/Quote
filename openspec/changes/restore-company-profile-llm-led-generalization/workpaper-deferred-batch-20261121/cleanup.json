@@ -1,0 +1,22 @@
+{
+  "task": "6.EL",
+  "target": "/home/python/Quote/data/QuoteBak/company-profile-6el-XZO237am",
+  "files": 66,
+  "file_bytes": 2113744,
+  "previous_6EK_temp_root_absent_before_start": true,
+  "proof_and_hashes_checked_before_delete": true,
+  "removed": [
+    "test databases and checkpoints",
+    "sandbox interrupted-test leftovers",
+    "duplicate exports",
+    "temporary scripts and process logs"
+  ],
+  "preserved": [
+    "formal PDF and useful shared caches",
+    "all current and historic research roots",
+    "original failures and attempts",
+    "necessary validation summary and three JUnit files",
+    "pre-existing and concurrent workspace changes"
+  ],
+  "target_exists_after": false
+}
