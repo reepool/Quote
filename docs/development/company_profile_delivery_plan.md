@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-21当前6.EP转[两家真实两阶段使用观察卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-two-phase-observation-card.md)：宁波银行002142/万达轴承920002已有公开2025年报，仅当前原入口first_read→可读待核稿→保存计划→新实例review_batch，观察首读交付速度和复核隔离，不再加接口或追尾项。两源237/190页及缓存、实际deferred身份/2450及600/1200接线已核，原入口到首个选章边界、完整有界操作快照和未批准拒发成立；复用6.EO同hash验证，0新调用/画像/正式attempt/研究根。本卡新外传/累计预算另一次明确批准前不发送，见[准备结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-two-phase-observation-20261121/result.md)。开工核6.EO根已清，必要一套后清本轮company-profile-6ep-prep-5lHpzN87库/重复源及脚本日志；正式PDF/有效缓存、20writer/旧失败/attempt和并行保护。旧S2结束与生产边界不变。
+
 2026-11-21 6.EO已交[统一应用入口的两阶段动作](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-task-entry-20261121/result.md)：first_read只处理显式股票并交待核稿，review_batch只消费保存计划，复用原队列/writer/暂停/幂等，不新增执行器或共享CLI模型配置。受控首读→计划落盘→新实例复核、重复不重发和默认内联兼容成立，23新＋12相关旧通过；扩展旧集2项既有失败及中断限制分列，不称全套绿。20writer hash不变，0新真实调用/公司/生产，不重开S2或追尾项。开工核前轮已清，必要摘要/JUnit后清本轮company-profile-6eo-Bj17yAfG的库/重复输出/脚本日志，源/有效缓存/旧失败/attempt和并行保护；后续以这两个动作组织有限首读与保存计划复核，新真实窗口另给合并授权。
 
 2026-11-21 6.EN已交[按股票清单批量读取完整画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-batch-query-20261121/result.md)：原read owner/HTTP新增有界只读query，1—100股去重保顺序，画像/未找到分列，保分级内容、缺项及后继；单股/目录/旧导出兼容。41直接及相关回归/0跳过，保存15画像＋5未找到经实际HTTP200与原合并导出一致，433可读/694指标、20writer hash不变。0新模型/外传/写研究根或生产，不为分众/国航尾项付费；先核前轮已清，必要摘要/JUnit后清本人QuoteBak/库/重复导出/脚本日志，正式源/缓存/旧失败/attempt及并行保护。

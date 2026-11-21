@@ -1,5 +1,15 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 362. 6.EP转真实两阶段使用观察：两源及原入口零调用准备完成，待新有限授权
+
+用户继续推进，按产品→验收→交付→A/B v3及OpenSpec/business-first技能，92925c1c/master开工、暂存空；6.EO本人根已清，本轮仅company-profile-6ep-prep-5lHpzN87。主线从入口接线转实际使用观察，不再加接口、单公司规则或追供应链尾项。固定宁波银行002142/万达轴承920002两份公开2025年报，现行执行代码不改，下一原execute_published_task首读两稿后保存计划，再新实例review_batch。
+
+正式源及237/190页原生缓存/hash成立，不重复下载；只用源/缓存metadata，不载旧导航/答案/复核。原入口分别到本次首个选章请求接点，队列deferred身份与目录/通用问题成立，payload61410/70908字节不是完整wire/token，最终本地准备36.024秒非开发总耗时。任务局部provider2450、Flash600、Grok1200/high明确，原60模块和20writer hash不变；复用上一轮23新/12相关旧回执及原限制，不重新跑大套。准备诊断误从payload取身份已更正为队列item，0发送，不是生产bug。两阶段执行快照AST/import-only通过，未批准运行在approval.json处拒绝，未构造外发客户端/队列或attempt。Review无新增A类阻塞；B类CLI/细项后置，C类既有保护，strict/diff通过。
+
+具体[6.EP整卡](company-profile-two-phase-observation-card.md)与[准备结果](workpaper-two-phase-observation-20261121/result.md)可审：仅这两份公开目录/模型所选章节及派生稿发官方DeepSeek与既有Scorpio/Grok，first_read→待核API→保存计划→review_batch；整组共用12600秒/2000000账本/20物理含6恢复（每逻辑1），有价部分20元/无价unknown，不承诺总人民币，串行、不追加窗/公司/改共享配置或生产。新明确授权前0真实调用/外传/正式attempt/画像，不借6.EM或旧S2余额；批准后同获准联网核DNS/TLS/冻结并连续整卡，不逐字段请批。
+
+本次只保来源引用/hash、操作快照及紧凑说明，清本人临时库/重复源输入/脚本日志，量见cleanup.json；正式源/有效缓存、原稿/失败/attempt及所有并行改动保护。只提交本人新增块，正常commit/push。旧S2方案结束、95%/99%与生产边界不变，不将准备完成当真实业务完成。活跃开发/审核总时长未精确计量。
+
 ## 361. 6.EO统一应用入口分发首读与保存计划复核
 
 用户继续推进，沿产品→验收→交付→A/B v3及OpenSpec/business-first技能，dd7a8f8c/master开工，暂存空；前轮本人根已清，本轮仅company-profile-6eo-Bj17yAfG。主要矛盾是两阶段能力仍需内部调用方分别绕过分发；先同步设计/spec/任务卡，再在原execute_published_task/TaskService.execute公开first_read、review_batch，不新增运行器、共享CLI模型工厂或业务循环，0新真实调用/外传。

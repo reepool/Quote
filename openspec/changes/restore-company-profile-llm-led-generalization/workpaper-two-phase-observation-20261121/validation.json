@@ -1,0 +1,56 @@
+{
+  "task": "6.EP",
+  "baseline_commit": "92925c1c",
+  "state": "prepared_not_authorized_for_new_calls",
+  "production_code_changed": false,
+  "instruments": ["002142.SZ", "920002.BJ"],
+  "checks": {
+    "official_pdf_bytes_equal_report_versions": true,
+    "native_cache_source_hash_matches": true,
+    "physical_pages": [237, 190],
+    "original_public_first_read_entry_reaches_selection_boundary": 2,
+    "actual_deferred_first_read_identity_captured": true,
+    "source_only_request_payload_bytes": [61410, 70908],
+    "not_complete_wire_or_token_measurement": true,
+    "old_navigation_or_semantic_response_loaded": false,
+    "provider_constructor_timeout_seconds": 2450,
+    "extract_physical_timeout_seconds": 600,
+    "review_physical_timeout_seconds": 1200,
+    "explicit_profiles_only_no_shared_config_change": true,
+    "sixty_current_module_hashes_verified": true,
+    "execution_snapshot_ast_and_import_only": "passed",
+    "unapproved_adapter_stops_before_network_client_or_queue": "FileNotFoundError for required approval.json, before network probe, storage or attempt creation",
+    "early_local_diagnostic_corrected": "preparation initially looked for processing identity in the model payload; corrected to capture the real queue item identity; no business code change or external send",
+    "protected_current_writer_files": 20,
+    "protected_current_writer_hashes_unchanged": true,
+    "new_research_root_created": false,
+    "formal_attempt_created": false
+  },
+  "reused_engineering_validation": {
+    "reference": "../workpaper-task-entry-20261121/validation.json",
+    "tested_source_hashes_unchanged": true,
+    "new_cases_passed_previous_round": 23,
+    "related_existing_cases_passed_previous_round": 12,
+    "old_expanded_suite_failures_and_interruptions_retained": true,
+    "new_pytest_run_this_round": false,
+    "not_a_new_real_model_quality_result": true
+  },
+  "snapshot_sha256": {
+    "readiness-snapshot.txt": "8160536eca6c8ac212bf0a103e762874f5bb74f35b62aafddcd153a1bc4e066b",
+    "execution-snapshot.txt": "2e7c2e98f16d86047a51c2dfd8f6367c749a5fa83236351fbb50441268e845d2"
+  },
+  "successful_local_prepare_seconds": 36.024,
+  "not_total_development_or_business_runtime": true,
+  "review": {
+    "new_blocking_defects_remaining": 0,
+    "nonblocking_deferred": ["shared CLI model defaults", "optional supply-chain detail", "new acceptance cohort"],
+    "unrelated_preexisting_worktree_changes_preserved": true,
+    "ready_scope": "local source and initial request preparation; not proof that a future model-selected full packet or review will succeed"
+  },
+  "syntax_and_diff": "passed",
+  "openspec_strict": "passed",
+  "new_real_calls": 0,
+  "new_external_transfers": 0,
+  "old_S2_changed": false,
+  "production_authorization": "not_authorized"
+}

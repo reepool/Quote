@@ -1,0 +1,16 @@
+{
+  "task": "6.EP preparation",
+  "previous_6EO_root_absent_at_start": true,
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6ep-prep-5lHpzN87",
+  "active_open_fds_before_cleanup": [],
+  "files_removed": 21,
+  "logical_file_bytes_removed": 4262154,
+  "physical_reclaimed_bytes_measured": false,
+  "root_absent_after_cleanup": true,
+  "persistent_evidence": ["readiness.json", "readiness-snapshot.txt", "execution-snapshot.txt", "validation.json", "result.md", "cleanup.json"],
+  "removed": ["temporary queue/database/checkpoints", "duplicate source selection inputs", "temporary preparation and execution copies", "task-local logs"],
+  "retained": ["official PDFs and useful native caches", "20 unchanged current research writer files", "old failures and attempt markers", "shared cache/logs and parallel or pre-existing work"],
+  "formal_attempt_created": false,
+  "new_research_root_created": false,
+  "recovery": "removed local preparation artifacts are reproducible from the snapshots in a new QuoteBak root; no original business data was deleted"
+}

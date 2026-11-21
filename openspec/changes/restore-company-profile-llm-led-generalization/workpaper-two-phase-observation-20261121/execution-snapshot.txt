@@ -1,0 +1,226 @@
+"""6.EP one approved observation adapter; original application owns both phases.
+
+Copy this snapshot to a fresh QuoteBak task root before execution. No execution
+is possible without the card's explicit approval.json and unchanged readiness.
+"""
+from __future__ import annotations
+import asyncio
+from collections import Counter
+from decimal import Decimal
+import hashlib
+import json
+import os
+from pathlib import Path
+import runpy
+import signal
+import socket
+import subprocess
+import sys
+import time
+from urllib.parse import urlsplit
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE / 'workpaper-two-phase-observation-20261121'
+TEMP = Path(__file__).parent
+OUTPUT = ROOT / 'data/research/company_profile_two_phase_20261121'
+H = runpy.run_path(str(DEST / 'readiness-snapshot.txt'))
+read, sha, task_config, load_sources = H['read'], H['sha'], H['task_config'], H['load_sources']
+EXTRACT, REVIEW, ORDER = H['EXTRACT'], H['REVIEW'], H['ORDER']
+
+
+def dump(path, value):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + '\n')
+
+
+def main():
+    from research.announcements import AnnouncementRecord, AnnouncementAttachment
+    from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+    from research.company_profile.operations import execute_published_task
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.storage import ResearchStorageManager
+    from utils.config_manager import ResearchConfig, ResearchStorageConfig
+    from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy, DEVELOPMENT_UNPRICED_BILLING
+    from utils.llm.client import LlmClient
+    from utils.llm.transport import HttpxOpenAICompatibleTransport
+    from utils.logging_manager import LoggingManager, LogConfig
+    import httpx
+
+    preparation = time.monotonic()
+    assert TEMP.parent == ROOT / 'data/QuoteBak' and not OUTPUT.exists()
+    assert os.environ['TMPDIR'] == str(ROOT / 'data/QuoteBak')
+    LoggingManager().configure(LogConfig(level='WARNING', enable_console=False,
+        enable_file=True, log_directory=str(TEMP / 'logs')))
+    approval, ready = read(DEST / 'approval.json'), read(DEST / 'readiness.json')
+    assert approval['status'] == 'authorized' and approval['approval_reference']
+    assert approval['instruments'] == list(ORDER) == ready['instruments']
+    assert approval['limits'] == dict(seconds=12600, tokens=2000000, physical_requests=20,
+        recoveries=6, per_logical_recoveries=1, priced_cost_cny=20)
+    assert approval['readiness_sha256'] == sha(DEST / 'readiness.json')
+    assert approval['operator_sha256'] == sha(__file__)
+    assert sha(ROOT / 'config/13_llm.json') == ready['shared_config_sha256']
+    assert all(sha(ROOT / path) == digest for path, digest in ready['code_sha256'].items())
+    protected = read(CHANGE / ready['protected_writer_hash_reference'])['protected_20_writer_sha256']
+    assert all(sha(ROOT / path) == digest for path, digest in protected.items())
+    sources, items = load_sources()
+    assert items == ready['items']
+    config = task_config()
+    network = []
+    for host in ('api.deepseek.com', 'scorpio.reepool.com'):
+        addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
+
+        async def probe():
+            async with httpx.AsyncClient(timeout=20) as client:
+                response = await client.get('https://' + host + '/')
+                stream = response.extensions.get('network_stream')
+                tls = stream.get_extra_info('ssl_object') if stream else None
+                return response.status_code, tls.version() if tls else None
+
+        status, tls = asyncio.run(probe())
+        assert tls
+        network.append(dict(host=host, dns_addresses=len(addresses), tls=tls, public_get_status=status))
+    db = str(TEMP / 'research.db')
+    storage = ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(db_path=db,
+        financials_db_path=db, valuation_db_path=db, interests_db_path=db,
+        quotes_db_path=str(TEMP / 'quotes.db'), attach_quotes_db=False)))
+    storage.initialize()
+    frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    for instrument, data in sources.items():
+        asset, announcement = data['source']['asset'], data['source']['announcement']
+        exchange = 'SZSE' if instrument.endswith('.SZ') else 'BSE'
+        frontier.upsert_record(instrument={'instrument_id': instrument, 'symbol': instrument[:6], 'exchange': exchange},
+            record=AnnouncementRecord(source='cninfo', source_announcement_id=asset['filing_id'],
+                announcement_key='cninfo:' + asset['filing_id'], title=announcement['title'],
+                published_at=asset['published_at'], exchange=exchange, symbols=(instrument[:6],),
+                attachments=(AnnouncementAttachment(source_url=announcement['source_url'],
+                    resolved_url=announcement['source_url'], file_extension='PDF'),)))
+    identity = workpaper_processing_identity(real=True, review=True, review_profile=REVIEW)
+    identity.update(logical_request_timeout_seconds=2450, review_max_output_tokens=16384, repair_profile=EXTRACT)
+    assert identity == ready['identity']
+    capture_helper = CHANGE / 'workpaper-content-acceptance-20261114/response_capture.py'
+    assert sha(capture_helper) == '6d5bd03ab5feeec5935dce275c9c7a3a6e304ad5acc49553df2b31e67425f268'
+    Capture = runpy.run_path(str(capture_helper))['ContentCapture']
+
+    class CaptureWire(Capture):
+        def __init__(self):
+            super().__init__(HttpxOpenAICompatibleTransport(), TEMP / 'model-content')
+            self.wires = []
+
+        async def send(self, url, headers, payload, timeout_seconds):
+            host, model = urlsplit(url).hostname, payload.get('model')
+            assert (host, model) in {('api.deepseek.com', 'deepseek-flash'), ('scorpio.reepool.com', 'grok-4.7')}
+            assert 0 < timeout_seconds <= (600 if model == 'deepseek-flash' else 1200) + .01
+            if model == 'grok-4.7':
+                assert payload.get('reasoning_effort') == 'high'
+            raw = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()
+            row = dict(sequence=len(self.wires)+1, host=host, model=model,
+                reasoning_effort=payload.get('reasoning_effort'), physical_timeout_seconds=timeout_seconds,
+                payload_bytes=len(raw), payload_sha256=hashlib.sha256(raw).hexdigest(), state='sending')
+            self.wires.append(row)
+            dump(DEST / 'request-wiring.json', self.wires)
+            started = time.monotonic()
+            try:
+                response = await super().send(url, headers, payload, timeout_seconds)
+                row.update(state='returned', status_code=response.status_code)
+                return response
+            except Exception as exc:
+                row.update(state='transport_error', error_type=type(exc).__name__)
+                raise
+            finally:
+                row['seconds'] = round(time.monotonic()-started, 3)
+                dump(DEST / 'request-wiring.json', self.wires)
+
+    capture = CaptureWire()
+    client = LlmClient(config, transport=capture, owns_transport=True)
+    provider = CommonGatewaySemanticProvider(client=client, profile=EXTRACT, max_output_tokens=12000,
+        timeout_seconds=2450, execution_authorization={'status': 'authorized',
+            'approval_reference': approval['approval_reference']})
+    original_request = provider.workpaper_request
+    purposes = []
+
+    def authorized_request(**kwargs):
+        report = kwargs['report']
+        assert report.instrument_id in sources and report == sources[report.instrument_id]['report']
+        provider.execution_authorization['document_version'] = report.document_version
+        purposes.append(dict(instrument_id=report.instrument_id, purpose=kwargs['purpose']))
+        return original_request(**kwargs)
+
+    provider.workpaper_request = authorized_request
+
+    def source_for(item):
+        data = sources[item['instrument_id']]
+        return dict(report=data['report'], pages=data['pages'], source_pdf_path=data['source']['asset']['archive_path'])
+
+    marker = ROOT / 'data/QuoteBak/s1-attempts/workpaper-ep-two-phase-20261121.json'
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    with marker.open('x') as stream:
+        json.dump(dict(task='6.EP', approval_sha256=sha(DEST/'approval.json'), operator_sha256=sha(__file__)), stream)
+    started = time.monotonic()
+    budget = LlmRunBudget(deadline=started+12600, prices={}, max_tokens=2000000, max_requests=20,
+        max_cost_cny=Decimal(20), ledger_path=DEST/'budget.json', billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        recovery_policy=LogicalRecoveryPolicy(6, 1), run_authorization='company_profile_workpaper_development.2026-11-11')
+    client.physical_budget = budget
+    signal.signal(signal.SIGTERM, lambda *_: budget.cancel('supervisor_stop_requested'))
+    dump(DEST/'authorization.json', dict(task='6.EP', approval_sha256=sha(DEST/'approval.json'),
+        readiness_sha256=sha(DEST/'readiness.json'), operator_sha256=sha(__file__), code_sha256=ready['code_sha256'],
+        commit=subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip(),
+        network_namespace=os.readlink('/proc/self/ns/net'), network=network, identity=identity,
+        provider_constructor_timeout_seconds=provider._timeout_seconds, limits=approval['limits']))
+    summary = dict(task='6.EP', state='running', preparation_seconds=round(started-preparation,3))
+    reader = CompanyProfileReadService(OUTPUT)
+    args = dict(storage=storage, output_root=OUTPUT, checkpoint_root=TEMP/'checkpoints', page_source=source_for,
+        provider=provider, processing_identity=identity, execution_budget=budget,
+        knowledge_cutoff='2026-11-21', token_budget=2000000)
+    try:
+        first = asyncio.run(execute_published_task(action='first_read', instrument_ids=ORDER, max_items=2,
+            max_elapsed_seconds=budget.remaining_time(), **args))
+        summary['first_read_response_ready_seconds'] = round(time.monotonic()-started,3)
+        dump(DEST/'first-read-execution.json', first)
+        initial = reader.research_profiles(ORDER)
+        dump(DEST/'first-read-api.json', initial)
+        plans = [reader.plan_review_recovery(code, request_id='ep-review-'+code[:6])
+            for code in ORDER if code not in initial['missing_instrument_ids']]
+        dump(DEST/'saved-plans.json', plans)
+        dump(DEST/'summary.json', summary)
+        if plans:
+            review_started = time.monotonic()
+            # The second public call constructs a new TaskService and consumes only saved plans.
+            reviewed = asyncio.run(execute_published_task(action='review_batch', review_plans=read(DEST/'saved-plans.json'),
+                max_elapsed_seconds=budget.remaining_time(), **args))
+            summary['review_phase_seconds'] = round(time.monotonic()-review_started,3)
+            dump(DEST/'review-execution.json', reviewed)
+            summary['state'] = reviewed['state']
+        else:
+            summary['state'] = 'no_reviewable_first_read'
+    except Exception as exc:
+        summary.update(state='failed', exception=type(exc).__name__+': '+str(exc)[:1500])
+    finally:
+        summary['business_seconds'] = round(time.monotonic()-started,3)
+        asyncio.run(client.close())
+        dump(DEST/'model-receipts.json', provider.workpaper_receipts)
+        dump(DEST/'provider-traces.json', [t.model_dump(mode='json') for t in provider.traces])
+        snapshot = budget.snapshot()
+        dump(DEST/'budget.json', snapshot)
+        counts = Counter(a['logical_request_id'] for a in snapshot['attempts'])
+        summary.update(physical_requests=snapshot['physical_requests'], charged_tokens=snapshot['charged_tokens'],
+            fee=snapshot['charged_cost_cny'], recoveries=sum(n-1 for n in counts.values()), purposes=purposes)
+        summary['protected_writers_unchanged'] = all(sha(ROOT/p)==h for p,h in protected.items())
+        # Only unmatched failure content is additional evidence; successful content already lives in receipts.
+        known = {hashlib.sha256(r['raw_content'].encode()).hexdigest() for r in provider.workpaper_receipts
+            if isinstance(r.get('raw_content'),str)}
+        for path in (TEMP/'model-content').glob('*.json'):
+            raw = read(path)
+            if raw.get('content_sha256') not in known:
+                dump(DEST/'failed-model-content'/path.name, raw)
+        dump(DEST/'annual-api.json', reader.research_profiles(ORDER))
+        dump(DEST/'summary.json', summary)
+        print(json.dumps(summary,ensure_ascii=False),flush=True)
+
+
+if __name__ == '__main__':
+    main()
