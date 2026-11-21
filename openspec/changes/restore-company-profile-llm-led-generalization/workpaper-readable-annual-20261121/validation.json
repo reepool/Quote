@@ -1,0 +1,30 @@
+{
+  "task": "6.ES",
+  "baseline_commit": "b0c3e8c3",
+  "business_behavior": "Existing export renders the safe current multi-reading annual API projection into annual_profiles.md",
+  "suite_command": "python -m pytest tests/unit/test_research/test_company_profile_annual_render.py tests/unit/test_research/test_company_profile_annual_export.py tests/unit/test_research/test_company_profile_reads.py -q --basetemp=data/QuoteBak/company-profile-6es-jJGOtz3l/tests --junitxml=data/QuoteBak/company-profile-6es-jJGOtz3l/tests.xml",
+  "suite_first_result": {"passed": 23, "failed": 1, "skipped": 0, "elapsed_seconds": 566.16},
+  "failure": "Test expected unescaped source_only in Markdown; actual literal-safe renderer correctly escapes its underscore; only the display assertion was corrected",
+  "recheck_command": "python -m pytest 'tests/unit/test_research/test_company_profile_annual_render.py::test_nonreadable_bodies_and_exclusive_quotes_never_reappear[source_only]' -q --basetemp=data/QuoteBak/company-profile-6es-jJGOtz3l/fix --junitxml=data/QuoteBak/company-profile-6es-jJGOtz3l/fix.xml",
+  "recheck_result": {"passed": 1, "failed": 0, "skipped": 0, "elapsed_seconds": 5.38},
+  "original_owner_command": "python -m pytest 'tests/unit/test_research/test_company_profile_review_execution.py::test_task_service_executes_only_missing_stages_keeps_history_and_is_idempotent[initial-True]' -q --basetemp=data/QuoteBak/company-profile-6es-jJGOtz3l/review --junitxml=data/QuoteBak/company-profile-6es-jJGOtz3l/review.xml",
+  "original_owner_result": {"passed": 1, "failed": 0, "skipped": 0, "elapsed_seconds": 41.33},
+  "final_distinct_passing_cases": 25,
+  "earlier_debug_run": "3 passed and the same display assertion failed; not additional distinct cases",
+  "source_sha256": {
+    "research/company_profile/annual_render.py": "3201db90e7c7c0a8860cd17278fac6192d6c779545007f2be69405d73f9cdada",
+    "research/company_profile/reads.py": "882a878e3e23e3d1fbc83f4dab4522b306b58c04162da67ae255284edb44e964",
+    "tests/unit/test_research/test_company_profile_annual_render.py": "9a65d15e5e2ccd942711f8bbdc1dd3cccfb542b3d8a2c0dd469c5e909a9e6ef2",
+    "tests/unit/test_research/test_company_profile_annual_export.py": "f4ff24477c561825dbaa8e3ea41ce04f75fc14d95d2453b8b998adbaf9e39bcb"
+  },
+  "saved_delivery": {"cohorts": 2, "profiles": 17, "unique_companies": 15, "protected_writer_files": 24, "all_unchanged": true, "every_visible_text_rendered": true, "api_equals_json": true, "all_source_links_resolve": true},
+  "review": {"blocking_remaining": 0, "nonblocking_deferred": "Cross-reading semantic deduplication, optional detailed fields", "unrelated_changes": "Untouched"},
+  "openspec_strict": "passed",
+  "syntax_and_diff": "passed",
+  "new_real_calls": 0,
+  "new_external_transfers": 0,
+  "quality_reassessed": false,
+  "old_S2_changed": false,
+  "shared_configuration_changed": false,
+  "production_authorization": "not_authorized"
+}

@@ -415,6 +415,8 @@ curl -X POST http://127.0.0.1:8000/api/v1/research/company/annual-profiles/query
 
 内部`await service.execute_review_batch(plans, knowledge_cutoff="YYYY-MM-DD", max_elapsed_seconds=...)`接收显式有限清单（一股一份上述完整计划），在现有有限预算内串行调用原逐股接续，不在HTTP端启动付费任务。返回每项request/股票、工作ID、执行state和独立review_status；两次相邻不同公司的同通道同因新失败暂停余项，余项为deferred并列入remaining_request_ids。completed仅表示清单处理结束，不表示全部复核通过或正式可用。以相同清单在新实例接续，已持久request返回already_processed且不重复调用，也不把它们的旧失败当新失败再次挡住余项；若需重试已失败项须新计划/有限授权，不自动生成新ID或额度。blocked/skipped计划不发送、不自动补修。复核清单暂停不会阻止独立执行的延后复核首读；已有控制暂停、源校验、预算和生产边界继续适用。
 
+原导出还提供`annual_profiles.md`：从同一`annual_profiles.json`安全年度投影渲染当前多轮画像，保缺项/实际模型/来源及限用；原`profiles.md`和单股Markdown仍是所选单轮底稿。合并人读版不发模型、不另行语义归并，不把已替代或隔离正文恢复为当前结论。日常命令见[使用说明](../development/company_profile_task_usage.md)。
+
 6.EO将这两阶段接入原应用函数`research.company_profile.operations.execute_published_task`，也可在已配置的服务上调用`service.execute`。以下是**内部调用**，HTTP仍只提供查询/计划；6.EQ另支持原job通过`--execution-plan-file`显式构造已授权依赖，完整用法见[首读与独立复核命令](../development/company_profile_task_usage.md)，没有文件时不自动选择付费模型。内部`dependencies`仍须由受授权调用方显式提供storage、provider、processing_identity、execution_budget、output_root和checkpoint_root；身份须为启用源复核的章节底稿，真实模型须有显式有限执行预算，每次使用独立服务实例。
 
 ```python

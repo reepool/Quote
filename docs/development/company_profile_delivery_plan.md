@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-21 6.ES已交[当前完整研究画像人读版](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-readable-annual-20261121/result.md)：原export从同一安全年度投影新增annual_profiles.md，保八要素/可选特色供应链、缺项/实际模型/来源，不复活已替代或隔离正文，不改旧单轮文件。原15家433/694及两阶段两稿54/75实际可读实物/API一致（唯一15家公司）、24writer不变；25不同用例最终通过，含1测试显示断言修正后复验。0新模型/外传/共享配置或生产，不重开S2；回到现有能力按需使用，不追齐尾项。开工核6.ER根已清，本轮company-profile-6es-jJGOtz3l在必要一套后清测试库/完整重复导出/脚本日志，两组各一对业务交付及正式源/缓存/旧失败/并行保护，沿A/B v3。
+
 2026-11-21 6.ER已交[日常单股精读入口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-enrichment-job-20261121/result.md)：显式文件enrich消费原API同报告/hash绑定问题，转原TaskService选章/抽取/源复核及writer，原稿保留、API/export逐轮读回及缺项成立，不自动补满。42不同直接/相关用例最终通过（含1测试请求ID修正后的定向复验），旧v1执行指纹兼容；17保存稿计划/15公司本地消费、24真实writer不变。0新真实调用/共享配置或生产，不重开S2；后续按需使用原入口。开工核6.EQ根已清，本轮company-profile-6er-hxHwFJOX在必要一套后清库/生成PDF/重复输出/脚本日志，正式源/有效缓存/旧失败/attempt及并行保护，流程沿A/B v3。
 
 2026-11-21 6.EQ已交[日常job两阶段入口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-configured-job-20261121/result.md)：execution-plan-file明确股票/版本/模型/有限预算和研究根，任务内构造依赖后转原应用/网关/队列/writer，不再需Python操作脚本。相同run_id复用结果不重置预算，控制/只读不建模型，CLI拒绝缺文件及混用范围/额度，旧默认/位置参数兼容；26受控直接/相关回归通过、24真实writer hash不变。用法及未授权模板见docs/development/company_profile_task_usage.md；0新真实调用/共享配置或生产，不重开S2。开工核6.EP两根已清，本轮company-profile-6eq-ytUFFXQw必要一套后清库/生成PDF缓存/重复测试输出/脚本日志，真实源/有效缓存/原稿/失败/attempt和并行保护。

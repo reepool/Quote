@@ -1,0 +1,174 @@
+{
+  "task": "6.ES",
+  "new_real_calls": 0,
+  "protected_writer_files": 24,
+  "unchanged": true,
+  "cohorts": [
+    {
+      "cohort": "reviewed_15",
+      "source_root": "data/research/company_profile_batch_reviewed_20261121",
+      "company_count": 15,
+      "rows": [
+        {
+          "instrument_id": "000725.SZ",
+          "readable_objects": 35,
+          "metrics": 39,
+          "readings": 1,
+          "active_gaps": 0
+        },
+        {
+          "instrument_id": "002027.SZ",
+          "readable_objects": 24,
+          "metrics": 61,
+          "readings": 2,
+          "active_gaps": 7
+        },
+        {
+          "instrument_id": "002142.SZ",
+          "readable_objects": 25,
+          "metrics": 62,
+          "readings": 1,
+          "active_gaps": 6
+        },
+        {
+          "instrument_id": "002352.SZ",
+          "readable_objects": 28,
+          "metrics": 68,
+          "readings": 2,
+          "active_gaps": 9
+        },
+        {
+          "instrument_id": "002594.SZ",
+          "readable_objects": 33,
+          "metrics": 32,
+          "readings": 1,
+          "active_gaps": 9
+        },
+        {
+          "instrument_id": "300144.SZ",
+          "readable_objects": 25,
+          "metrics": 62,
+          "readings": 1,
+          "active_gaps": 1
+        },
+        {
+          "instrument_id": "600309.SH",
+          "readable_objects": 37,
+          "metrics": 18,
+          "readings": 1,
+          "active_gaps": 4
+        },
+        {
+          "instrument_id": "600438.SH",
+          "readable_objects": 35,
+          "metrics": 66,
+          "readings": 1,
+          "active_gaps": 5
+        },
+        {
+          "instrument_id": "601021.SH",
+          "readable_objects": 31,
+          "metrics": 47,
+          "readings": 1,
+          "active_gaps": 2
+        },
+        {
+          "instrument_id": "601111.SH",
+          "readable_objects": 17,
+          "metrics": 36,
+          "readings": 2,
+          "active_gaps": 10
+        },
+        {
+          "instrument_id": "601601.SH",
+          "readable_objects": 23,
+          "metrics": 42,
+          "readings": 1,
+          "active_gaps": 3
+        },
+        {
+          "instrument_id": "601881.SH",
+          "readable_objects": 42,
+          "metrics": 55,
+          "readings": 3,
+          "active_gaps": 10
+        },
+        {
+          "instrument_id": "601888.SH",
+          "readable_objects": 23,
+          "metrics": 24,
+          "readings": 1,
+          "active_gaps": 8
+        },
+        {
+          "instrument_id": "920002.BJ",
+          "readable_objects": 29,
+          "metrics": 27,
+          "readings": 1,
+          "active_gaps": 0
+        },
+        {
+          "instrument_id": "920005.BJ",
+          "readable_objects": 26,
+          "metrics": 55,
+          "readings": 1,
+          "active_gaps": 0
+        }
+      ],
+      "files": [
+        {
+          "path": "data/research/company_profile_readable_20261121/reviewed_15/annual_profiles.json",
+          "bytes": 2861691,
+          "sha256": "ba66f38d1bb92bd379256b1a69aeaa0ce87a94b42381f683388d02c9b8507b16"
+        },
+        {
+          "path": "data/research/company_profile_readable_20261121/reviewed_15/annual_profiles.md",
+          "bytes": 1151019,
+          "sha256": "2291d5edd07b3d11247f9f69dcbc84b34db33c26ed0ca47c3c1e16bee9a642c8"
+        }
+      ],
+      "api_equal_json": true,
+      "every_visible_text_rendered": true,
+      "all_source_links_resolve": true
+    },
+    {
+      "cohort": "two_phase_2",
+      "source_root": "data/research/company_profile_two_phase_20261121",
+      "company_count": 2,
+      "rows": [
+        {
+          "instrument_id": "002142.SZ",
+          "readable_objects": 25,
+          "metrics": 34,
+          "readings": 2,
+          "active_gaps": 6
+        },
+        {
+          "instrument_id": "920002.BJ",
+          "readable_objects": 29,
+          "metrics": 41,
+          "readings": 2,
+          "active_gaps": 1
+        }
+      ],
+      "files": [
+        {
+          "path": "data/research/company_profile_readable_20261121/two_phase_2/annual_profiles.json",
+          "bytes": 526259,
+          "sha256": "7de326f15099ba0a8437f1d64e486e733ea2a1e811adc867f6056c2fa4aa8283"
+        },
+        {
+          "path": "data/research/company_profile_readable_20261121/two_phase_2/annual_profiles.md",
+          "bytes": 163208,
+          "sha256": "d00229af7f6ff796636cd2cde12209400a06992cda921987ebeb55dcc3dc0f69"
+        }
+      ],
+      "api_equal_json": true,
+      "every_visible_text_rendered": true,
+      "all_source_links_resolve": true
+    }
+  ],
+  "unique_stocks": 15,
+  "quality_reassessed": false,
+  "production_authorization": "not_authorized"
+}

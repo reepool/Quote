@@ -982,6 +982,8 @@ def _write_profile_export(
         }, ensure_ascii=False, indent=2), encoding="utf-8")
         written.append(str(research_path))
     if annual_profiles:
+        from .annual_render import render_annual_profiles
+
         annual_path = target / "annual_profiles.json"
         annual_path.write_text(json.dumps({
             "schema_version": "company_profile_annual_research_export.v1",
@@ -990,6 +992,9 @@ def _write_profile_export(
             "profiles": list(annual_profiles),
         }, ensure_ascii=False, indent=2), encoding="utf-8")
         written.append(str(annual_path))
+        annual_markdown = target / "annual_profiles.md"
+        annual_markdown.write_text(render_annual_profiles(annual_profiles), encoding="utf-8")
+        written.append(str(annual_markdown))
     csv_path = target / "profiles.csv"
     _write_profile_csv(csv_path, profiles)
     written.append(str(csv_path))
@@ -1007,6 +1012,7 @@ def _write_profile_overview(path: Path, profiles: Sequence[Mapping[str, Any]]) -
 
     lines = [
         "# 公司画像底稿总览", "",
+        "本页及单股画像文件为选定单轮底稿；多轮补读/复核后的当前完整研究投影请读 [annual_profiles.md](annual_profiles.md)（与 annual_profiles.json 同内容）。", "",
         "以下是底稿内容，不等于可信发布或完整性通过。事实/数字为当前可读底稿计数，非已接受核心事实数；未复核不表示零问题。生产未授权。", "",
         "| 公司／报告期 | 原业务描述 | 底稿事实／数字 | 来源及复核状态 | 实际抽取／初核模型 | 完整内容 |",
         "| --- | --- | --- | --- | --- | --- |",

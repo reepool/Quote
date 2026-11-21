@@ -80,6 +80,12 @@ def test_combined_export_matches_api_after_two_readings_with_local_restriction()
         manifest = json.loads((root / 'export/export_manifest.json').read_text())
         assert str(root / 'export/annual_profiles.json') in result['files']
         assert str(root / 'export/annual_profiles.json') in manifest['files']
+        markdown = (root / 'export/annual_profiles.md').read_text()
+        assert '当前公司画像' in markdown and 'read-two / main' in markdown
+        assert 'read-three / main：withheld' in markdown
+        assert str(root / 'export/annual_profiles.md') in result['files']
+        assert str(root / 'export/annual_profiles.md') in manifest['files']
+        assert '[annual_profiles.md](annual_profiles.md)' in (root / 'export/profiles.md').read_text()
     assert not root.exists()
 
 
@@ -132,6 +138,7 @@ def test_legacy_only_export_does_not_fabricate_workpapers():
         result = reader.export(('600000.SH',), root / 'export')
         assert result['delivered'] == 1
         assert not (root / 'export/annual_profiles.json').exists()
+        assert not (root / 'export/annual_profiles.md').exists()
         assert not (root / 'export/research_profiles.json').exists()
 
 
