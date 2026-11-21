@@ -46,6 +46,58 @@ def config_for_test(monkeypatch):
     return config
 
 
+def test_explicit_job_uses_its_own_runtime_without_scheduler_notifications(monkeypatch):
+    import main
+    import scheduler.tasks as jobs
+
+    system=main.QuoteSystem.__new__(main.QuoteSystem)
+    system.config=Mock(side_effect=AssertionError('explicit plan must not load scheduler defaults'))
+    direct=AsyncMock(return_value=True)
+    monkeypatch.setattr(jobs.scheduled_tasks,'company_profile_common_core',direct)
+    scheduler=AsyncMock(side_effect=AssertionError('explicit plan must not inherit scheduler timeout/reports'))
+    monkeypatch.setattr(main.task_scheduler,'execute_job_direct',scheduler)
+    monkeypatch.setattr(main.data_manager,'close',AsyncMock())
+    parameters=dict(action='first_read',execution_plan_file='planned.json')
+    assert asyncio.run(system.run_job('company_profile_common_core',parameters=parameters))
+    direct.assert_awaited_once_with(**parameters)
+    scheduler.assert_not_awaited()
+
+
+def test_company_profile_initialization_only_uses_existing_research_owner(monkeypatch):
+    import main
+
+    manager=SimpleNamespace(research_storage=object(),_initialize_research_storage=Mock(),
+        initialize=AsyncMock(side_effect=AssertionError('must not start unrelated data sources')))
+    monkeypatch.setattr(main,'data_manager',manager)
+    system=main.QuoteSystem.__new__(main.QuoteSystem)
+    asyncio.run(system.initialize_lightweight(company_profile_only=True))
+    manager._initialize_research_storage.assert_called_once_with()
+    manager.initialize.assert_not_awaited()
+
+
+def test_explicit_run_receipts_preserve_failed_schema_body_without_auth_headers(tmp_path):
+    raw='{"source_conditions": [{"quote": "公开原文"}]}'
+    delegate=SimpleNamespace(send=AsyncMock(return_value=SimpleNamespace(status_code=200,
+        data={'choices':[{'message':{'content':raw}}],'usage':{'total_tokens':12}},
+        provider_request_id='request-1')),close=AsyncMock())
+    transport=task_entry._TaskReceiptTransport(delegate,tmp_path/'receipts')
+    asyncio.run(transport.send('https://provider.example/v1/chat/completions?private=omitted',
+        {'Authorization':'Bearer secret-not-recorded'},{'messages':[{'role':'user','content':'公开材料'}]},1200))
+    saved=(tmp_path/'receipts/001.json').read_text()
+    receipt=json.loads(saved)
+    assert receipt['response']['choices'][0]['message']['content']==raw
+    assert receipt['physical_timeout_seconds']==1200 and receipt['response']['usage']['total_tokens']==12
+    assert 'secret-not-recorded' not in saved and 'private=omitted' not in saved
+    delegate.send.side_effect=TimeoutError('sensitive error text must not be recorded')
+    with pytest.raises(TimeoutError):
+        asyncio.run(transport.send('https://provider.example',{}, {'messages':[]},600))
+    failed=json.loads((tmp_path/'receipts/002.json').read_text())
+    assert failed['error_type']=='TimeoutError' and 'response' not in failed
+    assert 'sensitive error text' not in json.dumps(failed)
+    asyncio.run(transport.close())
+    delegate.close.assert_awaited_once()
+
+
 @pytest.mark.parametrize('case',['missing','two_stocks','other_stock','other_version','empty_targets','first_read','review_batch'])
 def test_enrichment_plan_scope_is_checked_before_model_construction(tmp_path,monkeypatch,case):
     from tests.unit.test_research.test_company_profile_workpaper import _report
@@ -120,6 +172,7 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     import scheduler.tasks as jobs
     task=jobs.ScheduledTasks.__new__(jobs.ScheduledTasks)
     task._active_tasks=set();task._send_task_report=AsyncMock()
+    monkeypatch.setattr(jobs,'scheduled_tasks',task)
     manager=SimpleNamespace(research_storage=storage,_get_announcement_asset_access=lambda **_:access)
     monkeypatch.setattr(jobs,'data_manager',manager)
     monkeypatch.setattr(task_entry,'UnifiedConfigManager',lambda _:SimpleNamespace(get_llm_config=lambda:config))

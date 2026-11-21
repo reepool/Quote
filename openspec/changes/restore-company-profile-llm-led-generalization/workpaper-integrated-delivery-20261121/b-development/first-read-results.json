@@ -1,0 +1,42 @@
+{
+  "000725": {
+    "first_read_visible_seconds": 36.013,
+    "visible_objects": 35,
+    "readings": 1,
+    "physical_requests": 2,
+    "ledger": 38507,
+    "fee": "unknown",
+    "source_report": {
+      "instrument_id": "000725.SZ",
+      "report_id": "asset_ee8381d6ef1a54776597e5dab8f426fa",
+      "document_version": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-31T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "writer_sha256": {
+      "data/research/company_profile_integrated_20261121/000725/company_profile_common_core.v1/bp-work-4510501aae7987c192419f29.json": "40754c04b57b7f56f0abda5e6c1ac225214804ca148356aa98aa162a5c857718"
+    },
+    "hash_scope": "Published first-read writer only; mutable runtime checkpoints are not immutable results."
+  },
+  "601881": {
+    "first_read_visible_seconds": 35.623,
+    "visible_objects": 30,
+    "readings": 1,
+    "physical_requests": 2,
+    "ledger": 49679,
+    "fee": "unknown",
+    "source_report": {
+      "instrument_id": "601881.SH",
+      "report_id": "asset_10336f11433796cd2e554ea5ba82ab23",
+      "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "writer_sha256": {
+      "data/research/company_profile_integrated_20261121/601881/company_profile_common_core.v1/bp-work-80f29bbe1547d8f50164c7b4.json": "a655440bee80583be5d58c057271b4966275f507546db214cbdf42912a5493dd"
+    },
+    "hash_scope": "Published first-read writer only; mutable runtime checkpoints are not immutable results."
+  }
+}

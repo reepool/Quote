@@ -1,0 +1,19 @@
+{
+  "removed": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/company-profile-6et-b-RPLyiJzh/pytest",
+      "files": 35,
+      "bytes": 2617231,
+      "reason": "Completed/interrupted controlled tests, no continuing dependency; tests.xml is persistent.",
+      "removed": true
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/company-profile-6et-b-RPLyiJzh/pytest-current",
+      "files": 80,
+      "bytes": 2920800,
+      "reason": "Completed/interrupted controlled tests, no continuing dependency; tests.xml is persistent.",
+      "removed": true
+    }
+  ],
+  "active_model_logs_retained": true
+}

@@ -1,0 +1,2979 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "601881.SH",
+  "report": {
+    "instrument_id": "601881.SH",
+    "report_id": "asset_10336f11433796cd2e554ea5ba82ab23",
+    "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+  "latest_reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+  "readings": [
+    {
+      "work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "workpaper_sha256": "a33cc5ff4ff4a0a8d55938c6b23dee01235902d349dc1b8764be96bf35a41efc",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0057",
+            "section_path": [
+              "第二节 公司简介和主要财务指标",
+              "八、近三年主要会计数据和财务指标"
+            ],
+            "start_page": 17,
+            "end_page": 17,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0077",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的业务情况"
+            ],
+            "start_page": 23,
+            "end_page": 23,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0080",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ],
+            "start_page": 24,
+            "end_page": 24,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0090",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "2、投资银行业务"
+            ],
+            "start_page": 26,
+            "end_page": 26,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0093",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "3、机构业务"
+            ],
+            "start_page": 26,
+            "end_page": 26,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0101",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "4、国际业务"
+            ],
+            "start_page": 28,
+            "end_page": 28,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0105",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "5、投资交易业务"
+            ],
+            "start_page": 29,
+            "end_page": 29,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0109",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "6、母子公司一体化业务"
+            ],
+            "start_page": 30,
+            "end_page": 30,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0124",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "（一）主营业务分析"
+            ],
+            "start_page": 34,
+            "end_page": 34,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0129",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分行业情况"
+            ],
+            "start_page": 35,
+            "end_page": 35,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          },
+          {
+            "section_id": "section-0131",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分地区情况"
+            ],
+            "start_page": 36,
+            "end_page": 36,
+            "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0117核心竞争力分析：属泛化竞争力描述，对业务结构与收入解释力有限，暂不纳入",
+          "section-0186未来发展讨论与section-0191风险：计划与风险展望非本期经营事实，仅在需要时补充",
+          "第八节财务报告及第九节附注中的分部报告、收入附注：现有管理层讨论已覆盖收入构成，暂不扩读",
+          "第七节债券相关情况：与业务经营解释关联较弱，暂不纳入",
+          "物理页17布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页24布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页26布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页28布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页29布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页30布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页34布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页35布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页36布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        ],
+        "selection_rationale": "优先选取第三节管理层讨论与分析中公司业务、经营情况讨论与主营业务分析等实质子节：section-0077说明公司从事的业务，section-0080及section-0082统领主营业务经营分析，section-0083/0090/0093/0101/0105/0109分别覆盖财富管理、投行、机构、国际、投资交易及母子公司一体化各业务板块的经营与收入贡献；section-0124/0125/0129/0131提供利润表科目变动、收入成本及分行业分地区收入构成，满足收入来源与主要业务权重问题。另选第二节section-0057/0058近三年主要会计数据，作为公司整体营收与规模的总量摘要，与详细分析互补且不重叠。",
+        "stop_reason": "已覆盖业务结构、各板块经营、收入构成与整体财务摘要，可回答做什么、怎么赚钱及主要业务权重；剩余为治理、债券、附注细节与前瞻性内容，对本期经营解释边际价值低，故在此停止。",
+        "transcription_version": "shared-pdf-layout-with-native-fallback.v2"
+      },
+      "limitations": [
+        "物理页17、24、26、28、29、30、34、35、36布局未恢复，表格列关系未核定，相关金额与表头对应关系依据共享原生文本推断，存在列归属不确定性。",
+        "分行业表“其他”行与分地区表部分数据未在所选章节进一步说明其业务性质与会计基础。",
+        "未获取成功：公司各业务板块的客户数量、AUM等细分运营指标未在所选章节完整披露。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-80f29bbe1547d8f50164c7b4:workpaper:sections",
+          "request_hash": "e94c7d94ca932ad670b7fe68fa3fa368cc943297b74f85abd67a2b529fa9fb6c",
+          "response_hash": "028513495aba2ce38df9a77f711ef76abb582d2e83f5028370fc03a4e6bc528a",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 28584,
+            "output_tokens": 410,
+            "total_tokens": 28994
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 1146,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0047",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0085",
+            "section-0089",
+            "section-0090",
+            "section-0093",
+            "section-0094",
+            "section-0100",
+            "section-0101",
+            "section-0103",
+            "section-0105",
+            "section-0108",
+            "section-0109",
+            "section-0111",
+            "section-0113",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0137",
+            "section-0138",
+            "section-0142",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0152",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0160",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0175",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0194",
+            "section-0198",
+            "section-0200",
+            "section-0203",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0266",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0288",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0312",
+            "section-0313",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0322",
+            "section-0323",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0408",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0431",
+            "section-0432",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0467",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0471",
+            "section-0473",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0601",
+            "section-0602",
+            "section-0603",
+            "section-0604",
+            "section-0605",
+            "section-0606",
+            "section-0608",
+            "section-0610",
+            "section-0613",
+            "section-0615",
+            "section-0616",
+            "section-0618",
+            "section-0620",
+            "section-0621",
+            "section-0622",
+            "section-0623",
+            "section-0624",
+            "section-0625",
+            "section-0626",
+            "section-0627",
+            "section-0628",
+            "section-0629",
+            "section-0630",
+            "section-0631",
+            "section-0632",
+            "section-0633",
+            "section-0634",
+            "section-0635",
+            "section-0636",
+            "section-0637",
+            "section-0638",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0643",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0647",
+            "section-0648",
+            "section-0649",
+            "section-0650",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0660",
+            "section-0661",
+            "section-0662",
+            "section-0663",
+            "section-0664",
+            "section-0671",
+            "section-0672",
+            "section-0673",
+            "section-0674",
+            "section-0675",
+            "section-0676",
+            "section-0677",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0681",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0690",
+            "section-0691",
+            "section-0692",
+            "section-0693",
+            "section-0694",
+            "section-0695",
+            "section-0696",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0700",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0704",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0708",
+            "section-0709",
+            "section-0710",
+            "section-0711",
+            "section-0712",
+            "section-0713",
+            "section-0714",
+            "section-0715",
+            "section-0716",
+            "section-0717",
+            "section-0718",
+            "section-0719",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0735",
+            "section-0736",
+            "section-0737",
+            "section-0738",
+            "section-0739",
+            "section-0740",
+            "section-0741",
+            "section-0742",
+            "section-0743",
+            "section-0744",
+            "section-0745",
+            "section-0746",
+            "section-0747",
+            "section-0748",
+            "section-0749",
+            "section-0750",
+            "section-0751",
+            "section-0752",
+            "section-0753",
+            "section-0754",
+            "section-0755",
+            "section-0756",
+            "section-0757",
+            "section-0758",
+            "section-0759",
+            "section-0762",
+            "section-0763",
+            "section-0764",
+            "section-0765",
+            "section-0766",
+            "section-0767",
+            "section-0768",
+            "section-0773",
+            "section-0774",
+            "section-0775",
+            "section-0776",
+            "section-0777",
+            "section-0778",
+            "section-0779",
+            "section-0780",
+            "section-0781",
+            "section-0782",
+            "section-0783",
+            "section-0784",
+            "section-0785",
+            "section-0786",
+            "section-0787",
+            "section-0788",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0795",
+            "section-0796",
+            "section-0797",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0801",
+            "section-0802",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0812",
+            "section-0813",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0824",
+            "section-0825",
+            "section-0826",
+            "section-0827",
+            "section-0828",
+            "section-0829",
+            "section-0830",
+            "section-0831",
+            "section-0832",
+            "section-0833",
+            "section-0834",
+            "section-0838",
+            "section-0839",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0848",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0854",
+            "section-0855",
+            "section-0856",
+            "section-0857",
+            "section-0858",
+            "section-0859",
+            "section-0860",
+            "section-0861",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0865",
+            "section-0866",
+            "section-0867",
+            "section-0868",
+            "section-0869",
+            "section-0870",
+            "section-0871",
+            "section-0872",
+            "section-0873",
+            "section-0874",
+            "section-0875",
+            "section-0876",
+            "section-0879",
+            "section-0880",
+            "section-0882",
+            "section-0883",
+            "section-0885",
+            "section-0886",
+            "section-0888",
+            "section-0889",
+            "section-0893",
+            "section-0894",
+            "section-0897",
+            "section-0898",
+            "section-0900",
+            "section-0901",
+            "section-0903",
+            "section-0904",
+            "section-0906",
+            "section-0907",
+            "section-0910",
+            "section-0911",
+            "section-0912",
+            "section-0913",
+            "section-0914",
+            "section-0915",
+            "section-0916",
+            "section-0917",
+            "section-0920",
+            "section-0921",
+            "section-0923",
+            "section-0924",
+            "section-0928",
+            "section-0929",
+            "section-0933",
+            "section-0934",
+            "section-0939",
+            "section-0940",
+            "section-0946",
+            "section-0947",
+            "section-0952",
+            "section-0953",
+            "section-0957",
+            "section-0958",
+            "section-0961",
+            "section-0962",
+            "section-0964",
+            "section-0965",
+            "section-0967",
+            "section-0968",
+            "section-0970",
+            "section-0971",
+            "section-0974",
+            "section-0975",
+            "section-0976",
+            "section-0977",
+            "section-0980",
+            "section-0981",
+            "section-0984",
+            "section-0985",
+            "section-0987",
+            "section-0988",
+            "section-0992",
+            "section-0993",
+            "section-0994",
+            "section-0995",
+            "section-0996",
+            "section-0997",
+            "section-0998",
+            "section-1000",
+            "section-1001",
+            "section-1004",
+            "section-1005",
+            "section-1008",
+            "section-1009",
+            "section-1011",
+            "section-1012",
+            "section-1014",
+            "section-1015",
+            "section-1018",
+            "section-1019",
+            "section-1020",
+            "section-1021",
+            "section-1022",
+            "section-1023",
+            "section-1024",
+            "section-1025",
+            "section-1026",
+            "section-1027",
+            "section-1028",
+            "section-1029",
+            "section-1030",
+            "section-1031",
+            "section-1032",
+            "section-1033",
+            "section-1034",
+            "section-1035",
+            "section-1036",
+            "section-1037",
+            "section-1038",
+            "section-1041",
+            "section-1042",
+            "section-1047",
+            "section-1048",
+            "section-1051",
+            "section-1052",
+            "section-1053",
+            "section-1054",
+            "section-1055",
+            "section-1056",
+            "section-1059",
+            "section-1060",
+            "section-1061",
+            "section-1062",
+            "section-1063",
+            "section-1064",
+            "section-1065",
+            "section-1066",
+            "section-1067",
+            "section-1068",
+            "section-1069",
+            "section-1070",
+            "section-1071",
+            "section-1073",
+            "section-1074",
+            "section-1076",
+            "section-1079",
+            "section-1080",
+            "section-1081",
+            "section-1082",
+            "section-1083",
+            "section-1084",
+            "section-1085",
+            "section-1093",
+            "section-1094",
+            "section-1103",
+            "section-1104",
+            "section-1112",
+            "section-1113",
+            "section-1121",
+            "section-1122",
+            "section-1127",
+            "section-1128",
+            "section-1129",
+            "section-1132",
+            "section-1133",
+            "section-1138",
+            "section-1139",
+            "section-1140",
+            "section-1141",
+            "section-1142",
+            "section-1143",
+            "section-1144",
+            "section-1145",
+            "section-1146",
+            "section-1147",
+            "section-1148",
+            "section-1152",
+            "section-1153",
+            "section-1154",
+            "section-1155",
+            "section-1156",
+            "section-1157",
+            "section-1159",
+            "section-1160",
+            "section-1162",
+            "section-1163",
+            "section-1165",
+            "section-1166",
+            "section-1167",
+            "section-1168",
+            "section-1169",
+            "section-1170",
+            "section-1171",
+            "section-1172",
+            "section-1173",
+            "section-1174",
+            "section-1175",
+            "section-1176",
+            "section-1177",
+            "section-1180",
+            "section-1181",
+            "section-1182",
+            "section-1183",
+            "section-1184",
+            "section-1185",
+            "section-1186",
+            "section-1187",
+            "section-1188",
+            "section-1189",
+            "section-1190",
+            "section-1191",
+            "section-1192",
+            "section-1195",
+            "section-1196",
+            "section-1199",
+            "section-1200",
+            "section-1201",
+            "section-1205",
+            "section-1206",
+            "section-1208",
+            "section-1209",
+            "section-1210",
+            "section-1211",
+            "section-1212",
+            "section-1213",
+            "section-1214",
+            "section-1215",
+            "section-1216",
+            "section-1217",
+            "section-1218",
+            "section-1219",
+            "section-1220",
+            "section-1221",
+            "section-1223",
+            "section-1224",
+            "section-1225",
+            "section-1226",
+            "section-1227",
+            "section-1228",
+            "section-1229",
+            "section-1230",
+            "section-1231",
+            "section-1232",
+            "section-1233",
+            "section-1234",
+            "section-1235",
+            "section-1239",
+            "section-1240",
+            "section-1241",
+            "section-1242",
+            "section-1243",
+            "section-1244",
+            "section-1245",
+            "section-1246",
+            "section-1247",
+            "section-1248",
+            "section-1251",
+            "section-1252",
+            "section-1255",
+            "section-1256",
+            "section-1258",
+            "section-1259",
+            "section-1260",
+            "section-1261",
+            "section-1264",
+            "section-1265",
+            "section-1268",
+            "section-1269",
+            "section-1271",
+            "section-1272",
+            "section-1273",
+            "section-1274",
+            "section-1275",
+            "section-1276",
+            "section-1277",
+            "section-1281",
+            "section-1282",
+            "section-1283",
+            "section-1284",
+            "section-1285",
+            "section-1286",
+            "section-1287",
+            "section-1288",
+            "section-1289",
+            "section-1290",
+            "section-1291",
+            "section-1292",
+            "section-1293",
+            "section-1294",
+            "section-1295",
+            "section-1298",
+            "section-1299",
+            "section-1302",
+            "section-1303",
+            "section-1306",
+            "section-1307",
+            "section-1308",
+            "section-1309",
+            "section-1310",
+            "section-1312",
+            "section-1313",
+            "section-1316",
+            "section-1317",
+            "section-1319",
+            "section-1320",
+            "section-1322",
+            "section-1323",
+            "section-1324",
+            "section-1326",
+            "section-1330",
+            "section-1331",
+            "section-1332",
+            "section-1333",
+            "section-1334",
+            "section-1335",
+            "section-1336",
+            "section-1337",
+            "section-1338",
+            "section-1339",
+            "section-1340",
+            "section-1341",
+            "section-1342",
+            "section-1343",
+            "section-1344",
+            "section-1345",
+            "section-1346",
+            "section-1347",
+            "section-1348",
+            "section-1349",
+            "section-1350",
+            "section-1351",
+            "section-1352",
+            "section-1353",
+            "section-1354",
+            "section-1355",
+            "section-1356",
+            "section-1357",
+            "section-1358",
+            "section-1359",
+            "section-1360",
+            "section-1361",
+            "section-1362",
+            "section-1365",
+            "section-1366",
+            "section-1368",
+            "section-1369",
+            "section-1372",
+            "section-1373",
+            "section-1376",
+            "section-1377",
+            "section-1379",
+            "section-1380",
+            "section-1383",
+            "section-1384",
+            "section-1388",
+            "section-1389",
+            "section-1393",
+            "section-1394",
+            "section-1398",
+            "section-1399",
+            "section-1401",
+            "section-1402",
+            "section-1404",
+            "section-1405",
+            "section-1408",
+            "section-1409",
+            "section-1411",
+            "section-1412",
+            "section-1414",
+            "section-1415",
+            "section-1416",
+            "section-1417",
+            "section-1418",
+            "section-1421",
+            "section-1422",
+            "section-1423",
+            "section-1424",
+            "section-1426",
+            "section-1427",
+            "section-1429",
+            "section-1432",
+            "section-1433",
+            "section-1434",
+            "section-1435",
+            "section-1437",
+            "section-1438",
+            "section-1441",
+            "section-1442",
+            "section-1443",
+            "section-1444",
+            "section-1445"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-80f29bbe1547d8f50164c7b4:workpaper:extract",
+          "request_hash": "b29455632db8615a84c438e453f3379fdb0a856ac4af69f7dc64cada93805fcb",
+          "response_hash": "94153eecb235e7e0ad78b8be0ffcbb03a667826376d660d46e372c1b2b2d01e1",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14959,
+            "output_tokens": 5726,
+            "total_tokens": 20685
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0057",
+            "section-0077",
+            "section-0080",
+            "section-0090",
+            "section-0093",
+            "section-0101",
+            "section-0105",
+            "section-0109",
+            "section-0124",
+            "section-0129",
+            "section-0131"
+          ],
+          "physical_pages": [
+            17,
+            23,
+            24,
+            26,
+            28,
+            29,
+            30,
+            34,
+            35,
+            36
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "a33cc5ff4ff4a0a8d55938c6b23dee01235902d349dc1b8764be96bf35a41efc",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "八、近三年主要会计数据和财务指标"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 1432,
+              "quote": "八、近三年主要会计数据和财务指标\r\n（一）主要会计数据\r\n单位：元 币种：人民币\r\n主要会计数据 2025 年\r\n2024 年 本期比上年\r\n同期增减（%）\r\n2023 年\r\n调整后 调整前 调整后 调整前\r\n营业收入 28,302,251,724.47 22,761,598,103.00 35,471,202,541.44 24.34 18,938,854,682.46 33,644,082,792.61\r\n利润总额 14,413,177,989.26 10,518,630,296.62 10,518,630,296.62 37.03 8,133,648,494.72 8,133,648,494.72\r\n归属于母公司\r\n股东的净利润 12,519,718,792.04 10,030,837,664.86 10,030,837,664.86 24.81 7,878,769,252.91 7,878,769,252.91\r\n归属于母公司\r\n股东的扣除非\r\n经常性损益的\r\n净利润\r\n12,521,689,329.66 9,995,210,302.52 9,995,210,302.52 25.28 7,885,614,077.40 7,885,614,077.40\r\n经营活动产生\r\n的现金流量净\r\n额\r\n24,935,995,656.20 34,796,748,317.43 34,796,748,317.43 -28.34 -44,260,691,662.01 -44,260,691,662.01\r\n其他综合收益\r\n的税后净额 -770,330,528.61 4,934,348,861.69 4,934,348,861.69 -115.61 1,502,176,168.59 1,502,176,168.59\r\n2025 年末\r\n2024 年末 本期末比上年\r\n同期末增减（%）\r\n2023 年末\r\n调整后 调整前 调整后 调整前\r\n资产总额 855,744,926,541.11 737,470,691,457.89 737,470,691,457.89 16.04 663,205,297,156.44 663,205,297,156.44\r\n负债总额 707,948,509,845.55 596,971,247,186.71 596,971,247,186.71 18.59 532,710,510,748.47 532,710,510,748.47\r\n归属于母公司\r\n股东的权益 147,780,142,827.69 140,480,735,424.29 140,480,735,424.29 5.20 130,466,361,900.54 130,466,361,900.54\r\n所有者权益总\r\n额 147,796,416,695.56 140,499,444,271.18 140,499,444,271.18 5.19 130,494,786,407.97 130,494,786,407.97\r\n注：2025 年 7 月，财政部发布了标准仓单交易相关会计处理实施问答，对于满足一定条件的仓单交易，按照《企业会计准则第 22 号——\r\n金融工具确认和计量》的规定进行会计处理。公司按照上述财政部发布的实施问答，对于同时满足特定条件的仓单交易，按照净额确认投资\r\n收益，相应调整了营业收入往年同期数据。\r\n14 2025年度报告\r\n"
+            }
+          ],
+          "table_context": "物理页17布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            23
+          ],
+          "source_spans": [
+            {
+              "page": 23,
+              "start": 14,
+              "end": 756,
+              "quote": "一、报告期内公司从事的业务情况\n\n\n    《中国银河证券战略发展规划（2023-2025）》明确了“金融报国、客户至上”的战略使命和“打造国内一流、国际优\n秀的现代投资银行”的战略目标。报告期内，公司坚持以市场化、平台化、数字化和全面协同为导向，持续打造“五位一体”\n的业务模式，即提供财富管理业务、投资银行业务、机构业务、国际业务、投资交易业务及母子公司一体化的综合金融服务。\n\n    财富管理业务：公司为客户提供代理买卖股票、基金、债券、衍生金融工具等服务，提供投资咨询、投资组合建议、金\n融产品销售和资产配置等金融服务，向客户提供融资融券、股票质押式回购及约定购回交易等服务。\n\n    投资银行业务：公司为各类型企业和政府客户提供一站式投资银行服务，包括股权融资、债券融资、结构化融资、财务\n顾问及多样化融资解决方案等金融服务。\n\n    机构业务：公司提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。\n\n    国际业务：公司通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投\n资银行、研究和资产管理、融资和金融产品等服务。\n\n    投资交易业务：公司从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融\n资及风险管理提供综合金融解决方案。\n\n    母子公司一体化业务：公司聚焦“客户需求”“专业发展”“协同创收”，将从事期货业务、私募股权基金管理业务、\n另类投资业务、资产管理业务的子公司平台与前述五大业务线主动进行融合，强化业务协同、资源对接，持续为客户提供综\n合金融服务。\n\n    报告期内公司新增重要非主营业务的说明\n\n    □适用√不适用\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            24
+          ],
+          "source_spans": [
+            {
+              "page": 24,
+              "start": 0,
+              "end": 1263,
+              "quote": "三、经营情况讨论与分析\r\n（一）总体经营情况\r\n2025 年是公司三年战略规划收官之年，在公司发展历程中具有重要的里程碑意义。面对复杂多变的外部环境，公司以\r\n党建引领凝聚发展合力，以学习教育强化思想根基，紧密遵循“专业为本、合规为先、稳中求进”经营理念，服务国家战略\r\n取得新成效，经营业绩稳中有进，资产规模稳步提升，行业地位保持稳固，圆满完成三年战略规划收官任务，为开启新一轮\r\n高质量发展奠定了坚实基础。\r\n（二）主营业务经营情况分析\r\n2025 年，公司主营业务开展情况具体如下：\r\n1、财富管理业务\r\n市场环境\r\n2025 年，A 股回稳向好态势明显，投资者预期有效改善，市场韧性、包容性和吸引力显著增强，服务新质生产力和高\r\n质量发展不断提升。上证指数创十年新高，根据交易所数据统计，全年 A 股成交额为人民币 420.69 万亿元，日均成交额为\r\n人民币 1.73 万亿元，较上年增长 61.7%，2025 年末，A 股总市值首次突破人民币 100 万亿元；市场融资融券余额为人民币\r\n25,407 亿元，较上年末增长 36.3%，其中，融资余额为人民币 25,242 亿元，较上年末增长 36.1%，融券余额为人民币 165\r\n亿元，较上年末增长 58.3%。\r\n经营举措和业绩\r\n2025年，公司坚定推进具有银河特色的财富管理业务转型，以“创造多维服务价值，提升投资者获得感”为宗旨，以集约化、\r\n平台化、生态化、国际化为导向，充分践行“以生态替代业务、以场景替代营销”理念，立足全账户视角构建“标准化 + 个\r\n性化”的客户分层服务体系，推动“获客、活客、留客、粘客”运营闭环建设。公司不断优化产品结构、投顾结构、网点结构，\r\n着力提升综合服务生态构建和输出能力，努力形成“好产品 + 好服务 + 好品牌”业务价值体系，推进财富管理跨境一体化发展，\r\n打造“银河一家”财富管理合作生态圈，强化客户财富全旅程的保护教育，维护广大投资者合法权益，切实做好老百姓身边\r\n的理财顾问。\r\n（1）经纪业务\r\n公司积极推进零售客群管理，着力构建精细化运营模式，以渠道、场景、内容、私域为抓手，持续加大客户全旅程、全场景“线\r\n上 + 线下”服务触达；以数智化驱动经营提效与服务生态升级，加强北交所、ETF 等细分领域服务供给，打造行业网格品牌，\r\n优化智能交易工具，全年落地 23 项创新产品，筑牢交易服务竞争力；深化“数字金融 +”实践，聚焦人工智能等前沿技术，\r\n落地营销助手大模型应用，提升一线服务效能与运营协同水平，构建全场景数字人服务体系，累计服务客户 130 万人次；倾\r\n力打造“银河金熠”服务品牌，通过“星耀管理人俱乐部”“星耀领航计划” “星善计划”有效构建私募同业与专业交易生\r\n态圈；优化完善“星耀企业家办公室”服务体系，聚焦上市公司股权综合服务场景，赋能客户全球化交易及资产配置；推出\r\nTDC 金耀专享策略服务，强化 IB 拓客模式，持续构建综合金融服务生态链。\r\n2025年度报告 21\r\n"
+            }
+          ],
+          "table_context": "物理页24布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "2、投资银行业务"
+          ],
+          "physical_pages": [
+            26
+          ],
+          "source_spans": [
+            {
+              "page": 26,
+              "start": 0,
+              "end": 1251,
+              "quote": "2、投资银行业务\r\n市场环境\r\n2025 年，我国资本市场政策以“稳中求进、以进促稳”为总体基调，深化科创板、创业板改革，支持未盈利科技企业\r\n上市，进一步激发并购重组市场活力，推出债券市场“科技板”，有效引导金融资源投向科技前沿领域。根据 Wind 统计，\r\n2025 年 A 股股权融资规模（含可转债，不含可交债及发行股份购买资产）为人民币 9,415.85 亿元，同比增长 274.2%。其中，\r\nIPO 规模为人民币 1,317.71 亿元，同比增长 95.6%；再融资规模为人民币 8,098.14 亿元，同比增长 339.5%。2025 年，境\r\n内债券新发行规模（不含可转债）为人民币 89.08 万亿元，同比增长 11.5%，境内并购市场整体交易规模为人民币 6,850.00\r\n亿元，同比增长 758.4%。\r\n经营举措和业绩\r\n2025年，公司投资银行业务紧密围绕打造“企业家信任的投资银行专家”的关键业务战略，努力践行“三化一同”体制机制，\r\n向纵深推进专业化改革，优化团队设置、补充专业人员，完善项目管理、协同拓展业务。\r\n（1）股权融资和财务顾问业务\r\n公司持续加强 A 股股权融资业务项目储备，提高项目承揽承做标准及综合服务能力，报告期内完成 1 单 IPO 项目、7 单\r\n再融资项目，股权承销规模为人民币 86.97 亿元，行业排名第 12；完成 3 单上市公司发行股份购买资产 / 重大资产重组项目，\r\n交易金额为人民币 194.66 亿元，行业排名第 7；另外完成 2 单新三板定向发行项目。\r\n（2）债券融资业务\r\n公司积极开展业务协同，进一步发掘地方政府债、金融债、中期票据、定向债务融资工具等业务机会，债券承销规模增\r\n速高于行业平均增速。根据 Wind 统计，2025 年，公司债券承销规模为人民币 6,825.75 亿元，同比增长 37.3%，行业排名\r\n第 6。其中，地方政府债承销规模为人民币 4,333.31 亿元，行业排名第 5；金融债承销规模为人民币 1,458.81 亿元，行业\r\n排名第 10；中期票据承销规模为人民币 300.00 亿元，行业排名第 10；定向债务融资工具承销规模为人民币 100.92 亿元，\r\n行业排名第 7；短期融资券承销规模为人民币 91.44 亿元，行业排名第 6。\r\n公司获评 2025 中国证券业“新锐投行君鼎奖”“服务央企国企项目君鼎奖”，2025 新财富杂志最佳投行评选“最具\r\n潜力投行”“最佳债权承销投行”“最佳并购投行”，2025 年度中债成员业务发展质量评价“优秀债券承销机构”，2025\r\n年度 Wind 最佳投行评选“最佳绿色债券承销商”“最佳金融债承销商”“A 股股权承销快速进步奖”“A 股再融资承销快\r\n速进步奖”，同花顺 iFinD 2025 年度证券公司获奖名单“五篇大文章最佳承销”“最佳债券承销”“区域最佳债券承销”，\r\n第十一届中国资产证券化论坛年会“年度杰出机构”等奖项。\r\n"
+            }
+          ],
+          "table_context": "物理页26布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "4、国际业务"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "source_spans": [
+            {
+              "page": 28,
+              "start": 228,
+              "end": 1656,
+              "quote": "4、国际业务\r\n市场环境\r\n2025 年，港股升势延续，恒生指数领涨全球，全年上涨 27.8%，市场活跃度增加，港股日均成交额为 2,498 亿港\r\n元，同比增长 89.5%。一级市场表现畅旺，港交所 IPO 融资额重回全球第一，全年融资总额为 6,444 亿港元，同比增长\r\n235.3%，其中新股融资总额为 2,858 亿港元，同比增长 224.8%，上市家数 119 家，同比增长 67.6%。根据 DMI 统计，\r\n2025 年中资离岸债市场发行规模为 3,071 亿美元，同比增长 15.8%。\r\n2025 年，东南亚核心四国股票指数涨跌互现，成交走势分化，其中新加坡海峡时报指数全年上涨 22.7%，股票市场日\r\n均成交额为 15 亿新加坡元，同比增长 21%；马来西亚吉隆坡指数上涨 2.3%，股票市场日均成交额为 24 亿马来西亚林吉\r\n特，同比下跌 21%；印度尼西亚雅加达指数上涨 22.1%，股票市场日均成交额为 18 万亿印度尼西亚盾，同比增长 38%；泰\r\n国 SET 综合指数下跌 10.0%，股票市场日均成交额为 405 亿泰铢，同比下跌 10%。四国一级市场有所回暖，全年融资总额\r\n为 65 亿美元，同比增长 76%，其中 IPO 数量 120 次，同比下降 12%。\r\n经营举措和业绩\r\n（1）银河国际控股\r\n2025 年，银河国际控股抢抓市场机遇，聚焦主责主业，夯实发展基础，持续做强本级。财富管理业务跨境一体化协同\r\n取得新突破，落地首单全权委托账户业务及“保险 + 信托”产品，上线美股期权交易等新服务，成为香港联交所综合基金平\r\n台首批分销商。投资银行业务一体化展业效能有效发挥，竞争力持续提升，港股 IPO 保荐规模首次排名香港市场前 10、参\r\n与项目数排名中资券商第 4，离岸债券发行数量排名中资券商第 5。资产管理业务成功发行设立首只公募基金，在优化境外\r\n资产管理产品布局、推动国际业务高质量发展方面迈出重要一步。FICC 和北向跨境业务稳步推进，落地首笔黄金交易，持续\r\n做优做强资产负债表。\r\n银河国际控股获 2025年度 Wind最佳投行评选“最佳港股 IPO全球协调人”，《中国证券报》“IPO中介机构金牛奖”“2025\r\n中国证券业境外投行君鼎奖”，2025 qeubee 第四届固收行业奖“中资离岸债杰出承销团队奖”，久期财经 2025 年度“金\r\n久期”奖“杰出承销商”，2025 年 DMI 中资离岸债年度机构评选“年度行业影响力承销机构（券商）”“年度点心债最佳\r\n承销机构（券商）”，2025 年度澳门债券市场奖项“优秀承销机构（非本地机构）”“优秀二级市场交易机构”，《财资》\r\n（The Asset）“最佳 G3 债券投资机构—资管机构（中国香港）”第 8 名、离岸人民币和港元债券最佳投资机构（香港地区）\r\n高度推荐奖，《哈佛商业评论》（Harvard Business Review）“2025 新增长 ESG 创新实践榜”。“银河星辰 AI 平台”获《财\r\n资》（The Asset）年度 3A 数字类奖项“最佳金融人工智能项目”，“CGT-ESG 债券组合”获粤港澳大湾区绿色金融联盟“绿\r\n色金融优秀案例卓越奖”、香港中国金融协会跨境金融及金融创新服务大奖“优秀方案奖”、2025 向光奖“ESG 影响力投\r\n资最佳实践 TOP10”等。\r\n2025年度报告 25\r\n"
+            }
+          ],
+          "table_context": "物理页28布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "5、投资交易业务"
+          ],
+          "physical_pages": [
+            29
+          ],
+          "source_spans": [
+            {
+              "page": 29,
+              "start": 698,
+              "end": 1528,
+              "quote": "5、投资交易业务\r\n市场环境\r\n2025 年，A 股结构性牛市特征明显，其中上证指数上涨 18.4%、创业板指上涨 49.6%、科创综指上涨 46.3%、北证 50\r\n上涨 38.8%。境内债券市场收益率普遍上行，2025 年末，10 年期国债收益率 1.85%，较年初上升 17BP；30 年期国债收益\r\n率 2.27%，较年初上升 36BP。其他大类资产方面，贵金属领涨商品市场，离岸人民币兑美元升破 7.0 关口。\r\n经营举措和业绩\r\n2025 年，公司投资交易业务锚定稳中求进工作总基调，充分发挥专业投资能力，精准把握市场节奏，积极推进业务创\r\n新实践，动态调整优化资产配置结构，持续提升服务国家战略质效和风险防控能力。\r\n（1）权益投资\r\n公司坚持绝对收益目标，多资产配置组合和多策略投资体系更加完备，持续参与央行互换便利（SFISF）操作，落实推\r\n动中长期资金入市，切实发挥维护市场稳定运行作用。压舱石层面，高分红、低波动资产配置持续贡献稳定收益；弹性增强\r\n层面，主动权益投资紧抓人工智能、半导体、新能源、生物医药等产业趋势，为组合提供显著业绩弹性；互补配置层面，转\r\n债投资坚持稳中求进，挖掘泛科技、新消费等结构性机会，与纯权益资产形成有效互补。\r\n（2）固定收益投资\r\n公司坚持以风险防控为主线，持续深化投研一体，精准研判宏观经济与利率走势，动态优化投资策略布局，不断提升交\r\n易定价专业能力，稳步完善量化交易体系，高效捕捉市场结构性机遇，推动固定收益投资实现提质增效。\r\n公司多维度发挥功能性作用，做市业务持续保持领先。公司建立起覆盖全面、品种广泛的做市报价体系，银行间和交易\r\n所多个关键券种及创新产品排名市场前列；成功获批上海黄金交易所黄金做市商资格，进一步拓展做市业务版图；针对科创\r\n债拓展交易机制和服务场景，构建全方位做市服务体系，实现多项业务首创；作为债券 ETF 做市商，紧抓市场扩容发展机遇，\r\n26 2025年度报告\r\n"
+            }
+          ],
+          "table_context": "物理页29布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "6、母子公司一体化业务"
+          ],
+          "physical_pages": [
+            30
+          ],
+          "source_spans": [
+            {
+              "page": 30,
+              "start": 1106,
+              "end": 1777,
+              "quote": "6、母子公司一体化业务\r\n（1）期货及衍生品业务\r\n市场环境\r\n2025 年，伴随全球经济增速放缓、贸易保护主义抬头和地缘冲突频发，实体经济对风险防控的需求刚性增长，“十五五”\r\n规划建议首次明确提出“稳步发展期货和衍生品市场”，顶层设计指明奋进方向，衍生品市场迎来历史性机遇。其中，期货\r\n市场整体发展更加成熟，并处于高质量转型的关键阶段，其价格发现、风险管理与资产配置功能获得行业广泛认同，为服务\r\n实体经济筑牢了坚实的市场基础。根据中国期货市场监控中心公告，2025 年我国期货市场资金总量和期货公司客户权益均\r\n突破人民币 2 万亿元，2025 年末，全市场有效客户总数达 278 万，较上年末增长 11%。根据中国期货业协会统计，以单边\r\n计算，2025 年全国期货市场累计成交量 90.74 亿手，累计成交额为人民币 766.25 万亿元，分别同比增长 17.4%、23.7%。\r\n经营举措和业绩\r\n期货经纪业务专业化、全链条服务能力持续提升。不断健全交割服务体系，黑色系、油品类专业优势持续巩固，焦煤、\r\n焦炭、铁矿等品种交割量稳居行业首位。客户结构持续优化，产业客户占比稳步提升并向头部集聚，金融机构客户有效扩容，\r\n国际客户方面加速补短板，其中 QFII 客户数量快速增长，与银河海外合作有序开展。持续培育赋能实体企业，与交易所合作\r\n推进“强源助企”“稳企安农”等重点项目 52 个，联合实体企业成功申请产融基地 17 家，成功开展市场首单以银行承兑汇\r\n票作为履约保障品的跨境收益互换业务。\r\n2025年度报告 27\r\n"
+            }
+          ],
+          "table_context": "物理页30布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "（一）主营业务分析"
+          ],
+          "physical_pages": [
+            34
+          ],
+          "source_spans": [
+            {
+              "page": 34,
+              "start": 0,
+              "end": 1753,
+              "quote": "（一）主营业务分析\r\n1、利润表及现金流量表相关科目变动分析表\r\n单位：元 币种：人民币\r\n科目 本期数 上年同期数 变动比例（%）\r\n营业收入 28,302,251,724.47 22,761,598,103.00 24.34\r\n利息净收入 4,482,828,193.13 3,848,625,683.41 16.48\r\n手续费及佣金净收入 10,419,509,128.97 7,371,191,632.96 41.35\r\n投资收益及公允价值变动损益 13,135,906,369.05 11,343,026,632.13 15.81\r\n其他收益 52,451,360.65 74,991,326.81 -30.06\r\n汇兑收益 30,453,791.51 -62,905,320.03 148.41\r\n其他业务收入 169,345,047.83 182,859,345.15 -7.39\r\n资产处置收益 11,757,833.33 3,808,802.57 208.70\r\n营业成本 13,845,856,470.63 12,233,728,841.88 13.18\r\n税金及附加 174,721,127.24 141,184,188.93 23.75\r\n业务及管理费 12,796,066,589.67 11,414,453,847.83 12.10\r\n信用减值损失 778,175,199.96 440,812,131.56 76.53\r\n其他资产减值损失 -8,817,564.01 -1,576,392.17 -459.35\r\n其他业务成本 105,711,117.77 238,855,065.73 -55.74\r\n营业外收入 9,722,990.02 1,783,032.43 445.31\r\n营业外支出 52,940,254.60 11,021,996.93 380.31\r\n所得税费用 1,893,444,176.24 487,708,292.30 288.23\r\n少数股东损益 15,020.98 84,339.46 -82.19\r\n其他综合收益的税后净额 -770,330,528.61 4,934,348,861.69 -115.61\r\n经营活动产生的现金流量净额 24,935,995,656.20 34,796,748,317.43 -28.34\r\n投资活动产生的现金流量净额 -9,096,511,624.79 -16,705,599,951.35 45.55\r\n筹资活动产生的现金流量净额 27,196,332,154.63 8,321,202,707.24 226.83\r\n营业收入变动原因说明：报告期内，本集团实现营业收入人民币 283.02 亿元，较 2024 年度增加人民币 55.41 亿元，\r\n增幅为 24.34%。主要科目变动如下：利息净收入较 2024 年度增加 16.48%，主要由于融出资金利息收入增加以及业务融资\r\n利息支出减少；手续费及佣金净收入较 2024 年度增加 41.35%，主要由于经纪业务手续费净收入增加；投资收益及公允价\r\n值变动损益较 2024 年度增加 15.81%，主要由于处置金融工具取得投资收益增加，交易性金融资产和衍生金融工具及交易\r\n性金融负债公允价值变动的影响；其他收益较 2024 年度减少 30.06%，主要由于政府补贴收入减少；汇兑收益较 2024 年度\r\n增加，主要由于汇率波动影响；资产处置收益较 2024 年度增加 208.70%，主要为非流动资产处置收益增加。\r\n营业成本变动原因说明：报告期内，本集团营业支出人民币 138.46 亿元，较 2024 年度增加人民币 16.12 亿元，增幅\r\n为 13.18%。主要科目变动如下：信用减值损失较 2024 年度增加 76.53%，主要由于公司信用类资产预期信用减值风险增加，\r\n公司审慎评估风险，合理计提信用减值损失；其他资产减值损失较 2024 年度减少，主要由于子公司大宗商品销售业务计提\r\n其他流动资产减值准备转回；其他业务成本较 2024 年度下降 55.74%，主要由于子公司“保险 + 期货”业务及大宗商品销\r\n2025年度报告 31\r\n"
+            }
+          ],
+          "table_context": "物理页34布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分行业情况"
+          ],
+          "physical_pages": [
+            35
+          ],
+          "source_spans": [
+            {
+              "page": 35,
+              "start": 1030,
+              "end": 1679,
+              "quote": "主营业务分行业情况\r\n分行业 营业收入 营业成本 毛利率（%） 营业收入比\r\n上年增减（%）\r\n营业成本比\r\n上年增减（%） 毛利率比上年增减（%）\r\n财富管理业务 13,471,647,340.02 5,818,779,502.73 56.81 28.36 3.56 增加 10.35 个百分点\r\n投资银行业务 585,113,645.92 494,166,900.37 15.54 22.18 16.66 增加 4.00 个百分点\r\n机构业务 1,714,321,579.93 299,580,110.22 82.52 508.20 9.64 增加 79.46 个百分点\r\n国际业务 2,568,513,564.51 1,971,804,455.30 23.23 18.23 4.59 增加 10.01 个百分点\r\n投资交易业务 7,026,017,998.15 521,854,624.62 92.57 10.76 2.08 增加 0.63 个百分点\r\n母子公司一体化\r\n业务 2,766,500,400.22 1,580,263,812.90 42.88 11.16 -4.51 增加 9.37 个百分点\r\n其他 170,137,195.72 3,159,407,064.49 不适用 -65.99 69.25 不适用\r\n合计 28,302,251,724.47 13,845,856,470.63 51.08 24.34 13.18 增加 4.83 个百分点\r\n32 2025年度报告\r\n"
+            }
+          ],
+          "table_context": "物理页35布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分地区情况"
+          ],
+          "physical_pages": [
+            36
+          ],
+          "source_spans": [
+            {
+              "page": 36,
+              "start": 0,
+              "end": 2042,
+              "quote": "主营业务分地区情况\r\n分地区 营业收入 营业成本 毛利率（%） 营业收入比\r\n上年增减（%）\r\n营业成本比\r\n上年增减（%） 毛利率比上年增减（%）\r\n浙江 1,604,386,284.32 483,432,887.80 69.87 37.30 10.59 增加 7.28 个百分点\r\n广东 1,327,610,735.07 548,469,204.13 58.69 41.07 11.43 增加 10.99 个百分点\r\n北京 1,205,280,823.61 377,103,157.07 68.71 17.86 4.38 增加 4.04 个百分点\r\n上海 774,528,760.37 284,641,200.09 63.25 32.86 6.91 增加 8.92 个百分点\r\n江苏 477,854,761.21 214,903,076.18 55.03 42.33 7.24 增加 14.71 个百分点\r\n湖北 336,649,771.61 120,295,558.14 64.27 32.20 3.84 增加 9.76 个百分点\r\n福建 332,779,082.91 137,973,899.14 58.54 37.13 3.89 增加 13.27 个百分点\r\n四川 274,850,725.75 85,012,047.95 69.07 38.36 11.12 增加 7.58 个百分点\r\n山西 270,236,457.00 104,218,374.20 61.43 31.34 6.31 增加 9.08 个百分点\r\n辽宁 215,625,198.73 99,571,626.13 53.82 40.31 3.08 增加 16.67 个百分点\r\n安徽 192,041,792.73 67,356,235.64 64.93 44.34 6.54 增加 12.45 个百分点\r\n河南 190,754,871.97 81,592,526.71 57.23 38.34 8.60 增加 11.72 个百分点\r\n重庆 173,207,969.00 79,184,859.08 54.28 30.22 2.57 增加 12.32 个百分点\r\n山东 168,866,905.08 92,832,249.90 45.03 33.84 7.15 增加 13.70 个百分点\r\n河北 158,449,920.03 58,981,900.46 62.78 36.87 4.62 增加 11.48 个百分点\r\n云南 123,077,790.24 34,589,905.11 71.90 39.09 21.38 增加 4.11 个百分点\r\n湖南 103,763,057.73 43,873,923.98 57.72 47.23 16.56 增加 11.13 个百分点\r\n内蒙古 103,575,693.78 34,283,721.92 66.90 37.61 8.29 增加 8.96 个百分点\r\n青海 96,236,685.93 22,023,213.47 77.12 36.74 8.09 增加 6.07 个百分点\r\n江西 86,085,840.81 34,551,410.38 59.86 30.30 3.15 增加 10.56 个百分点\r\n境内其他地区 447,378,762.99 223,704,224.58 50.00 40.81 7.80 增加 15.32 个百分点\r\n公司总部及境内\r\n子公司 17,070,496,269.09 8,659,399,145.95 49.27 20.65 17.76 增加 1.25 个百分点\r\n境外地区 2,568,513,564.51 1,957,862,122.62 23.77 18.23 3.85 增加 10.55 个百分点\r\n合计 28,302,251,724.47 13,845,856,470.63 51.08 24.34 13.18 增加 4.83 个百分点\r\n主营业务分行业、分地区情况的说明\r\n主营业务分行业板块看，本集团报告期内经营业绩主要来源于财富管理业务、投资交易业务、国际业务、机构业务、投\r\n资银行业务及母子公司一体化业务等。其中：财富管理业务营业收入人民币 134.72 亿元，占公司营业收入的 47.60%；投资\r\n交易业务营业收入人民币 70.26 亿元，占公司营业收入的 24.82%；国际业务营业收入人民币 25.69 亿元，占公司营业收入\r\n的 9.08%；机构业务营业收入人民币 17.14 亿元，占公司营业收入的 6.06%；投资银行业务营业收入人民币 5.85 亿元，占\r\n公司营业收入的 2.07%；母子公司一体化业务营业收入人民币 27.67 亿元，占公司营业收入的 9.77%。\r\n主营业务分地区看，北京、浙江、广东、上海及境外地区营业收入占公司营业收入的比重居前。\r\n2025年度报告 33\r\n"
+            }
+          ],
+          "table_context": "物理页36布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司以市场化、平台化、数字化和全面协同为导向，持续打造“五位一体”业务模式，即财富管理业务、投资银行业务、机构业务、国际业务、投资交易业务及母子公司一体化的综合金融服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F02",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "母子公司一体化业务将从事期货业务、私募股权基金管理业务、另类投资业务、资产管理业务的子公司平台与前述五大业务线融合，强化业务协同与资源对接。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F03",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "财富管理业务为客户提供代理买卖股票、基金、债券、衍生金融工具等服务，提供投资咨询、投资组合建议、金融产品销售和资产配置等金融服务，并向客户提供融资融券、股票质押式回购及约定购回交易等服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "投资银行业务为各类型企业和政府客户提供一站式服务，包括股权融资、债券融资、结构化融资、财务顾问及多样化融资解决方案等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F05",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "机构业务提供主经纪商、场外衍生品、席位租赁、托管与基金服务、投资研究、做市及销售交易等服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F06",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "国际业务通过银河国际控股、银河海外等业务平台，为全球机构客户、企业客户和零售客户提供经纪和销售、投资银行、研究和资产管理、融资和金融产品等服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F07",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "投资交易业务从事权益类证券、固定收益类证券、大宗商品、外汇及衍生金融工具的投资交易，并为客户的投融资及风险管理提供综合金融解决方案。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F08",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "程序显示说明：F08正文44.83亿元为利息净收入4,482,828,193.13元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文104.20亿元为手续费及佣金净收入10,419,509,128.97元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文131.36亿元为投资收益及公允价值变动损益13,135,906,369.05元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "公司营业收入由利息净收入、手续费及佣金净收入、投资收益及公允价值变动损益等构成；2025年利息净收入44.83亿元、手续费及佣金净收入104.20亿元、投资收益及公允价值变动损益131.36亿元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "利息净收入",
+            "raw_value": "4,482,828,193.13",
+            "value": "4482828193.13",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "手续费及佣金净收入",
+            "raw_value": "10,419,509,128.97",
+            "value": "10419509128.97",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资收益及公允价值变动损益",
+            "raw_value": "13,135,906,369.05",
+            "value": "13135906369.05",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F08正文44.83亿元为利息净收入4,482,828,193.13元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文104.20亿元为手续费及佣金净收入10,419,509,128.97元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文131.36亿元为投资收益及公允价值变动损益13,135,906,369.05元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F09",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "手续费及佣金净收入较2024年度增加41.35%，主要由于经纪业务手续费净收入增加；利息净收入增加16.48%，主要由于融出资金利息收入增加以及业务融资利息支出减少。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "手续费及佣金净收入同比增减",
+            "raw_value": "41.35",
+            "value": "41.35",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利息净收入同比增减",
+            "raw_value": "16.48",
+            "value": "16.48",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F10",
+      "element": "scale_and_mix",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "程序显示说明：F10正文283.02亿元为营业收入28,302,251,724.47元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F10",
+        "text": "2025年公司实现营业收入283.02亿元，较2024年度增加55.41亿元，增幅24.34%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001",
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "28,302,251,724.47",
+            "value": "28302251724.47",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "24.34",
+            "value": "24.34",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F10正文283.02亿元为营业收入28,302,251,724.47元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F11",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "分行业看，财富管理业务营业收入134.72亿元，占公司营业收入的47.60%；投资交易业务70.26亿元，占24.82%；国际业务25.69亿元，占9.08%；机构业务17.14亿元，占6.06%；投资银行业务5.85亿元，占2.07%；母子公司一体化业务27.67亿元，占9.77%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010",
+          "source-0011"
+        ],
+        "metrics": [
+          {
+            "name": "财富管理业务营业收入",
+            "raw_value": "13,471,647,340.02",
+            "value": "13471647340.02",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "财富管理业务营业收入占公司营业收入比重",
+            "raw_value": "47.60",
+            "value": "47.60",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资交易业务营业收入",
+            "raw_value": "7,026,017,998.15",
+            "value": "7026017998.15",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资交易业务营业收入占公司营业收入比重",
+            "raw_value": "24.82",
+            "value": "24.82",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际业务营业收入",
+            "raw_value": "2,568,513,564.51",
+            "value": "2568513564.51",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际业务营业收入占公司营业收入比重",
+            "raw_value": "9.08",
+            "value": "9.08",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "机构业务营业收入",
+            "raw_value": "1,714,321,579.93",
+            "value": "1714321579.93",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "机构业务营业收入占公司营业收入比重",
+            "raw_value": "6.06",
+            "value": "6.06",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资银行业务营业收入",
+            "raw_value": "585,113,645.92",
+            "value": "585113645.92",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资银行业务营业收入占公司营业收入比重",
+            "raw_value": "2.07",
+            "value": "2.07",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "母子公司一体化业务营业收入",
+            "raw_value": "2,766,500,400.22",
+            "value": "2766500400.22",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "母子公司一体化业务营业收入占公司营业收入比重",
+            "raw_value": "9.77",
+            "value": "9.77",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F14",
+      "element": "scale_and_mix",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "程序显示说明：F14正文8557.45亿元为资产总额855,744,926,541.11元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文1477.80亿元为归属于母公司股东的权益147,780,142,827.69元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "2025年末公司资产总额8557.45亿元，较上年末增长16.04%；归属于母公司股东的权益1477.80亿元，增长5.20%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "资产总额",
+            "raw_value": "855,744,926,541.11",
+            "value": "855744926541.11",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "资产总额较上年末增减",
+            "raw_value": "16.04",
+            "value": "16.04",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于母公司股东的权益",
+            "raw_value": "147,780,142,827.69",
+            "value": "147780142827.69",
+            "unit": "元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "程序显示说明：F14正文8557.45亿元为资产总额855,744,926,541.11元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文1477.80亿元为归属于母公司股东的权益147,780,142,827.69元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F15",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "财富管理业务以集约化、平台化、生态化、国际化为导向，构建“标准化+个性化”客户分层服务体系，推进“获客、活客、留客、粘客”运营闭环，并优化产品结构、投顾结构与网点结构。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F16",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "经纪业务以渠道、场景、内容、私域为抓手，加大客户全旅程“线上+线下”服务触达，全年落地23项创新产品，并落地营销助手大模型应用，构建全场景数字人服务体系，累计服务客户130万人次。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "全年落地创新产品数量",
+            "raw_value": "23",
+            "value": "23",
+            "unit": "项",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "数字人服务体系累计服务客户",
+            "raw_value": "130",
+            "value": "130",
+            "unit": "万人次",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F17",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "投资银行业务向纵深推进专业化改革，优化团队设置、补充专业人员，完善项目管理与协同拓展业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F18",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F18",
+        "text": "投资交易业务动态调整优化资产配置结构；权益投资坚持绝对收益目标，持续参与央行互换便利（SFISF）操作；固定收益投资深化投研一体并完善量化交易体系。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F19",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F19",
+        "text": "期货经纪业务不断健全交割服务体系，黑色系、油品类专业优势持续巩固，焦煤、焦炭、铁矿等品种交割量稳居行业首位；与交易所合作推进“强源助企”“稳企安农”等重点项目52个，联合实体企业成功申请产融基地17家。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "“强源助企”“稳企安农”等重点项目数量",
+            "raw_value": "52",
+            "value": "52",
+            "unit": "个",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "联合实体企业成功申请产融基地数量",
+            "raw_value": "17",
+            "value": "17",
+            "unit": "家",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F20",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F20",
+        "text": "财富管理业务面向零售客群，通过“线上+线下”全场景服务触达，并打造“银河一家”财富管理合作生态圈，推进财富管理跨境一体化发展。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F21",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F21",
+        "text": "投资银行业务客户为各类型企业和政府客户；国际业务客户为全球机构客户、企业客户和零售客户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F23",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F23",
+        "text": "期货经纪业务客户结构持续优化，产业客户占比稳步提升并向头部集聚，金融机构客户有效扩容，QFII客户数量快速增长。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F24",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F24",
+        "text": "2025年A股市场回稳向好，全年A股成交额420.69万亿元，日均成交额1.73万亿元，较上年增长61.7%；市场融资融券余额25,407亿元，较上年末增长36.3%。",
+        "subject_scope": "unclear",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [
+          {
+            "name": "A股全年成交额",
+            "raw_value": "420.69",
+            "value": "420.69",
+            "unit": "万亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "A股日均成交额较上年增长",
+            "raw_value": "61.7",
+            "value": "61.7",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "市场融资融券余额",
+            "raw_value": "25,407",
+            "value": "25407",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F25",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F25",
+        "text": "2025年A股股权融资规模9,415.85亿元，同比增长274.2%；境内债券新发行规模89.08万亿元，同比增长11.5%；境内并购市场交易规模6,850.00亿元，同比增长758.4%。",
+        "subject_scope": "unclear",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "A股股权融资规模",
+            "raw_value": "9,415.85",
+            "value": "9415.85",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "境内债券新发行规模",
+            "raw_value": "89.08",
+            "value": "89.08",
+            "unit": "万亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "境内并购市场交易规模",
+            "raw_value": "6,850.00",
+            "value": "6850.00",
+            "unit": "亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F26",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F26",
+        "text": "2025年港股日均成交额2,498亿港元，同比增长89.5%；港交所IPO融资总额6,444亿港元，同比增长235.3%。",
+        "subject_scope": "unclear",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "港股日均成交额",
+            "raw_value": "2,498",
+            "value": "2498",
+            "unit": "亿港元",
+            "source_unit": null,
+            "currency": "HKD",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "港交所IPO融资总额",
+            "raw_value": "6,444",
+            "value": "6444",
+            "unit": "亿港元",
+            "source_unit": null,
+            "currency": "HKD",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F27",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F27",
+        "text": "2025年全国期货市场累计成交量90.74亿手、累计成交额766.25万亿元，分别同比增长17.4%、23.7%。",
+        "subject_scope": "unclear",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "全国期货市场累计成交量",
+            "raw_value": "90.74",
+            "value": "90.74",
+            "unit": "亿手",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "全国期货市场累计成交额",
+            "raw_value": "766.25",
+            "value": "766.25",
+            "unit": "万亿元",
+            "source_unit": null,
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F28",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F28",
+        "text": "2025年7月财政部发布标准仓单交易相关会计处理实施问答，公司对同时满足特定条件的仓单交易按净额确认投资收益，并相应调整了营业收入往年同期数据。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F29",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "F29",
+        "text": "信用减值损失较2024年度增加76.53%，主要由于公司信用类资产预期信用减值风险增加，公司审慎评估风险并合理计提信用减值损失。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "信用减值损失同比增减",
+            "raw_value": "76.53",
+            "value": "76.53",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F30",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F30",
+        "text": "机构业务营业收入较上年增加508.20%，毛利率比上年增加79.46个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "机构业务营业收入同比增减",
+            "raw_value": "508.20",
+            "value": "508.20",
+            "unit": "%",
+            "source_unit": null,
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "机构业务毛利率比上年增减",
+            "raw_value": "79.46",
+            "value": "79.46",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F31",
+      "element": "position",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F31",
+        "text": "公司为综合金融服务机构，通过财富管理、投资银行、机构、国际、投资交易及母子公司一体化等业务线向客户提供金融服务，而非从事商品生产制造。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F32",
+      "element": "downstream_customers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "F32",
+        "text": "公司下游客户覆盖零售客户、企业客户、政府客户及全球机构客户，并通过经纪、投行、资管、做市等服务满足其投融资与风险管理需求。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "fact_id": "F33",
+      "element": "company_features",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002",
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F33",
+        "text": "公司战略目标为“打造国内一流、国际优秀的现代投资银行”，战略使命为“金融报国、客户至上”，2025年为三年战略规划收官之年。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0002",
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "分行业表“其他”行营业收入与营业成本规模不匹配且毛利率标注不适用，其业务性质与会计基础未在所选章节说明。",
+        "事实F12已隔离，未作为结论采用：narrative number is absent from cited source: 1.70亿元",
+        "事实F13已隔离，未作为结论采用：narrative number is absent from cited source: 283.02亿元"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "期货及衍生品业务的具体经营主体名称未在所选章节明确，相关事实按子公司平台口径标注为named_subsidiary。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "分地区收入表未说明各地区收入对应的具体业务线构成。",
+        "事实F22已隔离，未作为结论采用：narrative number is absent from cited source: 16.04亿元"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "上述市场数据为行业统计，非公司自身经营成果，subject_scope标注为unclear。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-80f29bbe1547d8f50164c7b4",
+      "element": "upstream_inputs",
+      "status": "not_disclosed",
+      "reasons": [
+        "所选章节未披露公司作为金融机构的具体上游资源或采购投入明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

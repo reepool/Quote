@@ -1,0 +1,165 @@
+{
+  "release_root": "/home/python/Quote/data/research/company_profile_release_20261121",
+  "companies": 15,
+  "writer_files": 23,
+  "readable_objects": 434,
+  "readable_metrics": 667,
+  "per_stock": {
+    "000725.SZ": {
+      "readable": 49,
+      "metrics": 44,
+      "readings": 3
+    },
+    "002027.SZ": {
+      "readable": 24,
+      "metrics": 61,
+      "readings": 2
+    },
+    "002142.SZ": {
+      "readable": 25,
+      "metrics": 34,
+      "readings": 2
+    },
+    "002352.SZ": {
+      "readable": 28,
+      "metrics": 68,
+      "readings": 2
+    },
+    "002594.SZ": {
+      "readable": 33,
+      "metrics": 32,
+      "readings": 1
+    },
+    "300144.SZ": {
+      "readable": 25,
+      "metrics": 62,
+      "readings": 1
+    },
+    "600309.SH": {
+      "readable": 37,
+      "metrics": 18,
+      "readings": 1
+    },
+    "600438.SH": {
+      "readable": 35,
+      "metrics": 66,
+      "readings": 1
+    },
+    "601021.SH": {
+      "readable": 31,
+      "metrics": 47,
+      "readings": 1
+    },
+    "601111.SH": {
+      "readable": 17,
+      "metrics": 36,
+      "readings": 2
+    },
+    "601601.SH": {
+      "readable": 23,
+      "metrics": 42,
+      "readings": 1
+    },
+    "601881.SH": {
+      "readable": 29,
+      "metrics": 37,
+      "readings": 2
+    },
+    "601888.SH": {
+      "readable": 23,
+      "metrics": 24,
+      "readings": 1
+    },
+    "920002.BJ": {
+      "readable": 29,
+      "metrics": 41,
+      "readings": 2
+    },
+    "920005.BJ": {
+      "readable": 26,
+      "metrics": 55,
+      "readings": 1
+    }
+  },
+  "export_json_equals_api": true,
+  "new_instance_equals_api": true,
+  "http": {
+    "batch": 200,
+    "details": {
+      "000725.SZ": 200,
+      "601881.SH": 200
+    },
+    "dependency": "actual configured research root, no override"
+  },
+  "galaxy_F26_source_only": true,
+  "protected_29_writers_unchanged": {
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-01e30502f99867e63a3e7126.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-5ce29dc63f76696150d64e1a.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-a99435fdd6133370b6c27a91.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-7cd3e40c46bb206be0cd4234.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-b9c957eb2ed7cf1a2da0ca3e.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-b94386f72fa9b8008e18090c.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-13b0c399f5b0c8150accfdcc.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-f486411f7f36b5e068ceefa1.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-39973bd61a38a0f69bf6e159.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-522acd73d4816c9de549211a.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-2829fcbafb318d193e68b256.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-35b3e51d85531e58dbebe54e.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-714b0f41c03b8caee1d97f61.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-b714e2a56fcb44d188cf3fee.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-58d1b361ac5dd345f0d4e2af.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-8a47bdc6129671bc9ca0fca1.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-d017ef9ea557d599dc731599.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-7c183d820fbfa220e24920bb.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-245e7049d39a49cac0cd6996.json": true,
+    "data/research/company_profile_batch_reviewed_20261121/company_profile_common_core.v1/bp-work-e27361c6f6d02924c70764e2.json": true,
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-26ef88abf3b07103641f6b26.json": true,
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-493287c9bad4098c25e4f70c.json": true,
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-b8845b7602e9c1dda0799704.json": true,
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-cdd7fedb987f076a42eb461a.json": true,
+    "data/research/company_profile_integrated_20261121/000725/company_profile_common_core.v1/bp-work-4510501aae7987c192419f29.json": true,
+    "data/research/company_profile_integrated_20261121/601881/company_profile_common_core.v1/bp-work-80f29bbe1547d8f50164c7b4.json": true,
+    "data/research/company_profile_integrated_20261121/000725/company_profile_common_core.v1/bp-work-a4aa0e8f2b8e24be913e625a.json": true,
+    "data/research/company_profile_integrated_20261121/000725/company_profile_common_core.v1/bp-work-7f46c1fc1a2be83f1a52f6a2.json": true,
+    "data/research/company_profile_integrated_20261121/601881/company_profile_common_core.v1/bp-work-c265f11a31d0e86f8f223804.json": true
+  },
+  "production_authorization": "not_authorized",
+  "delivery_files": {
+    "delivery/601601.SH_2025-12-31.json": "9892859c96df34b15f52536dbe59cc86248829d163c83971ec2863592e3cbee3",
+    "delivery/601601.SH_2025-12-31.md": "111ecefba16d894a2842b8b9390d7a125999cd9e222cd0ed5047583719cee6f1",
+    "delivery/002352.SZ_2025-12-31.json": "f30eb98c13f59038992136cb0193d13f373ac320e9a96147492de0d902cc8981",
+    "delivery/profiles.csv": "9be136f58fdcef25b796c1d5cac814dad11b463d0378394750e2edf46e052156",
+    "delivery/000725.SZ_2025-12-31.json": "7a520d60ab411c8a456af1731f7d658661dc2c8b5a4c7218b241ccc2dd9550f4",
+    "delivery/002027.SZ_2025-12-31.json": "3831a40ef429b03cfaa7e95ef6936dd53e671f83c09db3a7f8853fe4c8de74a8",
+    "delivery/600309.SH_2025-12-31.md": "6d4972b53680c92f67fa5435661acf3f9474647cfe631170e49b0b3bec280432",
+    "delivery/002027.SZ_2025-12-31.md": "7a664412a750596cdd9364e42ac5c7e63192e698c799a2e3afaf0212e0e06386",
+    "delivery/600438.SH_2025-12-31.json": "e4388267a19e845925fea63ee6a6cb6a47933d67c0a2d4f5efefd78aa28ce02a",
+    "delivery/annual_profiles.md": "655da595775350bdfe9d34481849ccb18906e0e7ad75043838a1d74a2eba771d",
+    "delivery/920005.BJ_2025-12-31.json": "e060c44caf45968768053ca46c19f72341765e5595735766dfd595ec4f19a0c8",
+    "delivery/601888.SH_2025-12-31.md": "2e27e4f75f2089def51fa2258fc24fb001b7e70b55d8c7ccbe78636f4875a5a5",
+    "delivery/300144.SZ_2025-12-31.md": "e1d7ea1b59d11ad3eafc3f84d2fe8a41339742bcdcf4ec32c159ea035858a162",
+    "delivery/920005.BJ_2025-12-31.md": "fa29635c3c8142352e669e91bc772a85547901fc52ff9b9e7a01c5c489d7d528",
+    "delivery/601881.SH_2025-12-31.md": "6dbeeb61512366b637feb00ed71d09196a38a1071aa0f5099b98611cdc4c2664",
+    "delivery/920002.BJ_2025-12-31.md": "f685d87f69e97f7cf19a435189ff79d9b7b1b5891afdaab30a66d72e79ffe4b7",
+    "delivery/920002.BJ_2025-12-31.json": "27c25ff409c24a99376e119cc307f3d4e0b65832e78de82acaab52e060863c9f",
+    "delivery/300144.SZ_2025-12-31.json": "a0e0ae0cdb9a14d830a65e57f6cf168771a4834cd4fa98c230ade2d6ac1c019f",
+    "delivery/002594.SZ_2025-12-31.json": "10ac6808425ff0d76d3101658a32b0904ede932b668b7f484aa2b7feabbfc9e5",
+    "delivery/002142.SZ_2025-12-31.json": "2645228fc8bfdb02c6963466e901b4039c745ae4d5a41b71b7694a04eecf0d1a",
+    "delivery/600438.SH_2025-12-31.md": "4052b54943ee8794ecec0a99ef578491ed25ac20f362ddf11a57f6771bd65395",
+    "delivery/600309.SH_2025-12-31.json": "6d1d48f5c272069a5f69fe65d98ef729048ddd7352897b9002a56bff90940a65",
+    "delivery/601888.SH_2025-12-31.json": "435152f33cf8fdb04243b2a08983e1860d475e343d1aacc3994172b14af3d2bd",
+    "delivery/601021.SH_2025-12-31.md": "302c1da8db34e14f773e196553869540a813c57634a560d74558cc5a548396fc",
+    "delivery/601111.SH_2025-12-31.json": "b05b356e6d5db90a0760d6f456f688eb3321d4fca1aef97d21e22a8fe7e6d766",
+    "delivery/profiles.md": "0f3977b689125b0aa36e18e17b73ec499bf7b066e15fd2aeb25a84e7c1d01a89",
+    "delivery/000725.SZ_2025-12-31.md": "5eb0e02c14527c086ab874c7cefa979ae034c1919b8a0493e2336d33fb5afa74",
+    "delivery/annual_profiles.json": "f55899e52d4f5e9fb608220050fe2f37149c0db293eaf701a24ce261fc6993c3",
+    "delivery/export_manifest.json": "e99fecbb6e907707cf21ca1750d1087dfd0f517edd9347835fe54833e983c1ba",
+    "delivery/601881.SH_2025-12-31.json": "3f402495783efdbbe0d69b5218514448b6c8949b6160e9560501c46155444e6b",
+    "delivery/research_profiles.json": "34a9fcf38e9a9b890720be1b9a0a26391287f97d65d102752e9a45a04ae0dbe1",
+    "delivery/601021.SH_2025-12-31.json": "43979833134f10dea07bcd86adf8637c6998a2777866457878b11a85bc5550a6",
+    "delivery/002352.SZ_2025-12-31.md": "64410ec6c42dd3f1dda876ba207fa01976165fee15140e6e7afec9785ad07d01",
+    "delivery/601111.SH_2025-12-31.md": "7ea8e1908838e1949a131d8014bde47fcb38a58ed928d9fc7433320b7c3d59e4",
+    "delivery/002594.SZ_2025-12-31.md": "93f2c2ab692194364dd8f23ef84b6a5e31eeb099b5f62b252b0e18a97b9a568f",
+    "delivery/002142.SZ_2025-12-31.md": "45e6e49587e227831c7f1a8b50003c66c643f94597156f92e841dacbf919aa27"
+  }
+}

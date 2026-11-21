@@ -50,6 +50,12 @@ An explicitly deferred-review workpaper MUST use the existing task/runtime/write
 ### Requirement: Acceptance separates basic business answers from supplementary acquisition and resource policy
 New batch acceptance contracts MUST separate substantive principal-business, main-product/service and earning-mechanism answers from recommended supplementary detail. Missing detailed models, uses, subsidiary inventories, parallel income labels or fine-grained supply-chain information MUST NOT alone reject an otherwise supported basic research profile. Whole major business lines and known false assertions remain subject to the existing correctness requirements. Existing frozen conditions and results MUST NOT be rescored by removing inconvenient items. A current research-delivery assessment MUST NOT be reported as a same-version first-run success, a new source audit or measured accuracy.
 
+#### Scenario: A and B deliver an integrated research release
+- **WHEN** the user authorizes research-release closure, bounded real daily use, an acceptance contract and an expansion decision as one work package
+- **THEN** A MUST freeze the business scope and cumulative resources, independently review the semantic evidence, and make the expansion decision while B implements and executes the existing daily task owner through the declared entry
+- **AND** necessary in-scope fixes and direct verification MUST continue within that work package without per-field or per-phase approval pauses; successful work MUST NOT be resent or cumulative budgets duplicated across first_read, review_batch and enrich files
+- **AND** technical delivery, substantive basic answers, review execution, independently audited content, missing information and resources MUST be reported separately; a useful graded research release MUST NOT be relabeled as a passed historical S2 or unauthorized unseen/production expansion
+
 #### Scenario: Existing profiles contain useful basic answers and optional omissions
 - **WHEN** existing real profiles have source-linked substantive business answers but retain optional acquisition gaps
 - **THEN** the current research data remains readable with those gaps and limitations

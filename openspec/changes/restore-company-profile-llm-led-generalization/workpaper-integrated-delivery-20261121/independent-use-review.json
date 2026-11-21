@@ -1,0 +1,483 @@
+{
+  "task": "6.ET",
+  "new_model_calls": 0,
+  "reference_sha256": "b72509848a3ebc6850ee09015adbeeb232a3470a4002086559765b31a5383796",
+  "items": [
+    {
+      "instrument_id": "000725.SZ",
+      "work_id": "bp-work-a4aa0e8f2b8e24be913e625a",
+      "original_writer_sha256": "3f07456df329600549eb4c7f16f18880470323a47e45769438af119a85d7e5c4",
+      "apply_to_release_copy_only": true,
+      "use_review": {
+        "report": {
+          "instrument_id": "000725.SZ",
+          "report_id": "asset_ee8381d6ef1a54776597e5dab8f426fa",
+          "document_version": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-31T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "Codex A independent original-source review",
+        "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/independent-source-review.md",
+        "reference_sha256": "b72509848a3ebc6850ee09015adbeeb232a3470a4002086559765b31a5383796",
+        "decisions": [
+          {
+            "fact_id": "PS-01",
+            "fact_sha256": "48cabb2400cc970d56711c640e701270690d61d7219ff2d19ba0b1febe182976",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-02",
+            "fact_sha256": "d2c395ddb2a689ffb47e73b64115667763a2e56b560080b1d36a91c813f9c951",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-03",
+            "fact_sha256": "4e60f73750d11f4a1a5c5069b9b7327f0b367d23d8b90f695361c7418acb9565",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-04",
+            "fact_sha256": "0622afdf2f4bb36e8338285e5be20334e9f8d0d5324ad5cb8b0d7dbd039cb966",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-05",
+            "fact_sha256": "9e6d36f619a63630cf571f3565e421de7233b951a0d399893c26cde6192382f1",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-06",
+            "fact_sha256": "409774ae75e36bbf1b62d68974c29f84894d2631d1b68287cb415f1ecf180192",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-07",
+            "fact_sha256": "dc76fc2225c1bbade1d24b7399dcad8cfe245cff5e20993ded82fb7d36e9d2b8",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-08",
+            "fact_sha256": "b87d1921c3bfc06723b01b10a6c8d55a5d2941cc6d09a2ff900cd755b85417ef",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-09",
+            "fact_sha256": "9254196377e1369b2ba6ab015501be6685b86c29b4f472600d863627ea08cd7a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-10",
+            "fact_sha256": "05bfde0c52483aead061473f7a8c5b24504779bf88de3bf3b710c69b20b1bc0e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-11",
+            "fact_sha256": "7da24ed96107f5c7fc6194464b647e84da82ce2368f99bc6033ba5aab774fc58",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-12",
+            "fact_sha256": "1d503c95d8b629eb59feb91585a51d918562612f959fb232d4272d557d42650c",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-13",
+            "fact_sha256": "7ceec28e08ff665592226ed9dd0038886d9ee7459fc34bf8e8695dcc952ddc9f",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "PS-14",
+            "fact_sha256": "1f486ec0cc06bc70329ab4656fadb51805a234468ebf2fb55365b985bcadf6de",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "MC-01",
+            "fact_sha256": "b48f269c7bcc4c9878b3ccf3714ced056c3f5509d440ca5705ebe3d6ab9a4e2c",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "A依正式PDF物理15/16/18/19页核产品/用途，MC-01依21页适用标记核对，具体范围见独审文档。",
+            "limitation": null
+          }
+        ]
+      }
+    },
+    {
+      "instrument_id": "601881.SH",
+      "work_id": "bp-work-c265f11a31d0e86f8f223804",
+      "original_writer_sha256": "131afc4e199451d9d8f35733c813ae558bb06b0327a5baefa1497ea3021b93d3",
+      "apply_to_release_copy_only": true,
+      "use_review": {
+        "report": {
+          "instrument_id": "601881.SH",
+          "report_id": "asset_10336f11433796cd2e554ea5ba82ab23",
+          "document_version": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "Codex A independent original-source review",
+        "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/independent-source-review.md",
+        "reference_sha256": "b72509848a3ebc6850ee09015adbeeb232a3470a4002086559765b31a5383796",
+        "decisions": [
+          {
+            "fact_id": "F01",
+            "fact_sha256": "6f0d0b8d45f6b17c8a529ef72fb5a0d2a069ef3cd25ce3d842ce17d6c309bf8e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F02",
+            "fact_sha256": "79909fe389c0596f34b7cb9e5ba46ad140c34bcb6c0472471f80443d9d0c4075",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F03",
+            "fact_sha256": "35a935d0a14a03a1b907418fef38321ae472cb140501e281656464f30346ff28",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F04",
+            "fact_sha256": "000314a95b6bd3da391437b6a110d41b9c044f41b4edc6109057fb471d69d478",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F05",
+            "fact_sha256": "f6a1f0cac68e2c8a3688fb26820f0fefe3f0c93f75446836a5117a345f4d6b21",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F06",
+            "fact_sha256": "90f151495928eafdc5166ccb32c217ab730af196e5bcca0db398ba42af3533a9",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F07",
+            "fact_sha256": "98df15bc09ae772064dd44d354a047ceaccb55b033d0ea2250e531477544de4f",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F08",
+            "fact_sha256": "331fa1cb1e35eb4ea7b7ddd8821f2ffb74f3ea4f06a97b298ec2733451791ffc",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": "程序显示说明：F08正文44.83亿元为利息净收入4,482,828,193.13元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文104.20亿元为手续费及佣金净收入10,419,509,128.97元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F08正文131.36亿元为投资收益及公允价值变动损益13,135,906,369.05元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F09",
+            "fact_sha256": "706fcfe0e6e0cbab911b84eded6477c0139ad91124b0888bb40c67c0c8ee20a7",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F10",
+            "fact_sha256": "825177ddb8fa14bfefc0491d8acbd76633de54b848ca6fd049d571afef1cd96b",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001",
+              "source-0009"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": "程序显示说明：F10正文283.02亿元为营业收入28,302,251,724.47元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F11",
+            "fact_sha256": "c3fdea99872e8a36fd69f9a10cbaba86b332da8a5b5e593645e915ac12690706",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0010",
+              "source-0011"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F14",
+            "fact_sha256": "7289846effddfba8beaf205d634917c56577434971dc7a6b410ead299f932e88",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": "程序显示说明：F14正文8557.45亿元为资产总额855,744,926,541.11元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文1477.80亿元为归属于母公司股东的权益147,780,142,827.69元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F15",
+            "fact_sha256": "9f5e9d6539c6c6a7ed174cb322852a0d158b4e6e9ff1875200ccb56fe2473a30",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F16",
+            "fact_sha256": "3d3f12f4e0ca43dfed37a2c4ec6c801ed9f0382247f28ecd07893a05e1b33fe8",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F17",
+            "fact_sha256": "a26b390f49a9f3ef10372291ed0b0be31801365a19c3b402b3bc581ca7046250",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F19",
+            "fact_sha256": "4c451892cac86e5df753d87d2a259578a9275ee54c59c7f23e3936f8214c662e",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": "原文未点名具体期货经营主体，仅说明期货业务由子公司平台开展"
+          },
+          {
+            "fact_id": "F20",
+            "fact_sha256": "bd78102596be0f1a0afde5ffe1f07f01ffb50a4e6309b429b00fb4a03a30361a",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F21",
+            "fact_sha256": "6024b9c427e862e1fa4deb51a8ede047b3094da77bce9466e19bfe19f8f20197",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F23",
+            "fact_sha256": "e7318eabdff1c04d727809859570c79f3952691ad48032dadb1014a645c51ab1",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": "原文未点名具体期货经营主体，仅说明期货业务由子公司平台开展"
+          },
+          {
+            "fact_id": "F24",
+            "fact_sha256": "3449bf0e0fbcfada7e8f3f578dbae714b9d9017c06f566998c220ed6c54f8a04",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F25",
+            "fact_sha256": "19c7637394288ba36eaf6f3af9fbf7ebd55e3c7964c644419ffe71ce1402515d",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F26",
+            "fact_sha256": "f10a8f01e8331837ed2e227793fbf083c883981f52d4d620b15a21cd70f6edca",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "A核正式PDF物理28页：全年融资总额6444亿港元与其中新股融资2858亿港元分列，当前句把6444直接标成IPO总额，范围至少不明确；整对象只源参考，不手填改数或再发模型。",
+            "limitation": "不作为港交所IPO融资总额或公司收入确定结论使用。"
+          },
+          {
+            "fact_id": "F27",
+            "fact_sha256": "8f003f410ce86675350f8bdde7e590e9eefb75c2b0d962efc312a28f39d98322",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F28",
+            "fact_sha256": "43ba695e8c3a4e1c131960fd55b7e9d5fd85f9a8e73bbed8d9563a9541645928",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F29",
+            "fact_sha256": "cd1c835bbea665671f7ff1cbe9bae56312a8184eca2dc1c98dac11a97e4f03f9",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F30",
+            "fact_sha256": "1b57ae27457668efeda09b415de412b5c5dafe0077c899c3a5ae1f0a90d97259",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F32",
+            "fact_sha256": "ce8c1f60f8687c116823b2b5da315563c92069842327170981ba72a70245b951",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F33",
+            "fact_sha256": "775a6f2148862c4290b1bbf55c5e10da9ff0b5ee8c2d1a05cf08cda960c8cbf0",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0002",
+              "source-0003"
+            ],
+            "reason": "A核正式PDF23/24/26/30页业务/客户/市场口径及17/34—36页主体、收入/规模；保原单位/显示精度和unclear，具体范围见独审文档。",
+            "limitation": null
+          }
+        ]
+      }
+    }
+  ]
+}

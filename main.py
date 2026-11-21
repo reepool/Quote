@@ -75,13 +75,19 @@ class QuoteSystem:
             scheduler_logger.error(f"[Main] Failed to initialize system: {e}")
             raise
 
-    async def initialize_lightweight(self):
+    async def initialize_lightweight(self, *, company_profile_only: bool = False):
         """轻量级初始化，只初始化数据管理器（用于不需要调度器的命令）"""
         try:
             scheduler_logger.info("[Main] Initializing Quote System (lightweight mode)...")
 
-            # 只初始化数据管理器，不初始化调度器
-            await data_manager.initialize()
+            if company_profile_only:
+                # The explicit research job uses local report assets and its
+                # own model plan, without unrelated market-source startup.
+                data_manager._initialize_research_storage()
+                if data_manager.research_storage is None:
+                    raise RuntimeError("research storage is not initialized")
+            else:
+                await data_manager.initialize()
 
             scheduler_logger.info("[Main] Quote System initialized successfully (lightweight mode)")
 
@@ -486,6 +492,11 @@ class QuoteSystem:
                 else:
                     scheduler_logger.error(f"[Main] Job {job_id} failed")
                 return success
+
+            elif job_id == 'company_profile_common_core' and (parameters or {}).get('execution_plan_file'):
+                # Explicit research plans own their finite runtime and keep their
+                # results locally. Do not inherit scheduler defaults or reports.
+                return await scheduled_tasks.company_profile_common_core(**dict(parameters))
 
             elif job_id == 'daily_data_update':
                 # 从配置获取参数
@@ -1258,7 +1269,10 @@ async def main():
         # 根据命令类型选择初始化方式
         if args.command in ['gap', 'api', 'download', 'update', 'status', 'interactive', 'job']:
             # 轻量级初始化，不需要调度器
-            await system.initialize_lightweight()
+            if args.command == 'job' and args.job_id == 'company_profile_common_core' and args.execution_plan_file:
+                await system.initialize_lightweight(company_profile_only=True)
+            else:
+                await system.initialize_lightweight()
         else:
             # 完整初始化，包括调度器（scheduler, full命令需要）
             await system.initialize()

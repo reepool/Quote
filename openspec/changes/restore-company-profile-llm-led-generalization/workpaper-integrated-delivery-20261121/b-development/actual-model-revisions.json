@@ -1,0 +1,803 @@
+[
+  {
+    "code": "000725",
+    "work_id": "bp-work-a4aa0e8f2b8e24be913e625a",
+    "writer_path": "data/research/company_profile_integrated_20261121/000725/company_profile_common_core.v1/bp-work-a4aa0e8f2b8e24be913e625a.json",
+    "writer_sha256": "3f07456df329600549eb4c7f16f18880470323a47e45769438af119a85d7e5c4",
+    "review_status": "completed",
+    "findings": [
+      {
+        "finding_id": "F-MC-01",
+        "element": "material_changes",
+        "severity": "material",
+        "issue_type": "unsupported_claim",
+        "affected_fact_id": "MC-01",
+        "related_fact_id": null,
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "explanation": "MC-01前半句有原文支持：合并范围变动勾选“是”，且明确写明对分部数据无显著影响，应保留。后半句将“业务、产品或服务发生重大变化或调整有关情况”的“不适用”写成“未发生重大变化或调整”，属于由披露适用性标记推断经济事实。应改为该项披露标记为不适用，不得据此断言未发生重大变化或调整。",
+        "resolution": "corrected_pending_trust",
+        "original_fact": {
+          "fact_id": "MC-01",
+          "text": "报告期内公司合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务未发生重大变化或调整。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        "revised_fact": {
+          "fact_id": "MC-01",
+          "text": "报告期内公司合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务发生重大变化或调整有关情况的披露标记为“不适用”。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      }
+    ],
+    "calls": [
+      {
+        "purpose": "review_profile_workpaper",
+        "request_id": "bp-work-a4aa0e8f2b8e24be913e625a:workpaper:review",
+        "request_hash": "52a2d9d9ca39c383986879aa8727ca321b4d7a24ab3037199e51a5da6521356f",
+        "response_hash": "54ac74e4cb69e3743af559c8f64ffc35a606ce7cd1e589df26c5a318abb1079f",
+        "source_label": "scorpio:grok-4.7",
+        "model": "grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "logical_profile": "semantic_extraction__scorpio_grok",
+        "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 23552,
+          "output_tokens": 336,
+          "total_tokens": 39279
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0015",
+          "section-0031",
+          "section-0048",
+          "section-0049"
+        ],
+        "physical_pages": [
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "purpose": "repair_profile_workpaper",
+        "request_id": "bp-work-a4aa0e8f2b8e24be913e625a:workpaper:repair",
+        "request_hash": "a652c8a8d75ed986a8966d3874bd0a7bbf66b566d68d8a8c3446d0006115343c",
+        "response_hash": "aaa5e31f1c4b5204fd8fd903b8442e2e47ab2c7a729927f300691928f5c55aee",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 9443,
+          "output_tokens": 91,
+          "total_tokens": 9534
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0015",
+          "section-0031",
+          "section-0048",
+          "section-0049"
+        ],
+        "physical_pages": [
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "purpose": "verify_profile_workpaper_repair",
+        "request_id": "bp-work-a4aa0e8f2b8e24be913e625a:workpaper:repair-verify",
+        "request_hash": "7b805519af626078bd8a3e962393baea536361fcf001daa8f89674aac4b366bf",
+        "response_hash": "2e5b446dd999fa6010dfa11e15d3051753cb2bbb61dcbddf3c36c57258f36146",
+        "source_label": "scorpio:grok-4.7",
+        "model": "grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "logical_profile": "semantic_extraction__scorpio_grok",
+        "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 11165,
+          "output_tokens": 135,
+          "total_tokens": 12556
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0015",
+          "section-0031",
+          "section-0048",
+          "section-0049"
+        ],
+        "physical_pages": [
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      }
+    ]
+  },
+  {
+    "code": "000725",
+    "work_id": "bp-work-7f46c1fc1a2be83f1a52f6a2",
+    "writer_path": "data/research/company_profile_integrated_20261121/000725/company_profile_common_core.v1/bp-work-7f46c1fc1a2be83f1a52f6a2.json",
+    "writer_sha256": "838489ded8c51375c9df820c5dec09c13a725aa38d86f38aea17b76b0ca7d0dd",
+    "review_status": "completed",
+    "findings": [
+      {
+        "finding_id": "RF-F31",
+        "element": "material_changes",
+        "severity": "material",
+        "issue_type": "unsupported_claim",
+        "affected_fact_id": "F31",
+        "related_fact_id": null,
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "explanation": "F31后半句将“公司报告期内业务、产品或服务发生重大变化或调整有关情况”勾选“不适用”，写成“未发生重大变化或调整”。适用性勾选只标明该披露项目的适用状态，不能单独支持“未发生变动或事件”的经济事实判断。前半句“报告期内合并范围发生变动，但对分部数据无显著影响”与原文一致，应保留；后半句应改为该事项勾选不适用，或删除该否定性断言，不得据此认定业务、产品或服务未发生重大变化。",
+        "resolution": "corrected_pending_trust",
+        "original_fact": {
+          "fact_id": "F31",
+          "text": "报告期内合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务未发生重大变化或调整。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        "revised_fact": {
+          "fact_id": "F31",
+          "text": "报告期内合并范围发生变动，但对分部数据无显著影响；公司报告期内业务、产品或服务发生重大变化或调整有关情况勾选“不适用”。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      }
+    ],
+    "calls": [
+      {
+        "purpose": "review_profile_workpaper",
+        "request_id": "bp-work-7f46c1fc1a2be83f1a52f6a2:workpaper:review",
+        "request_hash": "d66fe1f925bdb7f0fbd7700dd4e9525a012c64ff393e89d93c1ae11b7659570a",
+        "response_hash": "24ebb396ee56205cf92539f420d0d3029417daa12253399248674f82bfe1007a",
+        "source_label": "scorpio:grok-4.7",
+        "model": "grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "logical_profile": "semantic_extraction__scorpio_grok",
+        "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 20725,
+          "output_tokens": 301,
+          "total_tokens": 34858
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0015",
+          "section-0031",
+          "section-0048",
+          "section-0049",
+          "section-0079"
+        ],
+        "physical_pages": [
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          31,
+          32
+        ]
+      },
+      {
+        "purpose": "repair_profile_workpaper",
+        "request_id": "bp-work-7f46c1fc1a2be83f1a52f6a2:workpaper:repair",
+        "request_hash": "2fec7f3acacadb43873b1733c1a5a1ee6be8d3a9846edef43daa5e5432f33fc3",
+        "response_hash": "079bed3b28b1e6e37b8954147e3585951b5a531375750b3efce75b96de19b955",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 10402,
+          "output_tokens": 88,
+          "total_tokens": 10490
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0015",
+          "section-0031",
+          "section-0048",
+          "section-0049",
+          "section-0079"
+        ],
+        "physical_pages": [
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          31,
+          32
+        ]
+      },
+      {
+        "purpose": "verify_profile_workpaper_repair",
+        "request_id": "bp-work-7f46c1fc1a2be83f1a52f6a2:workpaper:repair-verify",
+        "request_hash": "861a0b3003b6055eb0b761f13b49a5dda12d52950d739001e4cbcaccb5dc5a52",
+        "response_hash": "ccea49f88060e5b796eb97c0a7028300642312142587d59965b6cf1047db7b0f",
+        "source_label": "scorpio:grok-4.7",
+        "model": "grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "logical_profile": "semantic_extraction__scorpio_grok",
+        "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 12284,
+          "output_tokens": 124,
+          "total_tokens": 13422
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0015",
+          "section-0031",
+          "section-0048",
+          "section-0049",
+          "section-0079"
+        ],
+        "physical_pages": [
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          31,
+          32
+        ]
+      }
+    ]
+  },
+  {
+    "code": "601881",
+    "work_id": "bp-work-c265f11a31d0e86f8f223804",
+    "writer_path": "data/research/company_profile_integrated_20261121/601881/company_profile_common_core.v1/bp-work-c265f11a31d0e86f8f223804.json",
+    "writer_sha256": "131afc4e199451d9d8f35733c813ae558bb06b0327a5baefa1497ea3021b93d3",
+    "review_status": "completed",
+    "findings": [
+      {
+        "finding_id": "R1",
+        "element": "operations_and_inputs",
+        "severity": "minor",
+        "issue_type": "wrong_subject",
+        "affected_fact_id": "F19",
+        "related_fact_id": null,
+        "evidence_ids": [
+          "source-0008",
+          "source-0002"
+        ],
+        "explanation": "F19关于交割服务、焦煤焦炭铁矿交割量、52个重点项目和17家产融基地的表述与原文一致，应保留。但事实及两项指标的subject_scope标为named_subsidiary，所选章节只说明期货业务由子公司平台开展，并未点名具体子公司；原文该段也未以“公司”作主语。named_subsidiary仅适用于已指明的子公司，不能用未命名的子公司平台代替。应改为unclear，不要编造经营主体名称，也不要升格为consolidated_group或并入母子公司一体化收入行。",
+        "resolution": "corrected_pending_trust",
+        "original_fact": {
+          "fact_id": "F19",
+          "text": "期货经纪业务不断健全交割服务体系，黑色系、油品类专业优势持续巩固，焦煤、焦炭、铁矿等品种交割量稳居行业首位；与交易所合作推进“强源助企”“稳企安农”等重点项目52个，联合实体企业成功申请产融基地17家。",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "“强源助企”“稳企安农”等重点项目数量",
+              "raw_value": "52",
+              "value": "52",
+              "unit": "个",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "联合实体企业成功申请产融基地数量",
+              "raw_value": "17",
+              "value": "17",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        "revised_fact": {
+          "fact_id": "F19",
+          "text": "期货经纪业务不断健全交割服务体系，黑色系、油品类专业优势持续巩固，焦煤、焦炭、铁矿等品种交割量稳居行业首位；与交易所合作推进“强源助企”“稳企安农”等重点项目52个，联合实体企业成功申请产融基地17家。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "“强源助企”“稳企安农”等重点项目数量",
+              "raw_value": "52",
+              "value": "52",
+              "unit": "个",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未点名具体期货经营主体，仅说明期货业务由子公司平台开展"
+            },
+            {
+              "name": "联合实体企业成功申请产融基地数量",
+              "raw_value": "17",
+              "value": "17",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未点名具体期货经营主体，仅说明期货业务由子公司平台开展"
+            }
+          ],
+          "uncertainty_reason": "原文未点名具体期货经营主体，仅说明期货业务由子公司平台开展"
+        }
+      },
+      {
+        "finding_id": "R2",
+        "element": "customers_channels_markets",
+        "severity": "minor",
+        "issue_type": "wrong_subject",
+        "affected_fact_id": "F23",
+        "related_fact_id": null,
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "explanation": "F23对期货经纪业务产业客户、金融机构客户和QFII客户变化的转述有原文支持，内容可保留。其subject_scope同样标为named_subsidiary，但原文未给出期货经营主体名称，客户结构不能据此归属某一指定子公司。应改为unclear，不得补写子公司全称，也不得仅因金额或项目数量相近就改判为合并集团或某一行业收入行。",
+        "resolution": "corrected_pending_trust",
+        "original_fact": {
+          "fact_id": "F23",
+          "text": "期货经纪业务客户结构持续优化，产业客户占比稳步提升并向头部集聚，金融机构客户有效扩容，QFII客户数量快速增长。",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        "revised_fact": {
+          "fact_id": "F23",
+          "text": "期货经纪业务客户结构持续优化，产业客户占比稳步提升并向头部集聚，金融机构客户有效扩容，QFII客户数量快速增长。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "原文未点名具体期货经营主体，仅说明期货业务由子公司平台开展"
+        }
+      },
+      {
+        "finding_id": "R3",
+        "element": "operating_drivers",
+        "severity": "minor",
+        "issue_type": "other",
+        "affected_fact_id": "F25",
+        "related_fact_id": null,
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "explanation": "F25的9,415.85亿元、89.08万亿元、6,850.00亿元及对应增速与原文数字一致，且市场统计标为unclear是恰当的。但股权融资规模原文限定为含可转债、不含可交债及发行股份购买资产，境内债券新发行规模原文限定为不含可转债；事实和指标名称均未保留这两项口径。省略后，可转债可能在两类市场数据之间被重复或漏计。应保留已支持的核心金额和增速，仅为前两项补回纳入/排除限定；并购交易规模无需改动。",
+        "resolution": "corrected_pending_trust",
+        "original_fact": {
+          "fact_id": "F25",
+          "text": "2025年A股股权融资规模9,415.85亿元，同比增长274.2%；境内债券新发行规模89.08万亿元，同比增长11.5%；境内并购市场交易规模6,850.00亿元，同比增长758.4%。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "A股股权融资规模",
+              "raw_value": "9,415.85",
+              "value": "9415.85",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内债券新发行规模",
+              "raw_value": "89.08",
+              "value": "89.08",
+              "unit": "万亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内并购市场交易规模",
+              "raw_value": "6,850.00",
+              "value": "6850.00",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        "revised_fact": {
+          "fact_id": "F25",
+          "text": "2025年A股股权融资规模（含可转债，不含可交债及发行股份购买资产）9,415.85亿元，同比增长274.2%；境内债券新发行规模（不含可转债）89.08万亿元，同比增长11.5%；境内并购市场交易规模6,850.00亿元，同比增长758.4%。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "A股股权融资规模（含可转债，不含可交债及发行股份购买资产）",
+              "raw_value": "9,415.85",
+              "value": "9415.85",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内债券新发行规模（不含可转债）",
+              "raw_value": "89.08",
+              "value": "89.08",
+              "unit": "万亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内并购市场交易规模",
+              "raw_value": "6,850.00",
+              "value": "6850.00",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "finding_id": "R4",
+        "element": "operating_drivers",
+        "severity": "minor",
+        "issue_type": "other",
+        "affected_fact_id": "F27",
+        "related_fact_id": null,
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "explanation": "F27的全国期货市场累计成交量90.74亿手、累计成交额766.25万亿元及分别同比增长17.4%、23.7%均有原文支持。原文同时写明“以单边计算”，事实和成交量指标未保留该统计口径。单边与双边会实质改变成交量含义，不能把未限定的90.74亿手当作完整口径。应保留核心数字并补回“以单边计算”，不必因该限定而隔离整条事实。",
+        "resolution": "corrected_pending_trust",
+        "original_fact": {
+          "fact_id": "F27",
+          "text": "2025年全国期货市场累计成交量90.74亿手、累计成交额766.25万亿元，分别同比增长17.4%、23.7%。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "全国期货市场累计成交量",
+              "raw_value": "90.74",
+              "value": "90.74",
+              "unit": "亿手",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "全国期货市场累计成交额",
+              "raw_value": "766.25",
+              "value": "766.25",
+              "unit": "万亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        "revised_fact": {
+          "fact_id": "F27",
+          "text": "2025年全国期货市场以单边计算累计成交量90.74亿手、累计成交额766.25万亿元，分别同比增长17.4%、23.7%。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "全国期货市场累计成交量（以单边计算）",
+              "raw_value": "90.74",
+              "value": "90.74",
+              "unit": "亿手",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "全国期货市场累计成交额",
+              "raw_value": "766.25",
+              "value": "766.25",
+              "unit": "万亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      }
+    ],
+    "calls": [
+      {
+        "purpose": "review_profile_workpaper",
+        "request_id": "bp-work-c265f11a31d0e86f8f223804:workpaper:review",
+        "request_hash": "8685506ac4e70aa5ec862acbff0a2989f39afd1c32f7ec8dbdcf25b3c87eedfd",
+        "response_hash": "7acb412ef45e993e4c9c6ac751c3ecd7a847ee53668cf68e7c11b1a9d0e8aa00",
+        "source_label": "scorpio:grok-4.7",
+        "model": "grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "logical_profile": "semantic_extraction__scorpio_grok",
+        "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 18973,
+          "output_tokens": 805,
+          "total_tokens": 51621
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0057",
+          "section-0077",
+          "section-0080",
+          "section-0090",
+          "section-0093",
+          "section-0101",
+          "section-0105",
+          "section-0109",
+          "section-0124",
+          "section-0129",
+          "section-0131"
+        ],
+        "physical_pages": [
+          17,
+          23,
+          24,
+          26,
+          28,
+          29,
+          30,
+          34,
+          35,
+          36
+        ]
+      },
+      {
+        "purpose": "repair_profile_workpaper",
+        "request_id": "bp-work-c265f11a31d0e86f8f223804:workpaper:repair",
+        "request_hash": "f541f64daf6580cc645216fde5f3fa54e5b5d396ae36a05e85e1f1a812677567",
+        "response_hash": "2a7104d0d593e23c0e609dc698430e424f7b0c34951ddfc41f62770218178422",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 11529,
+          "output_tokens": 966,
+          "total_tokens": 12495
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0057",
+          "section-0077",
+          "section-0080",
+          "section-0090",
+          "section-0093",
+          "section-0101",
+          "section-0105",
+          "section-0109",
+          "section-0124",
+          "section-0129",
+          "section-0131"
+        ],
+        "physical_pages": [
+          17,
+          23,
+          24,
+          26,
+          28,
+          29,
+          30,
+          34,
+          35,
+          36
+        ]
+      },
+      {
+        "purpose": "verify_profile_workpaper_repair",
+        "request_id": "bp-work-c265f11a31d0e86f8f223804:workpaper:repair-verify",
+        "request_hash": "4b76bc429ffbf462da7a33197e5ccb31afa79f3779c46702907fa2f7fd33fb83",
+        "response_hash": "320e36de3c67d2b99dd14321dc838b73dd7adf65fe615726d738be46be1ecace",
+        "source_label": "scorpio:grok-4.7",
+        "model": "grok-4.7",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "logical_profile": "semantic_extraction__scorpio_grok",
+        "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 12947,
+          "output_tokens": 495,
+          "total_tokens": 19963
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0057",
+          "section-0077",
+          "section-0080",
+          "section-0090",
+          "section-0093",
+          "section-0101",
+          "section-0105",
+          "section-0109",
+          "section-0124",
+          "section-0129",
+          "section-0131"
+        ],
+        "physical_pages": [
+          17,
+          23,
+          24,
+          26,
+          28,
+          29,
+          30,
+          34,
+          35,
+          36
+        ]
+      }
+    ]
+  }
+]

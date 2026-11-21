@@ -1,0 +1,171 @@
+{
+  "representation": "parsed provider envelopes with original content strings, not HTTP bytes",
+  "receipts": [
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-enrich/receipts/003.json",
+      "sha256": "fac7fe7f73cd8a632912c9935a41187d77f0e4e94a4c7c6f142c1b5493ff3688",
+      "bytes": 98672,
+      "host": "scorpio.reepool.com",
+      "model": "grok-4.7",
+      "timeout_seconds": 1200.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 161.6754537243396
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-enrich/receipts/001.json",
+      "sha256": "1fed3538d62890e08188bafc842e3278f9642421f2bd30e1a8a57af59b591f96",
+      "bytes": 68434,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 3.0574516840279102
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-enrich/receipts/005.json",
+      "sha256": "37715ce9511b1244d183f37d2f384012c84d23880f067243320bbd571e19e5da",
+      "bytes": 49363,
+      "host": "scorpio.reepool.com",
+      "model": "grok-4.7",
+      "timeout_seconds": 1200.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 16.322734266519547
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-enrich/receipts/004.json",
+      "sha256": "3c61b67fc6719201952309aaa0c78a784dfe42bd6418fa8febfcda01d24731b3",
+      "bytes": 52737,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 0.7707127798348665
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-enrich/receipts/002.json",
+      "sha256": "a27543d76f329405800ac53f3f47052ffaee9c45c055635d244b32223c421b8a",
+      "bytes": 105596,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 32.79616889730096
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-first_read/receipts/001.json",
+      "sha256": "d08604cbec73a7270ab5b72da0fd388050ea5c20b8e94463247b971e32e0e9f0",
+      "bytes": 68459,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 3.6301829013973475
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-first_read/receipts/002.json",
+      "sha256": "bdde3a0adad9dc9d875441eeb5593b4850d2ffc940113d8181027cba454cae65",
+      "bytes": 98730,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 21.387103006243706
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-review_batch/receipts/003.json",
+      "sha256": "6a622ba8863732d8e6be6a1cc4faee8bf3f15c5835251ec71b7b77900c7bca3a",
+      "bytes": 54089,
+      "host": "scorpio.reepool.com",
+      "model": "grok-4.7",
+      "timeout_seconds": 1200.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 12.458833212032914
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-review_batch/receipts/001.json",
+      "sha256": "0a7c552fc031994913ae5d2045197dc17ae0ca828384738ed241f34815011e6d",
+      "bytes": 88378,
+      "host": "scorpio.reepool.com",
+      "model": "grok-4.7",
+      "timeout_seconds": 1200.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 175.78766232915223
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-review_batch/receipts/002.json",
+      "sha256": "fd07438018e831592221aed2f9bdb3f8860c66bd433987ddc1ee2fb5b43bc2a6",
+      "bytes": 57501,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 1.0796285849064589
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/601881/executions/6et-601881-first_read/receipts/001.json",
+      "sha256": "6f216fe30b44992754410008dae0c105a09bfa947a786336b08e7d3484915cbe",
+      "bytes": 108960,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 4.440557215362787
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/601881/executions/6et-601881-first_read/receipts/002.json",
+      "sha256": "507731f513e39515be8801a42dd69e7336550239920acbb5cf4ab64b7f816525",
+      "bytes": 87041,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 20.230649057775736
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/601881/executions/6et-601881-review_batch/receipts/003.json",
+      "sha256": "aadf7fae02677445f9ed1cd49cf9ff8c67a490cc8bcf2be5b073d1efcb4a6b46",
+      "bytes": 44732,
+      "host": "scorpio.reepool.com",
+      "model": "grok-4.7",
+      "timeout_seconds": 1200.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 70.56751853600144
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/601881/executions/6et-601881-review_batch/receipts/001.json",
+      "sha256": "9ea7f6fca5850d6e470b5fc143fca035b5d32e5c7ad2a72bc717827a9db2a646",
+      "bytes": 70858,
+      "host": "scorpio.reepool.com",
+      "model": "grok-4.7",
+      "timeout_seconds": 1200.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 404.2088640369475
+    },
+    {
+      "path": "data/checkpoints/company_profile_integrated_20261121/601881/executions/6et-601881-review_batch/receipts/002.json",
+      "sha256": "1332be740d50ced7f9c44abdd239f522c33936db17ab9b8372a7fd931f46712e",
+      "bytes": 50147,
+      "host": "api.deepseek.com",
+      "model": "deepseek-flash",
+      "timeout_seconds": 600.0,
+      "status_code": 200,
+      "contains_response": true,
+      "elapsed_seconds": 3.4561456218361855
+    }
+  ],
+  "count": 15
+}

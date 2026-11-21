@@ -120,6 +120,37 @@ def _save_result(path: Path, value: dict) -> None:
     temporary.replace(path)
 
 
+class _TaskReceiptTransport:
+    """Keep this explicit research run's public wire bodies, never credentials."""
+
+    def __init__(self, delegate: Any, directory: Path) -> None:
+        self.delegate, self.directory, self.sequence = delegate, directory, 0
+
+    async def send(self, url, headers, payload, timeout_seconds):
+        self.sequence += 1
+        self.directory.mkdir(parents=True, exist_ok=True)
+        path = self.directory / f"{self.sequence:03d}.json"
+        receipt = {"host": urlsplit(url).hostname, "request": payload,
+                   "physical_timeout_seconds": timeout_seconds,
+                   "response_representation": "parsed_provider_envelope_preserving_content_strings"}
+        _save_result(path, receipt)
+        started = time.monotonic()
+        try:
+            response = await self.delegate.send(url, headers, payload, timeout_seconds)
+            receipt.update(status_code=response.status_code, response=response.data,
+                           provider_request_id=response.provider_request_id)
+            return response
+        except BaseException as exc:
+            receipt["error_type"] = type(exc).__name__
+            raise
+        finally:
+            receipt["elapsed_seconds"] = time.monotonic() - started
+            _save_result(path, receipt)
+
+    async def close(self):
+        await self.delegate.close()
+
+
 async def execute_configured_task(
     *, action: str, storage: Any, execution_plan_file: str | Path,
     shared_asset_access: Any = None, output_directory: str | Path | None = None,
@@ -189,6 +220,7 @@ async def execute_configured_task(
     client = None
     try:
         client = LlmClient(config, physical_budget=budget)
+        client.transport = _TaskReceiptTransport(client.transport, run_root / "receipts")
         provider = _PlanProvider(client=client, profile=plan.extract.name, max_output_tokens=12000,
             timeout_seconds=plan.budget.logical_seconds,
             execution_authorization={"status": "authorized", "approval_reference": plan.approval_reference})

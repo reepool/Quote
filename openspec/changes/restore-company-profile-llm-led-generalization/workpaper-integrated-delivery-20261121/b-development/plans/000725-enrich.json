@@ -1,0 +1,60 @@
+{
+  "schema_version": "company_profile_task_plan.v1",
+  "run_id": "6et-000725-enrich",
+  "authorization_status": "authorized",
+  "approval_reference": "human-20261121-integrated-1to4-A6ET",
+  "action": "enrich",
+  "instrument_ids": [
+    "000725.SZ"
+  ],
+  "document_versions": {
+    "000725.SZ": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80"
+  },
+  "knowledge_cutoff": "2026-11-21",
+  "output_root": "/home/python/Quote/data/research/company_profile_integrated_20261121/000725",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_integrated_20261121/000725",
+  "extract": {
+    "name": "semantic_extraction__deepseek",
+    "model": "deepseek-flash",
+    "host": "api.deepseek.com",
+    "attempt_seconds": 600,
+    "disable_thinking": true,
+    "max_output_tokens_field": "max_tokens"
+  },
+  "review": {
+    "name": "semantic_extraction__scorpio_grok",
+    "model": "grok-4.7",
+    "host": "scorpio.reepool.com",
+    "attempt_seconds": 1200,
+    "reasoning_effort": "high"
+  },
+  "budget": {
+    "seconds": 5969.9996728897095,
+    "tokens": 1000000,
+    "physical_requests": 10,
+    "recoveries": 3,
+    "logical_seconds": 2450,
+    "priced_cost_cny": "10.0",
+    "billing_mode": "development_unpriced"
+  },
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6et-000725-product-uses",
+    "base_work_id": "bp-work-7f46c1fc1a2be83f1a52f6a2",
+    "base_workpaper_sha256": "6fa10cc2a2dba89810bec74595e33150d99aed04df74666de31346a462c6e4a5",
+    "report": {
+      "instrument_id": "000725.SZ",
+      "report_id": "asset_ee8381d6ef1a54776597e5dab8f426fa",
+      "document_version": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-31T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "products_services",
+        "question": "主要产品分别面向哪些用途和客户领域？只依所选原文，不能确定的归属保留不确定。"
+      }
+    ]
+  }
+}

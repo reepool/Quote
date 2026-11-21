@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-21 [6.ET连续交付整卡已结束](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/result.md)：A规划独审、B子代理实施，15家研究release交434记录/667指标；两份真实日常处理与京东方一次精读均完成，15物理/332655供应商total/0恢复/631.198业务墙钟/unknown。六项真实修订另核，银河一行业背景口径歧义局部源参考，29原writer不改；不是新未见S2/正式全稿99%。[新验收合同](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/acceptance-contract.md)分首读技术交付、基础业务、复核执行、已审质量/缺项和资源，补充/供应链缺项不拒整稿。A裁决限范围研究交付、暂不扩正式20/100或生产；旧S2两组失败、95%/99%及后续数量/权限保留，不加第41家或拼旧成绩，不把每阶段分额复制成新余额。
+
 2026-11-21 6.EN只增加[按股票清单的完整研究画像只读API](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-batch-query-20261121/result.md)。保存15稿433可读对象694指标及旧清单5未找到经HTTP/导出核对，20writer不变，41相关测试通过；没有新模型/新公司运行，不把缺失变为未披露或推算准确率。旧S2本方案结束、95%/99%、S3和生产边界不改，未自动部署共享服务。
 
 2026-11-21 6.EM限定两稿真实接续已结束：[结果/限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saved-review-batch-20261121/result.md)。分众3修订终核接受且有限独核，24可读/61指标；国航1新增虽终核接受但独核发现集团合计错标分部及比较列标签错误，整对象仅源参考，17可读/36指标及原限制保留。6物理/0恢复/157369全部已知total、916.088业务秒/费用unknown。两次保存稿后段成功不回算旧S2/首发/95%与99%、不算新增公司或正式准确率；旧方案结束和S3/生产边界保持，无追加窗口或全池重抽。

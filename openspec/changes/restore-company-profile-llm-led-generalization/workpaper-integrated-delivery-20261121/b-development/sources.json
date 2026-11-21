@@ -1,0 +1,37 @@
+{
+  "scope": "existing public 2025 annual reports; PDF/native cache reused, no old semantic answers or navigation loaded",
+  "sources": [
+    {
+      "instrument_id": "000725.SZ",
+      "report_id": "asset_ee8381d6ef1a54776597e5dab8f426fa",
+      "source": "cninfo",
+      "filing_id": "1225068510",
+      "published_at": "2026-03-31T16:00:00+00:00",
+      "content_hash": "34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80",
+      "pdf": "/home/python/Quote/data/filings/announcements/blobs/34/34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80.pdf",
+      "bytes": 1860151,
+      "pages": 227,
+      "cache": "/home/python/Quote/data/filings/announcements/blobs/34/derived/business_profile_pdfium_recovery.v4/34ba47131763d6992d0997e714fa2e741e38abbfbcb7b6f537cfe2fdb97b1a80_57e1dd4f16ef40ff.json.gz",
+      "pdf_sha256_matches": true,
+      "output_root": "/home/python/Quote/data/research/company_profile_integrated_20261121/000725",
+      "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_integrated_20261121/000725"
+    },
+    {
+      "instrument_id": "601881.SH",
+      "report_id": "asset_10336f11433796cd2e554ea5ba82ab23",
+      "preflight_current_asset_without_cutoff": "asset_023fb3804de2d32787a4debe93105b56",
+      "identity_note": "Actual original entry resolved its cutoff-bound asset; preserve this identity through review/enrichment. Both observations have the same PDF content hash; no historical report chains are merged.",
+      "source": "cninfo",
+      "filing_id": "1225051623",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "content_hash": "56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410",
+      "pdf": "/home/python/Quote/data/filings/announcements/blobs/56/56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410.pdf",
+      "bytes": 13501220,
+      "pages": 380,
+      "cache": "/home/python/Quote/data/filings/announcements/blobs/56/derived/business_profile_pdfium_recovery.v4/56394465e14ee2a657b8654147848bfa9242d16ecbd32b5b9b68380e2823a410_57e1dd4f16ef40ff.json.gz",
+      "pdf_sha256_matches": true,
+      "output_root": "/home/python/Quote/data/research/company_profile_integrated_20261121/601881",
+      "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_integrated_20261121/601881"
+    }
+  ]
+}

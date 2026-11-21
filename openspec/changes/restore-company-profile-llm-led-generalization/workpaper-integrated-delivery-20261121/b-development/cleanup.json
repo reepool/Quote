@@ -1,0 +1,39 @@
+{
+  "temporary_root_removed": true,
+  "final_removal": {
+    "path": "/home/python/Quote/data/QuoteBak/company-profile-6et-b-RPLyiJzh",
+    "files": 7,
+    "bytes": 102926,
+    "scope": "Ended run logs and one-off assembly/verification scripts; all sessions completed, persistent execution events/receipts/results/release remain."
+  },
+  "prior_test_removals": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/company-profile-6et-b-RPLyiJzh/pytest",
+      "files": 35,
+      "bytes": 2617231,
+      "reason": "Completed/interrupted controlled tests, no continuing dependency; tests.xml is persistent.",
+      "removed": true
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/company-profile-6et-b-RPLyiJzh/pytest-current",
+      "files": 80,
+      "bytes": 2920800,
+      "reason": "Completed/interrupted controlled tests, no continuing dependency; tests.xml is persistent.",
+      "removed": true
+    }
+  ],
+  "temporary_total_files": 122,
+  "temporary_total_bytes": 5640957,
+  "one_off_persistent_parameter_script_removed": {
+    "files": 1,
+    "bytes": 4334,
+    "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-integrated-delivery-20261121/b-development/prepare_execution_files.py"
+  },
+  "preserved_business_roots": {
+    "data/research/company_profile_release_20261121": "One 15-company research API root, manifest and sole final delivery export; not production.",
+    "data/research/company_profile_integrated_20261121": "Five original writer records from three real chains; first/review/enrich provenance remains unchanged.",
+    "data/checkpoints/company_profile_integrated_20261121": "Original task idempotency, 15 raw parsed request/response receipts, budgets and stopped/completed attempts.",
+    "data/research/company_profile_batch_reviewed_20261121": "Original protected 20 writers.",
+    "data/research/company_profile_two_phase_20261121": "Original protected four writers."
+  }
+}

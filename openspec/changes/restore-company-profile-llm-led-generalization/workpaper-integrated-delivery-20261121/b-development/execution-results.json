@@ -1,0 +1,137 @@
+{
+  "phases": [
+    {
+      "code": "000725",
+      "phase": "first_read",
+      "state": "completed",
+      "start_epoch": 1795271215.2679555,
+      "end_epoch": 1795271244.8360014,
+      "client_budget_to_result_seconds": 29.568,
+      "physical_requests": 2,
+      "ledger": 38507,
+      "known_supplier_total": 38507,
+      "recoveries": 0,
+      "fees": "unknown",
+      "allocated_limits": {
+        "seconds": 3000,
+        "tokens": 500000,
+        "physical_requests": 4,
+        "recoveries": 1,
+        "logical_seconds": 2450,
+        "priced_cost_cny": "10.0",
+        "billing_mode": "development_unpriced"
+      },
+      "receipt_root": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-first_read/receipts"
+    },
+    {
+      "code": "601881",
+      "phase": "first_read",
+      "state": "completed",
+      "start_epoch": 1795271216.6559577,
+      "end_epoch": 1795271245.8040028,
+      "client_budget_to_result_seconds": 29.148,
+      "physical_requests": 2,
+      "ledger": 49679,
+      "known_supplier_total": 49679,
+      "recoveries": 0,
+      "fees": "unknown",
+      "allocated_limits": {
+        "seconds": 3000,
+        "tokens": 500000,
+        "physical_requests": 4,
+        "recoveries": 1,
+        "logical_seconds": 2450,
+        "priced_cost_cny": "10.0",
+        "billing_mode": "development_unpriced"
+      },
+      "receipt_root": "data/checkpoints/company_profile_integrated_20261121/601881/executions/6et-601881-first_read/receipts"
+    },
+    {
+      "code": "000725",
+      "phase": "review_batch",
+      "state": "completed",
+      "start_epoch": 1795271359.0121744,
+      "end_epoch": 1795271554.11246,
+      "client_budget_to_result_seconds": 195.1,
+      "physical_requests": 3,
+      "ledger": 58770,
+      "known_supplier_total": 58770,
+      "recoveries": 0,
+      "fees": "unknown",
+      "allocated_limits": {
+        "seconds": 5826.405873060226,
+        "tokens": 961493,
+        "physical_requests": 8,
+        "recoveries": 3,
+        "logical_seconds": 2450,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "receipt_root": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-review_batch/receipts"
+    },
+    {
+      "code": "601881",
+      "phase": "review_batch",
+      "state": "completed",
+      "start_epoch": 1795271356.23617,
+      "end_epoch": 1795271840.0208626,
+      "client_budget_to_result_seconds": 483.785,
+      "physical_requests": 3,
+      "ledger": 84079,
+      "known_supplier_total": 84079,
+      "recoveries": 0,
+      "fees": "unknown",
+      "allocated_limits": {
+        "seconds": 5831.273101568222,
+        "tokens": 950321,
+        "physical_requests": 8,
+        "recoveries": 3,
+        "logical_seconds": 2450,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "receipt_root": "data/checkpoints/company_profile_integrated_20261121/601881/executions/6et-601881-review_batch/receipts"
+    },
+    {
+      "code": "000725",
+      "phase": "enrich",
+      "state": "completed",
+      "start_epoch": 1795271613.6565452,
+      "end_epoch": 1795271834.8528554,
+      "client_budget_to_result_seconds": 221.196,
+      "physical_requests": 5,
+      "ledger": 101620,
+      "known_supplier_total": 101620,
+      "recoveries": 0,
+      "fees": "unknown",
+      "allocated_limits": {
+        "seconds": 5969.9996728897095,
+        "tokens": 1000000,
+        "physical_requests": 10,
+        "recoveries": 3,
+        "logical_seconds": 2450,
+        "priced_cost_cny": "10.0",
+        "billing_mode": "development_unpriced"
+      },
+      "receipt_root": "data/checkpoints/company_profile_integrated_20261121/000725/executions/6et-000725-enrich/receipts"
+    }
+  ],
+  "physical_requests": 15,
+  "recoveries": 0,
+  "ledger": 332655,
+  "known_supplier_total": 332655,
+  "fees": "unknown",
+  "group_wall_seconds": 631.198,
+  "unchanged_frozen_code": {
+    "main.py": true,
+    "research/company_profile/task_entry.py": true,
+    "research/company_profile/operations.py": true,
+    "research/company_profile/workpaper_llm.py": true,
+    "research/company_profile/workpaper_sections.py": true,
+    "research/company_profile/workpaper_review.py": true,
+    "config/13_llm.json": true,
+    "tests/unit/test_research/test_company_profile_configured_task.py": true
+  },
+  "old_S2_changed": false,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,32 @@
+{
+  "network": [
+    {
+      "host": "api.deepseek.com",
+      "dns_addresses": [
+        "115.231.230.218",
+        "61.170.82.99"
+      ],
+      "tls": "TLSv1.3"
+    },
+    {
+      "host": "scorpio.reepool.com",
+      "dns_addresses": [
+        "176.126.114.194"
+      ],
+      "tls": "TLSv1.3"
+    }
+  ],
+  "source_sha256": {
+    "main.py": "31a7118133164710b26dc7a7a4d6edc45dce47ba482bda80e605b43aa6e80651",
+    "research/company_profile/task_entry.py": "249292485fbf839a781470fc67d28abbf6ccfb751d916670fec7ab37f71fd9d2",
+    "research/company_profile/operations.py": "920720a87d356a05176b4f7987252c3f61022e66ec6a18fa5f531d7cba6a6c79",
+    "research/company_profile/workpaper_llm.py": "b7930754b8f9d5345c48e20e49450c943aad701137ee984e2c94da6d03e51b7a",
+    "research/company_profile/workpaper_sections.py": "994480c323874839040ee46db7d61447086b887e788b273bd9a395f492437a33",
+    "research/company_profile/workpaper_review.py": "5b21e81dbb7c26a88de8e783f196bf6b746be39b10af050580c077377d9c7414",
+    "config/13_llm.json": "7650f2960b036815a6c05649ca9caba7d518b73380e561e334db49d062d82233",
+    "tests/unit/test_research/test_company_profile_configured_task.py": "b8728366ee0a45d40a80cbc2814d395f23b9da433780d80d984209ee4cb340d4"
+  },
+  "authorization_reference": "human-20261121-integrated-1to4-A6ET",
+  "tests_passed": 36,
+  "real_model_calls_before_freeze": 0
+}
