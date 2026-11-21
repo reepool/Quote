@@ -1,0 +1,18 @@
+{
+  "task": "6.EP authorized execution",
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6ep-run-2WNv68pV",
+  "active_open_fds_before_cleanup": [],
+  "files_removed": 27,
+  "logical_file_bytes_removed": 3066578,
+  "physical_reclaimed_bytes_measured": false,
+  "root_absent_after_cleanup": true,
+  "removed": ["temporary SQLite queue/database and checkpoints", "duplicate successful response captures", "duplicate export files", "temporary execution and verification scripts", "task-local logs and source notes"],
+  "preserved_authoritative_evidence": ["approval and network/code/source authorization", "source references and native-cache hashes", "first-read execution/API and saved plans", "review execution, model receipts and unmatched failure content", "physical request wiring and vendor usage ledger", "final annual API and two readable profiles", "limited independent source review", "delivery hashes and operation snapshots"],
+  "retained_business_root": "data/research/company_profile_two_phase_20261121",
+  "retained_business_writer_files": 4,
+  "retained_attempt_marker": "data/QuoteBak/s1-attempts/workpaper-ep-two-phase-20261121.json",
+  "retained_attempt_marker_bytes": 190,
+  "prior_20_writer_files_unchanged": true,
+  "other_retained": ["official PDFs and useful caches", "old snapshots, failures and attempts", "shared logs/cache and parallel or pre-existing work"],
+  "recoverability": "temporary data can be reconstructed from the frozen source references and snapshots; actual new profiles and their history were not deleted"
+}

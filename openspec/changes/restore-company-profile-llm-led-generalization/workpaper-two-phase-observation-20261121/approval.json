@@ -1,0 +1,27 @@
+{
+  "task": "6.EP",
+  "status": "authorized",
+  "approval_reference": "user_reply:call_0woVGnosFSnrfjfOxIGfyxI2:2026-11-21",
+  "user_answer": "批准这两家一次两阶段真实观察",
+  "instruments": ["002142.SZ", "920002.BJ"],
+  "reports": "existing public 2025 annual reports only",
+  "models": ["official DeepSeek deepseek-flash", "existing scorpio.reepool.com grok-4.7 high"],
+  "allowed_data": "public TOC, model-selected public sections and public derived workpapers only",
+  "actions": ["first_read", "review_batch"],
+  "limits": {
+    "seconds": 12600,
+    "tokens": 2000000,
+    "physical_requests": 20,
+    "recoveries": 6,
+    "per_logical_recoveries": 1,
+    "priced_cost_cny": 20
+  },
+  "fee_without_reliable_price": "unknown, no total RMB guarantee",
+  "readiness_sha256": "136e9e6b24a4503920195e455b4cc7bf02fd4ec595cd3654e168dc88715c4f7e",
+  "operator_sha256": "2e7c2e98f16d86047a51c2dfd8f6367c749a5fa83236351fbb50441268e845d2",
+  "execution_environment": "approved network environment only",
+  "no_additional_window_or_company": true,
+  "shared_configuration_changed": false,
+  "production_authorization": "not_authorized",
+  "old_S2_changed": false
+}

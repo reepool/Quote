@@ -1,0 +1,168 @@
+{
+  "task": "6.EP",
+  "scope": "7 model-adopted changes fully checked plus selected initial business assertions; not whole-profile accuracy",
+  "model_adopted_changes": 7,
+  "independently_supported_changes": 7,
+  "checks": [
+    {
+      "instrument_id": "002142.SZ",
+      "work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "fact_id": "review-add:REV-001",
+      "fact_sha256": "7adc5fdd9c122d0903a3dabaa1bbefafb683d996fbf14b33aa70ba7d92185330",
+      "physical_pages": [
+        9,
+        17,
+        18
+      ],
+      "result": "supported_with_original_scope",
+      "conclusion": "本期营业收入71,969百万元/719.69亿元，增长8.01%，本期科目及单位一致。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "fact_id": "review-add:REV-002",
+      "fact_sha256": "da0f9add917a781be2f449aa952a996afbbc142d4ae8fdb80030e8ec08a37afb",
+      "physical_pages": [
+        18,
+        19
+      ],
+      "result": "supported_with_original_scope",
+      "conclusion": "本期利息净收入53,161百万元/531.61亿元，增长10.77%，不混作利息收入总额。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "fact_id": "review-add:REV-004",
+      "fact_sha256": "6bc995840a8d1863f1fbfc5d02c2911606e1b40a4cffc552e991d86670016c85",
+      "physical_pages": [
+        9,
+        17,
+        18
+      ],
+      "result": "supported_with_original_scope",
+      "conclusion": "归母净利润29,333百万元/293.33亿元，增长8.13%，区别净利润29,529百万元。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "fact_id": "F-BS-01",
+      "fact_sha256": "ee80c366e17f8e2cae8057e76e0544dcb3e388e6b2c636bcfeb036ca1e3d7a59",
+      "physical_pages": [
+        43,
+        44,
+        45,
+        46,
+        47
+      ],
+      "result": "supported_with_original_scope",
+      "conclusion": "删除引用未直接支持的机构类别，剩余业务板块及子公司对应业务回顾各子节。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "fact_id": "F-SC-01",
+      "fact_sha256": "5cd5351af4269a6036381e08eda486bce7d720e2239e0efcc0806338e68877ac",
+      "physical_pages": [
+        18,
+        19,
+        22
+      ],
+      "result": "supported_with_original_scope",
+      "conclusion": "资金来源/运用及结算代理托管等服务是利息收支和手续费科目的有据归纳，不冒称逐字原文。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "fact_id": "F-PS-03",
+      "fact_sha256": "39bfd545d102c64cdde03f0c92fbf24f385ae32e9b226dfdaa7577f3c3b46179",
+      "physical_pages": [
+        45,
+        47
+      ],
+      "result": "supported_with_original_scope",
+      "conclusion": "稳健+及养老/私行业务属于财富管理，固收/混合/权益产品矩阵明确归宁银理财。"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "fact_id": "F-MC-01",
+      "fact_sha256": "7227ed44576a35084e0089e6e1270d4d54ee953ab0e0398e2d1a2a49f11d53c9",
+      "physical_pages": [
+        9,
+        24
+      ],
+      "result": "supported_with_original_scope",
+      "conclusion": "公司贷款30.45%/个人贷款-4.17%及需求偏弱的因果范围相符，原因只限定个人贷款下降。"
+    }
+  ],
+  "initial_core_assertions": [
+    {
+      "instrument_id": "002142.SZ",
+      "assertion": "company-bank services include deposits, loans, settlement and digital corporate financial services",
+      "physical_pages": [
+        43,
+        44
+      ],
+      "section": "第六节 管理层讨论与分析 / 九、业务回顾 / 公司银行业务",
+      "finding": "supported for the selected service description; this does not independently approve every clause of the wider F-BS-01 summary"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "assertion": "2025 total assets 3,628,671 million CNY, loans principal 1,733,314 million CNY; revenue 71,969 million CNY",
+      "physical_pages": [
+        9
+      ],
+      "section": "第三节 会计数据和财务指标摘要 / 一、主要会计数据和财务指标",
+      "finding": "current-year column supported; asset/loan narrative conversion is consistent, revenue is an original-source reference and is not a newly extracted fact merely because this audit located it"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "assertion": "R&D, manufacture and sale of forklift bearings and slewing bearings",
+      "physical_pages": [
+        16
+      ],
+      "section": "第四节 管理层讨论与分析 / 一、业务概要",
+      "finding": "supported"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "assertion": "direct sales and trader sales, including direct-order and consignment-inventory sales",
+      "physical_pages": [
+        18
+      ],
+      "section": "第四节 管理层讨论与分析 / 一、业务概要 / 销售模式",
+      "finding": "supported"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "assertion": "2025 revenue 353,159,911.10 CNY, growth 2.16%; profit 62,676,195.15 CNY, growth 8.87%",
+      "physical_pages": [
+        19
+      ],
+      "section": "第四节 管理层讨论与分析 / 二、经营情况回顾",
+      "finding": "supported"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "assertion": "direct materials represent 68.41% of main-business cost; steel and specified bearing components account for 77.94% of direct materials",
+      "physical_pages": [
+        37
+      ],
+      "section": "第四节 管理层讨论与分析 / 四、风险因素 / 原材料价格波动风险",
+      "finding": "supported; supply-chain detail remains optional"
+    }
+  ],
+  "rejected_candidate": {
+    "instrument_id": "002142.SZ",
+    "fact_id": "review-add:REV-003",
+    "state": "not_adopted",
+    "original_pdf_reference_pages": [
+      18,
+      22
+    ],
+    "note": "原页有相应非息收入/构成数字；本轮程序未采纳，不凭独核定位自动补入或追加调用。"
+  },
+  "source_checked_projection_written": false,
+  "whole_profile_accuracy": "not_assessed",
+  "old_S2_changed": false
+}

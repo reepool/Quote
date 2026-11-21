@@ -1,0 +1,110 @@
+[
+  {
+    "sequence": 1,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 76345,
+    "payload_sha256": "9b82f3cc2ea18040d433451cbd207fd7890731ecb5c8d0fde3d1eb1eb006c79f",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 3.014
+  },
+  {
+    "sequence": 2,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 101059,
+    "payload_sha256": "8048633f1cbdd9523eab42d23723eaac332aa1ac420c7fb95dbed087315618a8",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 18.962
+  },
+  {
+    "sequence": 3,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 128089,
+    "payload_sha256": "c01b629ec3784d6dad7a3899041e2c90d4896aac8270e44b76b323b46833a5ab",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 16.859
+  },
+  {
+    "sequence": 4,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 66681,
+    "payload_sha256": "c690a5b49524fa9b4b3dffd1d3800ff13dd5e3c3472249a247963a705666d821",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 6.306
+  },
+  {
+    "sequence": 5,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 103911,
+    "payload_sha256": "c36b35ca427886660adfa700a29028609f3670120c4b1922a0b1427d4dacd739",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 23.83
+  },
+  {
+    "sequence": 6,
+    "host": "scorpio.reepool.com",
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 110035,
+    "payload_sha256": "e2d3203336fabbad0dadb211bbaa2810d15459561efdfba249940ef6b38200af",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 401.491
+  },
+  {
+    "sequence": 7,
+    "host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 600,
+    "payload_bytes": 94658,
+    "payload_sha256": "4354f8424d51c1da2673226c508138a7852c4ecab927e944bcc7b57b2e9ec616",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 4.728
+  },
+  {
+    "sequence": 8,
+    "host": "scorpio.reepool.com",
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 91416,
+    "payload_sha256": "ccdff7c99772a6f09c11e813db6c93a5e12a5b8358d5a56b091eca36e433d150",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 119.811
+  },
+  {
+    "sequence": 9,
+    "host": "scorpio.reepool.com",
+    "model": "grok-4.7",
+    "reasoning_effort": "high",
+    "physical_timeout_seconds": 1200,
+    "payload_bytes": 111429,
+    "payload_sha256": "00baa674db25a1146558d1d4cfaa5075de887b1c8ec6dfacfd2abe6f8b72032a",
+    "state": "returned",
+    "status_code": 200,
+    "seconds": 195.935
+  }
+]

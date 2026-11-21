@@ -1,0 +1,87 @@
+{
+  "task": "6.EP",
+  "phase": "authorized_real_observation_complete",
+  "baseline_commit": "4e594554",
+  "production_code_changed": false,
+  "instruments": [
+    "002142.SZ",
+    "920002.BJ"
+  ],
+  "entry": "execute_published_task(first_read), persisted plans, then execute_published_task(review_batch) with a new TaskService",
+  "first_read_response_ready_seconds": 102.432,
+  "review_phase_seconds": 758.05,
+  "business_seconds": 861.363,
+  "run_preparation_seconds": 21.165,
+  "not_total_development_time": true,
+  "resources": {
+    "logical_requests": 8,
+    "physical_requests": 9,
+    "recoveries": 1,
+    "recovery_reason": "Invalid JSON with finish_reason=stop on the first extraction; one gateway format recovery succeeded",
+    "all_physical_usage_known": true,
+    "vendor_reported_total_tokens_including_failed_attempt": 273436,
+    "ledger": 273436,
+    "first_read_vendor_total_tokens": 121960,
+    "review_vendor_total_tokens": 151476,
+    "fee": "unknown",
+    "budget_exhausted": false,
+    "new_window_or_company": false
+  },
+  "content": {
+    "first_read_visible_objects": 51,
+    "final_visible_objects": 54,
+    "final_metrics": 75,
+    "bank": {
+      "first": 22,
+      "final": 25,
+      "metrics": 34,
+      "review_status": "completed_with_open_findings"
+    },
+    "manufacturer": {
+      "first": 29,
+      "final": 29,
+      "metrics": 41,
+      "review_status": "completed"
+    },
+    "model_findings": 8,
+    "adopted_changes": 7,
+    "newly_added_objects": 3,
+    "revised_existing_objects": 4,
+    "not_adopted_candidates": 1,
+    "actual_adopted_changes_independently_checked": 7,
+    "independent_checks_reference": "independent-review.json",
+    "whole_profile_accuracy": "not_assessed"
+  },
+  "delivery_checks": {
+    "reference": "delivery-verification.json",
+    "http_batch": 200,
+    "http_details": [
+      200,
+      200
+    ],
+    "export_and_new_instance_equal": true,
+    "first_read_workpaper_hashes_equal_phase_one_api": true,
+    "new_writer_files": 4,
+    "parent_and_successor_not_double_counted": true,
+    "prior_20_writer_hashes_unchanged": true,
+    "local_verification_seconds": 2.904,
+    "local_verification_note": "Local script dict/object hash call corrected; existing successful export reused after overwrite refusal. No model resend or business-code change."
+  },
+  "review": {
+    "new_blocking_code_defects_found": 0,
+    "content_limitations_retained": [
+      "Bank non-interest-income candidate not adopted",
+      "Optional business mix and customer splits",
+      "Manufacturer operating-change isolation"
+    ],
+    "nonblocking_detail_not_chased": true,
+    "unrelated_preexisting_worktree_changes_preserved": true
+  },
+  "reused_engineering_tests": "6.EO same 3 source/test hashes: 23 new and 12 related old passed; old expanded failures/interruptions retained; no new pytest run",
+  "syntax_and_diff": "passed",
+  "openspec_strict": "passed",
+  "output_root": "data/research/company_profile_two_phase_20261121",
+  "shared_api_restarted_or_default_root_changed": false,
+  "old_S2_changed": false,
+  "production_authorization": "not_authorized"
+}

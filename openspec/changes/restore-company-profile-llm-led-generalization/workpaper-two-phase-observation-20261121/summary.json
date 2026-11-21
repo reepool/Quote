@@ -1,0 +1,47 @@
+{
+  "task": "6.EP",
+  "state": "completed",
+  "preparation_seconds": 21.165,
+  "first_read_response_ready_seconds": 102.432,
+  "review_phase_seconds": 758.05,
+  "business_seconds": 861.363,
+  "physical_requests": 9,
+  "charged_tokens": 273436,
+  "fee": "unknown",
+  "recoveries": 1,
+  "purposes": [
+    {
+      "instrument_id": "920002.BJ",
+      "purpose": "select_profile_sections"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "purpose": "extract_profile_workpaper"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "purpose": "select_profile_sections"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "purpose": "extract_profile_workpaper"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "purpose": "review_profile_workpaper"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "purpose": "repair_profile_workpaper"
+    },
+    {
+      "instrument_id": "002142.SZ",
+      "purpose": "verify_profile_workpaper_repair"
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "purpose": "review_profile_workpaper"
+    }
+  ],
+  "protected_writers_unchanged": true
+}

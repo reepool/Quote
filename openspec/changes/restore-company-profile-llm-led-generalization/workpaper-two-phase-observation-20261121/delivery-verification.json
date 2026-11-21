@@ -1,0 +1,71 @@
+{
+  "task": "6.EP",
+  "http_batch": 200,
+  "http_details": [
+    200,
+    200
+  ],
+  "api_equal_saved_result": true,
+  "api_equal_export": true,
+  "new_instance_query_equal": true,
+  "ordinary_facts_not_double_counted": true,
+  "rows": [
+    {
+      "instrument_id": "002142.SZ",
+      "first_read_visible": 22,
+      "final_visible": 25,
+      "metrics": 34,
+      "states": {
+        "superseded": 22,
+        "reviewed": 23,
+        "limited": 2
+      },
+      "review_status": "completed_with_open_findings",
+      "first_reading_work_id": "bp-work-cdd7fedb987f076a42eb461a",
+      "latest_reading_work_id": "bp-work-b8845b7602e9c1dda0799704",
+      "active_gap_elements": [
+        "revenue_model",
+        "scale_and_mix",
+        "operations_and_inputs",
+        "customers_channels_markets",
+        "operating_drivers",
+        "upstream_inputs"
+      ]
+    },
+    {
+      "instrument_id": "920002.BJ",
+      "first_read_visible": 29,
+      "final_visible": 29,
+      "metrics": 41,
+      "states": {
+        "superseded": 29,
+        "reviewed": 29
+      },
+      "review_status": "completed",
+      "first_reading_work_id": "bp-work-26ef88abf3b07103641f6b26",
+      "latest_reading_work_id": "bp-work-493287c9bad4098c25e4f70c",
+      "active_gap_elements": [
+        "operating_drivers"
+      ]
+    }
+  ],
+  "readable_objects": 54,
+  "metrics": 75,
+  "protected_prior_20_writer_reference": "workpaper-batch-query-20261121/saved-batch-verification.json",
+  "protected_prior_20_writers_unchanged": true,
+  "new_writer_files": 4,
+  "new_writer_sha256": {
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-26ef88abf3b07103641f6b26.json": "8d160465394cf18c91a000e254394952e9b2c1f6680032aeb7d60e92e9b21fe7",
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-493287c9bad4098c25e4f70c.json": "fdfdba711e88577818e70351ed23d22ac2635949784067383ddbcd978f8da6d1",
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-b8845b7602e9c1dda0799704.json": "db940eebd586d3b02be45cc01d487147fe0eeacbad21c46a0995fa746bce4eb5",
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-cdd7fedb987f076a42eb461a.json": "d8c00e4c6e28ce9d35704718da0d7ac62b1165cd76c1c1f283ad518386a3050e"
+  },
+  "initial_first_read_sha256": {
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-26ef88abf3b07103641f6b26.json": "8d160465394cf18c91a000e254394952e9b2c1f6680032aeb7d60e92e9b21fe7",
+    "data/research/company_profile_two_phase_20261121/company_profile_common_core.v1/bp-work-cdd7fedb987f076a42eb461a.json": "d8c00e4c6e28ce9d35704718da0d7ac62b1165cd76c1c1f283ad518386a3050e"
+  },
+  "new_writers_unchanged_by_read_verification": true,
+  "validation_seconds": 2.904,
+  "new_model_calls": 0,
+  "production_authorization": "not_authorized"
+}

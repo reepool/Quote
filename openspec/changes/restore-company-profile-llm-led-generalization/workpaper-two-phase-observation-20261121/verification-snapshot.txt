@@ -1,0 +1,108 @@
+"""Read-only delivery verification after the bounded 6.EP model run."""
+import asyncio
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import sys
+import time
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+TEMP=Path(__file__).parent
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=CHANGE/'workpaper-two-phase-observation-20261121'
+OUTPUT=ROOT/'data/research/company_profile_two_phase_20261121'
+
+
+def read(path):return json.loads(Path(path).read_text())
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def dump(path,value):Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+
+
+async def main():
+    from fastapi import FastAPI
+    import httpx
+    from api.company_profile_routes import annual_profile_reader,router
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.runtime import CompanyProfileRuntimeRecordV3
+    from research.company_profile.workpaper import render_workpaper,workpaper_fact_hash,workpaper_elements
+    from research.company_profile.workpaper_delivery import project_workpaper_delivery
+    started=time.monotonic()
+    codes=['002142.SZ','920002.BJ']
+    writer_paths=sorted((OUTPUT/'company_profile_common_core.v1').glob('*.json'))
+    protected={str(p.relative_to(ROOT)):sha(p) for p in writer_paths}
+    reader=CompanyProfileReadService(OUTPUT)
+    batch=reader.research_profiles(codes)
+    assert batch==read(DEST/'annual-api.json') and batch['delivered']==2
+    first=read(DEST/'first-read-api.json')
+    initial_work_ids={p['readings'][0]['work_id'] for p in first['profiles']}
+    records={p.stem:CompanyProfileRuntimeRecordV3.model_validate_json(p.read_text()) for p in writer_paths}
+    initial_hashes={str(p.relative_to(ROOT)):sha(p) for p in writer_paths if p.stem in initial_work_ids}
+    # Reuse the successful export from the earlier local check; its owner refuses overwrites.
+    if not (TEMP/'export/annual_profiles.json').exists():
+        reader.export(codes,TEMP/'export')
+    assert read(TEMP/'export/annual_profiles.json')['profiles']==batch['profiles']
+    assert CompanyProfileReadService(OUTPUT).query(codes)==reader.query(codes)
+    app=FastAPI();app.include_router(router,prefix='/api/v1')
+    app.dependency_overrides[annual_profile_reader]=lambda:reader
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://test') as client:
+        response=await client.post('/api/v1/research/company/annual-profiles/query',json={'instrument_ids':codes})
+        assert response.status_code==200 and response.json()==batch
+        for profile in batch['profiles']:
+            detail=await client.get('/api/v1/research/company/'+profile['instrument_id']+'/annual-profile')
+            assert detail.status_code==200 and detail.json()==profile
+    rows=[];source_checks=[]
+    for before,current in zip(first['profiles'],batch['profiles']):
+        latest=current['readings'][-1]
+        record=records[latest['work_id']]
+        rendered=render_workpaper(record.workpaper,delivery=project_workpaper_delivery(record.workpaper))
+        (DEST/(current['instrument_id'][:6]+'-profile.md')).write_text(rendered)
+        active=[row for row in current['facts'] if row['fact'] is not None]
+        assert len(current['readings'])==2
+        assert all(row['state']=='superseded' and row['fact'] is None for row in current['facts']
+            if row['reading_work_id']==before['readings'][0]['work_id'])
+        rows.append(dict(instrument_id=current['instrument_id'],first_read_visible=sum(r['fact'] is not None for r in before['facts']),
+            final_visible=len(active),metrics=sum(len(r['fact']['metrics']) for r in active),
+            states=dict(Counter(r['state'] for r in current['facts'])),review_status=latest['review_status'],
+            first_reading_work_id=before['readings'][0]['work_id'],latest_reading_work_id=latest['work_id'],
+            active_gap_elements=list(dict.fromkeys(g['element'] for g in current['information_gaps'] if g.get('active',True)))))
+        if current['instrument_id']=='002142.SZ':
+            by_id={r['fact_id']:r['fact'] for r in active}
+            record_facts={f.fact_id:f for group in workpaper_elements(record.workpaper).values() for f in group.facts}
+            supported={
+                'review-add:REV-001':([9,17,18],'本期营业收入71,969百万元/719.69亿元，增长8.01%，本期科目及单位一致。'),
+                'review-add:REV-002':([18,19],'本期利息净收入53,161百万元/531.61亿元，增长10.77%，不混作利息收入总额。'),
+                'review-add:REV-004':([9,17,18],'归母净利润29,333百万元/293.33亿元，增长8.13%，区别净利润29,529百万元。'),
+                'F-BS-01':([43,44,45,46,47],'删除引用未直接支持的机构类别，剩余业务板块及子公司对应业务回顾各子节。'),
+                'F-SC-01':([18,19,22],'资金来源/运用及结算代理托管等服务是利息收支和手续费科目的有据归纳，不冒称逐字原文。'),
+                'F-PS-03':([45,47],'稳健+及养老/私行业务属于财富管理，固收/混合/权益产品矩阵明确归宁银理财。'),
+                'F-MC-01':([9,24],'公司贷款30.45%/个人贷款-4.17%及需求偏弱的因果范围相符，原因只限定个人贷款下降。'),
+            }
+            for fid,(pages,conclusion) in supported.items():
+                assert fid in by_id
+                source_checks.append(dict(instrument_id=current['instrument_id'],work_id=latest['work_id'],
+                    fact_id=fid,fact_sha256=workpaper_fact_hash(record_facts[fid]),physical_pages=pages,
+                    result='supported_with_original_scope',conclusion=conclusion))
+    old=read(CHANGE/'workpaper-batch-query-20261121/saved-batch-verification.json')['protected_20_writer_sha256']
+    assert all(sha(ROOT/p)==h for p,h in old.items())
+    assert all(sha(ROOT/p)==h for p,h in protected.items())
+    audit=dict(task='6.EP',scope='7 model-adopted changes fully checked plus selected initial business assertions; not whole-profile accuracy',
+        model_adopted_changes=7,independently_supported_changes=7,checks=source_checks,
+        initial_core_assertions=read(TEMP/'core-source-notes.json')['checks'],
+        rejected_candidate=dict(instrument_id='002142.SZ',fact_id='review-add:REV-003',state='not_adopted',
+            original_pdf_reference_pages=[18,22],note='原页有相应非息收入/构成数字；本轮程序未采纳，不凭独核定位自动补入或追加调用。'),
+        source_checked_projection_written=False,whole_profile_accuracy='not_assessed',old_S2_changed=False)
+    dump(DEST/'independent-review.json',audit)
+    result=dict(task='6.EP',http_batch=200,http_details=[200,200],api_equal_saved_result=True,
+        api_equal_export=True,new_instance_query_equal=True,ordinary_facts_not_double_counted=True,
+        rows=rows,readable_objects=sum(r['final_visible'] for r in rows),metrics=sum(r['metrics'] for r in rows),
+        protected_prior_20_writer_reference='workpaper-batch-query-20261121/saved-batch-verification.json',
+        protected_prior_20_writers_unchanged=True,new_writer_files=len(protected),new_writer_sha256=protected,
+        initial_first_read_sha256=initial_hashes,new_writers_unchanged_by_read_verification=True,
+        validation_seconds=round(time.monotonic()-started,3),new_model_calls=0,production_authorization='not_authorized')
+    dump(DEST/'delivery-verification.json',result)
+    print(json.dumps({k:result[k] for k in ['rows','readable_objects','metrics','new_writer_files','validation_seconds']},ensure_ascii=False),flush=True)
+
+
+if __name__=='__main__':asyncio.run(main())
