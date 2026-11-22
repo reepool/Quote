@@ -1,0 +1,108 @@
+{
+  "result_state": "completed",
+  "review_status": "completed",
+  "run_id": "6ew-600233-source-review",
+  "physical_requests": 3,
+  "logical_requests": 3,
+  "recoveries": 0,
+  "supplier_total_tokens": 76047,
+  "charged_tokens": 76047,
+  "charged_cost_cny": "unknown",
+  "cost_scope": "unknown, not zero; priced portion bounded by plan 10 CNY",
+  "model_request_elapsed_seconds": 278.627,
+  "business_entry_elapsed_seconds": 294.66,
+  "elapsed_basis": "started.json mtime to saved result.json mtime; CLI import/initialization excluded",
+  "development_active_time": "unknown",
+  "ab_active_time": "unknown",
+  "receipts": [
+    {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_daily_release_20261122/executions/6ew-600233-source-review/receipts/001.json",
+      "sha256": "f3eee73e378ccd622273a436fbf39a96cc7626369b2d450433cedf59dd217935",
+      "elapsed_seconds": 249.4242797587067,
+      "physical_timeout_seconds": 1200.0,
+      "model": "grok-4.7",
+      "usage": {
+        "prompt_tokens": 24700,
+        "completion_tokens": 262,
+        "total_tokens": 44676,
+        "prompt_tokens_details": {
+          "text_tokens": 24700,
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 19714,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "num_sources_used": 0,
+        "cost_in_usd_ticks": 569595200
+      },
+      "status": 200
+    },
+    {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_daily_release_20261122/executions/6ew-600233-source-review/receipts/002.json",
+      "sha256": "79265ca9d5db8f1314e8caf2247046cf788f2674a790ca3531d9c67210169394",
+      "elapsed_seconds": 1.2033236753195524,
+      "physical_timeout_seconds": 600.0,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 13299,
+        "completion_tokens": 100,
+        "total_tokens": 13399,
+        "prompt_tokens_details": {
+          "cached_tokens": 1280
+        },
+        "prompt_cache_hit_tokens": 1280,
+        "prompt_cache_miss_tokens": 12019
+      },
+      "status": 200
+    },
+    {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_daily_release_20261122/executions/6ew-600233-source-review/receipts/003.json",
+      "sha256": "0431adebe73856f9fb221c57b70d6939d79ea6704c39f105d76913a08e105079",
+      "elapsed_seconds": 27.999481707811356,
+      "physical_timeout_seconds": 1200.0,
+      "model": "grok-4.7",
+      "usage": {
+        "prompt_tokens": 16030,
+        "completion_tokens": 139,
+        "total_tokens": 17972,
+        "prompt_tokens_details": {
+          "text_tokens": 16030,
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1803,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "num_sources_used": 0,
+        "cost_in_usd_ticks": 142745600
+      },
+      "status": 200
+    }
+  ],
+  "old_protected_file_count": 95,
+  "old_files_unchanged": true,
+  "frozen_runtime_code_unchanged": true,
+  "modified_daily_copies": [
+    {
+      "instrument_id": "601288.SH",
+      "work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+      "current_sha256": "e1ede7e15db754ffc3d131a2cdb22bb9acf9da6d540a4461db373b6d1b9bd1fa",
+      "why": "existing A products_services gap display only"
+    }
+  ],
+  "new_runtime_path": "/home/python/Quote/data/research/company_profile_daily_release_20261122/company_profile_common_core.v1/bp-work-05513a173c509ecf3867c101.json",
+  "new_runtime_sha256": "3febe68e01fb2097a37c58f90d2cbe9b62ef596bb3dbb39168f11c3c7df248ee",
+  "original_model_extraction_status": "rejected",
+  "new_source_review": "completed",
+  "formal_quality": "not_assessed",
+  "production_authorization": "not_authorized"
+}

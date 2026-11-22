@@ -1,0 +1,24 @@
+{
+  "actual_main_job_reached_review_boundary": true,
+  "official_source_and_seed_loaded": true,
+  "no_network": true,
+  "physical_requests": 0,
+  "retained_rejected_extraction": true,
+  "request_boundaries": [
+    {
+      "purpose": "review_profile_workpaper",
+      "report": {
+        "instrument_id": "600233.SH",
+        "report_id": "asset_bb30ecbd490f9a0a6d6f798d6ea7e87c",
+        "document_version": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "source_text_sha256": "1c92fac326e240a57b308ad6cc21bee35cdb231e95d81e633bb3b87ee8841e0c",
+      "seed_sha256": "480de60ecc82d974bbac105b27a3f79c1ebb569dcc5912e93a78bd5f137d7293"
+    }
+  ],
+  "evidence_kind": "isolated offline stop at model boundary; not a successful model result",
+  "production_authorization": "not_authorized"
+}

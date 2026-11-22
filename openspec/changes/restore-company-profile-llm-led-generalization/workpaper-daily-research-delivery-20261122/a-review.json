@@ -1,0 +1,53 @@
+{
+  "task": "6.EW",
+  "reviewer": "A independent business/use reviewer",
+  "scope": "Daily research consumption and actual changed-content checks; not full-report or formal 95%/99% assessment",
+  "existing_content_review": {
+    "source": "../workpaper-prospective20-20261122/a-independent-review.json and ../workpaper-saved-draft-job-20261122/a-source-review.json",
+    "current_json_read": "data/research/company_profile_saved_draft_release_20261122/exports/annual_profiles.json",
+    "observations": [
+      "Selected current core narratives explain principal business, products/services and monetization across manufacturing, services and finance; reusable earlier independent source checks retain their original limited scope.",
+      "Agricultural Bank subsidiary/fund/asset-management services remain incompletely described. Important missing detail does not invalidate the established banking profile or authorize new paid reading.",
+      "Shenzhen Airport has no declared active gap but still explicitly reports selected_scope_only/full_report_completeness not_assessed; an empty gap list does not claim a complete report."
+    ],
+    "new_full_company_or_accuracy_claim": false
+  },
+  "independent_actual_use_checks": {
+    "entry": "CompanyProfileReadService(data/research/company_profile_daily_release_20261122)",
+    "interpreter": "/home/python/miniconda3/envs/Quote/bin/python",
+    "checked_before_yuantong_review_completed": true,
+    "bank_gap": "passed: the existing independent omission is visible in active products_services reasons with its independent source attribution, while facts/model review remain unchanged",
+    "bank_gap_to_reading_plan": "passed: plan_enrichment binds the current same-report base work ID and report version, returns planned/execution_started=false, and preserves the exact submitted question",
+    "mixed_stock_query": "passed: 600176.SH, 601288.SH, 600233.SH returned; 600000.SH separately not_found in this research root, not undisclosed/zero business",
+    "scope_visibility": "passed: selected_scope_only and full_report_completeness=not_assessed remain visible",
+    "pending_yuantong_not_prematurely_reviewed": "passed: original reading remains not_reviewed while the separate model request is in flight"
+  },
+  "changed_model_content_review": {
+    "runtime_work_id": "bp-work-05513a173c509ecf3867c101",
+    "actual_model_flow": "initial Grok source review, one DeepSeek merged correction, final Grok review; three physical requests, no retry",
+    "finding": "RF01 reproduced the previously independently identified F23 applicability-to-economic-claim error; this is not claimed as a newly discovered error unknown to A",
+    "changed_fact_ids": ["F23"],
+    "unchanged_other_fact_count": 27,
+    "added_or_removed_fact_ids": [],
+    "original_extraction_contract_status": "rejected_preserved",
+    "independent_pdf_check": "Formal PDF hash matched; pypdf directly read physical p29 and confirmed the exact not-applicable disclosure label",
+    "new_f23_decision": "a-corrected-f23-decision.json; only revised content hash accepted with the explicit applicability-only limitation; original erroneous hash remains withheld",
+    "remaining_scope": "No assertion of full-report completeness, discovery of all omissions, or 99% full-profile accuracy"
+  },
+  "final_use_decision_application": {
+    "proof": "final-consumption-verification.json",
+    "current_research_companies": 20,
+    "current_readable_records": 620,
+    "record_count_is_not_accuracy": true,
+    "yuantong_readable_records": 28,
+    "yuantong_states": {"reviewed": 22, "limited": 6},
+    "new_corrected_F23": "limited with explicit independent_source_check and applicability-only limitation",
+    "old_erroneous_F23": "original independent withholding and release preserved",
+    "unchanged_proofs_reused": "Batch/missing/plan checks reused; only changed single-stock HTTP repeated after applying A decision",
+    "original_protection": "A independently recomputed the 95 protected file hashes and frozen runtime implementation hashes; all matched",
+    "conclusion": "Current bounded daily research delivery accepted; no new full-profile accuracy or formal scale permission"
+  },
+  "new_model_calls_by_A": 0,
+  "formal_acceptance": "not_assessed_original_failed_batches_unchanged",
+  "production_authorization": "not_authorized"
+}

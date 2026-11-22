@@ -1,0 +1,33 @@
+{
+  "scope": "post-model explicit independent use decision; not automatic model unquarantine",
+  "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-daily-research-delivery-20261122/a-corrected-f23-decision.json",
+  "reference_sha256": "e2056e1bff46dfa87a52241a8f4dac035531cda6c087704445dbc3324e54e051",
+  "runtime_path": "/home/python/Quote/data/research/company_profile_daily_release_20261122/company_profile_common_core.v1/bp-work-05513a173c509ecf3867c101.json",
+  "runtime_before_use_decision_sha256": "3febe68e01fb2097a37c58f90d2cbe9b62ef596bb3dbb39168f11c3c7df248ee",
+  "runtime_final_sha256": "1b14f64cba80e68937bf2f48874eddaa0e8c418a55406787b3aa95a070ccb7fe",
+  "first_runtime_review_index_retained": true,
+  "raw_fact_and_model_quality_review_unchanged": true,
+  "final_http": {
+    "status": 200,
+    "sha256": "6de022bc8a0e0b73eca8ef8af7c5dfb9be5807a038e731fab76608e5fd7ccd2b"
+  },
+  "other19_final_export_profiles_unchanged": true,
+  "final_single_new_instance_equals_export": true,
+  "root": "/home/python/Quote/data/research/company_profile_daily_release_20261122",
+  "total_companies": 20,
+  "total_visible_facts": 620,
+  "total_visible_metrics": 834,
+  "yuantong_visible_facts": 28,
+  "yuantong_visible_states": {
+    "reviewed": 22,
+    "limited": 6
+  },
+  "new_model_requests": 0,
+  "annual_json": "/home/python/Quote/data/research/company_profile_daily_release_20261122/exports/annual_profiles.json",
+  "annual_json_sha256": "d1cebe6d767b13bc9c6188c22cccf73e9dbbfa4c4c36f65bef1f79b4bd91524c",
+  "annual_markdown": "/home/python/Quote/data/research/company_profile_daily_release_20261122/exports/annual_profiles.md",
+  "annual_markdown_sha256": "b5d20fbfa6cb01809b92ab486f5a618d6f9bbc3604f55fef1389c3d87c93d1ae",
+  "reuses_consumption_proof": "consumption-verification.json for unchanged batch/missing/plan operations; only changed single HTTP repeated",
+  "production_authorization": "not_authorized",
+  "formal_quality": "not_assessed"
+}

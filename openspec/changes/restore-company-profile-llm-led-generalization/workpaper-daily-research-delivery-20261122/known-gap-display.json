@@ -1,0 +1,15 @@
+{
+  "instrument_id": "601288.SH",
+  "work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+  "path": "/home/python/Quote/data/research/company_profile_daily_release_20261122/company_profile_common_core.v1/bp-work-6170f3946dfb9b4aea05cc44.json",
+  "daily_sha256": "e1ede7e15db754ffc3d131a2cdb22bb9acf9da6d540a4461db373b6d1b9bd1fa",
+  "changed_field": "workpaper.elements.products_services.limitations",
+  "note": "独立读源提示：基金/资产管理及子公司综合金融服务的具体内容尚未充分获取，可按需阅读相关业务章节补充；已有公司/个人/县域金融描述仍可用。",
+  "source_note": "提示来源：6.EU a-independent-review.json的601288.SH条目；这是既有A独立读源缺项提示，不是本轮LLM新增判断。",
+  "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/a-independent-review.json",
+  "reference_sha256": "64c509641d5c68b6066e5f0ca8770964c6fb86f68f476fc65c609f36b32e0cff",
+  "all_projected_fact_values_and_states_unchanged": true,
+  "model_quality_review_unchanged": true,
+  "active_api_gap_visible": true,
+  "new_model_requests": 0
+}

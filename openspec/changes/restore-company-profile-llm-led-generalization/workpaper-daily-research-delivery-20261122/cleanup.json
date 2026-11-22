@@ -1,0 +1,21 @@
+{
+  "removed_exact_path": "/home/python/Quote/data/QuoteBak/company-profile-6ew-b-AK786IrS",
+  "removed_files": 73,
+  "released_logical_file_bytes": 17196492,
+  "removed": [
+    "owned isolated CLI test outputs/databases",
+    "temporary scripts/logs",
+    "superseded same-card pre-A export"
+  ],
+  "preserved": [
+    "official PDFs and effective caches",
+    "prior failures/raw/attempts/budgets and19/20 roots",
+    "current daily20 release",
+    "real checkpoint/execution/receipts",
+    "single necessary workpaper proofs",
+    "A files and unrelated dirty worktree"
+  ],
+  "previous_6EV_exact_roots_absent": true,
+  "active_owned_test_or_execution_sessions": 0,
+  "no_extra_model_calls": true
+}

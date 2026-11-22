@@ -1,0 +1,30 @@
+{
+  "state": "planned",
+  "execution_started": false,
+  "action": "enrich",
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6ew-601288-products-services-plan",
+    "base_work_id": "bp-work-6170f3946dfb9b4aea05cc44",
+    "base_workpaper_sha256": "8f3659c616fcc66f4fd394921c1fbcc38c167c4868bdb29f23fd07e3de8eb7bc",
+    "report": {
+      "instrument_id": "601288.SH",
+      "report_id": "asset_c49da47b4cbb872a77858820aac7eade",
+      "document_version": "9353f9a05d9cdf19cabef785e4c633fbd29ab63e7933dcd3c472ca02bc691d83",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "products_services",
+        "question": "基金/资产管理及子公司综合金融服务的具体内容有哪些？请从相关业务章节补充，未取得仍保留缺项。"
+      }
+    ]
+  },
+  "requires": [
+    "explicit_model_and_finite_budget",
+    "publication_write_permission"
+  ],
+  "production_authorization": "not_authorized"
+}

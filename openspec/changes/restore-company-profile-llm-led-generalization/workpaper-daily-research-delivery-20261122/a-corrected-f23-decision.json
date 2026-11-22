@@ -1,0 +1,27 @@
+{
+  "task": "6.EW",
+  "reviewer": "A independent source reader",
+  "report": {
+    "instrument_id": "600233.SH",
+    "report_id": "asset_bb30ecbd490f9a0a6d6f798d6ea7e87c",
+    "document_version": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "source_reference": "data/filings/announcements/blobs/d1/d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7.pdf",
+  "source_sha256": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7",
+  "physical_page": 29,
+  "actual_source_text": "本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n□适用  √不适用",
+  "decisions": [
+    {
+      "fact_id": "F23",
+      "fact_sha256": "f9d7bdfedd93b3f180c784f1ed5ba2373422fd86bfcbc0f915b64b82d302c324",
+      "disposition": "source_checked",
+      "evidence_ids": ["source-0013"],
+      "reason": "A重新读取正式PDF物理第29页，修订后的文字仅复述该披露项目为不适用，并明确没有确认业务/利润来源是否发生重大变化，原错误的未发生经济判断已删除。只接受这个新内容hash，不解除旧错误hash的隔离。",
+      "limitation": "仅为披露项目适用性说明，不证明实际业务或利润没有变化，不作为经济变化结论；旧章节祖先定位限制保持。"
+    }
+  ],
+  "application": "Bind only the exact revised F23/report through the existing UseReview and writer in the new daily research copy. Original 6.EV independent decision, raw, rejection, budget and earlier release remain unchanged. No new model call or code rule is authorized by this source decision."
+}

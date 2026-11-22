@@ -1,0 +1,48 @@
+{
+  "root": "/home/python/Quote/data/research/company_profile_daily_release_20261122",
+  "delivered": 20,
+  "api_calls": [
+    {
+      "action": "batch20_and_missing",
+      "status": 200,
+      "sha256": "b696bb518b3ca992a54ba3382fcbd3835c5937ebbda63870bb513aca42cc2021"
+    },
+    {
+      "action": "600233_detail",
+      "status": 200,
+      "sha256": "03237f57eac57b979fbffd69d8f64771c802167252097fe709de30ae92fb0668"
+    },
+    {
+      "action": "missing_detail",
+      "status": 404
+    },
+    {
+      "action": "known_gap_to_stock_enrichment_plan",
+      "status": 200,
+      "execution_started": false,
+      "sha256": "a7058083b6e379be12614c8ffc557f57f14f8496bff1ce1f0e4e891f20ed1fb2"
+    },
+    {
+      "action": "current_review_plan_only",
+      "status": 200,
+      "state": "not_needed",
+      "execution_started": false
+    }
+  ],
+  "api_equals_export_and_new_instance": true,
+  "read_and_plan_writer_hashes_unchanged": true,
+  "original18_profiles_identical": true,
+  "agricultural_existing_gap_visible": true,
+  "shennan_f14_limited": true,
+  "yuantong_f23_not_visible_as_normal_fact": true,
+  "annual_json": "/home/python/Quote/data/research/company_profile_daily_release_20261122/exports/annual_profiles.json",
+  "annual_json_sha256": "52c5a5f371bd5b19ed4a6a924d05c41acf0e06dc5d77f36a8c6962f96746eebc",
+  "annual_markdown": "/home/python/Quote/data/research/company_profile_daily_release_20261122/exports/annual_profiles.md",
+  "annual_markdown_sha256": "e034049cfe0cdac344f4378578f432b2dce385c4f082b29562850004f2c959c7",
+  "visible_fact_count": 619,
+  "visible_metric_count": 834,
+  "new_model_requests_from_consumption": 0,
+  "coverage": "selected_scope_only",
+  "formal_quality": "not_assessed",
+  "production_authorization": "not_authorized"
+}

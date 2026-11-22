@@ -1,5 +1,9 @@
 ## Context
 
+### 6.EW 既有能力收成日常研究版本
+
+复用已交付的首读、保存计划复核、单股定向补读及同报告API/年度导出，不新增业务循环或完成门禁。原20股由既有writer保存到新的研究交付根；圆通600233只在本次明确有限授权下复用旧真实稿和公开选章走原review_batch，至多一次必要合并修订及终核。旧release/raw/rejected/账本、独立限用和正式失败保留，研究使用与正式扩量仍分开。A并行核实际变化和内容主干，B负责实现/运行/用法/机械验证，临时物先核后清、末端一套证据后清理。详company-profile-daily-research-delivery-card.md。
+
 ### 6.EV 日常入口消费已保存响应，不重做语义抽取
 
 现有严格normalize_retained_workpaper_format/run_workpaper(local_format_only)与原TaskService已覆盖有源格式消费，但日常execution-plan仍只接first_read/review_batch/enrich，操作人要手工组装依赖。只在现有job参数适配中增加显式本地文件身份并转原run，复用原哈希/源包/归一化/队列/writer和run_id幂等，不新增公开动作或平行循环。新文件在LLM配置/客户端/预算构造前分离，不能借新模式放宽旧付费计划或构造模型回执。

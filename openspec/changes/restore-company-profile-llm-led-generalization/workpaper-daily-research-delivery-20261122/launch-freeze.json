@@ -1,0 +1,22 @@
+{
+  "frozen_at_utc": "2026-11-22T04:10:26.044451+00:00",
+  "base_head": "d94afa70",
+  "implementation_sha256": {
+    "main.py": "31a7118133164710b26dc7a7a4d6edc45dce47ba482bda80e605b43aa6e80651",
+    "scheduler/tasks.py": "c7bdaf1add63abd083c24fd8cb64494cb8a73e93adc722dd05e0bea5139fec6c",
+    "research/company_profile/task_entry.py": "23a460ab5245769d0e54984b0676962e09830ff85eb5d4aa4658e14a5bcbe9ef",
+    "research/company_profile/operations.py": "61417d270cac76206183e8749e3418d4451aeb123c95fd158f28532e80f82082",
+    "research/company_profile/runtime.py": "759cfc361f47a7dee27660a973ac4924f57be629674b7f930ec2159cd5441eca",
+    "research/company_profile/workpaper_review.py": "61fd41d14ebf25ef6261cf7d3f2ed90d84e2b7fd146dc4aceeae682855d893ad",
+    "research/company_profile/workpaper_llm.py": "f4f6799bbd0dde2ef773c3d39d772798002a2678236e785cbbd644181c713660"
+  },
+  "execution_plan_sha256": "83c43532c86e4ce223de2cced06e88350313a8e3d99b3cf01cc55bd498bdaa96",
+  "review_plan_sha256": "0750334f3dd2f5f935f1ade2741ead3d3f9b77505b1462927dcd98ea120fba57",
+  "offline_readiness_sha256": "e27c3b039117a2ad951544a249a73bc64c85beda3c1aa5ae16b3013f7f3186cf",
+  "network_preflight_sha256": "e7a2d26363404131a5520d1ff071a89ea0463ef863d89819de3fed462a35af70",
+  "same_card_hotfix_allowed": false,
+  "approved_scope": "one 600233 review_batch; no selection or extraction",
+  "code_changes_before_launch": 0,
+  "run_id": "6ew-600233-source-review",
+  "production_authorization": "not_authorized"
+}

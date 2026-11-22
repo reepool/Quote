@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-22 [6.EW日常研究交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-daily-research-delivery-20261122/result.md)已收口现20股研究版本：620可读记录/834指标，圆通保存稿原CLI完成初核→一次修订→终核，3物理/0恢复/76047已知供应商total、294.660业务秒、费用unknown。仅F23改成适用性限定，27其他事实不变；A重读正式PDF后只对新hash作限用接受，旧错误仍隔离，非新发现未知错误或全稿99%。API/JSON/人读版/新实例一致、农行既有服务遗漏随API提示、缺项可生成绑定报告的按股补读计划且不执行；既有研究根/95受保护文件和原18完整投影保持。研究使用可交付，正式95%/99%未新评估，6.EU首发17/20及旧S2失败不改，不自动20/100或生产；用法/有限Review/清理见本轮结果。
+
 2026-11-22 [6.EV零调用交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saved-draft-job-20261122/result.md)完成：圆通旧真实响应经已有严格归一化和原日常job/run恢复，30作者事实经原约束留28、A另隔离1，新增27待核/限用；原19不变，新20股研究根619可读记录/缺项/来源/作者和拒绝状态可查。新模型发送和新增供应商usage均0，真实源核计划仍planned、待限定外传答复；不是20家已审/旧S2或6.EU改判，正式95%/99%未新评估。源包绑定/拒绝回执复核接续及显示限制下恢复hash兼容直接验证，A有限原文检查/Review及清理收尾；不自动扩量/启生产。
 
 2026-11-22当前6.EV仅在新的日常本地恢复文件中消费圆通已保存真实内容：现有严格形状归一化适用不等于旧模型抽取转为accepted，不改6.EU首发17/20、后继19稿或正式失败。先在原owner零新模型/零网络交待核稿、保来源/原作者/原usage及独立限用；真实单稿源复核须另有新有限批准，不能借已结束窗口余额。供源、基础内容、审核、缺项和资源分列，候选/可读数量不冒充正式95%/99%或新阶段通过，详[本轮整卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-saved-draft-job-card.md)。

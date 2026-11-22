@@ -4,10 +4,62 @@
 
 ```bash
 source /home/python/Quote/scripts/quote_dev_env.sh
-python main.py job --job-id company_profile_common_core --action first_read --execution-plan-file /absolute/path/first-read.json
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action first_read --execution-plan-file /absolute/path/first-read.json
 ```
 
 文件负责股票/报告版本、模型、预算和读取根；不要再与`--instrument-ids`、`--knowledge-cutoff`、`--max-items`、`--token-budget`或`--max-elapsed-seconds`混用，CLI会拒绝这种歧义。无文件的旧动作保持原行为，新`first_read/review_batch/enrich`必须明确提供文件。
+
+本文命令使用已验证的项目完整环境`/home/python/miniconda3/envs/Quote/bin/python`。系统`python3`可能缺少pandas等项目依赖；此时应选正确解释器，不通过改业务代码或临时安装依赖解决。以下路径均从`/home/python/Quote`执行。
+
+## 当前20股日常研究版本（6.EW）
+
+显式研究根为`/home/python/Quote/data/research/company_profile_daily_release_20261122`；当前年度JSON及人读稿位于该根`exports/annual_profiles.json`、`exports/annual_profiles.md`。这是原20股的独立研究副本，旧19/20股根、原失败及planned文件保留；未切换默认配置或启用生产。
+
+已有画像、审核状态与缺项可直接读，不会隐式触发模型：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+cd /home/python/Quote
+/home/python/miniconda3/envs/Quote/bin/python - <<'PY'
+from research.company_profile.reads import CompanyProfileReadService
+reader = CompanyProfileReadService('/home/python/Quote/data/research/company_profile_daily_release_20261122')
+stocks = [p['instrument_id'] for p in reader.research_profile_catalog()['profiles']]
+batch = reader.research_profiles(stocks)
+profile = reader.research_profile('600233.SH')
+print('可读公司数:', batch['delivered'])
+print('逐轮审核:', [(r['work_id'], r['review_status']) for r in profile['readings']])
+print('缺项:', profile['information_gaps'])
+print('建议获取:', profile['suggested_acquisitions'])
+PY
+```
+
+API进程通过`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`显式指向同一根；既有路由如下，读取和生成计划均不执行模型：
+
+```http
+GET /api/v1/research/company/annual-profiles
+GET /api/v1/research/company/600233.SH/annual-profile
+POST /api/v1/research/company/annual-profiles/query
+Content-Type: application/json
+
+{"instrument_ids":["600233.SH","601288.SH"]}
+```
+
+清单中找不到的股票列在`missing`及`missing_instrument_ids`；单股不存在返回404。这仅说明本研究根没有画像，不表示年报未披露。
+
+首读待核和实际已核状态按每条事实显示；`limited`需连同原因使用，`withheld/source_only`不进入普通结论。模型复核完成也不等于全面正确或全报告完整。农行基金/资管及部分子公司服务仍有独审遗漏说明，不拒整稿、不为本卡追加补读；深南电F14源单位及圆通F23独立限制继续保留。
+
+6.EW圆通实际完成Grok初核、一次DeepSeek合并修订和Grok终核，共3物理/0恢复、76,047供应商total、费用unknown；修正的是A前轮已知F23错误。A再次核正式PDF后，仅允许新F23保真限用：它只说明披露项目“不适用”，不能推出实际业务或利润没有变化。该显式独立决定与模型结果分列，旧错误内容继续隔离；全组正式95%/99%及全报告完整性仍未评估。
+
+需要补缺时，从`information_gaps`或`suggested_acquisitions`选具体问题，调用下文`enrichment-plan`，再为明确授权的补读另建有界执行文件。不要直接重抽全部公司、改旧计划续额，或把当前缺项解释成业务不存在。
+
+本轮圆通源核实际文件位于`openspec/changes/restore-company-profile-llm-led-generalization/workpaper-daily-research-delivery-20261122/execution-plan.json`，原日常命令如下。该ID只对应本次已授权窗口，重复仅返回保存结果，不能用它新增额度：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action review_batch --execution-plan-file /home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-daily-research-delivery-20261122/execution-plan.json
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action status --execution-plan-file /home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-daily-research-delivery-20261122/execution-plan.json
+```
+
+整组当前导出已存在。需要另存时使用原`reader.export(stocks, export_directory='/absolute/path/new-empty-directory')`；旧导出目录受保护，不覆盖。CLI的`query/export`按执行文件中的股票范围工作，本轮单股源核文件不会自动导出全20股。
 
 显式执行文件的日常job只初始化已有研究存储，直接转原任务方法，不启动无关行情源或继承调度器的默认运行时限。该手动路径不传报告通知配置，因此不会外发任务报告；结果、预算及每次实际请求回执保存在本次检查点目录。回执保公开请求正文、供应商响应对象及其中未改写的正文字符串，不保认证头或URL查询参数；它不是原始HTTP字节。旧无文件job仍沿原调度行为。
 
@@ -65,10 +117,10 @@ python main.py job --job-id company_profile_common_core --action first_read --ex
 通过现有年报API或`CompanyProfileReadService.plan_review_recovery`为需要复核的股票取得完整计划；无需重新选章/抽取。新文件使用独立`run_id`，`action`改为`review_batch`，股票/报告版本与这些计划相同，`review_plans`数组放入API返回的完整计划对象，研究根/检查点根继续指向本批数据。单次调用串行消费显式清单，原同因失败暂停及缺项/局部隔离继续适用。
 
 ```bash
-python main.py job --job-id company_profile_common_core --action review_batch --execution-plan-file /absolute/path/review.json
-python main.py job --job-id company_profile_common_core --action status --execution-plan-file /absolute/path/first-read.json
-python main.py job --job-id company_profile_common_core --action query --execution-plan-file /absolute/path/first-read.json
-python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/first-read.json --output-directory /absolute/path/new-export-directory
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action review_batch --execution-plan-file /absolute/path/review.json
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action status --execution-plan-file /absolute/path/first-read.json
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action query --execution-plan-file /absolute/path/first-read.json
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/first-read.json --output-directory /absolute/path/new-export-directory
 ```
 
 首读与复核各文件分别有明确预算；一次授权可以预先覆盖两份分额计划，但不能把同一整组总额复制成两个独立余额。沿原API查看合并后的完整画像/缺项时，在研究API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`为本文件的output_root；不会自动切换共享API服务。`query/export`保旧合同，其中`annual_profiles.json`是合并研究投影。
@@ -97,8 +149,8 @@ Content-Type: application/json
 该接口只生成计划，不启动读取。复制上面首读文件，保留对应研究根/检查点根及具体模型配置，使用新的`run_id`和本次明确有界预算，将`action`设为`enrich`，`instrument_ids`只保留目标股票，`document_versions`只保留同一报告版本，并把API返回的**完整`enrichment_plan`对象**放入文件的同名字段；不放`review_plans`。计划自带原工作ID、原稿hash、报告身份和具体问题，不手工改写绑定。获得本次授权后执行：
 
 ```bash
-python main.py job --job-id company_profile_common_core --action enrich --execution-plan-file /absolute/path/enrich.json
-python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/enrich.json --output-directory /absolute/path/new-export-directory
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action enrich --execution-plan-file /absolute/path/enrich.json
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/enrich.json --output-directory /absolute/path/new-export-directory
 ```
 
 精读沿原应用完成选章、抽取和源复核，原稿保留，新增内容以独立阅读批次进入同报告API及`annual_profiles.json`；未找到的内容仍标缺项，不要求全部补齐。源/原稿hash过期、跨股跨报告或计划与动作不符会拒绝；同`run_id`重提只读原结果。需要第二轮时先按当前画像生成新问题计划，再给新执行文件及明确预算，不通过修改旧文件续额。复核未完成时可按已有`review-plan`→`review_batch`接续，无需重新选章/抽取；这也需要对应的新有限授权。
@@ -134,56 +186,12 @@ python main.py job --job-id company_profile_common_core --action export --execut
 示例中的哈希占位须替换为实际64位十六进制值。绑定唯一股票/报告、原成功选章、原拒绝响应、作者/用量及原处理身份；重建的`source_text + reading_scope`必须与旧实发请求逐字匹配。本地只处理既有允许的容器形状，不补语义、不构造模型客户端或供应商预算。错源、哈希不符、停写或不适用的格式会拒绝；同`run_id`重提只读原结果。
 
 ```bash
-python main.py job --job-id company_profile_common_core --action run --execution-plan-file /absolute/path/local.json
-python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/local.json --output-directory /absolute/path/new-export-directory
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action run --execution-plan-file /absolute/path/local.json
+/home/python/miniconda3/envs/Quote/bin/python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/local.json --output-directory /absolute/path/new-export-directory
 ```
 
 恢复后仍是待核稿，原抽取合同仍为`rejected`，保留归一化操作及前后hash。后续通过原`plan_review_recovery`生成源核计划，只有另获有限模型授权才用`review_batch`执行；本地恢复不会复用旧供应商余额或抹去历史失败。
 
-### 6.EV研究副本：20家可读，不等于20家已审
+## 历史版本
 
-显式研究根为`/home/python/Quote/data/research/company_profile_saved_draft_release_20261122`，整组文件为该根下的`exports/annual_profiles.json`和`exports/annual_profiles.md`。原19家研究根及旧失败不改；圆通本地恢复稿仍待源复核，F15/F19由原约束隔离，F23由独立UseReview隔离，历史目录祖先标签误差已有定位限制。未切默认配置、未启生产。
-
-```python
-from research.company_profile.reads import CompanyProfileReadService
-reader = CompanyProfileReadService("/home/python/Quote/data/research/company_profile_saved_draft_release_20261122")
-stocks = [p["instrument_id"] for p in reader.research_profile_catalog()["profiles"]]
-batch = reader.research_profiles(stocks)  # 原批量API投影，含缺项、限制及逐条审核状态
-yuantong = reader.research_profile("600233.SH")
-```
-
-使用已有HTTP路由时，仅在独立研究API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`为上述根；调用`POST /api/v1/research/company/annual-profiles/query`并传`{"instrument_ids":["600233.SH"]}`即可读取，不触发模型或任务。
-
-## 6.EU整组研究交付：显式根只读使用
-
-本批首发20家，17家有稿；两个零模型工程失败经原窗口内必要后继后，当前研究根可读19家，圆通速递600233.SH仍无稿。数量是可读内容范围，不是正式质量通过；初核/终核、独立有限核查和缺项仍分别保留。原首发失败不改，未切换默认研究配置或共享API服务，未启生产。
-
-可直接复制运行下列只读调用（不排队、不调用模型、不写画像）：
-
-```bash
-source /home/python/Quote/scripts/quote_dev_env.sh
-/home/python/miniconda3/envs/Quote/bin/python - <<'PY'
-import json
-from research.company_profile.reads import CompanyProfileReadService
-
-reader = CompanyProfileReadService(
-    "/home/python/Quote/data/research/company_profile_prospective20_release_20261122"
-)
-stocks = [
-    "600176.SH", "600115.SH", "601288.SH", "600163.SH", "600183.SH",
-    "601319.SH", "600170.SH", "000070.SZ", "600258.SH", "002500.SZ",
-    "000037.SZ", "000568.SZ", "000089.SZ", "000563.SZ", "000402.SZ",
-    "920008.BJ", "000524.SZ", "920016.BJ", "002558.SZ",
-]
-print(json.dumps(reader.research_profiles(stocks), ensure_ascii=False, indent=2))
-PY
-```
-
-API复用现有`POST /api/v1/research/company/annual-profiles/query`，请求体为`{"instrument_ids":["600176.SH","000070.SZ","002500.SZ"]}`等明确清单；它与上述ReadService投影一致。使用该根时，只在独立研究API进程启动前显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_prospective20_release_20261122`。这不修改共享配置，也不会替已经运行的默认服务切根。请求600233.SH会明确列为本地未找到画像，不表示年报未披露或零业务。
-
-本批唯一整组导出：
-
-- JSON：`/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.json`
-- 人读版：`/home/python/Quote/data/research/company_profile_prospective20_release_20261122/delivery/annual_profiles.md`
-
-000037/F14的原文电价单位有疑点，经独立有源决定保留原值并标`limited`，不能直接用于确定电价计算；其余事实、来源和已有缺项照常读取。读取者须同时消费每条事实的状态/限制，不能仅取裸数值。
+[6.EV零调用恢复20股](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saved-draft-job-20261122/result.md)与[6.EU首发及后继19股](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/result.md)保留各自研究根、原结果及失败，供追溯；其操作路径和成绩不覆盖本文当前6.EW版本。历史数据未删除。
