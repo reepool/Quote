@@ -56,7 +56,9 @@ def test_only_container_structure_changes_and_old_model_stays_rejected():
     assert normalized == expected
     result = run_workpaper(report=_report(), pages=PAGES, processing_identity=identity,
         provider=NoModelCalls(), work_id='local', extraction_resume=resume)
-    assert resume == before and len(result.receipts) == 1
+    assert resume == before and len(result.receipts) == 2
+    assert result.receipts[-1]['contract_status'] == 'rejected'
+    assert result.receipts[-1]['raw_content'] == raw
     assert result.workpaper.generation.extraction.contract_status == 'rejected'
     assert result.workpaper.generation.extraction.model == 'old-extractor'
     assert result.workpaper.generation.extraction.usage.total_tokens == 123

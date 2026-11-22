@@ -1,0 +1,37 @@
+{
+  "schema_version": "company_profile_local_task_plan.v1",
+  "run_id": "6ev-600233-local-saved",
+  "authorization_status": "authorized",
+  "approval_reference": "human-20261122-6EV-local",
+  "action": "run",
+  "instrument_ids": [
+    "600233.SH"
+  ],
+  "document_versions": {
+    "600233.SH": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7"
+  },
+  "knowledge_cutoff": "2026-11-22",
+  "output_root": "/home/python/Quote/data/research/company_profile_saved_draft_20261122/600233",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_saved_draft_20261122/600233",
+  "max_elapsed_seconds": 600,
+  "saved_draft": {
+    "checkpoint": {
+      "path": "/home/python/Quote/data/research/company_profile_prospective20_20261122/600233/company_profile_common_core.v1/checkpoints/bp-work-a643a72516c492ecb33110a8.json",
+      "sha256": "1b27d1461bd8117431b6d2b02a83386cef7bc855c7d3b0bb513e28ca2b17cc28"
+    },
+    "selection_receipt": {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/001.json",
+      "sha256": "a9b1c5f628637e3a5e4aaee9d23b443d67cdde84fe55a4d82beffa2b18065af9"
+    },
+    "failed_receipt": {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/002.json",
+      "sha256": "16932ccffeae57cc8563fcc6575d8098fd8a68afb3c78acd2f966886be826689"
+    },
+    "ledger": {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/budget.json",
+      "sha256": "90d3599c230e0b64414b73cbc64d6ce34391c8a7bdbd94d176d4e4f898c297bc"
+    },
+    "selection_sequence": 1,
+    "failed_sequence": 2
+  }
+}

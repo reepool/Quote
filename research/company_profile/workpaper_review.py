@@ -289,17 +289,29 @@ def prepare_review_recovery(record):
     if generation is None:
         raise ValueError("review recovery needs original extraction attribution")
     for call in (generation.selection, generation.extraction):
+        locally_normalized = call is generation.extraction and generation.local_format_normalization is not None
+        expected_status = "rejected" if locally_normalized else "accepted"
         items = [item for item in record.workpaper_receipts if item.get("request_id") == call.request_id
                  and item.get("purpose") == call.purpose]
         if len(items) != 1:
             raise ValueError("original extraction receipt missing or duplicated")
         item = items[0]
         raw = item.get("raw_content")
-        if (call.contract_status != "accepted" or item.get("contract_status") != "accepted"
+        if (call.contract_status != expected_status or item.get("contract_status") != expected_status
             or item.get("finish_reason") != "stop" or call.finish_reason != "stop" or not isinstance(raw, str)
             or hashlib.sha256(raw.encode()).hexdigest() != call.response_hash
-            or item.get("response_hash") != call.response_hash or json.loads(raw) != item.get("response_payload")):
+            or item.get("response_hash") != call.response_hash):
             raise ValueError("original extraction receipt is not complete and hash-bound")
+        if locally_normalized:
+            from .workpaper_llm import normalize_retained_workpaper_format
+
+            extraction_payload, normalization = normalize_retained_workpaper_format(raw)
+            if normalization != generation.local_format_normalization:
+                raise ValueError("saved local normalization differs from rejected original bytes")
+        elif json.loads(raw) != item.get("response_payload"):
+            raise ValueError("original extraction payload differs from its receipt")
+        else:
+            extraction_payload = json.loads(raw)
         if any(getattr(call, key) is not None and item.get(key) != getattr(call, key) for key in (
             "request_hash", "source_label", "model", "selected_profile", "logical_profile", "route_fingerprint",
         )):
@@ -309,10 +321,18 @@ def prepare_review_recovery(record):
         seed = paper.model_copy(update={"use_review": None})
     else:
         seed = bind_workpaper_draft(
-            WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(json.loads(generation_receipts[-1]["raw_content"]))),
+            WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(extraction_payload)),
             report=paper.report, reading_scope=paper.reading_scope, evidence=paper.evidence,
             origin=paper.origin, generation=generation,
         )
+        if generation.local_format_normalization is not None:
+            # Local releases can add display limits after extraction. Retain
+            # them only when they reconstruct the exact hashed review input.
+            seed = seed.model_copy(update={
+                "limitations": tuple(dict.fromkeys((*seed.limitations, *paper.limitations))),
+                "standardization_notes": tuple(dict.fromkeys(
+                    (*paper.standardization_notes, *seed.standardization_notes))),
+            })
         if workpaper_hash(seed) != paper.quality_review.original_draft_hash:
             raise ValueError("saved original draft cannot be reconstructed exactly")
     resume = None

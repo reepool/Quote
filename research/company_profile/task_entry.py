@@ -102,6 +102,47 @@ class CompanyProfileTaskPlan(_PlanModel):
         return self
 
 
+class _SavedFile(_PlanModel):
+    path: Path
+    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class _SavedDraft(_PlanModel):
+    checkpoint: _SavedFile
+    selection_receipt: _SavedFile
+    failed_receipt: _SavedFile
+    ledger: _SavedFile
+    selection_sequence: int = Field(ge=1)
+    failed_sequence: int = Field(ge=1)
+
+
+class CompanyProfileLocalTaskPlan(_PlanModel):
+    """One saved-content invocation; deliberately has no model or supplier budget."""
+    schema_version: Literal["company_profile_local_task_plan.v1"]
+    run_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
+    authorization_status: Literal["planned", "authorized"] = "planned"
+    approval_reference: str = ""
+    action: Literal["run"]
+    instrument_ids: tuple[str, ...] = Field(min_length=1, max_length=1)
+    document_versions: dict[str, str]
+    knowledge_cutoff: date
+    output_root: Path
+    checkpoint_root: Path
+    max_elapsed_seconds: float = Field(gt=0, le=1800)
+    saved_draft: _SavedDraft
+
+    @model_validator(mode="after")
+    def scope(self):
+        import re
+
+        if (not re.fullmatch(r"\d{6}\.(?:SH|SZ|BJ)", self.instrument_ids[0])
+            or set(self.document_versions) != set(self.instrument_ids)
+            or any(not re.fullmatch(r"[0-9a-f]{64}", value) for value in self.document_versions.values())
+            or self.authorization_status == "authorized" and not self.approval_reference.strip()):
+            raise ValueError("local saved-content plan requires its explicit single report and authority")
+        return self
+
+
 class _PlanProvider(CommonGatewaySemanticProvider):
     """Bind each original gateway request to this invocation's explicit source."""
     document_versions: dict[str, str]
@@ -161,7 +202,10 @@ async def execute_configured_task(
     Reusing a started run_id never constructs a fresh budget. An interrupted run
     remains inspectable; a new execution requires a new bounded authorized plan.
     """
-    plan = CompanyProfileTaskPlan.model_validate_json(Path(execution_plan_file).read_text(encoding="utf-8"))
+    source = Path(execution_plan_file).read_text(encoding="utf-8")
+    metadata = json.loads(source)
+    local = isinstance(metadata, dict) and metadata.get("schema_version") == "company_profile_local_task_plan.v1"
+    plan = (CompanyProfileLocalTaskPlan if local else CompanyProfileTaskPlan).model_validate_json(source)
     normalized = action.strip().lower()
     root = project_root()
     output_root = root / plan.output_root
@@ -173,9 +217,14 @@ async def execute_configured_task(
         return await execute_published_task(action=normalized, reason=reason,
             output_directory=output_directory, **arguments)
     if normalized != plan.action or plan.authorization_status != "authorized":
-        raise ValueError("paid action requires a matching explicitly authorized task plan")
+        raise ValueError("execution requires a matching explicitly authorized task plan")
+    local_started = time.monotonic()
+    if local:
+        from .saved_draft_input import load_saved_draft_input
+
+        saved = load_saved_draft_input(plan, root)
     parameters = plan.model_dump(mode="json")
-    if plan.enrichment_plan is None:
+    if not local and plan.enrichment_plan is None:
         parameters.pop("enrichment_plan")  # Preserve fingerprints of existing v1 execution files.
     fingerprint = hashlib.sha256(json.dumps(parameters, sort_keys=True).encode()).hexdigest()
     run_root = checkpoint_root / "executions" / plan.run_id
@@ -188,6 +237,27 @@ async def execute_configured_task(
         raise ValueError("task plan already started; inspect saved state instead of reopening its budget")
     if not publication_allows_new_writes(load_publication_control(checkpoint_root)):
         raise ValueError("research publication is stopped; task plan was not started")
+    if local:
+        remaining = plan.max_elapsed_seconds - (time.monotonic() - local_started)
+        if remaining <= 0:
+            raise TimeoutError("local saved-content budget expired while binding inputs")
+        run_root.mkdir(parents=True, exist_ok=True)
+        with marker.open("x", encoding="utf-8") as stream:
+            json.dump({"plan_sha256": fingerprint}, stream)
+        try:
+            result = await execute_published_task(action="run", provider=None,
+                processing_identity=saved.identity, page_source=saved.source,
+                token_budget=0, max_items=1, max_elapsed_seconds=remaining,
+                **{k: v for k, v in arguments.items() if k != "page_source"})
+            result["execution_plan"] = {"run_id": plan.run_id, "plan_sha256": fingerprint,
+                "mode": "local_format_only", "new_model_requests": 0, "added_supplier_usage": 0,
+                "production_authorization": PRODUCTION_AUTHORIZATION}
+            _save_result(result_path, result)
+            return result
+        except Exception as exc:
+            _save_result(result_path, {"action": "run", "state": "failed", "error_type": type(exc).__name__,
+                "production_authorization": PRODUCTION_AUTHORIZATION})
+            raise
     load_project_environment()
     config = llm_config if llm_config is not None else UnifiedConfigManager("config").get_llm_config()
     if not config.enabled:

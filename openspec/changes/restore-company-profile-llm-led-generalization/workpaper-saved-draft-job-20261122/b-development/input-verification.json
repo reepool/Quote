@@ -1,0 +1,79 @@
+{
+  "original_source_packet_sha256": "bbd9b9c8ada541b703a3a99dddbe8f70471a7f8f7fbd5504c47e818f36abe0ea",
+  "actual_cli_source_binding": "passed",
+  "negative_binding_checks": [
+    {
+      "changed": "source_text",
+      "refused_before_normalization": true,
+      "error": "saved extraction source packet differs from reconstructed source",
+      "model_requests": 0
+    },
+    {
+      "changed": "reading_scope",
+      "refused_before_normalization": true,
+      "error": "saved extraction source packet differs from reconstructed source",
+      "model_requests": 0
+    }
+  ],
+  "no_new_model_requests": true,
+  "no_credentials_or_supplier_budget_construction": true,
+  "repeated_run_read_only": true,
+  "repeated_result_sha256": "61fb45eb71e727807d0d3e5dc454ac0dcd6a0af84c86b484a617a417edf13bc5",
+  "repeated_result_hash_representation": "sha256(json.dumps(parsed_result, ensure_ascii=False, sort_keys=True).encode()); canonical parsed JSON, not on-disk bytes",
+  "repeated_result_disk_sha256_current": "e790985752f16d0285a17f4c50206fd359357af313a2cb73538c19cd3c12807b",
+  "hash_clarification_reference": "recovery-limit-verification.json; both representations reproduced from the same current result, no evidence of result overwrite; current repeated run checks disk bytes and mtime",
+  "candidate_path": "/home/python/Quote/data/research/company_profile_saved_draft_20261122/600233/company_profile_common_core.v1/bp-work-f5e16b21c76fb7851c247c21.json",
+  "candidate_sha256": "7ed10a639cd9eb95694068480a74dd913272f8caacd37d966dbcfe9bd7ee98e4",
+  "original_author_facts": 30,
+  "retained_typed_facts": 28,
+  "locally_isolated_fact_ids": [
+    "F15",
+    "F19"
+  ],
+  "text_and_raw_metric_values_preserved": true,
+  "normalization": {
+    "policy": "terminal_object_and_root_fields.v1",
+    "original_content_sha256": "29fad702d944d8efde07c4e3233756fff27c73e0595f778714680fa824ce58f7",
+    "normalized_object_sha256": "74107510f2f77f179080b6e6255913092ec075b8faa8db18e8eb4236e451bcf7",
+    "operations": [
+      "append_terminal_object_brace",
+      "move_elements.limitations_to_root",
+      "move_elements.company_features_to_root",
+      "move_elements.supply_chain_to_root"
+    ]
+  },
+  "protected_inputs": [
+    {
+      "path": "/home/python/Quote/data/research/company_profile_prospective20_20261122/600233/company_profile_common_core.v1/checkpoints/bp-work-a643a72516c492ecb33110a8.json",
+      "sha256": "1b27d1461bd8117431b6d2b02a83386cef7bc855c7d3b0bb513e28ca2b17cc28",
+      "unchanged": true
+    },
+    {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/001.json",
+      "sha256": "a9b1c5f628637e3a5e4aaee9d23b443d67cdde84fe55a4d82beffa2b18065af9",
+      "unchanged": true
+    },
+    {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/002.json",
+      "sha256": "16932ccffeae57cc8563fcc6575d8098fd8a68afb3c78acd2f966886be826689",
+      "unchanged": true
+    },
+    {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/budget.json",
+      "sha256": "90d3599c230e0b64414b73cbc64d6ce34391c8a7bdbd94d176d4e4f898c297bc",
+      "unchanged": true
+    }
+  ],
+  "source_pdf_path": "/home/python/Quote/data/filings/announcements/blobs/d1/d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7.pdf",
+  "source_pdf_sha256": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7",
+  "old_model_requests": 3,
+  "old_supplier_total_tokens": 75782,
+  "old_supplier_cost": "unknown",
+  "original_failed_physical_sequences": [
+    2,
+    3
+  ],
+  "new_physical_requests": 0,
+  "added_supplier_usage": 0,
+  "scope_limit": "selected sections only; source quality review not executed"
+}

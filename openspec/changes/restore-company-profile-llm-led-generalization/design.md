@@ -1,5 +1,11 @@
 ## Context
 
+### 6.EV 日常入口消费已保存响应，不重做语义抽取
+
+现有严格normalize_retained_workpaper_format/run_workpaper(local_format_only)与原TaskService已覆盖有源格式消费，但日常execution-plan仍只接first_read/review_batch/enrich，操作人要手工组装依赖。只在现有job参数适配中增加显式本地文件身份并转原run，复用原哈希/源包/归一化/队列/writer和run_id幂等，不新增公开动作或平行循环。新文件在LLM配置/客户端/预算构造前分离，不能借新模式放宽旧付费计划或构造模型回执。
+
+先交圆通旧真实内容的待核稿与20股组合研究视图，原19父链/限用和原失败不变；语法可恢复不等于语义准确，源/数值/主体校验仍适用。只复用旧选章和原文，不送人工参考；实际模型作者和原rejected保留。后续源核只有单独新授权后经原review_batch/源核owner执行，不将local-only恢复身份带成自动复核，不续原6.EU余额。原review恢复对这类特殊seed重算严格归一化并核拒绝回执，曾失败后重建时只在精确hash相符下保显示限制；普通accepted分支不放宽。卡内步骤、资源、停止和清理详company-profile-saved-draft-job-card.md。
+
 ### 6.EU 新前瞻验收：验证已交付的两阶段日常流程
 
 用户2026-11-22明确同意并授权新20家有界验收建议，不借旧S2/6.ET余额。沿既有first_read先可读、保存计划review_batch接续，A冻结元数据未见资格/独立源参考并在B运行时并行核内容；B只在原CLI/TaskService/网关/writer落实同版处理、必要局部P0—P3和交付，不造新运行/评分平台。阶段身份/总预算/分层/固定20分母及停止、后继和清理见company-profile-prospective20-card.md。

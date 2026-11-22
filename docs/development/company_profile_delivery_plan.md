@@ -1,5 +1,9 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-22 [6.EV本地整卡交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saved-draft-job-20261122/result.md)：已有严格local_format_only经原日常job/run实际恢复圆通待核稿，无重选章/重抽或新模型请求；28原约束保留对象中F23独立隔离，27可读并进入新20股研究根，原19投影/原首次失败不改。API定位限制、原作者/rejected/旧usage、缺项与审核分别可见，619记录不是准确率；54和66两组相关验证及末端6项正反通过，重叠分列。源码Review/strict/本人隔离Git、267文件23612990字节临时清理同卡完成；源核计划planned，收到限定新批准后才能沿原review_batch执行，不续旧额、不扩大样本/生产或追供应链。
+
+2026-11-22当前[6.EV保存底稿日常恢复](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-saved-draft-job-card.md)：A规划独审/B连续实施，优先复用已存在严格local_format_only，将圆通原选章/真实拒绝响应/正式PDF经原job/run交待核稿，原19和6.EU成绩不改。新增本地执行文件不构造模型、凭据或新费用，不造JSON修补框架/行业规则；只有新限定授权后才对这1稿源核，不重抽20或追供应链。API/JSON/人读版/新实例、幂等/错绑定/停写、Review/strict/本人Git及临时清理同卡交；旧源/失败/账本/并行保护，未批部分清楚标待批。
+
 2026-11-22 [6.EU整卡已执行并裁决](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/result.md)：首发20入口交17稿、3失败，正式扩量不通过。原全组首发保护后只修并发初始化与截止源选择两处阻塞，两个原窗口必要后继交稿，统一19家研究根/API/JSON/人读版可消费，圆通JSON重试仍失败保留，不再付费重抽。A有限核8家/26修订及1源单位限用，不开展已无意义的400抽审，不以592记录/775指标或模型completed冒充95%/99%。累计95物理/1恢复/2377610已知total、3664.423业务秒/unknown费用，旧原件/52既有writer及并行保护；卡内Review/strict/本人Git和A/B垃圾清理收尾，不增平台/细目门槛、不自动20/100或生产。下一优先使用现有研究API和显式定向补读，不循环整池付费；新的正式规模范围仍须另定。
 
 2026-11-22用户明确同意并授权新验收整卡，当前[6.EU两阶段20家前瞻验证](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-prospective20-card.md)：A冻结未见资格/独立源参考并行独审，B子代理沿原日常CLI同版first_read→review_batch、必要修订/终核；20家制造6/服务6/金融4/其他4，候补/来源/固定分母首发前冻结，不载旧语义。每股累计6000秒/1m/10物理含3恢复、并发4，组30600秒/20m/200物理/有价200元无价unknown，获准联网、无实际通知/生产。95%/99%及18/20、19/20、400实际补充对象沿正式门槛，旧S2两组及原15家研究版/29writer不改。元数据资格/独立源参考前不调用，卡内P0—P3/验证/有限后继不逐项停等，最终一次交业务/独审/资源/扩量结论；先清前轮结束本人根、A/B QuoteBak、必要一套后清重复库/导出/日志脚本，原源/有效缓存/失败/attempt及并行保护，沿A/B v3。

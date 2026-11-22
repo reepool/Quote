@@ -1,0 +1,47 @@
+{
+  "task": "6.EV",
+  "candidate_writer": "data/research/company_profile_saved_draft_20261122/600233/company_profile_common_core.v1/bp-work-f5e16b21c76fb7851c247c21.json",
+  "candidate_work_id": "bp-work-f5e16b21c76fb7851c247c21",
+  "original_response_sha256": "29fad702d944d8efde07c4e3233756fff27c73e0595f778714680fa824ce58f7",
+  "original_authored_fact_count": 30,
+  "retained_candidate_fact_count_before_independent_restriction": 28,
+  "original_typed_or_source_gate_isolated_ids": ["F15","F19"],
+  "checked_all_retained_objects": {
+    "text_equal_to_authored_response": true,
+    "subject_scope_equal": true,
+    "period_equal": true,
+    "evidence_ids_equal": true,
+    "metric_count_equal": true,
+    "authored_raw_value_value_unit_source_unit_currency_scope_period_comparison_qualifier_fields_equal": true,
+    "program_invented_or_rewritten_business_values": false
+  },
+  "normalization_operations": ["append_terminal_object_brace","move_elements.limitations_to_root","move_elements.company_features_to_root","move_elements.supply_chain_to_root"],
+  "original_author": "deepseek:deepseek-flash / deepseek-flash",
+  "original_extraction_contract_status": "rejected",
+  "original_selected_reply_supplier_total": 22923,
+  "quality_review": null,
+  "local_job": {
+    "run_id": "6ev-600233-local-saved",
+    "state": "completed",
+    "plan_sha256": "9e4c6102bb1d4d2e5f39e6f87dddacdf50ac739d1ff24f1cef16b532c0bbb426",
+    "new_model_requests": 0,
+    "added_supplier_usage": 0,
+    "no_new_supplier_budget_or_receipts_created": true,
+    "production_authorization": "not_authorized"
+  },
+  "known_independent_restriction": {"fact_id": "F23", "current_fact_sha256": "351e294714704452f84b81502be176bc4c3e17da9fafefb9e31c4abe02b1f2e6", "reference": "a-candidate-use-decisions.json", "applied_to_new_delivery": true, "original_raw_draft_unchanged": true},
+  "final_delivery_check": {
+    "research_root": "data/research/company_profile_saved_draft_release_20261122",
+    "original19_full_annual_projections_unchanged": true,
+    "current_profile_count": 20,
+    "readable_record_count_not_unique_accuracy_objects": 619,
+    "new_600233_readable_pending_or_limited_records": 27,
+    "f23_withheld_and_ordinary_json_markdown_do_not_show_its_false_sentence": true,
+    "source_ancestor_uncertainty_visible_in_api_reading_limitations": true,
+    "annual_profiles_json_sha256": "41dff7e17f5a6e3cfd6e5f1672055d2cd8ddcb0757a9a5c5520db0798b4f4c9a",
+    "annual_profiles_markdown_sha256": "7396fae80d3179aa4e1daf3c3e1fd790baddb98c6761021d6900df65e43be997",
+    "review_execution": "planned_not_sent",
+    "review_recovery_after_extra_display_limit": "A reproduced exact-hash reconstruction failure; B fixed local-normalization branch and six fixture/actual-release positive/tampered-raw/tampered-seed cases passed without bypassing original hash"
+  },
+  "limits": "This verifies no program-written business content, provenance and zero-call local execution; it is not an independent truth assessment of all28 facts. The source-first core/key-number check is in a-source-review.json; source review is still pending explicit bounded authority. Original first-run failures and scores do not change."
+}

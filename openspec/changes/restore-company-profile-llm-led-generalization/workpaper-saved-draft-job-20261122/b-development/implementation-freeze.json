@@ -1,0 +1,52 @@
+{
+  "base_head": "9b9b237f",
+  "mode": "offline local saved draft; no source review execution",
+  "changed_file_sha256": {
+    "research/company_profile/task_entry.py": "23a460ab5245769d0e54984b0676962e09830ff85eb5d4aa4658e14a5bcbe9ef",
+    "research/company_profile/saved_draft_input.py": "32deaeda4138c68189bbf420da8c0bb25d443d1945eec3bf8b12b1017b9f384a",
+    "research/company_profile/operations.py": "61417d270cac76206183e8749e3418d4451aeb123c95fd158f28532e80f82082",
+    "research/company_profile/workpaper_llm.py": "f4f6799bbd0dde2ef773c3d39d772798002a2678236e785cbbd644181c713660",
+    "research/company_profile/workpaper_review.py": "61fd41d14ebf25ef6261cf7d3f2ed90d84e2b7fd146dc4aceeae682855d893ad",
+    "tests/unit/test_research/test_company_profile_saved_draft_job.py": "1b8c097a652ab874a27a37d30bb863757e898df12dc6100e48bf39c2b2f4440e",
+    "tests/unit/test_research/test_company_profile_workpaper_format_consumption.py": "4d9c191560fad6a5f5d20cb4777f2327d8f88b0a213ef978c5912918c9b09cb3",
+    "docs/development/company_profile_task_usage.md": "5f8b9a6731d4d4c2778ffba3753ddba8fa2293dbb9ce8d94785519c90ec832d9"
+  },
+  "original_600233_first_result_budget_marker_unchanged": {
+    "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/budget.json": "90d3599c230e0b64414b73cbc64d6ce34391c8a7bdbd94d176d4e4f898c297bc",
+    "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/result.json": "54eefb5f207b4141405cfa67a8c946cfe6fa90b553a44c822f06d17a4001c2ca",
+    "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/started.json": "e0cbf2d84728ef44084a4360616f643e721d12a724ff36ecf375ccf60b8b8b9c",
+    "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/001.json": "a9b1c5f628637e3a5e4aaee9d23b443d67cdde84fe55a4d82beffa2b18065af9",
+    "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/002.json": "16932ccffeae57cc8563fcc6575d8098fd8a68afb3c78acd2f966886be826689",
+    "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/003.json": "24a1467b127884723cf7053a0ebbcac1905d845522bb9e6d4043a7ee82991a01"
+  },
+  "original19_release_writers_unchanged": 38,
+  "original_new_local_draft_unchanged": true,
+  "final_release_writer_count": 39,
+  "final_profile_count": 20,
+  "local_job_result_path": "/home/python/Quote/data/checkpoints/company_profile_saved_draft_20261122/600233/executions/6ev-600233-local-saved/result.json",
+  "local_job_result_sha256": "e790985752f16d0285a17f4c50206fd359357af313a2cb73538c19cd3c12807b",
+  "review_findings": [
+    {
+      "category": "blocking-fixed",
+      "issue": "selected scope can omit unlocatable headings; match original full source packet, not page bounds",
+      "evidence": "input-verification.json"
+    },
+    {
+      "category": "blocking-fixed",
+      "issue": "review recovery required accepted extraction; now verifies retained rejected bytes plus exact existing normalization proof",
+      "evidence": "review-owner-preparation.json"
+    },
+    {
+      "category": "blocking-fixed",
+      "issue": "failed review reconstruction lost post-extraction local display limitations; exact seed hash retained",
+      "evidence": "recovery-limit-verification.json"
+    }
+  ],
+  "remaining_blocking_local_issues": [],
+  "source_review_status": "planned; requires explicit external-send authorization",
+  "new_network_model_requests": 0,
+  "added_supplier_usage": 0,
+  "no_commit_or_push": true,
+  "original_dirty_unrelated_files_preserved": true,
+  "production_authorization": "not_authorized"
+}

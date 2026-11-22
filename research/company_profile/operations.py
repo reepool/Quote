@@ -995,6 +995,7 @@ class CompanyProfileTaskService:
                 max_items=int(max_items),
                 max_elapsed_seconds=float(max_elapsed_seconds),
                 enqueue=True,
+                limit_drain_to_enqueued=self.processing_identity.get("local_format_only") is True,
             )
         return await self._run(
             knowledge_cutoff=cutoff,
@@ -2027,7 +2028,14 @@ async def execute_published_task(
             )
     access = shared_asset_access or _resolve_shared_asset_access(storage)
     registry = candidate_registry
-    if str(action or "").strip().lower() == "run" and registry is None:
+    local_saved = (processing_identity or {}).get("local_format_only") is True
+    if local_saved and (normalized != "run" or provider is not None or execution_budget is not None
+        or page_source is None or token_budget != 0
+        or not processing_identity.get("workpaper_extraction_resume_hash")
+        or processing_identity.get("workpaper_review_policy")
+        or first_expansion_should_constrain_run(checkpoint_root)):
+        raise ValueError("local saved-content execution cannot construct paid or expansion work")
+    if str(action or "").strip().lower() == "run" and registry is None and not local_saved:
         logger.info("Company-profile entry: loading full-market registry")
         registry = load_official_task_candidate_registry(
             as_of=_knowledge_cutoff(knowledge_cutoff),

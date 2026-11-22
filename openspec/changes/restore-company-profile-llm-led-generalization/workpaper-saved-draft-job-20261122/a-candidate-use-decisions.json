@@ -1,0 +1,25 @@
+{
+  "task": "6.EV",
+  "reviewer": "A independent source reader",
+  "report": {
+    "instrument_id": "600233.SH",
+    "report_id": "asset_bb30ecbd490f9a0a6d6f798d6ea7e87c",
+    "document_version": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "original_rejected_content_sha256": "29fad702d944d8efde07c4e3233756fff27c73e0595f778714680fa824ce58f7",
+  "decisions": [
+    {
+      "fact_id": "F23",
+      "fact_sha256": "351e294714704452f84b81502be176bc4c3e17da9fafefb9e31c4abe02b1f2e6",
+      "disposition": "withheld",
+      "evidence_ids": ["source-0013"],
+      "reason": "A已直接核本报告第三节管理层讨论与分析/五、主要经营情况/主营业务分析，物理第29页。源文只是“本期公司业务类型、利润构成或利润来源发生重大变动的详细说明”勾选不适用；未直接支持F23所断言的“未发生重大变动”。不能由勾选补成经济事实，先局部退出普通正文。",
+      "limitation": "只限制该对象，不撤回其他有据内容；原响应与拒绝状态保留，不新增checkbox规则或手写正确模型答案。"
+    }
+  ],
+  "source_metadata_limit": "原保存章节索引祖先路径写作第八节财务报告096，A核物理第12页的03管理层讨论与分析及第13/14/16/29/30/31页正文可知其祖先标题有历史识别误差。当前恢复不改原源包/引用；定位以报告hash、物理页及原文小节标题为准，章节祖先标签不作为已核精确章名。",
+  "application": "Only attach this explicit independent restriction via the existing UseReview and writer to the exact recovered report/current fact hash. If original gates already removed F23, retain that isolation and report no extra application; never bind to a different hash or force it back. Preserve original raw/first rejection/budget and the prior19 release. A later changed correction needs a separate explicit source decision, not a mutated copy of this frozen reference."
+}

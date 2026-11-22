@@ -1,0 +1,25 @@
+{
+  "task": "6.EV",
+  "scope": "Independent source-first core/key-number and known-risk check, not full-report or formal batch accuracy",
+  "reference": "../workpaper-prospective20-20261122/source-reference-batch2.json:600233.SH",
+  "source_pdf_sha256": "d14fd26f26fff7967b381b808190da9e98f1a7d79dc93f7f56c0929d550a2ed7",
+  "source_pdf_physical_page_count": 305,
+  "direct_pdf_pages_checked": [12,13,14,16,29,30,31],
+  "retained_wire_source_pages_also_read": [20,33],
+  "core": [
+    {"condition": "principal_business", "verdict_on_authored_content": "supported", "fact_ids": ["F01","F02","F03","F28"], "basis": "Physical p13/14/16 explicitly explain express/logistics, self-operated transfer hubs/line haul and franchised pickup/delivery; the draft does not call the whole chain directly operated."},
+    {"condition": "products_services", "verdict_on_authored_content": "supported", "fact_ids": ["F04","F07"], "basis": "Physical p30/31 distinguish domestic timeliness, international express/parcels, value-added, forwarding, aviation and other main products. Forwarding/aviation and end-network roles are not collapsed into licensing fees."},
+    {"condition": "revenue_model", "verdict_on_authored_content": "supported", "fact_ids": ["F06","F07","F08"], "basis": "Physical p30/31 support express-service revenue and main income categories, forwarding/air freight and COD/collect handling fees, with other-main-business distinct from other-business revenue."}
+  ],
+  "key_numbers_checked": [
+    {"fact_id": "F06", "pages": [30], "basis": "Original text explicitly states main business743.37 hundred-million CNY/98.75%, other business9.40/1.25%; the exact table remains7433693.83/93990.92/7527684.74 ten-thousand CNY and is not forcibly merged with rounded text."},
+    {"fact_id": "F07", "pages": [30], "basis": "Six product revenues in ten-thousand CNY match6758515.99/62590.39/34416.87/228441.97/176076.98/173651.63; product and industry axes stay separate."},
+    {"fact_id": "F08", "pages": [30], "basis": "Margins9.19/2.66/21.40/7.75/-7.15/22.76 percent match the respective product rows; negative aviation margin retained."},
+    {"fact_id": "F10", "pages": [20], "basis": "Actually sent original source explicitly gives company revenue752.77 hundred-million CNY, group attributable profit43.22 and express-business attributable profit46.14, with their own labels; these are not summed or substituted."}
+  ],
+  "known_risk": {"fact_id": "F23", "decision": "separate immutable a-candidate-use-decisions.json", "basis": "Physical p29 checkbox does not support no economic change. Withhold only this fact; do not fill a corrected LLM answer."},
+  "source_range_limits": ["Original selected hierarchy ancestor is inaccurate; actual PDF chapter3 and physical pages are independently established. Preserve the original packet and declare hierarchy uncertainty, not silently rewrite its identity.", "Physical p15 layout was already declared unreadable; no inference from lost columns.", "Regional operating-cost blanks at p31 are not zero or borrowed product costs.", "No independent review of every optional figure/customer/channel/feature is claimed."],
+  "normalization_assessment": "Existing strict pure shape check accepts exactly one terminal object brace and moves only the three known nested root fields. Thirty authored fact IDs exist before typed/source gates; actual retained/isolated contents and any later review must be checked from the saved owner output, not inferred from this count.",
+  "formal_acceptance": "not_assessed_and_original_failed_batch_unchanged",
+  "new_model_calls_by_A": 0
+}

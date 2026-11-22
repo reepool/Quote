@@ -103,6 +103,57 @@ python main.py job --job-id company_profile_common_core --action export --execut
 
 精读沿原应用完成选章、抽取和源复核，原稿保留，新增内容以独立阅读批次进入同报告API及`annual_profiles.json`；未找到的内容仍标缺项，不要求全部补齐。源/原稿hash过期、跨股跨报告或计划与动作不符会拒绝；同`run_id`重提只读原结果。需要第二轮时先按当前画像生成新问题计划，再给新执行文件及明确预算，不通过修改旧文件续额。复核未完成时可按已有`review-plan`→`review_batch`接续，无需重新选章/抽取；这也需要对应的新有限授权。
 
+## 已保存拒绝响应：零调用恢复
+
+仅当旧真实抽取为`finish_reason=stop`且现有窄格式归一化可消费时，使用独立本地文件；不是付费计划的豁免开关。文件不含`extract/review/budget`，也不能自动接续源复核：
+
+```json
+{
+  "schema_version": "company_profile_local_task_plan.v1",
+  "run_id": "saved-draft-local",
+  "authorization_status": "authorized",
+  "approval_reference": "本次明确离线授权引用",
+  "action": "run",
+  "instrument_ids": ["600233.SH"],
+  "document_versions": {"600233.SH": "原PDF的64位sha256"},
+  "knowledge_cutoff": "2026-11-22",
+  "output_root": "/absolute/path/new-research-root",
+  "checkpoint_root": "/absolute/path/new-checkpoint-root",
+  "max_elapsed_seconds": 600,
+  "saved_draft": {
+    "checkpoint": {"path": "/absolute/path/original-checkpoint.json", "sha256": "文件64位sha256"},
+    "selection_receipt": {"path": "/absolute/path/original-selection-wire.json", "sha256": "文件64位sha256"},
+    "failed_receipt": {"path": "/absolute/path/original-rejected-wire.json", "sha256": "文件64位sha256"},
+    "ledger": {"path": "/absolute/path/original-budget.json", "sha256": "文件64位sha256"},
+    "selection_sequence": 1,
+    "failed_sequence": 2
+  }
+}
+```
+
+示例中的哈希占位须替换为实际64位十六进制值。绑定唯一股票/报告、原成功选章、原拒绝响应、作者/用量及原处理身份；重建的`source_text + reading_scope`必须与旧实发请求逐字匹配。本地只处理既有允许的容器形状，不补语义、不构造模型客户端或供应商预算。错源、哈希不符、停写或不适用的格式会拒绝；同`run_id`重提只读原结果。
+
+```bash
+python main.py job --job-id company_profile_common_core --action run --execution-plan-file /absolute/path/local.json
+python main.py job --job-id company_profile_common_core --action export --execution-plan-file /absolute/path/local.json --output-directory /absolute/path/new-export-directory
+```
+
+恢复后仍是待核稿，原抽取合同仍为`rejected`，保留归一化操作及前后hash。后续通过原`plan_review_recovery`生成源核计划，只有另获有限模型授权才用`review_batch`执行；本地恢复不会复用旧供应商余额或抹去历史失败。
+
+### 6.EV研究副本：20家可读，不等于20家已审
+
+显式研究根为`/home/python/Quote/data/research/company_profile_saved_draft_release_20261122`，整组文件为该根下的`exports/annual_profiles.json`和`exports/annual_profiles.md`。原19家研究根及旧失败不改；圆通本地恢复稿仍待源复核，F15/F19由原约束隔离，F23由独立UseReview隔离，历史目录祖先标签误差已有定位限制。未切默认配置、未启生产。
+
+```python
+from research.company_profile.reads import CompanyProfileReadService
+reader = CompanyProfileReadService("/home/python/Quote/data/research/company_profile_saved_draft_release_20261122")
+stocks = [p["instrument_id"] for p in reader.research_profile_catalog()["profiles"]]
+batch = reader.research_profiles(stocks)  # 原批量API投影，含缺项、限制及逐条审核状态
+yuantong = reader.research_profile("600233.SH")
+```
+
+使用已有HTTP路由时，仅在独立研究API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT`为上述根；调用`POST /api/v1/research/company/annual-profiles/query`并传`{"instrument_ids":["600233.SH"]}`即可读取，不触发模型或任务。
+
 ## 6.EU整组研究交付：显式根只读使用
 
 本批首发20家，17家有稿；两个零模型工程失败经原窗口内必要后继后，当前研究根可读19家，圆通速递600233.SH仍无稿。数量是可读内容范围，不是正式质量通过；初核/终核、独立有限核查和缺项仍分别保留。原首发失败不改，未切换默认研究配置或共享API服务，未启生产。

@@ -1,0 +1,22 @@
+{
+  "new_model_requests": 0,
+  "new_supplier_budget": false,
+  "actual_prepare_review_recovery_passed": true,
+  "actual_seed_material_passed": true,
+  "original_raw_draft_sha256": "7ed10a639cd9eb95694068480a74dd913272f8caacd37d966dbcfe9bd7ee98e4",
+  "raw_draft_unchanged": true,
+  "release_before_metadata_sha256": "56d81f4674382da984b21fc6be98d40dc455e391c29d95c5b3243a77a1ae7b8f",
+  "release_after_metadata_sha256": "9d5705c559ee8810fe1eb50cf7c8a77916e2c707a1f6fc547e09f0fc94833b40",
+  "release_workpaper_sha256": "d9e5c4518c40f41f7c0ce6b00735f7c053ace392ea0e42d212799f66246f3370",
+  "workpaper_and_plan_unchanged": false,
+  "rejected_receipt_raw_sha256": "29fad702d944d8efde07c4e3233756fff27c73e0595f778714680fa824ce58f7",
+  "extraction_contract_status": "rejected",
+  "source_packet_still_exact": true,
+  "independent_f23_restriction_inherits": true,
+  "final_single_fresh_equals_existing_export": true,
+  "active_source_review_authorization": "pending",
+  "sent": false,
+  "location_limitation_added_plan_rebuilt": true,
+  "original_raw_draft_unchanged": true,
+  "original19_projection_identical": true
+}

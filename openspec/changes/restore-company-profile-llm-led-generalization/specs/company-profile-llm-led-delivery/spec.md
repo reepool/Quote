@@ -5,6 +5,13 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 ### Requirement: The existing job command accepts an explicit bounded workpaper plan
 The CLI and scheduled-task adapter MUST forward an explicitly supplied execution plan file to the company-profile application adapter. The adapter MUST reuse the existing configuration, gateway, budget, workpaper identity and published task owner for first_read, review_batch or enrich. It MUST require explicit authorized scope, stock/report versions, configured profile identities and finite limits before model construction; it MUST reject unknown plan fields, profile drift and out-of-scope report requests. Constructed model dependencies MUST remain local to this explicit invocation, without changing shared configuration, default routes or production schedules. It MUST NOT implement another extraction/review loop.
 
+#### Scenario: A local saved-content plan uses the existing job without model construction
+- **WHEN** a caller explicitly authorizes a new local-only execution file for one saved rejected workpaper response, its accepted original selection, matching report/PDF version and original model attribution
+- **THEN** the adapter MUST dispatch the existing run/TaskService/runtime/writer path without constructing LLM clients, requiring model credentials, creating a new supplier budget or implicitly performing source review
+- **AND** only the existing strict local structural normalization may be used; original raw rejection/usage stay unchanged, hash/source/type/number checks and local quarantine still apply, and useful content is delivered as unreviewed with normalization provenance
+- **AND** run_id reuse, publication-stop and mismatched-input rejection MUST remain effective; paid first_read/review_batch/enrich plans retain their authorization/limits and serialization fingerprints without inheriting a free local bypass
+- **AND** a later source review requires its own explicit bounded authority and the existing review owner; pending local recovery does not alter historical scores, unrelated profiles or production authorization
+
 #### Scenario: A saved API gap plan is executed through the daily job
 - **WHEN** a caller supplies an explicitly authorized enrich execution file containing exactly one stock and its existing report/hash-bound enrichment plan
 - **THEN** the adapter MUST reject mismatched stock/version or a missing plan, and forward the original concrete questions to TaskService.enrich for its existing lineage/hash checks, targeted selection/extraction and source review
@@ -510,6 +517,8 @@ The v9 workpaper path MUST optimize useful business content per reading and mode
 - **WHEN** a new bounded authorization explicitly selects a saved, locally normalized LLM workpaper as a review seed
 - **THEN** the existing seed/source binding and review owner MAY review it without rerunning extraction or carrying a local-only extraction continuation into the review run
 - **AND** the original extraction remains rejected with its original content/model/usage attribution; new review/repair/final calls are separate, and rendering MUST distinguish unreviewed from actually reviewed candidates without implying trusted release
+- **AND** the saved rejected bytes MUST match their original hash and reproduce the exact recorded strict normalization; ordinary unnormalized extraction still requires an accepted receipt
+- **AND** subsequent recovery MUST preserve independent restrictions and any added source-display limitations only when they reconstruct the exact original review-input hash; it MUST NOT skip that hash check, invent missing source content or silently clear the limitations after a failed review
 
 #### Scenario: An already allowed retry follows a malformed workpaper JSON response
 - **WHEN** an explicitly opted-in workpaper request fails JSON or Schema validation and its existing profile/card still permits a physical retry

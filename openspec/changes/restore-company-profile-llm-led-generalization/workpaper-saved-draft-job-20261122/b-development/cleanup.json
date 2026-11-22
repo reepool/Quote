@@ -1,0 +1,29 @@
+{
+  "removed_exact_path": "/home/python/Quote/data/QuoteBak/company-profile-6ev-b-XmezIFaO",
+  "recoverable_from": "necessary proofs/tests in b-development; intended new delivery and original source preserved",
+  "removed_file_count": 265,
+  "released_logical_file_bytes": 23602676,
+  "removed_categories": [
+    "owned test databases",
+    "scratch scripts and logs",
+    "replaced duplicate local exports"
+  ],
+  "preserved": [
+    "original PDF/cache/failed responses and budgets",
+    "original19 release",
+    "raw local draft/checkpoint/result",
+    "single final20 release/exports",
+    "A and unrelated temporary roots"
+  ],
+  "active_owned_test_or_execution_sessions": 0,
+  "source_review_authorization": "planned",
+  "new_model_requests": 0,
+  "recovery_limit_follow_up": {
+    "removed_exact_path": "/home/python/Quote/data/QuoteBak/company-profile-6ev-b-recovery-UcB1AL4D",
+    "removed_file_count": 2,
+    "released_logical_file_bytes": 10314,
+    "processes": "targeted pytest finished; only this loaded cleanup driver",
+    "preserved": "all existing release/raw/result/plan/source assets and prior proofs",
+    "new_model_requests": 0
+  }
+}

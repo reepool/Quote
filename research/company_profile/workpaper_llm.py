@@ -441,9 +441,21 @@ def run_workpaper(
         skip_unlocatable_sections=local_sections,
     )
     if local_only:
+        expected_source = extraction_resume.get("expected_source_packet_sha256")
+        if expected_source is not None and expected_source != hashlib.sha256(json.dumps({
+            "reading_scope": packet.reading_scope.model_dump(mode="json"),
+            "source_text": packet.model_text(),
+        }, ensure_ascii=False, sort_keys=True).encode()).hexdigest():
+            raise ValueError("saved extraction source packet differs from reconstructed source")
         extracted, normalization = normalize_retained_workpaper_format(raw_failure)
         extracted = normalize_workpaper_draft(extracted)
         failed_call = WorkpaperModelCall.model_validate(extraction_resume.get("failed_call"))
+        if expected_source is not None:
+            # The exact original wire packet was matched above. Attribute its
+            # actual evidence pages, not section bounds containing empty edges.
+            failed_call = failed_call.model_copy(update={"physical_pages": tuple(sorted({
+                span.page for item in packet.evidence for span in item.source_spans
+            }))})
         if (failed_call.purpose != "extract_profile_workpaper"
             or failed_call.contract_status != "rejected"
             or failed_call.finish_reason != "stop"
@@ -470,6 +482,9 @@ def run_workpaper(
                      if item.get("request_id") in {selection_id, extraction_id})
     if retained_selection is not None:
         receipts = (dict(retained_selection, receipt_origin="retained_receipt"), *receipts)
+    if local_only:
+        receipts = (*receipts, dict(failed_call.model_dump(mode="json", exclude_none=True),
+            raw_content=raw_failure, receipt_origin="retained_rejected_receipt"))
     author_identity = extraction_resume.get("original_processing_identity", {}) if local_only else processing_identity
     if local_only and (not author_identity.get("prompt_version") or not author_identity.get("preprocessing_version")):
         raise ValueError("retained extraction processing identity is required")

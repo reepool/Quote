@@ -1,0 +1,23 @@
+{
+  "environment": "approved local ASGI HTTP, no external destination",
+  "explicit_root": "/home/python/Quote/data/research/company_profile_saved_draft_release_20261122",
+  "batch_status": 200,
+  "detail_600233_status": 200,
+  "delivered": 20,
+  "missing": [],
+  "http_equals_export_and_fresh_read": true,
+  "f23_withheld": true,
+  "writer_hashes_unchanged": true,
+  "detail_api_sha256": "0244cf6fb752c58a1bad331931e824eb7d323d935ced942d6e9428b9de9751ea",
+  "new_model_requests": 0,
+  "annual_json": "/home/python/Quote/data/research/company_profile_saved_draft_release_20261122/exports/annual_profiles.json",
+  "annual_json_sha256": "41dff7e17f5a6e3cfd6e5f1672055d2cd8ddcb0757a9a5c5520db0798b4f4c9a",
+  "annual_markdown": "/home/python/Quote/data/research/company_profile_saved_draft_release_20261122/exports/annual_profiles.md",
+  "annual_markdown_sha256": "7396fae80d3179aa4e1daf3c3e1fd790baddb98c6761021d6900df65e43be997",
+  "earlier_same_card_batch_api_sha256": "a40813100abbe7778d866be906be20b661dd413822f09def6f6d14dbf6be4770",
+  "final_detail_after_location_limit_status": 200,
+  "location_limitation_visible_in_http": true,
+  "final_detail_equals_final_export": true,
+  "original19_not_retested": true,
+  "batch_proof": "prior same-owner 20-stock HTTP + original19 projection equality + final changed600233 HTTP"
+}

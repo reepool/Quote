@@ -1,5 +1,21 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 369. 6.EV 保存真实底稿接日常入口：圆通零新模型交27条待核内容，20股研究读取成立
+
+用户“继续”，A先按产品→验收→交付→A/B v3和唯一change核主线，9b9b237f/master暂存空；现19稿已可用，剩余圆通旧实发正文只是缺末尾对象括号及三类已知字段层级误放，已有严格归一化可用。A明确先复用旧内容、不整批付费重抽：冻结company-profile-saved-draft-job-card.md，B沿原main job/run→TaskService/runtime/writer接显式local_task_plan，A直接读正式PDF/原实发源文、核业务主干及源值并末端独审。原6.EU/S2失败、次数/账本不改，无新公司、默认配置切换或生产授权。
+
+业务：[20股当前画像人读版](../../../data/research/company_profile_saved_draft_release_20261122/exports/annual_profiles.md)/同目录年度JSON可由原API读。圆通原30作者事实经原typed/source约束留28（F15/F19隔离），A核原29页仅不适用勾选不支持“未发生重大变动”，在新交付副本以精确hash UseReview隔离F23，27 pending/limited仍可读；未手改LLM答案或写勾选规则。原19家592记录完整投影/38writer不变，新合计619记录非独立正确事实数；原作者deepseek-flash、原抽取rejected、旧usage与归一化hash保留，quality_review为空，不把可读20当已审或阶段通过。
+
+程序只补实际接点：本地文件一股/报告/hash及旧checkpoint/选章/失败响应/账本绑定，在LLM配置/客户端/供应商budget构造前转原run，只drain本次scope；旧三类付费计划/指纹/授权不变。原实发source_text+reading_scope与重建包精确哈希匹配，篡改即0发送拒绝；现有归一化算法不改，不补字符串/数组/要素或语义值。拒绝稿复核准备原owner现重算规范化凭证、匹配原raw/rejected而不晋升accepted；真源核仍需另行批准。API定位祖先误差以现有限制说明，不改历史源包、原句或扩目录改造。
+
+验证：实际原CLI local run completed、同run_id重提保持文件hash/mtime不变，无新budget/receipts；54通过/2排除及66通过/4排除有重叠分列，原付费入口兼容与格式/复核接续只作工程证据。A末端独立复现显示限制加入后的失败源核seed重建hash拒绝，B在本卡只修local-normalization分支保限制且仍比原hash，6正反含真实release及篡改raw/seed最终全过；不重复大套、不跳hash。磁盘e7909857与canonical61fb45两hash为同一result不同序列化口径，澄清无补造历史。源复核计划及seed供源零调用就绪，HTTP新圆通及20批量200，API/JSON/人读版/新实例一致；原19不重新逐股测。
+
+A另核28保留对象全部文字/主体/期间/引用/原指标业务值未被程序补写，三基础问题及主要收入/产品毛利对正式物理页原文有支持；全稿其他可选项未独审、不报99%。A管理的a-source-review、a-local-content-validation及不可变F23判断与B机械回执分开。Review实际阻塞均已最小修复，其他供应链细目/可选字段/精确祖先标题不追齐；无关基线脏配置/scheduler/骨架/市场C类不碰，文档只隔离本轮块。
+
+资源与权限：本轮新业务模型0、新外部发送0、新供应商usage0，旧圆通3物理/75782已知total/费用unknown保持。单稿新的6000秒/1m/6物理含3恢复源核请求已合并询问，尚无明确答复，source-review-task-plan仍planned，不能借旧余额或称审核执行成功；本地部分连续交完不等付费回复。后续如批准仅接此稿初核/至多一次合并修订及终核，不重做前段/其他公司，不自动扩量/生产。
+
+清理：B确切主根265文件23602676字节及末端复验根2文件10314字节均清，共267文件23612990字节；A无新临时脚本/库，原正式PDF/有效缓存、旧首次/失败/预算/回执、raw候选、原19及新20交付根保留。源码/测试/回执hash、OpenSpec strict与有限Review通过，原有脏段落不整份提交；本人隔离Git/普通push结果见最终会话。A/B活跃时间未精确计量，不把等待墙钟或模型token冒充开发耗时。结果与限制详workpaper-saved-draft-job-20261122/result.md。
+
 ## 368. 6.EU 新20家整卡：首发17，通用阻塞修复后19份研究画像交付，正式扩量不通过
 
 用户明确“同意你的建议，授权实施”，A规划独立读源/B子代理开发执行，按OpenSpec apply与business-first沿唯一change整卡完成。3f0b7003/master开工暂存空；20未见资格、6/6/4/4分层、沪9/深9/北2/14行业及60基础参考按股首次模型前冻结，参考不送模型。原日常CLI→TaskService→网关→唯一writer，首发期间不热修，不新建评分/调度平台、不逐股请批，旧S2失败及原15研究版保护。整卡/结果见[6.EU结果](workpaper-prospective20-20261122/result.md)。
