@@ -4177,6 +4177,7 @@ class CommonGatewaySemanticProvider:
         max_output_tokens: int,
         timeout_seconds: float,
         profile_override: str | None = None,
+        local_format_recovery: bool = False,
     ) -> Mapping[str, Any]:
         """Versioned v9 purposes, through the same adapter and public gateway."""
         if purpose not in {
@@ -4185,6 +4186,8 @@ class CommonGatewaySemanticProvider:
             "verify_profile_workpaper_repair",
         }:
             raise ValueError("unregistered workpaper purpose")
+        if local_format_recovery and purpose != "extract_profile_workpaper":
+            raise ValueError("local format recovery is only an extraction response policy")
         if purpose in {"review_profile_workpaper", "verify_profile_workpaper_repair"} and not profile_override:
             raise ValueError("explicit workpaper reviewer profile is required")
         if profile_override:
@@ -4231,6 +4234,7 @@ class CommonGatewaySemanticProvider:
             include_page_contexts=False,
             system_instruction_override=instructions,
             profile_override=profile_override,
+            raw_workpaper_extraction=local_format_recovery,
         )
 
     def interpret(self, request: ReportSemanticRequest) -> Mapping[str, Any]:
@@ -4414,6 +4418,7 @@ class CommonGatewaySemanticProvider:
         partition_count: int | None = None,
         system_instruction_override: str | None = None,
         profile_override: str | None = None,
+        raw_workpaper_extraction: bool = False,
     ) -> dict[str, Any]:
         workpaper_reading = schema_version == "company_profile_workpaper_wire.v1"
         report_reading = schema_version in {
@@ -4680,6 +4685,12 @@ class CommonGatewaySemanticProvider:
                 sort_keys=True,
                 separators=(",", ":"),
             )
+        if raw_workpaper_extraction:
+            from utils.llm.schema import compact_schema_instruction
+
+            # Use the gateway's existing text mode for this versioned business
+            # response only: local validation must precede any paid JSON retry.
+            system_instruction = compact_schema_instruction(model_schema) + "\n" + system_instruction
         llm_request = LlmRequest(
             profile=profile_override or self._profile,
             messages=(
@@ -4697,7 +4708,7 @@ class CommonGatewaySemanticProvider:
             # only the task/object-reachable schema to the provider.  The
             # configured route currently uses json_object, so a full model
             # schema would otherwise be embedded in the prompt.
-            response_schema=model_schema,
+            response_schema=None if raw_workpaper_extraction else model_schema,
             schema_name=schema_name,
             schema_version=schema_version,
             temperature=0,
@@ -4781,7 +4792,14 @@ class CommonGatewaySemanticProvider:
                     },
                 }
                 self.workpaper_receipts.append(workpaper_receipt)
-            normalized_response = normalize_response(response.data)
+            if raw_workpaper_extraction:
+                from .workpaper_llm import _strict_workpaper_json
+
+                original_payload = _strict_workpaper_json(response.raw_content)
+                workpaper_receipt["response_payload"] = original_payload
+                normalized_response = normalize_response(original_payload)
+            else:
+                normalized_response = normalize_response(response.data)
             if isinstance(normalized_response, _NormalizedExtractPayload):
                 rejected_items = normalized_response.rejected_items
                 normalized_response = normalized_response.data

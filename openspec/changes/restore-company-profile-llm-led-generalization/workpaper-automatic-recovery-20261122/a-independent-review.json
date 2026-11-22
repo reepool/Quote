@@ -1,0 +1,40 @@
+{
+  "task": "6.EX",
+  "scope": "Independent structural/content preservation and new ordinary-path review; not new model semantic quality",
+  "historical_response": {
+    "path": "data/checkpoints/company_profile_prospective20_20261122/600233/executions/6eu-600233-first_read/receipts/002.json",
+    "finish_reason": "stop",
+    "raw_content_sha256": "29fad702d944d8efde07c4e3233756fff27c73e0595f778714680fa824ce58f7",
+    "independent_json_error": "Expecting ',' delimiter at character 18025",
+    "allowed_shape_operations": ["append_terminal_object_brace", "move_elements.limitations_to_root", "move_elements.company_features_to_root", "move_elements.supply_chain_to_root"],
+    "independent_expected_normalized_object_sha256": "74107510f2f77f179080b6e6255913092ec075b8faa8db18e8eb4236e451bcf7",
+    "author_fact_count": 30,
+    "previous_typed_source_retained": 28,
+    "previous_isolated_ids": ["F15", "F19"],
+    "retained_text_evidence_ids_subject_period_identical_to_authored": true,
+    "basis": "A parsed the actual original response by only the listed container edits without using the normalization function as the judge, then compared retained content against the protected original local workpaper. Full semantic correctness is not inferred from identical contents."
+  },
+  "new_implementation_review": {
+    "source_review": "Only the existing company-profile provider extraction path opts into the existing gateway text mode; no global JSON parser or shared configuration changed. New workpaper_format_recovery identity is passed through ordinary runtime policy comparison.",
+    "new_path": "Typed normal responses stay on the original bind/writer path. Only one matching rejected stop receipt with its exact raw-content hash can use the existing strict normalization; provenance keeps rejected and typed/source/numeric gates still apply.",
+    "saved_real_replay": "B actual ordinary-path replay used the saved successful selection and rejected response without local_format_only/resume identity; only selection/extraction were consumed and original 30 authored facts retained 28 with F15/F19 isolated.",
+    "independent_hash_agreement": "B normalized_object_sha256 matches A independently computed 74107510f2f77f179080b6e6255913092ec075b8faa8db18e8eb4236e451bcf7",
+    "actual_source_packet_agreement": "B directly compared actual extraction transport source_text+reading_scope with original002 payload; both hashes bbd9b9c8ada541b703a3a99dddbe8f70471a7f8f7fbd5504c47e818f36abe0ea, no rebinding old answers to a changed source packet",
+    "controlled_origin_limit": "Saved supplier response is replayed under a controlled test gateway route. Test route/request metadata is not represented as a new real supplier run, and zero new supplier/model consumption is claimed.",
+    "mixed_batch": "Original configured disk plan/TaskService delivered nonempty three-core-answer profiles for normal and eligible malformed responses while the genuinely truncated string remained absent/failed. Same IDs did not resend, and later failed review kept the draft readable.",
+    "pause_contract_clarification": "A paused after extraction may still finish verify/publish metadata on resume. Protect authoritative workpaper/generation/receipts/source/usage and no repeated sends; do not wrongly require the unfinished low-level runtime record to be byte frozen. Completed job result/ledger idempotency remains strict.",
+    "final_verification": {
+      "reports": ["automatic-tests.xml", "compatibility-tests.xml", "gateway-tests.xml", "corrected-tests.xml", "final-entry-tests.xml"],
+      "latest_outcome_per_distinct_testcase": {"passed": 37, "failed": 0, "errors": 0, "skipped": 0},
+      "earlier_failures_retained": "Two pause assertions incorrectly treated an unfinished runtime's top-level provider_calls phase summary as immutable; no source/fact/author/usage assertion was removed. Final check protects authoritative workpaper+receipts and all completed-record bytes instead.",
+      "actual_pause_scope": "Paused after the first extraction, before subsequent stages finished; fresh service completed remaining company. Transport count 2 before resume, 4 after, 4 after completed repeat; initial workpaper/receipts unchanged, completed records byte identical on repeated resume.",
+      "review_conclusion": "Current ordinary-path automatic recovery and finite mixed-batch engineering acceptance passed; no new real-model quality, unseen result or formal expansion permission inferred.",
+      "real_model_limit": "New extraction uses the existing gateway text mode with schema instructions so business-local parsing precedes paid JSON retry. Its effect on fresh supplier JSON compliance/quality is not established by controlled transport or the saved-response replay; this remains a named purpose of the separately authorized prospective validation.",
+      "remaining_closeout": "A independently recomputed six current implementation/test/usage hashes and 138 old protected source/research/receipt/budget hashes: all matched. B removed 185 owned temporary files/10705939 logical bytes, exact root absent. Strict validation and diff review passed; isolated commit/push closes the engineering card."
+    }
+  },
+  "prospective_plan": "../company-profile-automatic-path-validation-plan.md; metadata/hash only; no source-semantic calibration or send authorization",
+  "new_model_requests": 0,
+  "old_failed_batches": "unchanged",
+  "production_authorization": "not_authorized"
+}

@@ -1,5 +1,9 @@
 ## Context
 
+### 6.EX 新版普通首读复用窄格式恢复
+
+当前local_format_only需要显式手工计划，普通first_read仍会为可本地恢复的格式失败消耗恢复调用或结束无稿。新处理身份仅对实际finish=stop抽取拒绝复用既有严格normalize_retained_workpaper_format，在同一原provider/runtime中接续typed/source约束和writer，原响应拒绝不晋升accepted；规范化与实际源核分开。deferred先交、原inline及review_batch接续保持，不在全局网关造宽松解析器。保存真实响应重放与磁盘混合批量只证明工程路径，旧20股和正式失败不改；A并行准备下一前瞻合同，未批不外呼。写集/停止/清理见company-profile-automatic-recovery-card.md。
+
 ### 6.EW 既有能力收成日常研究版本
 
 复用已交付的首读、保存计划复核、单股定向补读及同报告API/年度导出，不新增业务循环或完成门禁。原20股由既有writer保存到新的研究交付根；圆通600233只在本次明确有限授权下复用旧真实稿和公开选章走原review_batch，至多一次必要合并修订及终核。旧release/raw/rejected/账本、独立限用和正式失败保留，研究使用与正式扩量仍分开。A并行核实际变化和内容主干，B负责实现/运行/用法/机械验证，临时物先核后清、末端一套证据后清理。详company-profile-daily-research-delivery-card.md。

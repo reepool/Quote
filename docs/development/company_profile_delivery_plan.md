@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-22 [6.EX自动首读收口已交](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-recovery-20261122/result.md)：A规划独审/B连续实施，既有严格归一化已接新版普通入口，原raw/rejected/作者/usage与typed/source约束不变，旧身份重试兼容。保存响应原供源精确重放、混合批量/inline/deferred/暂停新实例接续成立，37不同用例最终通过，0新真实调用，不新增平台或现20股版本。138旧文件及当前6文件hash保护、185临时文件10705939字节清理完成；原S2/6.EU失败及正式质量/生产不改，后续真实前瞻方案须独立限定批准并冻结参考后才发。
+
 2026-11-22 [6.EW日常研究版本已交](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-daily-research-delivery-20261122/result.md)：A规划独审/B连续实施，原20股当前根company_profile_daily_release_20261122提供API/JSON/人读版、620可读记录/834指标及来源/模型/缺项。圆通旧稿仅接续源核，3物理/0恢复/76047已知total/294.660业务秒/unknown；唯一修订F23经A重读正式PDF新hash限用接受，其余27事实不改。农行已知服务遗漏进入API提示，按股补读计划不执行；正确解释器/唯一当前根用法已交，历史示例改链接，不重复重抽/长测。95旧文件/冻结代码/旧根保护、原18投影不改；研究交付有限通过，旧S2/6.EU失败及95%/99%未评保持，未扩大20/100或生产。必要证据一套后清本人临时库/脚本/重复输出，沿A/B v3；后续按实际股票/问题使用已有链路。
 
 2026-11-22 [6.EV本地整卡交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saved-draft-job-20261122/result.md)：已有严格local_format_only经原日常job/run实际恢复圆通待核稿，无重选章/重抽或新模型请求；28原约束保留对象中F23独立隔离，27可读并进入新20股研究根，原19投影/原首次失败不改。API定位限制、原作者/rejected/旧usage、缺项与审核分别可见，619记录不是准确率；54和66两组相关验证及末端6项正反通过，重叠分列。源码Review/strict/本人隔离Git、267文件23612990字节临时清理同卡完成；源核计划planned，收到限定新批准后才能沿原review_batch执行，不续旧额、不扩大样本/生产或追供应链。

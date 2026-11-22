@@ -1,0 +1,61 @@
+{
+  "kind": "offline controlled transport, not new real model success",
+  "first_delivered": 2,
+  "first_missing": [
+    "600002.SH"
+  ],
+  "all_three_core_answers_nonempty": true,
+  "physical_sequence": [
+    {
+      "instrument_id": "600000.SH",
+      "purpose": "select_profile_sections",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600000.SH",
+      "purpose": "extract_profile_workpaper",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600002.SH",
+      "purpose": "select_profile_sections",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600002.SH",
+      "purpose": "extract_profile_workpaper",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600001.SH",
+      "purpose": "select_profile_sections",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600001.SH",
+      "purpose": "extract_profile_workpaper",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600000.SH",
+      "purpose": "review_profile_workpaper",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600001.SH",
+      "purpose": "review_profile_workpaper",
+      "physical_timeout_seconds": 20.0
+    },
+    {
+      "instrument_id": "600001.SH",
+      "purpose": "review_profile_workpaper",
+      "physical_timeout_seconds": 20.0
+    }
+  ],
+  "repeated_ids_no_resend": true,
+  "pause_resume_no_resend": true,
+  "review_failure_keeps_pending": true,
+  "original_first_writers_unchanged": true,
+  "api_export_fresh_equal": true,
+  "new_real_model_requests": 0
+}

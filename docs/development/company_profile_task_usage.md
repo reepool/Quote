@@ -63,6 +63,16 @@ Content-Type: application/json
 
 显式执行文件的日常job只初始化已有研究存储，直接转原任务方法，不启动无关行情源或继承调度器的默认运行时限。该手动路径不传报告通知配置，因此不会外发任务报告；结果、预算及每次实际请求回执保存在本次检查点目录。回执保公开请求正文、供应商响应对象及其中未改写的正文字符串，不保认证头或URL查询参数；它不是原始HTTP字节。旧无文件job仍沿原调度行为。
 
+### 正常首读的自动纯格式恢复（6.EX）
+
+新建处理身份的`workpaper_format_recovery=local_shape_before_retry.v3`沿正常`first_read/run`自动启用，无需用户先另建local_format_only文件。抽取响应仅在公司画像适配器使用网关既有text模式，原schema仍随请求指令提供，由业务owner先严格解析；不改全局网关、配置或模型额度。
+
+合法响应照常消费。仅实际`finish_reason=stop`的拒绝正文可尝试已有严格归一化：补一个末尾对象brace，及无冲突的limitations/company_features/supply_chain字段归根。字符串/数组截断、缺要素、重复键、非有限数或不明确归位一律不猜补，length不作格式恢复。不可恢复时直接停止该股本次抽取，不为同一坏JSON再付费重试；批量其余已有可用内容保留。
+
+这里针对已返回的非空抽取正文，不取消网关原有、受累计预算约束的网络或空响应恢复；模型源核仍有自己的明确预算和状态。
+
+恢复后仍经原typed/source/数字校验及坏对象隔离，保原raw、模型作者/usage、`rejected`状态和归一化操作/前后hash；不伪装模型原生accepted，也不是二次源核。deferred照常先交待核稿，inline及保存计划review_batch照常走原源核owner。旧v2身份保持原网关重试/反馈行为；已完成的旧run_id不重发或重写。显式local_format_only仍为0模型，不能借此开启复核。当前验证均为离线受控/已保存响应重放，不是新真实LLM成绩或新增调用授权。
+
 ## 首读文件示例
 
 先替换本次实际名单、来源版本、预算及研究根。只有获得本次授权后，才将`authorization_status`改为`authorized`并填写`approval_reference`；文件中的文字本身不是授权。凭据仍由原项目配置/环境提供，文件不得包含密钥。具体profile必须已在原配置启用，且model/host/指定思考强度一致；不隐式路由或切换模型。

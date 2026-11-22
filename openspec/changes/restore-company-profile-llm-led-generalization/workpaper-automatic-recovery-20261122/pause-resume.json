@@ -1,0 +1,21 @@
+{
+  "kind": "offline controlled real pause after first extraction, new service resumes remaining work",
+  "first_result": "paused",
+  "first_delivered": 1,
+  "resumed_state": "completed",
+  "final_delivered": 2,
+  "physical_calls_before_resume": 2,
+  "physical_calls_after_resume": 4,
+  "after_completed_repeat": 4,
+  "first_record_changed_fields": [
+    "provider_calls"
+  ],
+  "workpaper_and_original_receipts_unchanged": true,
+  "stage_summary_provider_calls_before": [
+    "select_profile_sections",
+    "extract_profile_workpaper"
+  ],
+  "stage_summary_provider_calls_after": [],
+  "completed_records_byte_identical_on_repeat": true,
+  "new_real_model_requests": 0
+}

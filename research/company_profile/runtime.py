@@ -213,6 +213,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "review_existing_draft_hash",
             "review_resume_hash",
             "review_seed_receipts_hash",
+            "workpaper_format_recovery",
             "workpaper_review_recovery",
             "workpaper_extraction_resume_hash",
             "workpaper_enrichment",

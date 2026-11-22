@@ -4,6 +4,8 @@
 
 ## Why
 
+6.EX将已验证的窄格式恢复接回新版普通首读，避免同一种纯形状错误仍需人工救稿和额外模型重试。仅复用既有算法与原provider/runtime/writer，保原raw/rejected/作者/usage及typed/source约束，原deferred/inline复核继续有效；保存真实失败与混合批量从日常磁盘计划离线验证，不重抽现20股。A独审并准备前瞻验收范围/质量/累计资源，新的真实调用具体范围另行合并批准；旧失败/95%/99%及生产权限不改。见company-profile-automatic-recovery-card.md。
+
 6.EW承接用户明确授权，以当前20股的日常研究交付为本轮完成点：原API可消费画像/审核/缺项，圆通保存稿按已提出的有限方案只补源核，已有两阶段及按股精读路径交可运行用法。A独审/B实施，同卡收口内容、实际资源及清理；沿现有规范和唯一owner，不新建接口/平台，不以新研究副本改变旧正式失败或自动扩量/生产。边界见company-profile-daily-research-delivery-card.md。
 
 6.EV继续优先复用已保存真实内容，圆通旧finish=stop响应符合现有严格末尾对象括号/已知字段归位条件；原纯形状检查不等于已交画像或已核准确。这轮将既有local_format_only沿原job/run执行文件落地，取得有源待核稿并保原作者/rejected/usage，原19与正式失败不变；真实单稿源核须新限定批准，不为一处格式失败整批重抽或新造JSON修补框架。完整边界见company-profile-saved-draft-job-card.md。

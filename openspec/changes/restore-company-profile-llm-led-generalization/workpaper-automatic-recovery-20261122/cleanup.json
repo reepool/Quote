@@ -1,0 +1,20 @@
+{
+  "removed_exact_path": "/home/python/Quote/data/QuoteBak/company-profile-6ex-b-rAsXp5Ju",
+  "removed_files": 185,
+  "released_logical_file_bytes": 10705939,
+  "active_owned_test_sessions": 0,
+  "removed": [
+    "owned synthetic databases",
+    "temporary scripts/logs",
+    "test copies and duplicate exports"
+  ],
+  "preserved": [
+    "existing daily20 and prior research roots",
+    "official source PDF/cache/raw/receipt/budget",
+    "single necessary current evidence",
+    "A planned metadata/reference material",
+    "unrelated worktree and temporary roots"
+  ],
+  "previous_EW_EV_exact_roots_absent": true,
+  "new_real_model_or_network_requests": 0
+}

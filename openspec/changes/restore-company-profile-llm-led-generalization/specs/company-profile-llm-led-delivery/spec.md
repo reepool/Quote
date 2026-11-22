@@ -5,6 +5,13 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 ### Requirement: The existing job command accepts an explicit bounded workpaper plan
 The CLI and scheduled-task adapter MUST forward an explicitly supplied execution plan file to the company-profile application adapter. The adapter MUST reuse the existing configuration, gateway, budget, workpaper identity and published task owner for first_read, review_batch or enrich. It MUST require explicit authorized scope, stock/report versions, configured profile identities and finite limits before model construction; it MUST reject unknown plan fields, profile drift and out-of-scope report requests. Constructed model dependencies MUST remain local to this explicit invocation, without changing shared configuration, default routes or production schedules. It MUST NOT implement another extraction/review loop.
 
+#### Scenario: A new-version ordinary first read recovers an eligible structural rejection
+- **WHEN** an explicitly versioned workpaper first-read path receives a rejected extraction with finish_reason=stop and the exact raw response satisfies the existing strict terminal-object-brace/known-field-relocation normalization
+- **THEN** it MUST reuse that normalization locally before another paid format retry and continue the existing typed/source/numeric checks, writer and graded research delivery without completing strings, arrays, missing elements or business values
+- **AND** the original raw response, rejected contract status, author/model and actual usage MUST remain intact alongside normalization operations and before/after hashes; successful normalization MUST NOT be represented as native model acceptance or semantic review
+- **AND** the ordinary inline reviewer and deferred saved-plan reviewer MUST use their existing owners; unknown anchors, wrong versions, ambiguous keys, nonfinite values and truncated outputs retain their rejection/isolation rules, and independent restrictions cannot be silently removed
+- **AND** historical identities and explicit local-only plans retain their original behavior; the new behavior MUST NOT relax global gateway parsing, reopen exhausted budgets or mutate saved research releases
+
 #### Scenario: A local saved-content plan uses the existing job without model construction
 - **WHEN** a caller explicitly authorizes a new local-only execution file for one saved rejected workpaper response, its accepted original selection, matching report/PDF version and original model attribution
 - **THEN** the adapter MUST dispatch the existing run/TaskService/runtime/writer path without constructing LLM clients, requiring model credentials, creating a new supplier budget or implicitly performing source review
