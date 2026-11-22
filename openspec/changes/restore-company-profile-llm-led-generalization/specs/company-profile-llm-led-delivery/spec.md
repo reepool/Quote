@@ -90,6 +90,18 @@ New batch acceptance contracts MUST separate substantive principal-business, mai
 ### Requirement: Source-backed uncertainty does not require deterministic closure
 New workpapers MUST retain source qualifications such as approximate values, bounds, differing units and unclear scope without forcing exact normalization. A metric MAY carry a null normalized value with its original spelling, source reference and uncertainty reason. Such a metric MUST NOT enter exact arithmetic. Facts with unclear scope MAY retain sourced text and an explicit uncertainty reason. Rendering MUST expose the qualification and original source, and MUST NOT label unknown scope as absence of disclosure. Correctly qualified uncertainty alone MUST NOT trigger repair or block the remaining profile or review workflow. Known false assertions and invalid evidence MUST remain withdrawn or rejected, not laundered by an uncertainty label. Historical results MUST remain unchanged.
 
+#### Scenario: A supported description contains a locally invalid metric
+- **WHEN** an explicit independent source-use decision supports the current fact's unchanged narrative and unaffected metrics but identifies particular invalid normalized metrics
+- **THEN** the existing owner MAY retain that narrative and unaffected metrics as limited research content while excluding the identified metrics from every ordinary API/export numeric payload
+- **AND** the component restriction MUST bind the exact report and current fact-content hash plus original metric positions; unknown, duplicate, stale, reordered or out-of-range targets MUST fail before writing, and API gaps MUST identify the omitted metrics and reasons without presenting their bad normalized values as usable data
+- **AND** raw facts, text, metrics, evidence, author/model review and original quality results MUST remain unchanged; old whole-fact restrictions and absent component decisions retain legacy behavior and serialization, while review continuations MUST preserve current component restrictions
+- **AND** no component decision may rescue an incorrect narrative or unsupported citation, infer a replacement value/scope/direction, or silently upgrade an entire fact to fully checked/complete status
+
+#### Scenario: A selected PDF paragraph has superscript note digits adjacent to a quantity
+- **WHEN** a new explicitly versioned selected-chapter transcription can unambiguously distinguish superscript note markers from body numbers using actual PDF typography and positioning
+- **THEN** it MUST keep the note markers structurally separate from the body quantity, retain source-page mapping and table/header context, and MUST NOT concatenate them into a different number
+- **AND** uncertain positioning stays verbatim with an explicit limitation rather than guessed numeric correction; historical preprocessing identities/source packages/offsets and saved response attribution remain unchanged, and the operation MUST reuse the existing PDF/source owner rather than introduce a parallel parser or stock-specific rule
+
 #### Scenario: A retained review predates display-only qualifications
 - **WHEN** a hash-bound review continuation reuses its exact original draft and stage receipts under newer source checks
 - **THEN** every original fact and source span is revalidated, but display-only qualification or normalization notes MUST NOT rewrite that retained review input

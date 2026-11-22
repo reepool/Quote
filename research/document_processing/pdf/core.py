@@ -362,14 +362,77 @@ def detect_text_quality(
     return "usable", tuple(diagnostics)
 
 
+def _separate_layout_note_markers(page, layout: str) -> tuple[str, tuple[str, ...]]:
+    """Annotate corroborated superscripts, without changing any body glyph.
+
+    This opt-in pass uses the same pypdf page/visitor, not another parser.
+    Font size alone is insufficient: require a lower-page note definition,
+    raised position, adjacent larger numeric text and a unique layout anchor.
+    """
+    spans = []
+
+    def collect(text, cm, tm, _font, size):
+        if text.strip() and not any(abs(v) > 1e-6 for v in (tm[1], tm[2], cm[1], cm[2])):
+            spans.append((text.strip(), tm[4] * cm[0] + cm[4],
+                          tm[5] * cm[3] + cm[5], abs(size * tm[0] * cm[0])))
+
+    plain = page.extract_text(visitor_text=collect) or ""
+    definitions = {m[1] for m in re.finditer(r"(?m)^[ \t]*(\d{1,2})[ \t]+[^\d\s].{4,}$", plain)}
+    edits, limitations = [], []
+
+    def spaced(value):
+        return r"\s*".join(re.escape(char) for char in value)
+
+    for i in range(1, len(spans) - 1):
+        marker, x, y, size = spans[i]
+        body, bx, by, body_size = spans[i + 1]
+        prefix, _px, py, _ps = spans[i - 1]
+        if (marker not in definitions or not size or body_size <= 0
+            or not re.fullmatch(r"\d[\d,.]*", body) or len(prefix) < 2
+            or not re.search(r"[^\W\d_]$", prefix)
+            or not .35 <= size / body_size <= .8
+            or not .1 * body_size <= y - by <= .7 * body_size
+            or not 0 <= bx - x <= 1.2 * size or abs(py - by) > .15 * body_size):
+            continue
+        # The corresponding definition must actually have a separate, lower
+        # baseline and smaller text, not just a matching number in a table.
+        if not any(t == marker and dy < by - body_size and ds < .8 * body_size
+                   and j + 1 < len(spans) and len(spans[j + 1][0]) >= 4
+                   and re.match(r"[^\W\d_]", spans[j + 1][0])
+                   for j, (t, _dx, dy, ds) in enumerate(spans)):
+            continue
+        number = body
+        for chunk, _cx, cy, cs in spans[i + 2:i + 10]:
+            if abs(cy - by) > .05 * body_size or abs(cs - body_size) > .05 * body_size or not re.fullmatch(r"[\d,.]+", chunk):
+                break
+            number += chunk
+        if not re.fullmatch(r"\d+(?:,\d{3})*(?:\.\d+)?", number) or not any(c in number for c in ",."):
+            continue
+        pattern = re.compile(spaced(prefix[-40:]) + r"\s*(?P<note>" + re.escape(marker) + r")\s*" + spaced(number))
+        matches = list(pattern.finditer(layout))
+        if len(matches) != 1:
+            limitations.append("脚注排版候选无法唯一绑定布局原文，保留原字形；相邻数字不可据此强制标准化。")
+            continue
+        start, end = matches[0].span("note")
+        edits.append((start, end, "[注" + marker + "]"))
+    for start, end, replacement in sorted(set(edits), reverse=True):
+        layout = layout[:start] + replacement + layout[end:]
+    return layout, tuple(dict.fromkeys(limitations))
+
+
 class PypdfNativeAdapter:
     name = "pypdf"
     version = PDF_PARSER_VERSION
 
-    def __init__(self, *, extraction_mode: str = "plain") -> None:
+    def __init__(self, *, extraction_mode: str = "plain", preserve_note_markers: bool = False) -> None:
         if extraction_mode not in {"plain", "layout"}:
             raise ValueError("native text mode must be plain or layout")
         self.extraction_mode = extraction_mode
+        self.preserve_note_markers = preserve_note_markers
+        if preserve_note_markers:
+            if extraction_mode != "layout":
+                raise ValueError("structured note markers require selected layout mode")
+            self.version = PDF_PARSER_VERSION + ".structured-notes.v1"
 
     def extract(self, content: bytes, *, target_pages: Sequence[int] = (), progress_callback: Optional[Callable[[NativePage], None]] = None, page_count_callback: Optional[Callable[[int], None]] = None) -> NativeResult:
         started = time.perf_counter()
@@ -410,12 +473,19 @@ class PypdfNativeAdapter:
                             if self.extraction_mode == "layout"
                             else page.extract_text()
                         ) or ""
+                        note_diags = ()
+                        if self.preserve_note_markers:
+                            try:
+                                text, notes = _separate_layout_note_markers(page, text)
+                            except (ValueError, TypeError, AttributeError, IndexError, ArithmeticError):
+                                notes = ("脚注结构元数据不足，保留原布局字形；相邻数字不可据此强制标准化。",)
+                            note_diags = tuple(PdfDiagnostic("layout_note_unresolved", note, number) for note in notes)
                         try:
                             width = float(reader.pages[number - 1].mediabox.width)
                             height = float(reader.pages[number - 1].mediabox.height)
                         except (AttributeError, TypeError, ValueError):
                             width = height = None
-                        item = NativePage(number, text, time.perf_counter() - page_started, width_points=width, height_points=height)
+                        item = NativePage(number, text, time.perf_counter() - page_started, note_diags, width_points=width, height_points=height)
                         pages.append(item)
                         if progress_callback is not None:
                             progress_callback(item)

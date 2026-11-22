@@ -1,0 +1,21 @@
+{
+  "report_sha256": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+  "official_pdf_path": "/home/python/Quote/data/filings/announcements/blobs/d6/d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3.pdf",
+  "physical_page": 44,
+  "old_preprocessing": "toc_sections_native_layout.v7.ordered-section-remap",
+  "old_packet_source_sha256": "7b33fa0c55e43ad25d758608496d4ab3ad87621fb9b8839834b23f2d3a33f653",
+  "original_sent_source_sha256": "7b33fa0c55e43ad25d758608496d4ab3ad87621fb9b8839834b23f2d3a33f653",
+  "old_v7_source_packet_exactly_matches_original_wire": true,
+  "original_receipt_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/600015/executions/6ey-600015-first_read/receipts/002.json",
+  "original_receipt_sha256": "6a7ee8a6b2a50f3cd4a0c2b64a15dcde9e4b20eecc3e846706704474c348c053",
+  "old_page_text_sha256": "bea990f6021f5b0d0f0346d588a38753702fd331fbf9f0bc40be61a171e0244d",
+  "new_page_text_sha256": "f5251cd4853888d7c7ecae17b85ef81d5eaa36eae9a5af796af4618c507a0400",
+  "new_extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+  "new_lines": [
+    "的属地零售生态。截至报告期末，本行零售客户群体稳中有进，零售客户总数[注4]4,012.44",
+    "万户。其中，私人银行客户[注5]2.02             万户，比上年末增长          21.71%；消费信贷客户[注6]56.11         万"
+  ],
+  "replacing_note_markup_back_reproduces_entire_old_page_exactly": true,
+  "old_F25_F37_unchanged": true,
+  "scope": "Previously seen PDF engineering check only; no old response attached to new text; no new model or semantic score."
+}

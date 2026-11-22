@@ -1,0 +1,35 @@
+{
+  "new_root": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122",
+  "visible_fact_records": 599,
+  "visible_metric_records": 932,
+  "restored_facts": 8,
+  "withheld_metrics": 15,
+  "safe_metrics_recovered": 12,
+  "coarse_objects_unchanged": 4,
+  "metric_gap_example": {
+    "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+    "fact_id": "F007",
+    "element": "revenue_model",
+    "state": "limited",
+    "metric_gaps": [
+      {
+        "metric_index": 0,
+        "name": "煤炭产品销售收入",
+        "state": "withheld",
+        "reason": "煤炭销售收入的业务范围错标集团。保留原文及原公司营业收入指标，不能将错误指标改名/改标签后冒称LLM已修正。"
+      }
+    ],
+    "metric_source_indices": [
+      1
+    ]
+  },
+  "final_P1_test": "test_query_export_follow_exact_component_limited_successor_not_unrestricted_parent: writer base -> partial child -> changed/coarse grandchild; default query/export follows grandchild; explicit work_id preserves history",
+  "EY_release_files_protected": 87,
+  "original_first_files_protected": 257,
+  "older_files_protected": 138,
+  "old_source_v7_exact_wire_proof": "transcription-verification.json",
+  "new_model_calls": 0,
+  "new_supplier_usage": 0,
+  "historical_accuracy_unchanged": 0.9789674952198852,
+  "counts_are_not_new_quality": true
+}

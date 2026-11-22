@@ -775,6 +775,13 @@ def workpaper_fact_hash(fact: WorkpaperFact) -> str:
     return hashlib.sha256(json.dumps(fact.model_dump(mode="json"), ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
+class WorkpaperMetricRestriction(_Model):
+    """An independent restriction on an original metric position, never a repair."""
+
+    metric_index: int = Field(ge=0, strict=True)
+    reason: str = Field(min_length=1)
+
+
 class WorkpaperUseDecision(_Model):
     fact_id: str = Field(min_length=1)
     fact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -782,6 +789,14 @@ class WorkpaperUseDecision(_Model):
     evidence_ids: tuple[str, ...] = Field(min_length=1)
     reason: str = Field(min_length=1)
     limitation: str | None = None
+    metric_restrictions: tuple[WorkpaperMetricRestriction, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        if not self.metric_restrictions:
+            payload.pop("metric_restrictions", None)
+        return payload
 
 
 class WorkpaperUseReview(_Model):
@@ -855,6 +870,11 @@ class CompanyProfileWorkpaper(_Model):
                 seen.add(decision.fact_id)
                 if workpaper_fact_hash(facts[decision.fact_id]) != decision.fact_sha256:
                     raise ValueError("independent use-review fact content is stale")
+                indices = [item.metric_index for item in decision.metric_restrictions]
+                if len(indices) != len(set(indices)) or any(
+                    index >= len(facts[decision.fact_id].metrics) for index in indices
+                ):
+                    raise ValueError("unknown, duplicate or out-of-range independent metric restriction")
                 if set(decision.evidence_ids) - sources.keys():
                     raise ValueError("independent use review cites unknown evidence")
         return self
@@ -1174,7 +1194,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper, *, delivery: Mapping | 
             out.append(f"- {label}{uncertain}{fact.text}（{refs}）")
             if entry is not None and entry["state"] in {"pending", "limited"}:
                 out.append("  - 使用限制：" + "；".join(entry["reasons"]))
-            for metric in fact.metrics:
+            metrics = (WorkpaperMetric.model_validate(item) for item in entry["fact"]["metrics"]) if entry else fact.metrics
+            for metric in metrics:
                 out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
         for limitation in element.limitations:
             out.append(f"- 限制：{limitation}")
@@ -1194,7 +1215,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper, *, delivery: Mapping | 
                 out.append(f"- {label}{uncertain}{fact.text}（{refs}）")
                 if entry is not None and entry["state"] in {"pending", "limited"}:
                     out.append("  - 使用限制：" + "；".join(entry["reasons"]))
-                for metric in fact.metrics:
+                metrics = (WorkpaperMetric.model_validate(item) for item in entry["fact"]["metrics"]) if entry else fact.metrics
+                for metric in metrics:
                     out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
             out.extend(f"- 限制：{limit}" for limit in element.limitations)
             out.append("")

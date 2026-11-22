@@ -144,11 +144,21 @@ class CompanyProfileReadService:
                 if not profile.get("workpaper"):
                     continue
                 record = selected.get(profile["instrument_id"])
+                base_record = record
+                if record is not None and record.work_id != profile["work_id"]:
+                    # A component-limited lineage may end in a stricter whole-
+                    # fact restriction. Keep its actual hash-linked successor.
+                    candidate = self._latest_by_instrument(work_id=profile["work_id"], include_enrichments=True).get(profile["instrument_id"])
+                    if (isinstance(candidate, CompanyProfileRuntimeRecordV3)
+                        and isinstance(base_record, CompanyProfileRuntimeRecordV3)
+                        and candidate.report == base_record.report
+                        and self._research_profile_from_record(base_record)["latest_reading_work_id"] == candidate.work_id):
+                        record = candidate
                 if (not isinstance(record, CompanyProfileRuntimeRecordV3)
                     or record.work_id != profile["work_id"]
                     or record.workpaper.model_dump(mode="json") != profile["workpaper"]):
                     raise ValueError("selected company-profile snapshot changed during export")
-                annual_profiles.append(self._research_profile_from_record(record))
+                annual_profiles.append(self._research_profile_from_record(base_record))
         profile_state = str(queried.get("state") or "idle")
         written: list[str] = []
         if profiles or views:
@@ -441,6 +451,32 @@ class CompanyProfileReadService:
         else:
             selected = [latest[key] for key in sorted(latest)]
             missing = []
+        if processing_identity is None and work_id is None:
+            # Legacy single-reading queries keep their old selection. Only an
+            # explicit metric restriction opts into its exact linked successor.
+            component_records = {}
+            all_records = {}
+            for path in self.namespace_root.glob("*.json"):
+                try:
+                    candidate = _RUNTIME_ADAPTER.validate_json(path.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                all_records[candidate.work_id] = candidate
+                if (isinstance(candidate, CompanyProfileRuntimeRecordV3) and candidate.workpaper.use_review
+                    and any(d.metric_restrictions for d in candidate.workpaper.use_review.decisions)):
+                    component_records[candidate.work_id] = candidate
+            if component_records:
+                for index, base in enumerate(selected):
+                    if isinstance(base, CompanyProfileRuntimeRecordV3) and any(c.report == base.report for c in component_records.values()):
+                        lineage = self._research_profile_from_record(base)
+                        if any(r["work_id"] in component_records for r in lineage["readings"]):
+                            from .workpaper_review import workpaper_hash
+
+                            successor = all_records.get(lineage["latest_reading_work_id"])
+                            if (not isinstance(successor, CompanyProfileRuntimeRecordV3) or successor.report != base.report
+                                or workpaper_hash(successor.workpaper) != lineage["readings"][-1]["workpaper_sha256"]):
+                                raise ValueError("component-restricted lineage changed while querying")
+                            selected[index] = successor
         return [self.render_profile(item) for item in selected], missing
 
     def _latest_by_instrument(
@@ -561,6 +597,13 @@ class CompanyProfileReadService:
                 "delivery_pending_review_count": delivery["pending_review_count"],
                 **{f"delivery_{key}_count": value for key, value in delivery["counts"].items()},
             }
+            if any(entry.get("metric_gaps") for entry in delivery["facts"]):
+                visible = [entry["fact"] for entry in delivery["facts"] if entry["fact"] is not None]
+                profile["workpaper_summary"].update(
+                    fact_count=len(visible), metric_count=sum(len(fact["metrics"]) for fact in visible),
+                    metric_gaps=[{"fact_id": entry["fact_id"], "element": entry["element"], **gap}
+                                 for entry in delivery["facts"] for gap in entry.get("metric_gaps", [])],
+                )
         elif isinstance(record, CompanyProfileRuntimeRecordV2):
             from .report_interpretation import research_views
 
@@ -827,6 +870,9 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
         "workpaper_status",
         *(f"workpaper_{name}" for name in workpaper_fields),
     ]
+    has_metric_gaps = any((p.get("workpaper_summary") or {}).get("metric_gaps") for p in profiles)
+    if has_metric_gaps:
+        fieldnames.append("workpaper_metric_gaps")
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
@@ -838,6 +884,8 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
             freshness = profile.get("freshness") or {}
             workpaper = profile.get("workpaper_summary") or {}
             workpaper_values = {f"workpaper_{name}": workpaper.get(name) for name in workpaper_fields}
+            if has_metric_gaps:
+                workpaper_values["workpaper_metric_gaps"] = json.dumps(workpaper.get("metric_gaps", []), ensure_ascii=False)
             description = workpaper_values["workpaper_business_description"]
             if isinstance(description, str) and description.lstrip().startswith(("=", "+", "-", "@")):
                 # External/model text must remain text when opened in a spreadsheet.

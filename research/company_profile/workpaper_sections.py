@@ -102,7 +102,8 @@ class SectionPacket(_Model):
                 f"[[{evidence.evidence_id}]] {' / '.join(evidence.section_path)}",
             ])
             for span in evidence.source_spans:
-                if evidence.table_context and "布局未恢复" in evidence.table_context:
+                if evidence.table_context and ("布局未恢复" in evidence.table_context
+                    or "structured-notes" in self.reading_scope.transcription_version):
                     out.append(evidence.table_context)
                 out.extend([f"物理页 {span.page}", "```text", span.quote, "```"])
         return "\n".join(out)
@@ -241,6 +242,7 @@ def build_section_packet(
     remap_layout: bool = False,
     max_characters: int = 160_000,
     skip_unlocatable_sections: bool = False,
+    preserve_note_markers: bool = False,
 ) -> SectionPacket:
     by_page = _source_pages(pages)
     page_metadata = {int(p.get("page", p.get("page_number"))): p for p in pages}
@@ -309,6 +311,9 @@ def build_section_packet(
         "shared-pdf-layout-with-native-fallback.v2" if remap_layout and limitations
         else "shared-pdf-pypdf-layout.v1" if remap_layout else "source_page_text.v1"
     )
+    if remap_layout and preserve_note_markers:
+        transcription = ("shared-pdf-layout-with-native-fallback.structured-notes.v3" if limitations
+                         else "shared-pdf-pypdf-layout.structured-notes.v1")
     return SectionPacket(
         report=report,
         reading_scope=WorkpaperReadingScope(
@@ -330,12 +335,13 @@ def build_section_packet(
 
 def extract_selected_layout(
     content: bytes, page_numbers: Sequence[int], *, native_pages: Sequence[Mapping] | None = None,
-    section_bounds: Sequence[IndexedSection] = (),
+    section_bounds: Sequence[IndexedSection] = (), preserve_note_markers: bool = False,
 ) -> tuple[dict, ...]:
     """Use the shared native PDF owner in opt-in fixed-width layout mode."""
     from research.document_processing.pdf import PypdfNativeAdapter, detect_text_quality
 
-    result = PypdfNativeAdapter(extraction_mode="layout").extract(content, target_pages=page_numbers)
+    options = {"preserve_note_markers": True} if preserve_note_markers else {}
+    result = PypdfNativeAdapter(extraction_mode="layout", **options).extract(content, target_pages=page_numbers)
     requested = set(page_numbers)
     if native_pages is None and set(page.page_number for page in result.pages) != requested:
         raise ValueError("native layout extraction did not return every selected page")
@@ -373,7 +379,8 @@ def extract_selected_layout(
         # Keep that text and its coordinates: low character count is not a
         # decoding failure, and must not discard the following business pages.
         metadata = {}
-        if quality not in {"usable", "low_text"} or page is None or page.diagnostics or lost_heading or empty_remap:
+        fatal_diagnostics = bool(page and any(d.code != "layout_note_unresolved" for d in page.diagnostics))
+        if quality not in {"usable", "low_text"} or page is None or fatal_diagnostics or lost_heading or empty_remap:
             if native_pages is None:
                 raise ValueError(f"selected page has unreadable native layout: {number}")
             text = fallback.get(number, "")
@@ -390,6 +397,10 @@ def extract_selected_layout(
             }
             if not readable:
                 text = ""
+        elif preserve_note_markers and page.diagnostics:
+            metadata["layout_limitation"] = "；".join(d.message for d in page.diagnostics)
+        if preserve_note_markers and not metadata.get("extraction_method"):
+            metadata["extraction_method"] = "shared-pdf-pypdf-layout.structured-notes.v1"
         pages.append({
             "page": number, "text": text, "readable": quality in {"usable", "low_text"},
             "text_hash": hashlib.sha256(text.encode()).hexdigest(),

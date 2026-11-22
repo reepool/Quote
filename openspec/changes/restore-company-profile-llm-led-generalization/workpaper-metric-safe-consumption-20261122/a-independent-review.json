@@ -1,0 +1,56 @@
+{
+  "task": "6.EZ",
+  "reviewer": "A/main",
+  "status": "engineering_and_existing_content_consumption_accepted_not_new_semantic_acceptance",
+  "baseline_commit": "90ce0055",
+  "authority": "a-source-use-decisions.json",
+  "authority_sha256": "3aa24510ce180a72f1694a21229923ffe4698629ed932e3dcb318e045ccbaf29",
+  "business_result": {"companies": 20, "previous_readable_records": 591, "current_readable_records": 599, "previous_metric_records": 920, "current_metric_records": 932, "source_backed_narratives_restored": 8, "other_source_checked_original_metrics_recovered": 12, "known_bad_metrics_excluded": 15, "whole_fact_restrictions_unchanged": 4, "counts_are_not_accuracy_or_all_independently_audited": true},
+  "direct_main_content_checks": {
+    "original_fact_hashes_and_metric_positions": "All8 current public facts match A-authorized original text/subject/period/evidence and retained metric dictionaries exactly; no new values, scope labels or signs inferred. Explicit current hash and original indices bind the decision.",
+    "unchanged_other_fact_projection_entries": 1210,
+    "stored_raw_records_compared": 40,
+    "stored_records_with_allowed_derived_changes": 4,
+    "allowed_changes": "Only independent use decisions and seven element-group gap-note changes replacing the prior whole-fact restriction with a source-backed partial-use successor explanation. Model-authored limitations, facts/all27 original target metrics, generation/quality review/usage, report identity and all other fields compare equal.",
+    "api_current_state": "Fresh CompanyProfileReadService research_profiles(all20) equals persisted annual-api.json. Actual query(four affected companies) selects the exact current work IDs, all8 facts limited, gaps carry original names/positions/reasons without bad normalized values.",
+    "api_canonical_json_sha256": "b67fca4613d17d3e9958e44108d22db5f3771ac82716de2109a4b5a0bc93be17",
+    "initial_validation_assumption": "One main metadata comparison only removed the old 独立源核： prefix and rejected the legitimate new 独立源核后继说明. Corrected the comparison boundary to permitted independent gap metadata; no business data or implementation was changed to satisfy that assertion. Final raw40-record comparison passed."
+  },
+  "direct_main_source_checks": {
+    "report_sha256": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+    "physical_page": 44,
+    "basis": "Main read original pypdf visitor glyph/font/position and actual lower-page definitions, not formatter self-report: footnotes4/5/6 font156 on raised baselines versus body240.",
+    "actual_new_markers": ["4","5","6"],
+    "actual_body_counts_in_wan_accounts": ["4012.44","2.02","56.11"],
+    "new_page_text_sha256": "f5251cd4853888d7c7ecae17b85ef81d5eaa36eae9a5af796af4618c507a0400",
+    "body_and_layout_preservation": "Independently replaced only the three [注N] labels back to their original digits and reproduced the whole old page exactly.",
+    "ordinary_financial_tables": [{"instrument_id": "600348.SH", "physical_page": 21, "new_equals_old": true, "text_sha256": "de2d33791cb7bbabd1bdc295bef67689c715391b43fa5d1b817dd1fdfa103a9e"}, {"instrument_id": "000651.SZ", "physical_page": 24, "new_equals_old": true, "text_sha256": "fe2b190fcbd2b8faa4c120bea27e6b0813088cbce692ad42d1d07ae8563f2e7f"}],
+    "legacy_source_wire": "Main directly read original receipt002, file sha6a7ee8a6b2a50f3cd4a0c2b64a15dcde9e4b20eecc3e846706704474c348c053 and actual user.source_text sha7b33fa0c55e43ad25d758608496d4ab3ad87621fb9b8839834b23f2d3a33f653. These match B's exact old-v7 packet reconstruction, not a new source attached to the saved response.",
+    "limitation": "Conservative structural recognition, not an exhaustive proof for every report/typography or evidence of improved new-model understanding. Old F25/F37 stay withdrawn."
+  },
+  "review_findings": {
+    "blocking_found": 1,
+    "blocking_fixed": "Initial component-only query candidate map could fall back to an unrestricted base after a partial child produced a stricter coarse grandchild. B now follows the actual same-report/hash-validated latest successor and refuses inconsistent snapshots. Final original-writer/read/export three-node test passes; explicit historical work_id access remains unchanged.",
+    "nonblocking": "No attempt to perfect optional supply chain, reclassify every legacy metric or prove new-model accuracy. Source warnings/version are visible without mutating old packets.",
+    "unrelated": "Existing dirty config/scheduler/core skeleton/market code and historical documentation remain outside this task."
+  },
+  "verification": {
+    "code_and_release_hashes_directly_checked": 96,
+    "code_files": 9,
+    "current_release_files": 87,
+    "test_receipts": ["combined-tests.xml", "recovery-tests.xml", "close-tests.xml", "p1-final-tests.xml"],
+    "passing_cohort_sizes_not_added": [54,41,26,16],
+    "distinct_test_identities_final_outcome_passed": 72,
+    "failed_attempts_retained": "One missing-required-fields test fixture and two source-request observation mistakes (top-level vs payload) were fixed without removing business assertions; earlier XML remains. Cohorts overlap and unchanged-path proofs were reused, not reported as another full run or new semantic evaluation.",
+    "readable_and_numeric_exports": "Actual original writer/read API, CSV, Markdown, annual JSON and fresh-instance receipts checked; partial metrics stay omitted with gaps, source-only/whole-withheld body not rescued.",
+    "openspec_strict": "passed in process with OPENSPEC_TELEMETRY=0 and DO_NOT_TRACK=1",
+    "tool_telemetry_note": "B's initial intended-local status command attempted default CLI telemetry and failed DNS; it then disabled telemetry per process. No business/model/source material was sent, no shared configuration changed."
+  },
+  "protection_and_cleanup": {"EY_release_files_verified": 87, "original_first_files_verified": 257, "older_files_verified": 138, "B_task_root_removed": true, "A_new_temporary_root": "none", "logical_bytes_removed": 26108804, "removed_scope": "Exact owned6.EZ QuoteBak root and exited uniquely-owned pytest-37; generated scripts/test stores/duplicate process output only. Official PDF/cache/raw/runtime/failed calls/budgets/old release roots retained."},
+  "new_business_model_calls": 0,
+  "new_supplier_usage": 0,
+  "historical_EY_accuracy_unchanged": 0.9789674952198852,
+  "formal_acceptance_or_100_expansion": "not_authorized_by_this_card",
+  "production_authorization": "not_authorized",
+  "active_A_review_time": "not precisely measured; model/runtime waits not counted as developer/auditor active time"
+}

@@ -362,13 +362,18 @@ def inherit_recovery_use_review(paper, link: ReviewRecoveryLink):
             continue
         fact = current[1]
         unchanged = decision.fact_sha256 == workpaper_fact_hash(fact)
-        if not unchanged and decision.disposition == "source_checked":
+        if not unchanged and decision.disposition == "source_checked" and not decision.metric_restrictions:
             continue
         payload = decision.model_dump(mode="json")
         if not unchanged:
             payload.update(fact_sha256=workpaper_fact_hash(fact), evidence_ids=list(fact.evidence_ids),
                 reason="继承原独立使用限制，模型接续不自动解除；" + decision.reason,
                 limitation="修订后仍保留原限制；未进行新的独立原文核查。")
+            if decision.metric_restrictions:
+                # Positions cannot be rebound after model edits/reordering. Fail
+                # closed at the fact level until a new independent decision.
+                payload.pop("metric_restrictions", None)
+                payload["disposition"] = "withheld"
         decisions.append(payload)
     if not decisions:
         return paper
@@ -406,8 +411,13 @@ def seed_material(seed, *, report, source_pdf_path, real: bool, native_pages=Non
             raise ValueError("review seed PDF hash differs from report")
         numbers = sorted({span.page for item in paper.evidence for span in item.source_spans})
         layout_options = {}
-        if (paper.generation and paper.generation.preprocessing_version == "toc_sections_native_layout.v7.ordered-section-remap"
-            and paper.reading_scope.transcription_version == "shared-pdf-layout-with-native-fallback.v2"):
+        note_markers = bool(paper.generation and paper.generation.preprocessing_version == "toc_sections_native_layout.v8.structured-note-markers")
+        fallback = paper.reading_scope.transcription_version in {
+            "shared-pdf-layout-with-native-fallback.v2", "shared-pdf-layout-with-native-fallback.structured-notes.v3"}
+        if note_markers:
+            layout_options["preserve_note_markers"] = True
+        if (paper.generation and (note_markers or paper.generation.preprocessing_version == "toc_sections_native_layout.v7.ordered-section-remap")
+            and fallback):
             if native_pages is None:
                 raise ValueError("ordered-remap review requires the original native pages")
             by_id = {section.section_id: section for section in index_sections(native_pages)}
@@ -416,7 +426,7 @@ def seed_material(seed, *, report, source_pdf_path, real: bool, native_pages=Non
             layout_options["section_bounds"] = tuple(by_id[section.section_id] for section in paper.reading_scope.sections)
         pages = extract_selected_layout(
             content, numbers,
-            native_pages=native_pages if paper.reading_scope.transcription_version == "shared-pdf-layout-with-native-fallback.v2" else None,
+            native_pages=native_pages if fallback else None,
             **layout_options,
         )
         paper.validate_pages(pages)

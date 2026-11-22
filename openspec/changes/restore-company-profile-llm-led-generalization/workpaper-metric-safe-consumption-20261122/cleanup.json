@@ -1,0 +1,16 @@
+{
+  "B_temp_root": "/home/python/Quote/data/QuoteBak/company-profile-6ez-b-md4SqAgB",
+  "B_temp_bytes_before_removal": 18610620,
+  "removal_status": "complete; all task verification/export processes exited, exact owned QuoteBak root removed and absence confirmed; no original source/research artifact removed",
+  "other_owned_test_roots_removed": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/pytest-of-python/pytest-37",
+      "bytes": 7498184,
+      "ownership": "new 6.EZ component-case directory and exact recovery-tests.xml scope, exited/no lock"
+    }
+  ],
+  "retained": "one new business release/API/JSON/Markdown; authority, compact proof/test XML and original official PDF/cache/raw/runtime/budgets remain",
+  "older_6EY_root_absent": true,
+  "protected_origins_verified": true,
+  "unrelated_or_parallel_paths_removed": false
+}

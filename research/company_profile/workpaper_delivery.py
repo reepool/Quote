@@ -74,6 +74,7 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
     checked = Counter(review.checked_fact_ids) if review else {}
     decisions = {d.fact_id: d for d in paper.use_review.decisions} if paper.use_review else {}
     facts = []
+    metric_gaps = []
     counts = dict.fromkeys(DELIVERY_LABELS, 0)
     for element, group in workpaper_elements(paper).items():
         for fact in group.facts:
@@ -113,18 +114,40 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                 state = "limited"
                 reasons.append((decision.limitation if decision else None) or fact.uncertainty_reason
                                or "保留原文主体、数值或近似限定，不作为确定值使用。")
+            restrictions = decision.metric_restrictions if decision is not None else ()
+            if restrictions and state not in {"source_only", "withheld", "duplicate"}:
+                state = "limited"
+                reasons.append("独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。")
             counts[state] += 1
             excluded = state in {"source_only", "withheld", "duplicate"}
             basis_label = {"independent_source_check": "独立源核", "model_source_check": "模型源核"}.get(basis)
             if state == "limited" and basis == "not_reviewed":
                 basis_label = "待核"
             label = DELIVERY_LABELS[state] + (f"／{basis_label}" if basis_label else "")
+            payload = fact.model_dump(mode="json")
+            component_metadata = {}
+            if restrictions and not excluded:
+                blocked = {item.metric_index for item in restrictions}
+                component_metadata = {
+                    "metric_gaps": [{"metric_index": item.metric_index, "name": fact.metrics[item.metric_index].name,
+                                     "state": "withheld", "reason": item.reason}
+                                    for item in restrictions],
+                    "metric_source_indices": [i for i in range(len(fact.metrics)) if i not in blocked],
+                }
+                payload["metrics"] = [item for i, item in enumerate(payload["metrics"]) if i not in blocked]
+                metric_gaps.append({"element": element, "fact_id": fid, "status": "unclear",
+                    "metric_indices": sorted(blocked),
+                    "metric_names": [fact.metrics[i].name for i in sorted(blocked)],
+                    "evidence_ids": list(fact.evidence_ids),
+                    "reasons": [item.reason for item in restrictions],
+                    "suggested_reading": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。"})
             facts.append({
                 "fact_id": fid, "element": element, "state": state,
                 "label": label, "review_basis": basis, "model_review_stage": model_stage,
                 "reasons": reasons, "evidence_ids": list(fact.evidence_ids),
                 # Excluded values stay in raw workpaper audit, not normal delivery.
-                "fact": None if excluded else fact.model_dump(mode="json"),
+                "fact": None if excluded else payload,
+                **component_metadata,
             })
     pending_review_count = sum(e["fact"] is not None and e["review_basis"] == "not_reviewed" for e in facts)
     information_gaps = [
@@ -140,6 +163,11 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
         if finding.original_fact is None and finding.resolution in {
             "omission_candidate", "repair_rejected", "verification_failed"}
     ]
+    information_gaps.extend(metric_gaps)
+    suggested_acquisitions.extend({"element": gap["element"], "fact_id": gap["fact_id"],
+        "metric_indices": gap["metric_indices"], "metric_names": gap["metric_names"], "severity": "material",
+        "reason": gap["suggested_reading"] + " " + "；".join(gap["reasons"]),
+        "evidence_ids": gap["evidence_ids"]} for gap in metric_gaps)
     return {"policy_version": "company_profile_research_delivery.v1", "research_only": True,
             "formal_acceptance": "not_assessed", "production_authorization": "not_authorized",
             "information_gaps": information_gaps, "suggested_acquisitions": suggested_acquisitions,

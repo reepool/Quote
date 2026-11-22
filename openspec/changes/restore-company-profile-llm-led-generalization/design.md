@@ -1,5 +1,11 @@
 ## Context
 
+### 6.EZ 有源描述与指标局部可靠性分开
+
+复用现有UseReview的独立来源/事实hash约束，显式增加最窄的原metric位置限制；没有新决定的旧记录保持旧序列化和粗粒度行为。安全投影从未改的raw fact派生，保正文/未受影响metrics，省略坏指标并公开限用/指标缺项；不能据名字/正则给scope或sign改值，也不能自动救错误正文/引文。续审沿既有hash继承规则保细粒度限制。6.EY八条原文正确但有局部metric错误的真实对象仅在新研究根恢复8描述/12安全指标，15个错误metric不作确定数值输出，其他四对象限制不解除；原20根/40writer/97.8967%不回算。
+
+选定layout只有在PDF字体/基线/位置足以确定为脚注而非正文/公式时分隔标识，使用既有native PDF和章节接点，表格与页映射保留；不确定保原文和限制，不解读业务值。新预处理身份与旧v7明确分开，已保存响应仍只绑定当时的原源包。零模型验证真实PDF转录及原读/导出/新实例局部消费，不以已见工程结果宣称未见泛化、95%/99%或生产通过。完整边界见本轮卡。
+
 ### 6.EX 新版普通首读复用窄格式恢复
 
 当前local_format_only需要显式手工计划，普通first_read仍会为可本地恢复的格式失败消耗恢复调用或结束无稿。新处理身份仅对实际finish=stop抽取拒绝复用既有严格normalize_retained_workpaper_format，在同一原provider/runtime中接续typed/source约束和writer，原响应拒绝不晋升accepted；规范化与实际源核分开。deferred先交、原inline及review_batch接续保持，不在全局网关造宽松解析器。保存真实响应重放与磁盘混合批量只证明工程路径，旧20股和正式失败不改；A并行准备下一前瞻合同，未批不外呼。写集/停止/清理见company-profile-automatic-recovery-card.md。

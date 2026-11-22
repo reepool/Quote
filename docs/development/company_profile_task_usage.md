@@ -11,7 +11,20 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 
 本文命令使用已验证的项目完整环境`/home/python/miniconda3/envs/Quote/bin/python`。系统`python3`可能缺少pandas等项目依赖；此时应选正确解释器，不通过改业务代码或临时安装依赖解决。以下路径均从`/home/python/Quote`执行。
 
-## 当前20股日常研究版本（6.EW）
+## 新20股的指标局部限用研究版本（6.EZ）
+
+本根为`/home/python/Quote/data/research/company_profile_metric_safe_release_20261122`，来源于6.EY新20股，和下文6.EW原20股是不同名单。它保留原LLM内容/模型审核，在有源独立使用决定下恢复8条正确描述及12个未受影响指标；15个错误指标不作为确定数值交付。不是一次新模型抽取或原97.8967%准确率的改判，不自动设置共享默认根或启生产。
+
+同一`CompanyProfileReadService(root).research_profiles(stocks)`与既有年度画像HTTP路由读取这一投影；API进程须显式指向该研究根，读取不启动LLM。整组JSON/人读版在`exports/annual_profiles.json`和`exports/annual_profiles.md`。
+
+局部指标限制的消费规则：
+
+- `facts[*].state=limited`仍可带有源原描述；`fact.metrics`只含未被该决定隔离的原指标。不要从正文重新正则抄数当作标准化指标，也不要把少掉的指标补为0。
+- `facts[*].metric_gaps`给出被隔离的原指标位置、名称和原因，不提供错误指标的可计算值；`metric_source_indices`将保留指标映射回原数组位置。没有这两个可选字段只表示无这种显式限制，不表示全文完整或全数正确。
+- `information_gaps`与`suggested_acquisitions`继续给出要素/指标缺口和定向精读建议；旧粗粒度`withheld/source_only`的`fact=null`，不因新功能恢复错误正文或缺证内容。是否补读仍由使用者选具体股票和问题，API不会自动重读到补满。
+- 原始完整metrics及独立决定保存在审计workpaper，不被就地改值/改标签；`readings[*].review_status`仍是实际原模型状态，不能用局部消费决定将incomplete改成completed。
+
+## 原20股日常研究版本（6.EW，保留）
 
 显式研究根为`/home/python/Quote/data/research/company_profile_daily_release_20261122`；当前年度JSON及人读稿位于该根`exports/annual_profiles.json`、`exports/annual_profiles.md`。这是原20股的独立研究副本，旧19/20股根、原失败及planned文件保留；未切换默认配置或启用生产。
 
@@ -71,7 +84,9 @@ Content-Type: application/json
 
 这里针对已返回的非空抽取正文，不取消网关原有、受累计预算约束的网络或空响应恢复；模型源核仍有自己的明确预算和状态。
 
-恢复后仍经原typed/source/数字校验及坏对象隔离，保原raw、模型作者/usage、`rejected`状态和归一化操作/前后hash；不伪装模型原生accepted，也不是二次源核。deferred照常先交待核稿，inline及保存计划review_batch照常走原源核owner。旧v2身份保持原网关重试/反馈行为；已完成的旧run_id不重发或重写。显式local_format_only仍为0模型，不能借此开启复核。当前验证均为离线受控/已保存响应重放，不是新真实LLM成绩或新增调用授权。
+恢复后仍经原typed/source/数字校验及坏对象隔离，保原raw、模型作者/usage、`rejected`状态和归一化操作/前后hash；不伪装模型原生accepted，也不是二次源核。deferred照常先交待核稿，inline及保存计划review_batch照常走原源核owner。旧v2身份保持原网关重试/反馈行为；已完成的旧run_id不重发或重写。显式local_format_only仍为0模型，不能借此开启复核。6.EX工程证明为离线受控/保存响应重放；6.EY兴业证券和特瑞斯两份真实正文实际自动恢复并沿原路径源核，没有付费格式重试。这只证明本次形状消费，不代表语义全对、正式验收通过或新增调用授权。
+
+6.EZ新版预处理沿原选定layout分开可确定的PDF脚注标识与邻接数量；保原页/表格及不确定排版说明。旧v7任务仍重建旧文本/偏移和原source packet hash，不能将保存响应换绑新转录冒充新模型理解结果。
 
 ## 首读文件示例
 

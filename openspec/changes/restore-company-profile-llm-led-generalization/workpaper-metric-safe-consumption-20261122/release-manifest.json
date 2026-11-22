@@ -1,0 +1,465 @@
+{
+  "root": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122",
+  "authority_sha256": "3aa24510ce180a72f1694a21229923ffe4698629ed932e3dcb318e045ccbaf29",
+  "records": [
+    {
+      "work_id": "bp-work-016367c43308049bffc006bc",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-016367c43308049bffc006bc.json",
+      "source_sha256": "1d53cf6eb8969561327ac855e9734d535d0ec18c836c1821ce631d2c5facc643",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-016367c43308049bffc006bc.json",
+      "sha256": "1d53cf6eb8969561327ac855e9734d535d0ec18c836c1821ce631d2c5facc643",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-0bf9bfd2e2031508d9c45c9f.json",
+      "source_sha256": "22a5873918e624b542f1480ca81065ae820f6b45fad088425df9fed6dfa821ef",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-0bf9bfd2e2031508d9c45c9f.json",
+      "sha256": "22a5873918e624b542f1480ca81065ae820f6b45fad088425df9fed6dfa821ef",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-1fd5914a27e798dd60b2a8e4",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-1fd5914a27e798dd60b2a8e4.json",
+      "source_sha256": "34c555112bff576c2e2c7a8e449f8149d84ebbb6cba01d80ec4c6f7f3e0c88dd",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-1fd5914a27e798dd60b2a8e4.json",
+      "sha256": "34c555112bff576c2e2c7a8e449f8149d84ebbb6cba01d80ec4c6f7f3e0c88dd",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-2247fec2f7b4b6e55b990fbf.json",
+      "source_sha256": "8c42bfab31cdb0274ca33f43f66e10d3289757566c036b396a2febc2a88fb0e2",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-2247fec2f7b4b6e55b990fbf.json",
+      "sha256": "8c42bfab31cdb0274ca33f43f66e10d3289757566c036b396a2febc2a88fb0e2",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-23e6d067fd5609667ce1f7e0",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-23e6d067fd5609667ce1f7e0.json",
+      "source_sha256": "21216f45e89330acf25eed05e0030e85533d68cab0d08b5ebac453fc2eac01e1",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-23e6d067fd5609667ce1f7e0.json",
+      "sha256": "21216f45e89330acf25eed05e0030e85533d68cab0d08b5ebac453fc2eac01e1",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-34ff969ffe50975951a8321b",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-34ff969ffe50975951a8321b.json",
+      "source_sha256": "5c76b5f9c1d9b4392f42c95613ac218a5bec04fcf76f8253864793bb6f052d65",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-34ff969ffe50975951a8321b.json",
+      "sha256": "5c76b5f9c1d9b4392f42c95613ac218a5bec04fcf76f8253864793bb6f052d65",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-397b2457dcdf688556762a2c",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-397b2457dcdf688556762a2c.json",
+      "source_sha256": "bccb72788d580ecec9ff991c8a86ccb63ab6d55bb6ffc9e87d7abdeff80c06c7",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-397b2457dcdf688556762a2c.json",
+      "sha256": "bccb72788d580ecec9ff991c8a86ccb63ab6d55bb6ffc9e87d7abdeff80c06c7",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-48d8b960832cda77a8f1a82f",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-48d8b960832cda77a8f1a82f.json",
+      "source_sha256": "8d8bef406d0b674f3e8c396fbe2cb50d25789e85775ecbcfd916cdf1dfc3aaf8",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-48d8b960832cda77a8f1a82f.json",
+      "sha256": "8d8bef406d0b674f3e8c396fbe2cb50d25789e85775ecbcfd916cdf1dfc3aaf8",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-4dda16898fc774971368308e",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-4dda16898fc774971368308e.json",
+      "source_sha256": "b4a93ec9f6ca19844b761e98f8550f28c6229f8468d44ea2f1f029edc057b4cc",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-4dda16898fc774971368308e.json",
+      "sha256": "b4a93ec9f6ca19844b761e98f8550f28c6229f8468d44ea2f1f029edc057b4cc",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-4eff58b1460ad9bdccd0133d",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-4eff58b1460ad9bdccd0133d.json",
+      "source_sha256": "fc397b5d06fe52114272043aaee5b85f4f35fe3e3d5bfffb5911ed2c8c521e3e",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-4eff58b1460ad9bdccd0133d.json",
+      "sha256": "fc397b5d06fe52114272043aaee5b85f4f35fe3e3d5bfffb5911ed2c8c521e3e",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-52d5b4c1992e90c91aa2c48c",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-52d5b4c1992e90c91aa2c48c.json",
+      "source_sha256": "d0ee15fda30777f10a40e4654ae8876b0a4399c9e2c47aa26a48baf92f3136c1",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-52d5b4c1992e90c91aa2c48c.json",
+      "sha256": "d0ee15fda30777f10a40e4654ae8876b0a4399c9e2c47aa26a48baf92f3136c1",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-585dae6e4e3cb18f72fbb21e",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-585dae6e4e3cb18f72fbb21e.json",
+      "source_sha256": "d72874f0aa2e638339d94464b273fc704c8c9131c54a0d83e2ae72285f65af03",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-585dae6e4e3cb18f72fbb21e.json",
+      "sha256": "d72874f0aa2e638339d94464b273fc704c8c9131c54a0d83e2ae72285f65af03",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-6442086a7536bee9f1ec5bc8",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-6442086a7536bee9f1ec5bc8.json",
+      "source_sha256": "e3dd78272c483ab6fdfcdeae9f4380cb5e28a8474f84799217838c49adb0f14d",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-6442086a7536bee9f1ec5bc8.json",
+      "sha256": "e3dd78272c483ab6fdfcdeae9f4380cb5e28a8474f84799217838c49adb0f14d",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-728c607662567e3f5c7de4ae",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-728c607662567e3f5c7de4ae.json",
+      "source_sha256": "52e3f72f5822339f05dba7d5459502a78931aab91ca0f0a8f4cdeb442f4f8760",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-728c607662567e3f5c7de4ae.json",
+      "sha256": "52e3f72f5822339f05dba7d5459502a78931aab91ca0f0a8f4cdeb442f4f8760",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-799fa5830dc8411f11f22ca6",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-799fa5830dc8411f11f22ca6.json",
+      "source_sha256": "831da4f6f20fe7dca87acd1f093ec2d0c2655850abc66b96e68b3a82b5e3878b",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-799fa5830dc8411f11f22ca6.json",
+      "sha256": "831da4f6f20fe7dca87acd1f093ec2d0c2655850abc66b96e68b3a82b5e3878b",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-7e4d48a5974e12bdbf850179",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-7e4d48a5974e12bdbf850179.json",
+      "source_sha256": "c16f492181ff9e047cca84e6fd17baff5bd38cbf4a48266dc272921425b89800",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-7e4d48a5974e12bdbf850179.json",
+      "sha256": "c16f492181ff9e047cca84e6fd17baff5bd38cbf4a48266dc272921425b89800",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-87377121962465449e50155d",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-87377121962465449e50155d.json",
+      "source_sha256": "8cb500578332680fef7e008d25fd323b4c9479859607277ce4b4ef22397954bc",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-87377121962465449e50155d.json",
+      "sha256": "8cb500578332680fef7e008d25fd323b4c9479859607277ce4b4ef22397954bc",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-88e327a6f594ec32aa9e05ec.json",
+      "source_sha256": "c9c278ed1f31f8ce528bd6a56bc767944377f83d53e17887a9c651e3d5c9b16a",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-88e327a6f594ec32aa9e05ec.json",
+      "sha256": "c9c278ed1f31f8ce528bd6a56bc767944377f83d53e17887a9c651e3d5c9b16a",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-8b886b28b2588fc228029832",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-8b886b28b2588fc228029832.json",
+      "source_sha256": "8a5f58325d458f5196504e9293d44b2e1164f0aeabe7268ab7051a4a223ca708",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-8b886b28b2588fc228029832.json",
+      "sha256": "8a5f58325d458f5196504e9293d44b2e1164f0aeabe7268ab7051a4a223ca708",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-92885cea87f428277839539c",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-92885cea87f428277839539c.json",
+      "source_sha256": "66dabd131446f7300269ae3299c56816885275217eb3f10c06320848121bb554",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-92885cea87f428277839539c.json",
+      "sha256": "66dabd131446f7300269ae3299c56816885275217eb3f10c06320848121bb554",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-98ec5af0ce24fa3f4e376330",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-98ec5af0ce24fa3f4e376330.json",
+      "source_sha256": "502e040cc9ca30fbe16c3308e3bffdcefff682d29aa01d39cb59d6d2de3148ea",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-98ec5af0ce24fa3f4e376330.json",
+      "sha256": "502e040cc9ca30fbe16c3308e3bffdcefff682d29aa01d39cb59d6d2de3148ea",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-9938c95dc5f968013098bf76",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-9938c95dc5f968013098bf76.json",
+      "source_sha256": "24e4a02a926dce5a9cb4e2282b9dc6644c8236cd69f311ee2427ad688f437f67",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-9938c95dc5f968013098bf76.json",
+      "sha256": "450aee38aec6d36ffd5c336561175760e1d21ba617f13968765413d07a24aac8",
+      "use_review_only_change": true
+    },
+    {
+      "work_id": "bp-work-a7d6f3e22b9c7816cd8960d7",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-a7d6f3e22b9c7816cd8960d7.json",
+      "source_sha256": "c900a7a9713b825533123be1b412bb7b67324e18982da8550adcb7c1b4c1723a",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-a7d6f3e22b9c7816cd8960d7.json",
+      "sha256": "c900a7a9713b825533123be1b412bb7b67324e18982da8550adcb7c1b4c1723a",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-af0dd326e18daf7478fdb0e7",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-af0dd326e18daf7478fdb0e7.json",
+      "source_sha256": "6c732fd9487593e1d5bcf2f93c80c0367cbafb842d45de7be313505ded33f0a1",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-af0dd326e18daf7478fdb0e7.json",
+      "sha256": "6c732fd9487593e1d5bcf2f93c80c0367cbafb842d45de7be313505ded33f0a1",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-b1b223f406a35d04173fba2f",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-b1b223f406a35d04173fba2f.json",
+      "source_sha256": "0bfbaad339dcb2f30d9d639fa4fcfc9d9fd4d806b24741de225c4a0da68c86f1",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-b1b223f406a35d04173fba2f.json",
+      "sha256": "0bfbaad339dcb2f30d9d639fa4fcfc9d9fd4d806b24741de225c4a0da68c86f1",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-b383d027017bd87aa8fc6071",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-b383d027017bd87aa8fc6071.json",
+      "source_sha256": "7a9ed5658a5a7f09a20632633ea51cbeabee02b3810c9ced514d61b317ea7236",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-b383d027017bd87aa8fc6071.json",
+      "sha256": "7a9ed5658a5a7f09a20632633ea51cbeabee02b3810c9ced514d61b317ea7236",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-b9a21297ab8f537b8e62f19d",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-b9a21297ab8f537b8e62f19d.json",
+      "source_sha256": "d3602e28812a6ddf22d374cbe4d134cb7767a28acf5a9024736eaa2ea844cf0f",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-b9a21297ab8f537b8e62f19d.json",
+      "sha256": "d3602e28812a6ddf22d374cbe4d134cb7767a28acf5a9024736eaa2ea844cf0f",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-bbd1db65c451d1d024bdb9b9.json",
+      "source_sha256": "31438340f9bfa90e4fc4f2170bef28cbf71321f392d68c1d15a14e54fc8c741e",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-bbd1db65c451d1d024bdb9b9.json",
+      "sha256": "377e44d36d38c71be061f377cacf078dc3454cff6e53f1e874e83aa375b862e4",
+      "use_review_only_change": true
+    },
+    {
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-c1ce1a5b541e1116b231a0ac.json",
+      "source_sha256": "80bfa44a82311dab447be4f8fd4bde6c561cca4212264a89d7c44620d234a662",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-c1ce1a5b541e1116b231a0ac.json",
+      "sha256": "3c952e56e8ef6cf3985f36054a1ff02171d0ac50325841f8bf93faa34495a51e",
+      "use_review_only_change": true
+    },
+    {
+      "work_id": "bp-work-c3af62070742e2c402bb4202",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-c3af62070742e2c402bb4202.json",
+      "source_sha256": "a6d25f2b100683d382b1426b3687cf6f0dd0149bd5d9f229c0a73d8bb5e70d98",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-c3af62070742e2c402bb4202.json",
+      "sha256": "a6d25f2b100683d382b1426b3687cf6f0dd0149bd5d9f229c0a73d8bb5e70d98",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-c3c91c6c1880ec02db342d63",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-c3c91c6c1880ec02db342d63.json",
+      "source_sha256": "d5f9d42224a3695d17516ababdcde51aa08f2b3de6929f00fec174db37928ef3",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-c3c91c6c1880ec02db342d63.json",
+      "sha256": "d5f9d42224a3695d17516ababdcde51aa08f2b3de6929f00fec174db37928ef3",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-c5b84bd9a116e97c17f38b56",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-c5b84bd9a116e97c17f38b56.json",
+      "source_sha256": "3993a56b0aabbf720ae7f6b3409b550dc5e5c81c6e0dec2954151e45b705dbdb",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-c5b84bd9a116e97c17f38b56.json",
+      "sha256": "3993a56b0aabbf720ae7f6b3409b550dc5e5c81c6e0dec2954151e45b705dbdb",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-c673511e57420b680e69052b",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-c673511e57420b680e69052b.json",
+      "source_sha256": "507b82a561d74dea2f8a7f2ac631faa8e540d4bb173567a4b1b1d1d185439db8",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-c673511e57420b680e69052b.json",
+      "sha256": "507b82a561d74dea2f8a7f2ac631faa8e540d4bb173567a4b1b1d1d185439db8",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-cad604975f9f30adcb311c8e.json",
+      "source_sha256": "11cb58c0230be7105e1ff22e357da1c5ae459a9c2da476563d72f1d5899c2cd2",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-cad604975f9f30adcb311c8e.json",
+      "sha256": "61d026baba136bf0ad36e9ec2f0a118923ef66a0739054c32854686dc6284950",
+      "use_review_only_change": true
+    },
+    {
+      "work_id": "bp-work-d07db9b1a9117cbd262a645d",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-d07db9b1a9117cbd262a645d.json",
+      "source_sha256": "363f1baa3a2c7c40eaebac2ff4f1839bbe9330358456da83e52c230a201fd8ec",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-d07db9b1a9117cbd262a645d.json",
+      "sha256": "363f1baa3a2c7c40eaebac2ff4f1839bbe9330358456da83e52c230a201fd8ec",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-d32507d43cbb1c885b6b4e34.json",
+      "source_sha256": "591cfabb2684cdf16a4ac441b11f02c480fd8ef4e467c5b25521c98887686f79",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-d32507d43cbb1c885b6b4e34.json",
+      "sha256": "591cfabb2684cdf16a4ac441b11f02c480fd8ef4e467c5b25521c98887686f79",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-d754b51baf3ed49c2b458883",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-d754b51baf3ed49c2b458883.json",
+      "source_sha256": "76584bac99590384b9df6b1cb5f8abf121091fc73e58d95e6c6ef02e40d399db",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-d754b51baf3ed49c2b458883.json",
+      "sha256": "76584bac99590384b9df6b1cb5f8abf121091fc73e58d95e6c6ef02e40d399db",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-ee612f8622b7100a0bb6a86a",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-ee612f8622b7100a0bb6a86a.json",
+      "source_sha256": "0073d47972f8e66334afcf2d21fcf50e6941fb56dd4189f2812ebba776fcd201",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-ee612f8622b7100a0bb6a86a.json",
+      "sha256": "0073d47972f8e66334afcf2d21fcf50e6941fb56dd4189f2812ebba776fcd201",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-f7d6599d77306d3a66c00bd0",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-f7d6599d77306d3a66c00bd0.json",
+      "source_sha256": "d41e4342ac96c24981742c05c7490166a41fb1ffe4543d0e1f917832117e1fc5",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-f7d6599d77306d3a66c00bd0.json",
+      "sha256": "d41e4342ac96c24981742c05c7490166a41fb1ffe4543d0e1f917832117e1fc5",
+      "use_review_only_change": false
+    },
+    {
+      "work_id": "bp-work-fbfb92491eaa652a123d167a",
+      "source_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/company_profile_common_core.v1/bp-work-fbfb92491eaa652a123d167a.json",
+      "source_sha256": "bba72f4410c5524de727d0c4e939378f11acfb941e938b65aa5bd5cdd99ea351",
+      "path": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122/company_profile_common_core.v1/bp-work-fbfb92491eaa652a123d167a.json",
+      "sha256": "bba72f4410c5524de727d0c4e939378f11acfb941e938b65aa5bd5cdd99ea351",
+      "use_review_only_change": false
+    }
+  ],
+  "changes": [
+    {
+      "instrument_id": "600901.SH",
+      "work_id": "bp-work-9938c95dc5f968013098bf76",
+      "fact_id": "F22",
+      "fact_sha256": "3355d9ce4a1ad65a984f6aa5375ca2c8519bf8497bf42ead4c5c071d39f50d6d",
+      "metric_indices": [
+        1
+      ],
+      "original_metric_count": 4,
+      "safe_metric_count": 3
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "fact_id": "F-SM-02",
+      "fact_sha256": "1e56e54f29690ffbd4ee9ea2e3f306623693f56c47965df9ff2d084edb98c896",
+      "metric_indices": [
+        0
+      ],
+      "original_metric_count": 4,
+      "safe_metric_count": 3
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F007",
+      "fact_sha256": "9005f4ea5ab0f6e487c6cddf32ce0b44dd13aa62bffd53b2cde3f4d8fa635bc1",
+      "metric_indices": [
+        0
+      ],
+      "original_metric_count": 2,
+      "safe_metric_count": 1
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F009",
+      "fact_sha256": "226e8c6823636244e8326e7d83239b23e5c71c0cb980ec17d68e51d484e93a52",
+      "metric_indices": [
+        4,
+        5,
+        6
+      ],
+      "original_metric_count": 7,
+      "safe_metric_count": 4
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F023",
+      "fact_sha256": "0b965f3da6d57c456c775d904dcf629c479ee440ab7d9bc1411a4b00d8fe9ecc",
+      "metric_indices": [
+        0,
+        1,
+        2
+      ],
+      "original_metric_count": 3,
+      "safe_metric_count": 0
+    },
+    {
+      "instrument_id": "601668.SH",
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "fact_id": "F15",
+      "fact_sha256": "03e14d6e992e7b22e2a72ef41c6fcf3092562bb7ec1e04ddb8834b15a9a3c93c",
+      "metric_indices": [
+        1
+      ],
+      "original_metric_count": 2,
+      "safe_metric_count": 1
+    },
+    {
+      "instrument_id": "601668.SH",
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "fact_id": "F20",
+      "fact_sha256": "451dfb6716341c8152733463d1405cc0aff342b7d66d536e7094fdfa54411fba",
+      "metric_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "original_metric_count": 4,
+      "safe_metric_count": 0
+    },
+    {
+      "instrument_id": "601668.SH",
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "fact_id": "F26",
+      "fact_sha256": "01aaa07dc9bacf127084bff4d591dab3d4586465a4b7a9a9747e30abdbc6e5e5",
+      "metric_indices": [
+        0
+      ],
+      "original_metric_count": 1,
+      "safe_metric_count": 0
+    }
+  ],
+  "display_note_refinements": [
+    {
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F007",
+      "element": "revenue_model"
+    },
+    {
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F009",
+      "element": "revenue_model"
+    },
+    {
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F023",
+      "element": "operating_drivers"
+    },
+    {
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "fact_id": "F-SM-02",
+      "element": "scale_and_mix"
+    },
+    {
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "fact_id": "F15",
+      "element": "scale_and_mix"
+    },
+    {
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "fact_id": "F20",
+      "element": "customers_channels_markets"
+    },
+    {
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "fact_id": "F26",
+      "element": "material_changes"
+    },
+    {
+      "work_id": "bp-work-9938c95dc5f968013098bf76",
+      "fact_id": "F22",
+      "element": "material_changes"
+    }
+  ]
+}

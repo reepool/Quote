@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-22 [6.EZ合并交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-metric-safe-consumption-20261122/result.md)已结束：A规划源核/B子代理沿原UseReview/read/writer恢复8有源描述/12原指标，15受限指标及4粗粒度对象保持，新20根599/932记录可由API/JSON/人读版/CSV读取。v8选定layout三脚注保真分开、旧v7实际源包不变；A指出的续审coarse后继回读旧base问题已修，72不同用例最终通过。0新增业务模型/usage、旧97.8967%和S2失败不改，不自动100/生产；原成果保护及本人临时26108804字节清理完成，未扩指标/解析平台。下一优先实际使用本研究根与API缺项、按股票/问题有界补读；新的真实验证另裁范围和预算，不整批重抽或追可选供应链细节。
+
 2026-11-22当前[6.EY新20家整卡](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/a-group-verdict.json)已完成真实运行与研究交付：20/20基础画像及60基础问成立，固定400补充/523去重对象独审，97.8967%低于99%，因此不扩100或另开20确认、不追可选供应链/细项。保原40 writer/成绩，现有UseReview只在单一新研究副本处置12对象并追加缺项提示，保其他内容、API缺项/原文/模型和资源；A主审及独立助手核源，B复用原owner交JSON/人读版/新实例一致性与清理，沿A/B v3，不新增业务代码/平台。下一业务工作面向已交研究API的实际使用，以及保存响应中影响数值使用的口径/方向和脚注供源问题合并处理，不为单家公司反复付费追齐。原源/失败/账本、旧20交付/138保护及并行内容不动；正式未通过与研究可用分列，未授权新调用/生产。
 
 2026-11-22 [6.EX自动首读收口已交](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-recovery-20261122/result.md)：A规划独审/B连续实施，既有严格归一化已接新版普通入口，原raw/rejected/作者/usage与typed/source约束不变，旧身份重试兼容。保存响应原供源精确重放、混合批量/inline/deferred/暂停新实例接续成立，37不同用例最终通过，0新真实调用，不新增平台或现20股版本。138旧文件及当前6文件hash保护、185临时文件10705939字节清理完成；原S2/6.EU失败及正式质量/生产不改，后续真实前瞻方案须独立限定批准并冻结参考后才发。
