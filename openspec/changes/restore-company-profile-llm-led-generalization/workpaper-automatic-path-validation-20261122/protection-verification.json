@@ -1,0 +1,8 @@
+{
+  "updated_epoch": 1795336298.8448694,
+  "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-recovery-20261122/final-freeze.json",
+  "reference_sha256": "81dcb0e5c0d107fd83c5faf4f3b09cf0ecb32cde7d44f95b283cdb3fb6032530",
+  "protected_file_count": 138,
+  "old_hash_mismatches": [],
+  "frozen_code_mismatches": []
+}

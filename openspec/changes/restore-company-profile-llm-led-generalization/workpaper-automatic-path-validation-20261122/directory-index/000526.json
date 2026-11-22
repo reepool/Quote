@@ -1,0 +1,1719 @@
+{
+  "instrument_id": "000526.SZ",
+  "source_document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+  "bookmark_index_only": true,
+  "no_business_answer": true,
+  "bookmarks": [
+    {
+      "level": 0,
+      "title": "第一节 重要提示、目录和释义",
+      "physical_page": 2
+    },
+    {
+      "level": 0,
+      "title": "第二节 公司简介和主要财务指标",
+      "physical_page": 6
+    },
+    {
+      "level": 1,
+      "title": "一、公司信息",
+      "physical_page": 6
+    },
+    {
+      "level": 1,
+      "title": "二、联系人和联系方式",
+      "physical_page": 6
+    },
+    {
+      "level": 1,
+      "title": "三、信息披露及备置地点",
+      "physical_page": 6
+    },
+    {
+      "level": 1,
+      "title": "四、注册变更情况",
+      "physical_page": 6
+    },
+    {
+      "level": 1,
+      "title": "五、其他有关资料",
+      "physical_page": 7
+    },
+    {
+      "level": 1,
+      "title": "六、主要会计数据和财务指标",
+      "physical_page": 7
+    },
+    {
+      "level": 1,
+      "title": "七、境内外会计准则下会计数据差异",
+      "physical_page": 8
+    },
+    {
+      "level": 2,
+      "title": "1、同时按照国际会计准则与按照中国会计准则披露的财务报告中净利润和净资产差异情况",
+      "physical_page": 8
+    },
+    {
+      "level": 2,
+      "title": "2、同时按照境外会计准则与按照中国会计准则披露的财务报告中净利润和净资产差异情况",
+      "physical_page": 8
+    },
+    {
+      "level": 1,
+      "title": "八、分季度主要财务指标",
+      "physical_page": 8
+    },
+    {
+      "level": 1,
+      "title": "九、非经常性损益项目及金额",
+      "physical_page": 8
+    },
+    {
+      "level": 0,
+      "title": "第三节 管理层讨论与分析",
+      "physical_page": 10
+    },
+    {
+      "level": 1,
+      "title": "一、报告期内公司从事的主要业务",
+      "physical_page": 10
+    },
+    {
+      "level": 1,
+      "title": "二、报告期内公司所处行业情况",
+      "physical_page": 12
+    },
+    {
+      "level": 1,
+      "title": "三、核心竞争力分析",
+      "physical_page": 16
+    },
+    {
+      "level": 1,
+      "title": "四、主营业务分析",
+      "physical_page": 17
+    },
+    {
+      "level": 2,
+      "title": "1、概述",
+      "physical_page": 17
+    },
+    {
+      "level": 2,
+      "title": "2、收入与成本",
+      "physical_page": 17
+    },
+    {
+      "level": 2,
+      "title": "3、费用",
+      "physical_page": 20
+    },
+    {
+      "level": 2,
+      "title": "4、研发投入",
+      "physical_page": 20
+    },
+    {
+      "level": 2,
+      "title": "5、现金流",
+      "physical_page": 21
+    },
+    {
+      "level": 1,
+      "title": "五、非主营业务分析",
+      "physical_page": 22
+    },
+    {
+      "level": 1,
+      "title": "六、资产及负债状况分析",
+      "physical_page": 23
+    },
+    {
+      "level": 2,
+      "title": "1、资产构成重大变动情况",
+      "physical_page": 23
+    },
+    {
+      "level": 2,
+      "title": "2、以公允价值计量的资产和负债",
+      "physical_page": 24
+    },
+    {
+      "level": 2,
+      "title": "3、截至报告期末的资产权利受限情况",
+      "physical_page": 24
+    },
+    {
+      "level": 1,
+      "title": "七、投资状况分析",
+      "physical_page": 25
+    },
+    {
+      "level": 2,
+      "title": "1、总体情况",
+      "physical_page": 25
+    },
+    {
+      "level": 2,
+      "title": "2、报告期内获取的重大的股权投资情况",
+      "physical_page": 25
+    },
+    {
+      "level": 2,
+      "title": "3、报告期内正在进行的重大的非股权投资情况",
+      "physical_page": 25
+    },
+    {
+      "level": 2,
+      "title": "4、金融资产投资",
+      "physical_page": 26
+    },
+    {
+      "level": 1,
+      "title": "八、重大资产和股权出售",
+      "physical_page": 26
+    },
+    {
+      "level": 2,
+      "title": "1、出售重大资产情况",
+      "physical_page": 26
+    },
+    {
+      "level": 2,
+      "title": "2、出售重大股权情况",
+      "physical_page": 26
+    },
+    {
+      "level": 1,
+      "title": "九、主要控股参股公司分析",
+      "physical_page": 26
+    },
+    {
+      "level": 1,
+      "title": "十、公司控制的结构化主体情况",
+      "physical_page": 26
+    },
+    {
+      "level": 1,
+      "title": "十一、公司未来发展的展望",
+      "physical_page": 27
+    },
+    {
+      "level": 1,
+      "title": "十二、报告期内接待调研、沟通、采访等活动",
+      "physical_page": 28
+    },
+    {
+      "level": 1,
+      "title": "十三、市值管理制度和估值提升计划的制定落实情况",
+      "physical_page": 30
+    },
+    {
+      "level": 1,
+      "title": "十四、“质量回报双提升”行动方案贯彻落实情况",
+      "physical_page": 30
+    },
+    {
+      "level": 0,
+      "title": "第四节 公司治理、环境和社会",
+      "physical_page": 31
+    },
+    {
+      "level": 1,
+      "title": "一、公司治理的基本状况",
+      "physical_page": 31
+    },
+    {
+      "level": 1,
+      "title": "二、公司相对于控股股东、实际控制人在保证公司资产、人员、财务、机构、业务等方面的独立情况",
+      "physical_page": 31
+    },
+    {
+      "level": 1,
+      "title": "三、同业竞争情况",
+      "physical_page": 32
+    },
+    {
+      "level": 1,
+      "title": "四、董事和高级管理人员情况",
+      "physical_page": 32
+    },
+    {
+      "level": 2,
+      "title": "1、基本情况",
+      "physical_page": 32
+    },
+    {
+      "level": 2,
+      "title": "2、任职情况",
+      "physical_page": 34
+    },
+    {
+      "level": 2,
+      "title": "3、董事、高级管理人员薪酬情况",
+      "physical_page": 36
+    },
+    {
+      "level": 1,
+      "title": "五、报告期内董事履行职责的情况",
+      "physical_page": 37
+    },
+    {
+      "level": 2,
+      "title": "1、董事出席董事会及股东会的情况",
+      "physical_page": 37
+    },
+    {
+      "level": 2,
+      "title": "2、董事对公司有关事项提出异议的情况",
+      "physical_page": 38
+    },
+    {
+      "level": 2,
+      "title": "3、董事履行职责的其他说明",
+      "physical_page": 38
+    },
+    {
+      "level": 1,
+      "title": "六、董事会下设专门委员会在报告期内的情况",
+      "physical_page": 38
+    },
+    {
+      "level": 1,
+      "title": "七、审计委员会工作情况",
+      "physical_page": 39
+    },
+    {
+      "level": 1,
+      "title": "八、公司员工情况",
+      "physical_page": 40
+    },
+    {
+      "level": 2,
+      "title": "1、员工数量、专业构成及教育程度",
+      "physical_page": 40
+    },
+    {
+      "level": 2,
+      "title": "2、薪酬政策",
+      "physical_page": 40
+    },
+    {
+      "level": 2,
+      "title": "3、培训计划",
+      "physical_page": 41
+    },
+    {
+      "level": 2,
+      "title": "4、劳务外包情况",
+      "physical_page": 41
+    },
+    {
+      "level": 1,
+      "title": "九、公司利润分配及资本公积金转增股本情况",
+      "physical_page": 41
+    },
+    {
+      "level": 1,
+      "title": "十、公司股权激励计划、员工持股计划或其他员工激励措施的实施情况",
+      "physical_page": 41
+    },
+    {
+      "level": 2,
+      "title": "1、股权激励",
+      "physical_page": 41
+    },
+    {
+      "level": 2,
+      "title": "2、员工持股计划的实施情况",
+      "physical_page": 43
+    },
+    {
+      "level": 2,
+      "title": "3、其他员工激励措施",
+      "physical_page": 43
+    },
+    {
+      "level": 1,
+      "title": "十一、报告期内的内部控制制度建设及实施情况",
+      "physical_page": 43
+    },
+    {
+      "level": 2,
+      "title": "1、内部控制建设及实施情况",
+      "physical_page": 43
+    },
+    {
+      "level": 2,
+      "title": "2、报告期内发现的内部控制重大缺陷的具体情况",
+      "physical_page": 43
+    },
+    {
+      "level": 1,
+      "title": "十二、公司报告期内对子公司的管理控制情况",
+      "physical_page": 43
+    },
+    {
+      "level": 1,
+      "title": "十三、内部控制评价报告或内部控制审计报告",
+      "physical_page": 43
+    },
+    {
+      "level": 2,
+      "title": "1、内控评价报告",
+      "physical_page": 43
+    },
+    {
+      "level": 2,
+      "title": "2、内部控制审计报告",
+      "physical_page": 44
+    },
+    {
+      "level": 1,
+      "title": "十四、上市公司治理专项行动自查问题整改情况",
+      "physical_page": 45
+    },
+    {
+      "level": 1,
+      "title": "十五、环境信息披露情况",
+      "physical_page": 45
+    },
+    {
+      "level": 1,
+      "title": "十六、社会责任情况",
+      "physical_page": 45
+    },
+    {
+      "level": 1,
+      "title": "十七、巩固拓展脱贫攻坚成果、乡村振兴的情况",
+      "physical_page": 45
+    },
+    {
+      "level": 0,
+      "title": "第五节 重要事项",
+      "physical_page": 46
+    },
+    {
+      "level": 1,
+      "title": "一、承诺事项履行情况",
+      "physical_page": 46
+    },
+    {
+      "level": 2,
+      "title": "1、公司实际控制人、股东、关联方、收购人以及公司等承诺相关方在报告期内履行完毕及截至报告期末尚未履行完毕的承诺事项",
+      "physical_page": 46
+    },
+    {
+      "level": 2,
+      "title": "2、公司资产或项目存在盈利预测，且报告期仍处在盈利预测期间，公司就资产或项目达到原盈利预测及其原因做出说明",
+      "physical_page": 62
+    },
+    {
+      "level": 2,
+      "title": "3、公司涉及业绩承诺",
+      "physical_page": 62
+    },
+    {
+      "level": 1,
+      "title": "二、控股股东及其他关联方对上市公司的非经营性占用资金情况",
+      "physical_page": 62
+    },
+    {
+      "level": 1,
+      "title": "三、违规对外担保情况",
+      "physical_page": 62
+    },
+    {
+      "level": 1,
+      "title": "四、董事会对最近一期“非标准审计报告”相关情况的说明",
+      "physical_page": 62
+    },
+    {
+      "level": 1,
+      "title": "五、董事会、独立董事（如有）对会计师事务所本报告期“非标准审计报告”的说明",
+      "physical_page": 63
+    },
+    {
+      "level": 1,
+      "title": "六、与上年度财务报告相比，会计政策、会计估计变更或重大会计差错更正的情况说明",
+      "physical_page": 63
+    },
+    {
+      "level": 1,
+      "title": "七、与上年度财务报告相比，合并报表范围发生变化的情况说明",
+      "physical_page": 63
+    },
+    {
+      "level": 1,
+      "title": "八、聘任、解聘会计师事务所情况",
+      "physical_page": 63
+    },
+    {
+      "level": 1,
+      "title": "九、年度报告披露后面临退市情况",
+      "physical_page": 63
+    },
+    {
+      "level": 1,
+      "title": "十、破产重整相关事项",
+      "physical_page": 63
+    },
+    {
+      "level": 1,
+      "title": "十一、重大诉讼、仲裁事项",
+      "physical_page": 63
+    },
+    {
+      "level": 1,
+      "title": "十二、处罚及整改情况",
+      "physical_page": 65
+    },
+    {
+      "level": 1,
+      "title": "十三、公司及其控股股东、实际控制人的诚信状况",
+      "physical_page": 65
+    },
+    {
+      "level": 1,
+      "title": "十四、重大关联交易",
+      "physical_page": 65
+    },
+    {
+      "level": 2,
+      "title": "1、与日常经营相关的关联交易",
+      "physical_page": 65
+    },
+    {
+      "level": 2,
+      "title": "2、资产或股权收购、出售发生的关联交易",
+      "physical_page": 65
+    },
+    {
+      "level": 2,
+      "title": "3、共同对外投资的关联交易",
+      "physical_page": 65
+    },
+    {
+      "level": 2,
+      "title": "4、关联债权债务往来",
+      "physical_page": 65
+    },
+    {
+      "level": 2,
+      "title": "5、与存在关联关系的财务公司的往来情况",
+      "physical_page": 66
+    },
+    {
+      "level": 2,
+      "title": "6、公司控股的财务公司与关联方的往来情况",
+      "physical_page": 66
+    },
+    {
+      "level": 2,
+      "title": "7、其他重大关联交易",
+      "physical_page": 66
+    },
+    {
+      "level": 1,
+      "title": "十五、重大合同及其履行情况",
+      "physical_page": 66
+    },
+    {
+      "level": 2,
+      "title": "1、托管、承包、租赁事项情况",
+      "physical_page": 66
+    },
+    {
+      "level": 2,
+      "title": "2、重大担保",
+      "physical_page": 67
+    },
+    {
+      "level": 2,
+      "title": "3、委托他人进行现金资产管理情况",
+      "physical_page": 68
+    },
+    {
+      "level": 2,
+      "title": "4、其他重大合同",
+      "physical_page": 68
+    },
+    {
+      "level": 1,
+      "title": "十六、募集资金使用情况",
+      "physical_page": 69
+    },
+    {
+      "level": 2,
+      "title": "1、募集资金总体使用情况",
+      "physical_page": 69
+    },
+    {
+      "level": 2,
+      "title": "2、募集资金承诺项目情况",
+      "physical_page": 70
+    },
+    {
+      "level": 2,
+      "title": "3、募集资金变更项目情况",
+      "physical_page": 73
+    },
+    {
+      "level": 2,
+      "title": "4、中介机构关于募集资金存储与使用情况的核查意见",
+      "physical_page": 76
+    },
+    {
+      "level": 1,
+      "title": "十七、其他重大事项的说明",
+      "physical_page": 76
+    },
+    {
+      "level": 1,
+      "title": "十八、公司子公司重大事项",
+      "physical_page": 76
+    },
+    {
+      "level": 0,
+      "title": "第六节 股份变动及股东情况",
+      "physical_page": 77
+    },
+    {
+      "level": 1,
+      "title": "一、股份变动情况",
+      "physical_page": 77
+    },
+    {
+      "level": 2,
+      "title": "1、股份变动情况",
+      "physical_page": 77
+    },
+    {
+      "level": 2,
+      "title": "2、限售股份变动情况",
+      "physical_page": 78
+    },
+    {
+      "level": 1,
+      "title": "二、证券发行与上市情况",
+      "physical_page": 84
+    },
+    {
+      "level": 2,
+      "title": "1、报告期内证券发行（不含优先股）情况",
+      "physical_page": 84
+    },
+    {
+      "level": 2,
+      "title": "2、公司股份总数及股东结构的变动、公司资产和负债结构的变动情况说明",
+      "physical_page": 84
+    },
+    {
+      "level": 2,
+      "title": "3、现存的内部职工股情况",
+      "physical_page": 84
+    },
+    {
+      "level": 1,
+      "title": "三、股东和实际控制人情况",
+      "physical_page": 84
+    },
+    {
+      "level": 2,
+      "title": "1、公司股东数量及持股情况",
+      "physical_page": 84
+    },
+    {
+      "level": 2,
+      "title": "2、公司控股股东情况",
+      "physical_page": 86
+    },
+    {
+      "level": 2,
+      "title": "3、公司实际控制人及其一致行动人",
+      "physical_page": 87
+    },
+    {
+      "level": 2,
+      "title": "4、公司控股股东或第一大股东及其一致行动人累计质押股份数量占其所持公司股份数量比例达到80%",
+      "physical_page": 88
+    },
+    {
+      "level": 2,
+      "title": "5、其他持股在10%以上的法人股东",
+      "physical_page": 88
+    },
+    {
+      "level": 2,
+      "title": "6、控股股东、实际控制人、重组方及其他承诺主体股份限制减持情况",
+      "physical_page": 88
+    },
+    {
+      "level": 1,
+      "title": "四、股份回购在报告期的具体实施情况",
+      "physical_page": 88
+    },
+    {
+      "level": 1,
+      "title": "五、优先股相关情况",
+      "physical_page": 89
+    },
+    {
+      "level": 0,
+      "title": "第七节 债券相关情况",
+      "physical_page": 90
+    },
+    {
+      "level": 0,
+      "title": "第八节 财务报告",
+      "physical_page": 91
+    },
+    {
+      "level": 1,
+      "title": "一、审计报告",
+      "physical_page": 91
+    },
+    {
+      "level": 1,
+      "title": "二、财务报表",
+      "physical_page": 94
+    },
+    {
+      "level": 2,
+      "title": "1、合并资产负债表",
+      "physical_page": 94
+    },
+    {
+      "level": 2,
+      "title": "2、母公司资产负债表",
+      "physical_page": 97
+    },
+    {
+      "level": 2,
+      "title": "3、合并利润表",
+      "physical_page": 99
+    },
+    {
+      "level": 2,
+      "title": "4、母公司利润表",
+      "physical_page": 101
+    },
+    {
+      "level": 2,
+      "title": "5、合并现金流量表",
+      "physical_page": 102
+    },
+    {
+      "level": 2,
+      "title": "6、母公司现金流量表",
+      "physical_page": 103
+    },
+    {
+      "level": 2,
+      "title": "7、合并所有者权益变动表",
+      "physical_page": 104
+    },
+    {
+      "level": 2,
+      "title": "8、母公司所有者权益变动表",
+      "physical_page": 110
+    },
+    {
+      "level": 1,
+      "title": "三、公司基本情况",
+      "physical_page": 116
+    },
+    {
+      "level": 1,
+      "title": "四、财务报表的编制基础",
+      "physical_page": 117
+    },
+    {
+      "level": 2,
+      "title": "1、编制基础",
+      "physical_page": 117
+    },
+    {
+      "level": 2,
+      "title": "2、持续经营",
+      "physical_page": 117
+    },
+    {
+      "level": 1,
+      "title": "五、重要会计政策及会计估计",
+      "physical_page": 117
+    },
+    {
+      "level": 2,
+      "title": "1、遵循企业会计准则的声明",
+      "physical_page": 118
+    },
+    {
+      "level": 2,
+      "title": "2、会计期间",
+      "physical_page": 118
+    },
+    {
+      "level": 2,
+      "title": "3、营业周期",
+      "physical_page": 118
+    },
+    {
+      "level": 2,
+      "title": "4、记账本位币",
+      "physical_page": 118
+    },
+    {
+      "level": 2,
+      "title": "5、重要性标准确定方法和选择依据",
+      "physical_page": 118
+    },
+    {
+      "level": 2,
+      "title": "6、同一控制下和非同一控制下企业合并的会计处理方法",
+      "physical_page": 118
+    },
+    {
+      "level": 2,
+      "title": "7、控制的判断标准和合并财务报表的编制方法",
+      "physical_page": 120
+    },
+    {
+      "level": 2,
+      "title": "8、合营安排分类及共同经营会计处理方法",
+      "physical_page": 122
+    },
+    {
+      "level": 2,
+      "title": "9、现金及现金等价物的确定标准",
+      "physical_page": 123
+    },
+    {
+      "level": 2,
+      "title": "10、外币业务和外币报表折算",
+      "physical_page": 123
+    },
+    {
+      "level": 2,
+      "title": "11、金融工具",
+      "physical_page": 123
+    },
+    {
+      "level": 2,
+      "title": "12、应收票据",
+      "physical_page": 131
+    },
+    {
+      "level": 2,
+      "title": "13、应收账款",
+      "physical_page": 131
+    },
+    {
+      "level": 2,
+      "title": "14、应收款项融资",
+      "physical_page": 131
+    },
+    {
+      "level": 2,
+      "title": "15、其他应收款",
+      "physical_page": 131
+    },
+    {
+      "level": 2,
+      "title": "16、合同资产",
+      "physical_page": 132
+    },
+    {
+      "level": 2,
+      "title": "17、存货",
+      "physical_page": 132
+    },
+    {
+      "level": 2,
+      "title": "18、持有待售资产",
+      "physical_page": 133
+    },
+    {
+      "level": 2,
+      "title": "19、债权投资",
+      "physical_page": 133
+    },
+    {
+      "level": 2,
+      "title": "20、其他债权投资",
+      "physical_page": 133
+    },
+    {
+      "level": 2,
+      "title": "21、长期应收款",
+      "physical_page": 133
+    },
+    {
+      "level": 2,
+      "title": "22、长期股权投资",
+      "physical_page": 134
+    },
+    {
+      "level": 2,
+      "title": "23、投资性房地产",
+      "physical_page": 137
+    },
+    {
+      "level": 2,
+      "title": "24、固定资产",
+      "physical_page": 138
+    },
+    {
+      "level": 2,
+      "title": "25、在建工程",
+      "physical_page": 138
+    },
+    {
+      "level": 2,
+      "title": "26、借款费用",
+      "physical_page": 139
+    },
+    {
+      "level": 2,
+      "title": "27、生物资产",
+      "physical_page": 140
+    },
+    {
+      "level": 2,
+      "title": "28、油气资产",
+      "physical_page": 140
+    },
+    {
+      "level": 2,
+      "title": "29、无形资产",
+      "physical_page": 140
+    },
+    {
+      "level": 2,
+      "title": "30、长期资产减值",
+      "physical_page": 141
+    },
+    {
+      "level": 2,
+      "title": "31、长期待摊费用",
+      "physical_page": 142
+    },
+    {
+      "level": 2,
+      "title": "32、合同负债",
+      "physical_page": 142
+    },
+    {
+      "level": 2,
+      "title": "33、职工薪酬",
+      "physical_page": 142
+    },
+    {
+      "level": 2,
+      "title": "34、预计负债",
+      "physical_page": 143
+    },
+    {
+      "level": 2,
+      "title": "35、股份支付",
+      "physical_page": 144
+    },
+    {
+      "level": 2,
+      "title": "36、优先股、永续债等其他金融工具",
+      "physical_page": 145
+    },
+    {
+      "level": 2,
+      "title": "37、收入",
+      "physical_page": 145
+    },
+    {
+      "level": 2,
+      "title": "38、合同成本",
+      "physical_page": 146
+    },
+    {
+      "level": 2,
+      "title": "39、政府补助",
+      "physical_page": 147
+    },
+    {
+      "level": 2,
+      "title": "40、递延所得税资产/递延所得税负债",
+      "physical_page": 148
+    },
+    {
+      "level": 2,
+      "title": "41、租赁",
+      "physical_page": 148
+    },
+    {
+      "level": 2,
+      "title": "42、其他重要的会计政策和会计估计",
+      "physical_page": 151
+    },
+    {
+      "level": 2,
+      "title": "43、重要会计政策和会计估计变更",
+      "physical_page": 151
+    },
+    {
+      "level": 2,
+      "title": "44、其他",
+      "physical_page": 152
+    },
+    {
+      "level": 1,
+      "title": "六、税项",
+      "physical_page": 152
+    },
+    {
+      "level": 2,
+      "title": "1、主要税种及税率",
+      "physical_page": 152
+    },
+    {
+      "level": 2,
+      "title": "2、税收优惠",
+      "physical_page": 152
+    },
+    {
+      "level": 2,
+      "title": "3、其他",
+      "physical_page": 152
+    },
+    {
+      "level": 1,
+      "title": "七、合并财务报表项目注释",
+      "physical_page": 152
+    },
+    {
+      "level": 2,
+      "title": "1、货币资金",
+      "physical_page": 152
+    },
+    {
+      "level": 2,
+      "title": "2、交易性金融资产",
+      "physical_page": 153
+    },
+    {
+      "level": 2,
+      "title": "3、衍生金融资产",
+      "physical_page": 153
+    },
+    {
+      "level": 2,
+      "title": "4、应收票据",
+      "physical_page": 153
+    },
+    {
+      "level": 2,
+      "title": "5、应收账款",
+      "physical_page": 155
+    },
+    {
+      "level": 2,
+      "title": "6、合同资产",
+      "physical_page": 157
+    },
+    {
+      "level": 2,
+      "title": "7、其他应收款",
+      "physical_page": 158
+    },
+    {
+      "level": 2,
+      "title": "8、预付款项",
+      "physical_page": 162
+    },
+    {
+      "level": 2,
+      "title": "9、存货",
+      "physical_page": 162
+    },
+    {
+      "level": 2,
+      "title": "10、一年内到期的非流动资产",
+      "physical_page": 163
+    },
+    {
+      "level": 2,
+      "title": "11、其他流动资产",
+      "physical_page": 163
+    },
+    {
+      "level": 2,
+      "title": "12、长期应收款",
+      "physical_page": 164
+    },
+    {
+      "level": 2,
+      "title": "13、长期股权投资",
+      "physical_page": 165
+    },
+    {
+      "level": 2,
+      "title": "14、其他非流动金融资产",
+      "physical_page": 167
+    },
+    {
+      "level": 2,
+      "title": "15、固定资产",
+      "physical_page": 167
+    },
+    {
+      "level": 2,
+      "title": "16、在建工程",
+      "physical_page": 169
+    },
+    {
+      "level": 2,
+      "title": "17、使用权资产",
+      "physical_page": 170
+    },
+    {
+      "level": 2,
+      "title": "18、无形资产",
+      "physical_page": 171
+    },
+    {
+      "level": 2,
+      "title": "19、商誉",
+      "physical_page": 173
+    },
+    {
+      "level": 2,
+      "title": "20、长期待摊费用",
+      "physical_page": 175
+    },
+    {
+      "level": 2,
+      "title": "21、递延所得税资产/递延所得税负债",
+      "physical_page": 175
+    },
+    {
+      "level": 2,
+      "title": "22、其他非流动资产",
+      "physical_page": 176
+    },
+    {
+      "level": 2,
+      "title": "23、短期借款",
+      "physical_page": 177
+    },
+    {
+      "level": 2,
+      "title": "24、应付账款",
+      "physical_page": 177
+    },
+    {
+      "level": 2,
+      "title": "25、其他应付款",
+      "physical_page": 177
+    },
+    {
+      "level": 2,
+      "title": "26、预收款项",
+      "physical_page": 178
+    },
+    {
+      "level": 2,
+      "title": "27、合同负债",
+      "physical_page": 179
+    },
+    {
+      "level": 2,
+      "title": "28、应付职工薪酬",
+      "physical_page": 179
+    },
+    {
+      "level": 2,
+      "title": "29、应交税费",
+      "physical_page": 180
+    },
+    {
+      "level": 2,
+      "title": "30、一年内到期的非流动负债",
+      "physical_page": 180
+    },
+    {
+      "level": 2,
+      "title": "31、其他流动负债",
+      "physical_page": 180
+    },
+    {
+      "level": 2,
+      "title": "32、长期借款",
+      "physical_page": 181
+    },
+    {
+      "level": 2,
+      "title": "33、租赁负债",
+      "physical_page": 181
+    },
+    {
+      "level": 2,
+      "title": "34、预计负债",
+      "physical_page": 181
+    },
+    {
+      "level": 2,
+      "title": "35、递延收益",
+      "physical_page": 182
+    },
+    {
+      "level": 2,
+      "title": "36、股本",
+      "physical_page": 182
+    },
+    {
+      "level": 2,
+      "title": "37、资本公积",
+      "physical_page": 182
+    },
+    {
+      "level": 2,
+      "title": "38、库存股",
+      "physical_page": 183
+    },
+    {
+      "level": 2,
+      "title": "39、其他综合收益",
+      "physical_page": 183
+    },
+    {
+      "level": 2,
+      "title": "40、盈余公积",
+      "physical_page": 183
+    },
+    {
+      "level": 2,
+      "title": "41、未分配利润",
+      "physical_page": 183
+    },
+    {
+      "level": 2,
+      "title": "42、营业收入和营业成本",
+      "physical_page": 184
+    },
+    {
+      "level": 2,
+      "title": "43、税金及附加",
+      "physical_page": 185
+    },
+    {
+      "level": 2,
+      "title": "44、管理费用",
+      "physical_page": 185
+    },
+    {
+      "level": 2,
+      "title": "45、销售费用",
+      "physical_page": 186
+    },
+    {
+      "level": 2,
+      "title": "46、研发费用",
+      "physical_page": 186
+    },
+    {
+      "level": 2,
+      "title": "47、财务费用",
+      "physical_page": 186
+    },
+    {
+      "level": 2,
+      "title": "48、其他收益",
+      "physical_page": 187
+    },
+    {
+      "level": 2,
+      "title": "49、公允价值变动收益",
+      "physical_page": 187
+    },
+    {
+      "level": 2,
+      "title": "50、投资收益",
+      "physical_page": 187
+    },
+    {
+      "level": 2,
+      "title": "51、信用减值损失",
+      "physical_page": 187
+    },
+    {
+      "level": 2,
+      "title": "52、资产减值损失",
+      "physical_page": 188
+    },
+    {
+      "level": 2,
+      "title": "53、资产处置收益",
+      "physical_page": 188
+    },
+    {
+      "level": 2,
+      "title": "54、营业外收入",
+      "physical_page": 188
+    },
+    {
+      "level": 2,
+      "title": "55、营业外支出",
+      "physical_page": 188
+    },
+    {
+      "level": 2,
+      "title": "56、所得税费用",
+      "physical_page": 189
+    },
+    {
+      "level": 2,
+      "title": "57、其他综合收益",
+      "physical_page": 189
+    },
+    {
+      "level": 2,
+      "title": "58、现金流量表项目",
+      "physical_page": 189
+    },
+    {
+      "level": 2,
+      "title": "59、现金流量表补充资料",
+      "physical_page": 191
+    },
+    {
+      "level": 2,
+      "title": "60、所有者权益变动表项目注释",
+      "physical_page": 193
+    },
+    {
+      "level": 2,
+      "title": "61、外币货币性项目",
+      "physical_page": 193
+    },
+    {
+      "level": 2,
+      "title": "62、租赁",
+      "physical_page": 194
+    },
+    {
+      "level": 2,
+      "title": "63、数据资源",
+      "physical_page": 195
+    },
+    {
+      "level": 2,
+      "title": "64、其他",
+      "physical_page": 195
+    },
+    {
+      "level": 1,
+      "title": "八、研发支出",
+      "physical_page": 195
+    },
+    {
+      "level": 2,
+      "title": "1、符合资本化条件的研发项目",
+      "physical_page": 195
+    },
+    {
+      "level": 2,
+      "title": "2、重要外购在研项目",
+      "physical_page": 196
+    },
+    {
+      "level": 1,
+      "title": "九、合并范围的变更",
+      "physical_page": 196
+    },
+    {
+      "level": 2,
+      "title": "1、非同一控制下企业合并",
+      "physical_page": 196
+    },
+    {
+      "level": 2,
+      "title": "2、同一控制下企业合并",
+      "physical_page": 197
+    },
+    {
+      "level": 2,
+      "title": "3、反向购买",
+      "physical_page": 198
+    },
+    {
+      "level": 2,
+      "title": "4、处置子公司",
+      "physical_page": 198
+    },
+    {
+      "level": 2,
+      "title": "5、其他原因的合并范围变动",
+      "physical_page": 198
+    },
+    {
+      "level": 2,
+      "title": "6、其他",
+      "physical_page": 199
+    },
+    {
+      "level": 1,
+      "title": "十、在其他主体中的权益",
+      "physical_page": 199
+    },
+    {
+      "level": 2,
+      "title": "1、在子公司中的权益",
+      "physical_page": 199
+    },
+    {
+      "level": 2,
+      "title": "2、在子公司的所有者权益份额发生变化且仍控制子公司的交易",
+      "physical_page": 200
+    },
+    {
+      "level": 2,
+      "title": "3、在合营企业或联营企业中的权益",
+      "physical_page": 200
+    },
+    {
+      "level": 2,
+      "title": "4、重要的共同经营",
+      "physical_page": 203
+    },
+    {
+      "level": 2,
+      "title": "5、在未纳入合并财务报表范围的结构化主体中的权益",
+      "physical_page": 203
+    },
+    {
+      "level": 2,
+      "title": "6、其他",
+      "physical_page": 203
+    },
+    {
+      "level": 1,
+      "title": "十一、政府补助",
+      "physical_page": 203
+    },
+    {
+      "level": 2,
+      "title": "1、报告期末按应收金额确认的政府补助",
+      "physical_page": 203
+    },
+    {
+      "level": 2,
+      "title": "2、涉及政府补助的负债项目",
+      "physical_page": 203
+    },
+    {
+      "level": 2,
+      "title": "3、计入当期损益的政府补助",
+      "physical_page": 203
+    },
+    {
+      "level": 1,
+      "title": "十二、与金融工具相关的风险",
+      "physical_page": 204
+    },
+    {
+      "level": 2,
+      "title": "1、金融工具产生的各类风险",
+      "physical_page": 204
+    },
+    {
+      "level": 2,
+      "title": "2、套期",
+      "physical_page": 206
+    },
+    {
+      "level": 2,
+      "title": "3、金融资产",
+      "physical_page": 206
+    },
+    {
+      "level": 1,
+      "title": "十三、公允价值的披露",
+      "physical_page": 207
+    },
+    {
+      "level": 2,
+      "title": "1、以公允价值计量的资产和负债的期末公允价值",
+      "physical_page": 207
+    },
+    {
+      "level": 2,
+      "title": "2、持续和非持续第一层次公允价值计量项目市价的确定依据",
+      "physical_page": 207
+    },
+    {
+      "level": 2,
+      "title": "3、持续和非持续第二层次公允价值计量项目，采用的估值技术和重要参数的定性及定量信息",
+      "physical_page": 207
+    },
+    {
+      "level": 2,
+      "title": "4、持续和非持续第三层次公允价值计量项目，采用的估值技术和重要参数的定性及定量信息",
+      "physical_page": 207
+    },
+    {
+      "level": 2,
+      "title": "5、持续的第三层次公允价值计量项目，期初与期末账面价值间的调节信息及不可观察参数敏感性分析",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "6、持续的公允价值计量项目，本期内发生各层级之间转换的，转换的原因及确定转换时点的政策",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "7、本期内发生的估值技术变更及变更原因",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "8、不以公允价值计量的金融资产和金融负债的公允价值情况",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "9、其他",
+      "physical_page": 208
+    },
+    {
+      "level": 1,
+      "title": "十四、关联方及关联交易",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "1、本企业的母公司情况",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "2、本企业的子公司情况",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "3、本企业合营和联营企业情况",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "4、其他关联方情况",
+      "physical_page": 208
+    },
+    {
+      "level": 2,
+      "title": "5、关联交易情况",
+      "physical_page": 209
+    },
+    {
+      "level": 2,
+      "title": "6、关联方应收应付款项",
+      "physical_page": 211
+    },
+    {
+      "level": 2,
+      "title": "7、关联方承诺",
+      "physical_page": 211
+    },
+    {
+      "level": 2,
+      "title": "8、其他",
+      "physical_page": 211
+    },
+    {
+      "level": 1,
+      "title": "十五、股份支付",
+      "physical_page": 211
+    },
+    {
+      "level": 2,
+      "title": "1、股份支付总体情况",
+      "physical_page": 211
+    },
+    {
+      "level": 2,
+      "title": "2、以权益结算的股份支付情况",
+      "physical_page": 212
+    },
+    {
+      "level": 2,
+      "title": "3、以现金结算的股份支付情况",
+      "physical_page": 213
+    },
+    {
+      "level": 2,
+      "title": "4、本期股份支付费用",
+      "physical_page": 213
+    },
+    {
+      "level": 2,
+      "title": "5、股份支付的修改、终止情况",
+      "physical_page": 213
+    },
+    {
+      "level": 2,
+      "title": "6、其他",
+      "physical_page": 213
+    },
+    {
+      "level": 1,
+      "title": "十六、承诺及或有事项",
+      "physical_page": 213
+    },
+    {
+      "level": 2,
+      "title": "1、重要承诺事项",
+      "physical_page": 213
+    },
+    {
+      "level": 2,
+      "title": "2、或有事项",
+      "physical_page": 214
+    },
+    {
+      "level": 2,
+      "title": "3、其他",
+      "physical_page": 216
+    },
+    {
+      "level": 1,
+      "title": "十七、资产负债表日后事项",
+      "physical_page": 216
+    },
+    {
+      "level": 2,
+      "title": "1、重要的非调整事项",
+      "physical_page": 216
+    },
+    {
+      "level": 2,
+      "title": "2、利润分配情况",
+      "physical_page": 216
+    },
+    {
+      "level": 2,
+      "title": "3、销售退回",
+      "physical_page": 216
+    },
+    {
+      "level": 2,
+      "title": "4、其他资产负债表日后事项说明",
+      "physical_page": 216
+    },
+    {
+      "level": 1,
+      "title": "十八、其他重要事项",
+      "physical_page": 216
+    },
+    {
+      "level": 2,
+      "title": "1、前期会计差错更正",
+      "physical_page": 216
+    },
+    {
+      "level": 2,
+      "title": "2、债务重组",
+      "physical_page": 217
+    },
+    {
+      "level": 2,
+      "title": "3、资产置换",
+      "physical_page": 217
+    },
+    {
+      "level": 2,
+      "title": "4、年金计划",
+      "physical_page": 217
+    },
+    {
+      "level": 2,
+      "title": "5、终止经营",
+      "physical_page": 217
+    },
+    {
+      "level": 2,
+      "title": "6、分部信息",
+      "physical_page": 217
+    },
+    {
+      "level": 2,
+      "title": "7、其他对投资者决策有影响的重要交易和事项",
+      "physical_page": 218
+    },
+    {
+      "level": 2,
+      "title": "8、其他",
+      "physical_page": 219
+    },
+    {
+      "level": 1,
+      "title": "十九、母公司财务报表主要项目注释",
+      "physical_page": 219
+    },
+    {
+      "level": 2,
+      "title": "1、应收账款",
+      "physical_page": 219
+    },
+    {
+      "level": 2,
+      "title": "2、其他应收款",
+      "physical_page": 220
+    },
+    {
+      "level": 2,
+      "title": "3、长期股权投资",
+      "physical_page": 223
+    },
+    {
+      "level": 2,
+      "title": "4、营业收入和营业成本",
+      "physical_page": 224
+    },
+    {
+      "level": 2,
+      "title": "5、投资收益",
+      "physical_page": 225
+    },
+    {
+      "level": 2,
+      "title": "6、其他",
+      "physical_page": 226
+    },
+    {
+      "level": 1,
+      "title": "二十、补充资料",
+      "physical_page": 226
+    },
+    {
+      "level": 2,
+      "title": "1、当期非经常性损益明细表",
+      "physical_page": 226
+    },
+    {
+      "level": 2,
+      "title": "2、净资产收益率及每股收益",
+      "physical_page": 226
+    },
+    {
+      "level": 2,
+      "title": "3、境内外会计准则下会计数据差异",
+      "physical_page": 227
+    },
+    {
+      "level": 2,
+      "title": "4、其他",
+      "physical_page": 227
+    }
+  ],
+  "access_note": "Use official PDF physical pages; bookmarks are locating metadata, not source quality judgment."
+}

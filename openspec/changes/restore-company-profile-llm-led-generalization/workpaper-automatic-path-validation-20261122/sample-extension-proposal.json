@@ -1,0 +1,209 @@
+{
+  "state": "proposal_only_not_semantically_approved",
+  "seed": 20261122,
+  "source_decisions": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/a-semantic-decisions.json",
+      "sha256": "64da2dd6d2bc7d7bda7c7ceabe857faa6b6c8eb5cdedf38abe64244b5eabb588"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/a-semantic-audit-group-b.json",
+      "sha256": "21433a03d1067b7efa3efa3802c57fe16485e1ed5db590e7e97cc8b9d696ca17"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/a-semantic-audit-group-c.json",
+      "sha256": "6116b8724c5aa4cd61950eff3cba22e654892b93c84a0625fde5bf66ab832d14"
+    }
+  ],
+  "algorithm": "SHA256 fixed identity; exclude only A core/semantic duplicates/initial supplemental sample; rotate layer then next eligible company in frozen dispatch order; no semantic selection",
+  "declared_queue_mismatches": [],
+  "proposed_sample_extension": [
+    {
+      "proposal_order": 1,
+      "layer": "manufacturing",
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "fact_id": "F-RM-06",
+      "rank_sha256": "ca56e0aa0655cbee7cfb6f9fbe924e42e3cc55438efbbbcab700b327a23755fb",
+      "workpaper_fact_hash": "1e5aa2f9c811252a68268ce85260f8f760a78e8af73e6f8decf383d2cb5f7675",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000338/company_profile_common_core.v1/bp-work-bbd1db65c451d1d024bdb9b9.json",
+      "runtime_sha256": "573599e6e252bbf8b5963e016f242ab9420945a357a72e7bfda41a8239c4b7b6",
+      "source_locations": [
+        {
+          "evidence_id": "source-0014",
+          "physical_pages": [
+            158
+          ],
+          "section_path": [
+            "第八节 财务报告",
+            "营业收入的明细情况"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal_order": 2,
+      "layer": "services",
+      "instrument_id": "601006.SH",
+      "work_id": "bp-work-799fa5830dc8411f11f22ca6",
+      "fact_id": "F26",
+      "rank_sha256": "b4cce44b121eb87c9405d3e240539a0e40a94dc991384664872b96597316c4cd",
+      "workpaper_fact_hash": "88abc77a4973a9c652912faba578acae675d1611f341d0220ba989d41d20482d",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601006/company_profile_common_core.v1/bp-work-799fa5830dc8411f11f22ca6.json",
+      "runtime_sha256": "831da4f6f20fe7dca87acd1f093ec2d0c2655850abc66b96e68b3a82b5e3878b",
+      "source_locations": [
+        {
+          "evidence_id": "source-0005",
+          "physical_pages": [
+            12
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal_order": 3,
+      "layer": "finance",
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "fact_id": "F31",
+      "rank_sha256": "c650d14ce11679c32c539a1cde3ece6013625080e1be389f6c6bb08ddc821818",
+      "workpaper_fact_hash": "639703dfe16794048d97b342571a7fbe20846ea491416b370a6d8ee6e6c9d1b7",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600015/company_profile_common_core.v1/bp-work-0bf9bfd2e2031508d9c45c9f.json",
+      "runtime_sha256": "e9ed8c5d4fcc244553cab6a12ede4908561d33e51ff605e01f7c28d5b1858c6c",
+      "source_locations": [
+        {
+          "evidence_id": "source-0002",
+          "physical_pages": [
+            9
+          ],
+          "section_path": [
+            "第二节 公司简介和主要财务指标"
+          ]
+        },
+        {
+          "evidence_id": "source-0008",
+          "physical_pages": [
+            17
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "3.3 总体经营情况讨论与分析"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal_order": 4,
+      "layer": "other",
+      "instrument_id": "000006.SZ",
+      "work_id": "bp-work-c5b84bd9a116e97c17f38b56",
+      "fact_id": "F-RM-02",
+      "rank_sha256": "ba2d987d42d6e648417ec7a0797aac569f3d20496f23e40f0d7850dc27bd6ac4",
+      "workpaper_fact_hash": "99747a410fb65ea5bdadf253bceb77f32729fabb39afed0b766d6e73d484d5cc",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000006/company_profile_common_core.v1/bp-work-c5b84bd9a116e97c17f38b56.json",
+      "runtime_sha256": "3993a56b0aabbf720ae7f6b3409b550dc5e5c81c6e0dec2954151e45b705dbdb",
+      "source_locations": [
+        {
+          "evidence_id": "source-0007",
+          "physical_pages": [
+            15
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal_order": 5,
+      "layer": "manufacturing",
+      "instrument_id": "000651.SZ",
+      "work_id": "bp-work-8b886b28b2588fc228029832",
+      "fact_id": "F-SC-03",
+      "rank_sha256": "f6b8e6e2ee1215c677ea5f7c84a52bbc19ee05d2d786065b43b0b5cbc841f605",
+      "workpaper_fact_hash": "06f4b48c815bc05e63b57703d80ab89d201b4181b36d7bc0833b074dc9befe69",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000651/company_profile_common_core.v1/bp-work-8b886b28b2588fc228029832.json",
+      "runtime_sha256": "8a5f58325d458f5196504e9293d44b2e1164f0aeabe7268ab7051a4a223ca708",
+      "source_locations": [
+        {
+          "evidence_id": "source-0001",
+          "physical_pages": [
+            10
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ]
+        },
+        {
+          "evidence_id": "source-0004",
+          "physical_pages": [
+            15
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ]
+        },
+        {
+          "evidence_id": "source-0006",
+          "physical_pages": [
+            17
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ]
+        },
+        {
+          "evidence_id": "source-0011",
+          "physical_pages": [
+            22
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal_order": 6,
+      "layer": "services",
+      "instrument_id": "600859.SH",
+      "work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "fact_id": "F28",
+      "rank_sha256": "f2a713a3d08d0701296d48b2f32b332a4849241a78e0830ccbad6eae354df62d",
+      "workpaper_fact_hash": "41f386987423db67b282287f0868f1ea8b8d0836bde81ee9a588cd3a4463be45",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600859/company_profile_common_core.v1/bp-work-d32507d43cbb1c885b6b4e34.json",
+      "runtime_sha256": "591cfabb2684cdf16a4ac441b11f02c480fd8ef4e467c5b25521c98887686f79",
+      "source_locations": [
+        {
+          "evidence_id": "source-0017",
+          "physical_pages": [
+            27
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "零售行业经营性信息分析"
+          ]
+        },
+        {
+          "evidence_id": "source-0018",
+          "physical_pages": [
+            28
+          ],
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "零售行业经营性信息分析"
+          ]
+        }
+      ]
+    }
+  ]
+}

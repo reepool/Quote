@@ -1,0 +1,37 @@
+{
+  "schema_version": "company_profile_review_recovery_plan.v1",
+  "request_id": "6ey-920014-source-review",
+  "state": "planned",
+  "execution_started": false,
+  "instrument_id": "920014.BJ",
+  "report": {
+    "instrument_id": "920014.BJ",
+    "report_id": "asset_4200550ae843a9d19834ece962d5323c",
+    "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "reading_work_id": "bp-work-ee612f8622b7100a0bb6a86a",
+  "workpaper_sha256": "1e42ab143686babbe27ed66026f563df73a9486f379d88957d30488cebb03c22",
+  "review_follow_up": {
+    "state": "planned",
+    "execution_started": false,
+    "next_purpose": "review_profile_workpaper",
+    "resume_mode": "review_saved_draft",
+    "retained_stages": [],
+    "candidate_ids": [],
+    "max_new_logical_requests": 3,
+    "original_draft_sha256": "1e42ab143686babbe27ed66026f563df73a9486f379d88957d30488cebb03c22",
+    "binding_status": "required_before_execution",
+    "requires": [
+      "original_draft_and_source_binding",
+      "preserve_current_use_restrictions",
+      "explicit_model_and_finite_budget",
+      "publication_write_permission"
+    ],
+    "reason": "review_not_started"
+  },
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

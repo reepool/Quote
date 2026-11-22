@@ -1,0 +1,1871 @@
+{
+  "updated_epoch": 1795336297.3243845,
+  "scope": "Mechanical current object and actual adoption/source-page index; not semantic approval. Replacement IDs may equal original IDs; hashes distinguish versions.",
+  "companies": [
+    {
+      "instrument_id": "000049.SZ",
+      "report": {
+        "instrument_id": "000049.SZ",
+        "report_id": "asset_7ae78f972cf60e746bd29ae8f2b7f2af",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000049/company_profile_common_core.v1/bp-work-4eff58b1460ad9bdccd0133d.json",
+      "current_runtime_sha256": "fc397b5d06fe52114272043aaee5b85f4f35fe3e3d5bfffb5911ed2c8c521e3e",
+      "current_work_id": "bp-work-4eff58b1460ad9bdccd0133d",
+      "workpaper_hash": "62a68becdae3385758728220aef2caae635a29973915c20accab5c21f05bbca7",
+      "adopted_revisions": [
+        {
+          "finding_id": "REV-F22",
+          "element": "operating_drivers",
+          "original_fact_id": "F22",
+          "replacement_id": "F22",
+          "original_fact_hash": "e98b5a25732658837f2e874cac32f38b80335e862d245b11b7ed4e348dc00d80",
+          "replacement_fact_hash": "686d516ae5a72d3fa9cd77912f9c4f1f957e0e5a4acdc1f8ee326f129a24f803",
+          "source_locations": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b"
+            }
+          ]
+        },
+        {
+          "finding_id": "REV-F23",
+          "element": "operating_drivers",
+          "original_fact_id": "F23",
+          "replacement_id": "F23",
+          "original_fact_hash": "03bcf731adab6597bf3cc367464b9d25d7bd38b7a58701623c7f396af7917320",
+          "replacement_fact_hash": "dedb1a3bfbaaae288634ffde6a5b57a9154455d19907a3e38670955b3f1319cd",
+          "source_locations": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "601006.SH",
+      "report": {
+        "instrument_id": "601006.SH",
+        "report_id": "asset_ada8751265db5b17cb19a4ade45f068e",
+        "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601006/company_profile_common_core.v1/bp-work-799fa5830dc8411f11f22ca6.json",
+      "current_runtime_sha256": "831da4f6f20fe7dca87acd1f093ec2d0c2655850abc66b96e68b3a82b5e3878b",
+      "current_work_id": "bp-work-799fa5830dc8411f11f22ca6",
+      "workpaper_hash": "635ae9adfa72f0d0b47b093349779bdf0e52ad1584d896bef8466b0a773e38a3",
+      "adopted_revisions": [
+        {
+          "finding_id": "RF-F15",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F15",
+          "replacement_id": "F15",
+          "original_fact_hash": "efb17e91fe4866d80d09ee867c32d7ec9dc5514d2c6e9a5d0ce4387e3580f847",
+          "replacement_fact_hash": "e6e428150ed355fc565ae0f97d466e09b93f29314f3cf2fdc459f859021d542a",
+          "source_locations": [
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "分行业情况"
+              ],
+              "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695"
+            },
+            {
+              "evidence_id": "source-0015",
+              "physical_pages": [
+                167
+              ],
+              "section_path": [
+                "第七节 债券相关情况",
+                "二、将重分类进损益的",
+                "61、 营业收入和营业成本"
+              ],
+              "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695"
+            },
+            {
+              "evidence_id": "source-0016",
+              "physical_pages": [
+                168
+              ],
+              "section_path": [
+                "第七节 债券相关情况",
+                "二、将重分类进损益的",
+                "61、 营业收入和营业成本"
+              ],
+              "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695"
+            }
+          ]
+        },
+        {
+          "finding_id": "RF-F27",
+          "element": "material_changes",
+          "original_fact_id": "F27",
+          "replacement_id": "F27",
+          "original_fact_hash": "787b80eba9bb51898008056119d87ff03924bac40cf7ca8505bf7537624fc685",
+          "replacement_fact_hash": "0c9dc9af2e4d767d7fd69e066601e8e9b9ea8c037405fe3c3926732d6a44f216",
+          "source_locations": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695"
+            },
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695"
+            }
+          ]
+        },
+        {
+          "finding_id": "RF-F14",
+          "element": "scale_and_mix",
+          "original_fact_id": "F14",
+          "replacement_id": "F14",
+          "original_fact_hash": "37611597e16800e37fb5ca4bffe9538457e278147cd671c029d6a896f4b5a20d",
+          "replacement_fact_hash": "6d6ced7a3babdaa96b98964b01a31cabae42eaf94638d1e6c5972acc07ca150e",
+          "source_locations": [
+            {
+              "evidence_id": "source-0004",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695"
+            }
+          ]
+        },
+        {
+          "finding_id": "RF-F23",
+          "element": "operating_drivers",
+          "original_fact_id": "F23",
+          "replacement_id": "F23",
+          "original_fact_hash": "bc63aefbfb35cb86aa6dfe5b4b3126b8cd9e3a385b74e0183232a183f3921e7a",
+          "replacement_fact_hash": "ee845d68d69409bd602ae1b470a88b14e550c398f348af56f84b1a7478a9319a",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "600015.SH",
+      "report": {
+        "instrument_id": "600015.SH",
+        "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600015/company_profile_common_core.v1/bp-work-0bf9bfd2e2031508d9c45c9f.json",
+      "current_runtime_sha256": "e9ed8c5d4fcc244553cab6a12ede4908561d33e51ff605e01f7c28d5b1858c6c",
+      "current_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "workpaper_hash": "3af21b7f69a877d906a3cacd44350f3e685040151f184a44ebb5a484ce176c63",
+      "adopted_revisions": [
+        {
+          "finding_id": "FND-04",
+          "element": "operating_drivers",
+          "original_fact_id": "F31",
+          "replacement_id": "F31",
+          "original_fact_hash": "fab304df075afc23e4679cd6f403c20d3d6dbc570ac6fcae7dc54926c3db2366",
+          "replacement_fact_hash": "639703dfe16794048d97b342571a7fbe20846ea491416b370a6d8ee6e6c9d1b7",
+          "source_locations": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第二节 公司简介和主要财务指标"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            },
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "3.3 总体经营情况讨论与分析"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-05",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F23",
+          "replacement_id": "F23",
+          "original_fact_hash": "dcc7d0f08eadc14f759a6ea6142f10974660183420ae90715cec0db7db4cf7f6",
+          "replacement_fact_hash": "bfb1884caaa68f17a914a5ad36d1c4d1ec64cf651dd1ba370dde4199b40e353a",
+          "source_locations": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "3.3 总体经营情况讨论与分析"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-06",
+          "element": "upstream_inputs",
+          "original_fact_id": "F36",
+          "replacement_id": "F36",
+          "original_fact_hash": "dc423148d123ec5c8f74ad1bcb6acca1f878dd2565cd88ac7da8c68fa267c9aa",
+          "replacement_fact_hash": "d0354302d8642bf4416c93f0504c2e5b51405bec1fd1a3852b30aba75ee943a4",
+          "source_locations": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "3.3 总体经营情况讨论与分析"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            },
+            {
+              "evidence_id": "source-0019",
+              "physical_pages": [
+                51
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "资产托管业务"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-07",
+          "element": "revenue_model",
+          "original_fact_id": "F14",
+          "replacement_id": "F14",
+          "original_fact_hash": "bce4eb2fd747df290f679903ce1f96634bb189b176ab9e10f9f135cdfa515a98",
+          "replacement_fact_hash": "92ebb70115b611f19602581d45404fadbef221ab03ed9fe0d6f8351124adf265",
+          "source_locations": [
+            {
+              "evidence_id": "source-0016",
+              "physical_pages": [
+                49
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "资产管理业务"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-08",
+          "element": "customers_channels_markets",
+          "original_fact_id": "F26",
+          "replacement_id": "F26",
+          "original_fact_hash": "1c4bb35621598e235816b740a222f0af5665411baf0c0993cf40d4135c7d979c",
+          "replacement_fact_hash": "03f61efe9533bfd1cf29f7fb9f565ea95be515e65f5115ba19af56d1c71ca79f",
+          "source_locations": [
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "3.1 业务概要"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            },
+            {
+              "evidence_id": "source-0011",
+              "physical_pages": [
+                21
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "按地区划分营业收入情况"
+              ],
+              "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "FND-01",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "FND-02",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "FND-03",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "model_review_status": "incomplete",
+      "model_review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F10,F17,F32,F33,F34"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "report": {
+        "instrument_id": "600348.SH",
+        "report_id": "asset_f320e4e874bc2381e9f05bb662544a64",
+        "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600348/company_profile_common_core.v1/bp-work-c1ce1a5b541e1116b231a0ac.json",
+      "current_runtime_sha256": "8f77b1d3d5c9b523feaee2d05f7bcdb94774fef97ee3d7d12528036a20c5ecdb",
+      "current_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "workpaper_hash": "772b9225bb8861349229756d3e0ca62d100da34f7185fe5f1770a907707b4413",
+      "adopted_revisions": [
+        {
+          "finding_id": "R001",
+          "element": "material_changes",
+          "original_fact_id": "F026",
+          "replacement_id": "F026",
+          "original_fact_hash": "de926730b0d15eaba541fc5744b40df64f9ac05bbbd9b0f93f2f1e6bb6513795",
+          "replacement_fact_hash": "21a31a67cc16d9343e9524d9069d18b7333d3e7220b6e0976e198c979086d38d",
+          "source_locations": [
+            {
+              "evidence_id": "source-0004",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+            },
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "分产品情况"
+              ],
+              "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+            }
+          ]
+        },
+        {
+          "finding_id": "R002",
+          "element": "revenue_model",
+          "original_fact_id": null,
+          "replacement_id": "review-add:R002",
+          "original_fact_hash": null,
+          "replacement_fact_hash": "f262da3692e7d0b754feafc51ec9588551bdf634d5536499fee9181d34dbc6e4",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "主营业务分产品情况"
+              ],
+              "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+            }
+          ]
+        },
+        {
+          "finding_id": "R005",
+          "element": "revenue_model",
+          "original_fact_id": "F007",
+          "replacement_id": "F007",
+          "original_fact_hash": "e998107a67064ba6441644455b6e7d89b381c96b9f382c6923a964e63669e560",
+          "replacement_fact_hash": "9005f4ea5ab0f6e487c6cddf32ce0b44dd13aa62bffd53b2cde3f4d8fa635bc1",
+          "source_locations": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+            },
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "主营业务分产品情况"
+              ],
+              "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+            }
+          ]
+        },
+        {
+          "finding_id": "R006",
+          "element": "position",
+          "original_fact_id": "F027",
+          "replacement_id": "F027",
+          "original_fact_hash": "cdf73246bfd17574e072cdd58b6513a3293a343213bdf0dfbb859d6c17124dde",
+          "replacement_fact_hash": "0f15c2f5a8fbbacaeaebce939b25f28565e5d314554f8a4f9bbfd00c3d38844b",
+          "source_locations": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "R003",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R004",
+          "affected_fact_id": "F006",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R007",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "model_review_status": "incomplete",
+      "model_review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F008,F013,F017"
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "report": {
+        "instrument_id": "000338.SZ",
+        "report_id": "asset_aa48dc0bb926a85541dfeacd0f94224f",
+        "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000338/company_profile_common_core.v1/bp-work-bbd1db65c451d1d024bdb9b9.json",
+      "current_runtime_sha256": "573599e6e252bbf8b5963e016f242ab9420945a357a72e7bfda41a8239c4b7b6",
+      "current_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "workpaper_hash": "1a3829d7d1697ed98b0379480e98a793b6df95144ae7298f8611a0c05bf1ca99",
+      "adopted_revisions": [
+        {
+          "finding_id": "WR-001",
+          "element": "material_changes",
+          "original_fact_id": "F-MC-02",
+          "replacement_id": "F-MC-02",
+          "original_fact_hash": "b85bc8e803dc0203112e10abdc3a9f2f771a616ae271fa8a2a499fac7ab3ba78",
+          "replacement_fact_hash": "409cdf6267ef40d93c0e52c021988e78c103ceb39072e8f36e7d22bc61e1a304",
+          "source_locations": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR-002",
+          "element": "business_structure",
+          "original_fact_id": "F-BS-03",
+          "replacement_id": "F-BS-03",
+          "original_fact_hash": "2a0d83520014ee9704af8f21a455f6a23997c9c070c76682918c2673713d6fde",
+          "replacement_fact_hash": "47ad8437e8db2a3a96e72274a1cc296c88d9d09b2a24d82858a574816a1aaadf",
+          "source_locations": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR-003",
+          "element": "operating_drivers",
+          "original_fact_id": "F-OD-01",
+          "replacement_id": "F-OD-01",
+          "original_fact_hash": "db81833fd12c5a73ac9752e16489e8e6747cd675c413aa3ecaff3b37fe5e87d9",
+          "replacement_fact_hash": "3edfdc990526072d58f688b41c52ab0efb4fab56307a801bec27ee1446f5d498",
+          "source_locations": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "新能源汽车整车及零部件的生产经营情况"
+              ],
+              "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "600859.SH",
+      "report": {
+        "instrument_id": "600859.SH",
+        "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600859/company_profile_common_core.v1/bp-work-d32507d43cbb1c885b6b4e34.json",
+      "current_runtime_sha256": "591cfabb2684cdf16a4ac441b11f02c480fd8ef4e467c5b25521c98887686f79",
+      "current_work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "workpaper_hash": "fbb32b69bc2dbce510bc282afa96942256f17a1fc6d88dcbea26efb695e6a3bd",
+      "adopted_revisions": [],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "R1",
+          "affected_fact_id": "F01",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "R2",
+          "affected_fact_id": "F05",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "R3",
+          "affected_fact_id": "F24",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "R4",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R5",
+          "affected_fact_id": "F18",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R6",
+          "affected_fact_id": "F30",
+          "resolution": "repair_rejected"
+        }
+      ],
+      "model_review_status": "incomplete",
+      "model_review_error": "复核覆盖不完整：未核编号=；未知或重复编号=F13,F16,F27"
+    },
+    {
+      "instrument_id": "601166.SH",
+      "report": {
+        "instrument_id": "601166.SH",
+        "report_id": "asset_59a39443ec9ffcc516feddd8820d3f19",
+        "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601166/company_profile_common_core.v1/bp-work-52d5b4c1992e90c91aa2c48c.json",
+      "current_runtime_sha256": "d0ee15fda30777f10a40e4654ae8876b0a4399c9e2c47aa26a48baf92f3136c1",
+      "current_work_id": "bp-work-52d5b4c1992e90c91aa2c48c",
+      "workpaper_hash": "256eb0d5cb4959ce39a727eb8b8a47976b6b085e1662ad1f1674b358efa86ed5",
+      "adopted_revisions": [
+        {
+          "finding_id": "WR01",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F12",
+          "replacement_id": "F12",
+          "original_fact_hash": "10ff88a917095a69d36187e15ac8db08cdc00ee30662bcd5f5737a9a676e110e",
+          "replacement_fact_hash": "4d9c0ca5cd7a849e225283871d5a3e5fb8ff419e53984072a920511f8fe274df",
+          "source_locations": [
+            {
+              "evidence_id": "source-0011",
+              "physical_pages": [
+                101
+              ],
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "3.6 业务情况分析"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            },
+            {
+              "evidence_id": "source-0012",
+              "physical_pages": [
+                102
+              ],
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "3.6 业务情况分析"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR02",
+          "element": "scale_and_mix",
+          "original_fact_id": "F10",
+          "replacement_id": "F10",
+          "original_fact_hash": "674a7b9ef07e04bf633dd8203b6a949fb020c4f1d1e77f6854b0ad683a40f5c8",
+          "replacement_fact_hash": "783fa373a4d31de54394067393931703a2210dc02976c98da0dc9402c26a9572",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                30
+              ],
+              "section_path": [
+                "第二章 财务摘要",
+                "2.1 主要会计数据和财务指标"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR03",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F14",
+          "replacement_id": "F14",
+          "original_fact_hash": "658f30f560a66978c32dc766f12ab61cf7f658b351566f88aa3da239ba764ef4",
+          "replacement_fact_hash": "acaf291aa09f512c6c381c910f894baa9f506cf711b98d420d19533012f9090f",
+          "source_locations": [
+            {
+              "evidence_id": "source-0014",
+              "physical_pages": [
+                103
+              ],
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "业务情况分析",
+                "3.6.2 业务分析"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR04",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F15",
+          "replacement_id": "F15",
+          "original_fact_hash": "d80b9ad2f33d08694b7261358217d6dbadaccf1b837edbf9c5b1541af7866384",
+          "replacement_fact_hash": "1aa4a66fa50e291a6a3f3161991122a0fc6a157e5ccf8d601cd55af1346b512e",
+          "source_locations": [
+            {
+              "evidence_id": "source-0017",
+              "physical_pages": [
+                105
+              ],
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "线上下、本外币、离在岸、商投行“五位一体”的国际业务",
+                "3.6.2.2 零售金融业务"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            },
+            {
+              "evidence_id": "source-0018",
+              "physical_pages": [
+                106
+              ],
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "线上下、本外币、离在岸、商投行“五位一体”的国际业务",
+                "3.6.2.2 零售金融业务"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR06",
+          "element": "operating_drivers",
+          "original_fact_id": "F24",
+          "replacement_id": "F24",
+          "original_fact_hash": "917341d7ba6e1584083570671541143804df73632a20fcbe6bb87a38e2f919e4",
+          "replacement_fact_hash": "f63dc369db2fdae51b6369bf81c80ea3dc3bfe41f0acaeb40c9cb9847b1b7a54",
+          "source_locations": [
+            {
+              "evidence_id": "source-0018",
+              "physical_pages": [
+                106
+              ],
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "线上下、本外币、离在岸、商投行“五位一体”的国际业务",
+                "3.6.2.2 零售金融业务"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR07",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F13",
+          "replacement_id": "F13",
+          "original_fact_hash": "24e068ca9646e535fca7ef0a3b48f60f4b16c5c652028e292bb2ac854589e0e7",
+          "replacement_fact_hash": "9cb8a1fdb6fbd5f5ff5b33033a072950cb0e8eb0002c8c31ea5a022c89272c4a",
+          "source_locations": [
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                76
+              ],
+              "section_path": [
+                "第三章 管理层讨论与分析",
+                "3.5 财务报表分析"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            }
+          ]
+        },
+        {
+          "finding_id": "WR09",
+          "element": "company_features",
+          "original_fact_id": "F30",
+          "replacement_id": "F30",
+          "original_fact_hash": "ac884f36414add03d9abb4b03fe55094ed097f01fca0f536b45331f16ef6e7d4",
+          "replacement_fact_hash": "ae9535c8559dd23d6770380bdb5b47f188faddd8bf4c54876d7e9b2ac247a9b8",
+          "source_locations": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第一章 公司简介",
+                "1.1 公司概况"
+              ],
+              "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "WR05",
+          "affected_fact_id": "F21",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "WR08",
+          "affected_fact_id": "F28",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "WR10",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "model_review_status": "completed_with_open_findings",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "600900.SH",
+      "report": {
+        "instrument_id": "600900.SH",
+        "report_id": "asset_691ced9281b1e1ac71b2d57fbb311cf8",
+        "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600900/company_profile_common_core.v1/bp-work-b9a21297ab8f537b8e62f19d.json",
+      "current_runtime_sha256": "d3602e28812a6ddf22d374cbe4d134cb7767a28acf5a9024736eaa2ea844cf0f",
+      "current_work_id": "bp-work-b9a21297ab8f537b8e62f19d",
+      "workpaper_hash": "7ed9a19d72c1ee6e3fc144e44d27789e86b87ea6b0a1838a9c54ff4970f6f22f",
+      "adopted_revisions": [
+        {
+          "finding_id": "R01",
+          "element": "downstream_customers",
+          "original_fact_id": "F26",
+          "replacement_id": "F26",
+          "original_fact_hash": "cc8dc3f6ce7a01c1312ca4c70e35e98ba741e6051236c4f1ef4eb999b2d4b7ad",
+          "replacement_fact_hash": "3ba843b18a488bc9e6d8180f6e934d53064457e0f99fc925e321b79cdd03fe5e",
+          "source_locations": [
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第二节 公司简介和主要财务指标",
+                "电力行业经营性信息分析"
+              ],
+              "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91"
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                20
+              ],
+              "section_path": [
+                "第二节 公司简介和主要财务指标",
+                "电力行业经营性信息分析"
+              ],
+              "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "report": {
+        "instrument_id": "000651.SZ",
+        "report_id": "asset_f73f966a206b2033870280b5582c290c",
+        "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000651/company_profile_common_core.v1/bp-work-8b886b28b2588fc228029832.json",
+      "current_runtime_sha256": "8a5f58325d458f5196504e9293d44b2e1164f0aeabe7268ab7051a4a223ca708",
+      "current_work_id": "bp-work-8b886b28b2588fc228029832",
+      "workpaper_hash": "88a806b24eb206668617103a82d9e31980611a53e5dedb82da0438a06684f41b",
+      "adopted_revisions": [
+        {
+          "finding_id": "FR-001",
+          "element": "material_changes",
+          "original_fact_id": "F-MC-01",
+          "replacement_id": "F-MC-01",
+          "original_fact_hash": "61ff0ecaca5bb11ee370eb29baa4977118bc6d72b2fc905092435a8cff931b32",
+          "replacement_fact_hash": "840b215c7c2c00af799623900e65c95c49673834727b0d124a9fce8d47afc089",
+          "source_locations": [
+            {
+              "evidence_id": "source-0014",
+              "physical_pages": [
+                25
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c"
+            }
+          ]
+        },
+        {
+          "finding_id": "FR-002",
+          "element": "operating_drivers",
+          "original_fact_id": "F-OD-01",
+          "replacement_id": "F-OD-01",
+          "original_fact_hash": "5019e07c15f81d1bb7f82715e9379c8b2f6ac182ffc4e355c4a238c9bb01f63a",
+          "replacement_fact_hash": "f61c58b92ef5632080f86e504d24733759e4d81e1324fd862c79e9f7e4a65804",
+          "source_locations": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "report": {
+        "instrument_id": "000526.SZ",
+        "report_id": "asset_4a4d1f962befae75d94117257218409b",
+        "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000526/company_profile_common_core.v1/bp-work-88e327a6f594ec32aa9e05ec.json",
+      "current_runtime_sha256": "b9133e5e5699c8f9d42e36f9cbd997a71007345505f203fe8d45abb51672235d",
+      "current_work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "workpaper_hash": "904c4e7bf2872d81d7b15742f5aca021d2a2e68c34752e1333450a8045ceddc9",
+      "adopted_revisions": [
+        {
+          "finding_id": "R01",
+          "element": "customers_channels_markets",
+          "original_fact_id": "F22",
+          "replacement_id": "F22",
+          "original_fact_hash": "e33449c3bb425e2757606013e4756c8dd09a90c3c0559c49d0a8152cd6784503",
+          "replacement_fact_hash": "c59e1ae1014240fe3cae27303a5cdf9e8b20dd94b71d9d79027d5a891b52b064",
+          "source_locations": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4"
+            },
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4"
+            }
+          ]
+        },
+        {
+          "finding_id": "R02",
+          "element": "material_changes",
+          "original_fact_id": "F29",
+          "replacement_id": "F29",
+          "original_fact_hash": "084c43ee238a17c94a23a9dccf9fba4f4c07f54124f534aea91dec00b525e366",
+          "replacement_fact_hash": "022f2d1a4699f07076beb66eeb5aecfa57a72e78db78261282b1d59670bd7f91",
+          "source_locations": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                19
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4"
+            }
+          ]
+        },
+        {
+          "finding_id": "R03",
+          "element": "material_changes",
+          "original_fact_id": "F26",
+          "replacement_id": "F26",
+          "original_fact_hash": "9f5140edf13f887766f9c3f9804f01e6e24b0b9f64140270d08b46037b596aeb",
+          "replacement_fact_hash": "73e0d92a51aa207015fdd0abe8281aab99335d5565d1a40c8b8c9d4b7015b7c5",
+          "source_locations": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4"
+            }
+          ]
+        },
+        {
+          "finding_id": "R04",
+          "element": "revenue_model",
+          "original_fact_id": "F12",
+          "replacement_id": "F12",
+          "original_fact_hash": "37c95bcb2a2b4e8eda1f2880eeb9fddf64ad749139ed0b3976937ffe73d67398",
+          "replacement_fact_hash": "a260c8fa52822ee43e6fb3ef266caa29768fe5a6bbe08057f242d216fd0a237f",
+          "source_locations": [
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4"
+            },
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4"
+            }
+          ]
+        },
+        {
+          "finding_id": "R05",
+          "element": "company_features",
+          "original_fact_id": "F34",
+          "replacement_id": "F34",
+          "original_fact_hash": "3eebe7e413e0ddf659c05fe7fe3cafd7e48ec8ffeef8c872c4df7dd0cc5f180a",
+          "replacement_fact_hash": "2d0f63fab831db2f91e7f165965061bc99313c22338c6f612ed9d00a8078bac0",
+          "source_locations": [
+            {
+              "evidence_id": "source-0004",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "R06",
+          "affected_fact_id": "F28",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R07",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R08",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "model_review_status": "completed_with_open_findings",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "601377.SH",
+      "report": {
+        "instrument_id": "601377.SH",
+        "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601377/company_profile_common_core.v1/bp-work-016367c43308049bffc006bc.json",
+      "current_runtime_sha256": "b5af2b3364fed499a926463a563079aa3afba1c9447520712374a2ea802ef0d9",
+      "current_work_id": "bp-work-016367c43308049bffc006bc",
+      "workpaper_hash": "fc081db01752256b41763391b5644b7a3e5632b6078cafa2b858feaa10d0a696",
+      "adopted_revisions": [],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "000006.SZ",
+      "report": {
+        "instrument_id": "000006.SZ",
+        "report_id": "asset_c1e17dfb6af589909da720726741948d",
+        "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-02T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000006/company_profile_common_core.v1/bp-work-c5b84bd9a116e97c17f38b56.json",
+      "current_runtime_sha256": "3993a56b0aabbf720ae7f6b3409b550dc5e5c81c6e0dec2954151e45b705dbdb",
+      "current_work_id": "bp-work-c5b84bd9a116e97c17f38b56",
+      "workpaper_hash": "968722d9da63acbe987cd9eeda5e03ad89aff1da8c948d6abaa2809cd0b93582",
+      "adopted_revisions": [
+        {
+          "finding_id": "FND-MC-03",
+          "element": "material_changes",
+          "original_fact_id": "F-MC-03",
+          "replacement_id": "F-MC-03",
+          "original_fact_hash": "fe0c7ff2b3f2f4e4d851261b8e3d0124a3e042f74e197cd40c50d858d0ea33bd",
+          "replacement_fact_hash": "e8b7b89ad72ec29af44a8032cd9291342a5b500673d45921d766fc4d5c933ad5",
+          "source_locations": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-CF-02",
+          "element": "company_features",
+          "original_fact_id": "F-CF-02",
+          "replacement_id": "F-CF-02",
+          "original_fact_hash": "20d6bdac5c606e14bbddbddce95a59a4bb4ee3c40f3388028613a50a5438734f",
+          "replacement_fact_hash": "3a608ebf3f507652513ddb09b1a0e0b58981bf8dc4ae1116c8719a2ed72c29dc",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-RM-01",
+          "element": "revenue_model",
+          "original_fact_id": "F-RM-01",
+          "replacement_id": "F-RM-01",
+          "original_fact_hash": "cc4a55fa422fde8959b70354dc3980844321e9a2ac0e37e06d1a2b0b020a34d1",
+          "replacement_fact_hash": "fa912535770d4404518bf06ba249ce0783b0e211a36a4a40af8f4c01b873ca37",
+          "source_locations": [
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-SM-04",
+          "element": "scale_and_mix",
+          "original_fact_id": "F-SM-04",
+          "replacement_id": "F-SM-04",
+          "original_fact_hash": "a53e156d57f79c896bf5dc23a9409535e33ec615e7eec25b8f481cce42d2a461",
+          "replacement_fact_hash": "29c7dfaa0f3ff380657f1e6702ba9e8a30d0d66deaf4c3a1ae50feefa6869e88",
+          "source_locations": [
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7"
+            },
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-OI-02",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F-OI-02",
+          "replacement_id": "F-OI-02",
+          "original_fact_hash": "914ee92ed424bdf470ca2b2c13f006e0fc717bd3fc168dcccb499a3418a273be",
+          "replacement_fact_hash": "ddc31957062162e20adcb5d5920a46014d03a349542ffa213b9908d635d3d20c",
+          "source_locations": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "600316.SH",
+      "report": {
+        "instrument_id": "600316.SH",
+        "report_id": "asset_1a30dda2a856cad8434d78325dae97b7",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600316/company_profile_common_core.v1/bp-work-1fd5914a27e798dd60b2a8e4.json",
+      "current_runtime_sha256": "34c555112bff576c2e2c7a8e449f8149d84ebbb6cba01d80ec4c6f7f3e0c88dd",
+      "current_work_id": "bp-work-1fd5914a27e798dd60b2a8e4",
+      "workpaper_hash": "2b2f764e29d78936aa787e0ffc211dedec321a0af68f2fc59847b0a7faf33bed",
+      "adopted_revisions": [
+        {
+          "finding_id": "R01",
+          "element": "business_structure",
+          "original_fact_id": "F01",
+          "replacement_id": "F01",
+          "original_fact_hash": "74f89ba226f81ee90aff41f7facc03323cdb4d70efdfbd68898b720fb397f16d",
+          "replacement_fact_hash": "71586869e354d5ca3e44ca4ca20a95d6979f39cd6ece9259a8799f7752b1bf87",
+          "source_locations": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                116
+              ],
+              "section_path": [
+                "第八节 财务报告",
+                "二、将重分类进",
+                "33、 营业收入和营业成本"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            }
+          ]
+        },
+        {
+          "finding_id": "R02",
+          "element": "material_changes",
+          "original_fact_id": "F27",
+          "replacement_id": "F27",
+          "original_fact_hash": "ba015a96b0c2e3e97cd95cc5a86ea521a7b71a33bd096494c940c99f9b4a925b",
+          "replacement_fact_hash": "2602f6d3ed5779f853ea9748cde6084fbf5ca6e8b4116dec4468cade36d9f03d",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            },
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "分产品情况"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            }
+          ]
+        },
+        {
+          "finding_id": "R03",
+          "element": "products_services",
+          "original_fact_id": "F07",
+          "replacement_id": "F07",
+          "original_fact_hash": "2891e3dc4b4e1704da904645557acf9e947a91d279131cef6f6332a947484130",
+          "replacement_fact_hash": "de8a75c33c15124ffbb13147e326f762602aa5c793779512a0adfc402c31c734",
+          "source_locations": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            }
+          ]
+        },
+        {
+          "finding_id": "R04",
+          "element": "customers_channels_markets",
+          "original_fact_id": "F23",
+          "replacement_id": "F23",
+          "original_fact_hash": "c359c5e657400c91c9223675ce13893e24e27c4e4d2d29c205315aaff880b73c",
+          "replacement_fact_hash": "35421b9ed19a84a1d2c21055a8f7fc9ffd025c0791acd8a3f05f237815acd57a",
+          "source_locations": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            },
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            }
+          ]
+        },
+        {
+          "finding_id": "R06",
+          "element": "operating_drivers",
+          "original_fact_id": "F26",
+          "replacement_id": "F26",
+          "original_fact_hash": "8b35307fd51bf3069a570c28c1822346c708849fe189c4a2a04ad8f5cfd4292c",
+          "replacement_fact_hash": "2a3b0653de4487e06e18e7572ef2b93a05289da154b31004312ff4c3f82a0970",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "R05",
+          "affected_fact_id": "F32",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R07",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "model_review_status": "completed_with_open_findings",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "report": {
+        "instrument_id": "000156.SZ",
+        "report_id": "asset_cb5fba56cc5413413d17e154d6a86c15",
+        "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-20T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000156/company_profile_common_core.v1/bp-work-397b2457dcdf688556762a2c.json",
+      "current_runtime_sha256": "bccb72788d580ecec9ff991c8a86ccb63ab6d55bb6ffc9e87d7abdeff80c06c7",
+      "current_work_id": "bp-work-397b2457dcdf688556762a2c",
+      "workpaper_hash": "d4a01036aeaaac7fa63165a91c04139d6bd30126169deeb260cc01d9cdd9c97e",
+      "adopted_revisions": [
+        {
+          "finding_id": "RF001",
+          "element": "company_features",
+          "original_fact_id": "F42",
+          "replacement_id": "F42",
+          "original_fact_hash": "fe61b4c6671abf903eecb969a2fef1696e7088e855c36b870f1155be2ee48246",
+          "replacement_fact_hash": "125763ed8c218da47be1124602bdd606b989deb6ce3029eb3a3b5607c5480f9a",
+          "source_locations": [
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                25
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "七、投资状况分析",
+                "4、金融资产投资"
+              ],
+              "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a"
+            }
+          ]
+        },
+        {
+          "finding_id": "RF002",
+          "element": "operating_drivers",
+          "original_fact_id": "F35",
+          "replacement_id": "F35",
+          "original_fact_hash": "7c147440c32015d1f733a5f6c85dfc2bed465f8bda2bb26ea53830632f5e01c0",
+          "replacement_fact_hash": "86d5533edd7095ee9eb39dc33c039a8f17b24edd9caf2e4bcd0a04481525f125",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a"
+            },
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "600901.SH",
+      "report": {
+        "instrument_id": "600901.SH",
+        "report_id": "asset_8c711b166add07b3ab8ace3c323c6dae",
+        "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600901/company_profile_common_core.v1/bp-work-9938c95dc5f968013098bf76.json",
+      "current_runtime_sha256": "338a28731fe84ca14c076cf551f714d65c9ecb1d5ed15bab19504827063d77f7",
+      "current_work_id": "bp-work-9938c95dc5f968013098bf76",
+      "workpaper_hash": "ea1316e6f086f459838fd3553af2c30e30af5266b94220bea4c1661104bb6b22",
+      "adopted_revisions": [
+        {
+          "finding_id": "R1",
+          "element": "scale_and_mix",
+          "original_fact_id": null,
+          "replacement_id": "review-add:R1",
+          "original_fact_hash": null,
+          "replacement_fact_hash": "439312612929664e108bd5cdab9aa5cab095cca7dd27094c9fb9979360b7db82",
+          "source_locations": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "三 经营情况讨论与分析"
+              ],
+              "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6"
+            }
+          ]
+        },
+        {
+          "finding_id": "R2",
+          "element": "customers_channels_markets",
+          "original_fact_id": null,
+          "replacement_id": "review-add:R2",
+          "original_fact_hash": null,
+          "replacement_fact_hash": "ec8ef24a20be790795c866bb11f6ca1c5b95671fb119f007321bdee8a7c7a141",
+          "source_locations": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "三 经营情况讨论与分析"
+              ],
+              "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6"
+            }
+          ]
+        },
+        {
+          "finding_id": "R4",
+          "element": "business_structure",
+          "original_fact_id": "F01",
+          "replacement_id": "F01",
+          "original_fact_hash": "37ad60a34be5bc0703335ec6b2896d74727da1399f14bfc2a0a7234bc4cfb0c7",
+          "replacement_fact_hash": "bb66994f9cdd4de3d1416e9a8f9de8f804d6eb37863e6cb6be0caad80eeff373",
+          "source_locations": [
+            {
+              "evidence_id": "source-0004",
+              "physical_pages": [
+                19
+              ],
+              "section_path": [
+                "四 报告期内核心竞争力分析"
+              ],
+              "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "R3",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "model_review_status": "completed_with_open_findings",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "601668.SH",
+      "report": {
+        "instrument_id": "601668.SH",
+        "report_id": "asset_364d5ee7dbf24db99a65f1d99b40ed6b",
+        "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601668/company_profile_common_core.v1/bp-work-cad604975f9f30adcb311c8e.json",
+      "current_runtime_sha256": "1683108b9ecafdde83f17de1be836089336a3f82b51d8662f2fd6c1f3ddbd67c",
+      "current_work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "workpaper_hash": "2a9a1ad5945934e078311a82115a1ad65e1a0a62729fc4eaaf3365afaedf66ea",
+      "adopted_revisions": [
+        {
+          "finding_id": "R07",
+          "element": "operations_and_inputs",
+          "original_fact_id": "F18",
+          "replacement_id": "F18",
+          "original_fact_hash": "cc7cda312244558582aa1908da21b6fad60b762f0bd47a98c544beb851dc0984",
+          "replacement_fact_hash": "ce7552ae28f37120d0b9f52d3d774f783d466118b5a078d13031140f748fd5b3",
+          "source_locations": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                22
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "R01",
+          "affected_fact_id": "F04",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R02",
+          "affected_fact_id": "F04",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R03",
+          "affected_fact_id": "F05",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "R04",
+          "affected_fact_id": "F06",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "R05",
+          "affected_fact_id": "F07",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R06",
+          "affected_fact_id": "F07",
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R08",
+          "affected_fact_id": "F27",
+          "resolution": "quarantined"
+        }
+      ],
+      "model_review_status": "completed_with_open_findings",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "report": {
+        "instrument_id": "920014.BJ",
+        "report_id": "asset_4200550ae843a9d19834ece962d5323c",
+        "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/company_profile_common_core.v1/bp-work-585dae6e4e3cb18f72fbb21e.json",
+      "current_runtime_sha256": "d72874f0aa2e638339d94464b273fc704c8c9131c54a0d83e2ae72285f65af03",
+      "current_work_id": "bp-work-585dae6e4e3cb18f72fbb21e",
+      "workpaper_hash": "c8a228b373b0967dd0cf544c1bd892c475b152b761593f414b4ad0b1cccee28a",
+      "adopted_revisions": [],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "report": {
+        "instrument_id": "300015.SZ",
+        "report_id": "asset_743d818c69875f2a45f62d0d79304978",
+        "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/300015/company_profile_common_core.v1/bp-work-af0dd326e18daf7478fdb0e7.json",
+      "current_runtime_sha256": "6c732fd9487593e1d5bcf2f93c80c0367cbafb842d45de7be313505ded33f0a1",
+      "current_work_id": "bp-work-af0dd326e18daf7478fdb0e7",
+      "workpaper_hash": "80d262bf3a2d49fe5d7bbb5f59fe9e734673e942a89c1bddc3c8045093f4dd56",
+      "adopted_revisions": [
+        {
+          "finding_id": "FND-MC-03",
+          "element": "material_changes",
+          "original_fact_id": "F-MC-03",
+          "replacement_id": "F-MC-03",
+          "original_fact_hash": "c13157fa433b811d209476df87bb6ec4d3b4d4f1c0b819e570ec236ff177005e",
+          "replacement_fact_hash": "d1a93e8a3b8f691646075813a0995944f285f6557dbf94e16f2d3f63ef3ec967",
+          "source_locations": [
+            {
+              "evidence_id": "source-0010",
+              "physical_pages": [
+                37
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "营业收入整体情况"
+              ],
+              "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e"
+            }
+          ]
+        },
+        {
+          "finding_id": "FND-RM-05",
+          "element": "revenue_model",
+          "original_fact_id": "F-RM-05",
+          "replacement_id": "F-RM-05",
+          "original_fact_hash": "266299ba57e26fabcf458e7ca2b420e8ce7406cef56d13e766218e4ee28a6644",
+          "replacement_fact_hash": "7410ba3429e5fc1cb6132177f743dc1a66a23e36c38f6869b9058c29a1c8c22d",
+          "source_locations": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                35
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "营业收入整体情况"
+              ],
+              "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "report": {
+        "instrument_id": "920017.BJ",
+        "report_id": "asset_1335a764a0ab9e646e2806aa4eeb4511",
+        "document_version": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920017/company_profile_common_core.v1/bp-work-c3c91c6c1880ec02db342d63.json",
+      "current_runtime_sha256": "d5f9d42224a3695d17516ababdcde51aa08f2b3de6929f00fec174db37928ef3",
+      "current_work_id": "bp-work-c3c91c6c1880ec02db342d63",
+      "workpaper_hash": "a53d4b4b0a46e524fc540c79c60151ca132de887ebbf6a220183bf829207690a",
+      "adopted_revisions": [],
+      "open_or_unadopted_findings": [],
+      "model_review_status": "completed",
+      "model_review_error": null
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "report": {
+        "instrument_id": "000099.SZ",
+        "report_id": "asset_13cf072b922d15bcd81c755ac7b69d44",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-16T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000099/company_profile_common_core.v1/bp-work-2247fec2f7b4b6e55b990fbf.json",
+      "current_runtime_sha256": "8c42bfab31cdb0274ca33f43f66e10d3289757566c036b396a2febc2a88fb0e2",
+      "current_work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+      "workpaper_hash": "2235fed6c4353fa64829e01ea1e26ff7181fc02e950e7dc8d421be4dec30c894",
+      "adopted_revisions": [
+        {
+          "finding_id": "R-001",
+          "element": "revenue_model",
+          "original_fact_id": "F-RM-01",
+          "replacement_id": "F-RM-01",
+          "original_fact_hash": "3c248782dbe6d97aa8abe4c265c7497d5d6b846d7f74e13cc186521b92a32794",
+          "replacement_fact_hash": "65e920b23935234b2fb07716168ed43ea66b59094b14ff8acc4979517ddab96a",
+          "source_locations": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb"
+            }
+          ]
+        },
+        {
+          "finding_id": "R-003",
+          "element": "upstream_inputs",
+          "original_fact_id": "F-SC-02",
+          "replacement_id": "F-SC-02",
+          "original_fact_hash": "6eb99fa52455eb9f65c5aed1dca0fd731d2d6aff6b5496a8522dd995f942c05b",
+          "replacement_fact_hash": "95735574b5555d29140e215475f6c1558966226e5e883682271abb38a18c3f1d",
+          "source_locations": [
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                19
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "公司主要供应商情况"
+              ],
+              "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb"
+            }
+          ]
+        }
+      ],
+      "open_or_unadopted_findings": [
+        {
+          "finding_id": "R-002",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        }
+      ],
+      "model_review_status": "completed_with_open_findings",
+      "model_review_error": null
+    }
+  ]
+}

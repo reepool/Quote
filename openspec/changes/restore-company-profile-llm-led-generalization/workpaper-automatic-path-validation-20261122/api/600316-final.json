@@ -1,0 +1,13 @@
+{
+  "schema_version": "company_profile_api_snapshot_index.v1",
+  "instrument_id": "600316.SH",
+  "stage": "final",
+  "original_api_sha256": "a1e3a1281a89aa4599f99e9e9ee3d088e31891a2d7b979774981941f13e5408a",
+  "original_api_bytes": 178384,
+  "reading_work_id": "bp-work-1fd5914a27e798dd60b2a8e4",
+  "authoritative_original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600316/company_profile_common_core.v1/bp-work-1fd5914a27e798dd60b2a8e4.json",
+  "runtime_sha256": "34c555112bff576c2e2c7a8e449f8149d84ebbb6cba01d80ec4c6f7f3e0c88dd",
+  "captured_api_state": "readable",
+  "normal_consumer_release_root": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122",
+  "replacement_reason": "A semantic review completed and exact original runtime/hash binding retained; duplicate full API projection compacted, no original result or raw removed."
+}

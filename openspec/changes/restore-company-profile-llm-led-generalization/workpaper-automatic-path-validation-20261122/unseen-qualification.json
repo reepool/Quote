@@ -1,0 +1,155 @@
+{
+  "task": "6.EY metadata-only unseen audit before model start",
+  "companies": [
+    "000049.SZ",
+    "000338.SZ",
+    "000651.SZ",
+    "600316.SH",
+    "920014.BJ",
+    "920017.BJ",
+    "601006.SH",
+    "600859.SH",
+    "000526.SZ",
+    "000156.SZ",
+    "300015.SZ",
+    "000099.SZ",
+    "600015.SH",
+    "601166.SH",
+    "601377.SH",
+    "600901.SH",
+    "600348.SH",
+    "600900.SH",
+    "000006.SZ",
+    "601668.SH"
+  ],
+  "inherited_excluded_count": 323,
+  "prior_work_items": [],
+  "matched_paths": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-recovery-20261122/next-sample-metadata.json",
+      "sha256": "8801859e9938730ffa3e11c8400edefef96f1901c167b83507d85352a83c2199",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/b-execution/metadata-shortlist.json",
+      "sha256": "5f3ecc3bb0fbb2144bb032b3fdd1d77adf994f0f8e77951ff9e073bc509b6163",
+      "classification": "6EU reserve metadata only; explicit A 920017/000156 qualification ruling"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-20261122/sample-manifest.json",
+      "sha256": "8a1b4fea0b41a58e09cc9eaf21a508695741b9962e58081f6793ba0b2569cb14",
+      "classification": "6EU reserve metadata only; explicit A 920017/000156 qualification ruling"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/source-preparation-diagnosis.json",
+      "sha256": "b930554a1373f22bb064194a279e156c0ba30aba662fed966083b037fce88898",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/source-manifest.json",
+      "sha256": "c2b6261b5e9a109b0b7ffa03a4a41d1db3df9097b0e9f48692fa8b00540d0f90",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/000651.json",
+      "sha256": "4bd39df78e5a19109edde47f92fd2e9c7ee894624e0bc41d64574a87c3a4e352",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/601166.json",
+      "sha256": "21ae2dabc61175d23b0a820157a813db05b9236b59bc684804cd641d2c78cf91",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/600316.json",
+      "sha256": "00c1adfe4ccb52312d64a7666468670354d8c47d1f46edfe981be3cd5001ccaa",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/000156.json",
+      "sha256": "466dd3dc8e684e58047c3111b3b593943fba2099053f88f610913136d58671b0",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/600901.json",
+      "sha256": "a0bb6ef05c8eae0280bb52bd87e27a3a72f255a361359f62d73272be18a3aee9",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/000049.json",
+      "sha256": "f7e5124dae82943047cb59c85264f93043a9a272e3b9d94337b353445f3e5aa7",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/920014.json",
+      "sha256": "8db0f312eb32de3bd72fc276f8b980e502837bd461f9a44d14da2fc54c6ff6e2",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/000006.json",
+      "sha256": "858dc658d144691c4d5a73e987cc385d018b05a2a6bfafa91856c29aa9b438f9",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/000526.json",
+      "sha256": "cd74fac5bd94871fad0b4a27bb3054db8f1a71ba84e009697d5e5955c370d5bb",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/600900.json",
+      "sha256": "86845161c4d461d7f730501707e1fdf0fd3b8e342842e1d39802a53704b92a27",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/600348.json",
+      "sha256": "0c1a0f7e2ff813552157c68eac851cb0742d91812fa77eedd425940a7efc20a9",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/601006.json",
+      "sha256": "53deb3c0d50948482ff2d8b24873a9b5424531577299863f6de774ef0d894056",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/601377.json",
+      "sha256": "b656fa106809b6e75136e3cb8d560c218500b7c02326de1ab3e661010358edb3",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/000338.json",
+      "sha256": "ca3b74d9c9f2a58df62a2777451002374e44a46fc1d9792402180ffcfeea0fe2",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/601668.json",
+      "sha256": "3c3b6b834993d3df093fedd6ccc169beff198505973d0b0221878d33b2448390",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/600859.json",
+      "sha256": "977f39162d41d36ab6db955586de5d2ed7e5412d702ef2212c9de33a5f679496",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/directory-index/600015.json",
+      "sha256": "b3acc368cdbe2a9700303b78d636548eb4291675121cdc7bd1e7befa8ae7d60a",
+      "classification": "current authorized metadata/reference"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/source-reference-batch1.json",
+      "sha256": "141cf0cf6cc196e6b31f6e99ece90f078b9d1128ee8d9092c9d838fe051ebb71",
+      "classification": "current authorized metadata/reference"
+    }
+  ],
+  "unresolved_historical_paths": [],
+  "actual_model_request_history_reused": "inherited 303 exclusions plus original20; scoped new report/record identifier search and SQL work identities",
+  "reserve_ruling": {
+    "instrument_ids": [
+      "920017.BJ",
+      "000156.SZ"
+    ],
+    "basis": "explicit A: reserve metadata only; business_text_read/model_preview false; not formal run or independent reference"
+  },
+  "ready": true,
+  "new_model_requests": 0
+}

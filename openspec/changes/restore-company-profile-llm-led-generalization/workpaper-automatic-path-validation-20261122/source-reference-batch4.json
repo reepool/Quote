@@ -1,0 +1,54 @@
+{
+  "task": "6.EY", "reference_type": "A_independent_source_first_not_model_input", "frozen": true,
+  "scope": "Concentrated report-native business/income sections; core is substantive understanding, numeric/optional completeness separately reported.",
+  "companies": [
+    {
+      "instrument_id": "600316.SH", "document_sha256": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "toc_read": "Report-local bookmarks",
+      "source_sections": [{"title": "第三节/一、业务情况/教练机、防务产品及经营模式", "physical_pages": [9]}, {"title": "第三节/经营讨论及主要经营情况/收入成本", "physical_pages": [11,12]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "航空教练机及其他航空/防务产品研制生产，并有维修保障服务；不是运营航空公司或单纯民航运输", "pages": [9,11,12]},
+        {"id": "products_services", "expected": "初级/基础/高级教练机及综合训练/保障方向，并保其他航空防务产品实际披露范围，不猜秘密型号或把全部收入都当教练机", "pages": [9,12]},
+        {"id": "revenue_model", "expected": "航空产品制造交付/销售及配套服务取得收入，教练机与其他航空产品收入分开；参股公司C919交付不自动成为本体整机制造收入", "pages": [9,11,12]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "7449126774.96", "aviation_manufacturing": "7384738642.33", "trainers": "1771660977.35", "other_aviation": "5613077664.98", "company_parent_profit_10k_CNY": "3975.98", "parent_profit_ex_nonrecurring_10k_CNY": "3739.35"},
+      "pitfalls": ["其他航空产品是披露聚合口径，不能无据改名为某单一防务型号", "万元叙述与元财表区分", "归母与扣非归母不能互换", "教练机未来集成服务拓展与实际已确认收入分开"]
+    },
+    {
+      "instrument_id": "000156.SZ", "document_sha256": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "toc_read": "Physical TOC4 and body third-section headings",
+      "source_sections": [{"title": "第三节/一、主要业务与产品/经营与盈利模式", "physical_pages": [11,12]}, {"title": "第三节/四、主营业务分析/营业收入构成", "physical_pages": [18]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "有线电视网络、新媒体、宽带及智慧城市数字化和广电5G等运营服务，不是只做电视机销售或节目制作", "pages": [11,12]},
+        {"id": "products_services", "expected": "电视视听/内容传输、新媒体内容服务、宽带数据通信及集团客户集成项目等主要服务的实质范围，5G按实际业务补充，不强求所有场景", "pages": [11,12,18]},
+        {"id": "revenue_model", "expected": "用户收视/维护及点播费用、平台内容服务/广告和分成、宽带与项目建设运营收入；不能把终端厂家负责的终端销售全部写成华数自售电视", "pages": [12,18]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "9178132953.66", "digital_tv": "1103162335.93", "broadband_data": "1601886435.77", "enterprise_integration": "2841842214.22", "internet_tv": "1596426138.03", "zhejiang_revenue": "7401954468.26", "direct_revenue": "7113053039.09", "agency_revenue": "2065079914.57"},
+      "pitfalls": ["版权采购买断/分成是投入关系，不当收入", "浙江本地与全国合作模式区分", "集团客户集成是最大收入线，不能只列旧有电视业务", "用户数/终端覆盖不当营业收入或唯一客户名"]
+    },
+    {
+      "instrument_id": "600901.SH", "document_sha256": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "toc_read": "PDF initial TOC text unavailable; used own report section headings (third-section business17, major operations21, income22/23), not another company's page strategy",
+      "source_sections": [{"title": "第三节/一、业务情况及三、经营讨论", "physical_pages": [17]}, {"title": "第三节/五、主要经营情况/主营业务分析/收入成本", "physical_pages": [21,22,23]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "融资租赁为主的金融租赁公司，服务设备全生命周期；不是制造设备或普通商业银行存贷款", "pages": [17,22]},
+        {"id": "products_services", "expected": "直接租赁、售后回租及新机融资/库存融资/二手设备更新等设备金融服务，覆盖清洁能源、交通、工业等领域；细分行业和所有设备型号不要求齐全", "pages": [17,23]},
+        {"id": "revenue_model", "expected": "融资/经营租赁及资金利息收入为业务来源，扣除资金等成本形成净利息/营业收入；主营总收入口径与利润表营业收入不同不能顶替，手续费佣金净支出不是净收入", "pages": [21,22,23]}
+      ],
+      "audit_targets": {"unit": "万元", "operating_revenue": "610921.60", "net_interest": "628261.09", "net_fee_expense": "31280.88", "main_business_gross_income": "899942.55", "finance_lease_income": "876987.65", "clean_energy_finance_income": "211602.92", "transport_finance_income": "209181.46", "industrial_equipment_income": "113651.91"},
+      "pitfalls": ["899942.55主营业务收入与610921.60营业收入不混", "融资租赁资产余额1501.24亿元不作收入", "净手续费是支出，不能按金融通用模板写成收入", "业务板块与国民经济行业两表维度不同，不相互加总"]
+    },
+    {
+      "instrument_id": "601668.SH", "document_sha256": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "toc_read": "Physical TOC3 and third-section body headings; printed-to-physical offset +4 in selected part",
+      "source_sections": [{"title": "第三节/一、业务情况/房建、基建、地产和设计", "physical_pages": [17,18,19]}, {"title": "第三节/五、主要经营情况/主营业务分析/收入成本", "physical_pages": [32,33]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "投资建设集团，房屋建筑工程、基础设施建设投资、地产开发投资及勘察设计为核心，不只写建筑施工一个笼统标签", "pages": [17,18,19,33]},
+        {"id": "products_services", "expected": "工程承包建设、基础设施、房地产开发运营与设计服务的实质范围，国内外全周期建设服务；具体项目/子品牌不必全列", "pages": [17,18,19]},
+        {"id": "revenue_model", "expected": "施工承包、基建、地产开发销售和设计等业务确认收入，合同新签/销售合约/资产规模与本期营业收入分别列示，分部间抵销保负调整而非独立产品", "pages": [17,19,32,33]}
+      ],
+      "audit_targets": {"unit": "人民币千元", "company_revenue": "2082141811", "building": "1234205792", "infrastructure": "543179718", "property": "284393567", "design": "10171215", "other": "40155113", "intersegment_elimination": "-29963594", "domestic": "1940443514", "overseas": "141698297"},
+      "pitfalls": ["千元不能直接当元/万元", "四大板块直接加总占比与合并净额分母不同", "基建投资/房地产投资不当纯金融投资收益", "图表串列不猜年份，优先p32/33完整财表", "不适用选择标记在文本中有丢失，不能凭空断定未变化"]
+    }
+  ]
+}

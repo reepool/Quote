@@ -1,0 +1,40 @@
+{
+  "schema_version": "company_profile_task_plan.v1",
+  "run_id": "6ey-601377-first_read",
+  "authorization_status": "authorized",
+  "approval_reference": "human-20261122-6EY-new20-automatic-path-validation",
+  "action": "first_read",
+  "instrument_ids": [
+    "601377.SH"
+  ],
+  "document_versions": {
+    "601377.SH": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb"
+  },
+  "knowledge_cutoff": "2026-11-22",
+  "output_root": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601377",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/601377",
+  "extract": {
+    "name": "semantic_extraction__deepseek",
+    "model": "deepseek-flash",
+    "host": "api.deepseek.com",
+    "attempt_seconds": 600,
+    "disable_thinking": true,
+    "max_output_tokens_field": "max_tokens"
+  },
+  "review": {
+    "name": "semantic_extraction__scorpio_grok",
+    "model": "grok-4.7",
+    "host": "scorpio.reepool.com",
+    "attempt_seconds": 1200,
+    "reasoning_effort": "high"
+  },
+  "budget": {
+    "seconds": 3000.0,
+    "tokens": 500000,
+    "physical_requests": 4,
+    "recoveries": 2,
+    "logical_seconds": 2450.0,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  }
+}

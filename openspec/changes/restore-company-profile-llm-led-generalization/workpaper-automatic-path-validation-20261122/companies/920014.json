@@ -1,0 +1,241 @@
+{
+  "instrument_id": "920014.BJ",
+  "dispatch_order": 17,
+  "started_epoch": 1795334862.5030873,
+  "absolute_deadline_epoch": 1795340862.5030873,
+  "source_reference": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/source-reference-batch5.json",
+    "sha256": "e6d4cf196686c9f41022e6408b26a79f72744f5f7eb5bf7fcd00d3ae186360d9"
+  },
+  "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+  "stage": "finished",
+  "phases": [
+    {
+      "run_id": "6ey-920014-first_read",
+      "action": "first_read",
+      "started_epoch": 1795334862.767169,
+      "command": [
+        "/home/python/miniconda3/envs/Quote/bin/python",
+        "main.py",
+        "job",
+        "--job-id",
+        "company_profile_common_core",
+        "--action",
+        "first_read",
+        "--execution-plan-file",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/920014-first_read.json"
+      ],
+      "allocated_budget": {
+        "seconds": 3000.0,
+        "tokens": 500000,
+        "physical_requests": 4,
+        "recoveries": 2,
+        "logical_seconds": 2450.0,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "result_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/920014/executions/6ey-920014-first_read/result.json",
+      "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6ey-b-4P7Kk9l2/6ey-920014-first_read.log",
+      "absolute_deadline_epoch": 1795340862.5030873,
+      "pid": 3363403,
+      "finished_epoch": 1795334902.1004233,
+      "process_returncode": 0,
+      "absolute_deadline_timeout": false,
+      "result_state": "completed",
+      "usage": {
+        "physical_requests": 2,
+        "recoveries": 0,
+        "charged_tokens": 42201,
+        "supplier_total_tokens": 42201,
+        "priced_cost_cny": "0",
+        "fees": "unknown",
+        "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/920014/executions/6ey-920014-first_read/budget.json",
+        "stopped_reason": null,
+        "attempts": [
+          {
+            "sequence": 1,
+            "request_id": "fbda3abf2afa478d9b84cd2644ba1bf9",
+            "logical_request_id": "60f3a6c2205429c36de6b6254091fa7e8819f472cae4da7e16fdc843e9b0c251",
+            "source_label": "deepseek:deepseek-flash",
+            "attempt": 1,
+            "profile": "semantic_extraction__deepseek",
+            "provider_resource": "deepseek",
+            "model": "deepseek-flash",
+            "reserved_input_tokens": 74643,
+            "reserved_output_tokens": 2500,
+            "charged_tokens": 21559,
+            "charged_cost_cny": "unknown",
+            "usage": {
+              "input_tokens": 21249,
+              "output_tokens": 310,
+              "total_tokens": 21559
+            },
+            "status": "success",
+            "billing_basis": "unpriced_development_observation",
+            "cost_status": "unknown",
+            "finish_reason": "stop",
+            "stream_summary": {
+              "event_count": 312,
+              "content_fragments": 310,
+              "content_chars": 626,
+              "content_sha256": "de642473db7d9dee4ed36d7a1f4d54cd7c1c6672c2104215c193e2027be7043c",
+              "reasoning_present": false,
+              "reasoning_chars": 0,
+              "finish_reason": "stop",
+              "done": true,
+              "usage_present": true
+            }
+          },
+          {
+            "sequence": 2,
+            "request_id": "5ca1f59d42914984add7bf891b505922",
+            "logical_request_id": "1ff3cd41b318de3f823a43cb99cf5db9e0cedc1cea6acd905a1134bf97606f38",
+            "source_label": "deepseek:deepseek-flash",
+            "attempt": 1,
+            "profile": "semantic_extraction__deepseek",
+            "provider_resource": "deepseek",
+            "model": "deepseek-flash",
+            "reserved_input_tokens": 75896,
+            "reserved_output_tokens": 12000,
+            "charged_tokens": 20642,
+            "charged_cost_cny": "unknown",
+            "usage": {
+              "input_tokens": 15098,
+              "output_tokens": 5544,
+              "total_tokens": 20642
+            },
+            "status": "success",
+            "billing_basis": "unpriced_development_observation",
+            "cost_status": "unknown",
+            "finish_reason": "stop",
+            "stream_summary": {
+              "event_count": 5546,
+              "content_fragments": 5544,
+              "content_chars": 14988,
+              "content_sha256": "cb833828f9ae0a8b5fbb1ac01df162cb54974630a52f82001e0bc7b671ed4915",
+              "reasoning_present": false,
+              "reasoning_chars": 0,
+              "finish_reason": "stop",
+              "done": true,
+              "usage_present": true
+            }
+          }
+        ]
+      },
+      "command_wall_seconds": 39.33325433731079
+    },
+    {
+      "run_id": "6ey-920014-review_batch",
+      "action": "review_batch",
+      "started_epoch": 1795334902.896154,
+      "command": [
+        "/home/python/miniconda3/envs/Quote/bin/python",
+        "main.py",
+        "job",
+        "--job-id",
+        "company_profile_common_core",
+        "--action",
+        "review_batch",
+        "--execution-plan-file",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/920014-review_batch.json"
+      ],
+      "allocated_budget": {
+        "seconds": 5951.607713460922,
+        "tokens": 957799,
+        "physical_requests": 6,
+        "recoveries": 3,
+        "logical_seconds": 2450.0,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "result_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/920014/executions/6ey-920014-review_batch/result.json",
+      "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6ey-b-4P7Kk9l2/6ey-920014-review_batch.log",
+      "absolute_deadline_epoch": 1795340862.5030873,
+      "pid": 3363577,
+      "finished_epoch": 1795335091.7138813,
+      "process_returncode": 0,
+      "absolute_deadline_timeout": false,
+      "result_state": "completed",
+      "usage": {
+        "physical_requests": 1,
+        "recoveries": 0,
+        "charged_tokens": 37906,
+        "supplier_total_tokens": 37906,
+        "priced_cost_cny": "0",
+        "fees": "unknown",
+        "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/920014/executions/6ey-920014-review_batch/budget.json",
+        "stopped_reason": null,
+        "attempts": [
+          {
+            "sequence": 1,
+            "request_id": "25a9b661134f4856854c4cdf7e9e0313",
+            "logical_request_id": "bf0003b0abf514ace504f909ef3058e002a6dab0a353580a00b082a06ac59d2f",
+            "source_label": "scorpio:grok-4.7",
+            "attempt": 1,
+            "profile": "semantic_extraction__scorpio_grok",
+            "provider_resource": "scorpio:grok",
+            "model": "grok-4.7",
+            "reserved_input_tokens": 87768,
+            "reserved_output_tokens": 16384,
+            "charged_tokens": 37906,
+            "charged_cost_cny": "unknown",
+            "usage": {
+              "input_tokens": 21683,
+              "output_tokens": 106,
+              "total_tokens": 37906
+            },
+            "status": "success",
+            "billing_basis": "unpriced_development_observation",
+            "cost_status": "unknown",
+            "finish_reason": "stop",
+            "stream_summary": {
+              "event_count": 221,
+              "content_fragments": 106,
+              "content_chars": 223,
+              "content_sha256": "6548f0fe934115707b8b48df71d491c967ef30d32e07f8f058a53fac4ca684d9",
+              "reasoning_present": true,
+              "reasoning_chars": 9730,
+              "finish_reason": "stop",
+              "done": true,
+              "usage_present": true
+            }
+          }
+        ]
+      },
+      "command_wall_seconds": 188.8177273273468
+    }
+  ],
+  "output_root": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/920014",
+  "first_read_api_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/api/920014-first_read.json",
+  "first_read_work_id": "bp-work-ee612f8622b7100a0bb6a86a",
+  "first_read_ready_epoch": 1795334902.5153062,
+  "final_api_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/api/920014-final.json",
+  "final_work_id": "bp-work-585dae6e4e3cb18f72fbb21e",
+  "final_ready_epoch": 1795335092.271132,
+  "export": {
+    "state": "completed",
+    "action": "export",
+    "profile_state": "found",
+    "export_directory": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery",
+    "files": [
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/920014.BJ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/920014.BJ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/research_profiles.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/annual_profiles.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/annual_profiles.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/profiles.csv",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/profiles.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery/export_manifest.json"
+    ]
+  },
+  "review_result_state": "completed",
+  "finished_epoch": 1795335092.8625436,
+  "failure_details": [],
+  "resources": {
+    "physical_requests": 3,
+    "recoveries": 0,
+    "charged_tokens": 80107,
+    "supplier_total_tokens": 80107
+  }
+}

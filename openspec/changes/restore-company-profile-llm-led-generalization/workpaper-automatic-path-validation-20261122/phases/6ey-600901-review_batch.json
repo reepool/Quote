@@ -1,0 +1,148 @@
+{
+  "run_id": "6ey-600901-review_batch",
+  "action": "review_batch",
+  "started_epoch": 1795334791.2165337,
+  "command": [
+    "/home/python/miniconda3/envs/Quote/bin/python",
+    "main.py",
+    "job",
+    "--job-id",
+    "company_profile_common_core",
+    "--action",
+    "review_batch",
+    "--execution-plan-file",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600901-review_batch.json"
+  ],
+  "allocated_budget": {
+    "seconds": 5941.494156599045,
+    "tokens": 967700,
+    "physical_requests": 6,
+    "recoveries": 3,
+    "logical_seconds": 2450.0,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "result_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/600901/executions/6ey-600901-review_batch/result.json",
+  "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6ey-b-4P7Kk9l2/6ey-600901-review_batch.log",
+  "absolute_deadline_epoch": 1795340740.709928,
+  "pid": 3362974,
+  "finished_epoch": 1795335196.0922735,
+  "process_returncode": 0,
+  "absolute_deadline_timeout": false,
+  "result_state": "completed",
+  "usage": {
+    "physical_requests": 3,
+    "recoveries": 0,
+    "charged_tokens": 92646,
+    "supplier_total_tokens": 92646,
+    "priced_cost_cny": "0",
+    "fees": "unknown",
+    "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/600901/executions/6ey-600901-review_batch/budget.json",
+    "stopped_reason": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "732e2d907653441196fed5948c8df559",
+        "logical_request_id": "d366ddf95a3c1b42d5582dd5accd8bf3fa548ff33acfb116697c6510e556f233",
+        "source_label": "scorpio:grok-4.7",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_grok",
+        "provider_resource": "scorpio:grok",
+        "model": "grok-4.7",
+        "reserved_input_tokens": 127382,
+        "reserved_output_tokens": 16384,
+        "charged_tokens": 55433,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 26809,
+          "output_tokens": 740,
+          "total_tokens": 55433
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 1015,
+          "content_fragments": 740,
+          "content_chars": 1669,
+          "content_sha256": "83da9c1850b7eecceac5ad2ace60d68239eb657b9ee25e24b13df38d57e1e2a4",
+          "reasoning_present": true,
+          "reasoning_chars": 22049,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "4f3e4a2958b2413889f2cbc1aa05c68f",
+        "logical_request_id": "fe7a23d8d04139075a6ac42d69bc7caacbc82556a4ef91172b37c423485eae89",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 92113,
+        "reserved_output_tokens": 16384,
+        "charged_tokens": 14396,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 13803,
+          "output_tokens": 593,
+          "total_tokens": 14396
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 595,
+          "content_fragments": 593,
+          "content_chars": 1812,
+          "content_sha256": "fd29292723b9eea21e46168270c772f943d6db8b791419fbeb9226eca5a4104a",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 3,
+        "request_id": "16e64271aa884526925ca8dab5e5adf4",
+        "logical_request_id": "893ad3e2eecef94f1f43cafde707f07148a5ca74c5feab08033e9840915cf55c",
+        "source_label": "scorpio:grok-4.7",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_grok",
+        "provider_resource": "scorpio:grok",
+        "model": "grok-4.7",
+        "reserved_input_tokens": 90274,
+        "reserved_output_tokens": 16384,
+        "charged_tokens": 22817,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 17439,
+          "output_tokens": 376,
+          "total_tokens": 22817
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 402,
+          "content_fragments": 376,
+          "content_chars": 796,
+          "content_sha256": "44ea6b2476eb05454a61486beca61b94a68bf0c5c1750fa78112198e12605293",
+          "reasoning_present": true,
+          "reasoning_chars": 2048,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "command_wall_seconds": 404.87573981285095
+}

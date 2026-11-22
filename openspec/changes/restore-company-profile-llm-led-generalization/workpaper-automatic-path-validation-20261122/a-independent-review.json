@@ -1,0 +1,41 @@
+{
+  "task": "6.EY",
+  "reviewer": "A/main",
+  "status": "completed_research_delivery_with_formal_quality_failure",
+  "semantic_authority": "a-group-verdict.json",
+  "semantic_authority_sha256": "88ce6bb9a5e74f412312f31fd96294dd0684f9b6f82c1c63afcb3e76320b7727",
+  "evidence_hashes": {
+    "a-semantic-decisions.json": "64da2dd6d2bc7d7bda7c7ceabe857faa6b6c8eb5cdedf38abe64244b5eabb588",
+    "a-semantic-audit-group-b.json": "21433a03d1067b7efa3efa3802c57fe16485e1ed5db590e7e97cc8b9d696ca17",
+    "a-semantic-audit-group-c.json": "6116b8724c5aa4cd61950eff3cba22e654892b93c84a0625fde5bf66ab832d14",
+    "original-audit-score.json": "7c25c552aea64d1de9fc7b6940747e949dbaf743c61b5a306427046bdbd19158"
+  },
+  "semantic_scope": "Main A original-PDF source references for all20 before each model launch; main A exact final-object review for first10 and direct challenge of all assistant-reported errors, remaining10 by independent A-side source auditors. Actual400 supplemental/523 unique core+risk+repair objects; no unreviewed object presumed correct.",
+  "result": {"usable_basic_profiles": 20, "core_conditions": "60/60", "original_unique_correct": 512, "original_unique_audited": 523, "original_accuracy": 0.9789674952198852, "supplemental_correct": 390, "supplemental_audited": 400, "actual_adopted_revisions_checked": 53, "formal_stage_pass": false},
+  "review_classes": {
+    "blocking_for_formal_expansion": "Original structured-object accuracy below99%, plus three explicitly incomplete model-review ledgers. Do not conflate source-backed narrative, usable basic descriptions or completed process with full model/source acceptance.",
+    "fixed_in_current_research_delivery": "12 exact raw objects handled locally in seven company copies:11withheld+1source_only; dependent F37 excluded from unique error count. No model facts or metrics were hand edited, no extra call or hotfix.",
+    "nonblocking": "Optional supply-chain and other missing details, verbatim approximations and reported units remain readable/limited with gaps, not whole-company rejection.",
+    "unrelated": "Baseline dirty configuration/scheduler/core skeleton/market code/docs remain protected and outside this task."
+  },
+  "main_independent_mechanical_challenges": {
+    "original_and_release_runtime_records_hashed": 40,
+    "modified_company_copies": 7,
+    "allowed_derived_changes": "Only use_review plus12 appended active-gap/source-only notes. Original element limitations are a preserved prefix; facts/text/metrics/evidence/model review/generation/usage and every other field compare equal.",
+    "api_exact_dispositions_and_active_gaps_verified": 12,
+    "api_affected_current_fact_payloads": "all null; old drafts superseded, not reintroduced",
+    "read_service_export_new_instance": "B current-snapshot receipt reused and input/output checked; main independently inspected actual batch API and exact local dispositions, not a duplicate old full suite.",
+    "validation_assumption_failures_preserved": "Early main read-only equality checks were too narrow: ignored automatic element/company_features gap-note appends and source_only wording. Corrected validation scope includes these necessary metadata only; did not remove valid gaps or change implementation to satisfy assertions. Final complete40-record/12-disposition assertion passed.",
+    "real_format_recovery_independently_reproduced": [
+      {"instrument_id": "601377.SH", "original_content_sha256": "0af585e4213178e809dc093557c4313d191da9112052ea0d20f06ec6cb540d4a", "normalized_object_sha256": "39142ca8d0481033ed86c4290a8b1c7e2f5714052843ff43a3823eae8941b148"},
+      {"instrument_id": "920014.BJ", "original_content_sha256": "cb833828f9ae0a8b5fbb1ac01df162cb54974630a52f82001e0bc7b671ed4915", "normalized_object_sha256": "ffa744102b949a99af57b3f02d77a2786bdb41d987acd8a6cbd1577bd5e5bb67"}
+    ],
+    "recovery_check_method": "Read actual first_read receipts/002.json stop content, confirm original JSON parse failure, independently append one object brace and relocate exactly three known root fields; standard json hash matches, without importing the production normalization function. Rejected original/raw/usage stay unchanged;0paid format retries.",
+    "openspec_strict": "passed; openspec validate restore-company-profile-llm-led-generalization --strict",
+    "new_business_code_or_tests": "none in6.EY; frozen6.EX37 tests are inherited engineering evidence, not rerun or counted as new semantic proof"
+  },
+  "cleanup": {"B_exact_root_absent": true, "A_new_temporary_root": "none", "scratch_bytes_removed": 18320524, "duplicate_exports_bytes_removed": 17492149, "duplicate_API_snapshots_bytes_released": 7553404, "logical_bytes_released_total": 43366077, "protected_first_run_files": 257, "protected_old_files": 138, "recovery": "generated projections/scratch reconstructible from retained records; formal PDF/source, raw failures and original budget/usage preserved"},
+  "next_action": "Use delivered research profiles/API gaps; any common metric/source improvements start from saved responses and preserve basic narrative, not repeated whole-batch paid extraction or optional-field completion. No100/production authorization.",
+  "active_A_review_time": "not precisely measured; business/model wait is not developer/auditor active time",
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,549 @@
+{
+  "release_root": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122",
+  "current_batch_api": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/annual-api.json",
+  "delivered": 20,
+  "missing_instrument_ids": [],
+  "annual_json": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/annual_profiles.json",
+  "annual_markdown": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/annual_profiles.md",
+  "fresh_instance_equals_batch": true,
+  "original_writer_hashes_unchanged": true,
+  "export": {
+    "state": "completed",
+    "action": "export",
+    "profile_state": "found",
+    "export_directory": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports",
+    "files": [
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000049.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000049.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601006.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601006.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600015.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600015.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600348.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600348.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000338.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000338.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600859.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600859.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601166.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601166.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600900.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600900.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000651.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000651.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000526.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000526.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601377.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601377.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000006.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000006.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600316.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600316.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000156.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000156.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600901.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/600901.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601668.SH_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/601668.SH_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/920014.BJ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/920014.BJ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/300015.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/300015.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/920017.BJ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/920017.BJ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000099.SZ_2025-12-31.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/000099.SZ_2025-12-31.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/research_profiles.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/annual_profiles.json",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/annual_profiles.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/profiles.csv",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/profiles.md",
+      "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/exports/export_manifest.json"
+    ]
+  },
+  "per_stock_projection_checks": [
+    {
+      "instrument_id": "000049.SZ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "141cf0cf6cc196e6b31f6e99ece90f078b9d1128ee8d9092c9d838fe051ebb71",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "601006.SH",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "141cf0cf6cc196e6b31f6e99ece90f078b9d1128ee8d9092c9d838fe051ebb71",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "600015.SH",
+      "same_projection": false,
+      "independent_A_use_review_applied": true,
+      "source_reference_sha256": "141cf0cf6cc196e6b31f6e99ece90f078b9d1128ee8d9092c9d838fe051ebb71",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "600348.SH",
+      "same_projection": false,
+      "independent_A_use_review_applied": true,
+      "source_reference_sha256": "141cf0cf6cc196e6b31f6e99ece90f078b9d1128ee8d9092c9d838fe051ebb71",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "same_projection": false,
+      "independent_A_use_review_applied": true,
+      "source_reference_sha256": "635ebd2c24a14fafdb79570eb0cf8279b55594913b040961398bb34b6da0b98a",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "600859.SH",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "635ebd2c24a14fafdb79570eb0cf8279b55594913b040961398bb34b6da0b98a",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "601166.SH",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "635ebd2c24a14fafdb79570eb0cf8279b55594913b040961398bb34b6da0b98a",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "600900.SH",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "635ebd2c24a14fafdb79570eb0cf8279b55594913b040961398bb34b6da0b98a",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "10cf60aba7fcd7292b7c36b4fee6aa1bdadacced7277104dc2e6df7d22ea59c2",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "same_projection": false,
+      "independent_A_use_review_applied": true,
+      "source_reference_sha256": "10cf60aba7fcd7292b7c36b4fee6aa1bdadacced7277104dc2e6df7d22ea59c2",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "601377.SH",
+      "same_projection": false,
+      "independent_A_use_review_applied": true,
+      "source_reference_sha256": "10cf60aba7fcd7292b7c36b4fee6aa1bdadacced7277104dc2e6df7d22ea59c2",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "000006.SZ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "10cf60aba7fcd7292b7c36b4fee6aa1bdadacced7277104dc2e6df7d22ea59c2",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "600316.SH",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "3aa97ce28daf615291bd7219cf2e0e8d80e8edf8d59b52d10cda46d2318ca8af",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "3aa97ce28daf615291bd7219cf2e0e8d80e8edf8d59b52d10cda46d2318ca8af",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "600901.SH",
+      "same_projection": false,
+      "independent_A_use_review_applied": true,
+      "source_reference_sha256": "3aa97ce28daf615291bd7219cf2e0e8d80e8edf8d59b52d10cda46d2318ca8af",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "601668.SH",
+      "same_projection": false,
+      "independent_A_use_review_applied": true,
+      "source_reference_sha256": "3aa97ce28daf615291bd7219cf2e0e8d80e8edf8d59b52d10cda46d2318ca8af",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "e6d4cf196686c9f41022e6408b26a79f72744f5f7eb5bf7fcd00d3ae186360d9",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "e6d4cf196686c9f41022e6408b26a79f72744f5f7eb5bf7fcd00d3ae186360d9",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "e6d4cf196686c9f41022e6408b26a79f72744f5f7eb5bf7fcd00d3ae186360d9",
+      "reference_existed_before_launch": true
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "same_projection": true,
+      "independent_A_use_review_applied": false,
+      "source_reference_sha256": "e6d4cf196686c9f41022e6408b26a79f72744f5f7eb5bf7fcd00d3ae186360d9",
+      "reference_existed_before_launch": true
+    }
+  ],
+  "formal_quality": "A independent audit only; counts do not imply acceptance",
+  "derived_change_contract": "use_review_and_active_gap_notes_only",
+  "narrow_assumption_correction": "A previous only-use_review/only-elements comparison was too narrow; existing owner gap notes and company_features/source_only display notes are legitimate. B also corrected a mechanical absent-use_review versus explicit-null comparison assumption, with no business-data mutation.",
+  "limitation_prefix_checks": [
+    {
+      "work_id": "bp-work-4eff58b1460ad9bdccd0133d",
+      "instrument_id": "000049.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-6442086a7536bee9f1ec5bc8",
+      "instrument_id": "000049.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-799fa5830dc8411f11f22ca6",
+      "instrument_id": "601006.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-f7d6599d77306d3a66c00bd0",
+      "instrument_id": "601006.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "instrument_id": "600015.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [
+        "customers_channels_markets",
+        "downstream_customers"
+      ],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-87377121962465449e50155d",
+      "instrument_id": "600015.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-7e4d48a5974e12bdbf850179",
+      "instrument_id": "600348.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "instrument_id": "600348.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [
+        "revenue_model",
+        "operating_drivers"
+      ],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "instrument_id": "000338.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [
+        "scale_and_mix"
+      ],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-c673511e57420b680e69052b",
+      "instrument_id": "000338.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-d07db9b1a9117cbd262a645d",
+      "instrument_id": "600859.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "instrument_id": "600859.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-52d5b4c1992e90c91aa2c48c",
+      "instrument_id": "601166.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-b1b223f406a35d04173fba2f",
+      "instrument_id": "601166.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-23e6d067fd5609667ce1f7e0",
+      "instrument_id": "600900.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-b9a21297ab8f537b8e62f19d",
+      "instrument_id": "600900.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-728c607662567e3f5c7de4ae",
+      "instrument_id": "000651.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-8b886b28b2588fc228029832",
+      "instrument_id": "000651.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-4dda16898fc774971368308e",
+      "instrument_id": "000526.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "instrument_id": "000526.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [
+        "revenue_model"
+      ],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-016367c43308049bffc006bc",
+      "instrument_id": "601377.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [
+        "company_features"
+      ],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-fbfb92491eaa652a123d167a",
+      "instrument_id": "601377.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-34ff969ffe50975951a8321b",
+      "instrument_id": "000006.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-c5b84bd9a116e97c17f38b56",
+      "instrument_id": "000006.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-1fd5914a27e798dd60b2a8e4",
+      "instrument_id": "600316.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-a7d6f3e22b9c7816cd8960d7",
+      "instrument_id": "600316.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-397b2457dcdf688556762a2c",
+      "instrument_id": "000156.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-b383d027017bd87aa8fc6071",
+      "instrument_id": "000156.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-48d8b960832cda77a8f1a82f",
+      "instrument_id": "600901.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-9938c95dc5f968013098bf76",
+      "instrument_id": "600901.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [
+        "material_changes"
+      ],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "instrument_id": "601668.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [
+        "scale_and_mix",
+        "customers_channels_markets",
+        "material_changes"
+      ],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-d754b51baf3ed49c2b458883",
+      "instrument_id": "601668.SH",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-585dae6e4e3cb18f72fbb21e",
+      "instrument_id": "920014.BJ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-ee612f8622b7100a0bb6a86a",
+      "instrument_id": "920014.BJ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-98ec5af0ce24fa3f4e376330",
+      "instrument_id": "300015.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-af0dd326e18daf7478fdb0e7",
+      "instrument_id": "300015.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-92885cea87f428277839539c",
+      "instrument_id": "920017.BJ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-c3c91c6c1880ec02db342d63",
+      "instrument_id": "920017.BJ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+      "instrument_id": "000099.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    },
+    {
+      "work_id": "bp-work-c3af62070742e2c402bb4202",
+      "instrument_id": "000099.SZ",
+      "facts_evidence_quality_generation_unchanged": true,
+      "original_limitation_prefixes_unchanged": true,
+      "appended_elements": [],
+      "only_disposed_elements_appended": true
+    }
+  ]
+}

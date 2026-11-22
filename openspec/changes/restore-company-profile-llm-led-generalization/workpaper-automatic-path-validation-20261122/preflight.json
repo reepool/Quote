@@ -1,0 +1,138 @@
+{
+  "time_epoch": 1795332936.0849395,
+  "network_environment": "require_escalated",
+  "profiles": [
+    {
+      "name": "semantic_extraction__deepseek",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "attempt_seconds": 600,
+      "disable_thinking": true,
+      "max_output_tokens_field": "max_tokens",
+      "credentials_present": true,
+      "dns_addresses": [
+        "61.170.66.121",
+        "61.170.82.99"
+      ],
+      "tls": "TLSv1.3"
+    },
+    {
+      "name": "semantic_extraction__scorpio_grok",
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "attempt_seconds": 1200,
+      "reasoning_effort": "high",
+      "credentials_present": true,
+      "dns_addresses": [
+        "176.126.114.194"
+      ],
+      "tls": "TLSv1.3"
+    }
+  ],
+  "plans": [
+    {
+      "instrument_id": "000049.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/000049-first_read.json",
+      "sha256": "f7e013e961e2e7f8d64e281b25e53fe306c4bbd3773ec76cbad28d9813548694"
+    },
+    {
+      "instrument_id": "601006.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/601006-first_read.json",
+      "sha256": "5c03b9921359325e87528f8534b30d508599a958d6bf86020391a6a37aeaa21d"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600015-first_read.json",
+      "sha256": "7d4c7de349cf77060e193436861c75f739b1f9db2814e90445a843ed12ffff2a"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600348-first_read.json",
+      "sha256": "f1046db25b11e8bcc4cbdf79533c0d361de52d0a7fe87fbd23db4be3c4145b16"
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/000338-first_read.json",
+      "sha256": "d7f3891e8c4b4793ebde843807eaee1ce4b50584316bf1bdbc4f450e19f603d6"
+    },
+    {
+      "instrument_id": "600859.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600859-first_read.json",
+      "sha256": "7cb35c81fb30b6058b9c46656dfa79f00d8306a1372eee07035fbf6c9d6bdc9f"
+    },
+    {
+      "instrument_id": "601166.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/601166-first_read.json",
+      "sha256": "b676a6d9cdd9756beb4cd1dd5240fa734d206db3b89958ed3f6de399e51f3e7b"
+    },
+    {
+      "instrument_id": "600900.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600900-first_read.json",
+      "sha256": "9efeb3bf68a76bf99a3f3ab6e1192a87497b1f26e159b105ea1e8d1e4ec961fb"
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/000651-first_read.json",
+      "sha256": "c8a1da689d9de1399e9cf87242313a3ba7513d18d590d258ada5a7a0779b3168"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/000526-first_read.json",
+      "sha256": "928b756724b0ce5764f07dcfc8faf9c11c4920a7cd739d14d4d9fb1de279ecf6"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/601377-first_read.json",
+      "sha256": "2181d61f41dedfa4b22c01c88c0e13000f062a8b527f3b79b565e9f28ab96211"
+    },
+    {
+      "instrument_id": "000006.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/000006-first_read.json",
+      "sha256": "18df7cdb66d858f2994a31c983c98b46f7dc67aa8754adad88b7bb6430da0d2d"
+    },
+    {
+      "instrument_id": "600316.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600316-first_read.json",
+      "sha256": "da6ee26f0bf9fcc072875c54156fb4741ab9b2cba30d29e74e9e3c593c2ae12f"
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/000156-first_read.json",
+      "sha256": "0441635e512997c86d5f7773b9c88218203ee460f210175a6e19af1d1ccfcdf1"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600901-first_read.json",
+      "sha256": "32f6a7f41166882c3d4bee6391f0eeabfddacb8d4167bbb666a3d41e428b9b27"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/601668-first_read.json",
+      "sha256": "02cee83c9a166b357761fdac4ad8e70118116e78612b5bdcbf0bfa14cbe66368"
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/920014-first_read.json",
+      "sha256": "5c4cafbee82cdb0821ec5bdd91b89f02df9a754f6f7ef3d76d78d079bba8fbc3"
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/300015-first_read.json",
+      "sha256": "30b50545a7e2d7979b1f7bf15df39f0e61e20c390bbdbe1d759b1331c288e344"
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/920017-first_read.json",
+      "sha256": "1017c6b2d1923ed8ddb8194a4702c02a98e26c76bdf371d0d9b36fdd1570888f"
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/000099-first_read.json",
+      "sha256": "d0575319fb931a64462736a7cf50a6da34863b00ac3409544ef7dd6f84df0b38"
+    }
+  ],
+  "real_model_requests": 0,
+  "notifications": false,
+  "initialization_in_absolute_deadline": true,
+  "cumulative_allocation": "review budget = stock cap minus actual first_read usage and wall time"
+}

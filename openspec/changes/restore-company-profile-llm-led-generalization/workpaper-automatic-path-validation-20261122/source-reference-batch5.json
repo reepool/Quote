@@ -1,0 +1,54 @@
+{
+  "task": "6.EY", "reference_type": "A_independent_source_first_not_model_input", "frozen": true,
+  "scope": "Report-native business overview and concentrated income tables. Supplementary gaps, small product lines and optional supply chains do not veto a usable basic description.",
+  "companies": [
+    {
+      "instrument_id": "920014.BJ", "document_sha256": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "toc_read": "Report-local bookmarks: fourth-section business12, operating review20, financial/income24-27",
+      "source_sections": [{"title": "第四节/一、业务概要/商业模式与主要产品", "physical_pages": [12]}, {"title": "第四节/二、经营情况回顾/营业分析及收入构成", "physical_pages": [20,24,26,27]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "天然气/氢能高端能源装备研发制造销售及配套技术服务，不是天然气开采或燃气公用事业运营商", "pages": [12,26]},
+        {"id": "products_services", "expected": "撬装集输系统、燃气调压集成/核心部件及智能管控等能源设备与服务，氢能装备有据可补；不必列全百余品种", "pages": [12,26]},
+        {"id": "revenue_model", "expected": "按客户需求设计制造和销售成套/单体设备及技术服务，直销为主经销为辅；非标撬装是主要收入线，不能把用户采购天然气金额当收入", "pages": [12,26,27]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "527692119.52", "main_revenue": "524501522.27", "standard_gas_equipment": "89702855.35", "nonstandard_skid_systems": "338138892.22", "gas_core_parts": "93167137.52", "hydrogen_equipment": "3492637.18", "other": "3190597.25", "hydrogen_margin_percent": "-10.88"},
+      "pitfalls": ["行业天然气采购建议/全国数据不升格公司实际投入或采购合同", "氢能试点培育不写成已经大规模成熟收入", "公司制造核心+非核心委外不同于全外包", "年度收入下降与某品种收入上升保原口径"]
+    },
+    {
+      "instrument_id": "300015.SZ", "document_sha256": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "toc_read": "Report-local bookmarks",
+      "source_sections": [{"title": "第三节/一、主要业务和经营模式", "physical_pages": [23]}, {"title": "第三节/四、主营业务分析/营业收入构成", "physical_pages": [35]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "专业眼科连锁医疗机构，提供眼病诊疗/手术及医学验光配镜，不是只售眼镜或器械制造", "pages": [23,35]},
+        {"id": "products_services", "expected": "屈光、白内障、视光及眼前/后段等主要眼科诊疗和服务范围，分级连锁服务患者；具体疾病/医院全名不要求齐全", "pages": [23,35]},
+        {"id": "revenue_model", "expected": "通过向患者提供眼科医疗/手术和验光配镜服务取得收入，直接销售或服务；诊次/手术量和医保行业政策不当收入或保险公司业务", "pages": [23,35]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "22352604724.87", "medical": "22281026432.28", "refractive": "8383189775.59", "cataract": "3478266775.10", "anterior": "2030763914.58", "posterior": "1573036009.59", "optometry": "5787549225.86", "other_projects": "1028220731.56", "other_business": "71578292.59", "outpatient_10k_visits": "1889.17", "surgeries_10k": "168"},
+      "pitfalls": ["医学验光配镜收入不全部改标普通眼镜零售", "净利润/归母/扣非净利不同，同比净利降而扣非升", "万元经营叙述与元表保持尺度", "医院网络海外区域与收入境外口径分别保留"]
+    },
+    {
+      "instrument_id": "920017.BJ", "document_sha256": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "toc_read": "Report-local bookmarks: fourth-section business11, operating12, income19/20",
+      "source_sections": [{"title": "第四节/一、业务概要/销售及CMC/CMO模式", "physical_pages": [11,12]}, {"title": "第四节/二、经营回顾/财务状况及收入构成", "physical_pages": [13,19,20]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "高端药物制剂研发产业化、药品制造销售及CMC/CMO一体化服务，不仅为药品流通或把全部业务当自主创新原研分子发现", "pages": [11,13]},
+        {"id": "products_services", "expected": "有复方消化酶胶囊等制剂药品及受托CMC/CMO研发阶段样品/上市后商业生产服务，主要药物领域和技术服务均有实质说明；小药品全目录不强求", "pages": [11,13,20]},
+        {"id": "revenue_model", "expected": "药品销售（以经销买断为主另直销）及受托技术/生产按批次试验加工、按订单加工收费；不能把客户药物收入全并为公司自有药品收入", "pages": [11,19,20]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "650139997.82", "main_revenue": "648896714.84", "digestive_metabolism": "396505628.82", "neuro": "63173256.25", "oncology_immuno": "64620919.84", "CMC_CMO": "57562117.75", "cardiovascular": "19096361.60", "other_product": "49181713.56", "net_profit": "103044799.11"},
+      "pitfalls": ["CMC/CMO按源名，不无据升级为所有CRO/CDMO业务", "MAH客户与本体主体区分", "产品分类其他行与其他业务收入不同", "药品集采和学术推广原因只归相应品种，不泛化全部指标"]
+    },
+    {
+      "instrument_id": "000099.SZ", "document_sha256": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "toc_read": "Physical TOC6 and own third-section headings",
+      "source_sections": [{"title": "第三节/一、主要业务及三、运营能力", "physical_pages": [14,15]}, {"title": "第三节/四、主营业务分析/收入成本续表", "physical_pages": [16,17]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "以直升机海上油气飞行服务为核心的通用航空运营商，兼应急/陆上/引航和维修；不是采油商、飞机制造商或全国客运航空公司", "pages": [14,15]},
+        {"id": "products_services", "expected": "海油飞行、应急救援、陆上通航、港口引航和通航维修等服务有实质范围，低空新场景保试飞/探索限定，不列全航线作门槛", "pages": [14,15]},
+        {"id": "revenue_model", "expected": "按合同提供飞行作业/运输及维修等服务获取主要收入，海油为核心，通航运输与维修/其他收入区分；作业小时、合同总额与当年已确认收入不同", "pages": [14,16,17]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "2235378155.32", "general_aviation_transport": "2215984977.85", "maintenance": "8835401.52", "other_business": "10557775.95", "operated_helicopters": "87", "deployed_UAV": "9", "pilots": "212", "maintenance_staff": "456"},
+      "pitfalls": ["海上油气服务不意味着公司生产/销售油气", "eVTOL试飞不升为成熟商业运输收入", "报告区间与合同累计履约额不同", "跨行小数与深圳/区域数不误并，极小尾项可不收"]
+    }
+  ]
+}

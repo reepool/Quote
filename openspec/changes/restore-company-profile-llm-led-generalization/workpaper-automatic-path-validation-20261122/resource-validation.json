@@ -1,0 +1,232 @@
+{
+  "physical_requests": 94,
+  "recoveries": 0,
+  "charged_tokens": 2426467,
+  "supplier_total_tokens": 2426467,
+  "unknown_usage_reserved_tokens": 0,
+  "fees": "unknown",
+  "priced_cost_cny": "0",
+  "group_wall_seconds": 2495.94127368927,
+  "per_stock": [
+    {
+      "instrument_id": "000049.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 101179,
+        "supplier_total_tokens": 101179
+      },
+      "first_read_seconds": 33.98142075538635,
+      "review_seconds": 401.2068843841553
+    },
+    {
+      "instrument_id": "601006.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 115466,
+        "supplier_total_tokens": 115466
+      },
+      "first_read_seconds": 38.25883340835571,
+      "review_seconds": 349.4265151023865
+    },
+    {
+      "instrument_id": "600015.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 149104,
+        "supplier_total_tokens": 149104
+      },
+      "first_read_seconds": 36.869975328445435,
+      "review_seconds": 580.3924603462219
+    },
+    {
+      "instrument_id": "600348.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 121429,
+        "supplier_total_tokens": 121429
+      },
+      "first_read_seconds": 33.74414277076721,
+      "review_seconds": 645.7060081958771
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 130195,
+        "supplier_total_tokens": 130195
+      },
+      "first_read_seconds": 42.64637517929077,
+      "review_seconds": 388.123743057251
+    },
+    {
+      "instrument_id": "600859.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 177923,
+        "supplier_total_tokens": 177923
+      },
+      "first_read_seconds": 47.98250603675842,
+      "review_seconds": 519.8445827960968
+    },
+    {
+      "instrument_id": "601166.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 164306,
+        "supplier_total_tokens": 164306
+      },
+      "first_read_seconds": 49.703165769577026,
+      "review_seconds": 645.9039204120636
+    },
+    {
+      "instrument_id": "600900.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 121542,
+        "supplier_total_tokens": 121542
+      },
+      "first_read_seconds": 36.49858999252319,
+      "review_seconds": 312.15911865234375
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 164084,
+        "supplier_total_tokens": 164084
+      },
+      "first_read_seconds": 40.73679709434509,
+      "review_seconds": 449.4624197483063
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 124717,
+        "supplier_total_tokens": 124717
+      },
+      "first_read_seconds": 32.61135220527649,
+      "review_seconds": 623.445702791214
+    },
+    {
+      "instrument_id": "601377.SH",
+      "resources": {
+        "physical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 81020,
+        "supplier_total_tokens": 81020
+      },
+      "first_read_seconds": 42.39048719406128,
+      "review_seconds": 241.53273582458496
+    },
+    {
+      "instrument_id": "000006.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 136408,
+        "supplier_total_tokens": 136408
+      },
+      "first_read_seconds": 43.09700322151184,
+      "review_seconds": 596.6533310413361
+    },
+    {
+      "instrument_id": "600316.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 96198,
+        "supplier_total_tokens": 96198
+      },
+      "first_read_seconds": 40.07322025299072,
+      "review_seconds": 424.39717411994934
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 104734,
+        "supplier_total_tokens": 104734
+      },
+      "first_read_seconds": 48.59077072143555,
+      "review_seconds": 361.96516013145447
+    },
+    {
+      "instrument_id": "600901.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 124946,
+        "supplier_total_tokens": 124946
+      },
+      "first_read_seconds": 49.30504894256592,
+      "review_seconds": 404.87573981285095
+    },
+    {
+      "instrument_id": "601668.SH",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 114031,
+        "supplier_total_tokens": 114031
+      },
+      "first_read_seconds": 39.175262689590454,
+      "review_seconds": 431.25295090675354
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "resources": {
+        "physical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 80107,
+        "supplier_total_tokens": 80107
+      },
+      "first_read_seconds": 39.33325433731079,
+      "review_seconds": 188.8177273273468
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 138522,
+        "supplier_total_tokens": 138522
+      },
+      "first_read_seconds": 49.668920278549194,
+      "review_seconds": 262.4968333244324
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "resources": {
+        "physical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 74586,
+        "supplier_total_tokens": 74586
+      },
+      "first_read_seconds": 39.160314321517944,
+      "review_seconds": 136.26574325561523
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "resources": {
+        "physical_requests": 5,
+        "recoveries": 0,
+        "charged_tokens": 105970,
+        "supplier_total_tokens": 105970
+      },
+      "first_read_seconds": 39.89476013183594,
+      "review_seconds": 327.2881398200989
+    }
+  ]
+}

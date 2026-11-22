@@ -1,0 +1,8 @@
+{
+  "started_epoch": 1795333072.2895653,
+  "absolute_deadline_epoch": 1795363672.289566,
+  "concurrency": 4,
+  "code_freeze": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/execution-freeze.json",
+  "operator_sha256": "d9e509555456b35f6894b6eff66dea7c46ab0ea634f171ec3f806b2ad48efc93",
+  "production_authorization": "not_authorized"
+}

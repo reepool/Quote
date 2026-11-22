@@ -1,0 +1,15 @@
+{
+  "instrument_id": "600348.SH",
+  "dispatch_order": 4,
+  "started_epoch": 1795333074.058763,
+  "absolute_deadline_epoch": 1795339074.058763,
+  "source_reference": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/source-reference-batch1.json",
+    "sha256": "141cf0cf6cc196e6b31f6e99ece90f078b9d1128ee8d9092c9d838fe051ebb71"
+  },
+  "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+  "stage": "initializing",
+  "phases": [],
+  "output_root": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600348",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/600348"
+}

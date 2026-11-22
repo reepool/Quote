@@ -1,0 +1,122 @@
+{
+  "updated_epoch": 1795336653.0311532,
+  "A_semantic_review_complete": true,
+  "OpenSpec_api_snapshot_compaction": {
+    "count": 40,
+    "bytes_before": 7590901,
+    "bytes_after": 37497,
+    "released_bytes": 7553404,
+    "hash_reference": "Each existing api/<stock>-<stage>.json now contains exact original snapshot hash/runtime pointer; source originals remain."
+  },
+  "duplicate_per_stock_exports_removed": [
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000049/delivery",
+      "bytes": 650821,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601006/delivery",
+      "bytes": 844374,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600015/delivery",
+      "bytes": 897229,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600348/delivery",
+      "bytes": 670484,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000338/delivery",
+      "bytes": 950555,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600859/delivery",
+      "bytes": 1096314,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601166/delivery",
+      "bytes": 1740195,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600900/delivery",
+      "bytes": 696774,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000651/delivery",
+      "bytes": 1089683,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000526/delivery",
+      "bytes": 875494,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601377/delivery",
+      "bytes": 911880,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000006/delivery",
+      "bytes": 755644,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600316/delivery",
+      "bytes": 623936,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000156/delivery",
+      "bytes": 798708,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600901/delivery",
+      "bytes": 990425,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601668/delivery",
+      "bytes": 761034,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920014/delivery",
+      "bytes": 785058,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/300015/delivery",
+      "bytes": 939935,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/920017/delivery",
+      "bytes": 740253,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    },
+    {
+      "path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000099/delivery",
+      "bytes": 673353,
+      "reason": "Superseded duplicate export; original writer records and unified business export retained."
+    }
+  ],
+  "duplicate_export_bytes_released": 17492149,
+  "B_temp_root": "/home/python/Quote/data/QuoteBak/company-profile-6ey-b-4P7Kk9l2",
+  "B_temp_bytes_before_removal": 18320524,
+  "B_temp_removal": "complete; exact task root absence confirmed after final verification exited. Initial removal left one 34303-byte NFS open-log handle; host /proc proved owner was this task's abandoned source_manifest.py PID3350662 and its child resource_tracker3350718. Normal SIGTERM only to exact-owned parent released both handles; tracker exited automatically. No unrelated process killed.",
+  "original_first_files_verified": 257,
+  "old_protected_files_verified": 138,
+  "frozen_code_verified": true,
+  "retained": "Official PDFs/effective caches, original runtime/checkpoints/raw/usage/failures, A decisions and bindings, one unified research release/API/JSON/Markdown.",
+  "recovery": "Removed generated projections and scratch can be recreated from retained writer records/CLI plans; no original research or source asset removed."
+}

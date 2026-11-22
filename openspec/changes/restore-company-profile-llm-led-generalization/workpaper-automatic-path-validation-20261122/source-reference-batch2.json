@@ -1,0 +1,60 @@
+{
+  "task": "6.EY",
+  "reference_type": "A_independent_source_first_not_model_input",
+  "frozen": true,
+  "scope": "Report-native TOC/bookmark concentrated sections; basic substantive answers are core, subsidiary/service/product-tail completeness is not a gate.",
+  "companies": [
+    {
+      "instrument_id": "000338.SZ",
+      "document_sha256": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "toc_read": "Report-local bookmarks",
+      "source_sections": [{"title": "第三节/一、主要业务和经营模式", "physical_pages": [12]}, {"title": "第三节/四、主营业务分析/电力能源/收入与成本（续表）", "physical_pages": [16,17]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "汽车与装备制造集团，动力系统/商用车、智慧物流、农业装备等为实际业务，不写成只造发动机；电力能源布局按原文保留", "pages": [12,16,17]},
+        {"id": "products_services", "expected": "发动机/动力总成、重型汽车及关键零部件，并覆盖叉车/供应链解决方案等智慧物流和农业装备的实质范围；不强求每个产品型号", "pages": [12,17]},
+        {"id": "revenue_model", "expected": "以装备/零部件及物流解决方案等销售/服务取得收入，主要动力总成整车和智慧物流收入线不混；直销为主且报表还有经销/分销，不能把经营概述的主要B2B模式说成全部收入只有直销", "pages": [12,16,17]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "231809281106.82", "powertrain_vehicles_core_parts": "100410725808.64", "other_parts": "11876205617.81", "smart_logistics": "91076800865.77", "agricultural_equipment": "18788699730.23", "other_products": "9656849084.37", "direct_sales": "181382026971.65", "reseller_sales": "43536910661.47", "distribution": "6890343473.70"},
+      "pitfalls": ["跨页表头p16与续行p17一起定位", "行业/产品/地区/渠道不是可相互加总的同一维度", "PSI发电产品贡献81%是子公司口径非集团", "规划建设SOFC产线与已实现销售/交付区分"]
+    },
+    {
+      "instrument_id": "600859.SH",
+      "document_sha256": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "toc_read": "Report-local bookmarks",
+      "source_sections": [{"title": "第三节/一、业务情况（零售业态与模式）", "physical_pages": [11,12]}, {"title": "第三节/五、主营业务分析/收入成本及业态续表", "physical_pages": [18,19]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "经营百货、购物中心、奥特莱斯等综合零售门店，含专业店/免税及线上业务；不是单一百货或全部为免税", "pages": [11,12]},
+        {"id": "products_services", "expected": "有税零售各主要业态及免税/专业店提供商品零售和购物消费服务，保不同业态特点；门店逐个名称、所有品类不要求齐全", "pages": [11,12]},
+        {"id": "revenue_model", "expected": "门店商品零售和租金为主要来源，百货/奥莱多联营并有自营租赁，购物中心以租赁为主；不能把商场销售额、线上销售和报表收入直接相加", "pages": [11,12,18]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "10149906153.24", "goods_retail_revenue": "8610455031.90", "rental_revenue": "1539451121.34", "department_stores": "3717853971.28", "shopping_centers": "2385863577.11", "outlets": "2373634570.07", "specialty_stores": "1388142329.81", "duty_free": "236384205.72"},
+      "pitfalls": ["业态续表表头在p18，行在p19，原注不含跨业态内部抵消", "原披露占比与金额/总额不强行重算统一，若口径不明保原文/限定", "2026年2月开店为期后信息，不升为2025年末店数", "报告p11概述管理口岸店与p12期末具体分类原口径有区别，店数可限用不补猜"]
+    },
+    {
+      "instrument_id": "601166.SH",
+      "document_sha256": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "toc_read": "No PDF bookmarks; directly read physical TOC p13/14, printed-to-physical offset +2 in selected sections",
+      "source_sections": [{"title": "第一章/1.1公司概况", "physical_pages": [18]}, {"title": "第三章/3.3战略实施及实际经营", "physical_pages": [40]}, {"title": "第三章/3.5财务报表分析/利润表/利息净收入", "physical_pages": [76,77]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "以商业银行为主体的综合金融服务集团，面向企金和零售并有投行、财富/资管、金融市场等；不能把集团旗下所有金融机构混作银行本体单一业务", "pages": [18,40]},
+        {"id": "products_services", "expected": "存贷及面向企业/个人的金融服务，资产管理/财富与金融市场等有实质说明；信托基金租赁等综合布局可按原名保留但不硬要求子公司服务目录齐全", "pages": [18,40,77]},
+        {"id": "revenue_model", "expected": "贷款/投资等利息收入扣除存款/债券等利息成本形成净利息收入，另有手续费佣金和其他非息；不能把存贷款/资管余额当收入", "pages": [40,76,77]}
+      ],
+      "audit_targets": {"unit": "人民币百万元", "operating_revenue": "212741", "net_interest": "148752", "noninterest": "63989", "net_fees_in_hundred_million_CNY": "258.91", "interest_income_total": "312406", "interest_expense_total": "163654", "group_net_profit": "77854", "parent_attributable_profit": "77469"},
+      "pitfalls": ["亿元叙述与百万元财表不能错换", "期末资产/贷款/存款和年度收入分开", "集团净利与归母净利不同", "括号费用是负项但利息支出表正列成本不错误当收入", "不要求从无法安全获取的表格补满所有分部收入"]
+    },
+    {
+      "instrument_id": "600900.SH",
+      "document_sha256": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "toc_read": "Report-local bookmarks",
+      "source_sections": [{"title": "第三节/业务情况和经营讨论", "physical_pages": [9,10]}, {"title": "第三节/跨大区电能营销/主要经营情况/主营业务分析", "physical_pages": [12,13]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "大型水电站运营/水力发电为主，不是电力设备制造或全国发电合计；境内六座梯级电站与国际业务范围保区别", "pages": [9,10,12]},
+        {"id": "products_services", "expected": "向社会提供清洁电能、运营三峡等六座大型梯级水电站，抽蓄/国际等有据可补，不把在建或投资项目当已发电产品", "pages": [9,10,12]},
+        {"id": "revenue_model", "expected": "水电生产和电能销售/跨区消纳取得主业收入，其他业务与投资收益单列，不能把投资收益当电力营业收入或仅给装机数替代赚钱方式", "pages": [9,12,13]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "86241940222.20", "domestic_hydropower_revenue": "75661563315.43", "other_industry_revenue": "10323376439.80", "company_generation_100m_kWh": "3097.35", "six_domestic_stations_generation_100m_kWh": "3071.94", "total_hydro_capacity_10k_kW": "7179.5", "domestic_hydro_capacity_10k_kW": "7169.5"},
+      "pitfalls": ["公司全部/境内六站/全国电力统计不能混", "主营分行业两项小计与利润表营业收入不完全相同", "投资收益49.59亿元不升格营业收入", "成本构成表53.07%等分母为原表总成本口径，不擅改成该行业内部占比"]
+    }
+  ]
+}

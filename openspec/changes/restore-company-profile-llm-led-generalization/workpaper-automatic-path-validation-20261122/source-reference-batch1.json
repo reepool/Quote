@@ -1,0 +1,60 @@
+{
+  "task": "6.EY",
+  "reference_type": "A_independent_source_first_not_model_input",
+  "frozen": true,
+  "scope": "Each report's own TOC/bookmarks led to concentrated business and income subsections. Three substantive basic questions are the core; supplementary details/numbers are audit targets, not mandatory field completion.",
+  "companies": [
+    {
+      "instrument_id": "000049.SZ",
+      "document_sha256": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "toc_read": "PDF bookmarks and physical p3",
+      "source_sections": [{"title": "第三节/一、主要业务、产品及用途/主要经营模式", "physical_pages": [10]}, {"title": "第三节/二、行业情况/公司地位", "physical_pages": [11]}, {"title": "第三节/四、主营业务分析/2、收入与成本", "physical_pages": [14]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "围绕锂电池产业链的电源管理系统与封装集成研发生产销售，储能电芯为正在发展的业务；不能误成手机/笔记本整机制造", "pages": [10]},
+        {"id": "products_services", "expected": "电源管理/电池封装集成及储能产品有实质说明，并解释面向消费电子、电动工具/智能家居出行及储能等用途；SIP新兴布局可有源补充，不以具体型号齐全为门槛", "pages": [10,11]},
+        {"id": "revenue_model", "expected": "以锂电相关产品研发制造并直接销售给终端客户或指定代工厂取得收入；收入表智能手机等标签是公司产品应用分类，不是公司销售手机整机", "pages": [10,14]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "22399427302.94", "smartphone": "7591429166.32", "wearables": "3377038240.44", "tools_home_mobility": "3449742533.42", "notebook_tablet": "2945195310.25", "energy_storage": "2828593460.56", "other": "2207428591.95", "energy_storage_margin_percent": "-1.47"},
+      "pitfalls": ["智能手机/储能等应用收入不当独立整机销售", "行业出货量与公司经营量分开", "储能负毛利不误正", "以销定产/以产定采及直接销售均有明确原文，具体客户名未从本组出处获取"]
+    },
+    {
+      "instrument_id": "601006.SH",
+      "document_sha256": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "toc_read": "PDF bookmarks and physical p4",
+      "source_sections": [{"title": "第三节/一、业务情况", "physical_pages": [8,9]}, {"title": "第三节/五、主营业务分析/收入和成本分析", "physical_pages": [13]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "铁路货运为主、客运及向其他铁路企业提供运输相关服务；不是煤矿开采销售商或国家全铁路合计", "pages": [8,9]},
+        {"id": "products_services", "expected": "货物/旅客铁路运输，并有路网相关服务的实质说明；运输以动力煤为主，另有焦炭矿石等；具体线路/逐项服务名不强求齐全", "pages": [8,9]},
+        {"id": "revenue_model", "expected": "依铁路运输合同/票运单提供客货运输取得运费，并向其他铁路企业提供牵引、线路/货车使用及委托管理等有偿服务，保持其他主营与非主营区别", "pages": [8,9,13]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "77644812382", "rail_main_revenue": "76409490504", "freight": "54321785789", "passenger": "10431258204", "other_main": "11656446511", "freight_share_main_percent": "71.09", "passenger_share_main_percent": "13.65"},
+      "pitfalls": ["运输货种不等于公司产煤或商品销售暴露", "公司收入与铁路运输主营合计不同", "产品成本空格/横线不是0，不从行业总成本硬分", "原文明示主营未变化与另一个不适用勾选分开", "全国行业运输量不是公司运输量"]
+    },
+    {
+      "instrument_id": "600015.SH",
+      "document_sha256": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "toc_read": "Physical p3 and report-local bookmarks; printed pages are three below physical pages in the selected part",
+      "source_sections": [{"title": "第三节/3.1业务概要", "physical_pages": [13]}, {"title": "第三节/3.4利润表分析/3.4.1营业收入", "physical_pages": [20,21]}, {"title": "第三节/3.12业务回顾/公司金融", "physical_pages": [41,42]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "面向企业机构及个人的商业银行综合金融服务，资金/资管/托管为业务组成；不把贷款存款余额当主营收入", "pages": [13]},
+        {"id": "products_services", "expected": "对公和个人存贷/结算、信用卡财富等银行服务，并能看出金融市场/资产管理等服务的存在；具体产品、子公司或所有特色目录可缺不拒稿", "pages": [13,41,42]},
+        {"id": "revenue_model", "expected": "主要通过生息资产与计息负债形成利息净收入，另有手续费佣金及其他非息净收入；不把存款当收入或只列资产规模替代机制", "pages": [20,21]}
+      ],
+      "audit_targets": {"unit": "百万元", "operating_revenue": "91914", "net_interest": "62948", "noninterest": "28966", "net_interest_share_percent": "68.49", "net_fee_share_percent": "6.07", "other_net_share_percent": "25.44", "group_net_profit": "27751", "regional_internal_elimination_revenue": "-677"},
+      "pitfalls": ["亿元叙述与百万元表各保单位", "本行/本集团/附属机构及内部抵销各保主体", "利息净收入不等于利息收入", "表内营业利润合计34289与另一利润总额34174不混", "有源定性及约数可限用，不强补各业务细收入"]
+    },
+    {
+      "instrument_id": "600348.SH",
+      "document_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "toc_read": "PDF bookmarks and physical p4",
+      "source_sections": [{"title": "第三节/一、业务情况及三、经营讨论", "physical_pages": [11,12]}, {"title": "第三节/五、主营业务分析/收入和成本分析", "physical_pages": [15]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "以煤炭开采洗选销售为主，并布局新能源新材料转型；不把行业风光装机或全国煤产量当公司经营规模", "pages": [11,12]},
+        {"id": "products_services", "expected": "无烟煤为核心，解释电力/化工/冶金/建材等用途，保公司自身钠电及碳纤维转型的有源属性；具体煤种/新能源型号齐全不是硬门槛，电热产品可按披露补充", "pages": [11,12,15]},
+        {"id": "revenue_model", "expected": "以自产煤炭产品销售取得主要收入，已披露供电/供热为其他收入线可有源说明，主营小计不是公司全部营业收入；不能把新项目投资额或全国数据当收入", "pages": [11,15]}
+      ],
+      "audit_targets": {"unit": "元", "coal_revenue": "17950554410.92", "power_revenue": "1741103014.27", "heat_revenue": "63801899.08", "main_subtotal": "19755459324.27", "washed_lump": "2245100086.93", "washed_fines": "1952123248.95", "fines": "13389254038.76", "slime": "364077036.28", "heat_margin_percent": "-46.15"},
+      "pitfalls": ["供热负毛利不误正", "煤泥成本空白不按0或借列补", "T1000项目2025年11月30日投产是公司披露，行业预测另标行业", "未从本组取得公司全部营业收入则明确缺项，不拿主营小计顶替", "不适用勾选不代替没有变化结论"]
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "main_A_authority": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+  "main_A_authority_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+  "helper_audit_files_consumed": true,
+  "main_A_explicitly_authorized": true,
+  "applications": [
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "decisions": {
+        "report": {
+          "instrument_id": "600015.SH",
+          "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+          "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "A independent original-PDF reader",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+        "reference_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+        "decisions": [
+          {
+            "fact_id": "F25",
+            "fact_sha256": "a03f69578150b8a29c757589c058040237823f8e514b63ab8e9530937ff06de9",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0014"
+            ],
+            "reason": "Original small superscript4/5/6 precedes body4,012.44/2.02/56.11万户. Transcription and both models fused to44,012.44/52.02/656.11. Original text positioning: superscript font156 y618.29/638.09 vs body font240 y622.37/642.169. This is a real extraction+review miss, not a source-reported 44012.44 or5202. Do not silently correct historic model values.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          },
+          {
+            "fact_id": "F37",
+            "fact_sha256": "58de3998b63a1c10d4eff246afded8c6b001aac7537ac4d08421797cf33dcb0b",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0012",
+              "source-0014"
+            ],
+            "reason": "Repeats F25 erroneous retail customer total; excluded from unique accuracy count as duplicate, but must also be withheld from final delivery.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          }
+        ]
+      },
+      "original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600015/company_profile_common_core.v1/bp-work-0bf9bfd2e2031508d9c45c9f.json",
+      "original_runtime_sha256": "e9ed8c5d4fcc244553cab6a12ede4908561d33e51ff605e01f7c28d5b1858c6c"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "decisions": {
+        "report": {
+          "instrument_id": "600348.SH",
+          "report_id": "asset_f320e4e874bc2381e9f05bb662544a64",
+          "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-26T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "A independent original-PDF reader",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+        "reference_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+        "decisions": [
+          {
+            "fact_id": "F007",
+            "fact_sha256": "9005f4ea5ab0f6e487c6cddf32ce0b44dd13aa62bffd53b2cde3f4d8fa635bc1",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0003",
+              "source-0005"
+            ],
+            "reason": "Coal revenue179.51亿元 is explicitly a business subset of company revenue214.44亿元, but metric煤炭产品销售收入 usesconsolidated_group. Only the company total's scope is valid. Existing contract requires each metric's own scope; do not relabel both. Text and values themselves are supported.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          },
+          {
+            "fact_id": "F009",
+            "fact_sha256": "226e8c6823636244e8326e7d83239b23e5c71c0cb980ec17d68e51d484e93a52",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "煤炭业务经营情况 table totals179.51 revenue/103.03 cost/76.48 gross亿元 cover coal only, not the entire group's activities; all three total metrics are incorrectlyconsolidated_group rather thanbusiness_segment. Product-line amounts and narrative are otherwise supported.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          },
+          {
+            "fact_id": "F023",
+            "fact_sha256": "0b965f3da6d57c456c775d904dcf629c479ee440ab7d9bc1411a4b00d8fe9ecc",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "reason": "Current103.03/prior120.48/reduction17.45亿元 all describe coal sales costs, but each metric incorrectly usesconsolidated_group. Values and decline narrative are correct; source business scope must not be upgraded.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          }
+        ]
+      },
+      "original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600348/company_profile_common_core.v1/bp-work-c1ce1a5b541e1116b231a0ac.json",
+      "original_runtime_sha256": "8f77b1d3d5c9b523feaee2d05f7bcdb94774fef97ee3d7d12528036a20c5ecdb"
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "decisions": {
+        "report": {
+          "instrument_id": "000338.SZ",
+          "report_id": "asset_aa48dc0bb926a85541dfeacd0f94224f",
+          "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-26T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "A independent original-PDF reader",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+        "reference_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+        "decisions": [
+          {
+            "fact_id": "F-SM-02",
+            "fact_sha256": "1e56e54f29690ffbd4ee9ea2e3f306623693f56c47965df9ff2d084edb98c896",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "三电业务收入30.4亿元 is a specified business subset, not group-wide revenue; metric incorrectlyconsolidated_group rather thanbusiness_segment. The original amount and growth narrative are supported. Actual independent consistency challenge against the existing scope contract, not a new requirement.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          }
+        ]
+      },
+      "original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000338/company_profile_common_core.v1/bp-work-bbd1db65c451d1d024bdb9b9.json",
+      "original_runtime_sha256": "573599e6e252bbf8b5963e016f242ab9420945a357a72e7bfda41a8239c4b7b6"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "decisions": {
+        "report": {
+          "instrument_id": "000526.SZ",
+          "report_id": "asset_4a4d1f962befae75d94117257218409b",
+          "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "A independent original-PDF reader",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+        "reference_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+        "decisions": [
+          {
+            "fact_id": "F12",
+            "fact_sha256": "a260c8fa52822ee43e6fb3ef266caa29768fe5a6bbe08057f242d216fd0a237f",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "reason": "First income-mix table has blank rent amount, but second same-period table explicitly reports房屋租赁收入0.00/成本0.00/毛利率0.00%, repeated p18 plus cost0.00. Accepted R04 says no explicit amount and cannot confirm zero across cited context; this inaccurately broad missingness assertion ignores supplied explicit zeros. No invented economic zero should be inferred from blanks, but actual explicit zeros cannot be discarded. Preserve original, withhold only this optional object from new derivative, no new paid read.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          }
+        ]
+      },
+      "original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/000526/company_profile_common_core.v1/bp-work-88e327a6f594ec32aa9e05ec.json",
+      "original_runtime_sha256": "b9133e5e5699c8f9d42e36f9cbd997a71007345505f203fe8d45abb51672235d"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-016367c43308049bffc006bc",
+      "decisions": {
+        "report": {
+          "instrument_id": "601377.SH",
+          "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+          "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "A independent original-PDF reader",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+        "reference_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+        "decisions": [
+          {
+            "fact_id": "F34",
+            "fact_sha256": "0700b26dbc502a59f60c02d972b0f24760e9ac88660c7be7edb990be3294ce17",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0002",
+              "source-0007"
+            ],
+            "reason": "F34前半句声称研究业务蝉联证券时报最佳分析师评选最佳研究团队第三名、连续十届前五。该断言确实逐字存在原PDF物理p39（印刷p38）研究服务/经营举措及业绩，故不是排名造假或数字错误；但当前仅绑定source-0002物理p35、source-0007物理p40，这两处未载第三名和连续十届前五，只支持第一梯队/托管排名等其他子句。当前事实的证据绑定未覆盖整个复合断言，不能按现绑定认作完全有据。",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          }
+        ]
+      },
+      "original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601377/company_profile_common_core.v1/bp-work-016367c43308049bffc006bc.json",
+      "original_runtime_sha256": "b5af2b3364fed499a926463a563079aa3afba1c9447520712374a2ea802ef0d9"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "work_id": "bp-work-9938c95dc5f968013098bf76",
+      "decisions": {
+        "report": {
+          "instrument_id": "600901.SH",
+          "report_id": "asset_8c711b166add07b3ab8ace3c323c6dae",
+          "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-23T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "A independent original-PDF reader",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+        "reference_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+        "decisions": [
+          {
+            "fact_id": "F22",
+            "fact_sha256": "3355d9ce4a1ad65a984f6aa5375ca2c8519bf8497bf42ead4c5c071d39f50d6d",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "原PDF主文明确为不良融资租赁资产率0.88%、比上年末下降/减少0.03个百分点。F22叙述保留下降，但metric名为不良融资租赁资产率较上年末变动，value/raw_value均正0.03，未以降幅命名或给负向限定；标准化变动读数因此与叙述方向不一致。若用有符号变动应为-0.03个百分点；若保正0.03须明确为下降幅度，不能在当前泛称变动的数值上默认正确。其source_unit还取了p18图示%的形态，应与主文百分点口径分开说明。",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          }
+        ]
+      },
+      "original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/600901/company_profile_common_core.v1/bp-work-9938c95dc5f968013098bf76.json",
+      "original_runtime_sha256": "338a28731fe84ca14c076cf551f714d65c9ecb1d5ed15bab19504827063d77f7"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "decisions": {
+        "report": {
+          "instrument_id": "601668.SH",
+          "report_id": "asset_364d5ee7dbf24db99a65f1d99b40ed6b",
+          "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-17T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reviewer": "A independent original-PDF reader",
+        "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/release-A-decision-snapshot.json",
+        "reference_sha256": "61d3ddc6acd1a3d443e0049ea289a470546d34ef0161c5d34649ff74c965b1e7",
+        "decisions": [
+          {
+            "fact_id": "F15",
+            "fact_sha256": "03e14d6e992e7b22e2a72ef41c6fcf3092562bb7ec1e04ddb8834b15a9a3c93c",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "Original p22 printed18 explicitly states 2025年公司战略性新兴产业实现营业收入2,629亿元. The value2629亿元 is correct, but the corresponding metric subject_scope=consolidated_group upgrades a named business subset to whole-group scope; it should retain business_segment. The same fact's 建筑业务新签合同额4.2万亿元 already has business_segment and is supported. This is local metric contamination, not a wrong company total or core failure.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          },
+          {
+            "fact_id": "F26",
+            "fact_sha256": "01aaa07dc9bacf127084bff4d591dab3d4586465a4b7a9a9747e30abdbc6e5e5",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "reason": "Original p22 printed18 strategy paragraph reports 战略性新兴产业营业收入2,629亿元, not whole-group revenue. Metric value2629亿元 is correct but subject_scope=consolidated_group is not: retain business_segment. This repeats the contaminated metric in F15 but the complete object also contains distinct implementation of the strategic-industry guidance and updated layout map, so the entire F26 object is not mechanically deduplicated or omitted from the fixed sample.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          },
+          {
+            "fact_id": "F20",
+            "fact_sha256": "451dfb6716341c8152733463d1405cc0aff342b7d66d536e7094fdfa54411fba",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "reason": "Original p33 printed29 table 主营业务分地区情况 reports 境内收入1,940,443,514千元/毛利率10.4% and 境外收入141,698,297千元/毛利率2.8%; note defines 境外 as outside mainland China. All four numbers match, but the fact and all four metrics use consolidated_group although each is an explicitly regional row, not the 合计2,082,141,811千元/9.9% row. Preserve the regional category/business_segment scope rather than equating a partial regional row with the whole group.",
+            "limitation": "A独立原文审核限定当前对象用途；原模型稿及原错误/绑定限制记录保留，未手工改数。"
+          }
+        ]
+      },
+      "original_runtime_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_20261122/601668/company_profile_common_core.v1/bp-work-cad604975f9f30adcb311c8e.json",
+      "original_runtime_sha256": "1683108b9ecafdde83f17de1be836089336a3f82b51d8662f2fd6c1f3ddbd67c"
+    }
+  ]
+}

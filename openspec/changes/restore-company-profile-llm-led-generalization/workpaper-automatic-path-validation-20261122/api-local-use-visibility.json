@@ -1,0 +1,189 @@
+{
+  "root": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122",
+  "api_path": "/home/python/Quote/data/research/company_profile_automatic_path_validation_release_20261122/annual-api.json",
+  "api_sha256": "3226d38d4a28592968b5a9eecb4c987b4e9320dc5fc8b62062630b1c4d4aded5",
+  "local_dispositions_checked": 12,
+  "checks": [
+    {
+      "instrument_id": "600015.SH",
+      "fact_id": "F25",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[56].state",
+        "facts[56].fact",
+        "information_gaps[5].reasons"
+      ]
+    },
+    {
+      "instrument_id": "600015.SH",
+      "fact_id": "F37",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[65].state",
+        "facts[65].fact",
+        "information_gaps[7].reasons"
+      ]
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "F12",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[40].state",
+        "facts[40].fact",
+        "information_gaps[6].reasons"
+      ]
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "fact_id": "F-SM-02",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[49].state",
+        "facts[49].fact",
+        "information_gaps[8].reasons"
+      ]
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F007",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[31].state",
+        "facts[31].fact",
+        "information_gaps[4].reasons"
+      ]
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F009",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[32].state",
+        "facts[32].fact",
+        "information_gaps[4].reasons"
+      ]
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F023",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[45].state",
+        "facts[45].fact",
+        "information_gaps[7].reasons"
+      ]
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F15",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[39].state",
+        "facts[39].fact",
+        "information_gaps[1].reasons"
+      ]
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F20",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[44].state",
+        "facts[44].fact",
+        "information_gaps[2].reasons"
+      ]
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F26",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[50].state",
+        "facts[50].fact",
+        "information_gaps[3].reasons"
+      ]
+    },
+    {
+      "instrument_id": "601377.SH",
+      "fact_id": "F34",
+      "state": "source_only",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[67].state",
+        "facts[67].fact",
+        "information_gaps[8].reasons"
+      ]
+    },
+    {
+      "instrument_id": "600901.SH",
+      "fact_id": "F22",
+      "state": "withheld",
+      "numeric_fact_payload_absent": true,
+      "gap_and_reading_advice_visible": true,
+      "field_paths": [
+        "facts[44].state",
+        "facts[44].fact",
+        "information_gaps[9].reasons"
+      ]
+    }
+  ],
+  "one_response_excerpt": {
+    "instrument_id": "600015.SH",
+    "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+    "fact_entry": {
+      "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "fact_id": "F25",
+      "element": "customers_channels_markets",
+      "state": "withheld",
+      "label": "已隔离／独立源核",
+      "review_basis": "independent_source_check",
+      "model_review_stage": null,
+      "reasons": [
+        "Original small superscript4/5/6 precedes body4,012.44/2.02/56.11万户. Transcription and both models fused to44,012.44/52.02/656.11. Original text positioning: superscript font156 y618.29/638.09 vs body font240 y622.37/642.169. This is a real extraction+review miss, not a source-reported 44012.44 or5202. Do not silently correct historic model values."
+      ],
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "fact": null
+    },
+    "information_gap": {
+      "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "active": true,
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "独立源核：事实F25已隔离，可靠信息尚未获取成功。原因：Original small superscript4/5/6 precedes body4,012.44/2.02/56.11万户. Transcription and both models fused to44,012.44/52.02/656.11. Original text positioning: superscript font156 y618.29/638.09 vs body font240 y622.37/642.169. This is a real extraction+review miss, not a source-reported 44012.44 or5202. Do not silently correct historic model values. 建议按需对本报告对应业务章节定向精读，核对主体、期间、表头、单位及完整引文覆盖；原稿保留，未补写确定值。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    "field_paths": [
+      "facts[56].state",
+      "facts[56].fact",
+      "information_gaps[5].reasons"
+    ]
+  },
+  "mechanism": "existing UseReview excludes fact payload; derived element.limitations supplies existing API information_gaps reasons and recommended directed reading; no new API or business code"
+}

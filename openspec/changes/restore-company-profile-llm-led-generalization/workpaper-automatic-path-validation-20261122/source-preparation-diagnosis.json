@@ -1,0 +1,30 @@
+{
+  "task": "6.EY metadata preparation before model entry",
+  "instrument_id": "000049.SZ",
+  "owner_actual_return": {
+    "pdf_parse_failed": true
+  },
+  "asserted_expected": "bound ReportIdentity and nonempty native pages",
+  "failed_artifact_path": "/home/python/Quote/data/filings/announcements/blobs/b6/derived/business_profile_pdfium_recovery.v4/b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b_57e1dd4f16ef40ff.json.gz",
+  "failed_artifact_sha256": "9798c297d518c715f1eec9fb608317f66170c44f6b853e7749ae6dd8e79e183c",
+  "source_hash": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+  "artifact_status": "parse_failed",
+  "artifact_diagnostics": {
+    "error": "RuntimeError: native worker exited with code 1",
+    "failure_class": "malformed_pdf",
+    "glyph_decoding_min_characters": 3,
+    "glyph_decoding_ratio_threshold": 0.05,
+    "low_text_character_threshold": 40
+  },
+  "direct_cause": "scratch script top-level reexecuted under multiprocessing spawn; bootstrapping exception",
+  "remedy": "guard scratch entry with __main__; existing owner retry_failed_artifact for this preparation failure only",
+  "frozen_business_code_modified": false,
+  "official_pdf_bytes_modified": false,
+  "new_model_requests": 0,
+  "real_first_entry_started": false,
+  "A_reserve_qualification_decision": {
+    "920017.BJ": "6EU /reserves/2 metadata only; no business text or model preview",
+    "000156.SZ": "6EU /reserves/4 metadata only; no business text or model preview"
+  },
+  "authority": "A explicit current qualification ruling: retain fixed20; genuine prior semantics would stop"
+}

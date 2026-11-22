@@ -1,0 +1,222 @@
+{
+  "task": "6.EY",
+  "reviewer": "A/main direct original-PDF review, not model agreement",
+  "status": "completed_primary10_pending_mechanical_binding_and_group_decision",
+  "method": "reference-and-audit-method.md",
+  "companies": [
+    {
+      "instrument_id": "000049.SZ",
+      "work_id": "bp-work-4eff58b1460ad9bdccd0133d",
+      "core_fact_ids": ["F01", "F03", "F04", "F05", "F06"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F20", "F26", "F27", "F29"],
+      "supplemental_sample": ["F25", "F23", "F11", "F02", "F08", "F21", "F14", "F16", "F15", "F07", "F10", "F13", "F24", "F09", "F22", "F17", "F12"],
+      "additional_risk_checked": [],
+      "adopted_repairs_checked": ["REV-F22", "REV-F23"],
+      "supported": ["F01", "F03", "F04", "F05", "F06", "F25", "F23", "F11", "F02", "F08", "F21", "F14", "F16", "F15", "F07", "F10", "F13", "F24", "F09", "F22", "F17", "F12"],
+      "errors": [],
+      "original_physical_pages_checked": [10, 11, 12, 13, 14, 15, 16, 24, 25],
+      "source_findings": [
+        "p10/11: lithium battery power management and packaging integration, not manufacture of smartphones/notebooks; direct sales and order-led production/procurement explicit.",
+        "p12/14: group revenue 22399427302.94 yuan and each cited product/region amount/share match complete table headers; rounded narrative is not misrepresented as exact metric.",
+        "p13: energy storage28.29亿元,49.89%; SIP30.42亿元 includes internal sales,13.88%; loss reduction belongs to storage segment. REV-F22/REV-F23 correctly retain segment scope, not group.",
+        "p13/15/16: R&D10.31亿元/14.63%/4.60%, cost materials87.18%/labor3.52%/other9.30%, consolidation +4/-3 are supported. The original itself says 内黄工业园; do not substitute geography. 超20亿元 output remains greater_than/limited.",
+        "p24/25: subsidiaries 蓝微/矽镨/湖南储能 and corresponding roles supported. F20/F26/F27/F29 repeat economic assertions and are not counted again."
+      ],
+      "known_error_externalization": false,
+      "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "601006.SH",
+      "work_id": "bp-work-799fa5830dc8411f11f22ca6",
+      "core_fact_ids": ["F01", "F04", "F05", "F06"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F27", "F30", "F32", "F33"],
+      "supplemental_sample": ["F21", "F23", "F08", "F15", "F09", "F14", "F31", "F20", "F10", "F29", "F25", "F16", "F03", "F17", "F12", "F24", "F18", "F19", "F28", "F11"],
+      "additional_risk_checked": ["F27", "F02", "F07", "F13", "F22", "F26"],
+      "remaining_eligible_ranked": ["F26", "F22", "F13", "F07", "F02"],
+      "adopted_repairs_checked": ["RF-F15", "RF-F27", "RF-F14", "RF-F23"],
+      "supported": ["F01", "F04", "F05", "F06", "F21", "F23", "F08", "F15", "F09", "F14", "F31", "F20", "F10", "F29", "F25", "F16", "F03", "F17", "F12", "F24", "F18", "F19", "F28", "F11", "F27", "F02", "F07", "F13", "F22", "F26"],
+      "errors": [],
+      "original_physical_pages_checked": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 167, 168],
+      "source_findings": [
+        "p8/9/13: freight-focused railway operator, passenger and other railway services, not coal producer. Group77644812382 yuan differs from main76409490504; freight54321785789/passenger10431258204/other11656446511 and main shares71.09%/13.65% supported.",
+        "p10/11: company freight68073万吨 and coal54884万吨, arrivals60674万吨, passenger4708万人; 39004万吨/81.6 pairs/50.7 pairs refer to core line, not named subsidiary. F14 correctly limits subject.",
+        "p14/167/168: paid service24942092564 comprises cargo18056723242 and passenger6885369322. 两端物流辅助3268187622 is a separate parallel item, not a paid-service component; RF-F15 corrected this hierarchy. Service definitions explicitly checked in p168 notes.",
+        "p12: company coal reduction4023万吨 vs core line211万吨 are distinct; RF-F23 now marks the latter unclear rather than upgrading line to group. RF-F27 preserves explicit no-major-main-business-change sentence and does not turn two not-applicable checkboxes into economic conclusions.",
+        "p15-17: top customers/vendors, R&D11719039元/0.02%, land-rights-related intangibles34512368917, cash35850008755, bonds7593350951 to0, other equity804984728 to0 and finance costs -296022107 all match subject/period and source explanatory text. Duplicate F27 is source checked but not counted again in unique accuracy."
+      ],
+      "known_error_externalization": false,
+      "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "core_fact_ids": ["F03", "F04", "F05", "F11"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F26", "F35", "F36", "F37"],
+      "supplemental_sample": ["F30", "F39", "F22", "F29", "F18", "F27", "F20", "F14", "F23", "F21", "F06", "F13", "F08", "F24", "F09", "F28", "F16", "F38", "F25", "F19"],
+      "additional_risk_checked": ["F01", "F02", "F07", "F12", "F15", "F31", "F26", "F36", "F37"],
+      "adopted_repairs_checked": ["FND-04", "FND-05", "FND-06", "FND-07", "FND-08"],
+      "supported": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09", "F11", "F12", "F13", "F14", "F15", "F16", "F18", "F19", "F20", "F21", "F22", "F23", "F24", "F26", "F27", "F28", "F29", "F30", "F31", "F36", "F38", "F39"],
+      "pending_source_check": [],
+      "errors": [
+        {"fact_id": "F25", "kind": "superscript_footnote_contaminated_numeric_value", "source_pages": [44], "reason": "Original small superscript4/5/6 precedes body4,012.44/2.02/56.11万户. Transcription and both models fused to44,012.44/52.02/656.11. Original text positioning: superscript font156 y618.29/638.09 vs body font240 y622.37/642.169. This is a real extraction+review miss, not a source-reported 44012.44 or5202. Do not silently correct historic model values."},
+        {"fact_id": "F37", "kind": "dependent_repeat", "source_pages": [44], "reason": "Repeats F25 erroneous retail customer total; excluded from unique accuracy count as duplicate, but must also be withheld from final delivery."}
+      ],
+      "withhold_from_new_delivery": ["F25", "F37"],
+      "original_physical_pages_checked": [9, 13, 17, 20, 21, 41, 44, 49, 50, 51, 52, 59, 60],
+      "source_findings": [
+        "p13/20/21: commercial bank services and net-interest/noninterest revenue support all three basic questions. Supplementary omission of group total919.14亿元 is not an automatic company rejection. Regional table includes negative intersegment -677, not an extra revenue line.",
+        "p49/50: group wealth product balance12151.17亿元/2114 products and fee14.22亿元; issuer custody40629.39亿元/12107 products, custody fee9.16亿元, public funds4626.45亿元 all supported and scopes preserved.",
+        "p17/51/52/59/60: asset/deposit/loan, technology39.43亿元/4.29%, RPA2528, NPL143.30% coverage/1.55% NPL rate and disposal433.24亿元 supported. Actual five accepted repairs support scope/numeric labels; no reliance on model agreement.",
+        "p44: F25 has three real numeric errors caused by footnote/body fusion; F37 repeats one. Other service descriptions on same page remain valid. Final derivative must isolate only affected objects and show API gap. Preserve first-read and model-reviewed originals and count original error."
+      ],
+      "known_error_externalization": true,
+      "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "core_fact_ids": ["F001", "F004", "F005", "F007"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F027", "F028"],
+      "supplemental_sample": ["F002", "F003", "F009", "review-add:R002", "F010", "F011", "F012", "F014", "F015", "F016", "F018", "F019", "F020", "F021", "F022", "F023", "F024", "F025", "F026", "F029"],
+      "sample_order_note": "All20 eligible objects; ordering mechanically checked against frozen hash seed in bindings.",
+      "additional_risk_checked": ["F027"],
+      "adopted_repairs_checked": ["R001", "R002", "R005", "R006"],
+      "supported": ["F001", "F002", "F003", "F004", "F005", "review-add:R002", "F010", "F011", "F012", "F014", "F015", "F016", "F018", "F019", "F020", "F021", "F022", "F024", "F025", "F026", "F027", "F029"],
+      "errors": [
+        {"fact_id": "F007", "kind": "mixed_fact_narrow_business_metric_wrong_scope", "source_pages": [14,15], "reason": "Coal revenue179.51亿元 is explicitly a business subset of company revenue214.44亿元, but metric煤炭产品销售收入 usesconsolidated_group. Only the company total's scope is valid. Existing contract requires each metric's own scope; do not relabel both. Text and values themselves are supported."},
+        {"fact_id": "F009", "kind": "business_subtotal_metrics_wrong_scope", "source_pages": [21], "reason": "煤炭业务经营情况 table totals179.51 revenue/103.03 cost/76.48 gross亿元 cover coal only, not the entire group's activities; all three total metrics are incorrectlyconsolidated_group rather thanbusiness_segment. Product-line amounts and narrative are otherwise supported."},
+        {"fact_id": "F023", "kind": "business_cost_metrics_wrong_scope", "source_pages": [16], "reason": "Current103.03/prior120.48/reduction17.45亿元 all describe coal sales costs, but each metric incorrectly usesconsolidated_group. Values and decline narrative are correct; source business scope must not be upgraded."}
+      ],
+      "withhold_from_new_delivery": ["F007", "F009", "F023"],
+      "core_judgment_note": "Basic monetization is substantively answered by coal mining/washing/sales in F001/F004 and source-supported coal-sales price/volume effects in F022. Wrong numeric metadata in original core-associatedF007 is counted in accuracy and withheld, not used to invent a new compulsory quantitative core condition; fixed original sampling pool is unchanged.",
+      "original_physical_pages_checked": [11, 12, 14, 15, 16, 21, 22],
+      "source_findings": [
+        "p11/12: coal mining/washing/sales, nine producing/one building mines, sodium battery and carbon fiber subsidiaries and T1000 startup11/30 are disclosed facts, not industry-wide output.",
+        "p14-16/21: total214.44亿元 differs from main19755459324.27元. Coal179.51亿元/product splits/cost103.03亿元/gross76.48亿元 supported; power1741103014.27元 supported. No invented zero for blank slime cost. Heat amount remains optional visible omission.",
+        "p14/16 vs p21: raw coal4161万吨 and coal-product output40950167.06吨 kept as different disclosed measures; volume and price effects23.01/-45.05亿元 supported.",
+        "p21/22: resource6565936000/reserve2932991000/proved1257891790 tons, production statuses, railway customer denominators80%/90%, named steel/electric/chemical buyers supported. R001 preserves only not-applicable disclosure status; R005/R006 remove unsupported purchase-processing statement."
+      ],
+      "known_error_externalization": true,
+      "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "core_fact_ids": ["F-BS-01", "F-BS-02", "F-RM-02"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F-OI-01", "F-CC-03", "F-SC-P1", "F-SC-U1", "F-SC-D1", "F-MC-03"],
+      "supplemental_sample": ["F-SM-01", "F-SM-04", "F-OD-02", "F-SM-02", "F-CF-02", "F-BS-03", "F-RM-01", "F-SM-03", "F-PS-01", "F-RM-03", "F-RM-05", "F-PS-03", "F-PS-02", "F-MC-02", "F-PS-06", "F-CC-02", "F-OD-01", "F-OD-03", "F-CF-01", "F-OI-02"],
+      "remaining_eligible_ranked": ["F-RM-06", "F-OI-03", "F-RM-04", "F-MC-01", "F-PS-04"],
+      "additional_risk_checked": ["F-RM-06", "F-OI-03", "F-RM-04", "F-MC-01", "F-PS-04"],
+      "adopted_repairs_checked": ["WR-001", "WR-002", "WR-003"],
+      "supported": ["F-BS-01", "F-BS-02", "F-RM-02", "F-SM-01", "F-SM-04", "F-OD-02", "F-CF-02", "F-BS-03", "F-RM-01", "F-SM-03", "F-PS-01", "F-RM-03", "F-RM-05", "F-PS-03", "F-PS-02", "F-MC-02", "F-PS-06", "F-CC-02", "F-OD-01", "F-OD-03", "F-CF-01", "F-OI-02", "F-RM-06", "F-OI-03", "F-RM-04", "F-MC-01", "F-PS-04"],
+      "errors": [{"fact_id": "F-SM-02", "kind": "business_revenue_metric_wrong_scope", "source_pages": [13], "reason": "三电业务收入30.4亿元 is a specified business subset, not group-wide revenue; metric incorrectlyconsolidated_group rather thanbusiness_segment. The original amount and growth narrative are supported. Actual independent consistency challenge against the existing scope contract, not a new requirement."}],
+      "withhold_from_new_delivery": ["F-SM-02"],
+      "original_physical_pages_checked": [12, 13, 14, 15, 16, 17, 18, 19, 20, 26, 158],
+      "source_findings": [
+        "p12-16: diversified power/commercial vehicle/agriculture/logistics/energy group and directB2B/custom manufacturing are explicit; actual WR-002 narrows102万台/年 capacity to engine segment; WR-003 labels broad industry developments industry, not company.",
+        "p16/17: revenue231809281106.82元, product/industry/region/channel tables match complete cross-page header; no relabeling logistics as engines or group subsidiary amounts. p158 main229924949864.93 and detailed lines retain their separate accounting axis.",
+        "p13-16/26: engine74.3万台, triple-electric30.4亿元, subsidiary trucks15.3万辆/agri-15% fuel use/KION113亿欧元 and82.7/30.7 splits supported; subsidiary table is人民币万元, not euros. PSI81% is explicitly subsidiary scope; 259% DC backup/65% large-engine income growth supported.",
+        "p18-20: actual consolidation change vs not-applicable business-change disclosure kept separate after WR-001. Customer45685330488.03/19.71% and vendor23893414043.78/13.13% denominators, related fractions and expense explanation supported. Non-core actual brands/vision retained; no inference of achieved vision."
+      ],
+      "known_error_externalization": true,
+      "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "600859.SH",
+      "work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "core_fact_ids": ["F32", "F07", "F08", "F09", "F11"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F33"],
+      "supplemental_sample": ["F06", "F31", "F02", "F12", "F17", "F26", "F35", "F21", "F15", "F34", "F19", "F25", "F29", "F20", "F23", "F03", "F36", "F22", "F10", "F14"],
+      "remaining_eligible_ranked": ["F28", "F04"],
+      "additional_risk_checked": ["F28", "F04"],
+      "adopted_repairs_checked": [],
+      "supported": ["F32", "F07", "F08", "F09", "F11", "F06", "F31", "F02", "F12", "F17", "F26", "F35", "F21", "F15", "F34", "F19", "F25", "F29", "F20", "F23", "F03", "F36", "F22", "F10", "F14", "F28", "F04"],
+      "errors": [],
+      "original_physical_pages_checked": [11, 12, 14, 15, 16, 17, 18, 19, 20, 27, 28],
+      "source_findings": [
+        "p11/12: store merchandise sales and rents, outlet/mall/department/duty-free/specialty/online modes and products are substantively explained. F01/F05 suppressed by model review, but F32 plus live detailed facts still answer all three core questions; no demand for every store name.",
+        "p18/19: retail8610455031.90元/84.83% and lease1539451121.34/15.17%; format/region amounts and margins match; negative南区-12.46% retained. F12 carries source warning excluding cross-format elimination, so do not force shares to group denominator. Group101.50亿元 omission remains API suggestion, not false basic failure.",
+        "p14-16/19/20: actual brand changes, digital stores/members/live streams, tax-refund1.1万 approximate/424%, customer flow近2/超10/超8%, product超60% preserve qualifiers. Procurement vs property costs match exact rows; no made-up corporate customer list.",
+        "p15/27/28: WellTown mixed retail/art format and robot shop are sourced company features. Actual openings/closures and2028预计 construction retained with time/status; 喜悦购物中心 is store-level named subject, no group uplift. No accepted repair in this batch, rejected candidates are not scored as delivered."
+      ],
+      "known_error_externalization": false,
+      "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "601166.SH", "work_id": "bp-work-52d5b4c1992e90c91aa2c48c",
+      "core_fact_ids": ["F01", "F03", "F04", "F05", "F06"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F27", "F29"],
+      "supplemental_sample": ["F11", "F20", "F08", "F15", "F26", "F14", "F02", "F16", "F31", "F17", "F30", "F13", "F12", "F10", "F09", "F23", "F24", "F18", "F19", "F25"],
+      "remaining_eligible_ranked": ["F22"], "additional_risk_checked": ["F22"],
+      "adopted_repairs_checked": ["WR01", "WR02", "WR03", "WR04", "WR06", "WR07", "WR09"],
+      "supported": ["F01", "F02", "F03", "F04", "F05", "F06", "F08", "F09", "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F22", "F23", "F24", "F25", "F26", "F30", "F31"],
+      "errors": [], "original_physical_pages_checked": [18, 19, 29, 30, 76, 82, 101, 102, 103, 104, 105, 106, 108],
+      "source_findings": [
+        "Own TOC/body3.5 and3.6: comprehensive banking group; enterprise/retail/interbank services and net-interest148752百万元/noninterest63989 against total212741 support core. Not required to list every fee category.",
+        "p29/30/76/82: group accounting amounts, region totals, net profit774.69亿元, NPL642.51亿元/1.08% and provision228.41% match. F11 metric0.74 has comparison_basis=下降, not an erroneous positive signed change.",
+        "p101/102:2091 outlets excludes head/licensed units,2095 institutions63233 staff10779940百万元 exclude subsidiaries; WR01 keeps denominator. p103/105/106 bank-only corporate/retail balances and product portfolio match WR02-WR04. WR07 foreign branches2730.46 is not group assets.",
+        "p103-108: client counts/green loan11075.54亿元/FPA4.89万亿/wealth55.61亿元 and global94 countries1259 banks source checked;近/超 and scope-unclear wealth lines preserved limited. WR09未来四张名片 retained future tense, not completed claim."
+      ],
+      "known_error_externalization": false, "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "600900.SH", "work_id": "bp-work-b9a21297ab8f537b8e62f19d",
+      "core_fact_ids": ["F01", "F04", "F15"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F24", "F25", "F26", "F27"],
+      "supplemental_sample": ["F14", "F03", "F11", "F05", "F22", "F09", "F19", "F13", "F20", "F16", "F17", "F06", "F08", "F23", "F21", "F18", "F10", "F07", "F12", "F02"],
+      "remaining_eligible_ranked": [], "additional_risk_checked": ["F26"], "adopted_repairs_checked": ["R01"],
+      "supported": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09", "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "F26"],
+      "errors": [], "original_physical_pages_checked": [9, 10, 11, 12, 18, 19, 20],
+      "source_findings": [
+        "p9-12/18-20: six-station large hydropower operator selling power to grid and through electricity-retail platform; major products/monetization substantively clear. Optional input detail not required.",
+        "p12: revenue86241940222.20 and cost33057840034.77 yuan match exact metrics and rounded narrative; group3097.35 vs domestic3071.94亿千瓦时, installed7179.5万千瓦 including domestic7169.5 and foreign10 distinguish subjects.",
+        "p18:756.62亿元 domestic revenue vs group862.42;258.82 cost/53.07 share literally reported in operating table; do not independently force denominator to group330.58 or invent correction. Metric retains row's named cost, not raw-material spend. Utilization hours all six p19 checked.",
+        "p10/11/19/20:140.1亿节水发电,94.43亿 capex, investment49.59亿 and约26亿 dividends, subsidiary2.98亿美元, wind13.57万千瓦 are supported. Markets1104.5/3055.6/36.1%, subsidiary超60亿/9 provinces/近30MW match. R01 changes downstream causal overclaim to measured sales/channel data; original quantities retained."
+      ],
+      "known_error_externalization": false, "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "000651.SZ", "work_id": "bp-work-8b886b28b2588fc228029832",
+      "core_fact_ids": ["F-BS-01", "F-RM-02"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": [],
+      "supplemental_sample": ["F-RM-01", "F-PS-01", "F-OD-02", "F-SC-01", "F-PS-04", "F-PS-03", "F-OI-03", "F-RM-04", "F-MC-02", "F-PS-02", "F-OD-01", "F-RM-03", "F-CC-03", "F-BS-02", "F-OI-01", "F-OI-02", "F-SM-01", "F-OD-03", "F-CC-01", "F-MC-01"],
+      "remaining_eligible_ranked": ["F-SC-03"], "additional_risk_checked": ["F-SC-03"], "adopted_repairs_checked": ["FR-001", "FR-002"],
+      "supported": ["F-BS-01", "F-RM-02", "F-RM-01", "F-PS-01", "F-OD-02", "F-SC-01", "F-PS-04", "F-PS-03", "F-OI-03", "F-RM-04", "F-MC-02", "F-PS-02", "F-OD-01", "F-RM-03", "F-CC-03", "F-BS-02", "F-OI-01", "F-OI-02", "F-SM-01", "F-OD-03", "F-CC-01", "F-MC-01", "F-SC-03"],
+      "errors": [], "original_physical_pages_checked": [10, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 39, 207],
+      "source_findings": [
+        "p10/24: consumer and industrial group, broad actual product family and revenue mix substantive; operating total1711.18亿元 vs营业收入170447058533.57元 kept separate, not forced consistent.",
+        "p24/25/207: every cited product/region amount/share/margin and four financial segments source checked with headers; domestic/foreign amounts are主营, shares use营业收入 denominator. MC02 includes other-business-14.31%, beyond partial duplicate product growth.",
+        "p13-23 concentrated product paragraphs: named aircon/HVAC/refrigeration/laundry/pet purifier/SiC/robots and shield-environment applications supported. Original automation and chip70%/80% contextual claims preserved; consumer/manufacturing input cost denominator not group total.",
+        "p21/23/39: retail/channel/three overseas brands, raw copper/steel/aluminum/plastic and risk responses all source supported. p26 R&D6463100763.66元/-6.39%; FR-001 keeps only not-applicable project disclosure, FR-002 correctly narrows24.31% to online home-AC retail amount share and retains超15%."
+      ],
+      "known_error_externalization": false, "basic_profile_usable": true
+    },
+    {
+      "instrument_id": "000526.SZ", "work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "core_fact_ids": ["F01", "F03", "F05", "F06", "F07", "F08"],
+      "core_conditions_supported": ["principal_business", "products_services", "revenue_model"],
+      "semantic_duplicates_excluded_from_sample": ["F19", "F30", "F32", "F33"],
+      "supplemental_sample": ["F21", "F23", "F35", "F29", "F02", "F25", "F13", "F11", "F24", "F04", "F26", "F12", "F22", "F14", "F20", "F10", "F18", "F34", "F27"],
+      "remaining_eligible_ranked": [], "additional_risk_checked": [], "adopted_repairs_checked": ["R01", "R02", "R03", "R04", "R05"],
+      "supported": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F10", "F11", "F13", "F14", "F18", "F20", "F21", "F22", "F23", "F24", "F25", "F26", "F27", "F29", "F34", "F35"],
+      "errors": [{"fact_id": "F12", "kind": "overcautious_missingness_contradicts_explicit_source_zero", "source_pages": [17,18], "reason": "First income-mix table has blank rent amount, but second same-period table explicitly reports房屋租赁收入0.00/成本0.00/毛利率0.00%, repeated p18 plus cost0.00. Accepted R04 says no explicit amount and cannot confirm zero across cited context; this inaccurately broad missingness assertion ignores supplied explicit zeros. No invented economic zero should be inferred from blanks, but actual explicit zeros cannot be discarded. Preserve original, withhold only this optional object from new derivative, no new paid read."}],
+      "withhold_from_new_delivery": ["F12"], "original_physical_pages_checked": [7,10,11,12,17,18,19,20],
+      "source_findings": [
+        "p10-12: four education/vocational/reading/medical-education lines, particular services and users supported; training-service fees96.67% is clear primary monetization despite missing its exact income as optional gap.",
+        "p7/17/18: group3227045720.68元/15.84%, profit195098225.52/8.58%, assets3981463589.21/4.00%; training and regions line-wrapped digits manually checked, other103329561.57/56.80% and equipment4000000/-82.15% are correct. F12 is specific overcautious false absence, not error in core training business.",
+        "p19/20: customer10196126.77/0.31% vs supplier82633185.50/3.85% and related ratios, all expense amounts/causes support output. R02 does not call all consolidated entities newly acquired; R01 changes regions denominator to company revenue.",
+        "p10/11: R03 keeps full debt repayment at report publication, amount0.99亿元 and约12348486.10 interest verbatim; R05 keeps low-altitude cooperation by publication not forced current2025. F27 strange注销股份金额6000万 wording is literally original, not inferred stock count. R04 limitation is the single known error recorded above."
+      ],
+      "known_error_externalization": true, "basic_profile_usable": true
+    }
+  ]
+}

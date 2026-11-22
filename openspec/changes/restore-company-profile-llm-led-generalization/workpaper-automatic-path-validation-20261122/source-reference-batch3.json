@@ -1,0 +1,54 @@
+{
+  "task": "6.EY", "reference_type": "A_independent_source_first_not_model_input", "frozen": true,
+  "scope": "Substantive basic business/product/earning answers only as core; amounts and supplementary details separately audited, not demanded to fill every field.",
+  "companies": [
+    {
+      "instrument_id": "000651.SZ", "document_sha256": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+      "toc_read": "Report-local bookmarks; printed page one below physical in selected section",
+      "source_sections": [{"title": "第三节/一、主要业务", "physical_pages": [10]}, {"title": "第三节/核心竞争力及新零售渠道", "physical_pages": [11]}, {"title": "第三节/四、主营业务分析/收入与成本", "physical_pages": [24]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "消费家电与工业板块的研发生产销售，空调/暖通为核心但不把集团概括成只卖空调；保工业制品绿色能源等业务范围", "pages": [10,24]},
+        {"id": "products_services", "expected": "家用空调/暖通及其他智能家电、楼宇解决方案与工业核心零部件/装备有实质说明，全部品牌/小产品目录不强求", "pages": [10]},
+        {"id": "revenue_model", "expected": "通过消费电器、工业制品及绿色能源等产品销售取得主要收入，结合线上线下渠道；行业销量不变成公司销售额，消费电器收入不全部改标空调", "pages": [10,11,24]}
+      ],
+      "audit_targets": {"unit": "元", "operating_revenue": "170447058533.57", "total_operating_income_100m_CNY": "1711.18", "consumer_appliances": "133055208627.13", "industrial_and_green_energy": "17380701260.95", "smart_equipment": "680790474.57", "other_main": "2665271980.81", "other_business": "16665086190.11"},
+      "pitfalls": ["营业总收入与营业收入不得混同", "铜/制冷剂行业涨价不是公司采购量或确定成本敏感性", "产业布局不推断每个子业务已有同样规模", "渠道节点数量与自营门店/直营收入不同"]
+    },
+    {
+      "instrument_id": "000526.SZ", "document_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "toc_read": "Report-local bookmarks",
+      "source_sections": [{"title": "第三节/一、主要业务/个性化教育、职业教育、文化阅读及医教融合", "physical_pages": [10,11]}, {"title": "第三节/四、主营业务分析/收入与成本", "physical_pages": [17]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "个性化教育为核心的教育服务，持续布局职业教育等；不能仅以教材零售/设备出租代表主体", "pages": [10,11,17]},
+        {"id": "products_services", "expected": "个性化学习中心/全日制培训教育及职业教育等教育服务的实质范围，文化阅读/医教融合按披露补充；不把康复教育直接说成医院医疗业务", "pages": [10,11]},
+        {"id": "revenue_model", "expected": "以教育培训服务费为主要收入，其他/设备租赁少量；学校和学员数量/合同金额不当本期收入，不要求各学校单独金额", "pages": [10,17]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "3227045720.68", "education_service_fees": "3119716159.11", "education_share_percent": "96.67", "equipment_rental": "4000000.00", "other": "103329561.57", "centers_approx": "约330所", "fulltime_training_bases": "34"},
+      "pitfalls": ["PDF小数末位跨行需同一数值上下文，不跨列拼接", "房屋租赁主表空栏不猜0，另明确表为0才引用0", "业务/投资或还款截至披露日与年末不同", "约/超等保原限定，不逼确定标准化"]
+    },
+    {
+      "instrument_id": "601377.SH", "document_sha256": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "toc_read": "No bookmarks; directly read physical TOC13; printed page +1 gives physical in selected body",
+      "source_sections": [{"title": "第三节/一、业务情况", "physical_pages": [34]}, {"title": "第三节/五、主要经营情况及主营业务分析/收入成本", "physical_pages": [46,47,48]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "财富管理、机构服务、自营投资和海外业务组成的证券金融集团，不只证券经纪且不误成商业银行", "pages": [34,48]},
+        {"id": "products_services", "expected": "证券/期货经纪和资管、研究/交易及投行服务、自有资金投资、海外综合金融服务有实质说明，具体基金产品/子公司细目不强求齐全", "pages": [34]},
+        {"id": "revenue_model", "expected": "提供金融服务取得手续费佣金、融资等利息和自营投资收益；客资和资管规模不等收入，分部收入与会计收入类型是不同轴", "pages": [34,47,48]}
+      ],
+      "audit_targets": {"company_revenue_100m_CNY": "118.41", "net_fees_100m_CNY": "63.71", "net_interest_100m_CNY": "15.85", "investment_income_CNY": "3860955227.47", "segment_unit": "万元", "brokerage_futures": "377812.12", "asset_management": "319408.12", "institutional_services": "157695.89", "proprietary_investment": "321443.92", "overseas": "47705.97"},
+      "pitfalls": ["本体/集团/海外子公司及分部不混", "投资收益与公允价值损失分开，现金流入不代替营业收入", "营业成本费列和金融利息净收入不可按制造毛利强算", "分部五行（财富含两行）与四大板块分类可合理归并但不重加"]
+    },
+    {
+      "instrument_id": "000006.SZ", "document_sha256": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "toc_read": "Physical TOC3, report-native third section starts physical9",
+      "source_sections": [{"title": "第三节/一、主要业务/经营管理回顾", "physical_pages": [9]}, {"title": "第三节/融资与展望及四、主营业务分析/收入成本", "physical_pages": [13,14]}],
+      "conditions": [
+        {"id": "principal_business", "expected": "房地产开发经营为主，商业运营租赁、旧改/代建和城市服务为补充；不能只用国企属性替代业务", "pages": [9,14]},
+        {"id": "products_services", "expected": "普通住宅/商用物业开发销售并有租赁经营等服务，旧改/代建按已开展与规划区分；具体项目全名单不是完成门槛", "pages": [9,13,14]},
+        {"id": "revenue_model", "expected": "以房产销售为主要收入，另有租金/物管及代建旧改前期服务等，合同签约/回款与会计营业收入不混", "pages": [9,14]}
+      ],
+      "audit_targets": {"unit": "元", "company_revenue": "2618016381.31", "property_sales": "2398098203.82", "property_rental": "131264727.40", "property_management": "17139654.21", "construction_urbanrenewal_service": "3382674.58", "other": "68131121.30", "parent_profit_100m_CNY": "-0.42", "contracted_sales_100m_CNY": "25.37"},
+      "pitfalls": ["归母亏损负号保留", "销售签约金额/回款/结转收入不同", "约/近不强变确定值", "城市服务/旧改未来布局不能全升级当期收入"]
+    }
+  ]
+}

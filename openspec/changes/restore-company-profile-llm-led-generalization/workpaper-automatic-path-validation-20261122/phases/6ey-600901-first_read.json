@@ -1,0 +1,114 @@
+{
+  "run_id": "6ey-600901-first_read",
+  "action": "first_read",
+  "started_epoch": 1795334741.0514972,
+  "command": [
+    "/home/python/miniconda3/envs/Quote/bin/python",
+    "main.py",
+    "job",
+    "--job-id",
+    "company_profile_common_core",
+    "--action",
+    "first_read",
+    "--execution-plan-file",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/plans/600901-first_read.json"
+  ],
+  "allocated_budget": {
+    "seconds": 3000.0,
+    "tokens": 500000,
+    "physical_requests": 4,
+    "recoveries": 2,
+    "logical_seconds": 2450.0,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "result_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/600901/executions/6ey-600901-first_read/result.json",
+  "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6ey-b-4P7Kk9l2/6ey-600901-first_read.log",
+  "absolute_deadline_epoch": 1795340740.709928,
+  "pid": 3362706,
+  "finished_epoch": 1795334790.3565462,
+  "process_returncode": 0,
+  "absolute_deadline_timeout": false,
+  "result_state": "completed",
+  "usage": {
+    "physical_requests": 2,
+    "recoveries": 0,
+    "charged_tokens": 32300,
+    "supplier_total_tokens": 32300,
+    "priced_cost_cny": "0",
+    "fees": "unknown",
+    "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automatic_path_validation_20261122/600901/executions/6ey-600901-first_read/budget.json",
+    "stopped_reason": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "73fdb081dfcc4e1bb40a98e03d99671f",
+        "logical_request_id": "49b5bd6bda6027b40463b512d6bbf45d5e2214ec7e906a2cb9510ca220b7c219",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 25978,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 7665,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 7226,
+          "output_tokens": 439,
+          "total_tokens": 7665
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 441,
+          "content_fragments": 439,
+          "content_chars": 866,
+          "content_sha256": "9b9f990e540207eef163ee84dc87fed6e1e2dbd1331ddb5e1242d06eafa07a5c",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "d5de96ab796848ef9c2386c23979d971",
+        "logical_request_id": "0312794a9949059450bd184c089c9f944e08c3cb999323788e939bcecb309f38",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 105984,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 24635,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 16643,
+          "output_tokens": 7992,
+          "total_tokens": 24635
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7994,
+          "content_fragments": 7992,
+          "content_chars": 22857,
+          "content_sha256": "a6c4ba8ac8438afa2deedc9667bd09722f2878903e146fdf3e045129bdedcc39",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "command_wall_seconds": 49.30504894256592
+}

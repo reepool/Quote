@@ -1,0 +1,349 @@
+{
+  "instrument_id": "600901.SH",
+  "source_document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+  "bookmark_index_only": true,
+  "no_business_answer": true,
+  "bookmarks": [
+    {
+      "level": 0,
+      "title": "财务报表浅色打印版",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "审计报告",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "一、审计意见",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "二、形成审计意见的基础",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "三、关键审计事项",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "四、其他信息",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "五、管理层和治理层对财务报表的责任",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "合并及母公司资产负债表",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "合并及母公司利润表",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "合并及母公司现金流量表",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "合并股东权益变动表",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "合并股东权益变动表 (续)",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "母公司股东权益变动表",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "母公司股东权益变动表 (续)",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "财务报表附注",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "一、 公司基本情况",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "二、 财务报表的编制基础",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "三、 重要会计政策、会计估计",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "四、 税项",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "五、 合并财务报表项目注释",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "六、 关联方关系及其交易",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "七、 承诺事项",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "八、 在其他主体中的权益",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "九、 与金融工具相关的风险",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "十、 公允价值的披露",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "十一、 股份支付",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "十二、 资本管理",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "十三、 未决诉讼",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "十四、 资产负债表日后事项",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "十五、 比较数据",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "财务报表补充资料",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "1、 非经常性损益明细表",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "2、 净资产收益率及每股收益",
+      "physical_page": null
+    },
+    {
+      "level": 2,
+      "title": "3、 资本管理",
+      "physical_page": null
+    },
+    {
+      "level": 0,
+      "title": "",
+      "physical_page": null
+    },
+    {
+      "level": 1,
+      "title": "审计报告",
+      "physical_page": 72
+    },
+    {
+      "level": 2,
+      "title": "一、审计意见",
+      "physical_page": 72
+    },
+    {
+      "level": 2,
+      "title": "二、形成审计意见的基础",
+      "physical_page": 72
+    },
+    {
+      "level": 2,
+      "title": "三、关键审计事项",
+      "physical_page": 73
+    },
+    {
+      "level": 2,
+      "title": "四、其他信息",
+      "physical_page": 77
+    },
+    {
+      "level": 2,
+      "title": "五、管理层和治理层对财务报表的责任",
+      "physical_page": 77
+    },
+    {
+      "level": 1,
+      "title": "合并及母公司资产负债表",
+      "physical_page": 80
+    },
+    {
+      "level": 1,
+      "title": "合并及母公司利润表",
+      "physical_page": 82
+    },
+    {
+      "level": 1,
+      "title": "合并及母公司现金流量表",
+      "physical_page": 84
+    },
+    {
+      "level": 1,
+      "title": "合并股东权益变动表",
+      "physical_page": 87
+    },
+    {
+      "level": 1,
+      "title": "合并股东权益变动表 (续)",
+      "physical_page": 88
+    },
+    {
+      "level": 1,
+      "title": "母公司股东权益变动表",
+      "physical_page": 89
+    },
+    {
+      "level": 1,
+      "title": "母公司股东权益变动表 (续)",
+      "physical_page": 90
+    },
+    {
+      "level": 1,
+      "title": "财务报表附注",
+      "physical_page": 91
+    },
+    {
+      "level": 2,
+      "title": "一、 公司基本情况",
+      "physical_page": 91
+    },
+    {
+      "level": 2,
+      "title": "二、 财务报表的编制基础",
+      "physical_page": 91
+    },
+    {
+      "level": 2,
+      "title": "三、 重要会计政策、会计估计",
+      "physical_page": 92
+    },
+    {
+      "level": 2,
+      "title": "四、 税项",
+      "physical_page": 116
+    },
+    {
+      "level": 2,
+      "title": "五、 合并财务报表项目注释",
+      "physical_page": 117
+    },
+    {
+      "level": 2,
+      "title": "六、 关联方关系及其交易",
+      "physical_page": 177
+    },
+    {
+      "level": 2,
+      "title": "七、 承诺事项",
+      "physical_page": 181
+    },
+    {
+      "level": 2,
+      "title": "八、 在其他主体中的权益",
+      "physical_page": 182
+    },
+    {
+      "level": 2,
+      "title": "九、 与金融工具相关的风险",
+      "physical_page": 186
+    },
+    {
+      "level": 2,
+      "title": "十、 公允价值的披露",
+      "physical_page": 204
+    },
+    {
+      "level": 2,
+      "title": "十一、 股份支付",
+      "physical_page": 206
+    },
+    {
+      "level": 2,
+      "title": "十二、 资本管理",
+      "physical_page": 209
+    },
+    {
+      "level": 2,
+      "title": "十三、 未决诉讼",
+      "physical_page": 210
+    },
+    {
+      "level": 2,
+      "title": "十四、 资产负债表日后事项",
+      "physical_page": 211
+    },
+    {
+      "level": 2,
+      "title": "十五、 比较数据",
+      "physical_page": 211
+    },
+    {
+      "level": 1,
+      "title": "财务报表补充资料",
+      "physical_page": 212
+    },
+    {
+      "level": 2,
+      "title": "1、 非经常性损益明细表",
+      "physical_page": 212
+    },
+    {
+      "level": 2,
+      "title": "2、 净资产收益率及每股收益",
+      "physical_page": 213
+    },
+    {
+      "level": 2,
+      "title": "3、 资本管理",
+      "physical_page": 214
+    }
+  ],
+  "access_note": "Use official PDF physical pages; bookmarks are locating metadata, not source quality judgment."
+}
