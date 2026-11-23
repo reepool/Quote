@@ -375,7 +375,7 @@ class CompanyProfileReadService:
         }
 
     def plan_review_recovery(self, instrument_id: str, *, request_id: str,
-                             reading_work_id: str | None = None) -> dict[str, Any]:
+                             reading_work_id: str | None = None, source_recheck_policy: str | None = None) -> dict[str, Any]:
         """Bind a review-only follow-up plan; never enqueue or expose raw replies."""
         from .workpaper_review import plan_review_follow_up, workpaper_hash
 
@@ -393,11 +393,19 @@ class CompanyProfileReadService:
             raise ValueError("review reading changed while planning")
         follow_up = (reading["review_follow_up"] if reading.get("superseded_by_review_work_id")
                      else plan_review_follow_up(record.workpaper, record.workpaper_receipts))
+        if source_recheck_policy is not None:
+            from .workpaper_review import prepare_review_recovery
+
+            seed, resume, receipts = prepare_review_recovery(record, source_recheck_policy=source_recheck_policy)
+            if resume is not None:
+                raise ValueError("explicit source recheck cannot reuse prior review opinions")
+            follow_up = plan_review_follow_up(seed, receipts)
         return {"schema_version": "company_profile_review_recovery_plan.v1", "request_id": request_id,
             "state": follow_up["state"], "execution_started": False,
             "instrument_id": instrument_id, "report": current["report"], "reading_work_id": chosen,
             "workpaper_sha256": workpaper_hash(record.workpaper), "review_follow_up": follow_up,
-            "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION}
+            "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION,
+            **({"source_recheck_policy": source_recheck_policy} if source_recheck_policy is not None else {})}
 
     def plan_enrichment(self, instrument_id: str, *, request_id: str, targets,
                         base_work_id: str | None = None) -> dict[str, Any]:
@@ -462,8 +470,10 @@ class CompanyProfileReadService:
                 except (OSError, ValueError):
                     continue
                 all_records[candidate.work_id] = candidate
-                if (isinstance(candidate, CompanyProfileRuntimeRecordV3) and candidate.workpaper.use_review
-                    and any(d.metric_restrictions for d in candidate.workpaper.use_review.decisions)):
+                if (isinstance(candidate, CompanyProfileRuntimeRecordV3) and (
+                    candidate.workpaper.use_review and any(d.metric_restrictions for d in candidate.workpaper.use_review.decisions)
+                    or candidate.workpaper.quality_review and candidate.workpaper.quality_review.metric_limit_policy is not None
+                )):
                     component_records[candidate.work_id] = candidate
             if component_records:
                 for index, base in enumerate(selected):

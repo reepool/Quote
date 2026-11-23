@@ -109,6 +109,18 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **AND** raw facts, text, metrics, evidence, author/model review and original quality results MUST remain unchanged; old whole-fact restrictions and absent component decisions retain legacy behavior and serialization, while review continuations MUST preserve current component restrictions
 - **AND** no component decision may rescue an incorrect narrative or unsupported citation, infer a replacement value/scope/direction, or silently upgrade an entire fact to fully checked/complete status
 
+#### Scenario: Ordinary source review explicitly limits a current fact's metric components
+- **WHEN** a newly versioned source review explicitly supports the original current narrative and its evidence but identifies particular original metric positions as unreliable
+- **THEN** the existing quality-review owner MUST bind that finding to the exact report, reviewed fact-content hash and validated original positions before the common delivery projection retains that narrative and unaffected metrics as limited content
+- **AND** ordinary API/JSON/CSV/Markdown MUST exclude those metric values and expose names, original positions, reasons and model-review basis as gaps without changing raw facts, source references, generation, values, subject scope or signs
+- **AND** unknown, duplicate, stale, boolean or out-of-range positions and unsupported narrative/evidence MUST NOT become an all-clear result; a whole-fact defect overrides component retention, and a changed/reordered fact requires new valid checking or conservative withholding
+- **AND** model findings MUST remain distinct from independent UseReview decisions and MUST NOT remove their restrictions; legacy absent fields/identities retain their serialization and behavior, and saved review/repair successors MUST preserve the effective limits without granting production approval
+
+#### Scenario: A caller explicitly requests the new policy to recheck a saved completed draft
+- **WHEN** a new bounded review plan explicitly names the supported source_recheck_policy for an existing same-report reading that has already completed an older review
+- **THEN** the existing plan and review owner MAY reconstruct the exact original model extraction and its original source package for a fresh source review, without passing old review opinions or independent use decisions as model answers
+- **AND** omitted recheck policy retains the existing not-needed behavior and serialized plan identity, unknown policies or mismatched content/source are rejected, and the new linked review preserves the old reading, actual author/usage and inherited independent limits rather than rewriting prior outcomes or automatically looping
+
 #### Scenario: A selected PDF paragraph has superscript note digits adjacent to a quantity
 - **WHEN** a new explicitly versioned selected-chapter transcription can unambiguously distinguish superscript note markers from body numbers using actual PDF typography and positioning
 - **THEN** it MUST keep the note markers structurally separate from the body quantity, retain source-page mapping and table/header context, and MUST NOT concatenate them into a different number

@@ -710,7 +710,11 @@ class CompanyProfileTaskService:
                 return {"action": "review_recovery", "state": "already_processed", "work_id": prior.work_id,
                     "review_status": prior.workpaper.quality_review.status if prior.workpaper.quality_review else "not_reviewed",
                     "production_authorization": PRODUCTION_AUTHORIZATION}
-        current = self.reads.plan_review_recovery(instrument, request_id=link.request_id, reading_work_id=base.work_id)
+        source_recheck_policy = plan.get("source_recheck_policy")
+        if source_recheck_policy is not None and self.processing_identity.get("workpaper_metric_limit_policy") != source_recheck_policy:
+            raise ValueError("explicit source recheck requires its new review processing policy")
+        current = self.reads.plan_review_recovery(instrument, request_id=link.request_id, reading_work_id=base.work_id,
+            source_recheck_policy=source_recheck_policy)
         if current != dict(plan) or current["state"] != "planned":
             raise ValueError("review recovery plan is stale, blocked or already superseded")
         if (self.processing_identity.get("reading_strategy") != "chapter_workpaper_v1"
@@ -724,7 +728,7 @@ class CompanyProfileTaskService:
             if max_elapsed_seconds <= 0:
                 raise ValueError("review recovery budget is exhausted")
         self._ensure_publication_allows_writes()
-        seed, resume, receipts = prepare_review_recovery(base)
+        seed, resume, receipts = prepare_review_recovery(base, source_recheck_policy=source_recheck_policy)
         old_identity, old_hash = self.processing_identity, self.processing_identity_hash
         old_source, old_runtime_source = self.page_source, self.runtime.page_source
         identity = {key: value for key, value in old_identity.items() if key not in {

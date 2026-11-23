@@ -124,7 +124,7 @@ def test_enrichment_plan_scope_is_checked_before_model_construction(tmp_path,mon
     assert not (tmp_path/'checkpoints').exists()
 
 
-@pytest.mark.parametrize('continuation',['review_batch','enrich','enrich_unread'])
+@pytest.mark.parametrize('continuation',['review_batch','enrich','enrich_unread','source_recheck'])
 def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_on_same_owner(tmp_path,monkeypatch,continuation):
     enriching = continuation in {'enrich', 'enrich_unread'}
     content=_pdf_bytes(['1. Business', 'Company provides loans and settlement services with source-backed business information.'])
@@ -158,7 +158,7 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
                     assert source['targeted_reading']['targets'][0]['element']=='products_services'
                 reply=dict(schema_version='company_profile_workpaper_draft.v1',elements=elements)
             else:
-                assert len(self.calls)==(4 if enriching else 2)
+                assert len(self.calls) in ((2,3) if continuation=='source_recheck' else (4 if enriching else 2,))
                 reply=dict(reviewed_fact_ids=['supplement' if enriching else 'main'],findings=[])
             self.responses.append(_response(reply))
             return await super().send(url,headers,payload,timeout_seconds)
@@ -208,7 +208,7 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     assert asyncio.run(task_entry.execute_configured_task(action='first_read',storage=storage,
         execution_plan_file=file,llm_config=None))==first  # No configuration/client reloaded on replay.
     assert len(clients)==1 and len(transport.calls)==2
-    review=deepcopy(plan);review.update(run_id='review',action='enrich' if enriching else continuation)
+    review=deepcopy(plan);review.update(run_id='review',action='enrich' if enriching else 'review_batch')
     if enriching:
         from api.company_profile_routes import EnrichmentPlanRequest, plan_annual_company_profile_enrichment
 
@@ -252,6 +252,36 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     assert len(clients)==count
     assert (tmp_path/'checkpoints/executions/first/budget.json').is_file()
     assert (tmp_path/'checkpoints/executions/review/budget.json').is_file()
+    if continuation=='source_recheck':
+        from research.company_profile.workpaper_review import METRIC_LIMIT_POLICY
+        from research.company_profile.runtime import CompanyProfileResearchWriter
+        from research.company_profile.reads import _RUNTIME_ADAPTER
+
+        # Current delivery may have A display notes; recheck must not send them.
+        latest=current['latest_reading_work_id']
+        current_path=tmp_path/'output/company_profile_common_core.v1'/f'{latest}.json'
+        previous=_RUNTIME_ADAPTER.validate_json(current_path.read_text())
+        body=previous.workpaper.model_dump(mode='json')
+        body['elements']['business_structure']['limitations'].append('A-only prior opinion: must never enter a new model request.')
+        annotated=previous.workpaper.__class__.model_validate(body)
+        CompanyProfileResearchWriter(tmp_path/'output').persist(previous.model_copy(update={'workpaper':annotated}))
+
+        old_bytes={p:p.read_bytes() for p in (tmp_path/'output/company_profile_common_core.v1').glob('*.json')}
+        assert reader.plan_review_recovery('600000.SH',request_id='not-reopened',reading_work_id=latest)['state']=='not_needed'
+        bound=reader.plan_review_recovery('600000.SH',request_id='new-policy-recheck',reading_work_id=latest,
+            source_recheck_policy=METRIC_LIMIT_POLICY)
+        assert bound['state']=='planned' and bound['review_follow_up']['next_purpose']=='review_profile_workpaper'
+        recheck=deepcopy(review);recheck.update(run_id='new-policy-recheck',review_plans=[bound])
+        after=invoke('review_batch',save(tmp_path,recheck))
+        assert after['state']=='completed' and len(transport.calls)==4
+        old_request=json.loads(transport.calls[2]['payload']['messages'][-1]['content'])
+        new_request=json.loads(transport.calls[3]['payload']['messages'][-1]['content'])
+        assert old_request['source_text']==new_request['source_text'] and old_request['draft']==new_request['draft']
+        assert 'A-only prior opinion' not in json.dumps(new_request)
+        assert 'quality_review' not in new_request['draft'] and 'use_review' not in new_request['draft']
+        assert all(p.read_bytes()==raw for p,raw in old_bytes.items())
+        current=CompanyProfileReadService(tmp_path/'output').research_profile('600000.SH')
+        assert current['readings'][-1]['review_status']=='completed'
 
 
 @pytest.mark.parametrize('case',['unknown_field','infinite','zero_tokens','no_stock','version_scope','bad_review','missing_approval','profile_drift','credential','action'])

@@ -60,12 +60,13 @@ def workpaper_processing_identity(
         "logical_request_timeout_seconds": 620,
     }
     if review:
-        from .workpaper_review import REVIEW_POLICY
+        from .workpaper_review import REVIEW_POLICY, METRIC_LIMIT_POLICY
 
         if real and not review_profile:
             raise ValueError("real workpaper review requires an explicitly selected enabled profile")
         identity.update(
             workpaper_review_policy=REVIEW_POLICY,
+            workpaper_metric_limit_policy=METRIC_LIMIT_POLICY,
             quality_review_profile=review_profile,
             repair_profile="semantic_extraction__deepseek" if real else None,
         )

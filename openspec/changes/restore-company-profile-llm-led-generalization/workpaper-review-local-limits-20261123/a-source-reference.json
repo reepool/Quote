@@ -1,0 +1,185 @@
+{
+  "task": "6.FB",
+  "reviewer": "A/main",
+  "baseline_commit": "fd2012de",
+  "stage": "independent_reference_before_new_model_calls",
+  "protected_research_root": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123",
+  "protected_file_count": 102,
+  "protected_manifest_sha256": "b7bbe181899919be0e09aa53f36416b1796d20dbc2fa4f4117e8732025226258",
+  "current_research_companies": 20,
+  "current_readable_records_not_score": 628,
+  "current_metric_records_not_score": 993,
+  "fixed_four": [
+    {
+      "instrument_id": "000338.SZ",
+      "layer": "manufacturing",
+      "report": {
+        "instrument_id": "000338.SZ",
+        "report_id": "asset_aa48dc0bb926a85541dfeacd0f94224f",
+        "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_latest_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "current_profile_sha256": "a1ae5d14d353f51d6f2a605434bd14a15c1d06ebcdf1a72633187751386f702a",
+      "original_pdf_path": "/home/python/Quote/data/filings/announcements/blobs/35/3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba.pdf",
+      "original_pdf_sha256": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "prior_restrictions_not_model_input": [
+        {
+          "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+          "fact_id": "F-SM-02",
+          "state": "limited",
+          "metric_indices": [
+            0
+          ],
+          "metric_names": [
+            "三电业务收入"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "600859.SH",
+      "layer": "services",
+      "report": {
+        "instrument_id": "600859.SH",
+        "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_latest_work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "current_profile_sha256": "b76faaee39c8fed1674895d0ac66f99380aabe0964835d7dd143df832e5b47d7",
+      "original_pdf_path": "/home/python/Quote/data/filings/announcements/blobs/e9/e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca.pdf",
+      "original_pdf_sha256": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "prior_restrictions_not_model_input": []
+    },
+    {
+      "instrument_id": "600015.SH",
+      "layer": "bank",
+      "report": {
+        "instrument_id": "600015.SH",
+        "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_latest_work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "current_profile_sha256": "e7ddeaf0a3a6a3d3c71baeab0748cdd4559c7f0249d086344cbc4c219a353065",
+      "original_pdf_path": "/home/python/Quote/data/filings/announcements/blobs/d6/d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3.pdf",
+      "original_pdf_sha256": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "prior_restrictions_not_model_input": [
+        {
+          "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+          "fact_id": "F25",
+          "state": "withheld",
+          "metric_indices": [],
+          "metric_names": []
+        },
+        {
+          "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+          "fact_id": "F37",
+          "state": "withheld",
+          "metric_indices": [],
+          "metric_names": []
+        },
+        {
+          "work_id": "bp-work-c144725bfcfff1bceadc5849",
+          "fact_id": "F-WEALTH-FEE-INCOME",
+          "state": "limited",
+          "metric_indices": [
+            0,
+            1
+          ],
+          "metric_names": [
+            "财富管理手续费及佣金收入",
+            "财富管理手续费及佣金收入同比增长率"
+          ]
+        },
+        {
+          "work_id": "bp-work-c144725bfcfff1bceadc5849",
+          "fact_id": "F-CREDIT-CARD-REVENUE",
+          "state": "limited",
+          "metric_indices": [
+            0,
+            1
+          ],
+          "metric_names": [
+            "信用卡业务收入",
+            "信用卡业务收入同比变动率"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "601668.SH",
+      "layer": "multi_business",
+      "report": {
+        "instrument_id": "601668.SH",
+        "report_id": "asset_364d5ee7dbf24db99a65f1d99b40ed6b",
+        "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "current_latest_work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "current_profile_sha256": "5af9481ca456fb67cdbe1f794faadbbd4e1a62b6b74d52928cd85f010eb0f854",
+      "original_pdf_path": "/home/python/Quote/data/filings/announcements/blobs/be/be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815.pdf",
+      "original_pdf_sha256": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "prior_restrictions_not_model_input": [
+        {
+          "work_id": "bp-work-cad604975f9f30adcb311c8e",
+          "fact_id": "F15",
+          "state": "limited",
+          "metric_indices": [
+            1
+          ],
+          "metric_names": [
+            "战略性新兴产业营业收入"
+          ]
+        },
+        {
+          "work_id": "bp-work-cad604975f9f30adcb311c8e",
+          "fact_id": "F20",
+          "state": "limited",
+          "metric_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "metric_names": [
+            "境内营业收入",
+            "境内毛利率",
+            "境外营业收入",
+            "境外毛利率"
+          ]
+        },
+        {
+          "work_id": "bp-work-cad604975f9f30adcb311c8e",
+          "fact_id": "F26",
+          "state": "limited",
+          "metric_indices": [
+            0
+          ],
+          "metric_names": [
+            "战略性新兴产业营业收入"
+          ]
+        }
+      ]
+    }
+  ],
+  "independent_challenges": {
+    "manufacturing": "三电业务收入不是group-wide收入；原文及其他指标独立保留，不按同事实主体继承指标范围。",
+    "services": "客流/客户消费和近约超等忠实披露保limited；没有局部metric缺陷则正常复核不可凭新字段要求造finding或强制精确化。",
+    "bank": "财富管理和信用卡业务收入不能标准化成全行/集团总收入；零售客户4012.44万户/私行2.02万户正文有源。旧F25/F37整条隔离和新4metric限制不可由模型解除。",
+    "multi_business": "战略新兴收入与建筑新签合同属于不同经济对象；地区数不是group-wide指标，消除行不是业务。现有6个受限指标不能由同名/同值或模型source_checked解禁。"
+  },
+  "evidence_basis": "Main already independently read6.EY/6.EZ and6.FA original sources; only changed/new model decisions will be challenged against original PDFs and source packages, not counted as a new full20 audit.",
+  "not_model_input": true,
+  "historical_accuracy_unchanged": 0.9789674952198852,
+  "production_authorization": "not_authorized"
+}

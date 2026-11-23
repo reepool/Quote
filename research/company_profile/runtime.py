@@ -209,6 +209,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "section_guide_version",
             "product_contract",
             "workpaper_review_policy",
+            "workpaper_metric_limit_policy",
             "workpaper_review_execution",
             "review_existing_draft_hash",
             "review_resume_hash",

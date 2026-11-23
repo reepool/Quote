@@ -1,0 +1,50 @@
+{
+  "runs": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/slice-tests.xml",
+      "tests": 17,
+      "failures": 2,
+      "timestamp": "2026-11-23T12:19:06.016876+08:00"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/direct-tests.xml",
+      "tests": 59,
+      "failures": 0,
+      "timestamp": "2026-11-23T12:20:29.467682+08:00"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/recheck-tests.xml",
+      "tests": 18,
+      "failures": 0,
+      "timestamp": "2026-11-23T12:25:22.256479+08:00"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/recheck-clean-tests.xml",
+      "tests": 1,
+      "failures": 0,
+      "timestamp": "2026-11-23T12:28:28.757726+08:00"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/review-regression-tests.xml",
+      "tests": 77,
+      "failures": 0,
+      "timestamp": "2026-11-23T12:28:22.603007+08:00"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/final-type-tests.xml",
+      "tests": 3,
+      "failures": 2,
+      "timestamp": "2026-11-23T12:35:16.637121+08:00"
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/final-type-recheck-tests.xml",
+      "tests": 3,
+      "failures": 0,
+      "timestamp": "2026-11-23T12:36:23.515793+08:00"
+    }
+  ],
+  "unique_latest": 123,
+  "unique_latest_passed": 123,
+  "new_real_model_requests": 0,
+  "original_failures_preserved": true
+}

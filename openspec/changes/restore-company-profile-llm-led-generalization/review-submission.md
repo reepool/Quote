@@ -1,5 +1,21 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 375. 6.FB 工程/V1交付：正常源复核自动局部限用，四类真实效果待预算
+
+用户同意上一轮四项合并建议并授权实施。A按产品→验收→交付→A/B v3及OpenSpec apply/business-first冻结company-profile-review-local-limits-card.md，B子代理沿原quality_review/TaskService/writer/read/export连续实施；基线fd2012de/master暂存空、既有配置/骨架/选源/scheduler/市场与历史文档脏改保护。目标是减少每个局部metric都靠A人工消费决定的依赖，不是再抽20股、追齐供应链或搭平台。具体四家新真实外传/预算已合并询问，尚未获答复；本轮0新真实模型/0新供应商usage，不借旧余额。
+
+业务：[研究版V1人读画像](../../../data/research/company_profile_research_v1_20261123/exports/annual_profiles.md)/同目录年度JSON及annual-api.json保20股628可读记录/993指标，沿用6.FA真实内容，不冒充本轮新发现或准确率。46原writer记录逐字保持；原102文件manifest与A0一致。新正常源核合同支持limit_metrics＋metric_limit（原fact hash、明确正文支持、原metrics零起整数位置），handler严格验证后保存metrics_limited模型意见，统一投影保正文/其他指标、limited及机器缺口；模型gap有依据/finding可辨，不能伪造独立UseReview。所有原业务值/主体/方向/来源/作者不改，旧独立限制与模型限制取保守并集。
+
+正文/引用错仍整条隔离，已知范围/hash/索引无效不能放行。A在源码审核指出旧source_checked/partial可能掩盖新whole缺陷的P1，B已仅在新policy下收紧并验证；首轮17项还发现未知limit目标仍把当前对象授予已核的真实P1，已停止授予不明覆盖。1个缺项active默认观察错误及严格bool/false两项夹具遗漏既有恢复响应均修测试观察，不改变生产bool拒绝/返回顺序或业务断言；原失败XML保持。旧无新字段的序列化和policy行为保持，当前新ReadService重读原20股结构等于原API快照，不回写旧稿。
+
+原已completed稿默认not_needed。A允许在既有计划/prepare_review_recovery中显式source_recheck_policy，只认本轮新policy；原raw重建原extract与当时选章，从新初核开始，不输入旧review、UseReview或A附加备注。实际磁盘CLI/原TaskService受控用例证明源文本/原draft相等、A-only备注不入请求、原文件不改，正常review→writer→新实例/API/JSON/Markdown/CSV及幂等成立。此为当前调用方所需最窄接线，不增加业务动作、API、registry或重核循环。
+
+四类已见计划为潍柴000338制造、王府井600859服务、华夏600015银行（6FA的10条v8稿）、中建601668综合，当前均authorization_status=planned/0启动。A独立复算四原wire source_text与PDF hash相符；不将旧A参考/已知错误列表送模型。新真实验证应分列模型有效局部限制命中、未识别而仍依赖旧A保护的范围、A新增语义/消费决定及实际耗时/资源；目前这些尚未评，不能用A新增决定0或受控触发新动作宣称人工节省、真实模型更准或99%达标。
+
+验证：123不同相关用例最新结果通过/0未决，17/59/18/1/77/3/3各组有重叠、不加总；首次2业务/观察失败及后2夹具恢复不足原XML保留。A核9代码/测试hash、8planned文件hash、V1的93交付文件hash、46原writer字节/20API和年度JSON一致，复用当前快照有效回执不再重跑整仓。OpenSpec strict和9源码AST有效；工程及限范围研究V1有限通过，不是整卡四家真实通过、不改旧97.8967%或历史失败，不自动100/生产。实际命令/原件/已知限制见[本轮result](workpaper-review-local-limits-20261123/result.md)单入口。
+
+B已清确切QuoteBak根121文件/3585926字节，A核完暂存增量后清9份基线副本/3050878字节，合6636804逻辑字节；两本人根不存在，必要源/旧102/新V1/计划及失败证据保留。本人Git只提交相对开工基线的独立增量，既有脏文档段落/配置/骨架等不纳入。A/B活跃时间未精确计量，不将受控测试等待或开发模型token混成业务成本。四类真实调用待预算答复后沿原已备卡执行，不在等待期间扩开发或新样本。
+
 ## 374. 6.FA 三股定向补读后继：29条可读记录/61指标，原20股研究API可用
 
 用户2026-11-23同意上一轮四项合并建议并授权实施，随后明确批准华夏600015、华阳600348、兴证601377各一次限定真实enrich。A按产品→验收→交付→A/B v3、OpenSpec apply/business-first冻结company-profile-targeted-gap-closure-card.md，B子代理沿原日常CLI/TaskService/章节/PDF/网关/writer/read owner连续实施；8682e3cc/master基线暂存空，既有配置/骨架/scheduler/市场及历史文档脏改保护。目标是验证API缺项到按股补读的实际改善，不是重抽20家或追齐细目。

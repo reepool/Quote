@@ -1,0 +1,124 @@
+{
+  "state": "planned",
+  "output_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "companies": [
+    {
+      "instrument_id": "000338.SZ",
+      "current_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-bbd1db65c451d1d024bdb9b9.json",
+      "current_workpaper_sha256": "e01f930a4f1a5e10773bdcfed079ef9e6905cbb0e37996928517c0769e9028c1",
+      "seed_sha256": "1b821adc1cedc73fda6860f03790a1a932132fde151b618929d2c43f7f3edd0e",
+      "report": {
+        "instrument_id": "000338.SZ",
+        "report_id": "asset_aa48dc0bb926a85541dfeacd0f94224f",
+        "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "seed_fact_count": 34,
+      "original_generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "extraction_request_id": "bp-work-c673511e57420b680e69052b:workpaper:extract",
+        "extraction_response_sha256": "40991b24cc445513a73873d255d8d8864884676485c2a67cfd8197513fd0688f",
+        "extraction_model": "deepseek-flash"
+      },
+      "recheck_state": "planned",
+      "original_review_status": "completed",
+      "independent_limits_retained_in_parent": true,
+      "prior_review_opinions_to_model": false,
+      "source_packet_revalidation": "original owner seed_material before actual sends"
+    },
+    {
+      "instrument_id": "600859.SH",
+      "current_work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-d32507d43cbb1c885b6b4e34.json",
+      "current_workpaper_sha256": "fbb32b69bc2dbce510bc282afa96942256f17a1fc6d88dcbea26efb695e6a3bd",
+      "seed_sha256": "91afc342c7aa0d3c7ccf6f245f43e8897209d92357d273996d352e5889c8ddc9",
+      "report": {
+        "instrument_id": "600859.SH",
+        "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "seed_fact_count": 33,
+      "original_generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "extraction_request_id": "bp-work-d07db9b1a9117cbd262a645d:workpaper:extract",
+        "extraction_response_sha256": "88e5e57afd5206452db693fad87f68d24defa7dc5363c0e09472e8d2260207ca",
+        "extraction_model": "deepseek-flash"
+      },
+      "recheck_state": "planned",
+      "original_review_status": "incomplete",
+      "independent_limits_retained_in_parent": true,
+      "prior_review_opinions_to_model": false,
+      "source_packet_revalidation": "original owner seed_material before actual sends"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "current_work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-c144725bfcfff1bceadc5849.json",
+      "current_workpaper_sha256": "d9fe3d7759066ca22ccee2388c12f81e416bf577589a2e8836951d408414b796",
+      "seed_sha256": "7b9ce9561b5cd24dde0bf0cede786879c430e1febe9b64e8e578b4a54ffdbc4d",
+      "report": {
+        "instrument_id": "600015.SH",
+        "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "seed_fact_count": 10,
+      "original_generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "extraction_request_id": "f9426b96fe85f014cab8c6f0b399b591ed76afa8711db45a9ce881cf5d5a9cad",
+        "extraction_response_sha256": "5787af354cc3f43848c41181697ba517bf86333d8df87d63b7c3171c52836165",
+        "extraction_model": "deepseek-flash"
+      },
+      "recheck_state": "planned",
+      "original_review_status": "completed_with_open_findings",
+      "independent_limits_retained_in_parent": true,
+      "prior_review_opinions_to_model": false,
+      "source_packet_revalidation": "original owner seed_material before actual sends"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "current_work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "current_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-cad604975f9f30adcb311c8e.json",
+      "current_workpaper_sha256": "5cba4c6ceb15acc6d6bc91a714b375989b8b36a927f6e1c4d42c4eda0f6f138f",
+      "seed_sha256": "1b672a1e1cd7fe979f4deb0bf83bb6271e031720486c241fe7ec61ac55185285",
+      "report": {
+        "instrument_id": "601668.SH",
+        "report_id": "asset_364d5ee7dbf24db99a65f1d99b40ed6b",
+        "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "seed_fact_count": 29,
+      "original_generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "extraction_request_id": "bp-work-d754b51baf3ed49c2b458883:workpaper:extract",
+        "extraction_response_sha256": "ababe02cf6ad7e68d9da0c236be937dc903546ee6cdab234bed9f2c072024d8f",
+        "extraction_model": "deepseek-flash"
+      },
+      "recheck_state": "planned",
+      "original_review_status": "completed_with_open_findings",
+      "independent_limits_retained_in_parent": true,
+      "prior_review_opinions_to_model": false,
+      "source_packet_revalidation": "original owner seed_material before actual sends"
+    }
+  ],
+  "model_requests": 0,
+  "same_report_original_extract_only": true
+}

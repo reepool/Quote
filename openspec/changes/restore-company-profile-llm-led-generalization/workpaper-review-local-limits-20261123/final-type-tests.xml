@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="4.634" timestamp="2026-11-23T12:35:16.637121+08:00" hostname="ComputeR"><testcase classname="tests.unit.test_research.test_company_profile_review_metric_limits" name="test_invalid_model_limit_never_becomes_fully_reviewed[bool_index]" time="0.177"><failure message="AssertionError: ScriptedTransport has no response left">research/company_profile/stage5_provider.py:5096: in _run_complete
+    asyncio.get_running_loop()
+E   RuntimeError: no running event loop
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_research/test_company_profile_review_metric_limits.py:90: in test_invalid_model_limit_never_becomes_fully_reviewed
+    result,_,_=review(paper,packet,reply,legacy=failure=='legacy')
+tests/unit/test_research/test_company_profile_review_metric_limits.py:40: in review
+    result,receipts=review_workpaper(paper,packet=packet,provider=provider,work_id='metric-review',identity=identity)
+research/company_profile/workpaper_review.py:644: in review_workpaper
+    if resume is not None else request(review_id, "review_profile_workpaper", WorkpaperReviewResponse,
+research/company_profile/workpaper_review.py:622: in request
+    result = provider.workpaper_request(
+research/company_profile/stage5_provider.py:4217: in workpaper_request
+    return self._execute(
+research/company_profile/stage5_provider.py:4768: in _execute
+    response = _run_complete(self._client, llm_request, self._runner)
+research/company_profile/stage5_provider.py:5100: in _run_complete
+    return asyncio.run(call_and_release())
+../miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+../miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+../miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+research/company_profile/stage5_provider.py:5087: in call_and_release
+    return await client.complete(request)
+utils/llm/client.py:130: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:155: in _complete_with_route
+    response = await self._complete_concrete(request, budget=budget)
+utils/llm/client.py:940: in _complete_concrete
+    response = await self._send_attempt(
+utils/llm/client.py:1472: in _send_attempt
+    response = await asyncio.wait_for(
+../miniconda3/envs/Quote/lib/python3.11/asyncio/tasks.py:489: in wait_for
+    return fut.result()
+utils/llm/testing.py:35: in send
+    raise AssertionError("ScriptedTransport has no response left")
+E   AssertionError: ScriptedTransport has no response left</failure></testcase><testcase classname="tests.unit.test_research.test_company_profile_review_metric_limits" name="test_invalid_model_limit_never_becomes_fully_reviewed[negative_index]" time="0.208" /><testcase classname="tests.unit.test_research.test_company_profile_review_metric_limits" name="test_invalid_model_limit_never_becomes_fully_reviewed[narrative_false]" time="0.216"><failure message="AssertionError: ScriptedTransport has no response left">research/company_profile/stage5_provider.py:5096: in _run_complete
+    asyncio.get_running_loop()
+E   RuntimeError: no running event loop
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_research/test_company_profile_review_metric_limits.py:90: in test_invalid_model_limit_never_becomes_fully_reviewed
+    result,_,_=review(paper,packet,reply,legacy=failure=='legacy')
+tests/unit/test_research/test_company_profile_review_metric_limits.py:40: in review
+    result,receipts=review_workpaper(paper,packet=packet,provider=provider,work_id='metric-review',identity=identity)
+research/company_profile/workpaper_review.py:644: in review_workpaper
+    if resume is not None else request(review_id, "review_profile_workpaper", WorkpaperReviewResponse,
+research/company_profile/workpaper_review.py:622: in request
+    result = provider.workpaper_request(
+research/company_profile/stage5_provider.py:4217: in workpaper_request
+    return self._execute(
+research/company_profile/stage5_provider.py:4768: in _execute
+    response = _run_complete(self._client, llm_request, self._runner)
+research/company_profile/stage5_provider.py:5100: in _run_complete
+    return asyncio.run(call_and_release())
+../miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+../miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+../miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+research/company_profile/stage5_provider.py:5087: in call_and_release
+    return await client.complete(request)
+utils/llm/client.py:130: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:155: in _complete_with_route
+    response = await self._complete_concrete(request, budget=budget)
+utils/llm/client.py:940: in _complete_concrete
+    response = await self._send_attempt(
+utils/llm/client.py:1472: in _send_attempt
+    response = await asyncio.wait_for(
+../miniconda3/envs/Quote/lib/python3.11/asyncio/tasks.py:489: in wait_for
+    return fut.result()
+utils/llm/testing.py:35: in send
+    raise AssertionError("ScriptedTransport has no response left")
+E   AssertionError: ScriptedTransport has no response left</failure></testcase></testsuite></testsuites>

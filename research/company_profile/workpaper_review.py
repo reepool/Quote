@@ -30,6 +30,7 @@ from .models import ReportIdentity
 from .workpaper_sections import SectionPacket, extract_selected_layout, index_sections
 
 REVIEW_POLICY = "company_profile_workpaper_review.v12"
+METRIC_LIMIT_POLICY = "source_review_exact_metric_limits.v1"
 BATCH_STOP_POLICY = "consecutive_same_execution_failure.v1"
 
 
@@ -162,6 +163,20 @@ text and structured period together; a next-year plan must not become a current 
 Explanatory style alone does not reject a fact that resolves the actual source issue.
 """
 
+METRIC_LIMIT_INSTRUCTIONS = """When the ORIGINAL source explicitly supports the fact's
+whole narrative and its evidence, but only specific original structured metrics have
+unreliable scope, column, unit or direction, use action=limit_metrics instead of
+rewriting or discarding that supported narrative. Include metric_limit with
+narrative_supported=true, fact_sha256 copied exactly from supplied fact_hashes, and
+metric_indices listing the exact ZERO-BASED positions in that fact's original metrics
+array. List each position once. Do not infer an index by metric-name matching.
+Explain the source basis and unreliable component. Preserve original numbers and
+scope labels; do not supply replacements for this action. If the narrative itself or
+its citations are wrong or insufficient, do NOT use limit_metrics: use the existing
+whole-fact correct/quarantine/human_review action. Model limits cannot lift any
+independent use restriction and do not establish complete metric coverage.
+"""
+
 
 def workpaper_hash(workpaper: CompanyProfileWorkpaper) -> str:
     return hashlib.sha256(workpaper.model_dump_json().encode()).hexdigest()
@@ -276,12 +291,16 @@ def review_execution_failure_signature(review: WorkpaperQualityReview | None) ->
     return json.dumps(cause, ensure_ascii=False, sort_keys=True)
 
 
-def prepare_review_recovery(record):
+def prepare_review_recovery(record, *, source_recheck_policy=None):
     """Reconstruct saved input, not the safe projection or caller-written facts."""
     from .workpaper import normalize_workpaper_draft
 
     paper = record.workpaper
     follow_up = plan_review_follow_up(paper, record.workpaper_receipts)
+    if source_recheck_policy is not None:
+        if source_recheck_policy != METRIC_LIMIT_POLICY:
+            raise ValueError("unknown explicit source recheck policy")
+        follow_up = {**follow_up, "state": "planned", "resume_mode": "review_saved_draft"}
     if follow_up["state"] != "planned":
         raise ValueError("review recovery plan is blocked or not needed")
     generation = paper.generation
@@ -325,7 +344,7 @@ def prepare_review_recovery(record):
         )):
             raise ValueError("original extraction model identity changed")
         generation_receipts.append(dict(item, receipt_origin="retained_receipt"))
-    if paper.quality_review is None:
+    if paper.quality_review is None and source_recheck_policy is None:
         seed = paper.model_copy(update={"use_review": None})
     else:
         seed = bind_workpaper_draft(
@@ -333,7 +352,7 @@ def prepare_review_recovery(record):
             report=paper.report, reading_scope=paper.reading_scope, evidence=paper.evidence,
             origin=paper.origin, generation=generation,
         )
-        if generation.local_format_normalization is not None or generation.local_schema_normalization is not None:
+        if source_recheck_policy is None and (generation.local_format_normalization is not None or generation.local_schema_normalization is not None):
             # Local releases can add display limits after extraction. Retain
             # them only when they reconstruct the exact hashed review input.
             seed = seed.model_copy(update={
@@ -341,7 +360,7 @@ def prepare_review_recovery(record):
                 "standardization_notes": tuple(dict.fromkeys(
                     (*paper.standardization_notes, *seed.standardization_notes))),
             })
-        if workpaper_hash(seed) != paper.quality_review.original_draft_hash:
+        if paper.quality_review is not None and workpaper_hash(seed) != paper.quality_review.original_draft_hash:
             raise ValueError("saved original draft cannot be reconstructed exactly")
     resume = None
     if follow_up["resume_mode"] != "review_saved_draft":
@@ -471,7 +490,7 @@ def _fact_map(paper):
 def _project(paper, *, review, findings, replacements):
     withheld = {item.affected_fact_id for item in findings
                 if item.original_fact is not None and item.resolution != "corrected_pending_trust"
-                and item.resolution != "omission_candidate"}
+                and item.resolution not in {"omission_candidate", "metrics_limited"}}
     payload = paper.model_dump(mode="json")
     if payload.get(FEATURE_ELEMENT) is None and any(
         item.element == FEATURE_ELEMENT and item.resolution == "corrected_pending_trust" for item in findings
@@ -526,6 +545,7 @@ def review_workpaper(
     verify_id = f"{work_id}:workpaper:repair-verify"
     call_ids = {review_id, repair_id, verify_id}
     real = identity.get("execution_mode") == "provider"
+    metric_limits_enabled = identity.get("workpaper_metric_limit_policy") == METRIC_LIMIT_POLICY
 
     prior_receipts = tuple((resume or {}).get("receipts") or ())
     prior_by_purpose = {item.get("purpose"): item for item in prior_receipts}
@@ -622,12 +642,13 @@ def review_workpaper(
         initial = (
             WorkpaperReviewResponse.model_validate(resume["review_response"])
             if resume is not None else request(review_id, "review_profile_workpaper", WorkpaperReviewResponse,
-                          REVIEW_INSTRUCTIONS, {"draft": {
+                          REVIEW_INSTRUCTIONS + ("\n" + METRIC_LIMIT_INSTRUCTIONS if metric_limits_enabled else ""), {"draft": {
                               "elements": paper.elements.model_dump(mode="json"),
                               "supply_chain": paper.supply_chain.model_dump(mode="json") if paper.supply_chain else None,
                               "company_features": paper.company_features.model_dump(mode="json") if paper.company_features else None,
                               "limitations": paper.limitations,
-                          }})
+                          }, **({"fact_hashes": {fid: workpaper_fact_hash(fact) for fid, (_, fact) in facts.items()},
+                                 "metric_index_base": 0} if metric_limits_enabled else {})})
         )
         counts = Counter(initial.reviewed_fact_ids)
         checked = tuple(fid for fid in initial.reviewed_fact_ids if fid in facts and counts[fid] == 1)
@@ -642,6 +663,8 @@ def review_workpaper(
         supplement_origins = {}
         validated_findings = []
         bound_findings = []
+        limited_positions = {}
+        unbound_metric_limit = False
         for finding in initial.findings:
             reason = None
             if finding_counts[finding.finding_id] > 1 or set(finding.evidence_ids) - sources.keys():
@@ -656,8 +679,28 @@ def review_workpaper(
                 reason = "fact-level review action requires an existing fact ID"
             elif finding.element == "limitations" and finding.action == "possible_omission":
                 reason = "scope issue cannot add a fact to limitations"
+            elif finding.action == "limit_metrics" or finding.metric_limit is not None:
+                limit = finding.metric_limit
+                old_entry = facts.get(finding.affected_fact_id)
+                if not metric_limits_enabled or finding.action != "limit_metrics" or limit is None or old_entry is None:
+                    reason = "explicit new policy, fact target and metric-only support are required"
+                elif (finding.element != old_entry[0] or limit.fact_sha256 != workpaper_fact_hash(old_entry[1])
+                    or len(set(limit.metric_indices)) != len(limit.metric_indices)
+                    or any(i >= len(old_entry[1].metrics) for i in limit.metric_indices)
+                    or set(limit.metric_indices) & limited_positions.get(finding.affected_fact_id, set())):
+                    reason = "metric-only finding has stale fact hash, wrong element or unknown/duplicate positions"
             if reason:
                 contract_errors.append(f"复核意见隔离：{finding.finding_id}；{reason}；原回复保留。")
+                if (finding.action == "limit_metrics" or finding.metric_limit is not None) and finding.affected_fact_id not in facts:
+                    unbound_metric_limit = True
+                if (finding.action == "limit_metrics" or finding.metric_limit is not None) and finding.affected_fact_id in facts:
+                    name, original = facts[finding.affected_fact_id]
+                    validated_findings.append(WorkpaperReviewFinding(
+                        finding_id=finding.finding_id, element=name, severity=finding.severity,
+                        issue_type=finding.issue_type, affected_fact_id=original.fact_id,
+                        evidence_ids=tuple(eid for eid in finding.evidence_ids if eid in sources),
+                        explanation="指标局部核验绑定失败，暂隔离整条事实；" + reason,
+                        original_fact=original, resolution="quarantined"))
                 continue
             old = None
             related_fact_id = None
@@ -673,6 +716,8 @@ def review_workpaper(
                     finding = finding.model_copy(update={"affected_fact_id": None})
                     old = None
             target = finding.affected_fact_id or f"review-add:{finding.finding_id}"
+            if finding.action == "limit_metrics":
+                limited_positions.setdefault(target, set()).update(finding.metric_limit.metric_indices)
             repairable = finding.action == "correct" and old is not None or (
                 finding.action == "possible_omission" and finding.severity == "material")
             if repairable:
@@ -689,12 +734,20 @@ def review_workpaper(
                 affected_fact_id=finding.affected_fact_id, evidence_ids=finding.evidence_ids,
                 related_fact_id=related_fact_id,
                 explanation=finding.explanation, original_fact=old,
-                resolution=("omission_candidate" if finding.action == "possible_omission"
+                metric_limit=finding.metric_limit,
+                resolution=("metrics_limited" if finding.action == "limit_metrics" else "omission_candidate" if finding.action == "possible_omission"
                             else "unresolved" if old is None else "quarantined"),
             ))
             bound_findings.append(finding)
         initial = initial.model_copy(update={"findings": tuple(bound_findings)})
+        whole_targets = {item.affected_fact_id for item in validated_findings
+                         if item.original_fact is not None and item.resolution != "metrics_limited"}
+        validated_findings = [item.model_copy(update={"resolution": "quarantined", "metric_limit": None})
+                              if item.resolution == "metrics_limited" and item.affected_fact_id in whole_targets
+                              else item for item in validated_findings]
         findings = validated_findings
+        if unbound_metric_limit:
+            checked = ()  # Unknown target cannot silently approve all known numeric facts.
         initial_contract_valid = True
         target_notes.extend(contract_errors)
         error = "; ".join(contract_errors)[:800] or None
@@ -805,6 +858,7 @@ def review_workpaper(
         # Only a new initial call may bind current input hashes automatically.
         checked_fact_hashes={fid: workpaper_fact_hash(facts[fid][1]) for fid in checked} if resume is None else None,
         execution_failure=execution_failure,
+        metric_limit_policy=METRIC_LIMIT_POLICY if metric_limits_enabled else None,
     )
     safe = standardize_workpaper_metrics(_project(paper, review=quality, findings=findings, replacements=replacements))
     if target_notes:

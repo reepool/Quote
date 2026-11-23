@@ -1,0 +1,27 @@
+{
+  "task": "6.FB",
+  "reviewer": "A/main",
+  "status": "engineering_and_research_v1_accepted_real_four_not_executed",
+  "freeze_hashes_independently_checked": {
+    "files": 9,
+    "plans": 8,
+    "delivery_files": 93
+  },
+  "original102_manifest_equals_A0": true,
+  "unchanged_raw_runtime_records_in_V1": 46,
+  "API_and_annual_JSON_equal_original20": true,
+  "companies": 20,
+  "readable_records_not_new_facts": 628,
+  "metric_records_not_quality_score": 993,
+  "planned_unstarted_task_files": [
+    "600859-review.json",
+    "600015-review.json",
+    "601668-review.json",
+    "000338-review.json"
+  ],
+  "true_model_requests": 0,
+  "true_supplier_usage": 0,
+  "real_model_limit_detection_or_human_savings": "not_evaluated",
+  "new_semantic_use_decisions_authored_by_A": 0,
+  "semantic_restrictions_on_old_research_data": "original decisions preserved, not evidence that models independently detected all errors"
+}

@@ -1,0 +1,22 @@
+{
+  "completed": true,
+  "removed_exact_B_root": "/home/python/Quote/data/QuoteBak/company-profile-6fb-b-33QWe8J0",
+  "removed_files": 121,
+  "released_bytes": 3585926,
+  "one_time_script_hashes": {
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-b-33QWe8J0/package_and_export.py": "41cb6d3d015fcaffc1060b6adf4ede16b43b1704273bd72d27ad1a29f1af2498",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-b-33QWe8J0/prepare.py": "62621308dd554fb8cf06dd086171ce265aaf58d7391712646f5f2775f737618d"
+  },
+  "old_6FA_roots_absent": true,
+  "A_parallel_root_untouched": "/home/python/Quote/data/QuoteBak/company-profile-6fb-a-VJyULsd0",
+  "formal_sources_cache_original102_newV1_and_planned_files_preserved": true,
+  "active_B_processes": 0,
+  "only_one_authoritative_evidence_set": true,
+  "one_mechanical_assertion_corrected": "task execution plans distinguished by schema_version from saved review plans; no business writes/model requests in failed cleanup precheck",
+  "removed_exact_A_root": "/home/python/Quote/data/QuoteBak/company-profile-6fb-a-VJyULsd0",
+  "A_removed_files": 9,
+  "A_released_bytes": 3050878,
+  "A_removed_scope": "Only owned baseline comparison copies after staged document additions were independently verified identical to the task increment; no active dependency, source, research result or inherited worktree edit removed.",
+  "A_root_absence_verified": true,
+  "total_A_B_measured_released_bytes": 6636804
+}

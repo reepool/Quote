@@ -683,6 +683,24 @@ class WorkpaperGenerationMetadata(_Model):
         return self
 
 
+class WorkpaperReviewMetricLimit(_Model):
+    """Model source-review limit on exact original positions, not a corrected metric."""
+
+    fact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    narrative_supported: Literal[True]
+    metric_indices: tuple[int, ...] = Field(min_length=1)
+
+    @model_validator(mode="before")
+    @classmethod
+    def strict_positions(cls, value):
+        if isinstance(value, Mapping):
+            indices = value.get("metric_indices")
+            if (value.get("narrative_supported") is not True or not isinstance(indices, (list, tuple))
+                or any(type(index) is not int or index < 0 for index in indices)):
+                raise ValueError("metric limit requires explicit narrative support and nonnegative integer indices")
+        return value
+
+
 class WorkpaperReviewFindingDraft(_Model):
     finding_id: str = Field(min_length=1)
     element: str = Field(min_length=1)
@@ -692,10 +710,18 @@ class WorkpaperReviewFindingDraft(_Model):
         "wrong_column", "wrong_unit_or_denominator", "unsupported_causality",
         "material_omission", "other",
     ]
-    action: Literal["quarantine", "correct", "possible_omission", "human_review"]
+    action: Literal["quarantine", "correct", "possible_omission", "human_review", "limit_metrics"]
     affected_fact_id: str | None = None
     evidence_ids: tuple[str, ...] = Field(min_length=1)
     explanation: str = Field(min_length=1)
+    metric_limit: WorkpaperReviewMetricLimit | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        if self.metric_limit is None:
+            payload.pop("metric_limit", None)
+        return payload
 
 
 class WorkpaperReviewResponse(_Model):
@@ -746,10 +772,32 @@ class WorkpaperReviewFinding(_Model):
     explanation: str = Field(min_length=1)
     resolution: Literal[
         "quarantined", "corrected_pending_trust", "unresolved",
-        "omission_candidate", "repair_rejected", "verification_failed",
+        "omission_candidate", "repair_rejected", "verification_failed", "metrics_limited",
     ]
     original_fact: WorkpaperFact | None = None
     revised_fact: WorkpaperFact | None = None
+    metric_limit: WorkpaperReviewMetricLimit | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        if self.metric_limit is None:
+            payload.pop("metric_limit", None)
+        return payload
+
+    @model_validator(mode="after")
+    def metric_limit_is_bound(self):
+        if self.resolution == "metrics_limited":
+            limit = self.metric_limit
+            fact = self.original_fact
+            if (limit is None or fact is None or self.affected_fact_id != fact.fact_id
+                or limit.fact_sha256 != workpaper_fact_hash(fact)
+                or len(set(limit.metric_indices)) != len(limit.metric_indices)
+                or any(i >= len(fact.metrics) for i in limit.metric_indices)):
+                raise ValueError("metric-only review requires exact original fact/hash and unique valid indices")
+        elif self.metric_limit is not None:
+            raise ValueError("metric-only support cannot accompany a whole-fact resolution")
+        return self
 
 
 class WorkpaperReviewExecutionFailure(_Model):
@@ -776,6 +824,7 @@ class WorkpaperQualityReview(_Model):
     error: str | None = None
     checked_fact_hashes: dict[str, str] | None = None
     execution_failure: WorkpaperReviewExecutionFailure | None = None
+    metric_limit_policy: Literal["source_review_exact_metric_limits.v1"] | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
@@ -784,6 +833,8 @@ class WorkpaperQualityReview(_Model):
             payload.pop("checked_fact_hashes", None)
         if self.execution_failure is None:
             payload.pop("execution_failure", None)
+        if self.metric_limit_policy is None:
+            payload.pop("metric_limit_policy", None)
         return payload
 
 
@@ -877,6 +928,15 @@ class CompanyProfileWorkpaper(_Model):
                 ids.add(fact.fact_id)
                 facts[fact.fact_id] = fact
                 _check_fact_source(fact, sources)
+        if self.quality_review is not None:
+            for finding in self.quality_review.findings:
+                if finding.resolution != "metrics_limited":
+                    continue
+                if self.quality_review.metric_limit_policy != "source_review_exact_metric_limits.v1":
+                    raise ValueError("metric-only source review requires its explicit policy")
+                current = facts.get(finding.affected_fact_id)
+                if current is not None and workpaper_fact_hash(current) != finding.metric_limit.fact_sha256:
+                    raise ValueError("metric-only source review content is stale")
         if self.use_review is not None:
             if self.use_review.report != self.report:
                 raise ValueError("independent use review belongs to another report")

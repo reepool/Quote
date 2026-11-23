@@ -1,0 +1,17 @@
+{
+  "root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "api": "/home/python/Quote/data/research/company_profile_research_v1_20261123/annual-api.json",
+  "annual_JSON": "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports/annual_profiles.json",
+  "annual_Markdown": "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports/annual_profiles.md",
+  "companies": 20,
+  "readable_fact_records": 628,
+  "safe_metric_records": 993,
+  "original20_API_equal": true,
+  "new_instance_and_export_equal": true,
+  "model_requests": 0,
+  "four_real_source_reviews": "planned_not_executed",
+  "counts_are_not_new_accuracy": true,
+  "HTTP_batch20_equals_ReadService_API_JSON": true,
+  "HTTP_status": 200,
+  "external_model_or_business_requests": 0
+}

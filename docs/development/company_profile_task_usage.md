@@ -11,6 +11,29 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 
 本文命令使用已验证的项目完整环境`/home/python/miniconda3/envs/Quote/bin/python`。系统`python3`可能缺少pandas等项目依赖；此时应选正确解释器，不通过改业务代码或临时安装依赖解决。以下路径均从`/home/python/Quote`执行。
 
+## 正常源复核的指标局部限用（6.FB）
+
+研究版V1根为`/home/python/Quote/data/research/company_profile_research_v1_20261123`，当前20股628条可读记录/993指标沿用6.FA实物，不是本轮新增抽取或质量改判。人读/机器入口分别为`exports/annual_profiles.md`、`exports/annual_profiles.json`及`annual-api.json`，来源/模型/复核状态和缺项保留，读取不发模型。四份新版本源复核执行计划仍为planned，真实效果/人工节省未评，具体有限预算答复前不执行；共享默认配置和生产未改。
+
+新版正常复核增加显式`workpaper_metric_limit_policy=source_review_exact_metric_limits.v1`。只有模型明确确认原正文及引用有源，且`limit_metrics`意见携带当前原fact hash和零起原指标位置，程序才保正文/未受影响指标、将整条标为limited，并从所有普通数值出口排除不可靠指标。原raw、指标值/scope和作者不改，不根据名称自动猜正确口径。
+
+API消费规则沿原`facts[*].metric_gaps`与`information_gaps`：被限指标只有原名/原位置/原因，无可用坏值；模型形成的缺口还标明模型核验依据及对应finding，和独立UseReview分开。两种限制并存时取保守并集，模型不能解除旧独立限制，新整条缺陷也不能被旧已核标签掩盖。正文或引用错误仍整条隔离，不以删指标变成有据描述。
+
+已有审核完成的保存稿默认仍返回`not_needed`。确需新版本同源复核时，可显式生成计划，仍不自动调用模型：
+
+```python
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper_review import METRIC_LIMIT_POLICY
+
+reader = CompanyProfileReadService('/home/python/Quote/data/research/company_profile_research_v1_20261123')
+plan = reader.plan_review_recovery(
+    '000338.SZ', request_id='explicit-new-policy-review',
+    source_recheck_policy=METRIC_LIMIT_POLICY,
+)
+```
+
+计划沿原`review_batch`执行文件入口和有限授权执行，重新取其原抽取及当时选章，不把旧审核意见、独立决定或人工备注当模型输入；原记录/作者/消耗及限制保持，新增后继单列。未带该字段的旧计划指纹和已完成语义不变，字段不是付费、自动重核或生产许可。6.FB工程验证与新真实模型质量分列，具体范围/预算及待批状态以本轮卡和result为准，不以受控用例推算准确率。
+
 ## 当前20股的定向补读研究版本（6.FA，2026-11-23）
 
 当前研究根为`/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123`，人读画像和机器投影分别在`exports/annual_profiles.md`、`exports/annual_profiles.json`；`annual-api.json`是同一年度API快照。本根沿6.EZ原20股追加华夏600015、华阳600348、兴证601377的同报告补读与真实源核，其余17股保持。6.EW原20股是另一名单，旧各根/失败和审核成绩保留，不改变共享默认配置或启用生产。
