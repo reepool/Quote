@@ -1,0 +1,23 @@
+{
+  "instrument_id": "000338",
+  "started_epoch": 1795410610.1932456,
+  "absolute_deadline_epoch": 1795416610.1932456,
+  "state": "exited",
+  "command": [
+    "/home/python/miniconda3/envs/Quote/bin/python",
+    "main.py",
+    "job",
+    "--job-id",
+    "company_profile_common_core",
+    "--action",
+    "review_batch",
+    "--execution-plan-file",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/000338-review.json"
+  ],
+  "execution_plan_sha256": "2a06394ba1009b5c23730953997872682a239369813eb71e407ebaaccf4ddb8f",
+  "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/000338.log",
+  "pid": 3419912,
+  "returncode": 0,
+  "finished_epoch": 1795411049.4480655,
+  "elapsed_seconds": 439.25482058525085
+}

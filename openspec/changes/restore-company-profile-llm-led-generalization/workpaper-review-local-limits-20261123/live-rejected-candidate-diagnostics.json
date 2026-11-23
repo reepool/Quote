@@ -1,0 +1,13 @@
+{
+  "600859.SH": [
+    "修订源检查隔离：review-add:R1未进入最终再核或正文；ValidationError: 2 validation errors for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '营业收入同...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nmetrics.2\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '营业收入同...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+  ],
+  "600015.SH": [
+    "修订源检查隔离：review-add:OM-CONSUMER-CREDIT-CUST未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '消费信贷客...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error",
+    "修订源检查隔离：review-add:OM-PERSONAL-LOAN-SCALE未进入最终再核或正文；ValidationError: 2 validation errors for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '个人贷款（...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nmetrics.3\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '个人消费贷...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error",
+    "修订源检查隔离：review-add:OM-CC-LOAN-BALANCE未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '信用卡贷款...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error",
+    "修订源检查隔离：review-add:OM-CC-TXN-VOLUME未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '信用卡交易...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+  ],
+  "original_receipts_retained": true,
+  "no_value_correction_or_extra_request": true
+}

@@ -1,0 +1,2453 @@
+{
+  "companies": [
+    {
+      "instrument_id": "000338.SZ",
+      "before_reading_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "after_reading_id": "bp-work-a5c5ab569526287c392a7482",
+      "before_visible_current_reading_records": 34,
+      "after_visible_current_reading_records": 34,
+      "newly_readable": [],
+      "withdrawn": [],
+      "changed": [
+        {
+          "fact_id": "F-BS-03",
+          "changed_projection_fields": [
+            "fact",
+            "state",
+            "metric_gaps"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+            "fact_id": "F-BS-03",
+            "element": "business_structure",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "final",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "fact": {
+              "fact_id": "F-BS-03",
+              "text": "潍柴动力发动机板块在国内主要有潍坊、扬州、重庆三大生产基地，发动机标准生产能力为102万台/年，并正实施生产线兼容性改造和局部工序能力提升项目。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "发动机标准生产能力",
+                  "raw_value": "102",
+                  "value": "102",
+                  "unit": "万台/年",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          },
+          "after": {
+            "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+            "fact_id": "F-BS-03",
+            "element": "business_structure",
+            "state": "limited",
+            "label": "保真限用／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "initial",
+            "reasons": [
+              "模型源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "fact": {
+              "fact_id": "F-BS-03",
+              "text": "潍柴动力发动机板块在国内主要有潍坊、扬州、重庆三大生产基地，发动机标准生产能力为102万台/年，并正实施生产线兼容性改造和局部工序能力提升项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "发动机标准生产能力",
+                "state": "withheld",
+                "reason": "叙述整体有原文支持：潍柴动力发动机板块在国内有潍坊、扬州、重庆三大基地，发动机标准生产能力为102万台/年，并正在实施兼容性改造和局部工序能力提升。不可靠的只是原指标数组索引0“发动机标准生产能力”：其subject_scope标为consolidated_group，但原文对象是发动机板块，不是集团全部业务的产能。限制该指标独立使用；不改写已支持叙述，也不另给替换数值或范围标签。",
+                "review_basis": "model_source_check",
+                "model_finding_ids": [
+                  "WR-BS-03"
+                ],
+                "model_reasons": [
+                  "叙述整体有原文支持：潍柴动力发动机板块在国内有潍坊、扬州、重庆三大基地，发动机标准生产能力为102万台/年，并正在实施兼容性改造和局部工序能力提升。不可靠的只是原指标数组索引0“发动机标准生产能力”：其subject_scope标为consolidated_group，但原文对象是发动机板块，不是集团全部业务的产能。限制该指标独立使用；不改写已支持叙述，也不另给替换数值或范围标签。"
+                ]
+              }
+            ],
+            "metric_source_indices": []
+          }
+        },
+        {
+          "fact_id": "F-MC-02",
+          "changed_projection_fields": [
+            "fact"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+            "fact_id": "F-MC-02",
+            "element": "material_changes",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "final",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "fact": {
+              "fact_id": "F-MC-02",
+              "text": "公司报告期内业务、产品或服务发生重大变化或调整有关情况标注为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            }
+          },
+          "after": {
+            "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+            "fact_id": "F-MC-02",
+            "element": "material_changes",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "final",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "fact": {
+              "fact_id": "F-MC-02",
+              "text": "公司报告期内业务、产品或服务发生重大变化或调整有关情况披露项标注为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            }
+          }
+        },
+        {
+          "fact_id": "F-OD-01",
+          "changed_projection_fields": [
+            "fact",
+            "state"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+            "fact_id": "F-OD-01",
+            "element": "operating_drivers",
+            "state": "limited",
+            "label": "保真限用／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "final",
+            "reasons": [
+              "原文描述的是全球重卡、工程机械、农业装备及算力基础设施等行业环境，并非公司或合并集团自身经营数据，主体范围无法归入公司、子公司或业务分部。"
+            ],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F-OD-01",
+              "text": "2025年全球重卡行业整体销量大幅增长，新能源销量占比显著提升；工程机械行业整体微增，电动化产品发展势头迅猛；农业装备行业整体承压；算力基础设施建设带动大功率备用发电机组及燃气分布式能源系统快速上量。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [],
+              "uncertainty_reason": "原文描述的是全球重卡、工程机械、农业装备及算力基础设施等行业环境，并非公司或合并集团自身经营数据，主体范围无法归入公司、子公司或业务分部。"
+            }
+          },
+          "after": {
+            "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+            "fact_id": "F-OD-01",
+            "element": "operating_drivers",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "initial",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F-OD-01",
+              "text": "2025年全球重卡行业整体销量大幅增长，新能源销量占比显著提升；工程机械行业整体微增，电动化产品发展势头迅猛；农业装备行业整体承压；算力基础设施建设带动大功率备用发电机组及燃气分布式能源系统快速上量。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            }
+          }
+        },
+        {
+          "fact_id": "F-OD-02",
+          "changed_projection_fields": [
+            "fact"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+            "fact_id": "F-OD-02",
+            "element": "operating_drivers",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "initial",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "fact": {
+              "fact_id": "F-OD-02",
+              "text": "公司紧抓人工智能浪潮带来的电力需求增长机遇，2025年数据中心备用电源销量同比增长259%，M系列大缸径发动机收入同比增长65%，美国PSI公司发电类产品收入贡献占比达81%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "PSI公司发电类产品收入贡献占比",
+                  "raw_value": "81",
+                  "value": "81",
+                  "unit": "%",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          },
+          "after": {
+            "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+            "fact_id": "F-OD-02",
+            "element": "operating_drivers",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "final",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "fact": {
+              "fact_id": "F-OD-02",
+              "text": "公司紧抓人工智能浪潮带来的电力需求增长机遇，2025年数据中心备用电源销量同比增长259%；其中，M系列大缸径发动机全年销量首次突破1万台、同比增长32%，收入同比增长65%；美国PSI公司发电类产品收入贡献占比达81%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "PSI公司发电类产品收入贡献占比",
+                  "raw_value": "81",
+                  "value": "81",
+                  "unit": "%",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          }
+        },
+        {
+          "fact_id": "F-SM-02",
+          "changed_projection_fields": [
+            "fact",
+            "metric_gaps"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+            "fact_id": "F-SM-02",
+            "element": "scale_and_mix",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "三电业务收入错标集团范围，保留原有源业务叙述与其他原指标，不给该收入重写主体标签。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F-SM-02",
+              "text": "“三电”业务实现收入30.4亿元、翻番增长，其中电池销量同比增长162%，自主电机销量同比增长219%，自主电机控制器销量同比增长56%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "电池销量同比增减",
+                  "raw_value": "162",
+                  "value": "162",
+                  "unit": "%",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                },
+                {
+                  "name": "自主电机销量同比增减",
+                  "raw_value": "219",
+                  "value": "219",
+                  "unit": "%",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                },
+                {
+                  "name": "自主电机控制器销量同比增减",
+                  "raw_value": "56",
+                  "value": "56",
+                  "unit": "%",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "三电业务收入",
+                "state": "withheld",
+                "reason": "三电业务收入错标集团范围，保留原有源业务叙述与其他原指标，不给该收入重写主体标签。"
+              }
+            ],
+            "metric_source_indices": [
+              1,
+              2,
+              3
+            ]
+          },
+          "after": {
+            "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+            "fact_id": "F-SM-02",
+            "element": "scale_and_mix",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "三电业务收入错标集团范围，保留原有源业务叙述与其他原指标，不给该收入重写主体标签。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F-SM-02",
+              "text": "“三电”业务实现收入30.4亿元、翻番增长，其中电池销量同比增长162%，自主电机销量同比增长219%，自主电机控制器销量同比增长56%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "三电业务收入",
+                "state": "withheld",
+                "reason": "三电业务收入错标集团范围，保留原有源业务叙述与其他原指标，不给该收入重写主体标签。",
+                "review_basis": "independent_and_model_source_check",
+                "model_finding_ids": [
+                  "WR-SM-02"
+                ],
+                "model_reasons": [
+                  "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+                ]
+              },
+              {
+                "metric_index": 1,
+                "name": "电池销量同比增减",
+                "state": "withheld",
+                "reason": "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。",
+                "review_basis": "model_source_check",
+                "model_finding_ids": [
+                  "WR-SM-02"
+                ],
+                "model_reasons": [
+                  "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+                ]
+              },
+              {
+                "metric_index": 2,
+                "name": "自主电机销量同比增减",
+                "state": "withheld",
+                "reason": "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。",
+                "review_basis": "model_source_check",
+                "model_finding_ids": [
+                  "WR-SM-02"
+                ],
+                "model_reasons": [
+                  "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+                ]
+              },
+              {
+                "metric_index": 3,
+                "name": "自主电机控制器销量同比增减",
+                "state": "withheld",
+                "reason": "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。",
+                "review_basis": "model_source_check",
+                "model_finding_ids": [
+                  "WR-SM-02"
+                ],
+                "model_reasons": [
+                  "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+                ]
+              }
+            ],
+            "metric_source_indices": []
+          }
+        }
+      ],
+      "comparison_is_API_projection_not_semantic_judgment": true
+    },
+    {
+      "instrument_id": "600859.SH",
+      "before_reading_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "after_reading_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "before_visible_current_reading_records": 28,
+      "after_visible_current_reading_records": 31,
+      "newly_readable": [
+        {
+          "fact_id": "F18",
+          "state": "reviewed",
+          "element": "operations_and_inputs",
+          "fact": {
+            "fact_id": "F18",
+            "text": "报告期内公司新开门店3家、建筑面积51.1万平方米，关闭门店5家、建筑面积23.2万平方米；期末门店78家、建筑面积567.2万平方米。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": [
+              {
+                "name": "新开门店家数",
+                "raw_value": "3",
+                "value": "3",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新开门店建筑面积",
+                "raw_value": "51.1",
+                "value": "51.1",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "关闭门店家数",
+                "raw_value": "5",
+                "value": "5",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "关闭门店建筑面积",
+                "raw_value": "23.2",
+                "value": "23.2",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R5",
+              "element": "operations_and_inputs",
+              "severity": "minor",
+              "issue_type": "other",
+              "affected_fact_id": "F18",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0017",
+                "source-0014",
+                "source-0001"
+              ],
+              "explanation": "新开3家、51.1万平方米，关闭5家、23.2万平方米，期末78家、567.2万平方米与source-0017合计行数字一致，但该表业态合计为购物中心/百货/奥特莱斯，面积列是“建筑面积/租赁面积”。source-0001将这78家限定为大型综合有税零售门店，并另有专业店333家；source-0014还将自有建筑面积与租赁/托管面积分开。应保留数字，改回上述门店范围和面积口径，不能写成公司全部期末门店的建筑面积。",
+              "resolution": "repair_rejected",
+              "original_fact": {
+                "fact_id": "F18",
+                "text": "报告期内公司新开门店3家、建筑面积51.1万平方米，关闭门店5家、建筑面积23.2万平方米；期末门店78家、建筑面积567.2万平方米。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "新开门店家数",
+                    "raw_value": "3",
+                    "value": "3",
+                    "unit": "家",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "新开门店建筑面积",
+                    "raw_value": "51.1",
+                    "value": "51.1",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "关闭门店家数",
+                    "raw_value": "5",
+                    "value": "5",
+                    "unit": "家",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "关闭门店建筑面积",
+                    "raw_value": "23.2",
+                    "value": "23.2",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              "revised_fact": {
+                "fact_id": "F18",
+                "text": "报告期内，公司新开门店3家、建筑面积/租赁面积51.1万平方米，关闭门店5家、建筑面积/租赁面积23.2万平方米；期末门店78家、建筑面积/租赁面积567.2万平方米。上述合计口径为购物中心/百货/奥特莱斯业态；公司期末另有大型综合有税零售门店78家（涉及奥特莱斯、购物中心、百货业态）及各类专业店333家。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017",
+                  "source-0014",
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "新开门店家数（购物中心/百货/奥特莱斯业态合计）",
+                    "raw_value": "3",
+                    "value": "3",
+                    "unit": "家",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "新开门店建筑面积/租赁面积（购物中心/百货/奥特莱斯业态合计）",
+                    "raw_value": "51.1",
+                    "value": "51.1",
+                    "unit": "万平方米",
+                    "source_unit": "万平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "关闭门店家数（购物中心/百货/奥特莱斯业态合计）",
+                    "raw_value": "5",
+                    "value": "5",
+                    "unit": "家",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "关闭门店建筑面积/租赁面积（购物中心/百货/奥特莱斯业态合计）",
+                    "raw_value": "23.2",
+                    "value": "23.2",
+                    "unit": "万平方米",
+                    "source_unit": "万平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "期末门店家数（购物中心/百货/奥特莱斯业态合计）",
+                    "raw_value": "78",
+                    "value": "78",
+                    "unit": "家",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "期末门店建筑面积/租赁面积（购物中心/百货/奥特莱斯业态合计）",
+                    "raw_value": "567.2",
+                    "value": "567.2",
+                    "unit": "万平方米",
+                    "source_unit": "万平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "期末大型综合有税零售门店家数",
+                    "raw_value": "78",
+                    "value": "78",
+                    "unit": "家",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "期末各类专业店家数",
+                    "raw_value": "333",
+                    "value": "333",
+                    "unit": "家",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              }
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        },
+        {
+          "fact_id": "F24",
+          "state": "reviewed",
+          "element": "operating_drivers",
+          "fact": {
+            "fact_id": "F24",
+            "text": "公司利润较上年同期下降的主要原因包括：公司处于转型迭代期，百货业态固有弊端叠加转型、关闭部分门店导致收入快速下滑，闭店带来一次性员工安置补偿；新门店培育期延长，短期成本投入尚未转化为效益产出，叠加新租赁准则下长租约门店前期成本偏高；已开业的5家免税门店尚处市场培育期；受春天贵阳资产组经营压力加大影响计提商誉减值。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R3",
+              "element": "operating_drivers",
+              "severity": "minor",
+              "issue_type": "contradicts_source",
+              "affected_fact_id": "F24",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0007",
+                "source-0002"
+              ],
+              "explanation": "利润下降的转型闭店、新店培育期、租赁准则及春天贵阳资产组商誉减值等原因与source-0007一致，可保留。其中“已开业5家免税门店”虽见于source-0007，但与source-0002期末口岸1家、市内2家、离岛1家冲突。该家数应与F01、F05一并限定，不能单独写成已核实的5家。",
+              "resolution": "quarantined",
+              "original_fact": {
+                "fact_id": "F24",
+                "text": "公司利润较上年同期下降的主要原因包括：公司处于转型迭代期，百货业态固有弊端叠加转型、关闭部分门店导致收入快速下滑，闭店带来一次性员工安置补偿；新门店培育期延长，短期成本投入尚未转化为效益产出，叠加新租赁准则下长租约门店前期成本偏高；已开业的5家免税门店尚处市场培育期；受春天贵阳资产组经营压力加大影响计提商誉减值。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [],
+                "uncertainty_reason": null
+              },
+              "revised_fact": null
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        },
+        {
+          "fact_id": "F30",
+          "state": "reviewed",
+          "element": "material_changes",
+          "fact": {
+            "fact_id": "F30",
+            "text": "报告期内哈尔滨机场王府井免税店、武汉、长沙市内免税店对外营业，实现了免税主要业务类型全覆盖。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R6",
+              "element": "material_changes",
+              "severity": "minor",
+              "issue_type": "wrong_period",
+              "affected_fact_id": "F30",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "explanation": "哈尔滨机场免税店及武汉、长沙市内免税店于报告期内开业，与source-0002一致。但该事实期间仅为2025年度，却纳入2026年2月首都机场T2免税店开业。该事项在报告期后，正文已写明日期，结构化期间不应把它记成2025年度成果。应保留两条信息，并将2026年开业单独标为期后事项。",
+              "resolution": "repair_rejected",
+              "original_fact": {
+                "fact_id": "F30",
+                "text": "报告期内哈尔滨机场王府井免税店、武汉、长沙市内免税店对外营业，实现了免税主要业务类型全覆盖；2026年2月公司旗下王府井免税北京首都机场T2航站楼免税店对外营业。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [],
+                "uncertainty_reason": null
+              },
+              "revised_fact": null
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        }
+      ],
+      "withdrawn": [],
+      "changed": [
+        {
+          "fact_id": "F31",
+          "changed_projection_fields": [
+            "fact",
+            "metric_gaps"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+            "fact_id": "F31",
+            "element": "material_changes",
+            "state": "limited",
+            "label": "保真限用／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "initial",
+            "reasons": [
+              "保留原文主体、数值或近似限定，不作为确定值使用。"
+            ],
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "fact": {
+              "fact_id": "F31",
+              "text": "友谊商店完成改造，将废弃露天空场和砖瓦房改造为“友谊花园”院落式商业空间，改造后空置率由高位降至零，客流提升数十倍；喜悦购物中心聚焦文创、IP、文娱、演艺等新生活方式业态，客流同比增长超15%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "喜悦购物中心客流同比增减",
+                  "raw_value": "超15",
+                  "value": "15",
+                  "unit": "%",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "greater_than",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          },
+          "after": {
+            "reading_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+            "fact_id": "F31",
+            "element": "material_changes",
+            "state": "limited",
+            "label": "保真限用／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "initial",
+            "reasons": [
+              "保留原文主体、数值或近似限定，不作为确定值使用。",
+              "模型源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "fact": {
+              "fact_id": "F31",
+              "text": "友谊商店完成改造，将废弃露天空场和砖瓦房改造为“友谊花园”院落式商业空间，改造后空置率由高位降至零，客流提升数十倍；喜悦购物中心聚焦文创、IP、文娱、演艺等新生活方式业态，客流同比增长超15%。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "喜悦购物中心客流同比增减",
+                "state": "withheld",
+                "reason": "叙述整体有source-0005支持：友谊商店改造后空置率由高位降至零、客流提升数十倍，喜悦购物中心客流同比增长超15%。不可靠的是原始指标第1项（索引0）把该增幅的subject_scope标成named_subsidiary。原文只点名喜悦购物中心这一门店/项目，未将其界定为法律子公司，不能把超15%当作子公司整体指标独立使用。不改写叙述，也不替换数值或范围标签。",
+                "review_basis": "model_source_check",
+                "model_finding_ids": [
+                  "R6"
+                ],
+                "model_reasons": [
+                  "叙述整体有source-0005支持：友谊商店改造后空置率由高位降至零、客流提升数十倍，喜悦购物中心客流同比增长超15%。不可靠的是原始指标第1项（索引0）把该增幅的subject_scope标成named_subsidiary。原文只点名喜悦购物中心这一门店/项目，未将其界定为法律子公司，不能把超15%当作子公司整体指标独立使用。不改写叙述，也不替换数值或范围标签。"
+                ]
+              }
+            ],
+            "metric_source_indices": []
+          }
+        }
+      ],
+      "comparison_is_API_projection_not_semantic_judgment": true
+    },
+    {
+      "instrument_id": "600015.SH",
+      "before_reading_id": "bp-work-c144725bfcfff1bceadc5849",
+      "after_reading_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "before_visible_current_reading_records": 10,
+      "after_visible_current_reading_records": 10,
+      "newly_readable": [],
+      "withdrawn": [],
+      "changed": [],
+      "comparison_is_API_projection_not_semantic_judgment": true
+    },
+    {
+      "instrument_id": "601668.SH",
+      "before_reading_id": "bp-work-cad604975f9f30adcb311c8e",
+      "after_reading_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "before_visible_current_reading_records": 24,
+      "after_visible_current_reading_records": 29,
+      "newly_readable": [
+        {
+          "fact_id": "F04",
+          "state": "reviewed",
+          "element": "products_services",
+          "fact": {
+            "fact_id": "F04",
+            "text": "房屋建筑工程业务2025年新签合同额26,654亿元，累计施工面积165,442万平方米，累计新开工面积27,652万平方米，累计竣工面积22,893万平方米。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "房屋建筑工程新签合同额",
+                "raw_value": "26,654",
+                "value": "26654",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "房屋建筑累计施工面积",
+                "raw_value": "165,442",
+                "value": "165442",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "房屋建筑累计新开工面积",
+                "raw_value": "27,652",
+                "value": "27652",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "房屋建筑累计竣工面积",
+                "raw_value": "22,893",
+                "value": "22893",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R01",
+              "element": "products_services",
+              "severity": "material",
+              "issue_type": "wrong_subject",
+              "affected_fact_id": "F04",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0003",
+                "source-0007"
+              ],
+              "explanation": "新签合同额表的来源类别是“房屋建筑”，收入分行业表的类别是“房屋建筑工程”。两类名称相近且都能定位到金额，但不能据此视为同一主体。F04正文和指标名写成“房屋建筑工程”，把合同额错接到另一来源类别。应改回来源原文的“房屋建筑”；改名不能证明这些金额已可核定为2025年。",
+              "resolution": "repair_rejected",
+              "original_fact": {
+                "fact_id": "F04",
+                "text": "房屋建筑工程业务2025年新签合同额26,654亿元，累计施工面积165,442万平方米，累计新开工面积27,652万平方米，累计竣工面积22,893万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "房屋建筑工程新签合同额",
+                    "raw_value": "26,654",
+                    "value": "26654",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计施工面积",
+                    "raw_value": "165,442",
+                    "value": "165442",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计新开工面积",
+                    "raw_value": "27,652",
+                    "value": "27652",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计竣工面积",
+                    "raw_value": "22,893",
+                    "value": "22893",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              "revised_fact": {
+                "fact_id": "F04",
+                "text": "房屋建筑业务2025年新签合同额26,654亿元，累计施工面积165,442万平方米，累计新开工面积27,652万平方米，累计竣工面积22,893万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "房屋建筑新签合同额",
+                    "raw_value": "26,654",
+                    "value": "26654",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计施工面积",
+                    "raw_value": "165,442",
+                    "value": "165442",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计新开工面积",
+                    "raw_value": "27,652",
+                    "value": "27652",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计竣工面积",
+                    "raw_value": "22,893",
+                    "value": "22893",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              }
+            },
+            {
+              "finding_id": "R02",
+              "element": "products_services",
+              "severity": "material",
+              "issue_type": "unsupported_claim",
+              "affected_fact_id": "F04",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "explanation": "source-0003标明布局未恢复、表格列关系未核定，不能猜列。房屋建筑新签合同额及累计施工、新开工、竣工面积后均并列多列数字，原文没有本期、上年列表头。F04将26654亿元、165442万平方米、27652万平方米、22893万平方米全部写成2025年exact，期间归属未被核定。应人工核对原表列后再决定是否保留，不能在本复核中当作已核实的2025年实绩。",
+              "resolution": "repair_rejected",
+              "original_fact": {
+                "fact_id": "F04",
+                "text": "房屋建筑工程业务2025年新签合同额26,654亿元，累计施工面积165,442万平方米，累计新开工面积27,652万平方米，累计竣工面积22,893万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "房屋建筑工程新签合同额",
+                    "raw_value": "26,654",
+                    "value": "26654",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计施工面积",
+                    "raw_value": "165,442",
+                    "value": "165442",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计新开工面积",
+                    "raw_value": "27,652",
+                    "value": "27652",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计竣工面积",
+                    "raw_value": "22,893",
+                    "value": "22893",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              "revised_fact": {
+                "fact_id": "F04",
+                "text": "房屋建筑业务2025年新签合同额26,654亿元，累计施工面积165,442万平方米，累计新开工面积27,652万平方米，累计竣工面积22,893万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "房屋建筑新签合同额",
+                    "raw_value": "26,654",
+                    "value": "26654",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计施工面积",
+                    "raw_value": "165,442",
+                    "value": "165442",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计新开工面积",
+                    "raw_value": "27,652",
+                    "value": "27652",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房屋建筑累计竣工面积",
+                    "raw_value": "22,893",
+                    "value": "22893",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              }
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        },
+        {
+          "fact_id": "F05",
+          "state": "reviewed",
+          "element": "products_services",
+          "fact": {
+            "fact_id": "F05",
+            "text": "基础设施业务2025年新签合同额14,728亿元，国内新签道路3,708公里、面积5,638万平方米。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "基础设施新签合同额",
+                "raw_value": "14,728",
+                "value": "14728",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "基础设施国内新签道路",
+                "raw_value": "3,708",
+                "value": "3708",
+                "unit": "公里",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "基础设施国内新签面积",
+                "raw_value": "5,638",
+                "value": "5638",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R03",
+              "element": "products_services",
+              "severity": "material",
+              "issue_type": "unsupported_claim",
+              "affected_fact_id": "F05",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "explanation": "基础设施新签合同额14728亿元，以及国内新签道路3708公里、面积5638万平方米，均取自列关系未核定的source-0003，标签后并列数字没有期间表头。指标保留“基础设施”是对的，但标成2025年exact超出可核定范围，也不得自动等同于收入表的“基础设施建设与投资”。应人工核对原表列。",
+              "resolution": "quarantined",
+              "original_fact": {
+                "fact_id": "F05",
+                "text": "基础设施业务2025年新签合同额14,728亿元，国内新签道路3,708公里、面积5,638万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "基础设施新签合同额",
+                    "raw_value": "14,728",
+                    "value": "14728",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "基础设施国内新签道路",
+                    "raw_value": "3,708",
+                    "value": "3708",
+                    "unit": "公里",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "基础设施国内新签面积",
+                    "raw_value": "5,638",
+                    "value": "5638",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              "revised_fact": null
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        },
+        {
+          "fact_id": "F06",
+          "state": "reviewed",
+          "element": "products_services",
+          "fact": {
+            "fact_id": "F06",
+            "text": "勘察设计业务2025年新签合同额128亿元。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "勘察设计新签合同额",
+                "raw_value": "128",
+                "value": "128",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R04",
+              "element": "products_services",
+              "severity": "minor",
+              "issue_type": "unsupported_claim",
+              "affected_fact_id": "F06",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "explanation": "勘察设计新签合同额128亿元同样来自未核定列的并列数字，F06将其写成2025年exact缺乏期间表头支持。该金额相对主业较小，但精确年度归属仍应人工核对，或改为带不确定性的有限结果，不能维持exact。",
+              "resolution": "quarantined",
+              "original_fact": {
+                "fact_id": "F06",
+                "text": "勘察设计业务2025年新签合同额128亿元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "勘察设计新签合同额",
+                    "raw_value": "128",
+                    "value": "128",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              "revised_fact": null
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        },
+        {
+          "fact_id": "F07",
+          "state": "reviewed",
+          "element": "products_services",
+          "fact": {
+            "fact_id": "F07",
+            "text": "房地产业务2025年合约销售额3,948亿元，合约销售面积1,509万平方米，平均售价26,166元/平方米；其中中海地产合约销售额2,190亿元、合约销售面积762万平方米。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "房地产业务合约销售额",
+                "raw_value": "3,948",
+                "value": "3948",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "房地产业务合约销售面积",
+                "raw_value": "1,509",
+                "value": "1509",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "房地产业务平均售价",
+                "raw_value": "26,166",
+                "value": "26166",
+                "unit": "元/平方米",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "中海地产合约销售额",
+                "raw_value": "2,190",
+                "value": "2190",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "中海地产合约销售面积",
+                "raw_value": "762",
+                "value": "762",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R05",
+              "element": "products_services",
+              "severity": "material",
+              "issue_type": "unsupported_claim",
+              "affected_fact_id": "F07",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "explanation": "合约销售额3948亿元、销售面积1509万平方米、均价26166元/平方米，以及中海地产2190亿元、762万平方米，均来自布局未恢复且列关系未核定的source-0004。节标题虽有“期内”，但并列数字没有本期、上年列表头。F07全部标为2025年exact，未核定前不能作为确切年度实绩发布，须人工核对原表列。",
+              "resolution": "repair_rejected",
+              "original_fact": {
+                "fact_id": "F07",
+                "text": "房地产业务2025年合约销售额3,948亿元，合约销售面积1,509万平方米，平均售价26,166元/平方米；其中中海地产合约销售额2,190亿元、合约销售面积762万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "房地产业务合约销售额",
+                    "raw_value": "3,948",
+                    "value": "3948",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务合约销售面积",
+                    "raw_value": "1,509",
+                    "value": "1509",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务平均售价",
+                    "raw_value": "26,166",
+                    "value": "26166",
+                    "unit": "元/平方米",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "中海地产合约销售额",
+                    "raw_value": "2,190",
+                    "value": "2190",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "中海地产合约销售面积",
+                    "raw_value": "762",
+                    "value": "762",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              "revised_fact": {
+                "fact_id": "F07",
+                "text": "房地产业务2025年合约销售额3,948亿元，合约销售面积1,509万平方米，平均售价26,166元/平方米；其中中海地产（指中国海外发展及其附属公司所从事的地产业务，但不包括中国海外宏洋）合约销售额2,190亿元、合约销售面积762万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "房地产业务合约销售额",
+                    "raw_value": "3,948",
+                    "value": "3948",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务合约销售面积",
+                    "raw_value": "1,509",
+                    "value": "1509",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务平均售价",
+                    "raw_value": "26,166",
+                    "value": "26166",
+                    "unit": "元/平方米",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "中海地产合约销售额",
+                    "raw_value": "2,190",
+                    "value": "2190",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": "中海地产指中国海外发展及其附属公司所从事的地产业务，但不包括中国海外宏洋"
+                  },
+                  {
+                    "name": "中海地产合约销售面积",
+                    "raw_value": "762",
+                    "value": "762",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": "中海地产指中国海外发展及其附属公司所从事的地产业务，但不包括中国海外宏洋"
+                  }
+                ],
+                "uncertainty_reason": null
+              }
+            },
+            {
+              "finding_id": "R06",
+              "element": "products_services",
+              "severity": "material",
+              "issue_type": "wrong_subject",
+              "affected_fact_id": "F07",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "explanation": "附注写明中海地产指中国海外发展及其附属公司所从事的地产业务，但不包括中国海外宏洋。F07将中海地产标为named_subsidiary且未写排除范围，主体大于来源定义。应补上该附注口径；补口径不能消除列关系未核定的问题。",
+              "resolution": "repair_rejected",
+              "original_fact": {
+                "fact_id": "F07",
+                "text": "房地产业务2025年合约销售额3,948亿元，合约销售面积1,509万平方米，平均售价26,166元/平方米；其中中海地产合约销售额2,190亿元、合约销售面积762万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "房地产业务合约销售额",
+                    "raw_value": "3,948",
+                    "value": "3948",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务合约销售面积",
+                    "raw_value": "1,509",
+                    "value": "1509",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务平均售价",
+                    "raw_value": "26,166",
+                    "value": "26166",
+                    "unit": "元/平方米",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "中海地产合约销售额",
+                    "raw_value": "2,190",
+                    "value": "2190",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "中海地产合约销售面积",
+                    "raw_value": "762",
+                    "value": "762",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              "revised_fact": {
+                "fact_id": "F07",
+                "text": "房地产业务2025年合约销售额3,948亿元，合约销售面积1,509万平方米，平均售价26,166元/平方米；其中中海地产（指中国海外发展及其附属公司所从事的地产业务，但不包括中国海外宏洋）合约销售额2,190亿元、合约销售面积762万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "房地产业务合约销售额",
+                    "raw_value": "3,948",
+                    "value": "3948",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务合约销售面积",
+                    "raw_value": "1,509",
+                    "value": "1509",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "房地产业务平均售价",
+                    "raw_value": "26,166",
+                    "value": "26166",
+                    "unit": "元/平方米",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "中海地产合约销售额",
+                    "raw_value": "2,190",
+                    "value": "2190",
+                    "unit": "亿元",
+                    "source_unit": null,
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": "中海地产指中国海外发展及其附属公司所从事的地产业务，但不包括中国海外宏洋"
+                  },
+                  {
+                    "name": "中海地产合约销售面积",
+                    "raw_value": "762",
+                    "value": "762",
+                    "unit": "万平方米",
+                    "source_unit": null,
+                    "currency": null,
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度",
+                    "comparison_basis": null,
+                    "qualifier": "exact",
+                    "uncertainty_reason": "中海地产指中国海外发展及其附属公司所从事的地产业务，但不包括中国海外宏洋"
+                  }
+                ],
+                "uncertainty_reason": null
+              }
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        },
+        {
+          "fact_id": "F27",
+          "state": "limited",
+          "element": "material_changes",
+          "fact": {
+            "fact_id": "F27",
+            "text": "报告期内公司新增重要非主营业务的说明列示“适用　不适用”，但给定文本未标明勾选结果。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "给定文本仅并列印出“适用”“不适用”，未标明勾选结果，无法确认是否勾选“不适用”。"
+          },
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "old_related_findings": [
+            {
+              "finding_id": "R08",
+              "element": "material_changes",
+              "severity": "minor",
+              "issue_type": "unsupported_claim",
+              "affected_fact_id": "F27",
+              "related_fact_id": null,
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "explanation": "原文只并列“适用”“不适用”，该页布局未恢复，看不到勾选标记。F27断言已勾选“不适用”缺乏核定依据。适用性勾选只说明披露项目，即使原件确为不适用，也不能单独解释为没有发生新增重要非主营业务。应人工核对原件勾选，未核实前撤回该断言。",
+              "resolution": "quarantined",
+              "original_fact": {
+                "fact_id": "F27",
+                "text": "报告期内公司新增重要非主营业务的说明勾选“不适用”。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [],
+                "uncertainty_reason": null
+              },
+              "revised_fact": null
+            }
+          ],
+          "prior_not_in_visible_current_API": true
+        }
+      ],
+      "withdrawn": [],
+      "changed": [
+        {
+          "fact_id": "F15",
+          "changed_projection_fields": [
+            "metric_gaps"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-cad604975f9f30adcb311c8e",
+            "fact_id": "F15",
+            "element": "scale_and_mix",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "战略新兴业务收入的指标范围不可靠，原正文与建筑业务新签合同指标有源，不连带隐藏后者。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F15",
+              "text": "2025年建筑业务新签合同额4.2万亿元；战略性新兴产业实现营业收入2,629亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "建筑业务新签合同额",
+                  "raw_value": "4.2",
+                  "value": "4.2",
+                  "unit": "万亿元",
+                  "source_unit": null,
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 1,
+                "name": "战略性新兴产业营业收入",
+                "state": "withheld",
+                "reason": "战略新兴业务收入的指标范围不可靠，原正文与建筑业务新签合同指标有源，不连带隐藏后者。"
+              }
+            ],
+            "metric_source_indices": [
+              0
+            ]
+          },
+          "after": {
+            "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+            "fact_id": "F15",
+            "element": "scale_and_mix",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "战略新兴业务收入的指标范围不可靠，原正文与建筑业务新签合同指标有源，不连带隐藏后者。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F15",
+              "text": "2025年建筑业务新签合同额4.2万亿元；战略性新兴产业实现营业收入2,629亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "建筑业务新签合同额",
+                  "raw_value": "4.2",
+                  "value": "4.2",
+                  "unit": "万亿元",
+                  "source_unit": null,
+                  "currency": "人民币",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 1,
+                "name": "战略性新兴产业营业收入",
+                "state": "withheld",
+                "reason": "战略新兴业务收入的指标范围不可靠，原正文与建筑业务新签合同指标有源，不连带隐藏后者。",
+                "review_basis": "independent_and_model_source_check",
+                "model_finding_ids": [
+                  "R4"
+                ],
+                "model_reasons": [
+                  "source-0002明文支持建筑业务新签合同额4.2万亿元，以及公司战略性新兴产业营业收入2,629亿元，叙述可保留。第0项已标为business_segment，与建筑业务这一更窄对象一致，不限制。第1项是战略性新兴产业这一交叉分类收入，不是集团整体营业收入，标成consolidated_group使范围不可靠。只限制第1项，不替换原数字。"
+                ]
+              }
+            ],
+            "metric_source_indices": [
+              0
+            ]
+          }
+        },
+        {
+          "fact_id": "F18",
+          "changed_projection_fields": [
+            "fact"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-cad604975f9f30adcb311c8e",
+            "fact_id": "F18",
+            "element": "operations_and_inputs",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "final",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F18",
+              "text": "2025年公司新增土地储备928万平方米，全部位于一线、二线及省会城市。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "新增土地储备",
+                  "raw_value": "928",
+                  "value": "928",
+                  "unit": "万平方米",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          },
+          "after": {
+            "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+            "fact_id": "F18",
+            "element": "operations_and_inputs",
+            "state": "reviewed",
+            "label": "已核（研究用途，非正式接受）／模型源核",
+            "review_basis": "model_source_check",
+            "model_review_stage": "final",
+            "reasons": [],
+            "evidence_ids": [
+              "source-0002",
+              "source-0004"
+            ],
+            "fact": {
+              "fact_id": "F18",
+              "text": "2025年公司购置土地储备（全额数）928万平方米，全部位于一线、二线及省会城市；期末土地储备（全额数）6,961万平方米，其中中海地产2,528万平方米（中海地产指中国海外发展及其附属公司所从事的地产业务，不包括中国海外宏洋）。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "购置土地储备（全额数）",
+                  "raw_value": "928",
+                  "value": "928",
+                  "unit": "万平方米",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                },
+                {
+                  "name": "期末土地储备（全额数）",
+                  "raw_value": "6,961",
+                  "value": "6961",
+                  "unit": "万平方米",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                },
+                {
+                  "name": "中海地产期末土地储备（全额数）",
+                  "raw_value": "2,528",
+                  "value": "2528",
+                  "unit": "万平方米",
+                  "source_unit": null,
+                  "currency": null,
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "comparison_basis": null,
+                  "qualifier": "exact",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          }
+        },
+        {
+          "fact_id": "F20",
+          "changed_projection_fields": [
+            "metric_gaps"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-cad604975f9f30adcb311c8e",
+            "fact_id": "F20",
+            "element": "customers_channels_markets",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "fact": {
+              "fact_id": "F20",
+              "text": "主营业务分地区：境内营业收入1,940,443,514千元、毛利率10.4%；境外营业收入141,698,297千元、毛利率2.8%，境外指除中国大陆以外的地区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "境内营业收入",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。"
+              },
+              {
+                "metric_index": 1,
+                "name": "境内毛利率",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。"
+              },
+              {
+                "metric_index": 2,
+                "name": "境外营业收入",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。"
+              },
+              {
+                "metric_index": 3,
+                "name": "境外毛利率",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。"
+              }
+            ],
+            "metric_source_indices": []
+          },
+          "after": {
+            "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+            "fact_id": "F20",
+            "element": "customers_channels_markets",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "fact": {
+              "fact_id": "F20",
+              "text": "主营业务分地区：境内营业收入1,940,443,514千元、毛利率10.4%；境外营业收入141,698,297千元、毛利率2.8%，境外指除中国大陆以外的地区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "境内营业收入",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+                "review_basis": "independent_and_model_source_check",
+                "model_finding_ids": [
+                  "R3"
+                ],
+                "model_reasons": [
+                  "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+                ]
+              },
+              {
+                "metric_index": 1,
+                "name": "境内毛利率",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+                "review_basis": "independent_and_model_source_check",
+                "model_finding_ids": [
+                  "R3"
+                ],
+                "model_reasons": [
+                  "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+                ]
+              },
+              {
+                "metric_index": 2,
+                "name": "境外营业收入",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+                "review_basis": "independent_and_model_source_check",
+                "model_finding_ids": [
+                  "R3"
+                ],
+                "model_reasons": [
+                  "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+                ]
+              },
+              {
+                "metric_index": 3,
+                "name": "境外毛利率",
+                "state": "withheld",
+                "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+                "review_basis": "independent_and_model_source_check",
+                "model_finding_ids": [
+                  "R3"
+                ],
+                "model_reasons": [
+                  "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+                ]
+              }
+            ],
+            "metric_source_indices": []
+          }
+        },
+        {
+          "fact_id": "F26",
+          "changed_projection_fields": [
+            "metric_gaps"
+          ],
+          "before": {
+            "reading_work_id": "bp-work-cad604975f9f30adcb311c8e",
+            "fact_id": "F26",
+            "element": "material_changes",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "原战略布局与该业务收入叙述有源，唯一指标错标集团范围，保正文而不输出该标准化指标。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F26",
+              "text": "公司落实《布局发展战略性新兴产业的指导性文件》，更新战略性新兴产业布局地图，2025年战略性新兴产业实现营业收入2,629亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "战略性新兴产业营业收入",
+                "state": "withheld",
+                "reason": "原战略布局与该业务收入叙述有源，唯一指标错标集团范围，保正文而不输出该标准化指标。"
+              }
+            ],
+            "metric_source_indices": []
+          },
+          "after": {
+            "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+            "fact_id": "F26",
+            "element": "material_changes",
+            "state": "limited",
+            "label": "保真限用／独立源核",
+            "review_basis": "independent_source_check",
+            "model_review_stage": null,
+            "reasons": [
+              "原战略布局与该业务收入叙述有源，唯一指标错标集团范围，保正文而不输出该标准化指标。",
+              "仅原有源描述及未受限指标可用；仍缺少可靠的受限指标，不构成完整数值覆盖。",
+              "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+            ],
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "fact": {
+              "fact_id": "F26",
+              "text": "公司落实《布局发展战略性新兴产业的指导性文件》，更新战略性新兴产业布局地图，2025年战略性新兴产业实现营业收入2,629亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "metric_gaps": [
+              {
+                "metric_index": 0,
+                "name": "战略性新兴产业营业收入",
+                "state": "withheld",
+                "reason": "原战略布局与该业务收入叙述有源，唯一指标错标集团范围，保正文而不输出该标准化指标。",
+                "review_basis": "independent_and_model_source_check",
+                "model_finding_ids": [
+                  "R5"
+                ],
+                "model_reasons": [
+                  "source-0002支持公司更新战略性新兴产业布局、2025年该产业实现营业收入2,629亿元的叙述。唯一结构化指标却把该交叉分类收入标为consolidated_group，宽于原文对象，不能当作集团整体收入。限制第0项，保留原叙述和原数字，不另给替换值。"
+                ]
+              }
+            ],
+            "metric_source_indices": []
+          }
+        }
+      ],
+      "comparison_is_API_projection_not_semantic_judgment": true
+    }
+  ],
+  "baseline_API_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/annual-api.json",
+  "newly_readable_items_include_original_seed_facts_previously_withheld": true
+}

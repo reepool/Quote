@@ -1,0 +1,2428 @@
+{
+  "companies": [
+    {
+      "instrument_id": "000338.SZ",
+      "formal_result_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/000338/executions/6fb-000338-source-review/result.json",
+      "result_state": "completed",
+      "actual_new_successor": true,
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-a5c5ab569526287c392a7482.json",
+      "runtime_sha256": "2c6e620081517323346a9ab043280816eea0945e5a64838e007fcbc75f65e1f5",
+      "workpaper_sha256": "e319490838aabe884eacabb98c706e3c31c26b758b0dcbbbbfc532ca9e0ad84c",
+      "review_status": "completed_with_open_findings",
+      "all_current_facts": [
+        {
+          "element": "business_structure",
+          "fact_id": "F-BS-01",
+          "fact_sha256": "00714acc750e93aabb223e8bd524e625200513584f95ce5115b2e77278aa27b6",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "business_structure",
+          "fact_id": "F-BS-02",
+          "fact_sha256": "bc5500549dce70f656d5b6617ed0d690f46f8e4ffaf76de91509c1614e772bb4",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "business_structure",
+          "fact_id": "F-BS-03",
+          "fact_sha256": "2a0d83520014ee9704af8f21a455f6a23997c9c070c76682918c2673713d6fde",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": [
+            "发动机标准生产能力"
+          ]
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F-PS-01",
+          "fact_sha256": "b01e1691ae66cde837a4392291b7a1d7dc4b7284768cf7e811ae9d50af57b0b8",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F-PS-02",
+          "fact_sha256": "42d2e6e804081712c06cfd6a3d87253713458d2d441635bebcd2035821e122fc",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "陕重汽整车销量",
+            "陕重汽国内整车销量",
+            "陕重汽整车出口量",
+            "陕重汽新能源市场份额同比增减"
+          ]
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F-PS-03",
+          "fact_sha256": "c28d2a79d6dde0475f6aa91015f79bf83dfa67f8ecab62ee3515c530f3233702",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "节能型农机综合油耗降幅"
+          ]
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F-PS-04",
+          "fact_sha256": "c20f6c5981ab6c2fbe4bf7a1e23b8dd4ff9da6eff27e003e23783747688762b0",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F-PS-06",
+          "fact_sha256": "55dd081613b1c0fc7c43c0cc9f485954a5ba475f5303641e093a9d14671c7ed6",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "metric_names": [
+            "动力电池电量覆盖下限",
+            "动力电池电量覆盖上限"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-01",
+          "fact_sha256": "8a4b926c95a8b862bd40d5c1d71453a6eb0441efc1d9946cc30cf4425e620cdd",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "metric_names": [
+            "营业收入合计"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-02",
+          "fact_sha256": "d7fc795142e00fd7e37276cee87c578b822158a5b8376246e13d40d12d432275",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": [
+            "动力总成、整车整机及关键零部件营业收入",
+            "其他零部件营业收入",
+            "智慧物流营业收入",
+            "农业装备营业收入",
+            "其他营业收入"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-03",
+          "fact_sha256": "21d0f4acffe5929b6a433ae5e685d8fd28381b06904bbf78f7bdb658a526ce6f",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": [
+            "交通运输设备制造业营业收入",
+            "专用设备制造业营业收入"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-04",
+          "fact_sha256": "24b3c472ff72a1bb4f55a0a438ed809bf3f1b9526d794a4375e8ba9fd296eb52",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": [
+            "国内营业收入",
+            "国外营业收入"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-05",
+          "fact_sha256": "5eb3a5d92e015189194b69085a08573c8f728b0e12d464b1615bbfd300517a24",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": [
+            "直销营业收入",
+            "经销营业收入",
+            "分销营业收入"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-06",
+          "fact_sha256": "1e5aa2f9c811252a68268ce85260f8f760a78e8af73e6f8decf383d2cb5f7675",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "physical_pages": [
+            158
+          ],
+          "metric_names": [
+            "主营业务收入-销售商品及其他",
+            "主营业务收入-叉车生产及销售、仓库技术收入",
+            "主营业务收入-供应链解决方案收入",
+            "主营业务收入-农业装备",
+            "主营业务收入小计"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F-SM-01",
+          "fact_sha256": "6a8dfe0c54e98264da55bb1b65917b98a26dd9cfa5f8fef4626f0a6ae66fed67",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "metric_names": [
+            "发动机销售量",
+            "发动机出口量",
+            "汉德车桥销售量",
+            "法士特变速箱销售量"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F-SM-02",
+          "fact_sha256": "1e56e54f29690ffbd4ee9ea2e3f306623693f56c47965df9ff2d084edb98c896",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "metric_names": [
+            "三电业务收入",
+            "电池销量同比增减",
+            "自主电机销量同比增减",
+            "自主电机控制器销量同比增减"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F-SM-03",
+          "fact_sha256": "3333c06ba568059c7e561de82e478306aaa7a3c6b138ed846b10a28febb0ab10",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "凯傲集团收入",
+            "凯傲叉车业务收入",
+            "凯傲供应链解决方案业务销售收入"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F-SM-04",
+          "fact_sha256": "28293905f6722dc258aea6b752e8acbacc44d79c0a59a90ac0a114589ed832e3",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "physical_pages": [
+            26
+          ],
+          "metric_names": [
+            "KION Group AG营业收入",
+            "KION Group AG净利润",
+            "陕西重型汽车有限公司营业收入",
+            "陕西重型汽车有限公司净利润",
+            "陕西法士特齿轮有限责任公司营业收入",
+            "陕西法士特齿轮有限责任公司净利润",
+            "潍柴雷沃智慧农业股份有限公司营业收入",
+            "潍柴雷沃智慧农业股份有限公司净利润"
+          ]
+        },
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F-OI-01",
+          "fact_sha256": "8fe6f3cd74111a6d279a56616ad0c5b50b3946231ffdf3d0b02be9b441065c60",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F-OI-02",
+          "fact_sha256": "8b658811e10c4cb2a0102d3cfc17d0572443a5a4486c4823766fd9bdbb208731",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "metric_names": [
+            "前五名供应商合计采购金额",
+            "前五名供应商中关联方采购额占年度采购总额比例"
+          ]
+        },
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F-OI-03",
+          "fact_sha256": "de8464b83209aa1c52dd1bce53b206b8a2cd214dc58f8d37c58f0d6456240d65",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "physical_pages": [
+            20
+          ],
+          "metric_names": [
+            "研发费用",
+            "管理费用"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CC-02",
+          "fact_sha256": "88b689e4059896d29b2703d0782473242be3da54e5fb3e8587c8d2c23461503b",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "metric_names": [
+            "前五名客户合计销售金额",
+            "前五名客户中关联方销售额占年度销售总额比例",
+            "第一大客户山东重工销售额"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CC-03",
+          "fact_sha256": "a6cf4cb6e4bdbd710fecb117c4c4d7da3b6406a9f997c55d29244c83cfba3c1a",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-01",
+          "fact_sha256": "db81833fd12c5a73ac9752e16489e8e6747cd675c413aa3ecaff3b37fe5e87d9",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-02",
+          "fact_sha256": "4737d30cb37de256afd57f48f7a97b459017c3a910eb4e748c2789ce61dd248f",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "metric_names": [
+            "PSI公司发电类产品收入贡献占比"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-03",
+          "fact_sha256": "dc43e16791a485fdca7fbbdd05d3f8e1461b6a05d99ed30a9fcfcbaf25452176",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "metric_names": [
+            "申请专利数",
+            "获授权专利数"
+          ]
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F-MC-01",
+          "fact_sha256": "95f5a6c4259cf3480f7299c57fc2ab745392e93f2c804edc7c21e391177eb27f",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F-MC-02",
+          "fact_sha256": "379d400a6fcc982eea0f7e1bd7eadbaca45204206553823ea087be243ab05ff9",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F-MC-03",
+          "fact_sha256": "dcc9689d9bf97f77d6b551bf958398fb53af03ea6aee4e68d3ea43916ce0ecda",
+          "evidence_ids": [
+            "source-0004",
+            "source-0002"
+          ],
+          "physical_pages": [
+            13,
+            14
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "position",
+          "fact_id": "F-SC-P1",
+          "fact_sha256": "fbfe57d7616b8073bc1706dcf3de25a9fe22ce8cefb14014ecb60555ec9b2680",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "upstream_inputs",
+          "fact_id": "F-SC-U1",
+          "fact_sha256": "95116a6cf5afe055ebd69cf4b76742436fc6ce3e9c33b43116e340a3cdb82b8a",
+          "evidence_ids": [
+            "source-0001",
+            "source-0011"
+          ],
+          "physical_pages": [
+            12,
+            19
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "downstream_customers",
+          "fact_id": "F-SC-D1",
+          "fact_sha256": "a3be88878b2ba8d875dcc90f662382efb79ef8e2183e65f4263b62620655337a",
+          "evidence_ids": [
+            "source-0001",
+            "source-0010"
+          ],
+          "physical_pages": [
+            12,
+            19
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-CF-01",
+          "fact_sha256": "716b6b34e6b92a3207b388f0a17ee4c2445f7dd3fa690b1152d15f93e8f9e26b",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-CF-02",
+          "fact_sha256": "027fb1c40002e75da6a75562561d4ccf567d598747c0d87bb1913341bb317d1f",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "WR-MC-02",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "affected_fact_id": "F-MC-02",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "原文仅对“公司报告期内业务、产品或服务发生重大变化或调整有关情况”勾选不适用。不适用只是披露项适用性标记，不能单独证明经济上未发生重大变化或调整。底稿主句写成“未发生重大变化或调整”，超出了勾选标记所能支持的范围。应改述为该披露项标注为不适用，不得表述为未发生重大变化；其他已支持事实不必删除。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F-MC-02",
+            "text": "公司报告期内业务、产品或服务未发生重大变化或调整（该披露项标注为不适用）。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F-MC-02",
+            "text": "公司报告期内业务、产品或服务发生重大变化或调整有关情况披露项标注为不适用。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "WR-BS-03",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F-BS-03",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "叙述整体有原文支持：潍柴动力发动机板块在国内有潍坊、扬州、重庆三大基地，发动机标准生产能力为102万台/年，并正在实施兼容性改造和局部工序能力提升。不可靠的只是原指标数组索引0“发动机标准生产能力”：其subject_scope标为consolidated_group，但原文对象是发动机板块，不是集团全部业务的产能。限制该指标独立使用；不改写已支持叙述，也不另给替换数值或范围标签。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "F-BS-03",
+            "text": "潍柴动力发动机板块在国内主要有潍坊、扬州、重庆三大生产基地，发动机标准生产能力为102万台/年，并正实施生产线兼容性改造和局部工序能力提升项目。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "发动机标准生产能力",
+                "raw_value": "102",
+                "value": "102",
+                "unit": "万台/年",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "2a0d83520014ee9704af8f21a455f6a23997c9c070c76682918c2673713d6fde",
+            "narrative_supported": true,
+            "metric_indices": [
+              0
+            ]
+          }
+        },
+        {
+          "finding_id": "WR-SM-02",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F-SM-02",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "F-SM-02",
+            "text": "“三电”业务实现收入30.4亿元、翻番增长，其中电池销量同比增长162%，自主电机销量同比增长219%，自主电机控制器销量同比增长56%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "三电业务收入",
+                "raw_value": "30.4",
+                "value": "30.4",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "翻番增长",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "电池销量同比增减",
+                "raw_value": "162",
+                "value": "162",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自主电机销量同比增减",
+                "raw_value": "219",
+                "value": "219",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自主电机控制器销量同比增减",
+                "raw_value": "56",
+                "value": "56",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "1e56e54f29690ffbd4ee9ea2e3f306623693f56c47965df9ff2d084edb98c896",
+            "narrative_supported": true,
+            "metric_indices": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "finding_id": "WR-OD-02",
+          "element": "operating_drivers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F-OD-02",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "数据中心备用电源销量同比增长259%，以及美国PSI公司发电类产品收入贡献占比81%，均有原文支持，应保留。但M系列大缸径发动机“收入同比增长65%”在原文中以“其中”承接数据中心备用电源，并同时说明全年销量首次突破1万台、同比增长32%。底稿将其与公司层面指标并列，未保留该限定，主体偏宽。应保留已支持核心内容，把65%限定回数据中心备用电源项下的M系列，或补上“其中”及销量口径，不要写成未限定范围的全部M系列收入增长。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F-OD-02",
+            "text": "公司紧抓人工智能浪潮带来的电力需求增长机遇，2025年数据中心备用电源销量同比增长259%，M系列大缸径发动机收入同比增长65%，美国PSI公司发电类产品收入贡献占比达81%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "PSI公司发电类产品收入贡献占比",
+                "raw_value": "81",
+                "value": "81",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F-OD-02",
+            "text": "公司紧抓人工智能浪潮带来的电力需求增长机遇，2025年数据中心备用电源销量同比增长259%；其中，M系列大缸径发动机全年销量首次突破1万台、同比增长32%，收入同比增长65%；美国PSI公司发电类产品收入贡献占比达81%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "PSI公司发电类产品收入贡献占比",
+                "raw_value": "81",
+                "value": "81",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        }
+      ],
+      "original_source_and_clean_seed_verified": "live-request-verification.json",
+      "receipts_root": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/000338/executions/6fb-000338-source-review/receipts"
+    },
+    {
+      "instrument_id": "600859.SH",
+      "formal_result_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600859/executions/6fb-600859-source-review/result.json",
+      "result_state": "completed",
+      "actual_new_successor": true,
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-512bcf3ad6b3e44af3089b56.json",
+      "runtime_sha256": "d47e432e94edaaecf91bed82f668297cd62ae336aac9bfe5ed40cac4f750c85e",
+      "workpaper_sha256": "8ec4ea844b584f23ec10aa306e411f882f9a8857bcc8d3d2a5810e9f8c2e04c8",
+      "review_status": "completed_with_open_findings",
+      "all_current_facts": [
+        {
+          "element": "business_structure",
+          "fact_id": "F02",
+          "fact_sha256": "55794716ea04f315d12adde5adea265d9d6400a526bda5108601be5564f6ede3",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "business_structure",
+          "fact_id": "F03",
+          "fact_sha256": "7b6c123e7ac3dba33b20df075d813ee5d72118048bb1a0ec96cf23459ddedc32",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "physical_pages": [
+            11,
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "business_structure",
+          "fact_id": "F04",
+          "fact_sha256": "6af1ba49fd25a5f50e978f0110ba99330ba125dbacd2ab472f0d32dfd7f6b6ea",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "business_structure",
+          "fact_id": "F06",
+          "fact_sha256": "e158843efbd8308359b62c9bad61ebc012e93bff042378209d8930d305f1a7de",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F07",
+          "fact_sha256": "d7cb12b59213304e11e708f87f24837c92b6c1bad4e52922a8e70fcb4e00f8fc",
+          "evidence_ids": [
+            "source-0001",
+            "source-0004"
+          ],
+          "physical_pages": [
+            11,
+            14
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F08",
+          "fact_sha256": "01aea7032efd7ddc4273a489e3ecce680bdb736ec039eeebaa00fb096b920b84",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F09",
+          "fact_sha256": "c86890b5360ef01baffc05e2db444dbf15b2f6c1899f3007608eee67264d4748",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "physical_pages": [
+            11,
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F10",
+          "fact_sha256": "d49b737142b15dc48e5c86a27bafe02570840078279fe60ebf9dd6700c097237",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": [
+            "线上销售额"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F11",
+          "fact_sha256": "5e6658404d7303b4483ac754df88529f69fdbddcc1e4f3c4d4ac3656c70c49e4",
+          "evidence_ids": [
+            "source-0001",
+            "source-0010"
+          ],
+          "physical_pages": [
+            11,
+            18
+          ],
+          "metric_names": [
+            "商品零售营业收入",
+            "商品零售营业收入占比",
+            "租赁营业收入",
+            "租赁营业收入占比"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F12",
+          "fact_sha256": "b45f623078a250af0e2544b21e1e615d4b014b7c0f56bafcda1f660d10f202bc",
+          "evidence_ids": [
+            "source-0010",
+            "source-0011"
+          ],
+          "physical_pages": [
+            18,
+            19
+          ],
+          "metric_names": [
+            "百货业态营业收入",
+            "百货业态毛利率",
+            "百货业态营业收入占比",
+            "购物中心业态营业收入",
+            "购物中心业态毛利率",
+            "购物中心业态营业收入占比",
+            "奥特莱斯业态营业收入",
+            "奥特莱斯业态毛利率",
+            "奥特莱斯业态营业收入占比",
+            "专业店业态营业收入",
+            "专业店业态毛利率",
+            "专业店业态营业收入占比",
+            "免税业态营业收入",
+            "免税业态毛利率",
+            "免税业态营业收入占比"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F14",
+          "fact_sha256": "d26afeaf809dda3c6559cead0dca4229b1db9661b50813119757a1cc83ffa14f",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": [
+            "归属于上市公司股东的净利润"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F15",
+          "fact_sha256": "09d525c282282ea4cb31aedd7fc7fa574534c4fbffe1b91b7e982ef49af05c23",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "physical_pages": [
+            18
+          ],
+          "metric_names": [
+            "华北地区营业收入",
+            "华北地区毛利率",
+            "华中地区营业收入",
+            "华南地区营业收入",
+            "华南地区毛利率",
+            "西南地区营业收入",
+            "西北地区营业收入",
+            "华东地区营业收入",
+            "东北地区营业收入",
+            "东北地区毛利率"
+          ]
+        },
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F17",
+          "fact_sha256": "7f7e814a967c07273f4d0eaaeb77608daa2df017f3e0d87e46c09734d186ca83",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "physical_pages": [
+            20
+          ],
+          "metric_names": [
+            "百货商品采购成本",
+            "百货物业成本",
+            "购物中心商品采购成本",
+            "购物中心物业成本",
+            "奥特莱斯商品采购成本",
+            "奥特莱斯物业成本",
+            "专业店商品采购成本",
+            "免税商品采购成本"
+          ]
+        },
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F18",
+          "fact_sha256": "5c16b740308142035dd85007a83867f726f33d5842797b41a54855aee2b86959",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "physical_pages": [
+            27
+          ],
+          "metric_names": [
+            "新开门店家数",
+            "新开门店建筑面积",
+            "关闭门店家数",
+            "关闭门店建筑面积"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F19",
+          "fact_sha256": "c756f2bb4c8adfa1c2cbe20dc913968714cfe51ff31153e4d97c34d8297bccc4",
+          "evidence_ids": [
+            "source-0001",
+            "source-0009"
+          ],
+          "physical_pages": [
+            11,
+            18
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F20",
+          "fact_sha256": "fd619df75539c6377ac19d34d3d0384c9f6d6320ad7dc1563b6e9bb9467ce752",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "metric_names": [
+            "客流同店同比增减",
+            "购物中心客流同店同比增减",
+            "奥特莱斯客流同比增减"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F21",
+          "fact_sha256": "ab7e29bdb7eefe44516130bb9b64fad2a3479ae4c02c3a035bd14d0ab134540a",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "metric_names": [
+            "前五类商品销售占总销比重"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F22",
+          "fact_sha256": "1dd265cb2797b14029000001c1a8cf21966968ec480d416eed7009f7ccb427b4",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "metric_names": [
+            "离境退税开单笔数",
+            "离境退税业务量同比增减",
+            "离境退税商店数量",
+            "“即买即退”商店数量"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F23",
+          "fact_sha256": "9228e3a6cc3c9420223685cdb72d7d077ac99ec08560c9ca25452e00abe8d3a5",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            19
+          ],
+          "metric_names": [
+            "奥特莱斯业态营业收入同比增减",
+            "购物中心业态营业收入同比增减",
+            "百货业态营业收入同比增减",
+            "专业店业态营业收入同比增减",
+            "免税业态营业收入同比增减"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F24",
+          "fact_sha256": "ffef4f1f10f7063b356c6a7c1f8546269d0f15c5adc5ff9975c5f3a8e4972b71",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F25",
+          "fact_sha256": "945e9e1005d772bd2b1e12d68e20ab18da3a33188a2f719dece99ce17926b995",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005"
+          ],
+          "physical_pages": [
+            14,
+            15
+          ],
+          "metric_names": [
+            "奥莱业态品牌调整数量",
+            "奥莱业态品牌调整占比",
+            "奥莱业态进新品牌数量",
+            "奥莱业态首店数量",
+            "门店新进品牌数量",
+            "首店品牌数量",
+            "首店品牌占新进品牌面积比"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F26",
+          "fact_sha256": "667596a576ab28b79ef3d7f84adae7ffe90154f8f998fc3e6fe67a7243bdcb0d",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "metric_names": [
+            "线上商城累计会员数",
+            "全年累计直播场次",
+            "抖音电子券核销额同比增减",
+            "智慧物业平台覆盖门店数"
+          ]
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F28",
+          "fact_sha256": "41f386987423db67b282287f0868f1ea8b8d0836bde81ee9a588cd3a4463be45",
+          "evidence_ids": [
+            "source-0017",
+            "source-0018"
+          ],
+          "physical_pages": [
+            27,
+            28
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F29",
+          "fact_sha256": "38ffbd772dc772d4f422736d00e2f0032dd7b31d7b9216397c27f50d48d45b93",
+          "evidence_ids": [
+            "source-0018"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F30",
+          "fact_sha256": "ded7435a02174b23ad0789b87070086f37edbca4ce8c67e59eab6966d661f172",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            12
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F31",
+          "fact_sha256": "afc33ca93dc569318fb233d4696ee0511fe4b66c5909f4be031ec1e492487a76",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "喜悦购物中心客流同比增减"
+          ]
+        },
+        {
+          "element": "position",
+          "fact_id": "F32",
+          "fact_sha256": "f8abe19ec10e60f0f30ea16a961140db57c49be1c35df190d2535ff1bb0c1ef8",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "upstream_inputs",
+          "fact_id": "F33",
+          "fact_sha256": "4f6831df3a9fc3a0e1d7de87ab05b9448544d4e7e56ae1886c720b411327eb06",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "physical_pages": [
+            20
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "downstream_customers",
+          "fact_id": "F34",
+          "fact_sha256": "d758f2195933e98b81628302b927f3f7ff12979d06e5f0fb17092129315bc7ff",
+          "evidence_ids": [
+            "source-0002",
+            "source-0006",
+            "source-0011"
+          ],
+          "physical_pages": [
+            12,
+            16,
+            19
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F35",
+          "fact_sha256": "4fc276ad22149a662ebd9136040ca403fd3530f210355f9ec13619a882a254fa",
+          "evidence_ids": [
+            "source-0001",
+            "source-0006"
+          ],
+          "physical_pages": [
+            11,
+            16
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F36",
+          "fact_sha256": "828d3a58ea9ade15b8dcfa011a3e4ec256dfdb20c1f3592952cbaac28eb757db",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": []
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "R1",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "源文明示报告期内公司实现营业收入101.50亿元（利润表10,149,906,153.24元），同比下降10.74%；剔除门店变动因素后，同店/营业收入同店同比下降3.75%。底稿规模部分只有归母净利润-0.40亿元。分销售模式两行金额虽可加总还原101.50亿元，但同比和同店口径无法由此推出，业态或区域分项也不能代替公司收入总额。缺少合并收入规模及下滑幅度，会改变对当期经营规模和业绩压力的理解。应单独补充该合并口径收入、同比及同店变动，不要与业态收入或内部抵消前分项混成一条。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "R2",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "源文明示营业成本62.10亿元（6,210,006,825.01元），同比下降8.74%。现有分业态商品采购成本、物业成本与合并营业成本不是同一会计口径，加总也不能代替公司营业成本。该总额有助于理解收入降幅与成本降幅的差异，但业态毛利率已有支持，属于补充性遗漏，建议单独列示，不据此否定已支持的分业态成本。",
+          "resolution": "omission_candidate",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "R3",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "affected_fact_id": "F01",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0007"
+          ],
+          "explanation": "F01按source-0001将期末免税门店写成口岸2家、市内2家、离岛1家。source-0002写期末离岛1家、口岸1家、市内2家，source-0007又称已开业5家免税门店。三处均有原文，不能择一改数。请仅对免税门店数量人工核对并加注冲突；78家大型综合有税零售门店、37个城市、333家专业店及商品销售与租金收入来源仍有source-0001支持，不应整段作废。须与F05、F24一并阅读。",
+          "resolution": "quarantined",
+          "original_fact": {
+            "fact_id": "F01",
+            "text": "公司营业收入主要来自旗下各门店的商品销售收入以及租金收入；截至报告期末在全国七大经济区域37个城市共运营78家大型综合有税零售门店，涉及奥特莱斯、购物中心、百货业态，同时管理运营2家口岸免税店、2家市内免税店及1家离岛免税门店，并涉及专业店及线上业务，共有各类专业店333家。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null
+        },
+        {
+          "finding_id": "R4",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "affected_fact_id": "F05",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0007",
+            "source-0016"
+          ],
+          "explanation": "F05将期末免税门店写成离岛1家、口岸1家、市内2家，与source-0001的口岸2家及source-0007的已开业5家冲突，不能自动改成其中任一数字。另，F05称王府井国际免税港2023年1月对外营业，而source-0016门店表开业时间为2022年7月，同一项目日期不一致，也不能自动改日期。免税业务定义和2020年6月取得资质有source-0002支持，应保留；期末家数与首店日期需人工并列原文并标不确定。",
+          "resolution": "quarantined",
+          "original_fact": {
+            "fact_id": "F05",
+            "text": "免税业务向特定消费者销售免征关税、进口环节税的进口商品和实行退（免）税进入免税店销售的国产商品，商品主要包括香化、烟酒、食品、精品等品类；渠道包括口岸店、海南离岛店、市内店等。公司于2020年6月取得免税品经营资质，2023年1月首个免税项目王府井国际免税港对外营业。截至报告期末共拥有离岛免税店1家、口岸免税店1家、市内免税店2家。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null
+        },
+        {
+          "finding_id": "R5",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_period",
+          "affected_fact_id": "F30",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "报告期内哈尔滨机场王府井免税店以及武汉、长沙市内免税店对外营业，有source-0002支持，可保留。但王府井免税北京首都机场T2航站楼免税店是2026年2月对外营业，属于报告期后事项，事实期间却标为2025年度。应把该句从2025年度经营结果中拆出并标明期后，不得视为2025年已实现开业。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F30",
+            "text": "报告期内哈尔滨机场王府井免税店、武汉、长沙市内免税店对外营业，实现了免税主要业务类型全覆盖；2026年2月公司旗下王府井免税北京首都机场T2航站楼免税店对外营业。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F30",
+            "text": "报告期内哈尔滨机场王府井免税店、武汉、长沙市内免税店对外营业，实现了免税主要业务类型全覆盖。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "R6",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F31",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "叙述整体有source-0005支持：友谊商店改造后空置率由高位降至零、客流提升数十倍，喜悦购物中心客流同比增长超15%。不可靠的是原始指标第1项（索引0）把该增幅的subject_scope标成named_subsidiary。原文只点名喜悦购物中心这一门店/项目，未将其界定为法律子公司，不能把超15%当作子公司整体指标独立使用。不改写叙述，也不替换数值或范围标签。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "F31",
+            "text": "友谊商店完成改造，将废弃露天空场和砖瓦房改造为“友谊花园”院落式商业空间，改造后空置率由高位降至零，客流提升数十倍；喜悦购物中心聚焦文创、IP、文娱、演艺等新生活方式业态，客流同比增长超15%。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "喜悦购物中心客流同比增减",
+                "raw_value": "超15",
+                "value": "15",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "greater_than",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "afc33ca93dc569318fb233d4696ee0511fe4b66c5909f4be031ec1e492487a76",
+            "narrative_supported": true,
+            "metric_indices": [
+              0
+            ]
+          }
+        }
+      ],
+      "original_source_and_clean_seed_verified": "live-request-verification.json",
+      "receipts_root": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600859/executions/6fb-600859-source-review/receipts"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "formal_result_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600015/executions/6fb-600015-source-review/result.json",
+      "result_state": "completed",
+      "actual_new_successor": true,
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-e686d859a2cafd7acc9ab1e4.json",
+      "runtime_sha256": "3f80ded3f44828d4111c97cc2ce8b23f9ce6ced4465c7c10a2bd6485ba9d0f19",
+      "workpaper_sha256": "f7bedb64c1d7e8b68f306004dd7838c91ff033646499ffeaaaea8af18dc3194b",
+      "review_status": "completed_with_open_findings",
+      "all_current_facts": [
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-CUST-TOTAL",
+          "fact_sha256": "1c63b5e9b007e138054000b0dbc47dfa5026af4fded864248e2b264293166000",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": [
+            "零售客户总数[注4]"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-PRIVATE-CUST",
+          "fact_sha256": "aa25f24f0e0f5c4c97e88b28bece79735676aa3482db3a7d349cdfb01bee2f02",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": [
+            "私人银行客户[注5]",
+            "私人银行客户[注5]比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-ACQUIRING-CUST",
+          "fact_sha256": "f829ca839318b269f1351dd0246a8f501dee10e0826844cb3cd6095087dbbbbe",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": [
+            "收单支付客户",
+            "收单支付客户比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CREDIT-CARD-ISSUED",
+          "fact_sha256": "3881196950de8c7e7bb736859230f35baf5ea7f1ea11e2ca27d02ebc890297ac",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "信用卡累计发卡",
+            "信用卡累计发卡比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CREDIT-CARD-APP-USERS",
+          "fact_sha256": "e7126b754b6beff4ecd62f2773d8e7d2db6bfd7a94b58528295aa4115c41d890",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "信用卡华彩生活APP注册用户",
+            "信用卡华彩生活APP注册用户比上年末增长率",
+            "信用卡华彩生活APP月活跃用户（MAU）",
+            "信用卡华彩生活APP月活跃用户（MAU）同比变动率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-MOBILE-BANK-USERS",
+          "fact_sha256": "cf914a81b53ee907a5232d2a4c5d65bc0ed74b119cc73b6de66fc8ffb465a9f1",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "手机银行签约客户",
+            "手机银行签约客户比上年末增长率",
+            "手机银行月活跃用户（MAU）",
+            "手机银行月活跃用户（MAU）同比增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-AUM",
+          "fact_sha256": "aad742c78d107ecb8d8dc495bf185c8b0cac30d65d9a977175033405da60d65a",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": [
+            "个人客户金融资产总量",
+            "个人客户金融资产总量比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-PERSONAL-DEPOSIT-BALANCE",
+          "fact_sha256": "e4c5d105e1377f7b4a11613b7aed03bbf97158d1f1fc42c0f64e1c7f3a543135",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": [
+            "个人存款余额",
+            "个人存款余额比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-WEALTH-FEE-INCOME",
+          "fact_sha256": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": [
+            "财富管理手续费及佣金收入",
+            "财富管理手续费及佣金收入同比增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CREDIT-CARD-REVENUE",
+          "fact_sha256": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "信用卡业务收入",
+            "信用卡业务收入同比变动率"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "OM-CONSUMER-CREDIT-CUST",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "定向问题要求补齐零售客户类别、数量、期间、计量单位并区分脚注。原文与私人银行客户、收单支付客户同一句披露：截至报告期末，消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6载明口径为非平台类消费信贷客户。已采用事实未包含该类别及脚注。隔离说明称变动率未见于引文，与原文不符，不能据此省略。应补记报告期末户数、下降幅度及脚注口径，下降不得记为未披露或零。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OM-PERSONAL-LOAN-SCALE",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "定向问题包含零售相关经营规模。原文披露截至报告期末本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。已采用事实有个人存款与金融资产，但缺少上述贷款规模。隔离说明与source-0008不符。总额与其中项应一并按期末余额、亿元及各自增减方向补记，不得把下降写成缺失。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OM-CC-LOAN-BALANCE",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "定向问题要求补充零售相关经营规模。原文披露截至报告期末本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。已采用事实仅有累计发卡与业务收入，未含该期末贷款存量。隔离说明称变动率未见于引文，与原文不符。应单独按报告期末、亿元及下降方向补记，不得与报告期内交易额或收入混为同一比较基础。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OM-CC-TXN-VOLUME",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "原文另披露报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。该数为报告期内流量，比较基础为同比，与期末信用卡贷款余额的存量口径不同，已采用事实未包含。应单独补记期间、亿元及下降方向，不得因同属信用卡业务而并入贷款余额或把下降记为未披露。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        }
+      ],
+      "original_source_and_clean_seed_verified": "live-request-verification.json",
+      "receipts_root": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600015/executions/6fb-600015-source-review/receipts"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "formal_result_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/601668/executions/6fb-601668-source-review/result.json",
+      "result_state": "completed",
+      "actual_new_successor": true,
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ab8677d04a366e40efdf18c2.json",
+      "runtime_sha256": "aa4227d5bc6141b0735de20f81142849acad40eb52709459d3ae6312d2f0453b",
+      "workpaper_sha256": "f206669f68d33d131e5274bba905c6c2c92e290cc1c956c28a32f964641f12ed",
+      "review_status": "completed_with_open_findings",
+      "all_current_facts": [
+        {
+          "element": "business_structure",
+          "fact_id": "F01",
+          "fact_sha256": "7f6194c3d825f99908722866ec67a3ac298c86b204abfa63b45d9b4a932ecba7",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "business_structure",
+          "fact_id": "F02",
+          "fact_sha256": "8c765889e360b8eb8b60c3af9881b9632d5231b8dceb13b625d85e6d57be6e52",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "business_structure",
+          "fact_id": "F03",
+          "fact_sha256": "68c560e5477f15f120cf661f338a84f7525366e36235dda3c339fbee2d375914",
+          "evidence_ids": [
+            "source-0007",
+            "source-0009"
+          ],
+          "physical_pages": [
+            33
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F04",
+          "fact_sha256": "21623ad9f9a75d8e12184336ac622b8f3bad11b06259c87b9cfa3789c8f56dc4",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "metric_names": [
+            "房屋建筑工程新签合同额",
+            "房屋建筑累计施工面积",
+            "房屋建筑累计新开工面积",
+            "房屋建筑累计竣工面积"
+          ]
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F05",
+          "fact_sha256": "cac1bf1684136e0710f6d5c3ba9e387a7ae9934fce0e52129d2d01eaaa11d385",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "metric_names": [
+            "基础设施新签合同额",
+            "基础设施国内新签道路",
+            "基础设施国内新签面积"
+          ]
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F06",
+          "fact_sha256": "b9d9926110f17ef2979096feb578cc172b12b62dfc78fe4dacc40019dd74a5e9",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "metric_names": [
+            "勘察设计新签合同额"
+          ]
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F07",
+          "fact_sha256": "3e3c8a5b9cf14929c4f8d342de62e3b11abc8cc98770b596c0a5c448c9b1503d",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "physical_pages": [
+            28
+          ],
+          "metric_names": [
+            "房地产业务合约销售额",
+            "房地产业务合约销售面积",
+            "房地产业务平均售价",
+            "中海地产合约销售额",
+            "中海地产合约销售面积"
+          ]
+        },
+        {
+          "element": "products_services",
+          "fact_id": "F08",
+          "fact_sha256": "0b29819043f25932a6eb1a966a611ff3c6e1006ee183ee2c5ec890d2d9e85321",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "physical_pages": [
+            51
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F09",
+          "fact_sha256": "9a058149c942e4be44ace93b70959f9b55b65b0a2ccff80a308e514386df5f2d",
+          "evidence_ids": [
+            "source-0005",
+            "source-0006"
+          ],
+          "physical_pages": [
+            32,
+            33
+          ],
+          "metric_names": [
+            "营业收入",
+            "营业成本",
+            "毛利润",
+            "毛利率"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F10",
+          "fact_sha256": "ec9956253d33ef8fa0cea5d37b290fca8b2aa31cce85f023e39e1ab4b5e19d5a",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            33
+          ],
+          "metric_names": [
+            "房屋建筑工程营业收入",
+            "房屋建筑工程毛利率",
+            "基础设施建设与投资营业收入",
+            "基础设施建设与投资毛利率",
+            "房地产开发与投资营业收入",
+            "房地产开发与投资毛利率",
+            "勘察设计营业收入",
+            "勘察设计毛利率",
+            "其他营业收入",
+            "其他毛利率"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F11",
+          "fact_sha256": "4fb088c9c05234bdf1278e80b396d9aa87f7e0357de10ea5b794a2334cf3b5b2",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "physical_pages": [
+            33
+          ],
+          "metric_names": [
+            "分部间抵销营业收入",
+            "分部间抵销营业成本"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F12",
+          "fact_sha256": "f9963e6f3b74bf16024206b1e190b7bb4ade2f7fc3012cc444f029122c94075f",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            277
+          ],
+          "metric_names": [
+            "主营业务收入-在某一时点转让",
+            "主营业务收入-在某一时段内转让",
+            "主营业务收入-租赁收入",
+            "其他业务收入"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F13",
+          "fact_sha256": "7c8dc68d6af4a3bb6bf04e52d7982c71c1bf6251d33f3f451bc1031928abd607",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "metric_names": [
+            "新签合同额",
+            "营业收入",
+            "归属于上市公司股东的净利润",
+            "经营性净现金流"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F14",
+          "fact_sha256": "874e65e93e351fa6155498fcf0fabb9b05a4dbc7b1fab4a673a1ea30efecdffa",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "physical_pages": [
+            33
+          ],
+          "metric_names": [
+            "房屋建筑工程营业收入占比",
+            "基础设施建设与投资营业收入占比",
+            "房地产开发与投资营业收入占比",
+            "勘察设计营业收入占比",
+            "其他营业收入占比",
+            "分部间抵销营业收入占比"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F15",
+          "fact_sha256": "03e14d6e992e7b22e2a72ef41c6fcf3092562bb7ec1e04ddb8834b15a9a3c93c",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "metric_names": [
+            "建筑业务新签合同额",
+            "战略性新兴产业营业收入"
+          ]
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "F16",
+          "fact_sha256": "af98e1e91a42d68aacf869fb7d8aa42328e2b30a0cee737a376cd36eb6b45539",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "physical_pages": [
+            51
+          ],
+          "metric_names": [
+            "专业板块新签合同额",
+            "专业板块营业收入",
+            "专业板块毛利",
+            "专业板块营业利润"
+          ]
+        },
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F17",
+          "fact_sha256": "02f9976ab1e010ccb13ec84da71c0be339772326675fa3078edf3e7d2b4375f2",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F18",
+          "fact_sha256": "951746a855d5ab261128b029ddbc99d7a7047034cfd6d57ad8706090138edf8f",
+          "evidence_ids": [
+            "source-0002",
+            "source-0004"
+          ],
+          "physical_pages": [
+            22,
+            28
+          ],
+          "metric_names": [
+            "购置土地储备（全额数）",
+            "期末土地储备（全额数）",
+            "中海地产期末土地储备（全额数）"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F19",
+          "fact_sha256": "2fc8cf2a15f82885ec0de9fe90daba53f41314cd3b81071033e36e61ac34e934",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "metric_names": [
+            "重点区域新签合同额占比",
+            "重点区域完成投资额占比"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F20",
+          "fact_sha256": "451dfb6716341c8152733463d1405cc0aff342b7d66d536e7094fdfa54411fba",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "physical_pages": [
+            33
+          ],
+          "metric_names": [
+            "境内营业收入",
+            "境内毛利率",
+            "境外营业收入",
+            "境外毛利率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F21",
+          "fact_sha256": "f7382d69d53050ba13ae7a8d48c118115fb84e8320b45d7239df5b0e925aeff9",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F22",
+          "fact_sha256": "ed45068b18d2db80aa041a71c624c050735864b244922fc6e3c7278a3d666bc2",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            32
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F23",
+          "fact_sha256": "b8f7726ac9d71d951e98206faba732b64e1a35b55773484f897f60a250bf529b",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            32
+          ],
+          "metric_names": [
+            "销售费用",
+            "财务费用"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F24",
+          "fact_sha256": "5b18da95295036f4e25c01cbb6b344d5be6956d77ed09bd744598c0c7274664a",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            32
+          ],
+          "metric_names": [
+            "经营活动产生的现金流量净额"
+          ]
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F25",
+          "fact_sha256": "7b727aab2739705929ddbbdd7454d8e5800cdb10447dfb2a9c8ccd1eb732de0a",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F26",
+          "fact_sha256": "01aaa07dc9bacf127084bff4d591dab3d4586465a4b7a9a9747e30abdbc6e5e5",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "metric_names": [
+            "战略性新兴产业营业收入"
+          ]
+        },
+        {
+          "element": "material_changes",
+          "fact_id": "F27",
+          "fact_sha256": "4589ac8a00d7e4666c103a28d8592f8af4665bb9a45687fa87e42ac046e61056",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "position",
+          "fact_id": "F29",
+          "fact_sha256": "cf7d2e75b2f65329dbf0d8c4b0f995bfa3f364cd7aaacd247287776cddd6874e",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "downstream_customers",
+          "fact_id": "F30",
+          "fact_sha256": "496ea5931ad8afbed6528b7f77fc46e8e35fb2406fdf652ad27148d5022505a3",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "metric_names": []
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "R1",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "affected_fact_id": "F27",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0006"
+          ],
+          "explanation": "source-0001仅并列印出“适用”“不适用”，所选文本没有勾选标记，不能认定勾选了“不适用”，也不能据此认为未新增重要非主营业务。同型表述在source-0006“收入和成本分析”下同样出现，但随后仍有具体分析，说明两个选项同时出现不等于选择“不适用”。应改为：该披露项列示适用与不适用，但给定文本未标明勾选结果。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F27",
+            "text": "报告期内公司新增重要非主营业务的说明勾选“不适用”。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F27",
+            "text": "报告期内公司新增重要非主营业务的说明列示“适用　不适用”，但给定文本未标明勾选结果。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "给定文本仅并列印出“适用”“不适用”，未标明勾选结果，无法确认是否勾选“不适用”。"
+          }
+        },
+        {
+          "finding_id": "R2",
+          "element": "operations_and_inputs",
+          "severity": "material",
+          "issue_type": "other",
+          "affected_fact_id": "F18",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002",
+            "source-0004"
+          ],
+          "explanation": "928万平方米及“全部位于一线、二线及省会城市”有source-0002明文支持，可保留。source-0004将期末土地储备6,961万平方米、其中中海地产2,528万平方米以及购置土地储备928万平方米明确标为“全额数”。草稿未保留该口径，容易被理解成公司权益土地储备。应保留原金额，并标明全额数；中海地产仍按附注理解为中国海外发展及其附属公司的地产业务、不包括中国海外宏洋。不要改写成权益口径或另造主体。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F18",
+            "text": "2025年公司新增土地储备928万平方米，全部位于一线、二线及省会城市；期末土地储备6,961万平方米，其中中海地产2,528万平方米。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002",
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "购置土地储备",
+                "raw_value": "928",
+                "value": "928",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "期末土地储备",
+                "raw_value": "6,961",
+                "value": "6961",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "中海地产期末土地储备",
+                "raw_value": "2,528",
+                "value": "2528",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F18",
+            "text": "2025年公司购置土地储备（全额数）928万平方米，全部位于一线、二线及省会城市；期末土地储备（全额数）6,961万平方米，其中中海地产2,528万平方米（中海地产指中国海外发展及其附属公司所从事的地产业务，不包括中国海外宏洋）。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002",
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "购置土地储备（全额数）",
+                "raw_value": "928",
+                "value": "928",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "期末土地储备（全额数）",
+                "raw_value": "6,961",
+                "value": "6961",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "中海地产期末土地储备（全额数）",
+                "raw_value": "2,528",
+                "value": "2528",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "R3",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F20",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "F20",
+            "text": "主营业务分地区：境内营业收入1,940,443,514千元、毛利率10.4%；境外营业收入141,698,297千元、毛利率2.8%，境外指除中国大陆以外的地区。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "境内营业收入",
+                "raw_value": "1,940,443,514",
+                "value": "1940443514",
+                "unit": "千元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境内毛利率",
+                "raw_value": "10.4",
+                "value": "10.4",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外营业收入",
+                "raw_value": "141,698,297",
+                "value": "141698297",
+                "unit": "千元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外毛利率",
+                "raw_value": "2.8",
+                "value": "2.8",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "451dfb6716341c8152733463d1405cc0aff342b7d66d536e7094fdfa54411fba",
+            "narrative_supported": true,
+            "metric_indices": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "finding_id": "R4",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F15",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "source-0002明文支持建筑业务新签合同额4.2万亿元，以及公司战略性新兴产业营业收入2,629亿元，叙述可保留。第0项已标为business_segment，与建筑业务这一更窄对象一致，不限制。第1项是战略性新兴产业这一交叉分类收入，不是集团整体营业收入，标成consolidated_group使范围不可靠。只限制第1项，不替换原数字。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "F15",
+            "text": "2025年建筑业务新签合同额4.2万亿元；战略性新兴产业实现营业收入2,629亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "建筑业务新签合同额",
+                "raw_value": "4.2",
+                "value": "4.2",
+                "unit": "万亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "战略性新兴产业营业收入",
+                "raw_value": "2,629",
+                "value": "2629",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "03e14d6e992e7b22e2a72ef41c6fcf3092562bb7ec1e04ddb8834b15a9a3c93c",
+            "narrative_supported": true,
+            "metric_indices": [
+              1
+            ]
+          }
+        },
+        {
+          "finding_id": "R5",
+          "element": "material_changes",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "F26",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "source-0002支持公司更新战略性新兴产业布局、2025年该产业实现营业收入2,629亿元的叙述。唯一结构化指标却把该交叉分类收入标为consolidated_group，宽于原文对象，不能当作集团整体收入。限制第0项，保留原叙述和原数字，不另给替换值。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "F26",
+            "text": "公司落实《布局发展战略性新兴产业的指导性文件》，更新战略性新兴产业布局地图，2025年战略性新兴产业实现营业收入2,629亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "战略性新兴产业营业收入",
+                "raw_value": "2,629",
+                "value": "2629",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "01aaa07dc9bacf127084bff4d591dab3d4586465a4b7a9a9747e30abdbc6e5e5",
+            "narrative_supported": true,
+            "metric_indices": [
+              0
+            ]
+          }
+        }
+      ],
+      "original_source_and_clean_seed_verified": "live-request-verification.json",
+      "receipts_root": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/601668/executions/6fb-601668-source-review/receipts"
+    }
+  ],
+  "mechanical_index_only": true
+}

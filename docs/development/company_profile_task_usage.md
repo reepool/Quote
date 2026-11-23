@@ -13,7 +13,7 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 
 ## 正常源复核的指标局部限用（6.FB）
 
-研究版V1根为`/home/python/Quote/data/research/company_profile_research_v1_20261123`，当前20股628条可读记录/993指标沿用6.FA实物，不是本轮新增抽取或质量改判。人读/机器入口分别为`exports/annual_profiles.md`、`exports/annual_profiles.json`及`annual-api.json`，来源/模型/复核状态和缺项保留，读取不发模型。四份新版本源复核执行计划仍为planned，真实效果/人工节省未评，具体有限预算答复前不执行；共享默认配置和生产未改。
+研究版V1根为`/home/python/Quote/data/research/company_profile_research_v1_20261123`，当前20股633条可读记录/1003指标；6.FA原628/993基线、旧writer与限制保留，增加的是保存稿真实源核后继，不是新抽取或质量分数改判。人读/机器入口分别为`exports/annual_profiles.md`、`exports/annual_profiles.json`及`annual-api.json`，来源/模型/复核状态和缺项保留，读取不发模型。2026-11-23获批四类原review_batch已全部执行，6条模型组件意见/12位置及5终核修订确有实际触发；另3项漏检经A仅源参考，华夏4旧指标限制仍靠原人工保护。实际效果及适用边界见本轮result；研究可用不等于全自动、正式99%或生产，不能重执行已结束计划借余额续跑，共享默认配置未改。
 
 新版正常复核增加显式`workpaper_metric_limit_policy=source_review_exact_metric_limits.v1`。只有模型明确确认原正文及引用有源，且`limit_metrics`意见携带当前原fact hash和零起原指标位置，程序才保正文/未受影响指标、将整条标为limited，并从所有普通数值出口排除不可靠指标。原raw、指标值/scope和作者不改，不根据名称自动猜正确口径。
 

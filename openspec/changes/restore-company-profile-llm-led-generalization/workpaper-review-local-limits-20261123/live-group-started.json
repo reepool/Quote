@@ -1,0 +1,14 @@
+{
+  "started_epoch": 1795410610.1925235,
+  "absolute_deadline_epoch": 1795423210.1925235,
+  "instrument_ids": [
+    "000338.SZ",
+    "600859.SH",
+    "600015.SH",
+    "601668.SH"
+  ],
+  "concurrency": 4,
+  "network_environment": "require_escalated",
+  "same_core_failure_stop": "all four dispatched together; no later unstarted stock",
+  "new_selection_or_extraction_requests_authorized": false
+}

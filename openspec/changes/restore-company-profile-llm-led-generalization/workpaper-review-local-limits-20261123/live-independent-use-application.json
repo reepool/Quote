@@ -1,0 +1,87 @@
+{
+  "A_source_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/a-live-independent-review.json",
+  "A_source_sha256": "20475f3b8caf30dd4ffaeb2d32dfa3b604ca3873d2a0e9a28fc27053fe2eac41",
+  "companies": [
+    {
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-a5c5ab569526287c392a7482",
+      "decisions": [
+        {
+          "fact_id": "F-OD-01",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "reason": "回原seed重核后丢失旧版已作的unclear主体修订，将全球重卡/工程机械/农业装备/算力行业环境标成集团主体且无不确定原因；本轮模型未识别，不能当公司自身事实消费。",
+          "limitation": "仅原文行业环境参考；不作为集团经营结果或零暴露，其他公司画像内容不受影响。",
+          "fact_sha256": "db81833fd12c5a73ac9752e16489e8e6747cd675c413aa3ecaff3b37fe5e87d9"
+        }
+      ],
+      "model_runtime_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/000338/executions/6fb-000338-source-review/model-runtime.json",
+      "model_runtime_sha256": "35dc7a4bb980c04b5947fc982812accdbfe9deb082a97b5c60a60dab241dc507",
+      "delivery_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-a5c5ab569526287c392a7482.json",
+      "delivery_runtime_sha256": "2c6e620081517323346a9ab043280816eea0945e5a64838e007fcbc75f65e1f5",
+      "active_gap_notes": [
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-01",
+          "note": "独立源核：事实F-OD-01仅源参考，尚未获得可确定采用的结论。原因：回原seed重核后丢失旧版已作的unclear主体修订，将全球重卡/工程机械/农业装备/算力行业环境标成集团主体且无不确定原因；本轮模型未识别，不能当公司自身事实消费。 建议按需精读该报告相关章节核对范围和原文冲突，不推断替代值。"
+        }
+      ],
+      "original_model_facts_metrics_quality_evidence_generation_unchanged": true,
+      "old_independent_decisions_preserved": true,
+      "final_reference_sha256": "20475f3b8caf30dd4ffaeb2d32dfa3b604ca3873d2a0e9a28fc27053fe2eac41"
+    },
+    {
+      "instrument_id": "600859.SH",
+      "work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "decisions": [
+        {
+          "fact_id": "F18",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "reason": "新版重核漏检并重新放出旧repair_rejected事实：原表为指定业态门店合计、建筑面积/租赁面积，原叙述却简化成公司全部门店的建筑面积；不能只限metrics救错误正文。",
+          "limitation": "仅原源参考；该范围和面积口径尚未形成可靠事实。保其他画像及有源不确定，不追补全。",
+          "fact_sha256": "5c16b740308142035dd85007a83867f726f33d5842797b41a54855aee2b86959"
+        },
+        {
+          "fact_id": "F24",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "新版重核漏检并重新放出旧quarantined事实：原文有已开业5家，但同报告期末另列4家，叙述未标注这一冲突；不得作为已核确定家数消费。",
+          "limitation": "仅原源参考；保留利润压力说明的出处及免税门店家数冲突，不猜精确答案，不因此拒绝整份画像。",
+          "fact_sha256": "ffef4f1f10f7063b356c6a7c1f8546269d0f15c5adc5ff9975c5f3a8e4972b71"
+        }
+      ],
+      "model_runtime_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600859/executions/6fb-600859-source-review/model-runtime.json",
+      "model_runtime_sha256": "1dbf119591de5fe7fb24dbc56ae60bb07c2706b62cf3a377133aefe0d58837d6",
+      "delivery_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-512bcf3ad6b3e44af3089b56.json",
+      "delivery_runtime_sha256": "d47e432e94edaaecf91bed82f668297cd62ae336aac9bfe5ed40cac4f750c85e",
+      "active_gap_notes": [
+        {
+          "element": "operations_and_inputs",
+          "fact_id": "F18",
+          "note": "独立源核：事实F18仅源参考，尚未获得可确定采用的结论。原因：新版重核漏检并重新放出旧repair_rejected事实：原表为指定业态门店合计、建筑面积/租赁面积，原叙述却简化成公司全部门店的建筑面积；不能只限metrics救错误正文。 建议按需精读该报告相关章节核对范围和原文冲突，不推断替代值。"
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F24",
+          "note": "独立源核：事实F24仅源参考，尚未获得可确定采用的结论。原因：新版重核漏检并重新放出旧quarantined事实：原文有已开业5家，但同报告期末另列4家，叙述未标注这一冲突；不得作为已核确定家数消费。 建议按需精读该报告相关章节核对范围和原文冲突，不推断替代值。"
+        }
+      ],
+      "original_model_facts_metrics_quality_evidence_generation_unchanged": true,
+      "old_independent_decisions_preserved": true,
+      "final_reference_sha256": "20475f3b8caf30dd4ffaeb2d32dfa3b604ca3873d2a0e9a28fc27053fe2eac41"
+    }
+  ],
+  "new_A_consumption_decisions": 3,
+  "new_model_calls": 0,
+  "only_changes": "use_review plus append-only affected-element gap notes",
+  "prior_intermediate_A_reference_sha256": "951e6678560d784769bd0444cfd8e686767ebf4b8ec2c9498bd30ca526ab9c08",
+  "final_A_reference_bound": true,
+  "reference_only_rebind_no_model_quality_changes": true
+}

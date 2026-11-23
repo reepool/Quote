@@ -1,0 +1,67 @@
+{
+  "task": "6.FB3/4 real source-review observation",
+  "reviewer": "A/main",
+  "not_model_input": true,
+  "baseline_commit": "de3168dc",
+  "basis": "Original frozen a-source-reference plus direct pypdfium2 read of original PDF physical pages before observing new model findings.",
+  "targets_are_preexisting_component_restrictions_not_a_new_accuracy_denominator": true,
+  "preexisting_restricted_metric_positions": 11,
+  "preexisting_affected_facts": 6,
+  "checks": [
+    {
+      "instrument_id": "000338.SZ",
+      "fact_id": "F-SM-02",
+      "original_metric_indices": [0],
+      "physical_pages": [13],
+      "source_supported_narrative": "三电业务收入30.4亿元、翻番增长；电池/自主电机/控制器销量同比162%/219%/56%。",
+      "restriction_basis": "30.4亿元是三电业务收入而非整个集团收入；只测试其明确范围是否被模型发现，不因同条局部问题丢叙述及其他指标。"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "fact_id": "F-WEALTH-FEE-INCOME",
+      "original_metric_indices": [0, 1],
+      "physical_pages": [45],
+      "source_supported_narrative": "财富管理手续费及佣金收入11.17亿元，同比增长16.48%。",
+      "restriction_basis": "业务收入和比较必须保财富管理口径，不能作为全行总收入/总收入同比消费；旧独立限制保留。"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "fact_id": "F-CREDIT-CARD-REVENUE",
+      "original_metric_indices": [0, 1],
+      "physical_pages": [47],
+      "source_supported_narrative": "信用卡业务收入144.59亿元，同比下降15.65%。",
+      "restriction_basis": "信用卡业务范围不是全行收入；方向为下降，原值为-15.65；正文可留而不靠程序重写元数据。"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F15",
+      "original_metric_indices": [1],
+      "physical_pages": [22],
+      "source_supported_narrative": "建筑业务新签合同4.2万亿元；战略性新兴产业营业收入2629亿元。",
+      "restriction_basis": "新兴产业收入保业务口径，不当集团总收入；正确建筑合同指标不可连带丢失。"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F20",
+      "original_metric_indices": [0, 1, 2, 3],
+      "physical_pages": [32, 33],
+      "source_supported_narrative": "主营业务分地区：境内收入1940443514千元/毛利率10.4%；境外141698297千元/2.8%，境外指大陆以外。",
+      "restriction_basis": "原单位表头及地区维度已核，现有独立限制不因模型宽口径判定而解除；仅将模型命中与未命中单列，不将与旧限制不一致直接等同全稿新准确率。"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F26",
+      "original_metric_indices": [0],
+      "physical_pages": [22],
+      "source_supported_narrative": "公司战略性新兴产业实现营业收入2629亿元。",
+      "restriction_basis": "保战略性新兴产业业务范围；与F15同一经济数字重复不是两个独立源错误。"
+    }
+  ],
+  "negative_control": {
+    "instrument_id": "600859.SH",
+    "fact_ids": ["F20", "F21", "F22", "F25", "F26", "F31"],
+    "physical_pages": [14, 15, 16, 19],
+    "expectation": "近/约/超、近四成等忠实限定可以保留原文与uncertainty，不强求统一精确值，不凭本轮字段存在强造错误；正文/金额/主体确有错误则仍局部处理。"
+  },
+  "interpretation": "Report actual valid model metric positions, prior-limit hits/misses, retained human protection and new independent decisions separately. No new human decision does not establish autonomous correctness. A audits all actual new findings/accepted repairs; these four seen reports do not establish 99% or unseen generalization."
+}

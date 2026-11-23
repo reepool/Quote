@@ -1,0 +1,27 @@
+{
+  "completed": true,
+  "removed_exact_B_root": "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX",
+  "removed_files": 55,
+  "released_bytes": 18199734,
+  "one_time_script_hashes": {
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/finalize.py": "51a5c8c7e9c38cbeffdef807e9e774f8eec4428a11ac96eeb37720578127d2dc",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/run_four.py": "1b5b1bd86964ec2b43c57bd625a8bace6d9da9416bb63de0fd203d73d79dd93a",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/collect.py": "47062118edd93fa94d8379df31b0f5863d9256f90fb38019540344b62c592e48"
+  },
+  "process_log_hashes": {
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/000338.log": "c665786b8000ff7f6ff5a3902ffd5d4c349f7a7076aecf2d4c2e4fc877e85872",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/600015.log": "8aeba2090562f4e6f292a023e7a6e80c3cb54ad969ead525ec774ebf7e8354e2",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/601668.log": "ab69061b4d68c1343febf02633b2bff55c6d5fbaa8264565c91f9ac1be2d1831",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/finalize.log": "91388afc5d56dac9c1276377fe9a5e488772659ae192f3a85fadbfbaf845f35a",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/finalize-final.log": "fbce18d21f9ef8091b651cca37ae664e1ad2fa0f3b9c738f236e8afeb7e1437b",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/600859.log": "7326178c35816e29663a0eefaa66aab7dabf57ef719a44343294c94aad3dce93"
+  },
+  "run_commands_preserved_in": "live-*-process.json",
+  "canonical_receipts_budgets_checkpoints_and_model_originals_preserved": true,
+  "old_V1_46_writer_and_original102_preserved": true,
+  "pre_live_duplicate_exports_removed": true,
+  "early_Wei_gap_example_removed": "fully superseded by live-final-consumption-verification.json; no reference dependencies",
+  "A_root_untouched": "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-a-82jwV1Mu",
+  "first_terminal_projection_was_stopped_for_A_third_decision": "not a model/business failure; final export complete",
+  "frozen_operator_deletion_is_cleanup_exception": "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/run_four.py"
+}

@@ -1,8 +1,8 @@
 {
   "schema_version": "company_profile_task_plan.v1",
   "run_id": "6fb-601668-source-review",
-  "authorization_status": "planned",
-  "approval_reference": "pending-human-four-saved-source-review-budget",
+  "authorization_status": "authorized",
+  "approval_reference": "human-20261123-6FB-four-saved-source-review-approved",
   "action": "review_batch",
   "instrument_ids": [
     "601668.SH"

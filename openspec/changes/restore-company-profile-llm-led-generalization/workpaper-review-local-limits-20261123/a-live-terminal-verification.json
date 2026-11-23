@@ -1,0 +1,119 @@
+{
+  "reviewer": "A/main",
+  "new_instance_fresh_read": true,
+  "fresh_api_equals_final_annual_api_snapshot": true,
+  "annual_JSON_export_same_twenty_profile_objects": true,
+  "API_export_envelope_difference_is_expected": "Batch API exposes requested/missing/status; annual export has formal_acceptance and export schema. Compare profiles, not unrelated envelope fields.",
+  "both_new_independent_use_records_bind_frozen_A_reference": true,
+  "protected_original_file_count": 102,
+  "protected_original_all_match": true,
+  "old_v1_writer_count": 46,
+  "old_v1_writers_all_match": true,
+  "seven_business_code_hashes_unchanged": true,
+  "other_sixteen_profiles_unchanged": {
+    "000049.SZ": true,
+    "601006.SH": true,
+    "600348.SH": true,
+    "601166.SH": true,
+    "600900.SH": true,
+    "000651.SZ": true,
+    "000526.SZ": true,
+    "601377.SH": true,
+    "000006.SZ": true,
+    "600316.SH": true,
+    "000156.SZ": true,
+    "600901.SH": true,
+    "920014.BJ": true,
+    "300015.SZ": true,
+    "920017.BJ": true,
+    "000099.SZ": true
+  },
+  "delivered_companies": 20,
+  "readable_records": 633,
+  "readable_metric_records": 1003,
+  "actual_component_projections": [
+    {
+      "instrument_id": "000338.SZ",
+      "fact_id": "F-BS-03",
+      "excluded_indices": [
+        0
+      ],
+      "narrative_retained": true,
+      "gaps_have_no_bad_numeric_values": true
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "fact_id": "F-SM-02",
+      "excluded_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "narrative_retained": true,
+      "gaps_have_no_bad_numeric_values": true
+    },
+    {
+      "instrument_id": "600859.SH",
+      "fact_id": "F31",
+      "excluded_indices": [
+        0
+      ],
+      "narrative_retained": true,
+      "gaps_have_no_bad_numeric_values": true
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F15",
+      "excluded_indices": [
+        1
+      ],
+      "narrative_retained": true,
+      "gaps_have_no_bad_numeric_values": true
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F20",
+      "excluded_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "narrative_retained": true,
+      "gaps_have_no_bad_numeric_values": true
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F26",
+      "excluded_indices": [
+        0
+      ],
+      "narrative_retained": true,
+      "gaps_have_no_bad_numeric_values": true
+    }
+  ],
+  "three_independent_exclusions": [
+    {
+      "instrument_id": "000338.SZ",
+      "fact_id": "F-OD-01",
+      "state": "source_only",
+      "fact": null
+    },
+    {
+      "instrument_id": "600859.SH",
+      "fact_id": "F18",
+      "state": "source_only",
+      "fact": null
+    },
+    {
+      "instrument_id": "600859.SH",
+      "fact_id": "F24",
+      "state": "source_only",
+      "fact": null
+    }
+  ],
+  "frozen_independent_reference_sha256": "20475f3b8caf30dd4ffaeb2d32dfa3b604ca3873d2a0e9a28fc27053fe2eac41",
+  "fresh_api_file_sha256": "38e30b0dc41ec5736950847cc85d45a61ea50bb70cb8d03d1575c9768b5eba4b",
+  "supplier_usage_or_new_model_sends_from_this_check": 0
+}

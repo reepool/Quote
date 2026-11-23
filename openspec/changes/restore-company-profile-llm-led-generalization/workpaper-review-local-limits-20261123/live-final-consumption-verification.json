@@ -1,0 +1,359 @@
+{
+  "root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "annual_API": "/home/python/Quote/data/research/company_profile_research_v1_20261123/annual-api.json",
+  "annual_JSON": "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports/annual_profiles.json",
+  "annual_Markdown": "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports/annual_profiles.md",
+  "companies": 20,
+  "visible_fact_records": 633,
+  "visible_metric_records": 1003,
+  "counts_are_not_accuracy": true,
+  "other16_API_profiles_unchanged": [
+    "000049.SZ",
+    "601006.SH",
+    "600348.SH",
+    "601166.SH",
+    "600900.SH",
+    "000651.SZ",
+    "000526.SZ",
+    "601377.SH",
+    "000006.SZ",
+    "600316.SH",
+    "000156.SZ",
+    "600901.SH",
+    "920014.BJ",
+    "300015.SZ",
+    "920017.BJ",
+    "000099.SZ"
+  ],
+  "old46_writer_files_unchanged": true,
+  "original102_files_unchanged": true,
+  "frozen_code_unchanged": true,
+  "fresh_instance_and_export_equal": true,
+  "http": {
+    "batch20_status": 200,
+    "equals_owner_API": true,
+    "external_business_requests": 0
+  },
+  "new_review_readings": [
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-e686d859a2cafd7acc9ab1e4.json",
+      "visible_facts": 10,
+      "visible_metrics": 19,
+      "review_status": "completed_with_open_findings",
+      "states": {
+        "limited": 2,
+        "reviewed": 8
+      },
+      "active_gap_count": 8
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-a5c5ab569526287c392a7482",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-a5c5ab569526287c392a7482.json",
+      "visible_facts": 33,
+      "visible_metrics": 50,
+      "review_status": "completed_with_open_findings",
+      "states": {
+        "limited": 2,
+        "reviewed": 31,
+        "source_only": 1
+      },
+      "active_gap_count": 9
+    },
+    {
+      "instrument_id": "600859.SH",
+      "work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-512bcf3ad6b3e44af3089b56.json",
+      "visible_facts": 29,
+      "visible_metrics": 63,
+      "review_status": "completed_with_open_findings",
+      "states": {
+        "limited": 6,
+        "reviewed": 23,
+        "source_only": 2
+      },
+      "active_gap_count": 4
+    },
+    {
+      "instrument_id": "601668.SH",
+      "work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ab8677d04a366e40efdf18c2.json",
+      "visible_facts": 29,
+      "visible_metrics": 56,
+      "review_status": "completed_with_open_findings",
+      "states": {
+        "limited": 6,
+        "reviewed": 23
+      },
+      "active_gap_count": 4
+    }
+  ],
+  "gap_examples": [
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F15",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [
+        0
+      ],
+      "metric_gaps": [
+        {
+          "metric_index": 1,
+          "name": "战略性新兴产业营业收入",
+          "state": "withheld",
+          "reason": "战略新兴业务收入的指标范围不可靠，原正文与建筑业务新签合同指标有源，不连带隐藏后者。",
+          "review_basis": "independent_and_model_source_check",
+          "model_finding_ids": [
+            "R4"
+          ],
+          "model_reasons": [
+            "source-0002明文支持建筑业务新签合同额4.2万亿元，以及公司战略性新兴产业营业收入2,629亿元，叙述可保留。第0项已标为business_segment，与建筑业务这一更窄对象一致，不限制。第1项是战略性新兴产业这一交叉分类收入，不是集团整体营业收入，标成consolidated_group使范围不可靠。只限制第1项，不替换原数字。"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F20",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [],
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "境内营业收入",
+          "state": "withheld",
+          "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+          "review_basis": "independent_and_model_source_check",
+          "model_finding_ids": [
+            "R3"
+          ],
+          "model_reasons": [
+            "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+          ]
+        },
+        {
+          "metric_index": 1,
+          "name": "境内毛利率",
+          "state": "withheld",
+          "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+          "review_basis": "independent_and_model_source_check",
+          "model_finding_ids": [
+            "R3"
+          ],
+          "model_reasons": [
+            "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+          ]
+        },
+        {
+          "metric_index": 2,
+          "name": "境外营业收入",
+          "state": "withheld",
+          "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+          "review_basis": "independent_and_model_source_check",
+          "model_finding_ids": [
+            "R3"
+          ],
+          "model_reasons": [
+            "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+          ]
+        },
+        {
+          "metric_index": 3,
+          "name": "境外毛利率",
+          "state": "withheld",
+          "reason": "地区行不能标准化为集团整体指标；原文地域、金额与毛利率有源，保叙述但不输出这四个错误口径指标。",
+          "review_basis": "independent_and_model_source_check",
+          "model_finding_ids": [
+            "R3"
+          ],
+          "model_reasons": [
+            "source-0008支持境内、境外分列叙述：境内营业收入1,940,443,514千元、毛利率10.4%，境外营业收入141,698,297千元、毛利率2.8%，且两地收入合计等于公司营业收入2,082,141,811千元；境外定义为除中国大陆以外地区。叙述可保留。但四个结构化指标都是地区分项，不是集团整体，原subject_scope标成consolidated_group，范围不可靠。限制第0至3项，不替换原数字或原标签。"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "601668.SH",
+      "fact_id": "F26",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [],
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "战略性新兴产业营业收入",
+          "state": "withheld",
+          "reason": "原战略布局与该业务收入叙述有源，唯一指标错标集团范围，保正文而不输出该标准化指标。",
+          "review_basis": "independent_and_model_source_check",
+          "model_finding_ids": [
+            "R5"
+          ],
+          "model_reasons": [
+            "source-0002支持公司更新战略性新兴产业布局、2025年该产业实现营业收入2,629亿元的叙述。唯一结构化指标却把该交叉分类收入标为consolidated_group，宽于原文对象，不能当作集团整体收入。限制第0项，保留原叙述和原数字，不另给替换值。"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "600015.SH",
+      "fact_id": "F-WEALTH-FEE-INCOME",
+      "reading_work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [],
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "财富管理手续费及佣金收入",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        },
+        {
+          "metric_index": 1,
+          "name": "财富管理手续费及佣金收入同比增长率",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600015.SH",
+      "fact_id": "F-CREDIT-CARD-REVENUE",
+      "reading_work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [],
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "信用卡业务收入",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        },
+        {
+          "metric_index": 1,
+          "name": "信用卡业务收入同比变动率",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "fact_id": "F-BS-03",
+      "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [],
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "发动机标准生产能力",
+          "state": "withheld",
+          "reason": "叙述整体有原文支持：潍柴动力发动机板块在国内有潍坊、扬州、重庆三大基地，发动机标准生产能力为102万台/年，并正在实施兼容性改造和局部工序能力提升。不可靠的只是原指标数组索引0“发动机标准生产能力”：其subject_scope标为consolidated_group，但原文对象是发动机板块，不是集团全部业务的产能。限制该指标独立使用；不改写已支持叙述，也不另给替换数值或范围标签。",
+          "review_basis": "model_source_check",
+          "model_finding_ids": [
+            "WR-BS-03"
+          ],
+          "model_reasons": [
+            "叙述整体有原文支持：潍柴动力发动机板块在国内有潍坊、扬州、重庆三大基地，发动机标准生产能力为102万台/年，并正在实施兼容性改造和局部工序能力提升。不可靠的只是原指标数组索引0“发动机标准生产能力”：其subject_scope标为consolidated_group，但原文对象是发动机板块，不是集团全部业务的产能。限制该指标独立使用；不改写已支持叙述，也不另给替换数值或范围标签。"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "fact_id": "F-SM-02",
+      "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [],
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "三电业务收入",
+          "state": "withheld",
+          "reason": "三电业务收入错标集团范围，保留原有源业务叙述与其他原指标，不给该收入重写主体标签。",
+          "review_basis": "independent_and_model_source_check",
+          "model_finding_ids": [
+            "WR-SM-02"
+          ],
+          "model_reasons": [
+            "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+          ]
+        },
+        {
+          "metric_index": 1,
+          "name": "电池销量同比增减",
+          "state": "withheld",
+          "reason": "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。",
+          "review_basis": "model_source_check",
+          "model_finding_ids": [
+            "WR-SM-02"
+          ],
+          "model_reasons": [
+            "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+          ]
+        },
+        {
+          "metric_index": 2,
+          "name": "自主电机销量同比增减",
+          "state": "withheld",
+          "reason": "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。",
+          "review_basis": "model_source_check",
+          "model_finding_ids": [
+            "WR-SM-02"
+          ],
+          "model_reasons": [
+            "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+          ]
+        },
+        {
+          "metric_index": 3,
+          "name": "自主电机控制器销量同比增减",
+          "state": "withheld",
+          "reason": "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。",
+          "review_basis": "model_source_check",
+          "model_finding_ids": [
+            "WR-SM-02"
+          ],
+          "model_reasons": [
+            "叙述整体有原文支持：“三电”业务收入30.4亿元、翻番增长，以及电池销量同比增长162%、自主电机销量同比增长219%、自主电机控制器销量同比增长56%。不可靠的是原指标数组索引0至3：四项subject_scope均标为consolidated_group，但原文以“三电”业务及其“其中”的电池、自主电机、自主电机控制器为对象，30.4亿元不是合并营业收入。若按集团主体独立使用，会实质误读公司收入规模。限制这些指标独立使用；保留原叙述与原数值，不提供替换值。"
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "600859.SH",
+      "fact_id": "F31",
+      "reading_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "state": "limited",
+      "text_retained": true,
+      "metric_source_indices": [],
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "喜悦购物中心客流同比增减",
+          "state": "withheld",
+          "reason": "叙述整体有source-0005支持：友谊商店改造后空置率由高位降至零、客流提升数十倍，喜悦购物中心客流同比增长超15%。不可靠的是原始指标第1项（索引0）把该增幅的subject_scope标成named_subsidiary。原文只点名喜悦购物中心这一门店/项目，未将其界定为法律子公司，不能把超15%当作子公司整体指标独立使用。不改写叙述，也不替换数值或范围标签。",
+          "review_basis": "model_source_check",
+          "model_finding_ids": [
+            "R6"
+          ],
+          "model_reasons": [
+            "叙述整体有source-0005支持：友谊商店改造后空置率由高位降至零、客流提升数十倍，喜悦购物中心客流同比增长超15%。不可靠的是原始指标第1项（索引0）把该增幅的subject_scope标成named_subsidiary。原文只点名喜悦购物中心这一门店/项目，未将其界定为法律子公司，不能把超15%当作子公司整体指标独立使用。不改写叙述，也不替换数值或范围标签。"
+          ]
+        }
+      ]
+    }
+  ],
+  "new_independent_decisions": 3,
+  "no_new_model_calls_in_verification": true
+}

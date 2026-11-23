@@ -1,0 +1,54 @@
+{
+  "companies": [
+    {
+      "instrument_id": "000338.SZ",
+      "receipt_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/000338/executions/6fb-000338-source-review/receipts/001.json",
+      "source_text_sha256": "2cc24b7b2df47066b657f1cac755e39ea5ac67a8221b3e1fdfc359e7ad67e22e",
+      "model_draft_sha256": "7a40c36968c2d48097802c0cd87c278a9998005dfd47a181b8405d0e8b0a438b",
+      "exact_original_source_and_clean_extract_seed": true,
+      "old_opinions_or_independent_decisions_in_draft": false,
+      "actual_metric_index_base": 0,
+      "fact_hashes_supplied": true,
+      "physical_timeout_seconds": 1200.0,
+      "status_code": "in_flight"
+    },
+    {
+      "instrument_id": "600859.SH",
+      "receipt_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600859/executions/6fb-600859-source-review/receipts/001.json",
+      "source_text_sha256": "1fe6683b613c3e545792e98d163a5c449b281bf5c980acaf7f81509e5fdaaccc",
+      "model_draft_sha256": "5689a4c4137c9198f45a12ec3d4709e299362c4953cc64700a3ba58d090f9e06",
+      "exact_original_source_and_clean_extract_seed": true,
+      "old_opinions_or_independent_decisions_in_draft": false,
+      "actual_metric_index_base": 0,
+      "fact_hashes_supplied": true,
+      "physical_timeout_seconds": 1200.0,
+      "status_code": "in_flight"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "receipt_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600015/executions/6fb-600015-source-review/receipts/001.json",
+      "source_text_sha256": "5f8a01bc5462b15003ce3600e70a4b7741bfe1d96b9a6fa11bf0a48e3a34cb42",
+      "model_draft_sha256": "b36fa8980496213fe0656ec95a33a3fa8461aefdd7f3d76843cc9ec2db9d25ea",
+      "exact_original_source_and_clean_extract_seed": true,
+      "old_opinions_or_independent_decisions_in_draft": false,
+      "actual_metric_index_base": 0,
+      "fact_hashes_supplied": true,
+      "physical_timeout_seconds": 1200.0,
+      "status_code": "in_flight"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "receipt_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/601668/executions/6fb-601668-source-review/receipts/001.json",
+      "source_text_sha256": "27b34a7fc00ceadf2382acd4997b2eba14a4193a88dadea01dccff01e6e81470",
+      "model_draft_sha256": "72fb1295069bd139103b1a107fdaf94c3d34af3f27c2b8084d46bd18f4dcee58",
+      "exact_original_source_and_clean_extract_seed": true,
+      "old_opinions_or_independent_decisions_in_draft": false,
+      "actual_metric_index_base": 0,
+      "fact_hashes_supplied": true,
+      "physical_timeout_seconds": 1200.0,
+      "status_code": "in_flight"
+    }
+  ],
+  "machine_only": true,
+  "prior_source_reference_not_sent": true
+}

@@ -1,0 +1,145 @@
+{
+  "stage": "model_before_independent_consumption",
+  "companies": [
+    {
+      "instrument_id": "000338.SZ",
+      "original_model_runtime_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/000338/executions/6fb-000338-source-review/model-runtime.json",
+      "original_model_runtime_sha256": "35dc7a4bb980c04b5947fc982812accdbfe9deb082a97b5c60a60dab241dc507",
+      "original_model_workpaper_sha256": "85349ff88a1cf12bcf4f1987879a1de60c01fb1553de4612c48089cabc05a7de",
+      "review_status": "completed_with_open_findings",
+      "model_fact_count": 34,
+      "findings_index": [
+        {
+          "finding_id": "WR-MC-02",
+          "affected_fact_id": "F-MC-02",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "WR-BS-03",
+          "affected_fact_id": "F-BS-03",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "WR-SM-02",
+          "affected_fact_id": "F-SM-02",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "WR-OD-02",
+          "affected_fact_id": "F-OD-02",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "full_authoritative_runtime_and_original_receipts_retained": true
+    },
+    {
+      "instrument_id": "600859.SH",
+      "original_model_runtime_path": "/home/python/Quote/data/checkpoints/company_profile_review_local_limits_20261123/600859/executions/6fb-600859-source-review/model-runtime.json",
+      "original_model_runtime_sha256": "1dbf119591de5fe7fb24dbc56ae60bb07c2706b62cf3a377133aefe0d58837d6",
+      "original_model_workpaper_sha256": "1bb3fd537fae8d3c5d46368ee0d53990fc60e2440bdd8a92e0936523e4475f4d",
+      "review_status": "completed_with_open_findings",
+      "model_fact_count": 31,
+      "findings_index": [
+        {
+          "finding_id": "R1",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "R2",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        },
+        {
+          "finding_id": "R3",
+          "affected_fact_id": "F01",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "R4",
+          "affected_fact_id": "F05",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "R5",
+          "affected_fact_id": "F30",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R6",
+          "affected_fact_id": "F31",
+          "resolution": "metrics_limited"
+        }
+      ],
+      "full_authoritative_runtime_and_original_receipts_retained": true
+    },
+    {
+      "instrument_id": "600015.SH",
+      "original_model_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-e686d859a2cafd7acc9ab1e4.json",
+      "original_model_runtime_sha256": "3f80ded3f44828d4111c97cc2ce8b23f9ce6ced4465c7c10a2bd6485ba9d0f19",
+      "original_model_workpaper_sha256": "f7bedb64c1d7e8b68f306004dd7838c91ff033646499ffeaaaea8af18dc3194b",
+      "review_status": "completed_with_open_findings",
+      "model_fact_count": 10,
+      "findings_index": [
+        {
+          "finding_id": "OM-CONSUMER-CREDIT-CUST",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "OM-PERSONAL-LOAN-SCALE",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "OM-CC-LOAN-BALANCE",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "OM-CC-TXN-VOLUME",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        }
+      ],
+      "full_authoritative_runtime_and_original_receipts_retained": true
+    },
+    {
+      "instrument_id": "601668.SH",
+      "original_model_runtime_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ab8677d04a366e40efdf18c2.json",
+      "original_model_runtime_sha256": "aa4227d5bc6141b0735de20f81142849acad40eb52709459d3ae6312d2f0453b",
+      "original_model_workpaper_sha256": "f206669f68d33d131e5274bba905c6c2c92e290cc1c956c28a32f964641f12ed",
+      "review_status": "completed_with_open_findings",
+      "model_fact_count": 29,
+      "findings_index": [
+        {
+          "finding_id": "R1",
+          "affected_fact_id": "F27",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R2",
+          "affected_fact_id": "F18",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "R3",
+          "affected_fact_id": "F20",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "R4",
+          "affected_fact_id": "F15",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "R5",
+          "affected_fact_id": "F26",
+          "resolution": "metrics_limited"
+        }
+      ],
+      "full_authoritative_runtime_and_original_receipts_retained": true
+    }
+  ],
+  "full_facts_and_findings_not_duplicated_here": "canonical model runtimes above; before/after exposure diff retained in live-model-before-after-deltas.json"
+}

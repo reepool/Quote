@@ -1,0 +1,48 @@
+{
+  "head": "de3168dc43ec7d89404bbe7e2916417845d0a7dc",
+  "frozen_epoch": 1795410601.1237264,
+  "files": {
+    "/home/python/Quote/research/company_profile/workpaper.py": "9ec408f73b3e73e457d58dc0d3d235a4029371ecea3b6e3dcd9dab3df18cfad6",
+    "/home/python/Quote/research/company_profile/workpaper_llm.py": "c95104cddd8a935c09e4e2b96815ba679f5d2c6331ac6deaf5f09c1ac1446512",
+    "/home/python/Quote/research/company_profile/workpaper_review.py": "238119527c078a8fee6b7287b2fbfb1b72aa46cea02971bcb99b5555a1261f79",
+    "/home/python/Quote/research/company_profile/workpaper_delivery.py": "9ba2e1d352e1ae52a681d9d061875466d1c2dd5300fc7adc5197ac3633f4d00e",
+    "/home/python/Quote/research/company_profile/reads.py": "13369639e0b474e32c0df06e35a03218b2cb12cea78add5b0ef48fde4650e57b",
+    "/home/python/Quote/research/company_profile/operations.py": "6a5a5356e31a457757d234c20ea1d213065d301b096410e0ea67b94dfe05baa1",
+    "/home/python/Quote/research/company_profile/runtime.py": "d4831c3e09f102fd7d660fd2d788745eff83db3dec332a0359684d4b4084e887",
+    "/home/python/Quote/tests/unit/test_research/test_company_profile_review_metric_limits.py": "b9856fe4a3da8db03328cdb293aa667654744b71b8525e8cd3758f435949575c",
+    "/home/python/Quote/tests/unit/test_research/test_company_profile_configured_task.py": "608a92c8974c83ba22dbada42883114d3fab73cd0037f8ffb8f5fe4a2a9ee773",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/600859-review.json": "d8c1e3fa959738018164bd98ec27584eaa9ec4f90928a1402cc412c3112e6c7f",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/601668-saved-review.json": "e73d54e7ed3077f554be54cfdf6aacabbde181f88320bd56ccba1bb081f927a4",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/600859-saved-review.json": "db56f3008056f7d657f15032bce75dee3f685013254bb634ff9168772ef3c9d3",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/600015-review.json": "b317dbb70ab90f39c463016fa07a0bf544afbe466bfacb3aac4d3cecece3a2b8",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/601668-review.json": "850ac296da9ac3ee6dc1f11e9c782c911ad13eca6a5705027a7d46d047b053ef",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/600015-saved-review.json": "ac21680e2e657487168a7ea9a7bc63a495ded2f5760c393bbedc903c9467aa02",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/000338-saved-review.json": "b4d6ae3554c2a31be02755e5cbe1fd4d24eaa759ce7c33fb09af31fec755c684",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/plans/000338-review.json": "2a06394ba1009b5c23730953997872682a239369813eb71e407ebaaccf4ddb8f",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/live-network-preflight.json": "162a8ab35cd17adf2047865b82c9f457da7dd57790ac6e990b238314787d8a4b",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-local-limits-20261123/source-package-verification.json": "df675caa87969083d3007a2cdff59b04131decee1e76c8212e6e17659d1ce3c2",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-b-Ozzq0sZX/run_four.py": "1b5b1bd86964ec2b43c57bd625a8bace6d9da9416bb63de0fd203d73d79dd93a"
+  },
+  "stock_cap": {
+    "absolute_seconds": 6000,
+    "task_budget_seconds": 5950,
+    "tokens": 1000000,
+    "physical_requests": 6,
+    "recoveries": 3,
+    "recoveries_per_logical": 1,
+    "priced_cost_cny": 10
+  },
+  "group_cap": {
+    "absolute_seconds": 12600,
+    "tokens": 4000000,
+    "physical_requests": 24,
+    "recoveries": 12
+  },
+  "logical_seconds": 2450,
+  "Grok_attempt_seconds": 1200,
+  "Flash_attempt_seconds": 600,
+  "concurrency": 4,
+  "new_selection_or_extraction": false,
+  "previous_123_tests_reused": true,
+  "authorization_reference": "human-20261123-6FB-four-saved-source-review-approved"
+}

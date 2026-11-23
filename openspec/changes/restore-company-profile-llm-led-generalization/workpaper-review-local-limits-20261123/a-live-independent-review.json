@@ -1,0 +1,123 @@
+{
+  "task": "6.FB3/4",
+  "reviewer": "A/main",
+  "state": "source_audit_complete_three_local_use_decisions_frozen",
+  "not_model_input": true,
+  "code_baseline": "de3168dc",
+  "observations": [
+    {
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-a5c5ab569526287c392a7482",
+      "model_component_findings": [
+        {"finding_id": "WR-BS-03", "fact_id": "F-BS-03", "indices": [0], "physical_pages": [12], "verdict": "supported; 102万台/年 is engine-board capacity, not all group operations"},
+        {"finding_id": "WR-SM-02", "fact_id": "F-SM-02", "indices": [0, 1, 2, 3], "physical_pages": [13], "verdict": "supported; 三电 revenue and the specified constituent sales growth retain their narrower business objects"}
+      ],
+      "actual_repairs_independently_supported": [
+        {"fact_id": "F-MC-02", "physical_pages": [18], "verdict": "Only the disclosure item is not applicable; no claim of economic absence of change."},
+        {"fact_id": "F-OD-02", "physical_pages": [16], "verdict": "Source includes 其中 M-series volume/65% income comparison; PSI81% is explicitly a named subsidiary metric."}
+      ],
+      "preexisting_metric_limit_hits": 1,
+      "new_model_metric_positions_beyond_preexisting_limits": 4,
+      "new_independent_consumption_decisions_needed": 1,
+      "required_local_decisions": [
+        {
+          "fact_id": "F-OD-01",
+          "disposition": "source_only",
+          "evidence_ids": ["source-0002"],
+          "physical_pages": [13],
+          "reason": "回原seed重核后丢失旧版已作的unclear主体修订，将全球重卡/工程机械/农业装备/算力行业环境标成集团主体且无不确定原因；本轮模型未识别，不能当公司自身事实消费。",
+          "limitation": "仅原文行业环境参考；不作为集团经营结果或零暴露，其他公司画像内容不受影响。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "model_component_findings": [],
+      "preexisting_metric_limit_hits": 0,
+      "preexisting_metric_limit_misses": 4,
+      "new_independent_consumption_decisions_needed": 0,
+      "actual_omission_findings": ["OM-CONSUMER-CREDIT-CUST", "OM-PERSONAL-LOAN-SCALE", "OM-CC-LOAN-BALANCE", "OM-CC-TXN-VOLUME"],
+      "omission_source_pages_independently_read": [44, 46, 47],
+      "verdict": "Source-backed target omissions, but all repair candidates were locally rejected before final review; none is a usable new fact. Existing four business-scope metric limits remain necessary and were not identified by this model review. Original physical45/47 and prior independent source reference remain applicable."
+    },
+    {
+      "instrument_id": "600859.SH",
+      "work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "model_component_findings": [
+        {"finding_id": "R6", "fact_id": "F31", "indices": [0], "physical_pages": [15], "verdict": "Source names a store/project, not a legal subsidiary; supported narrative and 超15% qualification may remain."}
+      ],
+      "actual_repairs_independently_supported": [
+        {"fact_id": "F30", "physical_pages": [12], "verdict": "Removes February2026 post-period opening from the2025 claim; retains source-backed current-period openings."}
+      ],
+      "other_model_findings": {
+        "R1": "Physical17 supports101.50亿元, decline10.74% and same-store decline3.75%; candidate rejected, no usable addition.",
+        "R2": "Company operating cost is a legitimate optional omission, not a company rejection condition.",
+        "R3": "Physical11/12/17 contain five-versus-four duty-free store statements; do not select an exact count by guessing.",
+        "R4": "Physical12 says first opening January2023 while physical26 table under physical24 opening-date header says July2022; preserve unresolved source conflict."
+      },
+      "faithful_approximation_control": "Physical14/15/16/19 support near/over/original near-four-tenths qualifications; this review did not flag them just to force exactness.",
+      "newly_resurfaced_original_fact_ids": ["F18", "F24"],
+      "new_independent_consumption_decisions_needed": 2,
+      "required_local_decisions": [
+        {
+          "fact_id": "F18",
+          "disposition": "source_only",
+          "evidence_ids": ["source-0017"],
+          "physical_pages": [11, 27],
+          "reason": "新版重核漏检并重新放出旧repair_rejected事实：原表为指定业态门店合计、建筑面积/租赁面积，原叙述却简化成公司全部门店的建筑面积；不能只限metrics救错误正文。",
+          "limitation": "仅原源参考；该范围和面积口径尚未形成可靠事实。保其他画像及有源不确定，不追补全。"
+        },
+        {
+          "fact_id": "F24",
+          "disposition": "source_only",
+          "evidence_ids": ["source-0007"],
+          "physical_pages": [12, 17],
+          "reason": "新版重核漏检并重新放出旧quarantined事实：原文有已开业5家，但同报告期末另列4家，叙述未标注这一冲突；不得作为已核确定家数消费。",
+          "limitation": "仅原源参考；保留利润压力说明的出处及免税门店家数冲突，不猜精确答案，不因此拒绝整份画像。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "601668.SH",
+      "work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "model_component_findings": [
+        {"finding_id": "R3", "fact_id": "F20", "indices": [0, 1, 2, 3], "physical_pages": [32, 33], "verdict": "Supported regional narrative; structured figures must retain their regional dimension."},
+        {"finding_id": "R4", "fact_id": "F15", "indices": [1], "physical_pages": [22], "verdict": "Strategic-emerging-industries revenue is not the group total; correct construction-contract metric0 is retained."},
+        {"finding_id": "R5", "fact_id": "F26", "indices": [0], "physical_pages": [22], "verdict": "Same emerging-industry amount in another original fact, not a second independent economic error."}
+      ],
+      "actual_repairs_independently_supported": [
+        {"fact_id": "F18", "physical_pages": [22, 28], "verdict": "Source supports928/6961/2528万平方米,全额数 and the explicit ChinaOverseas business definition/exclusion; not an equity-share area."},
+        {"fact_id": "F27", "physical_pages": [17, 33], "verdict": "Only states the given text omits a checked selection; retains uncertainty rather than assuming economic absence or making an assertion about the PDF graphic."}
+      ],
+      "newly_surfaced_original_facts_independently_supported": [
+        {"fact_id": "F04", "physical_pages": [28], "verdict": "Full original PDF/source page has explicit2025/2024/change columns;26654亿元 and165442/27652/22893万平方米 support the current-year house-building business narrative. Name similarity does not justify programmatically merging it with a revenue category."},
+        {"fact_id": "F05", "physical_pages": [28], "verdict": "14728亿元/3708公里/5638万平方米 align with2025 column and infrastructure label."},
+        {"fact_id": "F06", "physical_pages": [28], "verdict": "128亿元 design-contract amount aligns with2025 column."},
+        {"fact_id": "F07", "physical_pages": [28], "verdict": "3948亿元/1509万平方米/26166元 and中海2190亿元/762万平方米 align with2025 columns; 中海地产 retains original source footnote definition excluding宏洋, not an arbitrary broader corporate total."}
+      ],
+      "preexisting_metric_limit_hits": 6,
+      "preexisting_metric_limit_misses": 0,
+      "new_independent_consumption_decisions_needed": 0
+    }
+  ],
+  "model_result_summary": {
+    "model_findings": 19,
+    "valid_component_findings": 6,
+    "limited_original_metric_positions": 12,
+    "preexisting_restricted_positions_hit": 7,
+    "preexisting_restricted_positions_not_identified": 4,
+    "model_positions_beyond_old_independent_restrictions": 5,
+    "actual_final_accepted_repairs_source_audited": 5,
+    "repair_candidates_rejected_before_final": 5,
+    "new_independent_consumption_decisions_required": 3,
+    "new_independent_decision_stocks": ["000338.SZ", "600859.SH"],
+    "additional_A_audited_resurfaced_original_facts": ["601668.SH:F04", "601668.SH:F05", "601668.SH:F06", "601668.SH:F07"],
+    "incremental_gain_caveat": "This recheck intentionally reviews the exact original extraction, not old repairs as answers. For example the previous delivered潍柴F-BS-03 already had a corrected business_segment metric; new original-seed limiting is safe but not a net new quality gain. Model positions beyond old A restrictions are not automatically newly discovered errors in the currently delivered baseline.",
+    "position_counts_are_not_accuracy_or_independent_economic_error_rates": true
+  },
+  "terminal_source_verdict": "有限通过研究用途：真实模型会用组件限制并能纠错，但仍漏掉华夏四个既有限制位置，且回原seed重核有三项需A额外局部隔离。不能证明人工依赖已消除或降低为零；不重跑这四股、不追可选尾项、不开新模型窗口。最终机械保护和API/export验收另存a-live-terminal-verification.json，本源核决定文件冻结以便UseReview引用其真实hash。",
+  "actual_resources": {"physical_requests": 11, "recoveries": 0, "supplier_total_tokens_known": 329759, "business_wall_seconds": 746.515, "fee_status": "unknown"},
+  "pending_not_part_of_source_decision": ["final_API_export_projection_and_protection"],
+  "quality_interpretation": "Four seen reports are development observation only; model limitations are not independent truth. No change to original97.8967%,99%target, formal stage scores, scaling or production permissions. No claim of zero human work from zero new decisions in one stock."
+}

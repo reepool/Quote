@@ -1,0 +1,16 @@
+{
+  "task": "6.FB3/4",
+  "owner": "A/main",
+  "completed": true,
+  "exact_owned_temporary_root_absent_after_cleanup": true,
+  "exact_owned_temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6fb-live-a-82jwV1Mu",
+  "file_count": 15,
+  "released_logical_bytes": 14890811,
+  "contents": "Start-of-turn copies of eight owned/mixed documents, before/after API snapshots, four one-time audit/staging scripts and one generated owned-document patch.",
+  "cleanup_preconditions": "Original102/old46 writers/code/other16 profiles independently verified; source decisions and final projection checks persisted; owned document deltas staged and checked against HEAD without inherited edits; no symlinks or running audit subprocess remains.",
+  "preserved": ["Original PDFs and valid caches", "all actual request/response/budget checkpoints", "original model runtime before A use decisions", "current researchV1 API/JSON/Markdown/CSV", "frozen A source decisions and terminal verification", "preexisting and parallel dirty worktree"],
+  "B_cleanup_reference": "live-cleanup.json",
+  "B_released_logical_bytes": 18199734,
+  "total_released_logical_bytes": 33090545,
+  "note": "Logical file sizes, not allocated filesystem blocks. No business source, raw writer or protected failure was deleted."
+}
