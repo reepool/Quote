@@ -121,6 +121,16 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** the existing plan and review owner MAY reconstruct the exact original model extraction and its original source package for a fresh source review, without passing old review opinions or independent use decisions as model answers
 - **AND** omitted recheck policy retains the existing not-needed behavior and serialized plan identity, unknown policies or mismatched content/source are rejected, and the new linked review preserves the old reading, actual author/usage and inherited independent limits rather than rewriting prior outcomes or automatically looping
 
+#### Scenario: A new explicitly versioned recheck targets the currently delivered draft
+- **WHEN** a caller selects a newly supported current-draft source-recheck policy for a same-report saved reading
+- **THEN** the existing owner MUST bind the actual current draft and original source package rather than silently reconstructing an older extraction that discards prior accepted fixes or revives withdrawn facts
+- **AND** the new model input MUST exclude prior review opinions, independent use decisions and A-added advice; generation/source lineage, existing current content and inherited restrictions remain distinct, exact target/source mismatches fail before sending, and legacy original-seed policy/default fingerprints retain their prior behavior
+
+#### Scenario: A local numeric representation cannot be normalized without guessing
+- **WHEN** a new processing identity encounters the observed narrow metric-format incompatibility while preparing an otherwise source-bound fact or repair candidate
+- **THEN** the existing owner MAY retain its original narrative and raw metric spelling with a null normalized value and explicit local-format limitation after applicable typed/source checks, without guessing sign, amount, unit or subject or converting unknown to zero
+- **AND** unrelated invalid fields and unsupported narrative/evidence still fail, raw supplier responses and historical rejections remain unchanged, and a recovered repair candidate MUST receive its own final source review before adoption; local replay or a controlled final response is not a new supplier quality result
+
 #### Scenario: A selected PDF paragraph has superscript note digits adjacent to a quantity
 - **WHEN** a new explicitly versioned selected-chapter transcription can unambiguously distinguish superscript note markers from body numbers using actual PDF typography and positioning
 - **THEN** it MUST keep the note markers structurally separate from the body quantity, retain source-page mapping and table/header context, and MUST NOT concatenate them into a different number

@@ -1,0 +1,34 @@
+{
+  "task": "6.FD",
+  "baseline_commit": "cae1b92a78a6e2c91e4f96fed67fe14a6a162823",
+  "data_protection": {
+    "current_V1": {
+      "file_count": 104,
+      "all_hashes_match": true
+    },
+    "protected_pre_FB": {
+      "file_count": 102,
+      "all_hashes_match": true
+    }
+  },
+  "baseline_reference": "a-baseline.json",
+  "baseline_file_sha256": "b32b400a761e67fff9adff27b13c0940b77314f3d2b87af289c31278b0abc4bd",
+  "code_sha256": {
+    "research/company_profile/workpaper_review.py": "fe44353b97a970994b5d34c88e28c4e94282dbad7f43f4f9db5677b61b46f262",
+    "research/company_profile/workpaper.py": "be1186641639b25c76ffaa5341b1a74b6afae40669f312434a3d704c0665f722",
+    "research/company_profile/workpaper_llm.py": "03876d02215c919599e17716bfde9d5b495592566f80dac87bda3a5bc18922a9",
+    "research/company_profile/workpaper_metric_format.py": "9c6e8d24da0838e60c7d67542abb515c842f3c186d59cd8c55d5872ddddc4c07",
+    "research/company_profile/workpaper_delivery.py": "7b6f828fff5a2cba3d993d6bc9422e263fdb4b5c1ee8a33df03eb1df04ab7803",
+    "research/company_profile/reads.py": "d0f1cfdd784ede0aff3a75b6f60ea501d9d13425daf01a25f92424f8fa75c866",
+    "research/company_profile/operations.py": "d5e5a7f596e188d98c27fbba3b68cc728a89848aa8d343248e144647506c2f2e",
+    "research/company_profile/runtime.py": "0ef9958ce9775b8c94fd77db6045319edc87431450233ddcf1ca8fb6aba70e42"
+  },
+  "test_sha256": {
+    "tests/unit/test_research/test_company_profile_current_recheck.py": "bf3cfb4a8a2b683bcb790802fd955c55ccc0d35e7ec32ec7308d963a007354e9",
+    "tests/unit/test_research/test_company_profile_metric_format.py": "bd39843fd941f375d77bb9879baef0ee2fe941eb0c41cd3acf00545d3588e617",
+    "tests/unit/test_research/test_company_profile_repair_format_integration.py": "0fbea9113798b3571076b4d85c8ed035f41f8e7cb630734d861e01830284f16f"
+  },
+  "real_supplier_calls": 0,
+  "real_research_writes": 0,
+  "network_note": "B1 supplied no real network/model calls; B2 recorded OpenSpec CLI telemetry DNS failure, no supplier/public-report payload. OPENSPEC_TELEMETRY=0 and DO_NOT_TRACK=1 apply thereafter."
+}

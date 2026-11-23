@@ -991,11 +991,35 @@ def workpaper_draft_wire_schema() -> dict:
     return schema
 
 
-def normalize_workpaper_draft(data):
+def normalize_workpaper_draft(data, *, metric_format_policy=None):
     """Withhold observed local failures, never guess missing facts or metric meaning."""
+    from .workpaper_metric_format import METRIC_FORMAT_POLICY, normalize_directional_metric_format
+
+    if metric_format_policy not in (None, METRIC_FORMAT_POLICY):
+        raise ValueError(f"unknown workpaper metric format policy: {metric_format_policy!r}")
     if not isinstance(data, Mapping):
         return data
     payload = dict(data)
+    if metric_format_policy is not None:
+        groups = []
+        for container_name in ("elements", "supply_chain"):
+            container = payload.get(container_name)
+            if isinstance(container, Mapping):
+                payload[container_name] = dict(container)
+                groups.extend((payload[container_name], name) for name in container)
+        if payload.get(FEATURE_ELEMENT) is not None:
+            groups.append((payload, FEATURE_ELEMENT))
+        for container, name in groups:
+            element = container[name]
+            if not isinstance(element, Mapping) or not isinstance(element.get("facts"), (tuple, list)):
+                continue
+            facts, notes = [], []
+            for raw_fact in element["facts"]:
+                fact, local_notes = normalize_directional_metric_format(raw_fact, policy=metric_format_policy)
+                facts.append(fact)
+                notes.extend(local_notes)
+            container[name] = {**element, "facts": facts,
+                               "limitations": [*(element.get("limitations") or ()), *notes]}
     limitations = list(payload.get("limitations") or ())
     elements = payload.get("elements")
     if isinstance(elements, Mapping):

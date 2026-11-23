@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="17.161" timestamp="2026-11-24T02:11:36.900666+08:00" hostname="ComputeR"><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_repair_needs_own_final_and_preserves_original_receipt[accepted]" time="2.498" /><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_repair_needs_own_final_and_preserves_original_receipt[rejected]" time="0.810" /><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_repair_needs_own_final_and_preserves_original_receipt[unavailable]" time="3.047" /><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_repair_needs_own_final_and_preserves_original_receipt[legacy]" time="1.981" /><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_format_fallback_does_not_wash_other_defects_or_send_final[narrative]" time="0.575" /><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_format_fallback_does_not_wash_other_defects_or_send_final[evidence]" time="1.685" /><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_format_fallback_does_not_wash_other_defects_or_send_final[unit]" time="1.675" /><testcase classname="tests.unit.test_research.test_company_profile_repair_format_integration" name="test_format_fallback_does_not_wash_other_defects_or_send_final[arbitrary_field]" time="1.279"><failure message="AssertionError: ScriptedTransport has no response left">research/company_profile/stage5_provider.py:5096: in _run_complete
+    asyncio.get_running_loop()
+E   RuntimeError: no running event loop
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_research/test_company_profile_repair_format_integration.py:87: in test_format_fallback_does_not_wash_other_defects_or_send_final
+    result, _=review_workpaper(paper,packet=packet,provider=provider,work_id='bad-format',identity=identity)
+research/company_profile/workpaper_review.py:841: in review_workpaper
+    if resume is not None and resume_mode == "verify_only" else request(repair_id, "repair_profile_workpaper", WorkpaperRepairResponse,
+research/company_profile/workpaper_review.py:706: in request
+    result = provider.workpaper_request(
+research/company_profile/stage5_provider.py:4217: in workpaper_request
+    return self._execute(
+research/company_profile/stage5_provider.py:4768: in _execute
+    response = _run_complete(self._client, llm_request, self._runner)
+research/company_profile/stage5_provider.py:5100: in _run_complete
+    return asyncio.run(call_and_release())
+../miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+../miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+../miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+research/company_profile/stage5_provider.py:5087: in call_and_release
+    return await client.complete(request)
+utils/llm/client.py:130: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:155: in _complete_with_route
+    response = await self._complete_concrete(request, budget=budget)
+utils/llm/client.py:940: in _complete_concrete
+    response = await self._send_attempt(
+utils/llm/client.py:1472: in _send_attempt
+    response = await asyncio.wait_for(
+../miniconda3/envs/Quote/lib/python3.11/asyncio/tasks.py:489: in wait_for
+    return fut.result()
+utils/llm/testing.py:35: in send
+    raise AssertionError("ScriptedTransport has no response left")
+E   AssertionError: ScriptedTransport has no response left</failure></testcase></testsuite></testsuites>

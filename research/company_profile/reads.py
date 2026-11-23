@@ -377,7 +377,8 @@ class CompanyProfileReadService:
     def plan_review_recovery(self, instrument_id: str, *, request_id: str,
                              reading_work_id: str | None = None, source_recheck_policy: str | None = None) -> dict[str, Any]:
         """Bind a review-only follow-up plan; never enqueue or expose raw replies."""
-        from .workpaper_review import plan_review_follow_up, workpaper_hash
+        from .workpaper_review import (plan_review_follow_up, workpaper_hash,
+            CURRENT_DRAFT_REVIEW_POLICY, current_review_binding)
 
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", request_id):
             raise ValueError("invalid review recovery request_id")
@@ -394,9 +395,7 @@ class CompanyProfileReadService:
         follow_up = (reading["review_follow_up"] if reading.get("superseded_by_review_work_id")
                      else plan_review_follow_up(record.workpaper, record.workpaper_receipts))
         if source_recheck_policy is not None:
-            from .workpaper_review import prepare_review_recovery
-
-            seed, resume, receipts = prepare_review_recovery(record, source_recheck_policy=source_recheck_policy)
+            seed, resume, receipts = self._prepare_review_recovery(record, source_recheck_policy=source_recheck_policy)
             if resume is not None:
                 raise ValueError("explicit source recheck cannot reuse prior review opinions")
             follow_up = plan_review_follow_up(seed, receipts)
@@ -405,7 +404,20 @@ class CompanyProfileReadService:
             "instrument_id": instrument_id, "report": current["report"], "reading_work_id": chosen,
             "workpaper_sha256": workpaper_hash(record.workpaper), "review_follow_up": follow_up,
             "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION,
-            **({"source_recheck_policy": source_recheck_policy} if source_recheck_policy is not None else {})}
+            **({"source_recheck_policy": source_recheck_policy} if source_recheck_policy is not None else {}),
+            **({"current_review_binding": current_review_binding(seed)}
+               if source_recheck_policy == CURRENT_DRAFT_REVIEW_POLICY else {})}
+
+    def _prepare_review_recovery(self, record, *, source_recheck_policy=None):
+        from .workpaper_review import CURRENT_DRAFT_REVIEW_POLICY, ReviewRecoveryLink, prepare_review_recovery
+
+        saved = _record_processing_identity(record)
+        parent = None
+        if source_recheck_policy is None and saved.get("source_recheck_policy") == CURRENT_DRAFT_REVIEW_POLICY:
+            link = ReviewRecoveryLink.model_validate(saved.get("workpaper_review_recovery"))
+            parent = self._latest_by_instrument(work_id=link.current_seed_work_id or link.base_work_id, include_enrichments=True).get(
+                record.report.instrument_id)
+        return prepare_review_recovery(record, source_recheck_policy=source_recheck_policy, current_draft_base=parent)
 
     def plan_enrichment(self, instrument_id: str, *, request_id: str, targets,
                         base_work_id: str | None = None) -> dict[str, Any]:

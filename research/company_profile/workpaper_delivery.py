@@ -165,6 +165,8 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                                           if decision and any(r.metric_index == item.metric_index for r in decision.metric_restrictions)
                                           else "model_source_check"),
                                          "model_finding_ids": [f.finding_id for f in model_gap_sources[item.metric_index]],
+                                         **({"model_review_origin": "inherited_prior_review"}
+                                            if all(f.finding_id.startswith("inherited:") for f in model_gap_sources[item.metric_index]) else {}),
                                          "model_reasons": [f.explanation for f in model_gap_sources[item.metric_index]]}
                                         if item.metric_index in model_gap_sources else {})}
                                     for item in restrictions],
@@ -194,6 +196,14 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
         for name, element in workpaper_elements(paper).items()
         if element.status != "observed" or element.limitations
     ]
+    # Current-draft rechecks retain unresolved historical gaps locally, without
+    # sending those opinions to the model or resurrecting their removed facts.
+    information_gaps.extend({"element": finding.element, "fact_id": finding.affected_fact_id,
+        "status": "unclear", "reasons": [finding.explanation],
+        "review_basis": "inherited_model_source_check", "model_finding_ids": [finding.finding_id]}
+        for finding in (review.findings if review else ())
+        if finding.finding_id.startswith("inherited:") and finding.original_fact is None
+        and finding.resolution != "corrected_pending_trust")
     suggested_acquisitions = [
         {"finding_id": finding.finding_id, "element": finding.element,
          "severity": finding.severity, "reason": finding.explanation,

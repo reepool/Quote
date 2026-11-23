@@ -11,6 +11,7 @@ from typing import Any
 
 from .models import ReportIdentity
 from .contracts import SemanticProviderError
+from .workpaper_metric_format import METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICY
 from .workpaper import (
     ELEMENT_LABELS, SUPPLY_CHAIN_LABELS, FEATURE_ELEMENT, CompanyProfileWorkpaper, WorkpaperDraftResponse,
     WorkpaperFormatNormalization, WorkpaperGenerationMetadata,
@@ -35,6 +36,12 @@ SECTION_GUIDE = (
 WORKPAPER_READING_STRATEGY = "chapter_workpaper_v1"
 AUTO_FORMAT_RECOVERY = "local_shape_before_retry.v3"
 ENRICHMENT_UNREAD_RECOVERY = "empty_non_target_unread_status.v1"
+METRIC_FORMAT_INSTRUCTIONS = """Preserve source-native directional percentage wording
+in raw_value, with unchanged source_unit, unit, qualifier, subject and evidence.
+When this local format cannot safely be normalized, set value=null and explain
+the limitation in uncertainty_reason. Do not infer a sign or amount from Chinese
+direction words, convert units, fill unknown values with zero, or remove metrics
+to disguise incorrect narrative/evidence. Source review is still required."""
 
 
 def workpaper_processing_identity(
@@ -51,6 +58,7 @@ def workpaper_processing_identity(
         "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
         "source_binding_policy": "company_workpaper_source_literals.punctuated-numbers.v7",
         "workpaper_format_recovery": AUTO_FORMAT_RECOVERY,
+        METRIC_FORMAT_FLAG: METRIC_FORMAT_POLICY,
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
         "execution_mode": "provider" if real else "offline_fake",
         "semantic_reuse": False,
@@ -359,6 +367,9 @@ def run_workpaper(
     extraction_resume: Mapping[str, Any] | None = None,
 ) -> WorkpaperRun:
     """One selection and one company extraction, never eight per-element loops."""
+    metric_format_policy = processing_identity.get(METRIC_FORMAT_FLAG)
+    if metric_format_policy not in (None, METRIC_FORMAT_POLICY):
+        raise ValueError(f"unknown workpaper metric format policy: {metric_format_policy!r}")
     real = processing_identity.get("execution_mode") == "provider"
     mode = extraction_resume.get("mode") if extraction_resume is not None else None
     if mode not in (None, "local_format_only", "local_enrichment_schema_only"):
@@ -501,7 +512,7 @@ def run_workpaper(
                 raw_failure, [t["element"] for t in enrichment["targets"]])
         else:
             extracted, normalization = normalize_retained_workpaper_format(raw_failure)
-        extracted = normalize_workpaper_draft(extracted)
+        extracted = normalize_workpaper_draft(extracted, metric_format_policy=metric_format_policy)
         failed_call = WorkpaperModelCall.model_validate(extraction_resume.get("failed_call"))
         if expected_source is not None:
             # The exact original wire packet was matched above. Attribute its
@@ -528,11 +539,28 @@ def run_workpaper(
                     **recovery_content,
                     **reading_targets,
                 },
-                instructions=EXTRACTION_INSTRUCTIONS + ("\nThis is a supplemental reading: answer only targeted_reading questions from these original sections. Do not regenerate unrelated profile content. Keep required element keys; non-target elements have no facts and an explicit not-read-for-this-task limitation. Retain any remaining uncertainty; an answer does not establish exhaustive coverage." if enrichment else ""), response_model=WorkpaperDraftResponse,
+                instructions=EXTRACTION_INSTRUCTIONS + ("\n" + METRIC_FORMAT_INSTRUCTIONS if metric_format_policy else "") + ("\nThis is a supplemental reading: answer only targeted_reading questions from these original sections. Do not regenerate unrelated profile content. Keep required element keys; non-target elements have no facts and an explicit not-read-for-this-task limitation. Retain any remaining uncertainty; an answer does not establish exhaustive coverage." if enrichment else ""), response_model=WorkpaperDraftResponse,
                 max_output_tokens=int(processing_identity.get("workpaper_max_output_tokens", 12_000)),
                 timeout_seconds=timeout,
                 **({"local_format_recovery": True} if automatic_format else {}),
             )
+            if metric_format_policy:
+                # The existing provider's legacy normalizer can already have
+                # withheld a metric-bearing fact. Reconsume its exact original
+                # response under this explicit identity, without changing the
+                # provider, original receipt, author, usage or contract status.
+                original_receipts = [item for item in getattr(provider, "workpaper_receipts", ())
+                    if item.get("request_id") == extraction_id and item.get("purpose") == "extract_profile_workpaper"]
+                if real or any("raw_content" in item for item in original_receipts):
+                    if len(original_receipts) != 1:
+                        raise ValueError("metric format policy requires one exact extraction receipt")
+                    original = original_receipts[0]
+                    raw = original.get("raw_content")
+                    if (original.get("contract_status") != "accepted" or original.get("finish_reason") != "stop"
+                        or not isinstance(raw, str) or hashlib.sha256(raw.encode()).hexdigest() != original.get("response_hash")):
+                        raise ValueError("metric format policy requires hash-bound complete extraction bytes")
+                    extracted = _strict_workpaper_json(raw)
+                extracted = normalize_workpaper_draft(extracted, metric_format_policy=metric_format_policy)
         except SemanticProviderError as extraction_error:
             rejected = [item for item in getattr(provider, "workpaper_receipts", ())
                         if item.get("request_id") == extraction_id and item.get("purpose") == "extract_profile_workpaper"]
@@ -547,7 +575,7 @@ def run_workpaper(
                 try:
                     extracted, schema_normalization = normalize_retained_enrichment_unread(
                         raw, [target["element"] for target in enrichment["targets"]])
-                    extracted = normalize_workpaper_draft(extracted)
+                    extracted = normalize_workpaper_draft(extracted, metric_format_policy=metric_format_policy)
                     WorkpaperDraftResponse.model_validate(extracted)
                 except (ValueError, TypeError):
                     # A malformed container may still use the unchanged shape-only owner.
@@ -555,7 +583,7 @@ def run_workpaper(
                         _strict_workpaper_json(raw)
                     except (ValueError, TypeError):
                         extracted, normalization = normalize_retained_workpaper_format(raw)
-                        extracted = normalize_workpaper_draft(extracted)
+                        extracted = normalize_workpaper_draft(extracted, metric_format_policy=metric_format_policy)
                         schema_normalization = None
                     else:
                         raise extraction_error
@@ -567,7 +595,7 @@ def run_workpaper(
                 else:
                     raise  # Preserve the actual schema rejection of complete JSON.
                 extracted, normalization = normalize_retained_workpaper_format(raw)
-                extracted = normalize_workpaper_draft(extracted)
+                extracted = normalize_workpaper_draft(extracted, metric_format_policy=metric_format_policy)
             failed_call = _model_call(rejected, purpose="extract_profile_workpaper", request_id=extraction_id,
                 section_ids=tuple(item.section_id for item in packet.reading_scope.sections),
                 pages=tuple(sorted({span.page for item in packet.evidence for span in item.source_spans})),

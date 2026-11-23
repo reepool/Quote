@@ -210,6 +210,9 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "product_contract",
             "workpaper_review_policy",
             "workpaper_metric_limit_policy",
+            "workpaper_metric_format_policy",
+            "source_recheck_policy",
+            "current_review_binding",
             "workpaper_review_execution",
             "review_existing_draft_hash",
             "review_resume_hash",
@@ -515,6 +518,12 @@ class CompanyProfileStageRuntime:
                 or seed.report != state.report
             ):
                 raise ValueError("explicit matching existing-draft review identity is required")
+            if state.processing_identity.get("source_recheck_policy"):
+                from .workpaper_review import CURRENT_DRAFT_REVIEW_POLICY, current_review_binding
+
+                if (state.processing_identity["source_recheck_policy"] != CURRENT_DRAFT_REVIEW_POLICY
+                    or state.processing_identity.get("current_review_binding") != current_review_binding(seed)):
+                    raise ValueError("current draft/source packet differs from its explicit review binding")
             state.review_seed = seed
         if item.get("review_resume") is not None:
             resume = dict(item["review_resume"])

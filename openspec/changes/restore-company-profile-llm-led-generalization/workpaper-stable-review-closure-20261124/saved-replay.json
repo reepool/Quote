@@ -1,0 +1,89 @@
+{
+  "task": "6.FD",
+  "real_supplier_calls": 0,
+  "real_writer_changes": 0,
+  "current_bases": [
+    {
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-bbd1db65c451d1d024bdb9b9.json",
+      "file_sha256": "377e44d36d38c71be061f377cacf078dc3454cff6e53f1e874e83aa375b862e4",
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "binding": {
+        "current_draft_sha256": "a90f6f34bd20e2689d8d716c7042381678cba9cf730db85d1518509caf0d155e",
+        "request_draft_sha256": "98d50f7ae0b9d00d30c12421bf3f511df7d6e02d8c5951c92708bf4b865113bb",
+        "source_packet_sha256": "4a7e8d14719b8d4a25ef6c4c3cdb034aae150008d0981d988ee9d6341f43313c"
+      },
+      "controlled_transport_calls": 1,
+      "current_facts": 34,
+      "facts_verbatim": true,
+      "evidence_and_author_unchanged": true,
+      "old_removed_facts_not_restored": true,
+      "historical_findings_inherited_not_new_model_discovery": true
+    },
+    {
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-d32507d43cbb1c885b6b4e34.json",
+      "file_sha256": "591cfabb2684cdf16a4ac441b11f02c480fd8ef4e467c5b25521c98887686f79",
+      "work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "binding": {
+        "current_draft_sha256": "211d09eeb601d84b70d2bad7d289f06ae75950985acc44501ec6b4af76c0e1fd",
+        "request_draft_sha256": "840ef732edb0286773120407bfdaa3296fadbb5691bb08ecd1ee6e853250cbc7",
+        "source_packet_sha256": "aadbf23e331fb013726cc86927de88b51e0406a2a91c3136fb00f8cb45c87649"
+      },
+      "controlled_transport_calls": 1,
+      "current_facts": 28,
+      "facts_verbatim": true,
+      "evidence_and_author_unchanged": true,
+      "old_removed_facts_not_restored": true,
+      "historical_findings_inherited_not_new_model_discovery": true
+    }
+  ],
+  "saved_candidate_readiness_reference": "a-source-probe.json",
+  "saved_repair_owner_replays": [
+    {
+      "stock": "600015",
+      "wire_path": "data/checkpoints/company_profile_review_local_limits_20261123/600015/executions/6fb-600015-source-review/receipts/002.json",
+      "wire_file_sha256": "5ed9aeeaf1a77fbb1074bbfe886b029735ad7b7a7b0dc7f5a0524ef994e7c619",
+      "repair_content_sha256": "2761eafc91756051efa73bbe59be2d2c9d0a2859afbc0aa93322d72b4470431a",
+      "seed_workpaper_sha256": "7b9ce9561b5cd24dde0bf0cede786879c430e1febe9b64e8e578b4a54ffdbc4d",
+      "original_raw_author_usage_and_rejection_preserved": true,
+      "controlled_final_attempts": 2,
+      "source_text_equal_original_wire": true,
+      "target_candidate_ids": [
+        "review-add:OM-CONSUMER-CREDIT-CUST",
+        "review-add:OM-PERSONAL-LOAN-SCALE",
+        "review-add:OM-CC-LOAN-BALANCE",
+        "review-add:OM-CC-TXN-VOLUME"
+      ],
+      "own_final_payload_contains_targets": true,
+      "supplier_final_available": false,
+      "targets_adopted": 0,
+      "current_V1_written": false,
+      "candidate_fact_hashes": {
+        "review-add:OM-CONSUMER-CREDIT-CUST": "a255f3283eeb4473a2e6702d59a06225d82f287b8f56a634869a4752b03ac9c4",
+        "review-add:OM-PERSONAL-LOAN-SCALE": "daa3fe87feefdf554333d06e4ce9e0e169d1725eae5cf98ccce4f60d904e7647",
+        "review-add:OM-CC-LOAN-BALANCE": "b3766b986eb23375a62f6b9fd449424586fc6b3f13cddc97227dde74ea4a7039",
+        "review-add:OM-CC-TXN-VOLUME": "4e327be7eea004984c8253c900e347d29e874378973a51360b84abd7eb1ad119"
+      }
+    },
+    {
+      "stock": "600859",
+      "wire_path": "data/checkpoints/company_profile_review_local_limits_20261123/600859/executions/6fb-600859-source-review/receipts/002.json",
+      "wire_file_sha256": "28ac65bb3d3e6bbb07d96bf4acf2874f675177bcce11a5ba05b2bee54d0122a8",
+      "repair_content_sha256": "e412807d3398fd5022c0cdb7c942e92e3e26e66ac1d81286914a0bb046276651",
+      "seed_workpaper_sha256": "91afc342c7aa0d3c7ccf6f245f43e8897209d92357d273996d352e5889c8ddc9",
+      "original_raw_author_usage_and_rejection_preserved": true,
+      "controlled_final_attempts": 2,
+      "source_text_equal_original_wire": true,
+      "target_candidate_ids": [
+        "review-add:R1"
+      ],
+      "own_final_payload_contains_targets": true,
+      "supplier_final_available": false,
+      "targets_adopted": 0,
+      "current_V1_written": false,
+      "candidate_fact_hashes": {
+        "review-add:R1": "99d3201b353150daec845a12a48559605ec44db531fb1ead61678ead1340bd69",
+        "F30": "ded7435a02174b23ad0789b87070086f37edbca4ce8c67e59eab6966d661f172"
+      }
+    }
+  ]
+}

@@ -17,6 +17,27 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 
 ## 正常源复核的指标局部限用（6.FB）
 
+### 稳定研究版的当前稿重核与数值保真（6.FD）
+
+新建普通任务身份通过原`workpaper_processing_identity`带上`workpaper_metric_format_policy=source_metric_unparsed_value_null.v1`。对于已发生的窄百分比写法（如`raw_value="同比下降0.71%"`），程序不猜符号或替换数值，可保原文、原raw/unit/source及`value=null`和本地格式原因，再走原类型/源检查和复核。无法解析的其他坏字段仍按原约束处理，坏可选事实局部隔离，不影响其他有效内容。`null`不是0，也不是原文未披露；旧身份没有该flag时原合同不变。
+
+需要对当前交付稿做一次新版本源复核时，优先明确当前稿政策；生成计划仍不调用模型：
+
+```python
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper_review import CURRENT_DRAFT_REVIEW_POLICY
+
+reader = CompanyProfileReadService('/home/python/Quote/data/research/company_profile_research_v1_20261123')
+plan = reader.plan_review_recovery(
+    '000338.SZ', request_id='planned-current-draft-check',
+    source_recheck_policy=CURRENT_DRAFT_REVIEW_POLICY,
+)
+```
+
+`source_review_current_draft.v1`绑定当前base、实际送审draft和原source packet，保留已接受修订、撤回/隔离状态及未解缺项，不默默回到最早抽取。新模型请求不含旧审核、独立使用决定或自由文本人工备注；本地后继继续保守继承旧限制，`inherited:`意见/来源不代表本次模型新发现。错绑定拒绝发送，旧METRIC_LIMIT_POLICY的原seed模式仍可复现，缺省已完成稿仍`not_needed`。
+
+修订候选因格式变得可接纳，也必须经过它自己的最终源核。5个旧候选的本地回放不等于已采纳或新供应商通过，不能借用历史终核结果。6.FD只做离线/受控链验证，原20股633/1003交付不变；新的真实执行仍须明确模型/范围/预算授权，不重开6.FB或替两份6.FC问题计划自动执行。
+
 研究版V1根为`/home/python/Quote/data/research/company_profile_research_v1_20261123`，当前20股633条可读记录/1003指标；6.FA原628/993基线、旧writer与限制保留，增加的是保存稿真实源核后继，不是新抽取或质量分数改判。人读/机器入口分别为`exports/annual_profiles.md`、`exports/annual_profiles.json`及`annual-api.json`，来源/模型/复核状态和缺项保留，读取不发模型。2026-11-23获批四类原review_batch已全部执行，6条模型组件意见/12位置及5终核修订确有实际触发；另3项漏检经A仅源参考，华夏4旧指标限制仍靠原人工保护。实际效果及适用边界见本轮result；研究可用不等于全自动、正式99%或生产，不能重执行已结束计划借余额续跑，共享默认配置未改。
 
 新版正常复核增加显式`workpaper_metric_limit_policy=source_review_exact_metric_limits.v1`。只有模型明确确认原正文及引用有源，且`limit_metrics`意见携带当前原fact hash和零起原指标位置，程序才保正文/未受影响指标、将整条标为limited，并从所有普通数值出口排除不可靠指标。原raw、指标值/scope和作者不改，不根据名称自动猜正确口径。

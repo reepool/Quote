@@ -1,0 +1,109 @@
+{
+  "task": "6.FD",
+  "xml_groups_in_run_order": [
+    {
+      "xml": "current-guards-tests.xml",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "xml": "repair-format-tests.xml",
+      "passed": 7,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "xml": "b2-metric-tests-final.xml",
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "xml": "b2-metric-tests-legacy-version-failures.xml",
+      "passed": 53,
+      "failed": 4,
+      "skipped": 0
+    },
+    {
+      "xml": "current-recheck-tests.xml",
+      "passed": 9,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "xml": "final-integration-tests.xml",
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "xml": "current-continuation-compat-tests.xml",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "xml": "freeze-targeted-tests.xml",
+      "passed": 1,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "xml": "freeze-final-tests.xml",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "latest_distinct_tests": {
+    "passed": 83,
+    "failed": 4,
+    "skipped": 0
+  },
+  "known_HEAD_v7_v8_assertion_failures": {
+    "tests.unit.test_research.test_company_profile_workpaper::test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced[False-False]": {
+      "status": "failed",
+      "xml": "b2-metric-tests-legacy-version-failures.xml"
+    },
+    "tests.unit.test_research.test_company_profile_workpaper::test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced[False-True]": {
+      "status": "failed",
+      "xml": "b2-metric-tests-legacy-version-failures.xml"
+    },
+    "tests.unit.test_research.test_company_profile_workpaper::test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced[True-False]": {
+      "status": "failed",
+      "xml": "b2-metric-tests-legacy-version-failures.xml"
+    },
+    "tests.unit.test_research.test_company_profile_workpaper::test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced[True-True]": {
+      "status": "failed",
+      "xml": "b2-metric-tests-legacy-version-failures.xml"
+    }
+  },
+  "removed_nonportable_local_assertions": "Real two-base checks moved to saved-replay.json, excluded from portable unit counts.",
+  "initial_failures_preserved": {
+    "current-recheck-tests.xml": "2 test observation errors: actual CSV=profiles.csv; writer=output_root.",
+    "repair-format-tests.xml": "1 fixture lacked original bounded recovery response for unknown-field schema rejection.",
+    "freeze-targeted-tests.xml": "1 new test incorrectly expected old original-draft hash contract to accept a different current seed; production hash rejection retained."
+  },
+  "final_b1_groups": [
+    "final-integration-tests.xml",
+    "current-continuation-compat-tests.xml",
+    "freeze-final-tests.xml"
+  ],
+  "scope": "Offline engineering and local saved-response readiness; not new supplier/source semantic approval.",
+  "cleanup": {
+    "root": "/home/python/Quote/data/QuoteBak/company-profile-6fd-b-BlzNXwcp",
+    "state": "removed",
+    "files_removed": 123,
+    "logical_bytes_released": 15205078,
+    "active_owned_python_processes": 0,
+    "other_roots_touched": false,
+    "B2_cleanup_report": {"files": 10, "logical_bytes": 62176, "source": "A/B2 handoff; not recounted by B1"}
+  },
+  "final_accepted_evidence_distinct": {
+    "passed": 72,
+    "failed": 0,
+    "skipped": 0,
+    "note": "Union of final accepted groups only; historical removed/merged test identities are not added again."
+  }
+}

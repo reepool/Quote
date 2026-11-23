@@ -1,0 +1,34 @@
+{
+  "task": "6.FD",
+  "reviewer": "A/main",
+  "stage": "preimplementation_independent_expectations",
+  "new_supplier_calls": 0,
+  "current_V1_must_remain": {"companies": 20, "readable_records": 633, "metric_records": 1003},
+  "recheck_challenges": [
+    {
+      "instrument_id": "000338.SZ",
+      "saved_base_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "expectation": "New current-draft policy must send F-BS-03 with the existing business_segment correction and F-OD-01 with its existing unclear industry-context qualification, not original group metadata. A no-issue controlled review cannot regress those contents."
+    },
+    {
+      "instrument_id": "600859.SH",
+      "saved_base_work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "expectation": "F18/F24 were absent from the safe current draft after old review; a new no-issue review of that current draft cannot resurrect the original wrong area/store scope or unresolved4/5 duty-free count as facts or erase unresolved acquisition/limitation visibility."
+    },
+    {
+      "scope": "current_V1 bases with independent metric and source_only decisions",
+      "expectation": "Model recheck input excludes prior quality/use_review/A added advice, but local descendant and API retain independent restrictions. A current draft/source/hash mismatch must not be sent; original-seed legacy policy remains reproducible."
+    }
+  ],
+  "saved_repair_candidates": [
+    {"stock": "600015", "fact_id": "review-add:OM-CONSUMER-CREDIT-CUST", "physical_pages": [44], "preserve": "56.11万户、下降0.71%及非平台类消费信贷客户注6", "decorated_metric_positions": [1]},
+    {"stock": "600015", "fact_id": "review-add:OM-PERSONAL-LOAN-SCALE", "physical_pages": [46], "preserve": "个人贷款不含信用卡5330.20亿元/下降1.96%，其中个人消费贷款1116.64亿元/增长0.40%", "decorated_metric_positions": [1, 3]},
+    {"stock": "600015", "fact_id": "review-add:OM-CC-LOAN-BALANCE", "physical_pages": [47], "preserve": "信用卡贷款余额1510.86亿元、比上年末下降10.75%", "decorated_metric_positions": [1]},
+    {"stock": "600015", "fact_id": "review-add:OM-CC-TXN-VOLUME", "physical_pages": [47], "preserve": "报告期内信用卡交易总额7103.26亿元、同比下降14.29%；期间流量不能由日期字段冒充期末存量", "decorated_metric_positions": [1]},
+    {"stock": "600859", "fact_id": "review-add:R1", "physical_pages": [17, 18], "preserve": "营业收入101.50亿元、同比下降10.74%、剔除门店变动同店同比下降3.75%", "decorated_metric_positions": [1, 2]}
+  ],
+  "candidate_wire_pattern": "data/checkpoints/company_profile_review_local_limits_20261123/{stock}/executions/6fb-{stock}-source-review/receipts/002.json",
+  "reused_independent_source_audit": "../workpaper-review-local-limits-20261123/a-live-independent-review.json",
+  "numeric_expectation": "All5 candidates have source-backed narratives and7 decorated raw metric positions; value strings were already strings. If narrowly recovered, keep original raw wording and null normalized values with a truthful local-format cause, not a guessed sign/unit or false source-nondisclosure. Six ordinary numeric metrics may remain when all applicable checks pass. Source checks and the candidates' own later final review still apply.",
+  "quality_boundary": "No saved real final review covers these5 previously rejected candidates. Offline readiness is not adoption; controlled final replies are engineering fixtures, not supplier results. Wrong narrative/evidence/units or unrelated invalid fields must not be rescued by metric downgrade."
+}

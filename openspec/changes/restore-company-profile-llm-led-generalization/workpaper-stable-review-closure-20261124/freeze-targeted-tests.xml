@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="6.373" timestamp="2026-11-24T02:23:02.218939+08:00" hostname="ComputeR"><testcase classname="tests.unit.test_research.test_company_profile_current_recheck" name="test_existing_model_metric_guards_survive_new_no_findings_and_changed_fact_fails_closed" time="0.360" /><testcase classname="tests.unit.test_research.test_company_profile_current_recheck" name="test_failed_current_recheck_resumes_exact_parent_not_earliest_extract" time="3.220"><failure message="ValueError: saved original draft cannot be reconstructed exactly">tests/unit/test_research/test_company_profile_current_recheck.py:176: in test_failed_current_recheck_resumes_exact_parent_not_earliest_extract
+    original, _, _=prepare_review_recovery(failed,source_recheck_policy=METRIC_LIMIT_POLICY)
+research/company_profile/workpaper_review.py:424: in prepare_review_recovery
+    raise ValueError("saved original draft cannot be reconstructed exactly")
+E   ValueError: saved original draft cannot be reconstructed exactly</failure></testcase></testsuite></testsuites>

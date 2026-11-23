@@ -1,5 +1,13 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.FD 稳定研究版共性收口（用户授权，0新模型）
+
+- [x] 6.FD1 A冻结cae1b92a/原20股633/1003/104现业务文件及旧102、两planned问题/原owner与A-B v3及清理，规范先行；a-baseline.json与6.FD卡可定位。6.FC两本人根已清，0新模型/联网，不重开旧真实窗口。
+- [x] 6.FD2 新source_review_current_draft.v1保当前typed修订/缺项及旧模型/独立限制，base/current draft/request/source packet严绑且错绑0发送；原TaskService→writer→新实例API/export及当前失败后续读父稿绑定通过。旧原seed/not_needed及缺省序列化兼容，历史意见显式inherited，非本次模型判断。
+- [x] 6.FD3 新普通身份带source_metric_unparsed_value_null.v1，抽取/修订提示与Schema/消费对齐，观察到的方向百分比保raw/null/本地原因且原strict校验不改；坏项局部隔离不拖整稿、正文/引用/单位/未知字段仍拒。原receipt/作者/usage不变；有final/拒绝/不可用及保存计划恢复直接验证，候选无自己final不采纳。
+- [x] 6.FD4 冻结后两真实旧base/current稿受控回放保34/28事实及原修订/撤回，5真实修订经A独立typed/源检查可备终核、7null/6普通指标保持，实际repair owner受控终核不可用不采纳。保存原wire/原源等值，不新增V1内容/供应商调用；原104现与102旧保护及最终20新实例见a-terminal.json。
+- [x] 6.FD5 A独立5候选原源/两真实current稿/新实例20API及104现/102旧hash核过，8源码/3测试freeze和AST成立；最终72去重验收用例通过，4HEAD旧版本断言单列，初fixture失败保留。A发现eager全稿拒绝P1已修回局部隔离，未终核候选仍0采纳；strict/diff及本人临时清理/可隔离Git同卡收口。结论工程有限通过、研究数据不变，非新模型99%/人工为零或扩量/生产许可。
+
 ### 6.FC 现有20股研究使用检视（用户继续，0新增模型）
 
 沿产品总需求§3.2.2–3.2.5及A/B v3：A阅读当前可消费内容并作研究取舍，B仅机械核API状态/缺项和既有计划入口。唯一输入为d7cc82a1后研究V1，输出在原研究根research-use.md；不另建事实库、报告平台或开发接口，不重开6.FB，不重抽/源核四家或新增付费调用。先核前轮本人临时根已清，所有新临时物放QuoteBak，原源/writer/API/导出和并行改动不动；必要一份研究使用交付后清本轮临时物。实际缺项不以数量评质量，经营主干与可选细项分开，正式97.8967%及规模/生产边界不改。

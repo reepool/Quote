@@ -1,0 +1,19 @@
+{
+  "task": "6.FD",
+  "A_completed": true,
+  "A_exact_root_absent_after_cleanup": true,
+  "A_exact_root": "/home/python/Quote/data/QuoteBak/company-profile-6fd-a-Uiwpre6V",
+  "A_file_count": 13,
+  "A_logical_bytes": 3091280,
+  "B1_completed": true,
+  "B1_exact_root": "/home/python/Quote/data/QuoteBak/company-profile-6fd-b-BlzNXwcp",
+  "B1_file_count": 123,
+  "B1_logical_bytes": 15205078,
+  "B2_completed": true,
+  "B2_file_count": 10,
+  "B2_logical_bytes": 62176,
+  "total_logical_bytes": 18358534,
+  "basis": "A exact files counted before removal; B1/B2 counts from their completed handoffs, B1 root independently absent. Logical file sizes are not allocated block measurements.",
+  "preserved": "104 current research files,102 old protected files, original PDFs/cache/writer/first failures/usage and both FC planned questions; all unrelated dirty worktree changes.",
+  "removed_contents": "Owned temporary tests/databases/generated PDF fixtures/exports/logs/scripts and baseline document copies after only owned deltas were staged and reviewed; no current business data removed."
+}

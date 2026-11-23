@@ -1,0 +1,43 @@
+{
+  "reviewer": "A/main",
+  "new_instance_current20_API_equals_existing_snapshot": true,
+  "final_eight_source_three_tests_hashes_and_AST_verified": true,
+  "independent_code_review": {
+    "blocking_fixed": "New eager per-fact validation amplified an unrelated bad optional metric into whole-draft failure; fixed to retain existing explicit local isolation. Current-draft continuation also retains exact parent binding and no own final means no adoption.",
+    "nonblocking_deferred": "No unrelated generalization, source chapter-label cleanup, extra field coverage or legacy v7/v8 assertion rewrite.",
+    "data_and_real_quality": "No business-data write or new supplier response. Current20 remains633/1003 and historical97.8967% unchanged."
+  },
+  "protected_delivery_hashes": {
+    "current_V1": true,
+    "protected_pre_FB": true
+  },
+  "current_file_count": 104,
+  "old_file_count": 102,
+  "readable_fact_count": 633,
+  "readable_metric_count": 1003,
+  "actual_saved_current_draft_checks": [
+    {
+      "base_work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "current_facts_preserved": true,
+      "old_quality_and_A_notes_not_model_input": true,
+      "historical_supplier_calls_not_reused_as_new_review": true
+    },
+    {
+      "base_work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "current_facts_preserved": true,
+      "old_quality_and_A_notes_not_model_input": true,
+      "historical_supplier_calls_not_reused_as_new_review": true
+    }
+  ],
+  "code_hashes_at_check": {
+    "research/company_profile/workpaper.py": "be1186641639b25c76ffaa5341b1a74b6afae40669f312434a3d704c0665f722",
+    "research/company_profile/workpaper_llm.py": "03876d02215c919599e17716bfde9d5b495592566f80dac87bda3a5bc18922a9",
+    "research/company_profile/workpaper_review.py": "fe44353b97a970994b5d34c88e28c4e94282dbad7f43f4f9db5677b61b46f262",
+    "research/company_profile/workpaper_metric_format.py": "9c6e8d24da0838e60c7d67542abb515c842f3c186d59cd8c55d5872ddddc4c07",
+    "research/company_profile/operations.py": "d5e5a7f596e188d98c27fbba3b68cc728a89848aa8d343248e144647506c2f2e",
+    "research/company_profile/reads.py": "d0f1cfdd784ede0aff3a75b6f60ea501d9d13425daf01a25f92424f8fa75c866",
+    "research/company_profile/runtime.py": "0ef9958ce9775b8c94fd77db6045319edc87431450233ddcf1ca8fb6aba70e42"
+  },
+  "new_model_requests": 0,
+  "scope": "Code/current-draft and local source readiness only; no real final review, new adoption or formal quality score."
+}

@@ -1,5 +1,19 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 378. 6.FD稳定研究版：当前稿重核保修订，局部数值形状不拒有据正文
+
+2026-11-24用户明确同意并授权合并建议。A按产品/验收/交付/A-B v3及openspec-apply/business-first，冻结cae1b92a、104现V1/102旧文件hash、原20股633/1003及两planned问题，先核6.FC两本人根已清。B1负责原review/TaskService/reads/runtime及集成、B2负责窄格式helper/normalizer/LLM与直接测试，写集分开；A不重复开发，独立源期望/源码挑战/末端保护与Git。没有新增真实模型、公司、业务联网或writer执行，不续6.FB窗口。
+
+新source_review_current_draft.v1对当前typed稿及原source复核，计划分别绑定base/current seed/实际request/source hash，保已接受修订和已撤回内容，不做语义猜合并；旧quality/UseReview/自由文本人工备注不入请求，本地旧未解限制/缺项继续继承并明确inherited非本次模型新发现。原source_review_exact_metric_limits.v1原seed/default not_needed/无新字段旧shape保持。当前稿失败后须从精确父稿接续，而非重建最早extract；改内容、来源、父稿hash的路径拒绝发送。
+
+新普通身份source_metric_unparsed_value_null.v1在原抽取/修订提示、Schema及消费接线，窄helper只处理实际出现的同单位方向百分比表达，原raw/text/单位/主体/引用保留、value=null和本地格式原因，不猜符号/值或把unknown填0。非匹配坏字段沿原typed局部隔离，错误正文/证据仍拒，不能靠删除指标洗白；新eager验证导致坏可选项拖整稿的P1由A指出并修回局部隔离。原响应/作者/usage/拒绝不改，候选仍须自己的终核；原writer/新实例API/JSON/Markdown/CSV及无终核不采纳有受控纵向验证。
+
+A独立读取真实5修订原wire/原源并实跑类型/源检查：旧5拒绝，新5可备终核，7个方向raw指标为null/本地原因，6个普通数值不改。它们的真实终核和采纳仍为0；信用卡交易额正文为期间流量而候选日期字段为期末，语义仍须自己的终核，不以工程恢复冒充正确。两真实旧base当前稿受控回放保34/28事实和修订/撤回，源与作者不变；保存raw/父稿hash及实际final payload身份可定位。
+
+验证：最终验收组去重72通过（集合重叠不加总），另4个HEAD已存v7/v8断言失败独列，A核HEAD生产v8而旧test仍期待v7，未改旧测试。首版CSV/属性观察、缺Schema恢复夹具、误期待旧合同可换稿等失败XML保留并由相应最终复验覆盖；实际未知/错绑定规则不放宽。8源/3测试freeze hash与AST一致，OpenSpec strict/diff通过；A新实例20读取和104/102保护见a-terminal.json，当前业务数据仍633/1003。B2有一次OpenSpec CLI遥测DNS失败尝试，未含供应商或年报载荷，后续显式关遥测；不冒称绝对0所有网络。
+
+结论：本卡工程和保存响应接续有限通过，可继续有源分级研究使用；真实新版本模型效果/人工节省未评，不修改97.8967%、95%/99%门槛及S2历史失败，不自动扩100或生产。两家收入问题仍planned，不作为本卡必补门槛；不追本四家尾项、目录引擎或新平台。有限Review只修当前阻塞，旧版本断言/无关并行不动；A清13文件3091280字节、B1清123文件15205078字节、B2清10文件62176字节，共18358534逻辑字节，必要证据一套及现104/旧102原件保留，详cleanup.json。A按开工脏基线隔离本人增量及新代码/测试，普通commit/push收口。
+
 ## 377. 6.FC现有20股研究使用检视：交内容对照，只留两个未执行问题
 
 用户标注“下一步以研究使用和具体问题补读为主，不再反复重跑四家”并要求继续。A按OpenSpec apply/business-first及A/B v3，在原tasks/delivery冻结0模型的研究使用范围；B只做本地API统计/计划绑定，A阅读20股主营、产品服务、赚钱方式与实际缺项，未续6.FB、重抽、联网或改源码。开工d7cc82a1/master空暂存、既有脏配置/骨架/历史文档保护，6.FB两本人根已清。
