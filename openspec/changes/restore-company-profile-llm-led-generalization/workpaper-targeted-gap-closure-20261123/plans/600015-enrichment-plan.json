@@ -1,0 +1,30 @@
+{
+  "state": "planned",
+  "execution_started": false,
+  "action": "enrich",
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6fa-600015-targeted-gap",
+    "base_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+    "base_workpaper_sha256": "d7d4db37643b2b20d690a111dff1fb0825d51774f6f24c6cf4f471c7b052cf61",
+    "report": {
+      "instrument_id": "600015.SH",
+      "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "customers_channels_markets",
+        "question": "补充本报告零售客户及相关经营规模的披露数量、类别、期间和计量单位，区分正文数量与脚注标记，并为每项绑定完整原文依据；无法可靠读取的部分明确保留缺项。"
+      }
+    ]
+  },
+  "requires": [
+    "explicit_model_and_finite_budget",
+    "publication_write_permission"
+  ],
+  "production_authorization": "not_authorized"
+}

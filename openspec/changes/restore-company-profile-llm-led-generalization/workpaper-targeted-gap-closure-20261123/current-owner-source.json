@@ -1,0 +1,174 @@
+[
+  {
+    "instrument_id": "600015.SH",
+    "current_owner_asset": {
+      "asset_id": "asset_2aae592305458d4f705a76a316b62b0c",
+      "instrument_id": "600015.SH",
+      "fiscal_year": 2025,
+      "report_period": "2025-12-31",
+      "source": "cninfo",
+      "source_announcement_id": "1225058278",
+      "filing_id": "1225058278",
+      "attachment_id": "att_40901fd3c50bfe002418d0baa0b1efbc",
+      "observation_version": "ver_9b4fdf8c9a213f69e139d2f279fd68d0",
+      "version_available_at": "2026-08-14T19:46:27.232658+08:00",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_family": "annual_report",
+      "variant": "original",
+      "is_full_report": true,
+      "is_correction": false,
+      "classification_vocabulary_version": "official_document_classification.v1",
+      "content_hash": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "content_length": 11350196,
+      "content_url": null,
+      "integrity": "valid",
+      "asset_availability": "local_valid",
+      "availability": "local_valid",
+      "acquisition_status": "success",
+      "effective_state": "current",
+      "effective_decision_state": "current",
+      "exact_content_state": "local_valid",
+      "predecessor_asset_id": null,
+      "pending_candidate_id": null,
+      "activated_at": "2026-08-14T19:46:27.232658+08:00",
+      "last_checked_at": "2026-11-23T23:59:59.999999+08:00",
+      "decision_reasons": [
+        "winner_selected"
+      ],
+      "canonical_source_filing": {
+        "source": "cninfo",
+        "source_announcement_id": "1225058278",
+        "attachment_id": "att_40901fd3c50bfe002418d0baa0b1efbc"
+      },
+      "equivalent_source_filings": [
+        {
+          "source": "cninfo",
+          "source_announcement_id": "1225058278",
+          "attachment_id": "att_40901fd3c50bfe002418d0baa0b1efbc",
+          "version_id": "ver_9b4fdf8c9a213f69e139d2f279fd68d0",
+          "content_hash": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+        }
+      ],
+      "canonical_projection_policy_version": "canonical_source_filing.v1",
+      "evidence_set_hash": "259c0a937c2581724b9fc2e8fcd0a84d8a3012c22133b148028085904d65691f"
+    },
+    "expected_sha256": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+  },
+  {
+    "instrument_id": "600348.SH",
+    "current_owner_asset": {
+      "asset_id": "asset_f320e4e874bc2381e9f05bb662544a64",
+      "instrument_id": "600348.SH",
+      "fiscal_year": 2025,
+      "report_period": "2025-12-31",
+      "source": "cninfo",
+      "source_announcement_id": "1225197392",
+      "filing_id": "1225197392",
+      "attachment_id": "att_7595a8efe99e5d55e4252e7bb1287146",
+      "observation_version": "ver_2da66d7fb5caa35c969315c262786f56",
+      "version_available_at": "2026-08-14T20:20:01.712875+08:00",
+      "published_at": "2026-04-26T16:00:00+00:00",
+      "document_family": "annual_report",
+      "variant": "original",
+      "is_full_report": true,
+      "is_correction": false,
+      "classification_vocabulary_version": "official_document_classification.v1",
+      "content_hash": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "content_length": 1686259,
+      "content_url": null,
+      "integrity": "valid",
+      "asset_availability": "local_valid",
+      "availability": "local_valid",
+      "acquisition_status": "success",
+      "effective_state": "current",
+      "effective_decision_state": "current",
+      "exact_content_state": "local_valid",
+      "predecessor_asset_id": null,
+      "pending_candidate_id": null,
+      "activated_at": "2026-08-14T20:20:01.712875+08:00",
+      "last_checked_at": "2026-11-23T23:59:59.999999+08:00",
+      "decision_reasons": [
+        "winner_selected"
+      ],
+      "canonical_source_filing": {
+        "source": "cninfo",
+        "source_announcement_id": "1225197392",
+        "attachment_id": "att_7595a8efe99e5d55e4252e7bb1287146"
+      },
+      "equivalent_source_filings": [
+        {
+          "source": "cninfo",
+          "source_announcement_id": "1225197392",
+          "attachment_id": "att_7595a8efe99e5d55e4252e7bb1287146",
+          "version_id": "ver_2da66d7fb5caa35c969315c262786f56",
+          "content_hash": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+        }
+      ],
+      "canonical_projection_policy_version": "canonical_source_filing.v1",
+      "evidence_set_hash": "02fafba5cf8d4e3da64ec661c0ad97b647b0cc01378a0f471247d69a3d41dae8"
+    },
+    "expected_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559"
+  },
+  {
+    "instrument_id": "601377.SH",
+    "current_owner_asset": {
+      "asset_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+      "instrument_id": "601377.SH",
+      "fiscal_year": 2025,
+      "report_period": "2025-12-31",
+      "source": "cninfo",
+      "source_announcement_id": "1225046462",
+      "filing_id": "1225046462",
+      "attachment_id": "att_e8bae6c1a042ac59abe0418fb897c8c3",
+      "observation_version": "ver_878d56d0dd04be1ab571b334c06176a5",
+      "version_available_at": "2026-08-13T02:37:54.617652+00:00",
+      "published_at": "2026-03-27T16:00:00+00:00",
+      "document_family": "annual_report",
+      "variant": "original",
+      "is_full_report": true,
+      "is_correction": false,
+      "classification_vocabulary_version": "official_document_classification.v1",
+      "content_hash": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "content_length": 3234402,
+      "content_url": null,
+      "integrity": "valid",
+      "asset_availability": "local_valid",
+      "availability": "local_valid",
+      "acquisition_status": "success",
+      "effective_state": "current",
+      "effective_decision_state": "current",
+      "exact_content_state": "local_valid",
+      "predecessor_asset_id": null,
+      "pending_candidate_id": null,
+      "activated_at": "2026-08-13T02:37:54.617652+00:00",
+      "last_checked_at": "2026-11-23T23:59:59.999999+08:00",
+      "decision_reasons": [
+        "winner_selected"
+      ],
+      "canonical_source_filing": {
+        "source": "cninfo",
+        "source_announcement_id": "1225046462",
+        "attachment_id": "att_e8bae6c1a042ac59abe0418fb897c8c3"
+      },
+      "equivalent_source_filings": [
+        {
+          "source": "cninfo",
+          "source_announcement_id": "1225046462",
+          "attachment_id": "att_3f11a649cd040733472cad676c6de162",
+          "version_id": "ver_3440c2adef3f4ac6e3b556f7f165e47c",
+          "content_hash": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb"
+        },
+        {
+          "source": "cninfo",
+          "source_announcement_id": "1225046462",
+          "attachment_id": "att_e8bae6c1a042ac59abe0418fb897c8c3",
+          "version_id": "ver_878d56d0dd04be1ab571b334c06176a5",
+          "content_hash": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb"
+        }
+      ],
+      "canonical_projection_policy_version": "canonical_source_filing.v1",
+      "evidence_set_hash": "addbf44f7c89ac7872c9e5f99e071d54b7a574d8befa2e47f6b72c204c048a91"
+    },
+    "expected_sha256": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb"
+  }
+]

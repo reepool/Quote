@@ -1,0 +1,60 @@
+{
+  "schema_version": "company_profile_task_plan.v1",
+  "run_id": "6fa-600015-enrich",
+  "authorization_status": "authorized",
+  "approval_reference": "human-20261123-6FA-three-targeted-enrich-approved",
+  "action": "enrich",
+  "instrument_ids": [
+    "600015.SH"
+  ],
+  "document_versions": {
+    "600015.SH": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3"
+  },
+  "knowledge_cutoff": "2026-11-23",
+  "output_root": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600015",
+  "extract": {
+    "name": "semantic_extraction__deepseek",
+    "model": "deepseek-flash",
+    "host": "api.deepseek.com",
+    "attempt_seconds": 600,
+    "disable_thinking": true,
+    "max_output_tokens_field": "max_tokens"
+  },
+  "review": {
+    "name": "semantic_extraction__scorpio_grok",
+    "model": "grok-4.7",
+    "host": "scorpio.reepool.com",
+    "attempt_seconds": 1200,
+    "reasoning_effort": "high"
+  },
+  "budget": {
+    "seconds": 5950.0,
+    "tokens": 1000000,
+    "physical_requests": 10,
+    "recoveries": 3,
+    "logical_seconds": 2450.0,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6fa-600015-targeted-gap",
+    "base_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+    "base_workpaper_sha256": "d7d4db37643b2b20d690a111dff1fb0825d51774f6f24c6cf4f471c7b052cf61",
+    "report": {
+      "instrument_id": "600015.SH",
+      "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "customers_channels_markets",
+        "question": "补充本报告零售客户及相关经营规模的披露数量、类别、期间和计量单位，区分正文数量与脚注标记，并为每项绑定完整原文依据；无法可靠读取的部分明确保留缺项。"
+      }
+    ]
+  }
+}

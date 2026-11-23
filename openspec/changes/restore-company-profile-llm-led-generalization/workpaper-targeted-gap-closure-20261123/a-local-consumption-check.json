@@ -1,0 +1,63 @@
+{
+  "task": "6.FA",
+  "reviewer": "A/main",
+  "phase": "before_unused_source_review",
+  "method": "Independent JSON parse and exact empty-nontarget status-only transformation, compared with generation hashes; no call to implementation normalizer",
+  "checks": [
+    {
+      "instrument_id": "600015.SH",
+      "original_raw_hash": "5787af354cc3f43848c41181697ba517bf86333d8df87d63b7c3171c52836165",
+      "status_only_normalized_hash": "fef9614d58e16da3a60ef4df2c0cd33ba455a4b4e28575a11a682364674615ee",
+      "elements_changed": [
+        "business_structure",
+        "products_services",
+        "revenue_model",
+        "scale_and_mix",
+        "operations_and_inputs",
+        "operating_drivers",
+        "material_changes"
+      ],
+      "source_text_sha256": "5f8a01bc5462b15003ce3600e70a4b7741bfe1d96b9a6fa11bf0a48e3a34cb42",
+      "business_values_changed_by_normalization": 0,
+      "retained_facts": 10
+    },
+    {
+      "instrument_id": "600348.SH",
+      "original_raw_hash": "22fe13f27e6ea2cb090e896254b2b5e13fe85322e84e55884489f24383b42e35",
+      "status_only_normalized_hash": "483aa9cb5b14488a204bfa5195d293d1a97c520c327f84a9bafbc60c01e6dee4",
+      "elements_changed": [
+        "business_structure",
+        "products_services",
+        "scale_and_mix",
+        "operations_and_inputs",
+        "customers_channels_markets",
+        "material_changes"
+      ],
+      "source_text_sha256": "4274d55ddf27327e9fd71f1e1563af3083a2d4b4ba5c9e8d7388b669a0945212",
+      "business_values_changed_by_normalization": 0,
+      "retained_facts": 8
+    },
+    {
+      "instrument_id": "601377.SH",
+      "original_raw_hash": "ea046805ef8336a55ce4fed72a23388f4f7dfc7dd32f237effcc192f0976bf28",
+      "status_only_normalized_hash": "f35206b74564b74b2c4853ceef0989cc6eebad19a4c46fa4ac2ea148cd242dbe",
+      "elements_changed": [
+        "business_structure",
+        "products_services",
+        "revenue_model",
+        "scale_and_mix",
+        "operations_and_inputs",
+        "customers_channels_markets",
+        "operating_drivers",
+        "material_changes"
+      ],
+      "source_text_sha256": "50655cdceb1b48eb124183100fdb68a56fcdff2eef9b5c02521ce17f1517899b",
+      "business_values_changed_by_normalization": 0,
+      "retained_facts": 11
+    }
+  ],
+  "other17_fresh_API_equal_original": true,
+  "all3_original_fact_entries_equal_original": true,
+  "new_readable_candidates_not_reviewed": 29,
+  "new_metric_records_not_a_quality_score": 65
+}

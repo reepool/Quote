@@ -108,6 +108,34 @@ def test_live_raw_recovery_strictness_and_no_paid_format_retry(damage):
         asyncio.run(client.close())
 
 
+@pytest.mark.parametrize('legacy_enrich', [False, True])
+def test_complete_json_schema_rejection_keeps_original_error_without_brace_retry(legacy_enrich):
+    index = index_sections(PAGES)
+    selected = _selection(index)
+    draft = _draft(build_section_packet(_report(), PAGES, index, selected)).model_dump(mode='json')
+    draft['elements']['products_services'].update(status='not_read_for_this_task', facts=[],
+        limitations=['本轮未读此问题，不代表报告未披露。'])
+    raw = json.dumps(draft, ensure_ascii=False)
+    provider, transport, client = _provider([
+        _response(selected.model_dump(mode='json')),
+        _response(None, choices=[{'message': {'content': raw}, 'finish_reason': 'stop'}]),
+    ])
+    identity = workpaper_processing_identity(real=False)
+    if legacy_enrich:
+        identity['workpaper_enrichment'] = {'targets': [{'element':'business_structure', 'question':'业务是什么？'}]}
+    try:
+        with pytest.raises(SemanticProviderError, match='not_read_for_this_task'):
+            run_workpaper(report=_report(), pages=PAGES,
+                processing_identity=identity,
+                provider=provider, work_id='complete-schema-rejection')
+        assert len(transport.calls) == 2
+        assert provider.workpaper_receipts[-1]['raw_content'] == raw
+        assert provider.workpaper_receipts[-1]['contract_status'] == 'rejected'
+        assert provider.workpaper_receipts[-1]['response_hash'] == hashlib.sha256(raw.encode()).hexdigest()
+    finally:
+        asyncio.run(client.close())
+
+
 def _core_draft():
     elements = {key: dict(status='unclear', facts=[], limitations=['Not obtained from selected source.']) for key in ELEMENT_LABELS}
     for key, fid, text in [('business_structure','main','Company provides loans and settlement services.'),

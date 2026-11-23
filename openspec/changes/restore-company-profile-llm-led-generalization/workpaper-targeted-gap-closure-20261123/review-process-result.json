@@ -1,0 +1,71 @@
+{
+  "companies": [
+    {
+      "instrument_id": "600015.SH",
+      "command": [
+        "/home/python/miniconda3/envs/Quote/bin/python",
+        "main.py",
+        "job",
+        "--job-id",
+        "company_profile_common_core",
+        "--action",
+        "review_batch",
+        "--execution-plan-file",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/600015-unused-review.json"
+      ],
+      "started_epoch": 1795404285.2802653,
+      "absolute_deadline_epoch": 1795409003.378532,
+      "original_started_epoch": 1795403003.378532,
+      "state": "exited",
+      "pid": 3405442,
+      "returncode": 0,
+      "finished_epoch": 1795404440.652074,
+      "elapsed_seconds": 155.37180924415588
+    },
+    {
+      "instrument_id": "600348.SH",
+      "command": [
+        "/home/python/miniconda3/envs/Quote/bin/python",
+        "main.py",
+        "job",
+        "--job-id",
+        "company_profile_common_core",
+        "--action",
+        "review_batch",
+        "--execution-plan-file",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/600348-unused-review.json"
+      ],
+      "started_epoch": 1795404285.3136435,
+      "absolute_deadline_epoch": 1795409003.4086428,
+      "original_started_epoch": 1795403003.4086428,
+      "state": "exited",
+      "pid": 3405444,
+      "returncode": 0,
+      "finished_epoch": 1795404446.746305,
+      "elapsed_seconds": 161.43266224861145
+    },
+    {
+      "instrument_id": "601377.SH",
+      "command": [
+        "/home/python/miniconda3/envs/Quote/bin/python",
+        "main.py",
+        "job",
+        "--job-id",
+        "company_profile_common_core",
+        "--action",
+        "review_batch",
+        "--execution-plan-file",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/601377-unused-review.json"
+      ],
+      "started_epoch": 1795404285.3389344,
+      "absolute_deadline_epoch": 1795409003.4360495,
+      "original_started_epoch": 1795403003.4360495,
+      "state": "exited",
+      "pid": 3405446,
+      "returncode": 0,
+      "finished_epoch": 1795404482.1311145,
+      "elapsed_seconds": 196.7921805381775
+    }
+  ],
+  "finished_epoch": 1795404482.132322
+}

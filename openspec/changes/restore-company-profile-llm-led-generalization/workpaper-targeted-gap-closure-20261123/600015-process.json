@@ -1,0 +1,25 @@
+{
+  "instrument_id": "600015",
+  "command": [
+    "/home/python/miniconda3/envs/Quote/bin/python",
+    "main.py",
+    "job",
+    "--job-id",
+    "company_profile_common_core",
+    "--action",
+    "enrich",
+    "--execution-plan-file",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/600015-enrich.json"
+  ],
+  "started_epoch": 1795403003.378532,
+  "absolute_deadline_epoch": 1795409003.378532,
+  "state": "exited",
+  "plan_sha256": "247584b26fffd462c934878a810eb1976afecf992d2b0259682abddf4d3634a3",
+  "log_path": "/home/python/Quote/data/QuoteBak/company-profile-6fa-b-FhRR3FCV/600015.log",
+  "budget_seconds": 5950,
+  "initialization_guard_seconds": 50,
+  "pid": 3401929,
+  "returncode": 0,
+  "finished_epoch": 1795403046.8373942,
+  "elapsed_seconds": 43.45886301994324
+}

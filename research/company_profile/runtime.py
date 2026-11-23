@@ -217,6 +217,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "workpaper_review_recovery",
             "workpaper_extraction_resume_hash",
             "workpaper_enrichment",
+            "enrichment_unread_recovery",
             "quality_review_profile",
             "repair_profile",
             "discovery_scope",

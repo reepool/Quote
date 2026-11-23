@@ -11,6 +11,29 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 
 本文命令使用已验证的项目完整环境`/home/python/miniconda3/envs/Quote/bin/python`。系统`python3`可能缺少pandas等项目依赖；此时应选正确解释器，不通过改业务代码或临时安装依赖解决。以下路径均从`/home/python/Quote`执行。
 
+## 当前20股的定向补读研究版本（6.FA，2026-11-23）
+
+当前研究根为`/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123`，人读画像和机器投影分别在`exports/annual_profiles.md`、`exports/annual_profiles.json`；`annual-api.json`是同一年度API快照。本根沿6.EZ原20股追加华夏600015、华阳600348、兴证601377的同报告补读与真实源核，其余17股保持。6.EW原20股是另一名单，旧各根/失败和审核成绩保留，不改变共享默认配置或启用生产。
+
+研究命令使用进程级`QMT_BUSINESS_API_SANDBOX=1`避免初始化无关通知；它不替代真实调用的联网权限或范围预算授权。直接读当前本地画像不创建模型：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+QMT_BUSINESS_API_SANDBOX=1 /home/python/miniconda3/envs/Quote/bin/python - <<'PY'
+from research.company_profile.reads import CompanyProfileReadService
+reader = CompanyProfileReadService('/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123')
+profile = reader.research_profile('600015.SH')
+print(profile['information_gaps'])
+print([(r['work_id'], r['review_status']) for r in profile['readings']])
+PY
+```
+
+本轮补回华夏零售/私人银行客户数量、华阳按煤炭业务范围标记的收入成本指标、兴证研究排名的完整出处。首发三次Schema失败仍保留，当前是原响应的结构化消费和未用源核后继，不是三家修复版全新首发；原97.8967%不改。
+
+`generation.local_schema_normalization`记录仅对空非目标要素的明确未读状态所作规范化，原抽取仍为`rejected`、实际作者/原raw/usage保持。新版普通enrich以独立`enrichment_unread_recovery`身份复用同一窄处理并继续原源核；不认识的状态、有facts或目标要素仍拒绝，不补写业务值。
+
+华夏两条业务收入原句有源，但4个原metric误标集团整体范围，当前仅正文限用、指标缺口由`metric_gaps`公开。消费信贷客户/部分贷款规模原文有披露，仍因程序绑定/修订未通过而未进入可用事实，不能解释成未披露。兴证其他排名/荣誉属建议补充；`supplemented_not_fully_reassessed`只表示已有补读，不表示同要素全部缺项已解决。具体问题仍按下文enrichment-plan流程另行有界处理，不改旧文件续额或自动补齐。
+
 ## 新20股的指标局部限用研究版本（6.EZ）
 
 本根为`/home/python/Quote/data/research/company_profile_metric_safe_release_20261122`，来源于6.EY新20股，和下文6.EW原20股是不同名单。它保留原LLM内容/模型审核，在有源独立使用决定下恢复8条正确描述及12个未受影响指标；15个错误指标不作为确定数值交付。不是一次新模型抽取或原97.8967%准确率的改判，不自动设置共享默认根或启生产。

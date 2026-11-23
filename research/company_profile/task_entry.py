@@ -130,6 +130,7 @@ class CompanyProfileLocalTaskPlan(_PlanModel):
     checkpoint_root: Path
     max_elapsed_seconds: float = Field(gt=0, le=1800)
     saved_draft: _SavedDraft
+    consumption_mode: Literal["local_format_only", "local_enrichment_schema_only"] = "local_format_only"
 
     @model_validator(mode="after")
     def scope(self):
@@ -224,6 +225,8 @@ async def execute_configured_task(
 
         saved = load_saved_draft_input(plan, root)
     parameters = plan.model_dump(mode="json")
+    if local and plan.consumption_mode == "local_format_only":
+        parameters.pop("consumption_mode")  # Existing local fingerprints stay exact.
     if not local and plan.enrichment_plan is None:
         parameters.pop("enrichment_plan")  # Preserve fingerprints of existing v1 execution files.
     fingerprint = hashlib.sha256(json.dumps(parameters, sort_keys=True).encode()).hexdigest()
@@ -250,7 +253,7 @@ async def execute_configured_task(
                 token_budget=0, max_items=1, max_elapsed_seconds=remaining,
                 **{k: v for k, v in arguments.items() if k != "page_source"})
             result["execution_plan"] = {"run_id": plan.run_id, "plan_sha256": fingerprint,
-                "mode": "local_format_only", "new_model_requests": 0, "added_supplier_usage": 0,
+                "mode": plan.consumption_mode, "new_model_requests": 0, "added_supplier_usage": 0,
                 "production_authorization": PRODUCTION_AUTHORIZATION}
             _save_result(result_path, result)
             return result

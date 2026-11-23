@@ -1,0 +1,170 @@
+{
+  "root": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123",
+  "api_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/annual-api.json",
+  "annual_json": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/exports/annual_profiles.json",
+  "annual_markdown": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/exports/annual_profiles.md",
+  "delivered": 20,
+  "visible_fact_records": 628,
+  "visible_metric_records": 993,
+  "counts_are_not_quality_scores": true,
+  "other17_profiles_equal": [
+    "000049.SZ",
+    "601006.SH",
+    "000338.SZ",
+    "600859.SH",
+    "601166.SH",
+    "600900.SH",
+    "000651.SZ",
+    "000526.SZ",
+    "000006.SZ",
+    "600316.SH",
+    "000156.SZ",
+    "600901.SH",
+    "601668.SH",
+    "920014.BJ",
+    "300015.SZ",
+    "920017.BJ",
+    "000099.SZ"
+  ],
+  "three_old_fact_entries_unchanged": true,
+  "original87_protected": true,
+  "frozen_code_unchanged": true,
+  "fresh_instance_equals_API": true,
+  "export_equals_API": true,
+  "http": {
+    "batch20_equal": true,
+    "changed_three_detail_equal": true,
+    "status": 200,
+    "external_requests": 0
+  },
+  "active_gap_counts": {
+    "600348.SH": 10,
+    "600015.SH": 6,
+    "601377.SH": 6
+  },
+  "new_final_readings": [
+    {
+      "instrument_id": "600015.SH",
+      "final_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-c144725bfcfff1bceadc5849.json",
+      "workpaper_sha256": "d9fe3d7759066ca22ccee2388c12f81e416bf577589a2e8836951d408414b796",
+      "review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "final_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-2a5b3a9b1435fc7ccbf42d46.json",
+      "workpaper_sha256": "6041634dd243d0ea0247593dfaceddca0e1478d79e41aba21d9c2d47b01f3fdb",
+      "review_status": "completed"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "final_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-aeb6c2b53b6c62d3973c3a4c.json",
+      "workpaper_sha256": "cb21793fcd3f8d36f692f1a4ea6599b42af37cf83c59546c2285054c61765678",
+      "review_status": "completed_with_open_findings"
+    }
+  ],
+  "A_independent_restrictions_applied": true,
+  "post_decision_metric_gap_examples": [
+    {
+      "reading_work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-WEALTH-FEE-INCOME",
+      "state": "limited",
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "财富管理手续费及佣金收入",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        },
+        {
+          "metric_index": 1,
+          "name": "财富管理手续费及佣金收入同比增长率",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        }
+      ],
+      "active_gap": {
+        "reading_work_id": "bp-work-c144725bfcfff1bceadc5849",
+        "active": true,
+        "element": "customers_channels_markets",
+        "fact_id": "F-WEALTH-FEE-INCOME",
+        "status": "unclear",
+        "metric_indices": [
+          0,
+          1
+        ],
+        "metric_names": [
+          "财富管理手续费及佣金收入",
+          "财富管理手续费及佣金收入同比增长率"
+        ],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "reasons": [
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        ],
+        "suggested_reading": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。",
+        "supplemental_reading_work_ids": [
+          "bp-work-0bf9bfd2e2031508d9c45c9f"
+        ],
+        "follow_up_state": "supplemented_not_fully_reassessed"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-CREDIT-CARD-REVENUE",
+      "state": "limited",
+      "metric_gaps": [
+        {
+          "metric_index": 0,
+          "name": "信用卡业务收入",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        },
+        {
+          "metric_index": 1,
+          "name": "信用卡业务收入同比变动率",
+          "state": "withheld",
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        }
+      ],
+      "active_gap": {
+        "reading_work_id": "bp-work-c144725bfcfff1bceadc5849",
+        "active": true,
+        "element": "customers_channels_markets",
+        "fact_id": "F-CREDIT-CARD-REVENUE",
+        "status": "unclear",
+        "metric_indices": [
+          0,
+          1
+        ],
+        "metric_names": [
+          "信用卡业务收入",
+          "信用卡业务收入同比变动率"
+        ],
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "reasons": [
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        ],
+        "suggested_reading": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。",
+        "supplemental_reading_work_ids": [
+          "bp-work-0bf9bfd2e2031508d9c45c9f"
+        ],
+        "follow_up_state": "supplemented_not_fully_reassessed"
+      }
+    }
+  ],
+  "scoped_final_recheck": {
+    "changed_company": "600015.SH",
+    "fresh_ReadService": true,
+    "HTTP_detail_200_equals_API": true,
+    "original_exporter_JSON_Markdown_CSV_refreshed": true,
+    "group_HTTP20_and_other17_checks_reused": true,
+    "other17_and_old_fact_entry_verification": "pre-decision full proof; final change only two fact use_review metadata"
+  },
+  "pre_decision_metric_records": 997,
+  "new_metrics_after_independent_review": 61
+}

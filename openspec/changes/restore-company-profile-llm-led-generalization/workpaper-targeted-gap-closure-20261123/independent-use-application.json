@@ -1,0 +1,15 @@
+{
+  "source_decision_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/a-source-use-decisions.json",
+  "source_decision_sha256": "a1d2bd6228c6c84737b7a66af79f2b28ac7b0e5ac5bee2cacb5db3feda015849",
+  "original_model_runtime_path": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600015/executions/6fa-600015-unused-source-review/model-runtime.json",
+  "original_model_runtime_sha256": "adf2c3a6d6c862fbc5768caf842e4ab3a40893485c44185ade3dac0ce225a6e5",
+  "delivery_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-c144725bfcfff1bceadc5849.json",
+  "delivery_runtime_sha256": "fa9ccfde404661a054399deb3c8ad5e0456a9bdabf6221658b85dcf57628d45a",
+  "changed_fields": [
+    "workpaper.use_review"
+  ],
+  "fact_text_metrics_evidence_generation_quality_unchanged": true,
+  "restricted_metric_positions": 4,
+  "new_model_requests": 0,
+  "initial_mechanical_comparison": "None key vs omitted optional field; corrected assertion only, first attempt did not publish"
+}

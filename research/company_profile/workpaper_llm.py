@@ -12,7 +12,7 @@ from typing import Any
 from .models import ReportIdentity
 from .contracts import SemanticProviderError
 from .workpaper import (
-    ELEMENT_LABELS, CompanyProfileWorkpaper, WorkpaperDraftResponse,
+    ELEMENT_LABELS, SUPPLY_CHAIN_LABELS, FEATURE_ELEMENT, CompanyProfileWorkpaper, WorkpaperDraftResponse,
     WorkpaperFormatNormalization, WorkpaperGenerationMetadata,
     WorkpaperModelCall, bind_workpaper_draft, normalize_workpaper_draft,
     WORKPAPER_SUBJECT_INSTRUCTIONS,
@@ -34,6 +34,7 @@ SECTION_GUIDE = (
 )
 WORKPAPER_READING_STRATEGY = "chapter_workpaper_v1"
 AUTO_FORMAT_RECOVERY = "local_shape_before_retry.v3"
+ENRICHMENT_UNREAD_RECOVERY = "empty_non_target_unread_status.v1"
 
 
 def workpaper_processing_identity(
@@ -318,6 +319,38 @@ def normalize_retained_workpaper_format(raw: str) -> tuple[dict, WorkpaperFormat
     )
 
 
+def normalize_retained_enrichment_unread(raw: str, target_elements) -> tuple[dict, Any]:
+    """Normalize only explicit, empty non-target unread states; retain author bytes."""
+    from .workpaper import WorkpaperUnreadNormalization
+
+    targets = tuple(target_elements)
+    allowed = {*ELEMENT_LABELS, *SUPPLY_CHAIN_LABELS, FEATURE_ELEMENT}
+    if not targets or len(set(targets)) != len(targets) or set(targets) - allowed:
+        raise ValueError("explicit enrichment targets required for unread normalization")
+    payload = _strict_workpaper_json(raw)
+    if not isinstance(payload, dict) or payload.get("schema_version") != "company_profile_workpaper_draft.v1":
+        raise ValueError("explicit complete workpaper draft required")
+    elements = payload.get("elements")
+    if not isinstance(elements, dict) or set(elements) != set(ELEMENT_LABELS):
+        raise ValueError("all baseline elements required")
+    changed = []
+    for name, element in elements.items():
+        if not isinstance(element, dict) or element.get("status") != "not_read_for_this_task":
+            continue
+        if (name in targets or element.get("facts") != []
+            or not isinstance(element.get("limitations"), list) or not element["limitations"]
+            or any(not isinstance(note, str) or not note.strip() for note in element["limitations"])):
+            raise ValueError("unread normalization requires empty explicitly limited non-target elements")
+        element["status"] = "unclear"
+        changed.append(name)
+    if not changed:
+        raise ValueError("no eligible unread status to normalize")
+    return payload, WorkpaperUnreadNormalization(
+        original_content_sha256=hashlib.sha256(raw.encode()).hexdigest(),
+        normalized_object_sha256=hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()).hexdigest(),
+        target_elements=targets, normalized_elements=tuple(changed))
+
+
 def run_workpaper(
     *, report: ReportIdentity, pages: Sequence[Mapping],
     processing_identity: Mapping[str, Any], provider: Any, work_id: str,
@@ -327,9 +360,9 @@ def run_workpaper(
     """One selection and one company extraction, never eight per-element loops."""
     real = processing_identity.get("execution_mode") == "provider"
     mode = extraction_resume.get("mode") if extraction_resume is not None else None
-    if mode not in (None, "local_format_only"):
+    if mode not in (None, "local_format_only", "local_enrichment_schema_only"):
         raise ValueError("unknown extraction continuation mode")
-    local_only = mode == "local_format_only"
+    local_only = mode in {"local_format_only", "local_enrichment_schema_only"}
     automatic_format = processing_identity.get("workpaper_format_recovery") == AUTO_FORMAT_RECOVERY
     if local_only and processing_identity.get("workpaper_review_policy"):
         raise ValueError("local-only format consumption cannot send model review requests")
@@ -357,6 +390,7 @@ def run_workpaper(
     timeout = float(processing_identity.get("logical_request_timeout_seconds", 300))
     retained_selection = None
     normalization = None
+    schema_normalization = None
     recovery_content = {}
     enrichment = processing_identity.get("workpaper_enrichment")
     reading_targets = {"targeted_reading": {"targets": enrichment["targets"]}} if enrichment else {}
@@ -392,7 +426,10 @@ def run_workpaper(
                 "instructions": "Return a complete schema-conforming JSON object grounded only in the supplied source; correct the format, do not invent or infer missing business facts.",
             }}
         else:
-            raise ValueError("extraction continuation requires an actually malformed original JSON response")
+            if local_only and extraction_resume.get("mode") == "local_enrichment_schema_only" and enrichment:
+                normalize_retained_enrichment_unread(raw_failure, [t["element"] for t in enrichment["targets"]])
+            else:
+                raise ValueError("extraction continuation requires an actually malformed original JSON response")
         selected = extraction_resume["selection_response"]
         selection_id = retained_selection["request_id"]
     elif processing_identity.get("workpaper_extraction_resume_hash"):
@@ -458,7 +495,11 @@ def run_workpaper(
             "source_text": packet.model_text(),
         }, ensure_ascii=False, sort_keys=True).encode()).hexdigest():
             raise ValueError("saved extraction source packet differs from reconstructed source")
-        extracted, normalization = normalize_retained_workpaper_format(raw_failure)
+        if extraction_resume.get("mode") == "local_enrichment_schema_only":
+            extracted, schema_normalization = normalize_retained_enrichment_unread(
+                raw_failure, [t["element"] for t in enrichment["targets"]])
+        else:
+            extracted, normalization = normalize_retained_workpaper_format(raw_failure)
         extracted = normalize_workpaper_draft(extracted)
         failed_call = WorkpaperModelCall.model_validate(extraction_resume.get("failed_call"))
         if expected_source is not None:
@@ -470,7 +511,7 @@ def run_workpaper(
         if (failed_call.purpose != "extract_profile_workpaper"
             or failed_call.contract_status != "rejected"
             or failed_call.finish_reason != "stop"
-            or failed_call.response_hash != normalization.original_content_sha256
+            or failed_call.response_hash != (normalization or schema_normalization).original_content_sha256
             or not failed_call.model or not failed_call.source_label):
             raise ValueError("local normalization requires the actual rejected extraction attribution")
         extraction_id = failed_call.request_id
@@ -491,7 +532,7 @@ def run_workpaper(
                 timeout_seconds=timeout,
                 **({"local_format_recovery": True} if automatic_format else {}),
             )
-        except SemanticProviderError:
+        except SemanticProviderError as extraction_error:
             rejected = [item for item in getattr(provider, "workpaper_receipts", ())
                         if item.get("request_id") == extraction_id and item.get("purpose") == "extract_profile_workpaper"]
             if (not automatic_format or len(rejected) != 1
@@ -501,8 +542,31 @@ def run_workpaper(
             raw = rejected[0].get("raw_content")
             if not isinstance(raw, str) or hashlib.sha256(raw.encode()).hexdigest() != rejected[0].get("response_hash"):
                 raise ValueError("automatic format recovery requires exact rejected bytes")
-            extracted, normalization = normalize_retained_workpaper_format(raw)
-            extracted = normalize_workpaper_draft(extracted)
+            if enrichment and processing_identity.get("enrichment_unread_recovery") == ENRICHMENT_UNREAD_RECOVERY:
+                try:
+                    extracted, schema_normalization = normalize_retained_enrichment_unread(
+                        raw, [target["element"] for target in enrichment["targets"]])
+                    extracted = normalize_workpaper_draft(extracted)
+                    WorkpaperDraftResponse.model_validate(extracted)
+                except (ValueError, TypeError):
+                    # A malformed container may still use the unchanged shape-only owner.
+                    try:
+                        _strict_workpaper_json(raw)
+                    except (ValueError, TypeError):
+                        extracted, normalization = normalize_retained_workpaper_format(raw)
+                        extracted = normalize_workpaper_draft(extracted)
+                        schema_normalization = None
+                    else:
+                        raise extraction_error
+            else:
+                try:
+                    _strict_workpaper_json(raw)
+                except (ValueError, TypeError):
+                    pass
+                else:
+                    raise  # Preserve the actual schema rejection of complete JSON.
+                extracted, normalization = normalize_retained_workpaper_format(raw)
+                extracted = normalize_workpaper_draft(extracted)
             failed_call = _model_call(rejected, purpose="extract_profile_workpaper", request_id=extraction_id,
                 section_ids=tuple(item.section_id for item in packet.reading_scope.sections),
                 pages=tuple(sorted({span.page for item in packet.evidence for span in item.source_spans})),
@@ -513,7 +577,8 @@ def run_workpaper(
         receipts = (dict(retained_selection, receipt_origin="retained_receipt"), *receipts)
     if local_only:
         receipts = (*receipts, dict(failed_call.model_dump(mode="json", exclude_none=True),
-            raw_content=raw_failure, receipt_origin="retained_rejected_receipt"))
+            raw_content=raw_failure, receipt_origin="retained_rejected_receipt",
+            **({"response_payload": _strict_workpaper_json(raw_failure)} if schema_normalization else {})))
     author_identity = extraction_resume.get("original_processing_identity", {}) if local_only else processing_identity
     if local_only and (not author_identity.get("prompt_version") or not author_identity.get("preprocessing_version")):
         raise ValueError("retained extraction processing identity is required")
@@ -525,7 +590,8 @@ def run_workpaper(
                               section_ids=tuple(item.section_id for item in index if item.level <= 3),
                               heading_count=sum(item.level <= 3 for item in index)),
         local_format_normalization=normalization,
-        extraction=failed_call if normalization is not None else _model_call(
+        local_schema_normalization=schema_normalization,
+        extraction=failed_call if normalization is not None or schema_normalization is not None else _model_call(
             receipts, purpose="extract_profile_workpaper", request_id=extraction_id,
             section_ids=tuple(item.section_id for item in packet.reading_scope.sections),
             pages=tuple(sorted({span.page for item in packet.evidence for span in item.source_spans})),
@@ -533,7 +599,7 @@ def run_workpaper(
     )
     if real:
         for stage in (generation.selection, generation.extraction):
-            expected_status = "rejected" if normalization is not None and stage is generation.extraction else "accepted"
+            expected_status = "rejected" if (normalization is not None or schema_normalization is not None) and stage is generation.extraction else "accepted"
             if stage.contract_status != expected_status or not stage.model or not stage.source_label:
                 raise ValueError(f"actual model attribution is incomplete for {stage.purpose}")
     workpaper = bind_workpaper_draft(

@@ -1,0 +1,439 @@
+{
+  "task": "6.FA",
+  "reviewer": "A/main",
+  "status": "bounded_research_delivery_accepted_with_local_metric_limits",
+  "scope": "All29 actual supplemental source-reviewed records; not a new audit of full20 or a formal99% score. The two overlapping research-award narratives remain separate reading records, not independent economic discoveries.",
+  "source_method": "Main independently read original PDF44 glyph/typography and44-47 bank text,14/15/21 coal tables and14 explanations,35/38/39/40/41/44/45/46 securities paragraphs; compared actual final facts, metric rows and citations. Reused exact same-report prior valid source checks; did not treat model completed or parser matching as semantic proof.",
+  "audited_records": [
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-RETAIL-CUST-TOTAL",
+      "fact_sha256": "1c63b5e9b007e138054000b0dbc47dfa5026af4fded864248e2b264293166000",
+      "source_pages": [
+        44
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 1,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-RETAIL-PRIVATE-CUST",
+      "fact_sha256": "aa25f24f0e0f5c4c97e88b28bece79735676aa3482db3a7d349cdfb01bee2f02",
+      "source_pages": [
+        44
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-RETAIL-ACQUIRING-CUST",
+      "fact_sha256": "f829ca839318b269f1351dd0246a8f501dee10e0826844cb3cd6095087dbbbbe",
+      "source_pages": [
+        44
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-CREDIT-CARD-ISSUED",
+      "fact_sha256": "3881196950de8c7e7bb736859230f35baf5ea7f1ea11e2ca27d02ebc890297ac",
+      "source_pages": [
+        47
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-CREDIT-CARD-APP-USERS",
+      "fact_sha256": "e7126b754b6beff4ecd62f2773d8e7d2db6bfd7a94b58528295aa4115c41d890",
+      "source_pages": [
+        47
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 4,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-MOBILE-BANK-USERS",
+      "fact_sha256": "cf914a81b53ee907a5232d2a4c5d65bc0ed74b119cc73b6de66fc8ffb465a9f1",
+      "source_pages": [
+        47
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 4,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-RETAIL-AUM",
+      "fact_sha256": "aad742c78d107ecb8d8dc495bf185c8b0cac30d65d9a977175033405da60d65a",
+      "source_pages": [
+        45
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-PERSONAL-DEPOSIT-BALANCE",
+      "fact_sha256": "e4c5d105e1377f7b4a11613b7aed03bbf97158d1f1fc42c0f64e1c7f3a543135",
+      "source_pages": [
+        45
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-WEALTH-FEE-INCOME",
+      "fact_sha256": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+      "source_pages": [
+        45
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [
+        0,
+        1
+      ],
+      "metric_judgment": "business_income_scope_not_group_wide; four metric components excluded by explicit decision"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-CREDIT-CARD-REVENUE",
+      "fact_sha256": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d",
+      "source_pages": [
+        47
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [
+        0,
+        1
+      ],
+      "metric_judgment": "business_income_scope_not_group_wide; four metric components excluded by explicit decision"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-RM-01",
+      "fact_sha256": "e082746feef9f4288abe388b179e02382735d695eb2713010f33615c99bf2310",
+      "source_pages": [
+        21
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 5,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-RM-02",
+      "fact_sha256": "3ec0bf48e8a1c124f03410291fd816230cee494fae14d353a4286d4898a0f6da",
+      "source_pages": [
+        15
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 6,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-RM-03",
+      "fact_sha256": "908d511f05a9c534dfde1a206261bf7ed026ad048a59ada576c87fde2b8380dd",
+      "source_pages": [
+        15
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 11,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-RM-04",
+      "fact_sha256": "414809bf81ee77c221d3e9886ca6b023c29b34c46369196e369c412e099b5a99",
+      "source_pages": [
+        14
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 4,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-OD-01",
+      "fact_sha256": "280ad64590cc133308a9c9ea6be68c28c8b7780d47efe0246cf0882c497c6726",
+      "source_pages": [
+        21
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 4,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-OD-02",
+      "fact_sha256": "e7f8030118c2988b3c9bf0f6a2255ded65d1d88561ef5277653530e8b4ae9d37",
+      "source_pages": [
+        15
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 2,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-OD-03",
+      "fact_sha256": "a00a43b513b8ef792b9660cc996b951fcae41108391cd731be9f68ed95a5dcba",
+      "source_pages": [
+        15
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 6,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-2a5b3a9b1435fc7ccbf42d46",
+      "fact_id": "F-OD-04",
+      "fact_sha256": "22247e10258bd94d314e4f27ddfe296815dd57fe7af15f5fac81810a18703c6c",
+      "source_pages": [
+        14
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 4,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-01",
+      "fact_sha256": "950d5891bbb6763e0a5c49864590a994b97f1a9cdbf03c08e84487f3d35dd681",
+      "source_pages": [
+        39
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-02",
+      "fact_sha256": "9cc7279f2aa93391efc295cfd53139dab01e13892b5cbff1424dfc160c7f2902",
+      "source_pages": [
+        45
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-03",
+      "fact_sha256": "a2e8b6d95a3e5007e5ae697776be5457373ffcff31310480eee1e954c461a7b9",
+      "source_pages": [
+        40,
+        45
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-04",
+      "fact_sha256": "57d00c6b0c0f6b02a5fc4b4cb8b1dc0bf43d533cd697f2867a09ae65be128c2c",
+      "source_pages": [
+        45
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-05",
+      "fact_sha256": "68e7e51ec1ea75131c8cc1b1ececd032138b46a8af7851b016e9dc3c5f617623",
+      "source_pages": [
+        38,
+        45
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-06",
+      "fact_sha256": "3898366121b9e4793235e4ffc74ba15775b44b2a1a0b36143a147d0df4a6d15f",
+      "source_pages": [
+        41
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-07",
+      "fact_sha256": "a43cbb94a353280ab6c32752f4aa7fe6239388961c092500147ce888bbe248b5",
+      "source_pages": [
+        44
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-08",
+      "fact_sha256": "e29b077016e42d628ab26b7d83f58358a5c1636dbacdeb1cc1a27a03dc6330f5",
+      "source_pages": [
+        38
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-09",
+      "fact_sha256": "9772c1c1183e55c74f80a5568bcbbd353f89d376a2a277d08b55672b3d71db24",
+      "source_pages": [
+        41
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-10",
+      "fact_sha256": "22c8e83d0fdcfa24019c13ab0062b4e5fdce48785034238b84d972f8a71e61e1",
+      "source_pages": [
+        44
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "fact_id": "F-RANK-11",
+      "fact_sha256": "e299039db5ee2823e758d852b379ea9a3cd3792356352686e2f4ef3e164df337",
+      "source_pages": [
+        46
+      ],
+      "narrative_judgment": "supported_by_original_selected_source",
+      "metric_count": 0,
+      "metric_restrictions": [],
+      "metric_judgment": "no_additional_blocking_numeric_or_scope_error_found_in_this_bounded_source_audit"
+    }
+  ],
+  "summary": {
+    "source_backed_narrative_records": 29,
+    "original_new_metric_records": 65,
+    "known_business_scope_metric_components_withheld": 4,
+    "remaining_new_metric_records": 61,
+    "bank_customer_note_quantities_recovered": [
+      "零售客户4012.44万户",
+      "私人银行客户2.02万户"
+    ],
+    "bank_consumer_credit_quantity_remaining_gap": "原文56.11万户确有披露，下降率原文比上年末下降0.71%；程序指标绑定未通过且修订候选拒绝，未恢复成可用事实，不记为未披露。",
+    "coal_improvement": "煤炭业务收入179.51亿元、成本103.03亿元及产品行/同比均保持business_segment；公司总收入214.44亿元单列。",
+    "securities_improvement": "研究团队第三名/连续十届前五现在绑定实际39/45页，不解除旧F34缺证限制。"
+  },
+  "review_observations": {
+    "real_source_review_finished": 3,
+    "completed": 1,
+    "completed_with_open_findings": 2,
+    "bank_repair_candidates_adopted": 0,
+    "remaining_omissions": "银行3项客户/贷款规模补充及小额联名卡下限、证券其他排名/荣誉均保API缺项；不追加调用追全。",
+    "independent_findings": "Two sourced bank business-income narratives contain four incorrectly group-wide metric scope labels; explicit hash-bound component limits preserve narrative and withhold metrics without rewriting authorship.",
+    "automation_boundary": "New normal-enrich empty-nontarget status handling proved by actual-owner controlled request, source review and read/export test; this real recovery reused saved original extraction plus real new source review, not a new fixed-version first-run extraction."
+  },
+  "business_source_changes_after_continuation_freeze": 0,
+  "historical_EY_accuracy_unchanged": 0.9789674952198852,
+  "formal_batch_pass_or_100_expansion": false,
+  "production_authorization": "not_authorized",
+  "A_active_time": "not precisely measured; model waits and B development excluded",
+  "final_delivery_checks": {
+    "delivered_companies": 20,
+    "readable_record_count_not_accuracy": 628,
+    "metric_record_count_not_accuracy": 993,
+    "main_fresh_bank_API": "Both current business-income facts remain limited with unchanged text, zero consumable metrics and two named original-position gaps each; old independent restrictions remain.",
+    "post_decision_API_export_HTTP": "Same-owner scoped final refresh verifies annual API/JSON/Markdown/CSV and new-instance/bank-detail/batch HTTP200 equality; other17 and old fact entries reuse unchanged-input checks. Previous997 metric snapshot was pre-decision, final993.",
+    "original87_manifest_fresh_main_verified": "1456f0526b7100b994be98e77c368180fa36082d462e7590e8e2081f7abac1fe",
+    "original87_manifest_equals_A0": true,
+    "distinct_related_test_latest_outcomes": "56passed/0unresolved; overlapping cohorts not added. First40-case run retains1failed observation, later direct outcome supersedes only that test result.",
+    "model_requests": 10,
+    "supplier_total_tokens_known": 218324,
+    "transport_recoveries": 0,
+    "cost_status": "unknown",
+    "new_reextractions_after_first_failures": 0,
+    "original_per_stock_deadlines_and_cumulative_budgets_preserved": true,
+    "cleanup": "B190files/22758995bytes and A8baseline copies/2993162bytes removed, total25752157 logical bytes; exact owned roots absent. Original source/raw/budgets and inherited worktree edits preserved.",
+    "nonblocking_generated_evidence_format": "Original failed local-schema-tests.xml contains pytest's trailing whitespace in a console stack line. Retained verbatim as a failed-run receipt. Staged source/docs and remaining artifacts checked separately; no business or test assertion changed to remove this formatting observation."
+  }
+}

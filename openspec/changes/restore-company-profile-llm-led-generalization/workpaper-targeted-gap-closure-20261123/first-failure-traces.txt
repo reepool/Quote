@@ -1,0 +1,107 @@
+[600015] [WARNING][2026-11-23 11:04:05][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-c2288466aef667e98c75830b instrument_id=600015.SH stage=semantic disposition=terminal_failure category=JSONDecodeError error=Extra data: line 1 column 12791 (char 12790)
+Original wire is retained at the canonical execution receipts/002.json.
+Traceback (most recent call last):
+  File "/home/python/Quote/research/company_profile/stage5_provider.py", line 4806, in _execute
+    parsed = response_model.model_validate_json(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/pydantic/main.py", line 734, in model_validate_json
+    return cls.__pydantic_validator__.validate_json(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 7 validation errors for WorkpaperDraftResponse
+elements.business_structure.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.products_services.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.revenue_model.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.scale_and_mix.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.operations_and_inputs.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.operating_drivers.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.material_changes.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+
+The above exception was the direct cause of the following exception:
+
+... repeated schema fields omitted; terminal JSONDecodeError is the mask diagnosed in failure-diagnosis.json.
+
+[600348] [WARNING][2026-11-23 11:04:00][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-0693c66ce416bf1294b8c58c instrument_id=600348.SH stage=semantic disposition=terminal_failure category=JSONDecodeError error=Extra data: line 1 column 11070 (char 11069)
+Original wire is retained at the canonical execution receipts/002.json.
+Traceback (most recent call last):
+  File "/home/python/Quote/research/company_profile/stage5_provider.py", line 4806, in _execute
+    parsed = response_model.model_validate_json(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/pydantic/main.py", line 734, in model_validate_json
+    return cls.__pydantic_validator__.validate_json(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 6 validation errors for WorkpaperDraftResponse
+elements.business_structure.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.products_services.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.scale_and_mix.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.operations_and_inputs.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.customers_channels_markets.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.material_changes.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/python/Quote/research/company_profile/workpaper_llm.py", line 479, in run_workpaper
+    extracted = complete(
+... repeated schema fields omitted; terminal JSONDecodeError is the mask diagnosed in failure-diagnosis.json.
+
+[601377] [WARNING][2026-11-23 11:03:52][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-27756b9ea49921c71320c0b0 instrument_id=601377.SH stage=semantic disposition=terminal_failure category=JSONDecodeError error=Extra data: line 1 column 3552 (char 3551)
+Original wire is retained at the canonical execution receipts/002.json.
+Traceback (most recent call last):
+  File "/home/python/Quote/research/company_profile/stage5_provider.py", line 4806, in _execute
+    parsed = response_model.model_validate_json(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/pydantic/main.py", line 734, in model_validate_json
+    return cls.__pydantic_validator__.validate_json(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 8 validation errors for WorkpaperDraftResponse
+elements.business_structure.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.products_services.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.revenue_model.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.scale_and_mix.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.operations_and_inputs.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.customers_channels_markets.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.operating_drivers.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+elements.material_changes.status
+  Input should be 'observed', 'not_disclosed', 'not_applicable', 'extraction_failed' or 'unclear' [type=literal_error, input_value='not_read_for_this_task', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/literal_error
+... repeated schema fields omitted; terminal JSONDecodeError is the mask diagnosed in failure-diagnosis.json.

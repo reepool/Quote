@@ -637,6 +637,14 @@ class WorkpaperFormatNormalization(_Model):
     operations: tuple[str, ...] = Field(min_length=1)
 
 
+class WorkpaperUnreadNormalization(_Model):
+    policy: Literal["enrichment_empty_unread_status.v1"] = "enrichment_empty_unread_status.v1"
+    original_content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    normalized_object_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    target_elements: tuple[str, ...] = Field(min_length=1)
+    normalized_elements: tuple[str, ...] = Field(min_length=1)
+
+
 class WorkpaperGenerationMetadata(_Model):
     prompt_version: str = Field(min_length=1)
     preprocessing_version: str = Field(min_length=1)
@@ -644,12 +652,15 @@ class WorkpaperGenerationMetadata(_Model):
     selection: WorkpaperModelCall
     extraction: WorkpaperModelCall
     local_format_normalization: WorkpaperFormatNormalization | None = None
+    local_schema_normalization: WorkpaperUnreadNormalization | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
         payload = handler(self)
         if self.local_format_normalization is None:
             payload.pop("local_format_normalization", None)
+        if self.local_schema_normalization is None:
+            payload.pop("local_schema_normalization", None)
         return payload
 
     @model_validator(mode="after")
@@ -663,6 +674,12 @@ class WorkpaperGenerationMetadata(_Model):
             or self.extraction.response_hash != self.local_format_normalization.original_content_sha256
         ):
             raise ValueError("local format normalization must retain the rejected original hash")
+        if self.local_schema_normalization is not None and (
+            self.local_format_normalization is not None
+            or self.extraction.contract_status != "rejected"
+            or self.extraction.response_hash != self.local_schema_normalization.original_content_sha256
+        ):
+            raise ValueError("local schema normalization must retain its rejected original hash")
         return self
 
 

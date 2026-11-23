@@ -1,0 +1,35 @@
+{
+  "new_model_calls": 0,
+  "companies": [
+    {
+      "instrument_id": "600015.SH",
+      "state": "local_consumption_completed_not_reviewed",
+      "reading_id": "bp-work-5b0a7a170befb5995f4a080e",
+      "runtime_path": "data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-5b0a7a170befb5995f4a080e.json",
+      "review_plan_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/600015-saved-review-plan.json",
+      "visible_facts": 10,
+      "raw_fact_entries": 10,
+      "plan_state": "planned"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "state": "local_consumption_completed_not_reviewed",
+      "reading_id": "bp-work-1972712727ed295e4eb944eb",
+      "runtime_path": "data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-1972712727ed295e4eb944eb.json",
+      "review_plan_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/600348-saved-review-plan.json",
+      "visible_facts": 8,
+      "raw_fact_entries": 8,
+      "plan_state": "planned"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "state": "local_consumption_completed_not_reviewed",
+      "reading_id": "bp-work-9a8e32721c350793252aa7c6",
+      "runtime_path": "data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-9a8e32721c350793252aa7c6.json",
+      "review_plan_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/601377-saved-review-plan.json",
+      "visible_facts": 11,
+      "raw_fact_entries": 11,
+      "plan_state": "planned"
+    }
+  ]
+}

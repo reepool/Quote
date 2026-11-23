@@ -289,7 +289,8 @@ def prepare_review_recovery(record):
     if generation is None:
         raise ValueError("review recovery needs original extraction attribution")
     for call in (generation.selection, generation.extraction):
-        locally_normalized = call is generation.extraction and generation.local_format_normalization is not None
+        locally_normalized = call is generation.extraction and (
+            generation.local_format_normalization is not None or generation.local_schema_normalization is not None)
         expected_status = "rejected" if locally_normalized else "accepted"
         items = [item for item in record.workpaper_receipts if item.get("request_id") == call.request_id
                  and item.get("purpose") == call.purpose]
@@ -302,7 +303,14 @@ def prepare_review_recovery(record):
             or hashlib.sha256(raw.encode()).hexdigest() != call.response_hash
             or item.get("response_hash") != call.response_hash):
             raise ValueError("original extraction receipt is not complete and hash-bound")
-        if locally_normalized:
+        if locally_normalized and generation.local_schema_normalization is not None:
+            from .workpaper_llm import normalize_retained_enrichment_unread
+
+            extraction_payload, normalization = normalize_retained_enrichment_unread(
+                raw, generation.local_schema_normalization.target_elements)
+            if normalization != generation.local_schema_normalization:
+                raise ValueError("saved schema normalization differs from rejected original bytes")
+        elif locally_normalized:
             from .workpaper_llm import normalize_retained_workpaper_format
 
             extraction_payload, normalization = normalize_retained_workpaper_format(raw)
@@ -325,7 +333,7 @@ def prepare_review_recovery(record):
             report=paper.report, reading_scope=paper.reading_scope, evidence=paper.evidence,
             origin=paper.origin, generation=generation,
         )
-        if generation.local_format_normalization is not None:
+        if generation.local_format_normalization is not None or generation.local_schema_normalization is not None:
             # Local releases can add display limits after extraction. Retain
             # them only when they reconstruct the exact hashed review input.
             seed = seed.model_copy(update={

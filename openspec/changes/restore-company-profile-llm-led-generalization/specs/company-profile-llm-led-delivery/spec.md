@@ -25,6 +25,18 @@ The CLI and scheduled-task adapter MUST forward an explicitly supplied execution
 - **AND** the original writer MUST retain the first reading and append the supplementary reading, with content, remaining gaps and actual review state available through the existing API/export; repeated run_id submissions MUST NOT issue new model requests
 - **AND** first_read and review_batch files MUST reject enrichment plans, while later explicitly requested readings and review recovery continue through their existing owners without automatic gap-filling
 
+#### Scenario: A targeted reread uses corrected transcription without rewriting prior evidence
+- **WHEN** an explicitly authorized same-report gap plan targets an existing metric restriction or incomplete source citation using a new transcription identity
+- **THEN** the original enrich owner MUST obtain fresh source-grounded model extraction and the applicable source review from that report's selected chapter context, without rebinding saved old responses to the corrected source or substituting an independent reference answer
+- **AND** the first reading and its restrictions MUST remain traceable, new or revised content MUST expose its actual source/model/review state through the existing annual API/export, and acquiring one same-named item MUST NOT silently clear unrelated gaps or independent restrictions
+- **AND** before/after substantive improvements, unresolved targets and cumulative resources MUST be reported separately from historical and unseen-batch quality; incomplete optional targets MUST NOT reject the remaining profile or trigger an unbounded rereading loop
+
+#### Scenario: A supplemental response explicitly marks empty nontarget elements unread
+- **WHEN** an explicitly targeted enrich response uses the exact status not_read_for_this_task only for nontarget elements with empty facts and nonempty limitations
+- **THEN** the existing local structural normalizer MAY represent those elements as unclear while preserving the unread limitations, original rejected bytes, author/usage and normalization record; it MUST NOT fill facts, alter metrics/evidence, normalize other invalid statuses or convert a targeted/nonempty element this way
+- **AND** an already complete JSON response MUST NOT undergo terminal-brace repair that masks its original typed rejection; recovered content still requires the ordinary typed/source checks and real source review, and no recovery can reopen exhausted budgets or rewrite first-run outcomes
+- **AND** an explicitly versioned new ordinary enrich execution MUST reuse the same narrow local normalization before requiring a manual recovery plan, preserving actual rejected attribution and applying the original source-review path; historical processing identities retain their frozen behavior
+
 #### Scenario: An operator submits a bounded first-read or saved-review command
 - **WHEN** an authorized caller supplies a valid plan through the existing job command
 - **THEN** its finite parameters and dependencies reach the original published task action and the existing writer

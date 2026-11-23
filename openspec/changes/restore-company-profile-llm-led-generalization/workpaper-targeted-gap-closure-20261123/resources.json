@@ -1,0 +1,77 @@
+{
+  "companies": [
+    {
+      "instrument_id": "600015.SH",
+      "first_state": "incomplete",
+      "review_continuation_state": "completed",
+      "original_started_epoch": 1795403003.378532,
+      "absolute_deadline_epoch": 1795409003.378532,
+      "elapsed_from_first_to_end_seconds": 1437.2735421657562,
+      "physical_requests": 4,
+      "recoveries": 0,
+      "conservative_tokens": 78379,
+      "supplier_total_tokens_known": 78379,
+      "unknown_usage_attempts": 0,
+      "cost_status": "unknown",
+      "models": [
+        "deepseek-flash",
+        "grok-4.7"
+      ],
+      "phase_budget_paths": [
+        "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600015/executions/6fa-600015-enrich/budget.json",
+        "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600015/executions/6fa-600015-unused-source-review/budget.json"
+      ]
+    },
+    {
+      "instrument_id": "600348.SH",
+      "first_state": "incomplete",
+      "review_continuation_state": "completed",
+      "original_started_epoch": 1795403003.4086428,
+      "absolute_deadline_epoch": 1795409003.4086428,
+      "elapsed_from_first_to_end_seconds": 1443.3376622200012,
+      "physical_requests": 3,
+      "recoveries": 0,
+      "conservative_tokens": 65945,
+      "supplier_total_tokens_known": 65945,
+      "unknown_usage_attempts": 0,
+      "cost_status": "unknown",
+      "models": [
+        "deepseek-flash",
+        "grok-4.7"
+      ],
+      "phase_budget_paths": [
+        "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600348/executions/6fa-600348-enrich/budget.json",
+        "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600348/executions/6fa-600348-unused-source-review/budget.json"
+      ]
+    },
+    {
+      "instrument_id": "601377.SH",
+      "first_state": "incomplete",
+      "review_continuation_state": "completed",
+      "original_started_epoch": 1795403003.4360495,
+      "absolute_deadline_epoch": 1795409003.4360495,
+      "elapsed_from_first_to_end_seconds": 1478.695065021515,
+      "physical_requests": 3,
+      "recoveries": 0,
+      "conservative_tokens": 74000,
+      "supplier_total_tokens_known": 74000,
+      "unknown_usage_attempts": 0,
+      "cost_status": "unknown",
+      "models": [
+        "deepseek-flash",
+        "grok-4.7"
+      ],
+      "phase_budget_paths": [
+        "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377/executions/6fa-601377-enrich/budget.json",
+        "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377/executions/6fa-601377-unused-source-review/budget.json"
+      ]
+    }
+  ],
+  "physical_requests": 10,
+  "recoveries": 0,
+  "conservative_tokens": 218324,
+  "supplier_total_tokens_known": 218324,
+  "cost_status": "unknown",
+  "original_first_failed": 3,
+  "new_extraction_entrances": 0
+}

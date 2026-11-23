@@ -1,0 +1,59 @@
+{
+  "task": "6.FA",
+  "reviewer": "A/main",
+  "scope": "Only two current new-reading business-revenue metric scopes; original text/model review/raw remain unchanged. No code or new model request authorized by this data decision.",
+  "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+  "decisions": [
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-WEALTH-FEE-INCOME",
+      "fact_sha256": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "withheld_metric_indices": [
+        0,
+        1
+      ],
+      "expected_metric_names": [
+        "财富管理手续费及佣金收入",
+        "财富管理手续费及佣金收入同比增长率"
+      ],
+      "source_pages": [
+        45
+      ],
+      "narrative_supported": true,
+      "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+      "limitation": "业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-c144725bfcfff1bceadc5849",
+      "fact_id": "F-CREDIT-CARD-REVENUE",
+      "fact_sha256": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d",
+      "disposition": "source_checked",
+      "evidence_ids": [
+        "source-0011"
+      ],
+      "withheld_metric_indices": [
+        0,
+        1
+      ],
+      "expected_metric_names": [
+        "信用卡业务收入",
+        "信用卡业务收入同比变动率"
+      ],
+      "source_pages": [
+        47
+      ],
+      "narrative_supported": true,
+      "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+      "limitation": "业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。"
+    }
+  ],
+  "source_basis": "Independent main read of original physical45 wealth/private-banking section and47 credit-card section, compared with specific metric subject-scope instructions. Valid numbers do not establish group-wide scope.",
+  "new_metric_restrictions": 4,
+  "other_new_and_original_facts_unchanged": true
+}

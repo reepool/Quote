@@ -95,6 +95,7 @@ def load_saved_draft_input(plan: Any, root: Path) -> SavedDraftInput:
     if _sha(source_path.read_bytes()) != report.document_version:
         raise ValueError("source PDF hash differs from the bound report")
     original = dict(checkpoint["execution"]["input_identity"]["processing_identity"])
+    schema_only = getattr(plan, "consumption_mode", "local_format_only") == "local_enrichment_schema_only"
     if (original.get("reading_strategy") != "chapter_workpaper_v1"
         or original.get("execution_mode") != "provider"):
         raise ValueError("local saved workpaper requires its real original reading identity")
@@ -103,8 +104,19 @@ def load_saved_draft_input(plan: Any, root: Path) -> SavedDraftInput:
     if (selection_request.get("report") != report.model_dump(mode="json")
         or failed_request.get("report") != report.model_dump(mode="json")
         or selection_attempt.get("error_code")
-        or failed_attempt.get("error_code") != "response_parse_error"):
+        or (not schema_only and failed_attempt.get("error_code") != "response_parse_error")):
         raise ValueError("saved source/accepted selection/rejected extraction binding differs")
+    if schema_only:
+        from .workpaper_enrichment import WorkpaperEnrichmentPlan
+        from .workpaper_llm import normalize_retained_enrichment_unread
+        from .workpaper import WorkpaperDraftResponse, normalize_workpaper_draft
+
+        enrichment = WorkpaperEnrichmentPlan.model_validate(original.get("workpaper_enrichment"))
+        if (enrichment.report != report or failed_attempt.get("error_code")
+            or failed_request.get("targeted_reading") != {"targets": [t.model_dump(mode="json") for t in enrichment.targets]}):
+            raise ValueError("saved schema consumption requires the original explicit enrichment request")
+        normalized, _ = normalize_retained_enrichment_unread(failed_raw, [t.element for t in enrichment.targets])
+        WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(normalized))
     selected = json.loads(selection_raw)
     SectionSelection.model_validate(selected)
     scope = WorkpaperReadingScope.model_validate(failed_request["reading_scope"])
@@ -124,7 +136,7 @@ def load_saved_draft_input(plan: Any, root: Path) -> SavedDraftInput:
         "contract_status": "rejected", "finish_reason": "stop", "response_hash": _sha(failed_raw.encode()),
         "scope_kind": "selected_source_sections", "section_ids": [s.section_id for s in scope.sections],
         **author(failed_attempt)}
-    resume = {"mode": "local_format_only", "document_version": report.document_version,
+    resume = {"mode": "local_enrichment_schema_only" if schema_only else "local_format_only", "document_version": report.document_version,
         "selection_receipt": selection, "selection_response": selected,
         "failed_response": {"content": failed_raw, "content_sha256": _sha(failed_raw.encode()), "finish_reason": "stop"},
         "failed_call": failed, "original_processing_identity": original,

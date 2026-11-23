@@ -1,0 +1,38 @@
+{
+  "authorization_status": "authorized",
+  "instrument_ids": [
+    "601377.SH"
+  ],
+  "document_versions": {
+    "601377.SH": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb"
+  },
+  "knowledge_cutoff": "2026-11-23",
+  "output_root": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377",
+  "schema_version": "company_profile_local_task_plan.v1",
+  "run_id": "6fa-601377-local-consume",
+  "approval_reference": "human-20261123-6FA-A-explicit-saved-enrichment-continuation-original-window",
+  "action": "run",
+  "consumption_mode": "local_enrichment_schema_only",
+  "max_elapsed_seconds": 300,
+  "saved_draft": {
+    "checkpoint": {
+      "path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/checkpoints/bp-work-27756b9ea49921c71320c0b0.json",
+      "sha256": "04b8112494eaf911594c6926f2f7e8c4500700a69164bfe9a8ab821bce20b717"
+    },
+    "selection_receipt": {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377/executions/6fa-601377-enrich/receipts/001.json",
+      "sha256": "cf6805840de13794b9a5246705b9d41668b7f6b6161f4d0af913d6f4888cd0d4"
+    },
+    "failed_receipt": {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377/executions/6fa-601377-enrich/receipts/002.json",
+      "sha256": "739ad2cbd9b53caf6b42a9ebf57e1a2a682baf8dfa933ba51504311b6a5218b8"
+    },
+    "ledger": {
+      "path": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377/executions/6fa-601377-enrich/budget.json",
+      "sha256": "c6239d0cc41d1c345bf7bfa26299a768014bb79f4da3dd5116859fa80ebe89cd"
+    },
+    "selection_sequence": 1,
+    "failed_sequence": 2
+  }
+}

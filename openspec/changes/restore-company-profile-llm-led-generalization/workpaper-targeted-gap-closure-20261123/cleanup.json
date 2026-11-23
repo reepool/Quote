@@ -1,0 +1,40 @@
+{
+  "one_time_scripts": {
+    "/home/python/Quote/data/QuoteBak/company-profile-6fa-b-FhRR3FCV/prepare.py": "5c42f8df3d757756f60dfe025fe33db3b6fc808c148ad765c6114557c6c6ad47",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fa-b-FhRR3FCV/diagnose.py": "d494b9c3ec3326a12a46948f626b29ac8c0144f51e7144a059c7bc8fd19c1a3e",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fa-b-FhRR3FCV/finalize.py": "652372fd5f0ec028d9380442a0efc18642042501939ef8ff30b607b67fd8ac5a",
+    "/home/python/Quote/data/QuoteBak/company-profile-6fa-b-FhRR3FCV/post_decision.py": "d576693a30b22e11fb39ace4e8bd283cc130875b72e9e67cfd1fa41942a6a7da",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/run_approved_three.py": "54219d2e0eb1da0042838436d940a73d5c67b7bc0899dff34fcfe9db968a3fe9",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/run_unused_reviews.py": "76fd10f4d2937b8f7af4f76848dad10108f3103fd2bda62dab306e909924eabe"
+  },
+  "commands_recorded_in": [
+    "600015-process.json",
+    "600348-process.json",
+    "601377-process.json",
+    "600015-review-process.json",
+    "600348-review-process.json",
+    "601377-review-process.json"
+  ],
+  "first_failure_trace_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/first-failure-traces.txt",
+  "canonical_raw_and_budgets_preserved": true,
+  "first_attempts_completed": true,
+  "review_attempts_completed": true,
+  "all_test_sessions_finished": true,
+  "A_parallel_root_not_touched": "/home/python/Quote/data/QuoteBak/company-profile-6fa-a-DvSxOcWf",
+  "old_6EZ_root_absent": true,
+  "completed": true,
+  "removed_exact_temp_root": "/home/python/Quote/data/QuoteBak/company-profile-6fa-b-FhRR3FCV",
+  "removed_temp_files": 190,
+  "released_temp_bytes": 22758995,
+  "removed_duplicate_offline_candidate_files": 2,
+  "one_time_persistent_operators_removed": true,
+  "removed_repeated_pre_A_exports": true,
+  "necessary_evidence_retained_once": true,
+  "original_PDF_cache_runtime_checkpoint_raw_budget_and_A_files_preserved": true,
+  "A_removed_exact_temp_root": "/home/python/Quote/data/QuoteBak/company-profile-6fa-a-DvSxOcWf",
+  "A_removed_temp_files": 8,
+  "A_released_temp_bytes": 2993162,
+  "A_removed_scope": "Only owned baseline comparison copies after validating staged additions equal this round's incremental patch. Original working-tree legacy edits and source/research/evidence were preserved; no active dependency remained.",
+  "A_removal_verified_absent": true,
+  "total_A_B_measured_released_bytes": 25752157
+}

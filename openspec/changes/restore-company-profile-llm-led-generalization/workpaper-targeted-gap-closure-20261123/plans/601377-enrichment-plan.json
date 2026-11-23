@@ -1,0 +1,30 @@
+{
+  "state": "planned",
+  "execution_started": false,
+  "action": "enrich",
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6fa-601377-targeted-gap",
+    "base_work_id": "bp-work-016367c43308049bffc006bc",
+    "base_workpaper_sha256": "a799c73dd0f99a4ef8cb9777eca729da195c85251fdda9ef75767726a89a5d9a",
+    "report": {
+      "instrument_id": "601377.SH",
+      "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-27T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "company_features",
+        "question": "补充本报告研究服务等重要排名描述的完整原文证据，每项明确评选或排名名称、对应主体与期间；复合描述中的各子句均须有覆盖，证据不全则明确保留限制。"
+      }
+    ]
+  },
+  "requires": [
+    "explicit_model_and_finite_budget",
+    "publication_write_permission"
+  ],
+  "production_authorization": "not_authorized"
+}

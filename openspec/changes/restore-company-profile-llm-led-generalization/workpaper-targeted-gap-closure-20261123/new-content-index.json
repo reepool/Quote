@@ -1,0 +1,542 @@
+{
+  "stage": "final_after_source_review",
+  "mechanical_only": true,
+  "companies": [
+    {
+      "instrument_id": "600015.SH",
+      "final_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-c144725bfcfff1bceadc5849.json",
+      "runtime_sha256": "fa9ccfde404661a054399deb3c8ad5e0456a9bdabf6221658b85dcf57628d45a",
+      "workpaper_sha256": "d9fe3d7759066ca22ccee2388c12f81e416bf577589a2e8836951d408414b796",
+      "review_status": "completed_with_open_findings",
+      "all_final_facts": [
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-CUST-TOTAL",
+          "fact_sha256": "1c63b5e9b007e138054000b0dbc47dfa5026af4fded864248e2b264293166000",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": [
+            "零售客户总数[注4]"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-PRIVATE-CUST",
+          "fact_sha256": "aa25f24f0e0f5c4c97e88b28bece79735676aa3482db3a7d349cdfb01bee2f02",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": [
+            "私人银行客户[注5]",
+            "私人银行客户[注5]比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-ACQUIRING-CUST",
+          "fact_sha256": "f829ca839318b269f1351dd0246a8f501dee10e0826844cb3cd6095087dbbbbe",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": [
+            "收单支付客户",
+            "收单支付客户比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CREDIT-CARD-ISSUED",
+          "fact_sha256": "3881196950de8c7e7bb736859230f35baf5ea7f1ea11e2ca27d02ebc890297ac",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "信用卡累计发卡",
+            "信用卡累计发卡比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CREDIT-CARD-APP-USERS",
+          "fact_sha256": "e7126b754b6beff4ecd62f2773d8e7d2db6bfd7a94b58528295aa4115c41d890",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "信用卡华彩生活APP注册用户",
+            "信用卡华彩生活APP注册用户比上年末增长率",
+            "信用卡华彩生活APP月活跃用户（MAU）",
+            "信用卡华彩生活APP月活跃用户（MAU）同比变动率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-MOBILE-BANK-USERS",
+          "fact_sha256": "cf914a81b53ee907a5232d2a4c5d65bc0ed74b119cc73b6de66fc8ffb465a9f1",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "手机银行签约客户",
+            "手机银行签约客户比上年末增长率",
+            "手机银行月活跃用户（MAU）",
+            "手机银行月活跃用户（MAU）同比增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-RETAIL-AUM",
+          "fact_sha256": "aad742c78d107ecb8d8dc495bf185c8b0cac30d65d9a977175033405da60d65a",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": [
+            "个人客户金融资产总量",
+            "个人客户金融资产总量比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-PERSONAL-DEPOSIT-BALANCE",
+          "fact_sha256": "e4c5d105e1377f7b4a11613b7aed03bbf97158d1f1fc42c0f64e1c7f3a543135",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": [
+            "个人存款余额",
+            "个人存款余额比上年末增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-WEALTH-FEE-INCOME",
+          "fact_sha256": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": [
+            "财富管理手续费及佣金收入",
+            "财富管理手续费及佣金收入同比增长率"
+          ]
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "F-CREDIT-CARD-REVENUE",
+          "fact_sha256": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            47
+          ],
+          "metric_names": [
+            "信用卡业务收入",
+            "信用卡业务收入同比变动率"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "OMIT-CONSUMER-CREDIT-CUST",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OMIT-PERSONAL-LOAN-BALANCE",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OMIT-CREDIT-CARD-LOAN-TXN",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OMIT-KPL-COBRAND-CARDS",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "revised_fact": null
+        }
+      ],
+      "source_wire_root": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600015/executions/6fa-600015-unused-source-review/receipts",
+      "local_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-5b0a7a170befb5995f4a080e.json",
+      "raw_wire": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600015/executions/6fa-600015-enrich/receipts/002.json",
+      "original_model_runtime_path": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600015/executions/6fa-600015-unused-source-review/model-runtime.json",
+      "original_model_runtime_sha256": "adf2c3a6d6c862fbc5768caf842e4ab3a40893485c44185ade3dac0ce225a6e5",
+      "limited_fact_ids": [
+        "F-WEALTH-FEE-INCOME",
+        "F-CREDIT-CARD-REVENUE"
+      ],
+      "restricted_metrics": 4
+    },
+    {
+      "instrument_id": "600348.SH",
+      "final_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-2a5b3a9b1435fc7ccbf42d46.json",
+      "runtime_sha256": "d87e0e469983833d57e3aeb0f11718b46d0acc1f0b5b48fb143bb09458d74e78",
+      "workpaper_sha256": "6041634dd243d0ea0247593dfaceddca0e1478d79e41aba21d9c2d47b01f3fdb",
+      "review_status": "completed",
+      "all_final_facts": [
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-01",
+          "fact_sha256": "e082746feef9f4288abe388b179e02382735d695eb2713010f33615c99bf2310",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "physical_pages": [
+            21
+          ],
+          "metric_names": [
+            "煤炭业务分品种销售收入-洗块煤",
+            "煤炭业务分品种销售收入-洗末煤",
+            "煤炭业务分品种销售收入-末煤",
+            "煤炭业务分品种销售收入-煤泥",
+            "煤炭业务分品种销售收入-合计"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-02",
+          "fact_sha256": "3ec0bf48e8a1c124f03410291fd816230cee494fae14d353a4286d4898a0f6da",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "煤炭行业营业收入",
+            "煤炭行业营业成本",
+            "煤炭行业毛利率",
+            "煤炭行业营业收入比上年增减",
+            "煤炭行业营业成本比上年增减",
+            "煤炭行业毛利率比上年增减"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-03",
+          "fact_sha256": "908d511f05a9c534dfde1a206261bf7ed026ad048a59ada576c87fde2b8380dd",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "洗块煤营业收入",
+            "洗块煤营业成本",
+            "洗块煤毛利率",
+            "洗末煤营业收入",
+            "洗末煤营业成本",
+            "洗末煤毛利率",
+            "末煤营业收入",
+            "末煤营业成本",
+            "末煤毛利率",
+            "煤泥营业收入",
+            "煤泥毛利率"
+          ]
+        },
+        {
+          "element": "revenue_model",
+          "fact_id": "F-RM-04",
+          "fact_sha256": "414809bf81ee77c221d3e9886ca6b023c29b34c46369196e369c412e099b5a99",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "metric_names": [
+            "营业收入",
+            "营业收入同比增减",
+            "煤炭产品销售收入",
+            "煤炭产品销售收入同比增减"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-01",
+          "fact_sha256": "280ad64590cc133308a9c9ea6be68c28c8b7780d47efe0246cf0882c497c6726",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "physical_pages": [
+            21
+          ],
+          "metric_names": [
+            "煤炭业务分品种销售成本-洗块煤",
+            "煤炭业务分品种销售成本-洗末煤",
+            "煤炭业务分品种销售成本-末煤",
+            "煤炭业务分品种销售成本-合计"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-02",
+          "fact_sha256": "e7f8030118c2988b3c9bf0f6a2255ded65d1d88561ef5277653530e8b4ae9d37",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "煤炭行业营业成本",
+            "煤炭行业营业成本比上年增减"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-03",
+          "fact_sha256": "a00a43b513b8ef792b9660cc996b951fcae41108391cd731be9f68ed95a5dcba",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "metric_names": [
+            "洗块煤营业成本",
+            "洗块煤营业成本比上年增减",
+            "洗末煤营业成本",
+            "洗末煤营业成本比上年增减",
+            "末煤营业成本",
+            "末煤营业成本比上年增减"
+          ]
+        },
+        {
+          "element": "operating_drivers",
+          "fact_id": "F-OD-04",
+          "fact_sha256": "22247e10258bd94d314e4f27ddfe296815dd57fe7af15f5fac81810a18703c6c",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "metric_names": [
+            "营业成本",
+            "营业成本同比增减",
+            "煤炭产品销售成本",
+            "煤炭产品销售成本同比增减"
+          ]
+        }
+      ],
+      "findings": [],
+      "source_wire_root": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600348/executions/6fa-600348-unused-source-review/receipts",
+      "local_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-1972712727ed295e4eb944eb.json",
+      "raw_wire": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/600348/executions/6fa-600348-enrich/receipts/002.json"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "final_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-aeb6c2b53b6c62d3973c3a4c.json",
+      "runtime_sha256": "c1e1a32cd33fe7d5d39efa7f37e874274544cb66a6caa3df0cd0712918de15cc",
+      "workpaper_sha256": "cb21793fcd3f8d36f692f1a4ea6599b42af37cf83c59546c2285054c61765678",
+      "review_status": "completed_with_open_findings",
+      "all_final_facts": [
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-01",
+          "fact_sha256": "950d5891bbb6763e0a5c49864590a994b97f1a9cdbf03c08e84487f3d35dd681",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "physical_pages": [
+            39
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-02",
+          "fact_sha256": "9cc7279f2aa93391efc295cfd53139dab01e13892b5cbff1424dfc160c7f2902",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-03",
+          "fact_sha256": "a2e8b6d95a3e5007e5ae697776be5457373ffcff31310480eee1e954c461a7b9",
+          "evidence_ids": [
+            "source-0012",
+            "source-0007"
+          ],
+          "physical_pages": [
+            40,
+            45
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-04",
+          "fact_sha256": "57d00c6b0c0f6b02a5fc4b4cb8b1dc0bf43d533cd697f2867a09ae65be128c2c",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-05",
+          "fact_sha256": "68e7e51ec1ea75131c8cc1b1ececd032138b46a8af7851b016e9dc3c5f617623",
+          "evidence_ids": [
+            "source-0012",
+            "source-0005"
+          ],
+          "physical_pages": [
+            38,
+            45
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-06",
+          "fact_sha256": "3898366121b9e4793235e4ffc74ba15775b44b2a1a0b36143a147d0df4a6d15f",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "physical_pages": [
+            41
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-07",
+          "fact_sha256": "a43cbb94a353280ab6c32752f4aa7fe6239388961c092500147ce888bbe248b5",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-08",
+          "fact_sha256": "e29b077016e42d628ab26b7d83f58358a5c1636dbacdeb1cc1a27a03dc6330f5",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "physical_pages": [
+            38
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-09",
+          "fact_sha256": "9772c1c1183e55c74f80a5568bcbbd353f89d376a2a277d08b55672b3d71db24",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "physical_pages": [
+            41
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-10",
+          "fact_sha256": "22c8e83d0fdcfa24019c13ab0062b4e5fdce48785034238b84d972f8a71e61e1",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "metric_names": []
+        },
+        {
+          "element": "company_features",
+          "fact_id": "F-RANK-11",
+          "fact_sha256": "e299039db5ee2823e758d852b379ea9a3cd3792356352686e2f4ef3e164df337",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "physical_pages": [
+            46
+          ],
+          "metric_names": []
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "RF-OMIT-RANK-01",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate",
+          "evidence_ids": [
+            "source-0002",
+            "source-0005",
+            "source-0007",
+            "source-0013"
+          ],
+          "revised_fact": null
+        }
+      ],
+      "source_wire_root": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377/executions/6fa-601377-unused-source-review/receipts",
+      "local_runtime_path": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123/company_profile_common_core.v1/bp-work-9a8e32721c350793252aa7c6.json",
+      "raw_wire": "/home/python/Quote/data/checkpoints/company_profile_targeted_gap_closure_20261123/601377/executions/6fa-601377-enrich/receipts/002.json"
+    }
+  ],
+  "independent_use_decision_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/a-source-use-decisions.json",
+  "model_phase_and_independent_delivery_separate": true
+}

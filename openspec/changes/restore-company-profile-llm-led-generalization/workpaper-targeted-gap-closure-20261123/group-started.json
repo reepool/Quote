@@ -1,0 +1,13 @@
+{
+  "started_epoch": 1795403003.3782034,
+  "absolute_deadline_epoch": 1795415603.3782034,
+  "concurrency": 3,
+  "stocks": [
+    "600015.SH",
+    "600348.SH",
+    "601377.SH"
+  ],
+  "source_reference_sha256": "3b26d927859928392d08684e83daf1f762b45ae2c29916d504d15c994d156372",
+  "network_environment": "require_escalated",
+  "new_entrances": 3
+}

@@ -1,0 +1,174 @@
+{
+  "task": "6.FA",
+  "baseline_commit": "8682e3cc508e6c38909292ae9cf6fedc5b5ee8ea",
+  "author": "A/main",
+  "stage": "independent_reference_before_new_model_calls",
+  "source_root": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122",
+  "protected_file_count": 87,
+  "protected_root_manifest_sha256": "1456f0526b7100b994be98e77c368180fa36082d462e7590e8e2081f7abac1fe",
+  "profile_count": 20,
+  "profiles": [
+    {
+      "instrument_id": "600015.SH",
+      "report": {
+        "instrument_id": "600015.SH",
+        "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-87377121962465449e50155d",
+      "latest_reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "profile_sha256": "30056af7c7b88bd214a8c923265979dbde7ad4fa1d050b0b87bb4468f15ff843",
+      "active_gap_count": 5,
+      "prior_targets": [
+        {
+          "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+          "fact_id": "F25",
+          "state": "withheld",
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+          "fact_id": "F37",
+          "state": "withheld",
+          "metric_gaps": []
+        }
+      ]
+    },
+    {
+      "instrument_id": "600348.SH",
+      "report": {
+        "instrument_id": "600348.SH",
+        "report_id": "asset_f320e4e874bc2381e9f05bb662544a64",
+        "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-7e4d48a5974e12bdbf850179",
+      "latest_reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "profile_sha256": "cac410058693ca467777e107910582008b4f8340fe9fdaad9e70a7b201990aff",
+      "active_gap_count": 8,
+      "prior_targets": [
+        {
+          "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+          "fact_id": "F007",
+          "state": "limited",
+          "metric_gaps": [
+            {
+              "metric_index": 0,
+              "name": "煤炭产品销售收入",
+              "state": "withheld",
+              "reason": "煤炭销售收入的业务范围错标集团。保留原文及原公司营业收入指标，不能将错误指标改名/改标签后冒称LLM已修正。"
+            }
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+          "fact_id": "F009",
+          "state": "limited",
+          "metric_gaps": [
+            {
+              "metric_index": 4,
+              "name": "煤炭业务销售收入合计",
+              "state": "withheld",
+              "reason": "三个煤炭小计的标准化主体范围不可靠，原文及四个原分品种金额有据；仅隔离小计指标。"
+            },
+            {
+              "metric_index": 5,
+              "name": "煤炭业务销售成本合计",
+              "state": "withheld",
+              "reason": "三个煤炭小计的标准化主体范围不可靠，原文及四个原分品种金额有据；仅隔离小计指标。"
+            },
+            {
+              "metric_index": 6,
+              "name": "煤炭业务毛利合计",
+              "state": "withheld",
+              "reason": "三个煤炭小计的标准化主体范围不可靠，原文及四个原分品种金额有据；仅隔离小计指标。"
+            }
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+          "fact_id": "F023",
+          "state": "limited",
+          "metric_gaps": [
+            {
+              "metric_index": 0,
+              "name": "煤炭销售成本",
+              "state": "withheld",
+              "reason": "煤炭成本不是集团全部成本，原数及减少方向有原文；保留叙述，三个指标不供确定计算。"
+            },
+            {
+              "metric_index": 1,
+              "name": "上年同期煤炭销售成本",
+              "state": "withheld",
+              "reason": "煤炭成本不是集团全部成本，原数及减少方向有原文；保留叙述，三个指标不供确定计算。"
+            },
+            {
+              "metric_index": 2,
+              "name": "煤炭销售成本同比减少额",
+              "state": "withheld",
+              "reason": "煤炭成本不是集团全部成本，原数及减少方向有原文；保留叙述，三个指标不供确定计算。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instrument_id": "601377.SH",
+      "report": {
+        "instrument_id": "601377.SH",
+        "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "base_work_id": "bp-work-fbfb92491eaa652a123d167a",
+      "latest_reading_work_id": "bp-work-016367c43308049bffc006bc",
+      "profile_sha256": "122f919b491118dfef11701f75f824f8dbd227bbf2825d59c7d26f648dfd743c",
+      "active_gap_count": 5,
+      "prior_targets": [
+        {
+          "reading_work_id": "bp-work-016367c43308049bffc006bc",
+          "fact_id": "F34",
+          "state": "source_only",
+          "metric_gaps": []
+        }
+      ]
+    }
+  ],
+  "independent_challenges": {
+    "600015.SH": {
+      "chapter": "管理层讨论与分析/业务回顾/零售金融、信用卡",
+      "source_physical_pages_for_A_only": [
+        44
+      ],
+      "expected": "Actual body quantities are4012.44/2.02/56.11万户 with separate superscript notes4/5/6; fresh model must not concatenate notes into quantities. Retain subject, period and customer/card distinctions. This independent answer is not model input."
+    },
+    "600348.SH": {
+      "chapter": "管理层讨论与分析/主营业务分产品、经营性信息及成本分析",
+      "source_physical_pages_for_A_only": [
+        21
+      ],
+      "expected": "Coal segment is not consolidated group. Retain subgroup rows and period/amount/direction; an independently correct total cannot repair a mislabeled subgroup by numeric similarity. Old partial restrictions remain on original facts."
+    },
+    "601377.SH": {
+      "chapter": "管理层讨论与分析/机构服务/研究服务",
+      "source_physical_pages_for_A_only": [
+        39
+      ],
+      "expected": "Research award statement belongs to original physical39/printed38; existing35/40 citations did not support third-place and10-editions top5 clause. New claim must bind actual source including ranking and period, or stay limited."
+    }
+  },
+  "historical_accuracy_unchanged": 0.9789674952198852,
+  "not_model_input": true,
+  "fresh_main_source_check": {
+    "600015.SH": "Main independently re-read original physical44 and PDF visitor glyphs: note4/5/6 font156 and raised baseline618.29/638.09 vs body240 at622.37/642.169; bottom note definitions115. Original plain layout fuses note digits, so string-only replay is insufficient. Optional visual renderer unavailable (fitz not installed); no dependency installed or source mutated.",
+    "600348.SH": "Main re-read original physical21 coal table: unit亿元人民币, washed lump22.45/9.74/12.71, washed fine19.52/9.68/9.84, fine133.89/83.60/50.29, slurry3.64/blank/3.64; coal total179.51/103.03/76.48. This does not supply group totals; blank slurry cost is not automatically zero. Original cited physical16 cost analysis expressly reports103.03 vs120.48亿元减少17.45亿元.",
+    "601377.SH": "Main re-read original physical39: 研究服务业务/经营举措及业绩 explicitly says report-period research team third place and10 consecutive top5. Subsequent company future actions remain plans, not completed facts. Original35/40 compound citation stays source_only."
+  }
+}

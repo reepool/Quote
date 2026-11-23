@@ -1,0 +1,25 @@
+{
+  "network_environment": "require_escalated",
+  "profiles": [
+    {
+      "profile": "semantic_extraction__deepseek",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "dns_addresses": 3,
+      "tls": "TLSv1.3",
+      "credential_present": true,
+      "reasoning_effort": "high"
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "dns_addresses": 1,
+      "tls": "TLSv1.3",
+      "credential_present": true,
+      "reasoning_effort": "high"
+    }
+  ],
+  "model_requests": 0,
+  "same_environment_as_launch": true
+}

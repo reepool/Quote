@@ -1,0 +1,114 @@
+{
+  "timestamp": "2026-11-23T02:59:25.656875+00:00",
+  "baseline_head": "8682e3cc508e6c38909292ae9cf6fedc5b5ee8ea",
+  "original_root": "/home/python/Quote/data/research/company_profile_metric_safe_release_20261122",
+  "output_root": "/home/python/Quote/data/research/company_profile_targeted_gap_release_20261123",
+  "original_writer_records": 40,
+  "initialized_records": 40,
+  "protected_files": 87,
+  "company_absolute_seconds": 6000,
+  "plan_seconds": 5950,
+  "initialization_guard_seconds": 50,
+  "group_seconds": 12600,
+  "concurrent_limit": 3,
+  "questions_derived_from_active_API_gaps": true,
+  "artificial_answers_or_fixed_pages_sent": false,
+  "planned_only": true,
+  "new_model_calls": 0,
+  "companies": [
+    {
+      "instrument_id": "600015.SH",
+      "base_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "base_workpaper_sha256": "d7d4db37643b2b20d690a111dff1fb0825d51774f6f24c6cf4f471c7b052cf61",
+      "before_profile_sha256": "c104d82653317c090c8363f6df32d5da9c53885d451e0204ba3dd9b5c0195fa3",
+      "active_gap_elements": [
+        "customers_channels_markets",
+        "downstream_customers",
+        "material_changes",
+        "revenue_model",
+        "scale_and_mix"
+      ],
+      "targets": [
+        {
+          "element": "customers_channels_markets",
+          "question": "补充本报告零售客户及相关经营规模的披露数量、类别、期间和计量单位，区分正文数量与脚注标记，并为每项绑定完整原文依据；无法可靠读取的部分明确保留缺项。"
+        }
+      ],
+      "report": {
+        "instrument_id": "600015.SH",
+        "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/d6/d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3.pdf",
+      "pdf_sha256": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "execution_plan": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/600015-enrich.json"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "base_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "base_workpaper_sha256": "c4f3a21ec00cc987bb05de13ebb70b62ccb3ad31ca1d3158b870bc55ab55b7d8",
+      "before_profile_sha256": "37db998490f6cf5db75625aca12e7276e7d9c3112062fcb0078bb8902a3f5ba8",
+      "active_gap_elements": [
+        "operating_drivers",
+        "operations_and_inputs",
+        "revenue_model",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "targets": [
+        {
+          "element": "revenue_model",
+          "question": "补充煤炭业务销售收入及主要构成的标准化指标，明确公司整体、业务板块或产品等归属范围、期间、单位及完整原文依据，不将业务子集当作公司整体。"
+        },
+        {
+          "element": "operating_drivers",
+          "question": "补充煤炭业务销售成本及同期比较的标准化指标，明确主体范围、期间、单位和增减方向；绑定表头、行名与对应原文，不可靠的部分保留缺项。"
+        }
+      ],
+      "report": {
+        "instrument_id": "600348.SH",
+        "report_id": "asset_f320e4e874bc2381e9f05bb662544a64",
+        "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/82/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559.pdf",
+      "pdf_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "execution_plan": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/600348-enrich.json"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "base_work_id": "bp-work-016367c43308049bffc006bc",
+      "base_workpaper_sha256": "a799c73dd0f99a4ef8cb9777eca729da195c85251fdda9ef75767726a89a5d9a",
+      "before_profile_sha256": "94c439207923e6b880bf4ff3d393ac07d0a035842b7fe629f84744261adb8cf8",
+      "active_gap_elements": [
+        "company_features",
+        "operating_drivers",
+        "revenue_model",
+        "scale_and_mix",
+        "upstream_inputs"
+      ],
+      "targets": [
+        {
+          "element": "company_features",
+          "question": "补充本报告研究服务等重要排名描述的完整原文证据，每项明确评选或排名名称、对应主体与期间；复合描述中的各子句均须有覆盖，证据不全则明确保留限制。"
+        }
+      ],
+      "report": {
+        "instrument_id": "601377.SH",
+        "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/71/71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb.pdf",
+      "pdf_sha256": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "execution_plan": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-targeted-gap-closure-20261123/plans/601377-enrich.json"
+    }
+  ]
+}

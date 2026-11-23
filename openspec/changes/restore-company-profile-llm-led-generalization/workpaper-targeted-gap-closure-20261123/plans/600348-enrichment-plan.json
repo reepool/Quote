@@ -1,0 +1,34 @@
+{
+  "state": "planned",
+  "execution_started": false,
+  "action": "enrich",
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6fa-600348-targeted-gap",
+    "base_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+    "base_workpaper_sha256": "c4f3a21ec00cc987bb05de13ebb70b62ccb3ad31ca1d3158b870bc55ab55b7d8",
+    "report": {
+      "instrument_id": "600348.SH",
+      "report_id": "asset_f320e4e874bc2381e9f05bb662544a64",
+      "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-26T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "revenue_model",
+        "question": "补充煤炭业务销售收入及主要构成的标准化指标，明确公司整体、业务板块或产品等归属范围、期间、单位及完整原文依据，不将业务子集当作公司整体。"
+      },
+      {
+        "element": "operating_drivers",
+        "question": "补充煤炭业务销售成本及同期比较的标准化指标，明确主体范围、期间、单位和增减方向；绑定表头、行名与对应原文，不可靠的部分保留缺项。"
+      }
+    ]
+  },
+  "requires": [
+    "explicit_model_and_finite_budget",
+    "publication_write_permission"
+  ],
+  "production_authorization": "not_authorized"
+}

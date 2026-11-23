@@ -1,0 +1,15 @@
+{
+  "phase": "A_terminal_independent_static_and_fresh_read_checks",
+  "profiles": 20,
+  "readable_records": 628,
+  "metric_records": 993,
+  "other17_equal": true,
+  "three_old_fact_entries_equal": true,
+  "annual_JSON_API_equal": true,
+  "audited29_fact_hashes_still_equal": 29,
+  "source_code_hashes_unchanged_after_continuation_freeze": 73,
+  "actual_wire_receipts_counted": 10,
+  "actual_supplier_total_summed": 218324,
+  "fresh_bank_API_two_limited_facts_four_metric_gaps_verified": true,
+  "old87_manifest_equal_A0": true
+}

@@ -124,8 +124,9 @@ def test_enrichment_plan_scope_is_checked_before_model_construction(tmp_path,mon
     assert not (tmp_path/'checkpoints').exists()
 
 
-@pytest.mark.parametrize('continuation',['review_batch','enrich'])
+@pytest.mark.parametrize('continuation',['review_batch','enrich','enrich_unread'])
 def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_on_same_owner(tmp_path,monkeypatch,continuation):
+    enriching = continuation in {'enrich', 'enrich_unread'}
     content=_pdf_bytes(['1. Business', 'Company provides loans and settlement services with source-backed business information.'])
     pdf=tmp_path/'annual.pdf';pdf.write_bytes(content)
     plan=plan_for(tmp_path);plan['document_versions']['600000.SH']=hashlib.sha256(content).hexdigest()
@@ -136,25 +137,29 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     class Transport(ScriptedTransport):
         async def send(self,url,headers,payload,timeout_seconds):
             source=json.loads(payload['messages'][-1]['content'])
-            if len(self.calls)==0 or (continuation=='enrich' and len(self.calls)==2):
+            if len(self.calls)==0 or (enriching and len(self.calls)==2):
                 assert source['sections']
                 if len(self.calls)==2:
                     assert source['targeted_reading']['targets'][0]['element']=='products_services'
                 selected=max(source['sections'],key=lambda row:row[3])[0]
                 reply=dict(selected_section_ids=[selected],rationale='Read the source business section.',deferred=[],stop_reason='Bounded selection.')
-            elif len(self.calls)==1 or (continuation=='enrich' and len(self.calls)==3):
+            elif len(self.calls)==1 or (enriching and len(self.calls)==3):
                 supplemental=len(self.calls)==3
                 elements={name:dict(status='unclear',facts=[],limitations=['Not obtained from this selected source.']) for name in ELEMENT_LABELS}
                 elements['products_services' if supplemental else 'business_structure']=dict(status='observed',facts=[dict(
                     fact_id='supplement' if supplemental else 'main',
                     text='Loans and settlement services.' if supplemental else 'Company provides loans and settlement services.',subject_scope='consolidated_group',
                     period='2025',evidence_ids=['source-0001'],metrics=[])],limitations=[])
+                if supplemental and continuation=='enrich_unread':
+                    for name, element in elements.items():
+                        if name != 'products_services':
+                            element['status']='not_read_for_this_task'
                 if supplemental:
                     assert source['targeted_reading']['targets'][0]['element']=='products_services'
                 reply=dict(schema_version='company_profile_workpaper_draft.v1',elements=elements)
             else:
-                assert len(self.calls)==(4 if continuation=='enrich' else 2)
-                reply=dict(reviewed_fact_ids=['supplement' if continuation=='enrich' else 'main'],findings=[])
+                assert len(self.calls)==(4 if enriching else 2)
+                reply=dict(reviewed_fact_ids=['supplement' if enriching else 'main'],findings=[])
             self.responses.append(_response(reply))
             return await super().send(url,headers,payload,timeout_seconds)
 
@@ -203,8 +208,8 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     assert asyncio.run(task_entry.execute_configured_task(action='first_read',storage=storage,
         execution_plan_file=file,llm_config=None))==first  # No configuration/client reloaded on replay.
     assert len(clients)==1 and len(transport.calls)==2
-    review=deepcopy(plan);review.update(run_id='review',action=continuation)
-    if continuation=='enrich':
+    review=deepcopy(plan);review.update(run_id='review',action='enrich' if enriching else continuation)
+    if enriching:
         from api.company_profile_routes import EnrichmentPlanRequest, plan_annual_company_profile_enrichment
 
         requested=EnrichmentPlanRequest(request_id='job-enrich',targets=[dict(
@@ -214,13 +219,17 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     else:
         review['review_plans']=[reader.plan_review_recovery('600000.SH',request_id='job-review')]
     review_file=save(tmp_path,review)
-    final=invoke(continuation,review_file)
-    assert final['state']=='completed' and len(transport.calls)==(5 if continuation=='enrich' else 3) and len(clients)==2
+    final=invoke(review['action'],review_file)
+    assert final['state']=='completed' and len(transport.calls)==(5 if enriching else 3) and len(clients)==2
     current=CompanyProfileReadService(tmp_path/'output').research_profile('600000.SH')
     assert current['readings'][-1]['review_status']=='completed'
-    assert len([f for f in current['facts'] if f['fact']])==(2 if continuation=='enrich' else 1)
+    assert len([f for f in current['facts'] if f['fact']])==(2 if enriching else 1)
     assert base_path.read_bytes()==base_bytes
-    if continuation=='enrich':
+    if enriching:
+        if continuation=='enrich_unread':
+            generation=current['readings'][-1]['generation']
+            assert generation['extraction']['contract_status']=='rejected'
+            assert generation['local_schema_normalization']['policy']=='enrichment_empty_unread_status.v1'
         assert current['facts'][0]['fact']['text']==before['facts'][0]['fact']['text']
         assert any(f['element']=='products_services' and f['fact']['text']=='Loans and settlement services.'
             for f in current['facts'] if f['fact'])
@@ -238,7 +247,7 @@ def test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_
     else:
         assert current['facts'][0]['state']=='superseded'
     count=len(clients)
-    assert asyncio.run(task_entry.execute_configured_task(action=continuation,storage=storage,
+    assert asyncio.run(task_entry.execute_configured_task(action=review['action'],storage=storage,
         execution_plan_file=review_file))==final
     assert len(clients)==count
     assert (tmp_path/'checkpoints/executions/first/budget.json').is_file()

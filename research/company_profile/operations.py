@@ -949,7 +949,10 @@ class CompanyProfileTaskService:
             self._ensure_publication_allows_writes()
             previous = self.processing_identity
             previous_hash = self.processing_identity_hash
-            self.processing_identity = {**previous, "workpaper_enrichment": plan.model_dump(mode="json")}
+            from .workpaper_llm import ENRICHMENT_UNREAD_RECOVERY
+
+            self.processing_identity = {**previous, "workpaper_enrichment": plan.model_dump(mode="json"),
+                "enrichment_unread_recovery": ENRICHMENT_UNREAD_RECOVERY}
             self.processing_identity_hash = _stable_hash(self.processing_identity)
             try:
                 result = await self._run(knowledge_cutoff=cutoff, instrument_ids=instruments,
