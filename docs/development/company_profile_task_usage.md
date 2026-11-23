@@ -11,6 +11,10 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 
 本文命令使用已验证的项目完整环境`/home/python/miniconda3/envs/Quote/bin/python`。系统`python3`可能缺少pandas等项目依赖；此时应选正确解释器，不通过改业务代码或临时安装依赖解决。以下路径均从`/home/python/Quote`执行。
 
+## 从研究问题决定是否补读（6.FC）
+
+[20家公司业务对照与补读取舍](../../data/research/company_profile_research_v1_20261123/research-use.md)直接使用当前研究V1，可看主营/产品服务/赚钱方式、公司特色、局部限制和不值得追补的细项。121条active缺项不是121个必补任务，先排除历史替代记录，再判断是否影响本次研究。兴业证券业务板块收入权重、中信海直通航收入构成已各形成一份原plan_enrichment问题计划，保在同根reading-plans/6fc-*-revenue.json；仅planned、未启动、无模型预算，不是可直接执行的execution-plan-file。读取与生成问题计划不隐式调用模型，不自动补满。
+
 ## 正常源复核的指标局部限用（6.FB）
 
 研究版V1根为`/home/python/Quote/data/research/company_profile_research_v1_20261123`，当前20股633条可读记录/1003指标；6.FA原628/993基线、旧writer与限制保留，增加的是保存稿真实源核后继，不是新抽取或质量分数改判。人读/机器入口分别为`exports/annual_profiles.md`、`exports/annual_profiles.json`及`annual-api.json`，来源/模型/复核状态和缺项保留，读取不发模型。2026-11-23获批四类原review_batch已全部执行，6条模型组件意见/12位置及5终核修订确有实际触发；另3项漏检经A仅源参考，华夏4旧指标限制仍靠原人工保护。实际效果及适用边界见本轮result；研究可用不等于全自动、正式99%或生产，不能重执行已结束计划借余额续跑，共享默认配置未改。
