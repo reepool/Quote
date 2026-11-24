@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import csv
 import fcntl
+import hashlib
 import json
 import os
 import re
@@ -89,6 +90,11 @@ class CompanyProfileReadService:
         processing_identity: Mapping[str, Any] | None = None,
         work_id: str | None = None,
     ) -> dict[str, Any]:
+        records, _ = self._validated_snapshot()
+        return self._query(instrument_ids, processing_identity=processing_identity,
+            work_id=work_id, records=records)
+
+    def _query(self, instrument_ids=(), *, processing_identity=None, work_id=None, records):
         requested = tuple(
             str(item).strip() for item in instrument_ids if str(item).strip()
         )
@@ -96,6 +102,7 @@ class CompanyProfileReadService:
             requested,
             processing_identity=processing_identity,
             work_id=work_id,
+            records=records,
         )
         if profiles:
             state = "found"
@@ -126,10 +133,12 @@ class CompanyProfileReadService:
     ) -> dict[str, Any]:
         if export_directory is None or not str(export_directory).strip():
             raise ValueError("export directory is required")
-        queried = self.query(
+        records, versions = self._validated_snapshot()
+        queried = self._query(
             instrument_ids,
             processing_identity=processing_identity,
             work_id=work_id,
+            records=records,
         )
         profiles = list(queried.get("profiles") or [])
         views = list(queried.get("stage4_restricted_views") or [])
@@ -138,30 +147,37 @@ class CompanyProfileReadService:
         annual_profiles: list[dict[str, Any]] = []
         if any(profile.get("workpaper") for profile in profiles):
             selected = self._latest_by_instrument(
-                processing_identity=processing_identity, work_id=work_id,
+                processing_identity=processing_identity, work_id=work_id, records=records,
             )
             for profile in profiles:
                 if not profile.get("workpaper"):
                     continue
                 record = selected.get(profile["instrument_id"])
                 base_record = record
+                annual = self._research_profile_from_record(base_record, records=records) if isinstance(
+                    base_record, CompanyProfileRuntimeRecordV3) else None
                 if record is not None and record.work_id != profile["work_id"]:
                     # A component-limited lineage may end in a stricter whole-
                     # fact restriction. Keep its actual hash-linked successor.
-                    candidate = self._latest_by_instrument(work_id=profile["work_id"], include_enrichments=True).get(profile["instrument_id"])
+                    candidate = self._latest_by_instrument(work_id=profile["work_id"], include_enrichments=True,
+                        records=records).get(profile["instrument_id"])
                     if (isinstance(candidate, CompanyProfileRuntimeRecordV3)
                         and isinstance(base_record, CompanyProfileRuntimeRecordV3)
                         and candidate.report == base_record.report
-                        and self._research_profile_from_record(base_record)["latest_reading_work_id"] == candidate.work_id):
+                        and annual["latest_reading_work_id"] == candidate.work_id):
                         record = candidate
                 if (not isinstance(record, CompanyProfileRuntimeRecordV3)
                     or record.work_id != profile["work_id"]
                     or record.workpaper.model_dump(mode="json") != profile["workpaper"]):
                     raise ValueError("selected company-profile snapshot changed during export")
-                annual_profiles.append(self._research_profile_from_record(base_record))
+                annual_profiles.append(annual)
         profile_state = str(queried.get("state") or "idle")
         written: list[str] = []
         if profiles or views:
+            # Re-read bytes, not typed/source validation. A concurrently edited,
+            # added or removed record invalidates this export's input snapshot.
+            if self._record_versions() != versions:
+                raise ValueError("selected company-profile snapshot changed during export")
             with _exclusive_export(target):
                 written.extend(_write_profile_export(target, profiles, annual_profiles=annual_profiles))
                 written.extend(_write_stage4_export(target, views))
@@ -208,10 +224,14 @@ class CompanyProfileReadService:
         Facts keep (reading_work_id, fact_id) identity. Later readings do not
         silently replace, reconcile or approve earlier facts or gap statements.
         """
-        root = self._latest_by_instrument().get(instrument_id)
+        records, _ = self._validated_snapshot()
+        return self._research_profile(instrument_id, records=records)
+
+    def _research_profile(self, instrument_id, *, records):
+        root = self._latest_by_instrument(records=records).get(instrument_id)
         if not isinstance(root, CompanyProfileRuntimeRecordV3):
             raise FileNotFoundError("annual-report company profile not found")
-        return self._research_profile_from_record(root)
+        return self._research_profile_from_record(root, records=records)
 
     def research_profiles(self, instrument_ids: Sequence[str]) -> dict[str, Any]:
         """Read an explicit stock list with the single-stock graded projection.
@@ -223,12 +243,13 @@ class CompanyProfileReadService:
             or any(not isinstance(item, str) or not item.strip() for item in instrument_ids)):
             raise ValueError("annual-profile batch requires 1 to 100 nonempty stock IDs")
         requested = list(dict.fromkeys(item.strip() for item in instrument_ids))
-        selected = self._latest_by_instrument()
+        records, _ = self._validated_snapshot()
+        selected = self._latest_by_instrument(records=records)
         profiles, missing = [], []
         for instrument_id in requested:
             record = selected.get(instrument_id)
             if isinstance(record, CompanyProfileRuntimeRecordV3):
-                profiles.append(self._research_profile_from_record(record))
+                profiles.append(self._research_profile_from_record(record, records=records))
             else:
                 missing.append(instrument_id)
         return {
@@ -242,18 +263,18 @@ class CompanyProfileReadService:
             "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION,
         }
 
-    def _research_profile_from_record(self, root: CompanyProfileRuntimeRecordV3) -> dict[str, Any]:
+    def _research_profile_from_record(self, root: CompanyProfileRuntimeRecordV3, *, records=None) -> dict[str, Any]:
         """Project one selected base and its exact supplemental-reading chain."""
         from .workpaper import workpaper_elements
         from .workpaper_delivery import project_workpaper_delivery
         from .workpaper_enrichment import WorkpaperEnrichmentPlan
         from .workpaper_review import ReviewRecoveryLink, plan_review_follow_up, workpaper_hash
 
+        snapshot = self._validated_snapshot()[0] if records is None else records
         records = {root.work_id: root}
         candidates = []
-        for path in self.namespace_root.glob("*.json"):
+        for record in snapshot:
             try:
-                record = _RUNTIME_ADAPTER.validate_json(path.read_text(encoding="utf-8"))
                 identity = _record_processing_identity(record)
                 recovery = identity.get("workpaper_review_recovery")
                 raw = recovery or identity.get("workpaper_enrichment")
@@ -342,10 +363,11 @@ class CompanyProfileReadService:
         reads, including valid supplements; excluded payloads are never counted.
         """
         items = []
-        for instrument_id, record in sorted(self._latest_by_instrument().items()):
+        records, _ = self._validated_snapshot()
+        for instrument_id, record in sorted(self._latest_by_instrument(records=records).items()):
             if not isinstance(record, CompanyProfileRuntimeRecordV3):
                 continue
-            profile = self._research_profile_from_record(record)
+            profile = self._research_profile_from_record(record, records=records)
             visible = [entry["fact"] for entry in profile["facts"] if entry["fact"] is not None]
             items.append({
                 "instrument_id": instrument_id,
@@ -382,12 +404,13 @@ class CompanyProfileReadService:
 
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", request_id):
             raise ValueError("invalid review recovery request_id")
-        current = self.research_profile(instrument_id)
+        records, _ = self._validated_snapshot()
+        current = self._research_profile(instrument_id, records=records)
         chosen = reading_work_id or current["latest_reading_work_id"]
         reading = next((item for item in current["readings"] if item["work_id"] == chosen), None)
         if reading is None:
             raise ValueError("review reading is outside the current same-report lineage")
-        record = self._latest_by_instrument(work_id=chosen, include_enrichments=True).get(instrument_id)
+        record = self._latest_by_instrument(work_id=chosen, include_enrichments=True, records=records).get(instrument_id)
         if (not isinstance(record, CompanyProfileRuntimeRecordV3)
             or record.report.model_dump(mode="json") != current["report"]
             or workpaper_hash(record.workpaper) != reading["workpaper_sha256"]):
@@ -395,7 +418,8 @@ class CompanyProfileReadService:
         follow_up = (reading["review_follow_up"] if reading.get("superseded_by_review_work_id")
                      else plan_review_follow_up(record.workpaper, record.workpaper_receipts))
         if source_recheck_policy is not None:
-            seed, resume, receipts = self._prepare_review_recovery(record, source_recheck_policy=source_recheck_policy)
+            seed, resume, receipts = self._prepare_review_recovery(record, source_recheck_policy=source_recheck_policy,
+                records=records)
             if resume is not None:
                 raise ValueError("explicit source recheck cannot reuse prior review opinions")
             follow_up = plan_review_follow_up(seed, receipts)
@@ -408,14 +432,15 @@ class CompanyProfileReadService:
             **({"current_review_binding": current_review_binding(seed)}
                if source_recheck_policy == CURRENT_DRAFT_REVIEW_POLICY else {})}
 
-    def _prepare_review_recovery(self, record, *, source_recheck_policy=None):
+    def _prepare_review_recovery(self, record, *, source_recheck_policy=None, records=None):
         from .workpaper_review import CURRENT_DRAFT_REVIEW_POLICY, ReviewRecoveryLink, prepare_review_recovery
 
         saved = _record_processing_identity(record)
         parent = None
         if source_recheck_policy is None and saved.get("source_recheck_policy") == CURRENT_DRAFT_REVIEW_POLICY:
             link = ReviewRecoveryLink.model_validate(saved.get("workpaper_review_recovery"))
-            parent = self._latest_by_instrument(work_id=link.current_seed_work_id or link.base_work_id, include_enrichments=True).get(
+            parent = self._latest_by_instrument(work_id=link.current_seed_work_id or link.base_work_id, include_enrichments=True,
+                records=records).get(
                 record.report.instrument_id)
         return prepare_review_recovery(record, source_recheck_policy=source_recheck_policy, current_draft_base=parent)
 
@@ -424,7 +449,8 @@ class CompanyProfileReadService:
         """Bind questions to a readable version, without queuing or calling."""
         from .workpaper_enrichment import enrichment_plan_from_record
 
-        current = self.research_profile(instrument_id)
+        records, _ = self._validated_snapshot()
+        current = self._research_profile(instrument_id, records=records)
         from .workpaper_enrichment import EnrichmentTarget
 
         normalized_targets = [EnrichmentTarget.model_validate(t).model_dump(mode="json") for t in targets]
@@ -439,7 +465,7 @@ class CompanyProfileReadService:
         chosen = base_work_id or current["latest_reading_work_id"]
         if chosen not in {r["work_id"] for r in current["readings"]}:
             raise ValueError("base reading is outside the current same-report lineage")
-        record = self._latest_by_instrument(work_id=chosen, include_enrichments=True)[instrument_id]
+        record = self._latest_by_instrument(work_id=chosen, include_enrichments=True, records=records)[instrument_id]
         plan = enrichment_plan_from_record(record, request_id=request_id, targets=normalized_targets)
         return {"state": "planned", "execution_started": False,
             "action": "enrich", "enrichment_plan": plan.model_dump(mode="json"),
@@ -452,10 +478,13 @@ class CompanyProfileReadService:
         *,
         processing_identity: Mapping[str, Any] | None = None,
         work_id: str | None = None,
+        records=None,
     ) -> tuple[list[dict[str, Any]], list[str]]:
+        records = self._validated_snapshot()[0] if records is None else records
         latest = self._latest_by_instrument(
             processing_identity=processing_identity,
             work_id=work_id,
+            records=records,
         )
         if instrument_ids:
             selected = [
@@ -476,11 +505,7 @@ class CompanyProfileReadService:
             # explicit metric restriction opts into its exact linked successor.
             component_records = {}
             all_records = {}
-            for path in self.namespace_root.glob("*.json"):
-                try:
-                    candidate = _RUNTIME_ADAPTER.validate_json(path.read_text(encoding="utf-8"))
-                except (OSError, ValueError):
-                    continue
+            for candidate in records:
                 all_records[candidate.work_id] = candidate
                 if (isinstance(candidate, CompanyProfileRuntimeRecordV3) and (
                     candidate.workpaper.use_review and any(d.metric_restrictions for d in candidate.workpaper.use_review.decisions)
@@ -490,7 +515,7 @@ class CompanyProfileReadService:
             if component_records:
                 for index, base in enumerate(selected):
                     if isinstance(base, CompanyProfileRuntimeRecordV3) and any(c.report == base.report for c in component_records.values()):
-                        lineage = self._research_profile_from_record(base)
+                        lineage = self._research_profile_from_record(base, records=records)
                         if any(r["work_id"] in component_records for r in lineage["readings"]):
                             from .workpaper_review import workpaper_hash
 
@@ -507,22 +532,14 @@ class CompanyProfileReadService:
         processing_identity: Mapping[str, Any] | None = None,
         work_id: str | None = None,
         include_enrichments: bool = False,
+        records=None,
     ) -> dict[str, CompanyProfileRuntimeRecord]:
         latest: dict[str, CompanyProfileRuntimeRecord] = {}
-        if not self.namespace_root.is_dir():
-            return latest
         wanted_identity = (
             None if processing_identity is None else dict(processing_identity)
         )
-        for path in self.namespace_root.glob("*.json"):
-            if not path.is_file():
-                continue
-            try:
-                record = _RUNTIME_ADAPTER.validate_json(
-                    path.read_text(encoding="utf-8")
-                )
-            except (OSError, ValueError):
-                continue
+        records = self._validated_snapshot()[0] if records is None else records
+        for record in records:
             if (not include_enrichments and not work_id and wanted_identity is None and any(
                 _record_processing_identity(record).get(key) for key in ("workpaper_enrichment", "workpaper_review_recovery"))):
                 continue
@@ -538,6 +555,36 @@ class CompanyProfileReadService:
             if current is None or _record_sort_key(record) > _record_sort_key(current):
                 latest[instrument_id] = record
         return latest
+
+    def _validated_snapshot(self):
+        """Strictly decode each file once for this call; retain no instance cache."""
+        records, versions = [], {}
+        for path in self.namespace_root.glob("*.json"):
+            if not path.is_file():
+                continue
+            try:
+                raw = path.read_bytes()
+            except OSError:
+                versions[path] = None
+                continue
+            versions[path] = hashlib.sha256(raw).digest()
+            try:
+                record = _RUNTIME_ADAPTER.validate_json(raw)
+            except ValueError:
+                continue  # Same local malformed/source-invalid isolation as before.
+            records.append(record)
+        return tuple(records), versions
+
+    def _record_versions(self):
+        versions = {}
+        for path in self.namespace_root.glob("*.json"):
+            if not path.is_file():
+                continue
+            try:
+                versions[path] = hashlib.sha256(path.read_bytes()).digest()
+            except OSError:
+                versions[path] = None
+        return versions
 
     def render_profile(self, record: CompanyProfileRuntimeRecord) -> dict[str, Any]:
         checkpoint = self._load_checkpoint(record.work_id)

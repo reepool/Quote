@@ -1,0 +1,44 @@
+{
+  "transport": "in_process_ASGI",
+  "mount_prefix": "/api/v1",
+  "explicit_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "network_blocked": true,
+  "new_model_calls": 0,
+  "initial_full_check": "Frozen verify_fixed_owner.py http completed20batch and601377 single/plan200 with exact assertions; group45s limit stopped remaining two.",
+  "full20_batch_repeated": false,
+  "000099_remaining_checks_seconds": 20.050771087408066,
+  "checks": [
+    {
+      "endpoint": "POST /api/v1/research/company/annual-profiles/query",
+      "delivered": 20,
+      "exact_current_API_equal": true
+    },
+    {
+      "endpoint": "GET /api/v1/research/company/601377.SH/annual-profile",
+      "exact_current_profile_equal": true
+    },
+    {
+      "endpoint": "POST /api/v1/research/company/601377.SH/annual-profile/enrichment-plan",
+      "state": "planned",
+      "execution_started": false,
+      "current_base_hash_bound": true
+    },
+    {
+      "endpoint": "GET /api/v1/research/company/000099.SZ/annual-profile",
+      "exact_current_profile_equal": true
+    },
+    {
+      "endpoint": "POST /api/v1/research/company/000099.SZ/annual-profile/enrichment-plan",
+      "state": "planned",
+      "execution_started": false,
+      "current_base_hash_bound": true
+    }
+  ],
+  "dependency": "process-local async dependency returns original root-bound ReadService; original handlers retained",
+  "HTTP_response_and_content_checks_passed": 5,
+  "ASGI_process_clean_exit": false,
+  "remaining_check_process_exit_code": 124,
+  "remaining_check_outer_limit_seconds": 50,
+  "post_fix_first_group_limit_seconds": 45,
+  "first_attempt": "http-first-attempt.json"
+}

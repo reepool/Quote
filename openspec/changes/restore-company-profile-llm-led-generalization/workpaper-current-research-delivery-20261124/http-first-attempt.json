@@ -1,0 +1,18 @@
+{
+  "state": "bounded_check_incomplete",
+  "original_router": "api/company_profile_routes.py",
+  "explicit_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "transport": "in_process_ASGI",
+  "network_blocked": true,
+  "attempted": "POST /research/company/annual-profiles/query",
+  "instrument_ids": ["601377.SH", "000099.SZ"],
+  "response_received": false,
+  "whole_20_HTTP_verified": false,
+  "single_and_plan_verified": false,
+  "short_limit_seconds": 40,
+  "exit_code": 1,
+  "trace": "asyncio.runners.close -> loop.run_until_complete -> selectors.select",
+  "production_source_changed": false,
+  "new_model_calls": 0,
+  "follow_up": "No repeated HTTP run; A to decide one current20 request/dependency wiring if necessary."
+}

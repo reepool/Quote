@@ -54,6 +54,16 @@ The existing published task application entry and TaskService execute method MUS
 ### Requirement: Explicit stock lists return complete graded research profiles without execution
 The existing read owner MUST support a bounded explicit stock list and reuse the same annual-profile projection as single-stock detail reads. The HTTP query MUST retain local source/model identities, review continuations, gaps and fact-level restrictions, deduplicate canonical stock IDs in request order, and separately identify stocks without a saved annual workpaper. Missing records MUST NOT be described as undisclosed business, zero exposure or a diagnosed execution failure. This query MUST NOT call models, enqueue work, write files, silently select all stocks or grant trusted/production status. Existing single-stock, catalog and export contracts remain compatible.
 
+#### Scenario: Previously reviewed supplementary readings join the current research root
+- **WHEN** an explicitly authorized research delivery appends unchanged, hash-checked original-owner same-report supplementary records whose parent lineage is already present in the existing root
+- **THEN** the existing single-stock and explicit-list read/export owners MUST return that root's latest supplementary content with its original model attribution, review state and unresolved restrictions, while unrelated companies remain unchanged
+- **AND** existing frozen snapshots remain intact, new exports use explicit distinct destinations, and neither delivery nor subsequent read-only queries/planning may generate facts, issue model requests, clear old restrictions or claim new batch-quality or production approval
+
+#### Scenario: A bounded batch read reuses its strictly validated record view
+- **WHEN** the existing read/export owner projects multiple companies and their same-report supplementary ancestry in one invocation
+- **THEN** it SHOULD reuse that invocation's strictly validated records instead of repeatedly revalidating the unchanged entire directory for each company, without changing source checks, record selection, output or independent restrictions
+- **AND** a later invocation MUST observe updated files rather than a stale cross-request cache, while export MUST retain rejection of a changed selected input snapshot before publication
+
 #### Scenario: A requested list mixes saved profiles and absent stocks
 - **WHEN** a caller supplies between one and one hundred stocks, including aliases and a stock without a saved annual workpaper
 - **THEN** the response contains each found stock once in request order with the same complete content as its single-stock API and a separate not-found entry for each absent stock

@@ -1,0 +1,12 @@
+{
+  "explicit_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "fresh_20_exact_API_equal": true,
+  "tmp_export_annual_profiles_equal": true,
+  "read_seconds": 2.7200750429183245,
+  "export_seconds": 6.369068067520857,
+  "exported_files": 46,
+  "strict_record_snapshot_per_call": true,
+  "new_models": 0,
+  "new_network": 0,
+  "persistent_delivery_not_rewritten": true
+}

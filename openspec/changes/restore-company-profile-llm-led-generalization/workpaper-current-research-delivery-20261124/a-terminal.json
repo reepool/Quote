@@ -1,0 +1,141 @@
+{
+  "protected_files_checked": 227,
+  "protected_files_altered": [],
+  "unrelated_existing_dirty_files_altered": [],
+  "current_companies": 20,
+  "current_readable_records": 647,
+  "current_metrics": 1050,
+  "fresh_twenty_stock_read_seconds": 2.3329579271376133,
+  "complete_profile_comparisons": [
+    {
+      "instrument_id": "000049.SZ",
+      "expected": "17204b8fc0524cc26c957c8556a567e6281bfc2be86c02d2fad60683f8ac86fc",
+      "actual": "17204b8fc0524cc26c957c8556a567e6281bfc2be86c02d2fad60683f8ac86fc",
+      "equal": true
+    },
+    {
+      "instrument_id": "601006.SH",
+      "expected": "fdc9442df0ebe1d9501dd6ee11e08182428d9fe32df7bd2f287c9937be1d06a8",
+      "actual": "fdc9442df0ebe1d9501dd6ee11e08182428d9fe32df7bd2f287c9937be1d06a8",
+      "equal": true
+    },
+    {
+      "instrument_id": "600015.SH",
+      "expected": "ef75932330645962ff9fc6fbe56fe12a936299740112ed0218e11dee05437534",
+      "actual": "ef75932330645962ff9fc6fbe56fe12a936299740112ed0218e11dee05437534",
+      "equal": true
+    },
+    {
+      "instrument_id": "600348.SH",
+      "expected": "c015a73ae8d08073d10718658a14132ad413d5fa535b92936e923999e00c8f2c",
+      "actual": "c015a73ae8d08073d10718658a14132ad413d5fa535b92936e923999e00c8f2c",
+      "equal": true
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "expected": "8e504009d4219bcdb5d15fb50b46d042569e135213d7837d55d880dbbd8c0b60",
+      "actual": "8e504009d4219bcdb5d15fb50b46d042569e135213d7837d55d880dbbd8c0b60",
+      "equal": true
+    },
+    {
+      "instrument_id": "600859.SH",
+      "expected": "072539cba0533349636fd2543bf2153038f18a5ca7fa8f0cb7e9b7e2bee67bec",
+      "actual": "072539cba0533349636fd2543bf2153038f18a5ca7fa8f0cb7e9b7e2bee67bec",
+      "equal": true
+    },
+    {
+      "instrument_id": "601166.SH",
+      "expected": "dc94876c2206fb1ba288e61e01cc06bedf8d7728e353a36df04179fb4cdc8975",
+      "actual": "dc94876c2206fb1ba288e61e01cc06bedf8d7728e353a36df04179fb4cdc8975",
+      "equal": true
+    },
+    {
+      "instrument_id": "600900.SH",
+      "expected": "bd147013eb848c50a9a5c9a66c0776b3c20bfab4045d24c9a291390c556ea348",
+      "actual": "bd147013eb848c50a9a5c9a66c0776b3c20bfab4045d24c9a291390c556ea348",
+      "equal": true
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "expected": "ae81edcfc8c2e0f426b09d10848b7dffe99c3601fe07d1a21f4c2056c4de7a3c",
+      "actual": "ae81edcfc8c2e0f426b09d10848b7dffe99c3601fe07d1a21f4c2056c4de7a3c",
+      "equal": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "expected": "4e4daed236e93d5eb61f685cbb4ad6b12190ac79381cafc5585a253c441d5658",
+      "actual": "4e4daed236e93d5eb61f685cbb4ad6b12190ac79381cafc5585a253c441d5658",
+      "equal": true
+    },
+    {
+      "instrument_id": "601377.SH",
+      "expected": "b0512dc5bd688179ce7035ea543a36522720dc9c51b42760f8095172e9c22230",
+      "actual": "b0512dc5bd688179ce7035ea543a36522720dc9c51b42760f8095172e9c22230",
+      "equal": true
+    },
+    {
+      "instrument_id": "000006.SZ",
+      "expected": "3bf19e73d85202be4237e22d567216883fae2b100428931238e26f3a99d1798a",
+      "actual": "3bf19e73d85202be4237e22d567216883fae2b100428931238e26f3a99d1798a",
+      "equal": true
+    },
+    {
+      "instrument_id": "600316.SH",
+      "expected": "9a9205c9808c06390183ad188751d058f5061d7ccf835566dca94f2075e0ee9c",
+      "actual": "9a9205c9808c06390183ad188751d058f5061d7ccf835566dca94f2075e0ee9c",
+      "equal": true
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "expected": "4215710084646727d661ca10bd8919744318fbab260a40884bbdb40930ba5b22",
+      "actual": "4215710084646727d661ca10bd8919744318fbab260a40884bbdb40930ba5b22",
+      "equal": true
+    },
+    {
+      "instrument_id": "600901.SH",
+      "expected": "ec37bd681db1af8a029b3f7933245cd25ba9d9e33652cff3ee51dbf8268775e2",
+      "actual": "ec37bd681db1af8a029b3f7933245cd25ba9d9e33652cff3ee51dbf8268775e2",
+      "equal": true
+    },
+    {
+      "instrument_id": "601668.SH",
+      "expected": "6871472819810bcdee16749854e6205611520ace94d01b7f6673af6cc4682b89",
+      "actual": "6871472819810bcdee16749854e6205611520ace94d01b7f6673af6cc4682b89",
+      "equal": true
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "expected": "7fe84abda38bd65894434abc7503e119b01da89a73b50f9e711cd57d7e5fcefc",
+      "actual": "7fe84abda38bd65894434abc7503e119b01da89a73b50f9e711cd57d7e5fcefc",
+      "equal": true
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "expected": "81bdd390b90380a0a569d7e42d43aeddfc9e43094095fdd8cba29f72e756f08d",
+      "actual": "81bdd390b90380a0a569d7e42d43aeddfc9e43094095fdd8cba29f72e756f08d",
+      "equal": true
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "expected": "68ff5e732188dfbf550c2d484eacfd79cd9038aafaf5a644b01286903d63fbcb",
+      "actual": "68ff5e732188dfbf550c2d484eacfd79cd9038aafaf5a644b01286903d63fbcb",
+      "equal": true
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "expected": "b7f0ccfd3e86999d7820390fba6792a8208c58701cc7eb910d671883dfa62100",
+      "actual": "b7f0ccfd3e86999d7820390fba6792a8208c58701cc7eb910d671883dfa62100",
+      "equal": true
+    }
+  ],
+  "same_stock_order": true,
+  "current_api_equals_fresh_instance": true,
+  "exported_profiles_equal": true,
+  "appended_writer_bytes_equal_original": {
+    "bp-work-75219f282a5b80afada802ac.json": true,
+    "bp-work-5470620ee9834702d5a05c32.json": true
+  },
+  "active_gap_count": 124,
+  "new_model_calls": 0,
+  "semantic_review": "Inherited original source/model/independent restrictions; no new accuracy score."
+}

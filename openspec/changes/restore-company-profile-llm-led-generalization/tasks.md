@@ -1,5 +1,12 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.FF 二十股当前研究版与原API统一交付（用户继续，零新模型）
+
+- [x] 6.FF1 A冻结8d8cbeb5、49脏基线、125现有业务文件/旧102保护及20完整profile预期，原owner/仅两record追加/新导出命名与清理，见company-profile-current-research-delivery-card.md；模型/联网预算0。
+- [x] 6.FF2 B核6.FE两个原writer字节及report谱系，追加至原20股root；A新实例全20等独立hash，原125/旧102共227文件不变，不复制20股writer/源，不写新语义或解禁旧限制。
+- [x] 6.FF3 原root交20股647记录/1050指标及current使用页/JSON/人读/CSV；卡内P2仅reads.py一次调用复用已校记录，source/hash/独立限制、跨请求更新、export变稿拒绝及稳定不可读局部隔离保持。最终12新/5既有不同回归通过，冻结后B读20为2.720秒/导出6.369秒、A独立2.333秒等20完整预期；原路由离线HTTP20批量/两详情/两planned只读计划响应内容/绑定通过，ASGI关闭到限不计全程通过，不启生产。首次90/40失败与A错比raw导出的观察保留，未覆盖原current快照、未改值/新建owner或跨请求缓存。
+- [x] 6.FF4 A核20完整预期、原限制及API/年度导出/新实例一致、227旧文件/其他49既有脏改保护；reads/test冻结hash/AST及有限Review成立，初版不可读兼容问题已修、无剩余本卡阻塞。strict/diff、必要一套后清本人临时物及隔离普通Git同卡收口，早9成功XML由最终12覆盖删除、失败轨迹保持；旧分/规模/生产边界不变，本卡结束。
+
 ### 6.FE 两个收入问题的真实研究增量（用户授权，A/B整卡）
 
 - [x] 6.FE1 A冻结b5b8f55e、原104文件/20股633/1003、两份6.FC问题及原owner/有限模型预算/停止清理；用户本轮授权激活仅两股新enrich，不重开旧窗或扩批，见company-profile-research-enrichment-card.md。

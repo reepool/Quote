@@ -1,0 +1,13 @@
+{
+  "scope": "A-authorized 6.FF P2 per-call validated record snapshot",
+  "baseline": "8d8cbeb5",
+  "sha256": {
+    "research/company_profile/reads.py": "d1e29528c370b47e8088abe620c7733b3e22b775512af1f732c45f0a4396be97",
+    "tests/unit/test_research/test_company_profile_read_call_snapshot.py": "e1ccc982956e8aa5f862e68a426a3e284524ce93591c6f695fc91f41f16f8f53",
+    "data/QuoteBak/company-profile-6ff-b-MmcRLSKs/verify_fixed_owner.py": "8e14c56d3c547c5ba594e8e1d870eb4f38bec95ef8f0646731b59171e4841769"
+  },
+  "new_provider_requests": 0,
+  "new_network": 0,
+  "new_test_final": 12,
+  "existing_export_compat": 5
+}

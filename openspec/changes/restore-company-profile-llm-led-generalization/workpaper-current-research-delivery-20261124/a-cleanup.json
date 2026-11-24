@@ -1,0 +1,29 @@
+{
+  "task": "6.FF",
+  "A_removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6ff-a-eGflHGPk",
+  "A_removed_files": 11,
+  "A_removed_logical_bytes": 2915720,
+  "A_removed_names": [
+    "baseline.py",
+    "cleanup.py",
+    "current-card.patch",
+    "doc-0.before",
+    "doc-1.before",
+    "doc-2.before",
+    "doc-3.before",
+    "doc-4.before",
+    "doc-5.before",
+    "stage_patch.py",
+    "terminal.py"
+  ],
+  "A_root_absent": true,
+  "B_removed_files": 214,
+  "B_removed_logical_bytes": 20811752,
+  "B_root_absent": true,
+  "B_cleanup_reference": "result.md#保护与清理",
+  "superseded_success_XML_removed": "read-snapshot-tests.xml",
+  "superseded_success_XML_bytes": 1791,
+  "superseded_XML_reason": "All nine successful identities are covered by final twelve; final 12+5 and actual failure traces remain.",
+  "total_removed_logical_bytes": 23729263,
+  "retained": "One current research delivery, original 227 protected inputs, final tests and necessary first-failure/independent review evidence. No source/PDF/cache or unrelated workspace data deleted."
+}

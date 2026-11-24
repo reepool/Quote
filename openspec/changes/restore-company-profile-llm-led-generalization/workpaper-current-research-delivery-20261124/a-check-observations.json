@@ -1,0 +1,19 @@
+{
+  "first_fresh_instance_check": {
+    "complete_profiles_equal_expected": 20,
+    "companies": 20,
+    "readable_records": 647,
+    "metrics": 1050,
+    "protected_files_unchanged": 227,
+    "current_api_equal_fresh_instance": true,
+    "one_failed_observation": "Compared annual research API objects to research_profiles.json, which is the separate raw workpaper export projection; exported_profiles_equal=false is not a business-content mismatch.",
+    "correct_projection": "exports-current-20261124/annual_profiles.json",
+    "action": "Correct only the observation. Preserve first result and compare the already validated unchanged API to the proper export; do not modify any facts or test expected values."
+  },
+  "known_delivery_failures_before_read_fix": {
+    "bulk_export_limit_seconds": 90,
+    "HTTP_check_limit_seconds": 40,
+    "passed": false,
+    "root_cause_reference": "Task card A in-card P2 decision; repeated directory-wide typed/source validation in per-company ancestry reads."
+  }
+}
