@@ -1,0 +1,225 @@
+{
+  "task": "6.FG",
+  "source": "current-api-20261124.json and exact bound current raw UseReview",
+  "active_fact_entries": 654,
+  "current_states": {
+    "reviewed": 579,
+    "limited": 68,
+    "withheld": 3,
+    "source_only": 4
+  },
+  "current_review_basis": {
+    "model_source_check": 637,
+    "independent_source_check": 17
+  },
+  "independent_decisions": [
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "fact_id": "F25",
+      "fact_sha256": "a03f69578150b8a29c757589c058040237823f8e514b63ab8e9530937ff06de9",
+      "current_state": "withheld",
+      "disposition": "withheld",
+      "metric_restriction_indices": [],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "fact_id": "F37",
+      "fact_sha256": "58de3998b63a1c10d4eff246afded8c6b001aac7537ac4d08421797cf33dcb0b",
+      "current_state": "withheld",
+      "disposition": "withheld",
+      "metric_restriction_indices": [],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "fact_id": "F-WEALTH-FEE-INCOME",
+      "fact_sha256": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        0,
+        1
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "fact_id": "F-CREDIT-CARD-REVENUE",
+      "fact_sha256": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        0,
+        1
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F007",
+      "fact_sha256": "9005f4ea5ab0f6e487c6cddf32ce0b44dd13aa62bffd53b2cde3f4d8fa635bc1",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        0
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F009",
+      "fact_sha256": "226e8c6823636244e8326e7d83239b23e5c71c0cb980ec17d68e51d484e93a52",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        4,
+        5,
+        6
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F023",
+      "fact_sha256": "0b965f3da6d57c456c775d904dcf629c479ee440ab7d9bc1411a4b00d8fe9ecc",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        0,
+        1,
+        2
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+      "fact_id": "F-SM-02",
+      "fact_sha256": "1e56e54f29690ffbd4ee9ea2e3f306623693f56c47965df9ff2d084edb98c896",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        0
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+      "fact_id": "F-OD-01",
+      "fact_sha256": "db81833fd12c5a73ac9752e16489e8e6747cd675c413aa3ecaff3b37fe5e87d9",
+      "current_state": "source_only",
+      "disposition": "source_only",
+      "metric_restriction_indices": [],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "fact_id": "F18",
+      "fact_sha256": "5c16b740308142035dd85007a83867f726f33d5842797b41a54855aee2b86959",
+      "current_state": "source_only",
+      "disposition": "source_only",
+      "metric_restriction_indices": [],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "fact_id": "F24",
+      "fact_sha256": "ffef4f1f10f7063b356c6a7c1f8546269d0f15c5adc5ff9975c5f3a8e4972b71",
+      "current_state": "source_only",
+      "disposition": "source_only",
+      "metric_restriction_indices": [],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "reading_work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "fact_id": "F12",
+      "fact_sha256": "a260c8fa52822ee43e6fb3ef266caa29768fe5a6bbe08057f242d216fd0a237f",
+      "current_state": "withheld",
+      "disposition": "withheld",
+      "metric_restriction_indices": [],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "601377.SH",
+      "reading_work_id": "bp-work-016367c43308049bffc006bc",
+      "fact_id": "F34",
+      "fact_sha256": "0700b26dbc502a59f60c02d972b0f24760e9ac88660c7be7edb990be3294ce17",
+      "current_state": "source_only",
+      "disposition": "source_only",
+      "metric_restriction_indices": [],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "600901.SH",
+      "reading_work_id": "bp-work-9938c95dc5f968013098bf76",
+      "fact_id": "F22",
+      "fact_sha256": "3355d9ce4a1ad65a984f6aa5375ca2c8519bf8497bf42ead4c5c071d39f50d6d",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        1
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "601668.SH",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "fact_id": "F15",
+      "fact_sha256": "03e14d6e992e7b22e2a72ef41c6fcf3092562bb7ec1e04ddb8834b15a9a3c93c",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        1
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "601668.SH",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "fact_id": "F20",
+      "fact_sha256": "451dfb6716341c8152733463d1405cc0aff342b7d66d536e7094fdfa54411fba",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    },
+    {
+      "instrument_id": "601668.SH",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "fact_id": "F26",
+      "fact_sha256": "01aaa07dc9bacf127084bff4d591dab3d4586465a4b7a9a9747e30abdbc6e5e5",
+      "current_state": "limited",
+      "disposition": "source_checked",
+      "metric_restriction_indices": [
+        0
+      ],
+      "reason_reference": "Original hash-bound UseReview decision; no new semantic verdict."
+    }
+  ],
+  "independent_decision_count": 17,
+  "note": "These are bound decisions, not the number of model misses or causal manual-safety dependencies. B must use the original owner for the counterfactual and distinguish fresh/inherited model protection and pending states.",
+  "historical_semantic_authority": "workpaper-automatic-path-validation-20261122/a-group-verdict.json",
+  "historical_accuracy": {
+    "audited": 523,
+    "supported": 512,
+    "incorrect": 11,
+    "rate": 0.9789674952198852
+  }
+}

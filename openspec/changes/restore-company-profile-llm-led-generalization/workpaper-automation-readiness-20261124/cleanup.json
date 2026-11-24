@@ -1,0 +1,16 @@
+{
+  "task": "6.FG",
+  "owned_roots": [
+    {"role": "B1_audit", "path": "/home/python/Quote/data/QuoteBak/company-profile-6fg-b1-JK1yW0HF", "files": 1, "logical_bytes": 24208, "removed_and_absent": true},
+    {"role": "B2_http_diagnostic", "path": "/home/python/Quote/data/QuoteBak/company-profile-6fg-b2-Qm2PZf5P", "files": 9, "logical_bytes": 14034, "removed_and_absent": true},
+    {"role": "B1_probe_preparation", "path": "/home/python/Quote/data/QuoteBak/company-profile-6fg-probe-b1-CLkegJcU", "files": 1, "logical_bytes": 16107, "removed_and_absent": true},
+    {"role": "A_baseline_and_review", "path": "/home/python/Quote/data/QuoteBak/company-profile-6fg-a-mdeedJgQ", "files": 19, "logical_bytes": 4639653, "removed_and_absent": true}
+  ],
+  "total_files": 30,
+  "total_logical_bytes": 4694002,
+  "recoverability": "Scripts are disposable; the eight temporary parent records remain reconstructible by exact original reading IDs from the protected original research root. No source or business file was deleted.",
+  "retained_evidence": "One set in workpaper-automation-readiness-20261124: exact bindings, final audit and A review, diagnostic failures/minimal reproduction, and three unexecuted source-review plans.",
+  "unknown_parallel_and_shared_caches": "preserved",
+  "new_provider_calls": 0,
+  "pending_proposed_probe": "specific finite authorization unanswered; no provider constructed or probe output/checkpoint root created"
+}

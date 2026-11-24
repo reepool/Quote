@@ -1,5 +1,19 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 381. 6.FG自动化边界：先核清人工保护，不造新规则或准确率
+
+用户同意并授权上一整卡建议。A沿产品目标/验收/交付/A-B v3及OpenSpec apply、business-first冻结e6ae151b、277旧业务文件、20完整profile和49既有脏改；B1核原ReadService/typed workpaper/delivery/UseReview的实际依赖，B2独立短诊断HTTP退出。A只写可隔离管理文档及本轮证据，不为产生代码改动扩建平台或逐公司语义规则。
+
+当前20股仍647可读/1050指标；654当前对象为579 reviewed、68 limited、3 withheld、4 source_only，另740 superseded不混分母。647可读均精确绑定保存模型源核回执（594初核/53终核），但这不证明语义全对。541可复用本组有限A正向源支持，含受限指标范围，其余106仅是证据未匹配、不能推断错误或未核。17当前独立决定为10条正文有源但带指标限制、3 withheld、4 source_only，不等于17模型漏检。
+
+B仅typed内存移除UseReview，A独立对全部17决定执行原owner对照：7整事实及另6事实中的12指标位置会重新暴露，仅靠A保护；7个其他指标位置模型与A共有保护，保存模型另有10位置保护，本轮新模型检出0。兴证F34排名原文存在，问题是绑定证据覆盖；华夏F37为依赖重复，不另计独立原错。原6.EY 512/523、11错误及97.8967%不回算。A fresh20于2.965827秒读取并等当前API，277文件/5源文件及本人6管理文档之外43既有脏文件（含原缺失）保持，具体见a-review.json。
+
+未发现新的消费P0/P1/P2，应用源码和测试改动0。B2在无业务模块/无guard的最小asyncio也复现沙箱socketpair.send EPERM及到限；获准本地IPC且禁外网后，原router海直单股200/完整profile等current、5.797308秒clean exit0，仅MainThread。曾有初始化文件写/IP socket构造被拦，不称零初始化尝试；无外部payload。原6.FF被删harness不可精确重建，原多请求到限不撤回，不把单股代表性诊断说成生产生命周期全过。
+
+当前裁决：研究版继续使用且保全部人工限制，不具备自动扩100/生产或新99%证据。原source_review_current_draft.v1在当前目录实际使用0，真正下一步是有限真实校准，而非继续堆字段规则。A已从原plan_review_recovery准备华阳c1ce、江苏金租9938、学大88e3三份显式当前reading计划，8父record临时副本与原plan等值，review resume=None、只保原selection/extraction作者回执；原v7源包/当前稿hash已绑，旧quality/UseReview/人工意见不进模型。计划均planned、未启动，新增调用0；已向用户一次合并询问具体三份限定预算，未获批准不发送，不借结束旧窗，也不将已见校准当新20/正式质量。
+
+Review只关注当前真实阻塞：精确绑定与人工限制、保护旧稿、独核口径、离线/真实区分；无新代码故无扩展工程测试。A首次检查误假定各期映射同名hash字段，修正为原字段和唯一reading/fact/hash绑定，未改预期或业务数据。OpenSpec strict/diff及临时清理/Git收口记录随最终证据；必要一套后清本人父稿副本/脚本，未知并行、原PDF/cache/writer及49旧脏保护。新真实结果只在实际批准并执行后补记，不以计划冒充已改善模型质量。
+
 ## 380. 6.FF二十股同root当前研究交付，读取阻塞卡内修复
 
 用户在6.FE后要求继续。A先按产品/验收/交付/A-B v3及openspec-apply/business-first核主线：不再补两股尾项，复用既有已审事实，让原API同一root返回20最新。冻结8d8cbeb5、49脏基线、125现有研究文件及旧102资料和20整份profile独立hash；B仅把6.FE两个原writer按原字节追加V1现namespace，新current命名快照/导出及research-current.md不覆盖旧104/6.FE或旧exports。当前20股647可读/1050指标、124active/123历史缺项记录，旧限制/模型/来源/usage保留，不把继承内容当新抽取或124项必补。

@@ -1,0 +1,122 @@
+{
+  "state": "prepared_pending_specific_finite_call_authorization",
+  "new_model_calls": 0,
+  "execution_started": false,
+  "authorization_basis_required": "AGENTS.md 10.4: new run needs frozen card/version and budget; no old exhausted window is reused.",
+  "companies": [
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "workpaper_sha256": "c4f3a21ec00cc987bb05de13ebb70b62ccb3ad31ca1d3158b870bc55ab55b7d8",
+      "current_review_binding": {
+        "current_draft_sha256": "3cb6a260a51d994ade572624d81e24b29983b853d6c499498d184a812c1bf592",
+        "request_draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2",
+        "source_packet_sha256": "31925cb672b1ec9bc452383a76bc573afc1fa090852166c48cc148c511547e55"
+      },
+      "isolated_parent_binding_equal": true,
+      "new_request_excludes_old_reviews_and_UseReview": true,
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "3cb6a260a51d994ade572624d81e24b29983b853d6c499498d184a812c1bf592",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "task_plan": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automation-readiness-20261124/proposed-probe-plans/600348-review.json",
+      "task_plan_sha256": "1c6f7f83d9745e80b283bf988f0fbca49a83055b19bf796dce9b696a3901a28e"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "reading_work_id": "bp-work-9938c95dc5f968013098bf76",
+      "workpaper_sha256": "34c2052ce583f7ea690f956f14ce23fb8540712e7f3832b11f6c3ce58dfb3b08",
+      "current_review_binding": {
+        "current_draft_sha256": "f9efe8c92808345397c7fa1f293b1b7c84b939c0ac8b55d0deba2543e77c8522",
+        "request_draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e",
+        "source_packet_sha256": "3466fb26c2a0e0769d24d9ff7068816fdd2ed57e1edffe7a8ed4c1e65b56f120"
+      },
+      "isolated_parent_binding_equal": true,
+      "new_request_excludes_old_reviews_and_UseReview": true,
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "f9efe8c92808345397c7fa1f293b1b7c84b939c0ac8b55d0deba2543e77c8522",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "task_plan": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automation-readiness-20261124/proposed-probe-plans/600901-review.json",
+      "task_plan_sha256": "5907367e9f820ca7dca4d61da7a4c02b06853f75c8fd8ef728d807ed62c96fd5"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "reading_work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "workpaper_sha256": "269355ae11fb0f1e1e9164a60b9e642f0412361e11059fe4631fa3f18a900061",
+      "current_review_binding": {
+        "current_draft_sha256": "cd9da10cc552ef8df7e1f36256452f3a0bb338fb1049004e987063ac0f39aa51",
+        "request_draft_sha256": "8a609bac5bd6e720ebdb43e606c97413570cd44bcecc4692a5c7d5f29db4ee98",
+        "source_packet_sha256": "aeb6f24ae554b70d8ba007d42867e9558996e94acc536b971b2f9efd37ec3bee"
+      },
+      "isolated_parent_binding_equal": true,
+      "new_request_excludes_old_reviews_and_UseReview": true,
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "cd9da10cc552ef8df7e1f36256452f3a0bb338fb1049004e987063ac0f39aa51",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "task_plan": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automation-readiness-20261124/proposed-probe-plans/000526-review.json",
+      "task_plan_sha256": "aed4e5e8ff4444cb1613b213d048a69792be6b818a516a70bbf73fc0cb024d83"
+    }
+  ],
+  "limits": {
+    "per_company_absolute_seconds": 6000,
+    "per_company_tokens": 1000000,
+    "per_company_physical": 6,
+    "per_company_recoveries": 3,
+    "per_logical_recovery": 1,
+    "review_physical_seconds": 1200,
+    "review_logical_seconds": 2450,
+    "group_seconds": 12600,
+    "group_tokens": 3000000,
+    "group_physical": 18,
+    "concurrency": 3
+  },
+  "current_delivery_mutation": false,
+  "local_parent_records_prepared": 8,
+  "local_parent_root": null,
+  "temporary_parent_copy_status": "removed_at_zero_call_handoff; reconstruct_exact_eight_records_from_original_root_after_authorization",
+  "new_unseen_or_formal_accuracy_claim": false
+}

@@ -1,0 +1,19 @@
+{
+  "task": "6.FG",
+  "baseline_head": "e6ae151bacd1e19909305982e4da0cb68d718e9f",
+  "protected_business_files": 277,
+  "business_files_changed": 0,
+  "frozen_business_source_files": 5,
+  "source_changes": 0,
+  "inherited_dirty_files_preserved": 49,
+  "inherited_six_document_bytes_reconstructed_equal_baseline": true,
+  "current_API_sha256": "1803aa6aeb1f5d97d3bcb2beeceae98a48fa052a9f824c0f04f5271b4eb3e0d4",
+  "original_API_unchanged": true,
+  "temporary_roots_absent": true,
+  "formal_probe_roots_created": false,
+  "new_provider_calls": 0,
+  "review_blocking_defects_remaining": 0,
+  "nonblocking_recommendations": "Retain original human restrictions; evaluate current-draft model review in the three specifically planned, separately authorized calls. No application fix or expansion inferred.",
+  "review_scope": "Exact current bindings, inherited dirty isolation, original owner projections, existing semantic evidence, environment distinction, finite authorization and cleanup.",
+  "tests": "No application code changed; A original-owner verification/fresh20, B2 minimal and original-router finite diagnostics, OpenSpec strict and git diff checks."
+}

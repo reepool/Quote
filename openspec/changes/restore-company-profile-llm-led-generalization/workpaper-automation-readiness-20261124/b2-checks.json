@@ -1,0 +1,109 @@
+{
+  "task": "6.FG/B2",
+  "baseline_head": "e6ae151bacd1e19909305982e4da0cb68d718e9f",
+  "payload_scope": "local_only",
+  "outcome": "restricted_environment_blocks_local_asyncio_self_pipe; no_application_fix_required",
+  "python": "3.11.15",
+  "previous_roots_absent": [
+    "/home/python/Quote/data/QuoteBak/company-profile-6ff-b-MmcRLSKs",
+    "/home/python/Quote/data/QuoteBak/company-profile-6ff-a-eGflHGPk"
+  ],
+  "checks": [
+    {
+      "case": "stdlib_to_thread_in_restricted_sandbox_with_offline_guard",
+      "python_exit_code": 124,
+      "outer_limit_seconds": 6,
+      "worker_return_seconds": 0.003002,
+      "await_returned": false,
+      "trace_at_3_seconds": ["concurrent.futures.thread._worker", "selectors.select -> asyncio.base_events._run_once -> runners.run"],
+      "raw_log_sha256": "f33edb3b5d0157020268ba4e58c5fce3af7d1c903efbc2e9ac8b3c01855616ee"
+    },
+    {
+      "case": "bare_socketpair_send_in_restricted_sandbox_without_guard",
+      "python_exit_code": 1,
+      "socketpair_created": true,
+      "send_result": "PermissionError: [Errno 1] Operation not permitted",
+      "payload": "one local byte; no address, DNS, bind or connect"
+    },
+    {
+      "case": "stdlib_to_thread_in_restricted_sandbox_without_guard",
+      "python_exit_code": 124,
+      "outer_limit_seconds": 6,
+      "worker_return_seconds": 0.004856,
+      "await_returned": false,
+      "trace_at_3_seconds": ["concurrent.futures.thread._worker", "selectors.select -> asyncio.base_events._run_once -> runners.run"],
+      "raw_log_sha256": "55816279d09e4121dadcde49126f22bd7cad85a4ec7f1a53a55441493a5fd63f"
+    },
+    {
+      "case": "stdlib_to_thread_with_approved_local_ipc_and_offline_guard",
+      "python_exit_code": 0,
+      "outer_limit_seconds": 6,
+      "worker_return_seconds": 0.005265,
+      "to_thread_awaited_seconds": 0.005978,
+      "executor_shutdown_complete_seconds": 0.007060,
+      "asyncio_run_returned_seconds": 0.008401,
+      "final_threads": ["MainThread"],
+      "raw_log_sha256": "d6e56228026a3e9365f9fed79d8471950fb098fe312a40e75ecc1d4d4a80ba4e"
+    },
+    {
+      "case": "router_first_attempt_with_overstrict_file_guard",
+      "python_exit_code": 1,
+      "outer_limit_seconds": 25,
+      "response_received": false,
+      "failure": "utils.logging_manager import initialization needs diagnostic file handlers; B2 guard denied all writes including QuoteBak logs",
+      "trace": "research.source_policy -> utils.__init__ -> logging_manager.initialize_logging -> RotatingFileHandler -> B2 offline_guard -> PermissionError",
+      "remedy": "Only harness changed: QUOTE_DEV_LOG_DIR is own root/logs; file writes permitted only below own QuoteBak root. No application/config edits.",
+      "raw_log_sha256": "ef5042db47d4f92676c5ef6f04d0d7d296622cc0c84e417082788d88b4bc903f"
+    },
+    {
+      "case": "original_router_single_profile_with_approved_local_ipc_and_offline_guard",
+      "python_exit_code": 0,
+      "outer_limit_seconds": 25,
+      "request": "GET /api/v1/research/company/000099.SZ/annual-profile",
+      "transport": "httpx.ASGITransport; in process; trust_env=false; no server or listener",
+      "dependency": "process-local async dependency returns original root-bound CompanyProfileReadService; original handler and asyncio.to_thread retained",
+      "original_router_ready_seconds": 3.359513,
+      "response_asserted_seconds": 5.788245,
+      "status_code": 200,
+      "full_profile_equal_current_snapshot": true,
+      "profile_canonical_sha256": "b7f0ccfd3e86999d7820390fba6792a8208c58701cc7eb910d671883dfa62100",
+      "asgi_client_closed_seconds": 5.788432,
+      "pending_other_asyncio_tasks": [],
+      "executor_shutdown_complete_seconds": 5.795743,
+      "asyncio_run_returned_seconds": 5.797308,
+      "final_threads": ["MainThread"],
+      "blocked_events": ["file_write", "socket.__new__"],
+      "blocked_event_details": "One write outside B2 root and one IP socket construction were denied; exact import/path not collected. No DNS/connect/bind/sendto event was observed. Imports catch these two errors; no external socket or payload was sent.",
+      "raw_log_sha256": "12e1cc78babcba5c70403a90130784cf87b063a50e122cb8f1195bb5033d99f9"
+    }
+  ],
+  "mechanism": {
+    "stdlib_self_pipe": "asyncio/selector_events.py:_write_to_self calls socket.send and catches OSError; failed wakeup leaves selector asleep",
+    "shutdown": "asyncio/base_events.py:_do_shutdown signals its completed executor shutdown using call_soon_threadsafe, which uses the same self-pipe",
+    "scope_limit": "Original 6.FF temporary harness was already removed. Its exact socket blocker cannot be reconstructed. Current sandbox independently reproduces the failure without any business module or blocker; approved local IPC removes it. No unexited application task was found in the representative original route."
+  },
+  "protection": {
+    "application_source_edits": 0,
+    "new_model_calls": 0,
+    "new_supplier_usage": 0,
+    "external_payloads_sent": 0,
+    "business_writes": 0,
+    "stage_commit_push": false,
+    "router_sha256_before_and_after": "71885819185b78555071379eb623f65d50c0313e97d090680b78ea852315c0d7",
+    "reads_sha256_before_and_after": "d1e29528c370b47e8088abe620c7733b3e22b775512af1f732c45f0a4396be97",
+    "frozen_read_test_sha256_before_and_after": "e1ccc982956e8aa5f862e68a426a3e284524ce93591c6f695fc91f41f16f8f53",
+    "current_api_sha256_before_and_after": "1803aa6aeb1f5d97d3bcb2beeceae98a48fa052a9f824c0f04f5271b4eb3e0d4",
+    "current_root_file_count": 154,
+    "current_root_sorted_sha256sum_manifest_digest_before_and_after": "26aa8a98f91f831dbf28376629e9d4cf987a191acc1525adea700d759e6e3553",
+    "original_http_first_attempt_sha256_before_and_after": "a93cba411bbd68a5f41f59f43ac9efb7481dc32c6adf5bd70da7d808b5b3430e",
+    "original_http_verification_sha256_before_and_after": "f67969dd149281aeb2c7ecd68c6e5dc0d2000deb4f7799c93ff5254bbe6d4f31"
+  },
+  "reproducer_sha256": "0355aca208966be2cf031c952703d471c9e188489dc48ead431a705ec194aecb",
+  "cleanup": {
+    "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fg-b2-Qm2PZf5P",
+    "files": 9,
+    "logical_bytes": 14034,
+    "status": "removed_after_persistence_verification; root_absent_confirmed",
+    "retained": "b2-result.md, b2-checks.json, b2-repro.py; failure excerpts and raw log hashes included; original 6.FF evidence unchanged"
+  }
+}
