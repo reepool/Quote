@@ -1,0 +1,51 @@
+{
+  "head": "c33bf2f4",
+  "frozen_epoch": 1795533098.2701993,
+  "operator_sha256": "2e988d5bc810780722708f8cbbeebd9b04397e043befb6bf68723c7956af3942",
+  "preparation_sha256": "5cb33dbcc401f028ca406657e2cedf622ef02cfc5655b18b4611beb4326638a6",
+  "network_preflight_sha256": "d0aae7cd32303317248084f76c69ad293bbb34defde6cea2bf845e3bae97df81",
+  "approval_reference": "human-20261124-6FG-three-current-draft-source-review-approved",
+  "application_source_sha256": {
+    "task_entry.py": "211a4fa34baa45f8270735a0bf4b460a83cdbe2c2337febaf99d12b364791132",
+    "operations.py": "d5e5a7f596e188d98c27fbba3b68cc728a89848aa8d343248e144647506c2f2e",
+    "runtime.py": "0ef9958ce9775b8c94fd77db6045319edc87431450233ddcf1ca8fb6aba70e42",
+    "reads.py": "d1e29528c370b47e8088abe620c7733b3e22b775512af1f732c45f0a4396be97",
+    "workpaper_review.py": "fe44353b97a970994b5d34c88e28c4e94282dbad7f43f4f9db5677b61b46f262",
+    "workpaper_llm.py": "03876d02215c919599e17716bfde9d5b495592566f80dac87bda3a5bc18922a9",
+    "workpaper.py": "be1186641639b25c76ffaa5341b1a74b6afae40669f312434a3d704c0665f722",
+    "workpaper_metric_format.py": "9c6e8d24da0838e60c7d67542abb515c842f3c186d59cd8c55d5872ddddc4c07",
+    "workpaper_delivery.py": "7b6f828fff5a2cba3d993d6bc9422e263fdb4b5c1ee8a33df03eb1df04ab7803"
+  },
+  "activated_plan_sha256": {
+    "600348": "19b8907c8b777dacee832f5f4e185d9a99214c29f5107704152fcc32e7353806",
+    "600901": "0922a91ef5f0588ab4f848a4d2bdc9f3f0f1dab45a16f039ef2fd9f8f72c976f",
+    "000526": "fc17cc1d2161aba2138de1920692d1bb696bf8228f872d5b7b919cd70ad2064a"
+  },
+  "protected_277_unchanged": true,
+  "old_dependency_test_scope": {
+    "whole_objects": 1,
+    "metric_positions": 8
+  },
+  "per_stock": {
+    "absolute_seconds": 6000,
+    "task_seconds": 5950,
+    "tokens": 1000000,
+    "physical": 6,
+    "recoveries": 3,
+    "recoveries_per_logical": 1,
+    "priced_cny": 10
+  },
+  "group": {
+    "seconds": 12600,
+    "tokens": 3000000,
+    "physical": 18,
+    "concurrency": 3
+  },
+  "source_adapter": "Original cached PDF artifact pages into OfficialAnnualReportPageSource._source_result; saved current seed supplies the exact original v7 request packet",
+  "entry": "task_entry.execute_configured_task -> execute_published_task -> CompanyProfileTaskService.review_batch",
+  "operator_prelaunch_corrections": [
+    "Renamed operator.py because it shadowed Python stdlib operator; no provider/request existed.",
+    "upsert_record returns a status, not frontier_id; corrected observation and verified actual SQLite frontier_id equals original."
+  ],
+  "formal_requests_before_freeze": 0
+}

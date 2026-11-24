@@ -1,0 +1,23 @@
+{
+  "action": "review_batch",
+  "state": "completed",
+  "items": [
+    {
+      "instrument_id": "600901.SH",
+      "request_id": "6fg-600901-current-source",
+      "state": "incomplete",
+      "work_id": "bp-work-d38959943f1d3b3b21a6000a",
+      "review_status": "not_reviewed"
+    }
+  ],
+  "stop_reason": null,
+  "remaining_request_ids": [],
+  "research_only": true,
+  "production_authorization": "not_authorized",
+  "execution_plan": {
+    "run_id": "6fg-600901-current-source",
+    "plan_sha256": "0c51b397127cf41465557873e317493174a8b4397027d0ab8d251cfc26b37d40",
+    "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/budget.json",
+    "production_authorization": "not_authorized"
+  }
+}

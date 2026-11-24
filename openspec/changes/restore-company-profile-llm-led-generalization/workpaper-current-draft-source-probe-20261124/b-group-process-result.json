@@ -1,0 +1,91 @@
+{
+  "elapsed_seconds": 21.763181198388338,
+  "items": [
+    {
+      "code": "600348",
+      "exit_code": 0,
+      "result_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/result.json",
+      "owner_result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "600348.SH",
+            "request_id": "6fg-600348-current-source",
+            "state": "incomplete",
+            "work_id": "bp-work-fe09d6465b9b8bc9e6ecc88a",
+            "review_status": "not_reviewed"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fg-600348-current-source",
+          "plan_sha256": "257f7fa93198622e4b25deb70a5008efeab00111b571810459f6b83edc947ce8",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "code": "600901",
+      "exit_code": 0,
+      "result_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/result.json",
+      "owner_result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "600901.SH",
+            "request_id": "6fg-600901-current-source",
+            "state": "incomplete",
+            "work_id": "bp-work-d38959943f1d3b3b21a6000a",
+            "review_status": "not_reviewed"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fg-600901-current-source",
+          "plan_sha256": "0c51b397127cf41465557873e317493174a8b4397027d0ab8d251cfc26b37d40",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "code": "000526",
+      "exit_code": 0,
+      "result_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/result.json",
+      "owner_result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "000526.SZ",
+            "request_id": "6fg-000526-current-source",
+            "state": "incomplete",
+            "work_id": "bp-work-75e527d9602de85bada65805",
+            "review_status": "not_reviewed"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fg-000526-current-source",
+          "plan_sha256": "f0bd1a93d52491bdffdf5e4a36f945c0d6ce93a3adcad7b334367acef5da022d",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    }
+  ],
+  "stop_reason": null,
+  "exit_zero_is_not_semantic_success": true
+}

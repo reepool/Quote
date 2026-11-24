@@ -1,0 +1,22 @@
+{
+  "proof": [
+    {
+      "code": "600348",
+      "actual_deployed_adapter_valid_passed": true,
+      "actual_deployed_adapter_wrong_source_version_rejected": true
+    },
+    {
+      "code": "600901",
+      "actual_deployed_adapter_valid_passed": true,
+      "actual_deployed_adapter_wrong_source_version_rejected": true
+    },
+    {
+      "code": "000526",
+      "actual_deployed_adapter_valid_passed": true,
+      "actual_deployed_adapter_wrong_source_version_rejected": true
+    }
+  ],
+  "new_requests": 0,
+  "new_provider_instances": 0,
+  "new_network": 0
+}

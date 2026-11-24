@@ -1,0 +1,36 @@
+{
+  "task": "6.FH",
+  "review": "A finite handoff verification",
+  "protected_business_files": 277,
+  "changed": [],
+  "application_source_files_unchanged": 9,
+  "original_plans_unchanged": 3,
+  "inherited_dirty_files_preserved": 49,
+  "current20_API_unchanged": true,
+  "three_profiles_equal_saved_API_and_annual_export": true,
+  "physical_requests": 5,
+  "supplier_total_and_ledger": 158954,
+  "recoveries": 0,
+  "within_first_absolute_deadlines": true,
+  "all_five_actual_wires_hash_checked": true,
+  "review_blockers_in_current_assessment_delivery": 0,
+  "unresolved_business_limitations": [
+    "Five known metric positions and one explicit-zero fact missed by the new model; inherited A guards retained.",
+    "Two sourced split-line monetary candidates rejected locally before final review.",
+    "Original20 API unchanged; new model restrictions/repairs are confined to this isolated evaluation root."
+  ],
+  "no_further_model_calls": true,
+  "new_formal_quality_score": false,
+  "cleanup": {
+    "A_root": "/home/python/Quote/data/QuoteBak/company-profile-6fh-a-Mif95KnD",
+    "A_files": 11,
+    "A_logical_bytes": 2938435,
+    "A_root_removed_and_absent": true,
+    "B_roots_removed_and_absent": true,
+    "B_files": 57,
+    "B_logical_bytes": 8611002,
+    "total_files": 68,
+    "total_logical_bytes": 11549437,
+    "kept": "One persistent set of original failures, real wire/results/usage, source bindings and source judgments; the original PDFs/cache/current20 and the isolated11-record research lineage/API/exports remain. Disposable scripts, document baselines and working databases/checkpoints removed."
+  }
+}

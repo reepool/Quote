@@ -1,0 +1,81 @@
+{
+  "protected_277_unchanged": true,
+  "application_files_checked": 9,
+  "application_changed": 0,
+  "original_planned_files_unchanged": true,
+  "original_parent_records_preserved": 8,
+  "new_writer_records": 3,
+  "API_export_profiles_equal": true,
+  "api_sha256": "9c9cfcba3255f8d1b8ccd1572dbebae18e89860829e1a013c653fe319c9a0c3b",
+  "annual_export_sha256": "46e1e746a84889de7f59e0b46df86d1b0ee612d4dabe6cea5eb9b06352f96271",
+  "first_entry_archives": {
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/result.json": {
+      "archive": "b-first-entry/600348/result.json",
+      "sha256": "3c0e687acb11bad347e041bc573070cad2f62836811961a0d64ae9f32efae7f2"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/budget.json": {
+      "archive": "b-first-entry/600348/budget.json",
+      "sha256": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/started.json": {
+      "archive": "b-first-entry/600348/started.json",
+      "sha256": "2abe2b3f43f6121107daac86b53d3482f02ee793b896edefd4084df4bf825c6d"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/control/task_control.json": {
+      "archive": "b-first-entry/600348/checkpoint-metadata/control/task_control.json",
+      "sha256": "251540220a642857c8f17362d85afa75da59cc51a8643084af54a95c9195311e"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/result.json": {
+      "archive": "b-first-entry/600901/result.json",
+      "sha256": "8fb17b3fe4b7145c99982642f887bb7e5827f1e1d0bada49787864d7fb566203"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/budget.json": {
+      "archive": "b-first-entry/600901/budget.json",
+      "sha256": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/started.json": {
+      "archive": "b-first-entry/600901/started.json",
+      "sha256": "eb79a2c2f469d2ee9080d087a1313e08b39c05899d2aef0e6893a1aa74854eb0"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/control/task_control.json": {
+      "archive": "b-first-entry/600901/checkpoint-metadata/control/task_control.json",
+      "sha256": "69e042dcbe05ebda00d274d04bb91da5c865ff02a942bcea5064ecdff75b32bf"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/result.json": {
+      "archive": "b-first-entry/000526/result.json",
+      "sha256": "a0e9558a92a4bac9bba08a38a79366f6ca4f040fddb0c9e78ba3892c40eecade"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/budget.json": {
+      "archive": "b-first-entry/000526/budget.json",
+      "sha256": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/started.json": {
+      "archive": "b-first-entry/000526/started.json",
+      "sha256": "8db4704d63e3c5c9cdb50070a8caff27589daed9ea306e143fc7634a1fad49d1"
+    },
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/control/task_control.json": {
+      "archive": "b-first-entry/000526/checkpoint-metadata/control/task_control.json",
+      "sha256": "6ea19427c2ac5b61b905b140f3b28259d856f3ece1786be6ee1c744ca342608c"
+    }
+  },
+  "wire_receipts_preserved": 5,
+  "new_authors_equal_original": true,
+  "active_owned_processes": [],
+  "cleanup": [
+    {
+      "root": "/home/python/Quote/data/QuoteBak/company-profile-6fh-b-n9gWAGfj",
+      "files": 25,
+      "logical_bytes": 8055400
+    },
+    {
+      "root": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124",
+      "files": 32,
+      "logical_bytes": 555602
+    }
+  ],
+  "cleanup_roots_absent": true,
+  "released_logical_bytes": 8611002,
+  "removed_files": 57,
+  "kept": "Original PDFs/cache/current20, exact 8 parents + 3 new records, owner API/exports, initial failure and real wire/budget/result evidence; A files untouched",
+  "stage_commit_push": false
+}

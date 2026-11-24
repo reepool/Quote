@@ -1,0 +1,205 @@
+{
+  "stocks": [
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-52157e13cdbf80605eb26a27",
+      "initial_failed_physical": 0,
+      "physical_requests": 1,
+      "recoveries": 0,
+      "supplier_total_tokens": 41033,
+      "all_usage_known": true,
+      "budget_charged_tokens": 41033,
+      "cost_status": "unknown",
+      "charged_cost_cny": "unknown",
+      "original_deadline_epoch": 1795539162.7921333,
+      "task_seconds": 5316.111357212067,
+      "last_saved_result_mtime_epoch": 1795534139.5331826,
+      "within_original_deadline": true,
+      "wire_index": [
+        {
+          "path": "b-runs/600348/receipts/001.json",
+          "sha256": "6319ba5c98cdf2d6095f94eda9234d39194ee6a69169cad2ed8dfa449a3fa8d5",
+          "host": "scorpio.reepool.com",
+          "model": "grok-4.7",
+          "elapsed_seconds": 313.13442548923194,
+          "physical_timeout_seconds": 1200.0,
+          "status_code": 200,
+          "supplier_usage": {
+            "prompt_tokens": 16024,
+            "completion_tokens": 605,
+            "total_tokens": 41033,
+            "prompt_tokens_details": {
+              "text_tokens": 16024,
+              "audio_tokens": 0,
+              "image_tokens": 0,
+              "cached_tokens": 1152
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 24404,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "num_sources_used": 0,
+            "cost_in_usd_ticks": 613271600
+          }
+        }
+      ],
+      "review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+      "initial_failed_physical": 0,
+      "physical_requests": 1,
+      "recoveries": 0,
+      "supplier_total_tokens": 47985,
+      "all_usage_known": true,
+      "budget_charged_tokens": 47985,
+      "cost_status": "unknown",
+      "charged_cost_cny": "unknown",
+      "original_deadline_epoch": 1795539162.8258255,
+      "task_seconds": 5316.143746376038,
+      "last_saved_result_mtime_epoch": 1795534058.8413618,
+      "within_original_deadline": true,
+      "wire_index": [
+        {
+          "path": "b-runs/600901/receipts/001.json",
+          "sha256": "eaa07057bad1795fe1e2121a83afa305525eaecd9d8d4288d00fb31bd8b368fc",
+          "host": "scorpio.reepool.com",
+          "model": "grok-4.7",
+          "elapsed_seconds": 232.18814736418426,
+          "physical_timeout_seconds": 1200.0,
+          "status_code": 200,
+          "supplier_usage": {
+            "prompt_tokens": 28572,
+            "completion_tokens": 96,
+            "total_tokens": 47985,
+            "prompt_tokens_details": {
+              "text_tokens": 28572,
+              "audio_tokens": 0,
+              "image_tokens": 0,
+              "cached_tokens": 1152
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 19317,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "num_sources_used": 0,
+            "cost_in_usd_ticks": 584439600
+          }
+        }
+      ],
+      "review_status": "completed_with_open_findings"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "work_id": "bp-work-721e6851edbaa279f67917e5",
+      "initial_failed_physical": 0,
+      "physical_requests": 3,
+      "recoveries": 0,
+      "supplier_total_tokens": 69936,
+      "all_usage_known": true,
+      "budget_charged_tokens": 69936,
+      "cost_status": "unknown",
+      "charged_cost_cny": "unknown",
+      "original_deadline_epoch": 1795539162.85909,
+      "task_seconds": 5316.175937175751,
+      "last_saved_result_mtime_epoch": 1795534214.6890445,
+      "within_original_deadline": true,
+      "wire_index": [
+        {
+          "path": "b-runs/000526/receipts/001.json",
+          "sha256": "ac5816a71f7404d2457e54c444924bdae3287b9431daa34fe123635f0620f19f",
+          "host": "scorpio.reepool.com",
+          "model": "grok-4.7",
+          "elapsed_seconds": 287.05503695458174,
+          "physical_timeout_seconds": 1200.0,
+          "status_code": 200,
+          "supplier_usage": {
+            "prompt_tokens": 16352,
+            "completion_tokens": 1264,
+            "total_tokens": 38323,
+            "prompt_tokens_details": {
+              "text_tokens": 16352,
+              "audio_tokens": 0,
+              "image_tokens": 0,
+              "cached_tokens": 1152
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 20707,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "num_sources_used": 0,
+            "cost_in_usd_ticks": 553526800
+          }
+        },
+        {
+          "path": "b-runs/000526/receipts/002.json",
+          "sha256": "dfccacac8ebe22a0596178a4abc882a17826cb051d4172b76ec0df1dbaef154c",
+          "host": "api.deepseek.com",
+          "model": "deepseek-flash",
+          "elapsed_seconds": 4.51507324911654,
+          "physical_timeout_seconds": 600.0,
+          "status_code": 200,
+          "supplier_usage": {
+            "prompt_tokens": 10294,
+            "completion_tokens": 1379,
+            "total_tokens": 11673,
+            "prompt_tokens_details": {
+              "cached_tokens": 1408
+            },
+            "prompt_cache_hit_tokens": 1408,
+            "prompt_cache_miss_tokens": 8886
+          }
+        },
+        {
+          "path": "b-runs/000526/receipts/003.json",
+          "sha256": "0dcef44884dba5ae5df79350df64089cef6143396a097d0ef9e21cf87eab7b9c",
+          "host": "scorpio.reepool.com",
+          "model": "grok-4.7",
+          "elapsed_seconds": 94.41468249075115,
+          "physical_timeout_seconds": 1200.0,
+          "status_code": 200,
+          "supplier_usage": {
+            "prompt_tokens": 11971,
+            "completion_tokens": 528,
+            "total_tokens": 19940,
+            "prompt_tokens_details": {
+              "text_tokens": 11971,
+              "audio_tokens": 0,
+              "image_tokens": 0,
+              "cached_tokens": 1152
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 7441,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "num_sources_used": 0,
+            "cost_in_usd_ticks": 238095200
+          }
+        }
+      ],
+      "review_status": "completed_with_open_findings"
+    }
+  ],
+  "total_physical": 5,
+  "total_recoveries": 0,
+  "supplier_total_tokens": 158954,
+  "cost_status": "unknown",
+  "continuation_wall_seconds": 418.6047232877463,
+  "initial_failed_group_wall_seconds": 21.763181198388338,
+  "original_group_deadline_epoch": 1795545762.7432127,
+  "all_within_original_deadlines": true,
+  "observed_target_scope": {
+    "whole_objects": 1,
+    "metric_positions": 8
+  },
+  "new_semantic_accuracy_score": null
+}

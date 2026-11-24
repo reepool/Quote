@@ -1,0 +1,65 @@
+{
+  "items": [
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "wire_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/continuation-1/executions/6fh-600348-current-source-cont1/receipts/001.json",
+      "request_source_text_sha256": "3a7ecfa23daf4c69c7f9da96b1cb4c147dfabb81cf9ef8910299fa919e8e8c9c",
+      "current_binding": {
+        "current_draft_sha256": "3cb6a260a51d994ade572624d81e24b29983b853d6c499498d184a812c1bf592",
+        "request_draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2",
+        "source_packet_sha256": "31925cb672b1ec9bc452383a76bc573afc1fa090852166c48cc148c511547e55"
+      },
+      "original_v7_packet_equal": true,
+      "current_request_draft_equal": true,
+      "all_current_fact_hashes_equal": true,
+      "old_quality_and_UseReview_excluded": true,
+      "all_element_limitations_removed": true,
+      "retained_author_receipts": 2,
+      "physical_timeout_seconds": 1200.0,
+      "model": "grok-4.7",
+      "reasoning_effort": "high"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "reading_work_id": "bp-work-9938c95dc5f968013098bf76",
+      "wire_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/continuation-1/executions/6fh-600901-current-source-cont1/receipts/001.json",
+      "request_source_text_sha256": "296103275390cda8ed4f718747a7e6e4bcf987b5ba2aa744aa31b71521de768f",
+      "current_binding": {
+        "current_draft_sha256": "f9efe8c92808345397c7fa1f293b1b7c84b939c0ac8b55d0deba2543e77c8522",
+        "request_draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e",
+        "source_packet_sha256": "3466fb26c2a0e0769d24d9ff7068816fdd2ed57e1edffe7a8ed4c1e65b56f120"
+      },
+      "original_v7_packet_equal": true,
+      "current_request_draft_equal": true,
+      "all_current_fact_hashes_equal": true,
+      "old_quality_and_UseReview_excluded": true,
+      "all_element_limitations_removed": true,
+      "retained_author_receipts": 2,
+      "physical_timeout_seconds": 1200.0,
+      "model": "grok-4.7",
+      "reasoning_effort": "high"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "reading_work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "wire_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/continuation-1/executions/6fh-000526-current-source-cont1/receipts/001.json",
+      "request_source_text_sha256": "f5da24485e8882181bb8ea8c53ab13c6e2831a4e6503864394e36154b4157d44",
+      "current_binding": {
+        "current_draft_sha256": "cd9da10cc552ef8df7e1f36256452f3a0bb338fb1049004e987063ac0f39aa51",
+        "request_draft_sha256": "8a609bac5bd6e720ebdb43e606c97413570cd44bcecc4692a5c7d5f29db4ee98",
+        "source_packet_sha256": "aeb6f24ae554b70d8ba007d42867e9558996e94acc536b971b2f9efd37ec3bee"
+      },
+      "original_v7_packet_equal": true,
+      "current_request_draft_equal": true,
+      "all_current_fact_hashes_equal": true,
+      "old_quality_and_UseReview_excluded": true,
+      "all_element_limitations_removed": true,
+      "retained_author_receipts": 2,
+      "physical_timeout_seconds": 1200.0,
+      "model": "grok-4.7",
+      "reasoning_effort": "high"
+    }
+  ],
+  "new_calls_in_verification": 0
+}

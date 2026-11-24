@@ -1,0 +1,45 @@
+{
+  "task": "6.FH",
+  "actual_first_supplier_requests": [
+    {
+      "instrument_id": "000526.SZ",
+      "reading_work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "request_draft_sha256": "8a609bac5bd6e720ebdb43e606c97413570cd44bcecc4692a5c7d5f29db4ee98",
+      "source_packet_sha256": "aeb6f24ae554b70d8ba007d42867e9558996e94acc536b971b2f9efd37ec3bee",
+      "actual_initial_request_sha256": "f59b68ee4418903a1be9cb8f2b9569ed7e5ba5af7b6af339bdac23daf03c2075",
+      "exact_planned_draft_and_source_match": true,
+      "A_and_old_review_opinions_excluded": true,
+      "risk_fact_hashes_equal_A_frozen": true,
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "physical_timeout_seconds": 1200.0
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "request_draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2",
+      "source_packet_sha256": "31925cb672b1ec9bc452383a76bc573afc1fa090852166c48cc148c511547e55",
+      "actual_initial_request_sha256": "f249812ec4485ec18a3f69fc8d8aa150b789fc6220681fce5906fa04bb5dd7a4",
+      "exact_planned_draft_and_source_match": true,
+      "A_and_old_review_opinions_excluded": true,
+      "risk_fact_hashes_equal_A_frozen": true,
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "physical_timeout_seconds": 1200.0
+    },
+    {
+      "instrument_id": "600901.SH",
+      "reading_work_id": "bp-work-9938c95dc5f968013098bf76",
+      "request_draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e",
+      "source_packet_sha256": "3466fb26c2a0e0769d24d9ff7068816fdd2ed57e1edffe7a8ed4c1e65b56f120",
+      "actual_initial_request_sha256": "593b646088aeb429e37e84d2362f91da479bd8bc5d2c81f3a517f9629a2efd1d",
+      "exact_planned_draft_and_source_match": true,
+      "A_and_old_review_opinions_excluded": true,
+      "risk_fact_hashes_equal_A_frozen": true,
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "physical_timeout_seconds": 1200.0
+    }
+  ],
+  "meaning": "Actual wire request/input validation, not a model-quality result."
+}

@@ -1,0 +1,37 @@
+{
+  "environment": "require_escalated",
+  "profiles": [
+    {
+      "profile": "semantic_extraction__deepseek",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "dns_count": 2,
+      "tls": "TLSv1.3",
+      "credential_present": true,
+      "logical_seconds": 2450,
+      "physical_seconds": 600.0,
+      "reasoning_effort": "high",
+      "disable_thinking": true,
+      "max_output_tokens_field": "max_tokens",
+      "max_retries": 1,
+      "max_schema_repair_attempts": 1
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "dns_count": 1,
+      "tls": "TLSv1.3",
+      "credential_present": true,
+      "logical_seconds": 2450,
+      "physical_seconds": 1200.0,
+      "reasoning_effort": "high",
+      "disable_thinking": false,
+      "max_output_tokens_field": "max_completion_tokens",
+      "max_retries": 1,
+      "max_schema_repair_attempts": 1
+    }
+  ],
+  "formal_model_requests": 0,
+  "approval_reference": "human-20261124-6FG-three-current-draft-source-review-approved"
+}

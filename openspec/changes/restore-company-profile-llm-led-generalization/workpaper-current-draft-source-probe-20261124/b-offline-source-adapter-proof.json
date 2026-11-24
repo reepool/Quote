@@ -1,0 +1,175 @@
+{
+  "state": "offline_source_adapter_fix_proven_no_continuation_authorized",
+  "cause": "ReportIdentity versus dict equality in frozen operator cached_source, not a report field difference",
+  "fix": "Compare ReportIdentity.model_validate(result[report]) with ReportIdentity.model_validate(expected); return original result unchanged",
+  "proof": [
+    {
+      "instrument_id": "600348.SH",
+      "old_actual_type": "ReportIdentity",
+      "old_expected_type": "dict",
+      "direct_equality": false,
+      "serialized_field_differences": [],
+      "typed_identity_equal": true,
+      "corrected_return_is_original_source": true,
+      "pages_object_unchanged": true,
+      "source_payload_sha256_before_and_after": "86d2fdcf43f9dac2ec9cad19b24a538941bbe4ecbd22d2e3fc2bf3a3a7654e7b",
+      "model_constructed": false
+    },
+    {
+      "instrument_id": "600901.SH",
+      "old_actual_type": "ReportIdentity",
+      "old_expected_type": "dict",
+      "direct_equality": false,
+      "serialized_field_differences": [],
+      "typed_identity_equal": true,
+      "corrected_return_is_original_source": true,
+      "pages_object_unchanged": true,
+      "source_payload_sha256_before_and_after": "a86e7c76d56a9f15a484ad7876da1ce0bcc49d7ce2e726cd4ba2c314d1ef07e1",
+      "model_constructed": false
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "old_actual_type": "ReportIdentity",
+      "old_expected_type": "dict",
+      "direct_equality": false,
+      "serialized_field_differences": [],
+      "typed_identity_equal": true,
+      "corrected_return_is_original_source": true,
+      "pages_object_unchanged": true,
+      "source_payload_sha256_before_and_after": "8d16bd2081cc2bdd1e02890a816c14c3f6bf113b300250fb7a3be4b14c5dff9a",
+      "model_constructed": false
+    }
+  ],
+  "first_entries": [
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-fe09d6465b9b8bc9e6ecc88a",
+      "stage": "acquire",
+      "status": "terminal_failure",
+      "attempt_count": 1,
+      "last_error": "AssertionError: ",
+      "original_process_start": {
+        "code": "600348",
+        "pid": 3540875,
+        "started_epoch": 1795533162.7921326,
+        "absolute_deadline_epoch": 1795539162.7921333
+      },
+      "original_plan_budget": {
+        "seconds": 5950.0,
+        "tokens": 1000000,
+        "physical_requests": 6,
+        "recoveries": 3,
+        "logical_seconds": 2450.0,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "actual_budget": {
+        "physical_requests": 0,
+        "charged_tokens": 0,
+        "charged_cost_cny": "0",
+        "cost_status": "priced",
+        "billing_mode": "development_unpriced",
+        "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+        "stopped_reason": null,
+        "denied_request": null,
+        "attempts": []
+      },
+      "archive": "b-first-entry/600348",
+      "file_sha256": {
+        "started.json": "2abe2b3f43f6121107daac86b53d3482f02ee793b896edefd4084df4bf825c6d",
+        "budget.json": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e",
+        "result.json": "3c0e687acb11bad347e041bc573070cad2f62836811961a0d64ae9f32efae7f2",
+        "process.log": "5c7d3e60d449fd61297eb1890e5c76e546c7e965597ef7cf301f639ac8f2b0f2"
+      }
+    },
+    {
+      "instrument_id": "600901.SH",
+      "work_id": "bp-work-d38959943f1d3b3b21a6000a",
+      "stage": "acquire",
+      "status": "terminal_failure",
+      "attempt_count": 1,
+      "last_error": "AssertionError: ",
+      "original_process_start": {
+        "code": "600901",
+        "pid": 3540876,
+        "started_epoch": 1795533162.8258247,
+        "absolute_deadline_epoch": 1795539162.8258255
+      },
+      "original_plan_budget": {
+        "seconds": 5950.0,
+        "tokens": 1000000,
+        "physical_requests": 6,
+        "recoveries": 3,
+        "logical_seconds": 2450.0,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "actual_budget": {
+        "physical_requests": 0,
+        "charged_tokens": 0,
+        "charged_cost_cny": "0",
+        "cost_status": "priced",
+        "billing_mode": "development_unpriced",
+        "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+        "stopped_reason": null,
+        "denied_request": null,
+        "attempts": []
+      },
+      "archive": "b-first-entry/600901",
+      "file_sha256": {
+        "started.json": "eb79a2c2f469d2ee9080d087a1313e08b39c05899d2aef0e6893a1aa74854eb0",
+        "budget.json": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e",
+        "result.json": "8fb17b3fe4b7145c99982642f887bb7e5827f1e1d0bada49787864d7fb566203",
+        "process.log": "5ba1bf10fff8ad1e531ca44caab2c119678c3c8797a18a9e05ca036dea826a21"
+      }
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "work_id": "bp-work-75e527d9602de85bada65805",
+      "stage": "acquire",
+      "status": "terminal_failure",
+      "attempt_count": 1,
+      "last_error": "AssertionError: ",
+      "original_process_start": {
+        "code": "000526",
+        "pid": 3540877,
+        "started_epoch": 1795533162.8590894,
+        "absolute_deadline_epoch": 1795539162.85909
+      },
+      "original_plan_budget": {
+        "seconds": 5950.0,
+        "tokens": 1000000,
+        "physical_requests": 6,
+        "recoveries": 3,
+        "logical_seconds": 2450.0,
+        "priced_cost_cny": "10",
+        "billing_mode": "development_unpriced"
+      },
+      "actual_budget": {
+        "physical_requests": 0,
+        "charged_tokens": 0,
+        "charged_cost_cny": "0",
+        "cost_status": "priced",
+        "billing_mode": "development_unpriced",
+        "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+        "stopped_reason": null,
+        "denied_request": null,
+        "attempts": []
+      },
+      "archive": "b-first-entry/000526",
+      "file_sha256": {
+        "started.json": "8db4704d63e3c5c9cdb50070a8caff27589daed9ea306e143fc7634a1fad49d1",
+        "budget.json": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e",
+        "result.json": "a0e9558a92a4bac9bba08a38a79366f6ca4f040fddb0c9e78ba3892c40eecade",
+        "process.log": "3d5bb9dcd2735a2375ba3eeb375fa7b50f645e6a4557a64823f45140ba9f763b"
+      }
+    }
+  ],
+  "new_provider_instances": 0,
+  "new_model_requests": 0,
+  "new_network_during_proof": 0,
+  "frozen_operator_unchanged": true,
+  "application_source_unchanged": true,
+  "protected_277_unchanged": true,
+  "original_absolute_windows_not_reset": true
+}

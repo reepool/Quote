@@ -1,0 +1,87 @@
+{
+  "items": [
+    {
+      "code": "600348",
+      "process_exit": 0,
+      "owner_result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "600348.SH",
+            "request_id": "6fh-600348-current-source-cont1",
+            "state": "completed",
+            "work_id": "bp-work-52157e13cdbf80605eb26a27",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fh-600348-current-source-cont1",
+          "plan_sha256": "96889ba30251c92c2db21badf883bf0a0b5e960561ad5b70d023c13f7679839b",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/continuation-1/executions/6fh-600348-current-source-cont1/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "code": "600901",
+      "process_exit": 0,
+      "owner_result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "600901.SH",
+            "request_id": "6fh-600901-current-source-cont1",
+            "state": "completed",
+            "work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fh-600901-current-source-cont1",
+          "plan_sha256": "1dca2bb3c726fbc690f18ef50ed590b178770a2b248b7434cec08488cb8d73e2",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/continuation-1/executions/6fh-600901-current-source-cont1/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "code": "000526",
+      "process_exit": 0,
+      "owner_result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "000526.SZ",
+            "request_id": "6fh-000526-current-source-cont1",
+            "state": "completed",
+            "work_id": "bp-work-721e6851edbaa279f67917e5",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fh-000526-current-source-cont1",
+          "plan_sha256": "07daa7bc58d9dd90e87ac58cac25e2c7bfb2bd8f532f5d29e624a2267bfd331d",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/continuation-1/executions/6fh-000526-current-source-cont1/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    }
+  ],
+  "elapsed_seconds": 418.6047232877463,
+  "stop_reason": null
+}

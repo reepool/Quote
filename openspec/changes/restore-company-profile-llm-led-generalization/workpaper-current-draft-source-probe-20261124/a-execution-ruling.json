@@ -1,0 +1,14 @@
+{
+  "task": "6.FH",
+  "decision_owner": "A/main",
+  "evidence": "All three original TaskService invocations stopped at the operator's ReportIdentity object versus JSON dict equality assertion, before any gateway receipt or physical request; each original budget records zero physical requests/tokens/attempts.",
+  "classification": "Local operator representation mismatch, not a source mismatch or model-quality result. The original acquire failures and completed/incomplete task results remain failures.",
+  "authorized_action": "One narrow operator correction and continuation through the original TaskService.review_batch, after offline typed identity equality and wrong-version rejection checks.",
+  "authorization_basis": "The user's explicit approval of the three bounded current-draft source reviews. No model request has used that authorization yet. Routine local wiring repair remains within the same named reports, payloads, models and cumulative limits; no extra paid or wall-clock window is granted.",
+  "time_boundary": "Use each FIRST process's saved absolute_deadline_epoch and the FIRST group's started_epoch+12600. Continuation task seconds must be reduced to remaining original time minus at most50 seconds initialization. Do not restart a6000-second window or logical deadline beyond remaining time.",
+  "limits": {"cumulative_per_stock_physical": 6, "cumulative_per_stock_tokens": 1000000, "cumulative_per_stock_recoveries": 3, "per_logical_recovery": 1, "group_physical": 18, "group_tokens": 3000000, "priced_per_stock_cny": 10},
+  "persistence": "Keep original started markers, result/budget bytes and failures unchanged; use explicitly linked continuation IDs and checkpoint paths, not deletion/reset/reopening of completed original plans. Previous supplier usage is exactly zero, not a transferable unmeasured balance.",
+  "freeze": "Application/prompt/source files remain c33bf2f4. Freeze the corrected operator and continuation plans before the first supplier request; record operator versions and the failed first path separately.",
+  "no_change": ["three reports and exact reading/source/current-request hashes", "existing providers and public-data-only scope", "original20 profiles/API and independent restrictions", "no reselection/extraction or new company", "no production/shared configuration/topup", "no old score rewriting or new formal accuracy claim"],
+  "stop": "No send if original remaining time cannot admit its logical limit or if cumulative limits/source binding cannot be proven; original failure remains. No second operator-correction continuation is authorized."
+}

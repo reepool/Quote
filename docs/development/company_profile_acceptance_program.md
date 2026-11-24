@@ -1,5 +1,9 @@
 # 公司画像分阶段验收计划
 
+2026-11-24 [6.FH三稿真实源核结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-draft-source-probe-20261124/result.md)：原TaskService三份后继交88可读/169指标；A核9实际意见、学大4采纳（3修正+1约330中心/教师/基地/学生网络信息），华阳5指标自动限用，其中2为本次额外保护。偏选已知风险8指标只检出3，另5与明确零整事实仍漏检且靠继承A保护，不能评全稿99%。学大主要教育收入/成本候选有原文但本地跨行金额匹配拒绝，未送终核；这才是下一通用消费阻塞，非必须补齐小项。5物理/0恢复/158954已知total及账本、418.605秒同原窗接续/unknown费用；首21.763秒0发送因operator类型比较失败不改判，A同窗裁决和原deadline/预算保持。原20/6471050/277文件与旧分保护，不扩100/生产，不重跑三家或整批。
+
+2026-11-24用户在6.FG结果后明确授权三份保存稿真实源复核，执行为6.FH：华阳600348(c1ce)、江苏金租600901(9938)、学大000526(88e3)，原v7源/当前稿/原planned hash绑定，预算和停止沿[6.FG卡授权执行段](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-automation-readiness-card.md)。A冻结c33bf2f4/277文件/49脏，B原review_batch在独立probe根各一次真实闭环；不重选章/抽取或将A/旧审核意见送模型。新检出/漏检/继承保护与修订原文独核分列，旧20/API/人工限制不改；已见三稿不是新20或正式99%，不扩100/生产。开工旧4根已清，末端必要一套后清/Git同卡完成，无逐字段审批。
+
 2026-11-24 [6.FG实际自动化核查](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automation-readiness-20261124/result.md)：现20股647可读/1050指标保持；7整事实、另6事实中的12指标位置仍仅依赖A限制，17独立决定不直接等于模型漏检数。647均有精确保存源核回执，541有本组有限独核正向源支持，其余106不由未匹配推断错误；新current-draft政策实际使用仍0。A独核17原owner对照/fresh20及277旧文件保护成立；本轮未见新消费P1/P2，无应用源码修改。HTTP代表性退出问题由受限环境本地IPC解释，获准IPC单股200/5.797308秒正常退出，不追改6.FF原到限或推算生产。继续现有研究使用、保人工限制；不据此扩100或宣称新99%。已备华阳/江苏金租/学大三份精确绑定计划，8父record仅本地隔离、planned/0调用，新有限调用另待具体授权，旧分/窗口不变；不是新20/未见或补齐所有缺项任务。
 
 2026-11-24用户已同意并授权[6.FG自动化/人工保护整卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-automation-readiness-card.md)：沿现20股647/1050、277旧文件及原owner，区分模型核验、人工正向独核与安全限制依赖，临时投影反事实不发布坏内容、跨hash未知不评分。仅实际共性阻塞最小修复，HTTP退出并行有限定位；A独审/B连续实施，模型/外传预算0，旧97.8967%及95%/99%/S2不改，不自动新20/100/生产。卡末给实际人工依赖、研究适用和扩量裁决，必要新前瞻先有明确合同/预算及具体授权；先核6.FF本人根已清，必要一套后清本轮产物/Git收口。

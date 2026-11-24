@@ -1,0 +1,24 @@
+{
+  "operator_sha256": "2814e2705c54ce884a130f12ebf00968c0db1c2609218ecb53b5fd5619f9bf22",
+  "frozen_epoch": 1795533796.6852434,
+  "initial_operator_sha256": "2e988d5bc810780722708f8cbbeebd9b04397e043befb6bf68723c7956af3942",
+  "preparation_sha256": "ef3fffaadc9d6037feffb3556952294b95e494901510378d8365f4b3f16fe6ea",
+  "plan_sha256": {
+    "600348": "acb1a59418883717a38cafeff326eabeec3d7bb44b1c69c3e3d67b7f011e0e4d",
+    "600901": "8e73b8ce414bfc9899a7a845707ea6bfaf187ee65fc63c652fdedde826ca8419",
+    "000526": "9ae0e51e785262cd8c4e1abfb7f4052af820b950f4668edc138618465f917813"
+  },
+  "original_deadline_epoch": {
+    "600348": 1795539162.7921333,
+    "600901": 1795539162.8258255,
+    "000526": 1795539162.85909
+  },
+  "original_group_deadline_epoch": 1795545762.7432127,
+  "ruling_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-draft-source-probe-20261124/a-execution-ruling.json",
+  "ruling_sha256": "ca618420df48520c9de07d2b8707b69673ecfed16e625a50e0004dae6bb35783",
+  "approval_reference": "human-20261124-6FG-three-current-draft-source-review-approved;A-same-window-zero-send-continuation-ruling",
+  "original_same_environment_network_preflight_sha256": "d0aae7cd32303317248084f76c69ad293bbb34defde6cea2bf845e3bae97df81",
+  "source_fix": "Compare original source report and expected JSON through ReportIdentity.model_validate; return original source unchanged",
+  "new_selection_extraction": false,
+  "application_source_changed": false
+}

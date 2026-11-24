@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FH 当前稿源核的隔离真实验证
+
+复用原三份计划的report/current/request/source绑定；仅新增approved副本及一次有限执行，不覆盖原planned/旧响应或将A判断送模型。独立probe根保原8父record的必要谱系，以原TaskService.review_batch及writer交后继；原20/API和独立保护不变。A按预冻原文与准确fact/metric位置核新供应商发现/漏检，继承findings和A保护不作新收益；同冻结代码/模型/预算连续执行，不热修/补样或重算旧分。
+
 ### 6.FG 用原业务投影量化人工保护边界
 
 以当前API读取批次/事实hash/指标位置为身份，复用原source review与UseReview投影，不从标签/同名字段推断真值。人工正向独核与限制性依赖分开；临时typed副本中仅为观察去除UseReview，原record/API及所有安全限制保留，反事实内容不作为可用事实交付。真错映射只能复用等值原独立判定，未知保未知；离线对照不是新模型检错率。实际P0/P1/P2先由A定最小代码写集；HTTP关闭由独立B2短诊断，必要测试环境处理不发展新平台。卡末交实际自动化/人工介入与扩量裁决，0调用边界、后续具体授权和清理沿6.FG卡。

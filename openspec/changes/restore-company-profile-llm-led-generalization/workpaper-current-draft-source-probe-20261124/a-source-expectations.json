@@ -1,0 +1,164 @@
+{
+  "task": "6.FH",
+  "reviewer": "A independent original-PDF reader",
+  "frozen_before_new_responses": true,
+  "method": "Direct pypdf reading of the exact original public PDF pages, compared with the current original facts/metric metadata and exact inherited A decisions. Not sent to the model.",
+  "target_fact_count": 5,
+  "target_metric_positions": 8,
+  "target_whole_facts": 1,
+  "cases": [
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F007",
+      "original_fact_sha256": "9005f4ea5ab0f6e487c6cddf32ce0b44dd13aa62bffd53b2cde3f4d8fa635bc1",
+      "metric_positions": [
+        0
+      ],
+      "whole_fact_problem": false,
+      "evidence_ids": [
+        "source-0003",
+        "source-0005"
+      ],
+      "source_chapter": "第三节 管理层讨论与分析 / 五、主要经营情况 / 收入和成本分析；煤炭行业经营性信息分析",
+      "source_physical_pages": [
+        14,
+        15,
+        16,
+        21
+      ],
+      "pdf_path": "data/filings/announcements/blobs/82/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559.pdf",
+      "pdf_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "source_page_text_sha256": {
+        "14": "67976742f1a0984e2d9b9e6c1e2639e15b87b42d7e78f05a1812506f11aab115",
+        "15": "e4f6842ec69f69408f01107596f6e7f4a24109d147a655ff89e5f23ccfd531dc",
+        "16": "e56cf1e885f9d5ffd8d9fe04ee67b5c7a80e3493398295c68186f3bea1d4fc1d",
+        "21": "20774d3023d19c202d27da597a038afecce3391d15e424505301110f8167b3f9"
+      },
+      "concise_source_basis": "营业收入214.44亿元，其中煤炭产品销售收入179.51亿元；煤炭业务合计收入179.51、成本103.03、毛利76.48亿元。",
+      "expected_problem": "Coal-product revenue179.51亿元 is a business-segment amount; company revenue214.44亿元 is separately group-wide. Preserve supported narrative and group revenue while correcting or limiting the coal-revenue metric scope.",
+      "new_model_result_seen": false
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F009",
+      "original_fact_sha256": "226e8c6823636244e8326e7d83239b23e5c71c0cb980ec17d68e51d484e93a52",
+      "metric_positions": [
+        4,
+        5,
+        6
+      ],
+      "whole_fact_problem": false,
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "source_chapter": "第三节 管理层讨论与分析 / 五、主要经营情况 / 收入和成本分析；煤炭行业经营性信息分析",
+      "source_physical_pages": [
+        14,
+        15,
+        16,
+        21
+      ],
+      "pdf_path": "data/filings/announcements/blobs/82/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559.pdf",
+      "pdf_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "source_page_text_sha256": {
+        "14": "67976742f1a0984e2d9b9e6c1e2639e15b87b42d7e78f05a1812506f11aab115",
+        "15": "e4f6842ec69f69408f01107596f6e7f4a24109d147a655ff89e5f23ccfd531dc",
+        "16": "e56cf1e885f9d5ffd8d9fe04ee67b5c7a80e3493398295c68186f3bea1d4fc1d",
+        "21": "20774d3023d19c202d27da597a038afecce3391d15e424505301110f8167b3f9"
+      },
+      "concise_source_basis": "营业收入214.44亿元，其中煤炭产品销售收入179.51亿元；煤炭业务合计收入179.51、成本103.03、毛利76.48亿元。",
+      "expected_problem": "The179.51/103.03/76.48亿元 totals are under the coal-business table, not group-wide revenue/cost/gross-profit totals. Product rows and source text remain valid.",
+      "new_model_result_seen": false
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "fact_id": "F023",
+      "original_fact_sha256": "0b965f3da6d57c456c775d904dcf629c479ee440ab7d9bc1411a4b00d8fe9ecc",
+      "metric_positions": [
+        0,
+        1,
+        2
+      ],
+      "whole_fact_problem": false,
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "source_chapter": "第三节 管理层讨论与分析 / 五、主要经营情况 / 收入和成本分析；煤炭行业经营性信息分析",
+      "source_physical_pages": [
+        14,
+        15,
+        16,
+        21
+      ],
+      "pdf_path": "data/filings/announcements/blobs/82/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559.pdf",
+      "pdf_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "source_page_text_sha256": {
+        "14": "67976742f1a0984e2d9b9e6c1e2639e15b87b42d7e78f05a1812506f11aab115",
+        "15": "e4f6842ec69f69408f01107596f6e7f4a24109d147a655ff89e5f23ccfd531dc",
+        "16": "e56cf1e885f9d5ffd8d9fe04ee67b5c7a80e3493398295c68186f3bea1d4fc1d",
+        "21": "20774d3023d19c202d27da597a038afecce3391d15e424505301110f8167b3f9"
+      },
+      "concise_source_basis": "营业收入214.44亿元，其中煤炭产品销售收入179.51亿元；煤炭业务合计收入179.51、成本103.03、毛利76.48亿元。",
+      "expected_problem": "Coal sales costs103.03亿元 versus120.48亿元 and decrease17.45亿元 describe the coal business, not total group costs; original source separately reports group cost129.84亿元.",
+      "new_model_result_seen": false
+    },
+    {
+      "instrument_id": "600901.SH",
+      "reading_work_id": "bp-work-9938c95dc5f968013098bf76",
+      "fact_id": "F22",
+      "original_fact_sha256": "3355d9ce4a1ad65a984f6aa5375ca2c8519bf8497bf42ead4c5c071d39f50d6d",
+      "metric_positions": [
+        1
+      ],
+      "whole_fact_problem": false,
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "source_chapter": "管理层讨论与分析 / 经营情况讨论与分析（物理18、印刷17）；资产及负债状况分析 / 融资租赁资产（物理27、印刷26）",
+      "source_physical_pages": [
+        18,
+        27
+      ],
+      "pdf_path": "data/filings/announcements/blobs/e4/e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6.pdf",
+      "pdf_sha256": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "source_page_text_sha256": {
+        "18": "3d2382cc91ba14e08e2c820003ff797ba6cdad63979eb58ab0e1d30509422590",
+        "27": "6c58607ef696eaaf3108b0d119946ca23f1b6106bea8ee536c29440dc16daec3"
+      },
+      "concise_source_basis": "不良融资租赁资产率0.88%，较上年末下降0.03个百分点。",
+      "expected_problem": "The source explicitly says NPL ratio0.88% decreased0.03 percentage points. An unsigned +0.03 generic change with no directional comparison is unreliable. Narrative and the other three metrics have source support.",
+      "new_model_result_seen": false
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "reading_work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "fact_id": "F12",
+      "original_fact_sha256": "a260c8fa52822ee43e6fb3ef266caa29768fe5a6bbe08057f242d216fd0a237f",
+      "metric_positions": [],
+      "whole_fact_problem": true,
+      "evidence_ids": [
+        "source-0006",
+        "source-0007"
+      ],
+      "source_chapter": "第三节 管理层讨论与分析 / 四、主营业务分析 / 2、收入与成本 / （1）营业收入构成、（2）主要行业产品情况、（5）营业成本构成",
+      "source_physical_pages": [
+        17,
+        18
+      ],
+      "pdf_path": "data/filings/announcements/blobs/a8/a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4.pdf",
+      "pdf_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "source_page_text_sha256": {
+        "17": "6b9f5fc63c078ca57a22dbfea2249ef0e9ef8ee650010b590204ee8d8b263213",
+        "18": "021f519f7b2cbbd0a8291c0cf6bd6cd952476a3fb74de9b4a7d18be18dbe812a"
+      },
+      "concise_source_basis": "房屋租赁0.00 / 0.00 / 0.00%；营业成本构成房屋租赁0.00。",
+      "expected_problem": "The revenue-composition table has a blank current amount, but the adjacent main-business and cost tables explicitly report house-rental revenue0.00, cost0.00 and gross margin0.00%. The global assertion that these cannot be confirmed is contradicted by the already-read source. No zero is inferred from an empty cell.",
+      "new_model_result_seen": false
+    }
+  ],
+  "scope_limit": "Five known risk objects in three seen reports; one whole fact and eight metric positions. Not a fresh accuracy sample, not all seven whole facts/twelve positions from the20-company audit.",
+  "tool_observation": "Initial reader selection fitz was unavailable; used already-installed pypdf, with no dependency installation or business/model call."
+}

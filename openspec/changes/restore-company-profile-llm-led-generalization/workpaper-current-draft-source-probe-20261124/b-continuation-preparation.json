@@ -1,0 +1,69 @@
+{
+  "proof": [
+    {
+      "instrument_id": "600348.SH",
+      "typed_equal": true,
+      "wrong_version_rejected": true,
+      "first_absolute_deadline_epoch": 1795539162.7921333,
+      "remaining_task_seconds_at_plan": 5464.562868356705,
+      "original_current_review_binding": {
+        "current_draft_sha256": "3cb6a260a51d994ade572624d81e24b29983b853d6c499498d184a812c1bf592",
+        "request_draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2",
+        "source_packet_sha256": "31925cb672b1ec9bc452383a76bc573afc1fa090852166c48cc148c511547e55"
+      },
+      "plan_sha256": "83f00a45087da991c43d2768da35a61437912785f099166a9eabaeebf9144b6d"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "typed_equal": true,
+      "wrong_version_rejected": true,
+      "first_absolute_deadline_epoch": 1795539162.8258255,
+      "remaining_task_seconds_at_plan": 5445.112931251526,
+      "original_current_review_binding": {
+        "current_draft_sha256": "f9efe8c92808345397c7fa1f293b1b7c84b939c0ac8b55d0deba2543e77c8522",
+        "request_draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e",
+        "source_packet_sha256": "3466fb26c2a0e0769d24d9ff7068816fdd2ed57e1edffe7a8ed4c1e65b56f120"
+      },
+      "plan_sha256": "fa4d91fac985867dbb6fed8ff871e5b128f389445a1730fa31711ed929033f69"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "typed_equal": true,
+      "wrong_version_rejected": true,
+      "first_absolute_deadline_epoch": 1795539162.85909,
+      "remaining_task_seconds_at_plan": 5425.297061920166,
+      "original_current_review_binding": {
+        "current_draft_sha256": "cd9da10cc552ef8df7e1f36256452f3a0bb338fb1049004e987063ac0f39aa51",
+        "request_draft_sha256": "8a609bac5bd6e720ebdb43e606c97413570cd44bcecc4692a5c7d5f29db4ee98",
+        "source_packet_sha256": "aeb6f24ae554b70d8ba007d42867e9558996e94acc536b971b2f9efd37ec3bee"
+      },
+      "plan_sha256": "1ee82d1da4c5e6e1dacea7197e2b49713799a96e75b2ac7c6e0ea37bc4cf7629"
+    }
+  ],
+  "first_entry_file_sha256": {
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/result.json": "3c0e687acb11bad347e041bc573070cad2f62836811961a0d64ae9f32efae7f2",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/budget.json": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/started.json": "2abe2b3f43f6121107daac86b53d3482f02ee793b896edefd4084df4bf825c6d",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/control/task_control.json": "251540220a642857c8f17362d85afa75da59cc51a8643084af54a95c9195311e",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/result.json": "8fb17b3fe4b7145c99982642f887bb7e5827f1e1d0bada49787864d7fb566203",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/budget.json": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/executions/6fg-600901-current-source/started.json": "eb79a2c2f469d2ee9080d087a1313e08b39c05899d2aef0e6893a1aa74854eb0",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600901/control/task_control.json": "69e042dcbe05ebda00d274d04bb91da5c865ff02a942bcea5064ecdff75b32bf",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/result.json": "a0e9558a92a4bac9bba08a38a79366f6ca4f040fddb0c9e78ba3892c40eecade",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/budget.json": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/executions/6fg-000526-current-source/started.json": "8db4704d63e3c5c9cdb50070a8caff27589daed9ea306e143fc7634a1fad49d1",
+    "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/000526/control/task_control.json": "6ea19427c2ac5b61b905b140f3b28259d856f3ece1786be6ee1c744ca342608c"
+  },
+  "old_ledger_physical": 0,
+  "old_ledger_tokens": 0,
+  "old_recoveries": 0,
+  "same_cumulative_stock_limits": {
+    "physical": 6,
+    "tokens": 1000000,
+    "recoveries": 3
+  },
+  "no_new_absolute_window": true,
+  "new_provider_instances": 0,
+  "new_requests": 0,
+  "original_group_deadline_epoch": 1795545762.7432127
+}

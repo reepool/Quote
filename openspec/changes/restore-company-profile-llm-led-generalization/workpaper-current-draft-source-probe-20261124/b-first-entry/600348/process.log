@@ -1,0 +1,62 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-11-24 23:12:43][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-11-24 23:12:43][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-11-24 23:12:43][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.02s
+[INFO][2026-11-24 23:12:44][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-11-24 23:12:44][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-11-24 23:12:48][config_manager.py:314] - Loading configuration from directory: config
+[INFO][2026-11-24 23:12:48][config_manager.py:358] - Configuration loaded and merged from 25 files.
+[INFO][2026-11-24 23:12:48][operations.py:2078] - Company-profile entry: constructing task service
+[INFO][2026-11-24 23:12:48][operations.py:2093] - Company-profile entry: task service ready
+[INFO][2026-11-24 23:12:53][business_profile_async_production.py:3197] - business-profile stage start stage=acquire max_items=1 concurrency=1 max_elapsed_seconds=5947.819510519505 high_water_mark=1000
+[WARNING][2026-11-24 23:12:56][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-fe09d6465b9b8bc9e6ecc88a instrument_id=600348.SH stage=acquire disposition=terminal_failure category=AssertionError error=
+[DEBUG][2026-11-24 23:12:56][business_profile_async_production.py:3455] - business-profile work failure traceback work_id=bp-work-fe09d6465b9b8bc9e6ecc88a instrument_id=600348.SH stage=acquire
+Traceback (most recent call last):
+  File "/home/python/Quote/research/business_profile_async_production.py", line 3254, in run_one
+    result = dict(await self.stage_runner(stage, item))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 448, in __call__
+    return await _run_thread_call(self.run_stage, stage, item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/business_profile_async_production.py", line 56, in _run_thread_call
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 467, in run_stage
+    return self._acquire(state, item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 571, in _acquire
+    loaded = self.page_source(item)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/operations.py", line 772, in saved_source
+    loaded = old_source(item)
+             ^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/data/QuoteBak/company-profile-6fh-b-n9gWAGfj/run_probe.py", line 205, in cached_source
+    assert result['report']==meta['report']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+[INFO][2026-11-24 23:12:57][business_profile_async_production.py:3466] - business-profile stage item stage=acquire work_id=bp-work-fe09d6465b9b8bc9e6ecc88a instrument_id=600348.SH duration_seconds=2.003 claimed=1 completed=0 retried=0 terminal_failures=1
+[INFO][2026-11-24 23:12:57][business_profile_async_production.py:3576] - business-profile stage progress stage=acquire finished=1 in_flight=0 claimed=1 completed=0 retried=0 terminal_failures=1 effective_concurrency=1 elapsed_seconds=3.874 active_seconds=2.045
+[WARNING][2026-11-24 23:12:57][business_profile_async_production.py:3671] - business-profile stage end stage=acquire status=success claimed=1 completed=0 retried=0 terminal_failures=1 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=3.959 active_work_seconds=2.045 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 2, 'wait_seconds': 2.7e-05, 'write_seconds': 0.325279, 'observation_seconds': 8.349973, 'transaction_p50_seconds': 0.16264, 'transaction_p95_seconds': 0.164307, 'transaction_max_seconds': 0.164492, 'writer_lock_duty': 0.038956, 'inter_write_idle_seconds': 1.854295, 'inter_write_seconds': 0.01}
+[INFO][2026-11-24 23:12:57][business_profile_async_production.py:3197] - business-profile stage start stage=parse max_items=1 concurrency=1 max_elapsed_seconds=5947.819510519505 high_water_mark=1000
+[INFO][2026-11-24 23:12:57][business_profile_async_production.py:3671] - business-profile stage end stage=parse status=success claimed=0 completed=0 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=0 elapsed_seconds=0.599 active_work_seconds=0.0 peak_in_flight=0 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 2, 'wait_seconds': 2.7e-05, 'write_seconds': 0.325279, 'observation_seconds': 8.975471, 'transaction_p50_seconds': 0.16264, 'transaction_p95_seconds': 0.164307, 'transaction_max_seconds': 0.164492, 'writer_lock_duty': 0.036241, 'inter_write_idle_seconds': 1.854295, 'inter_write_seconds': 0.01}
+[INFO][2026-11-24 23:12:57][business_profile_async_production.py:3197] - business-profile stage start stage=semantic max_items=1 concurrency=1 max_elapsed_seconds=5947.819510519505 high_water_mark=1000
+[INFO][2026-11-24 23:12:58][business_profile_async_production.py:3671] - business-profile stage end stage=semantic status=success claimed=0 completed=0 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=0 elapsed_seconds=0.695 active_work_seconds=0.0 peak_in_flight=0 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 2, 'wait_seconds': 2.7e-05, 'write_seconds': 0.325279, 'observation_seconds': 9.700592, 'transaction_p50_seconds': 0.16264, 'transaction_p95_seconds': 0.164307, 'transaction_max_seconds': 0.164492, 'writer_lock_duty': 0.033532, 'inter_write_idle_seconds': 1.854295, 'inter_write_seconds': 0.01}
+[INFO][2026-11-24 23:12:58][business_profile_async_production.py:3197] - business-profile stage start stage=verify max_items=1 concurrency=1 max_elapsed_seconds=5947.819510519505 high_water_mark=1000
+[INFO][2026-11-24 23:12:59][business_profile_async_production.py:3671] - business-profile stage end stage=verify status=success claimed=0 completed=0 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=0 elapsed_seconds=0.891 active_work_seconds=0.0 peak_in_flight=0 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 2, 'wait_seconds': 2.7e-05, 'write_seconds': 0.325279, 'observation_seconds': 10.769503, 'transaction_p50_seconds': 0.16264, 'transaction_p95_seconds': 0.164307, 'transaction_max_seconds': 0.164492, 'writer_lock_duty': 0.030204, 'inter_write_idle_seconds': 1.854295, 'inter_write_seconds': 0.01}
+[INFO][2026-11-24 23:12:59][business_profile_async_production.py:3197] - business-profile stage start stage=publish max_items=1 concurrency=1 max_elapsed_seconds=5947.819510519505 high_water_mark=1000
+[INFO][2026-11-24 23:13:00][business_profile_async_production.py:3671] - business-profile stage end stage=publish status=success claimed=0 completed=0 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=0 elapsed_seconds=0.854 active_work_seconds=0.0 peak_in_flight=0 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 2, 'wait_seconds': 2.7e-05, 'write_seconds': 0.325279, 'observation_seconds': 11.637915, 'transaction_p50_seconds': 0.16264, 'transaction_p95_seconds': 0.164307, 'transaction_max_seconds': 0.164492, 'writer_lock_duty': 0.02795, 'inter_write_idle_seconds': 1.854295, 'inter_write_seconds': 0.01}
+OWNER_RESULT {"action": "review_batch", "state": "completed", "items": [{"instrument_id": "600348.SH", "request_id": "6fg-600348-current-source", "state": "incomplete", "work_id": "bp-work-fe09d6465b9b8bc9e6ecc88a", "review_status": "not_reviewed"}], "stop_reason": null, "remaining_request_ids": [], "research_only": true, "production_authorization": "not_authorized", "execution_plan": {"run_id": "6fg-600348-current-source", "plan_sha256": "257f7fa93198622e4b25deb70a5008efeab00111b571810459f6b83edc947ce8", "budget_path": "/home/python/Quote/data/checkpoints/company_profile_automation_probe_20261124/600348/executions/6fg-600348-current-source/budget.json", "production_authorization": "not_authorized"}}
