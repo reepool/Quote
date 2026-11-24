@@ -1,0 +1,882 @@
+{
+  "purpose": "A independent audit of every actual new fact/candidate; no semantic B score",
+  "companies": [
+    {
+      "instrument_id": "601377.SH",
+      "records": [
+        {
+          "runtime_path": "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-75219f282a5b80afada802ac.json",
+          "runtime_sha256": "0d9f19d6b5a5f379b01a31690f58349ed1d137032f57e1806895314eb5d86e7a",
+          "work_id": "bp-work-75219f282a5b80afada802ac",
+          "workpaper_sha256": "7bf54b7891b7b890e5aef36b128210f442114541e84bb223710802936e5e6dd4",
+          "report": {
+            "instrument_id": "601377.SH",
+            "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+            "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-27T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "facts": [
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-001",
+              "fact_sha256": "32b1dfc8a1c51eed294a9c89c8482903c8f3cfedf881e98f24eddb1661bf8a01",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                46,
+                47
+              ],
+              "evidence_ids": [
+                "source-0012",
+                "source-0013"
+              ],
+              "metric_count": 2
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-002",
+              "fact_sha256": "528a16d145731ac30de8175bbf46c15f55f5a6bc40adfec603a869d4ce23d6fd",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                48
+              ],
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-003",
+              "fact_sha256": "b9b8039403f54db90a865ad3cc7b21009ca46f94bbfd8f9fbe3be2ba94b99ebd",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                48
+              ],
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-004",
+              "fact_sha256": "ce8c1d5b27011eade67d4d104864641cc36a7ca41f7fd86a26045d70c32ae1f5",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                48
+              ],
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-005",
+              "fact_sha256": "88c28aa7ee47d349261193695d2bf73c5b28225bf16ae12368d6942881218144",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                48
+              ],
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-006",
+              "fact_sha256": "74202b19db4119f8ea806de6dd921a04f748317f9b0062091ca24ce224591903",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                48
+              ],
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-007",
+              "fact_sha256": "9efe7023e9208ce94b4e6a6a887323fd1075e3a0a817b2a7c8b3eae7d6d18231",
+              "state": "limited",
+              "visible": true,
+              "physical_pages": [
+                49
+              ],
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metric_count": 5
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-008",
+              "fact_sha256": "8f0cfc41e52769e28494ed271e3819b2b0a870bbfc93c640d7758fd56555e914",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                47
+              ],
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metric_count": 6
+            }
+          ],
+          "findings_and_all_candidates": [
+            {
+              "finding_id": "F-RM007-SCOPE",
+              "element": "revenue_model",
+              "affected_fact_id": "RM-007",
+              "resolution": "metrics_limited",
+              "original_fact_id": "RM-007",
+              "revised_fact_id": null,
+              "candidate_fact_sha256": null,
+              "candidate_evidence_ids": [],
+              "candidate_source_pages": []
+            }
+          ],
+          "selected_sections": [
+            {
+              "section_id": "section-0062",
+              "section_path": [
+                "第九节 证券公司信息披露 ----------------------------------------249",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "start_page": 34,
+              "end_page": 34,
+              "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+            },
+            {
+              "section_id": "section-0064",
+              "section_path": [
+                "第九节 证券公司信息披露 ----------------------------------------249",
+                "三、经营情况讨论与分析"
+              ],
+              "start_page": 35,
+              "end_page": 45,
+              "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+            },
+            {
+              "section_id": "section-0092",
+              "section_path": [
+                "第九节 证券公司信息披露 ----------------------------------------249",
+                "五、报告期内主要经营情况"
+              ],
+              "start_page": 46,
+              "end_page": 48,
+              "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+            },
+            {
+              "section_id": "section-0096",
+              "section_path": [
+                "第九节 证券公司信息披露 ----------------------------------------249",
+                "主营业务分行业情况"
+              ],
+              "start_page": 48,
+              "end_page": 48,
+              "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+            },
+            {
+              "section_id": "section-0097",
+              "section_path": [
+                "第九节 证券公司信息披露 ----------------------------------------249",
+                "主营业务分地区情况"
+              ],
+              "start_page": 48,
+              "end_page": 49,
+              "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+            },
+            {
+              "section_id": "section-0750",
+              "section_path": [
+                "第九节 证券公司信息披露 ----------------------------------------249",
+                "八、分部报告"
+              ],
+              "start_page": 221,
+              "end_page": 222,
+              "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+            }
+          ],
+          "quality_status": "completed_with_open_findings",
+          "original_extraction_wire": "data/checkpoints/company_profile_research_enrichment_20261124/601377/executions/6fe-601377-revenue-enrich/receipts/002.json",
+          "raw_extraction_fact_index_including_locally_rejected": [
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-001",
+              "raw_fact_sha256": "9afb40eacdc527c9db7e5a1783f51accb2992fc728598622f6bb82cb45a8e5db",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0012",
+                "source-0013"
+              ],
+              "metric_count": 2,
+              "physical_pages": [
+                46,
+                47
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-002",
+              "raw_fact_sha256": "af9eb69754865cd0b7cff818e4337488e064127cbb9f3fb001268db9daee34bf",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4,
+              "physical_pages": [
+                48
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-003",
+              "raw_fact_sha256": "d394ce50844093c003db802a027ee2e5ad179457b7e1d75e57ee109d8797f7c0",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4,
+              "physical_pages": [
+                48
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-004",
+              "raw_fact_sha256": "4903405b59ea6bde7e155821cd8bdf92d81e93a08dd09dfb1d39bc20177eaf47",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4,
+              "physical_pages": [
+                48
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-005",
+              "raw_fact_sha256": "e66bdf84e36ce87cde5f2945f6ad32a9aa57ba21556572feefd5cc461b66889f",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4,
+              "physical_pages": [
+                48
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-006",
+              "raw_fact_sha256": "3bd1fd551ee79301255e1c245ac3bd5cdb552dc3284a8af81805c2c1489e1a5b",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metric_count": 4,
+              "physical_pages": [
+                48
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-007",
+              "raw_fact_sha256": "ecdc7fefc03d7db89e551f6db863b4ad700335efcc6b2bba4d551cd5488b0288",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metric_count": 5,
+              "physical_pages": [
+                49
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "RM-008",
+              "raw_fact_sha256": "2136df5b2eee1b2c060e5878a283bf289755cc8d2b3736897f4e9780d7b2205d",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metric_count": 6,
+              "physical_pages": [
+                47
+              ]
+            }
+          ]
+        }
+      ],
+      "wire_receipts": "data/checkpoints/company_profile_research_enrichment_20261124/601377/executions/6fe-601377-revenue-enrich/receipts/"
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "records": [
+        {
+          "runtime_path": "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-5470620ee9834702d5a05c32.json",
+          "runtime_sha256": "fa1415d30fc7e854e15305f67779193960d64ddea88b3116142a1e1bf4463466",
+          "work_id": "bp-work-5470620ee9834702d5a05c32",
+          "workpaper_sha256": "36301ca04ad016dd6819095f4241b6234b8a5367ada95248ac8e8f2ec6878063",
+          "report": {
+            "instrument_id": "000099.SZ",
+            "report_id": "asset_13cf072b922d15bcd81c755ac7b69d44",
+            "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-16T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "facts": [
+            {
+              "element": "products_services",
+              "fact_id": "F-PS-01",
+              "fact_sha256": "8ab4b22fe853f049bbf9d4c2afd017ec3b0b24309c74191151a704e11012435f",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                14
+              ],
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metric_count": 0
+            },
+            {
+              "element": "products_services",
+              "fact_id": "F-PS-02",
+              "fact_sha256": "c93d6798a7f85cda5a28e33423d45ec2a01d75857c8059735a29a790f9f86c9b",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                15
+              ],
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metric_count": 0
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-01",
+              "fact_sha256": "d0a9d4d72c5b76362783897607f08f42ea3f63bf1cc69c57d50e9968297174d9",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                16
+              ],
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metric_count": 3
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-03",
+              "fact_sha256": "f9d722462d30a37a264b2736e9b2b484f65538e16caa3e0a8d6922dc287458d3",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                16
+              ],
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metric_count": 3
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-04",
+              "fact_sha256": "a474d9032da7bc2658f399d76497410fd9471c28b068b6aa8fe578c3282d49f4",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                17
+              ],
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metric_count": 3
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-05",
+              "fact_sha256": "deb5080dc2cf2260acbf8d62276c7bdc709d0a9b47141a48ed6591a9f6a6beb5",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                135
+              ],
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metric_count": 6
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-06",
+              "fact_sha256": "ef1bf51a5d19b6acb6cd5ef5336a11c562ae9f13b88a42b4e091c6d41815c0c1",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                135
+              ],
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metric_count": 0
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-07",
+              "fact_sha256": "3083945cf78f26866897b9d4d0966fa75c87f60cc172e93a7bfa84ee1309c46a",
+              "state": "reviewed",
+              "visible": true,
+              "physical_pages": [
+                135
+              ],
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metric_count": 4
+            },
+            {
+              "element": "scale_and_mix",
+              "fact_id": "F-SM-01",
+              "fact_sha256": "759a4340438a136331a17998a89c70f1c91c53e684ac7800ba1ef873106f2036",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                16,
+                17
+              ],
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ],
+              "metric_count": 3
+            },
+            {
+              "element": "operations_and_inputs",
+              "fact_id": "F-OI-01",
+              "fact_sha256": "038f3a4460681214048dc062791b09389fd94aa1fcfa013453f115139e37faa2",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                15
+              ],
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metric_count": 3
+            },
+            {
+              "element": "operations_and_inputs",
+              "fact_id": "F-OI-02",
+              "fact_sha256": "ca588721c5558ef7d90ecfca58014f709d1e0eb91c75fea210d1f3200ccfd086",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                15
+              ],
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metric_count": 0
+            },
+            {
+              "element": "customers_channels_markets",
+              "fact_id": "F-CC-01",
+              "fact_sha256": "2739816037765967c53ad854aaf1aa1ea5963a8d8c7e2de46351cc1f630294fb",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                14
+              ],
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metric_count": 0
+            },
+            {
+              "element": "customers_channels_markets",
+              "fact_id": "F-CC-02",
+              "fact_sha256": "ef70c9bf0aaa655a42b59c2851bafe1c532d155123c4add103da1791a77bdd77",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                17
+              ],
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metric_count": 1
+            },
+            {
+              "element": "operating_drivers",
+              "fact_id": "F-OD-01",
+              "fact_sha256": "772097ffb52a68cb908c833b4dc7220600264b4cf25aac9560e6028892a5dfed",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                16
+              ],
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metric_count": 2
+            },
+            {
+              "element": "operating_drivers",
+              "fact_id": "F-OD-02",
+              "fact_sha256": "0fce11d5af187e4bcb8d5171c020e30a143a77a5412ba68f9ee5c4e004fa59e4",
+              "state": null,
+              "visible": false,
+              "physical_pages": [
+                17
+              ],
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metric_count": 4
+            }
+          ],
+          "findings_and_all_candidates": [
+            {
+              "finding_id": "REV-001",
+              "element": "revenue_model",
+              "affected_fact_id": null,
+              "resolution": "repair_rejected",
+              "original_fact_id": null,
+              "revised_fact_id": "review-add:REV-001",
+              "candidate_fact_sha256": "69130dd126731d2fe618369f1122e18bb29eb8378bc17a6e927bd14847eff78b",
+              "candidate_evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ],
+              "candidate_source_pages": [
+                16,
+                17
+              ]
+            }
+          ],
+          "selected_sections": [
+            {
+              "section_id": "section-0020",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "start_page": 14,
+              "end_page": 14,
+              "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+            },
+            {
+              "section_id": "section-0023",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、核心竞争力分析",
+                "（一）全面的品牌影响力"
+              ],
+              "start_page": 15,
+              "end_page": 15,
+              "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+            },
+            {
+              "section_id": "section-0024",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、核心竞争力分析",
+                "（二）多元的运营服务体系"
+              ],
+              "start_page": 15,
+              "end_page": 15,
+              "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+            },
+            {
+              "section_id": "section-0026",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、核心竞争力分析",
+                "（四）领先的机队和基地规模"
+              ],
+              "start_page": 15,
+              "end_page": 15,
+              "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+            },
+            {
+              "section_id": "section-0028",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "start_page": 15,
+              "end_page": 17,
+              "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+            },
+            {
+              "section_id": "section-0623",
+              "section_path": [
+                "第八节 财务报告",
+                "一、不能",
+                "35、营业收入和营业成本"
+              ],
+              "start_page": 135,
+              "end_page": 135,
+              "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+            }
+          ],
+          "quality_status": "completed_with_open_findings",
+          "original_extraction_wire": "data/checkpoints/company_profile_research_enrichment_20261124/000099/executions/6fe-000099-revenue-enrich/receipts/002.json",
+          "raw_extraction_fact_index_including_locally_rejected": [
+            {
+              "element": "products_services",
+              "fact_id": "F-PS-01",
+              "raw_fact_sha256": "2fa2498c837cc93ea61b1459eac0cff72e18ff5226e48ca57568975488cd3f61",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metric_count": 0,
+              "physical_pages": [
+                14
+              ]
+            },
+            {
+              "element": "products_services",
+              "fact_id": "F-PS-02",
+              "raw_fact_sha256": "a0adb6ba13ad6aae01a5f4c6c638fdbcf44702d4bb6075c73329564a61c2b257",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metric_count": 0,
+              "physical_pages": [
+                15
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-01",
+              "raw_fact_sha256": "09f44d9e595c2a80dab79e3dc0c4de22b072c9df96e132a2830c01e61124ac4d",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metric_count": 3,
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-02",
+              "raw_fact_sha256": "7aacca6c0c6f8a9c43af60725bc5d76c436e0a7dbda4c2531f47273d6bb8decd",
+              "retained_in_current_typed_draft": false,
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metric_count": 3,
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-03",
+              "raw_fact_sha256": "b9ec6e3c98eec174f71bb97e264c5682aa2a8c38a70cb1fd6ff8c68c6a152f2a",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metric_count": 3,
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-04",
+              "raw_fact_sha256": "cb6c7d464f34c4d9cc6733724f999c92925158faf525fe68723bf765a71ac286",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metric_count": 3,
+              "physical_pages": [
+                17
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-05",
+              "raw_fact_sha256": "ce3af8bd612c6e45db8441af8076c08a0ce90219ec2019e937524a149d14e3d7",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metric_count": 6,
+              "physical_pages": [
+                135
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-06",
+              "raw_fact_sha256": "f531cc5df52990fa31d733e825a2fe8f2ce2e3287b65485d45f9b8feb30d1304",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metric_count": 0,
+              "physical_pages": [
+                135
+              ]
+            },
+            {
+              "element": "revenue_model",
+              "fact_id": "F-RM-07",
+              "raw_fact_sha256": "fa0429f9d748b0c428b0ed526812871c3176e3e3617d771ee52679f5f2a392a7",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metric_count": 4,
+              "physical_pages": [
+                135
+              ]
+            },
+            {
+              "element": "scale_and_mix",
+              "fact_id": "F-SM-01",
+              "raw_fact_sha256": "e6b618bd78e883bd956b10087f6a31920439295c98406eb26b91f2d2316f474d",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ],
+              "metric_count": 3,
+              "physical_pages": [
+                16,
+                17
+              ]
+            },
+            {
+              "element": "scale_and_mix",
+              "fact_id": "F-SM-02",
+              "raw_fact_sha256": "8bc1deaa4ab6e7eea5bc507aa8fa8e395241222adcc5858cd7fbc59db1b95975",
+              "retained_in_current_typed_draft": false,
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metric_count": 8,
+              "physical_pages": [
+                17
+              ]
+            },
+            {
+              "element": "operations_and_inputs",
+              "fact_id": "F-OI-01",
+              "raw_fact_sha256": "0780b940f5b851b950df43f03e008ae03cb5c6f200ca69d577e6f265141e2864",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metric_count": 3,
+              "physical_pages": [
+                15
+              ]
+            },
+            {
+              "element": "operations_and_inputs",
+              "fact_id": "F-OI-02",
+              "raw_fact_sha256": "ae3ec9811f9d80634a52864ca7f98f87c25d6874e4b4ef9533495fa925071b8b",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metric_count": 0,
+              "physical_pages": [
+                15
+              ]
+            },
+            {
+              "element": "customers_channels_markets",
+              "fact_id": "F-CC-01",
+              "raw_fact_sha256": "57d3f9451a2f871e399bb2b9ac287568e295cad0ca702a776a9ed60031a41c1b",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metric_count": 0,
+              "physical_pages": [
+                14
+              ]
+            },
+            {
+              "element": "customers_channels_markets",
+              "fact_id": "F-CC-02",
+              "raw_fact_sha256": "e7da1cb0da2c72c80b9a89a2fc60ebe4863815279c55ccc3e259d036c3b42795",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metric_count": 1,
+              "physical_pages": [
+                17
+              ]
+            },
+            {
+              "element": "operating_drivers",
+              "fact_id": "F-OD-01",
+              "raw_fact_sha256": "211a2b9567a703139ba880c79929cc6e66cb4b7e94ca4e2417e4c7651a1f2d5e",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metric_count": 2,
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "element": "operating_drivers",
+              "fact_id": "F-OD-02",
+              "raw_fact_sha256": "297023ba83ff92ac57c3ae84a8bcaa7e0a9d763155e42f46d3df40437c02346d",
+              "retained_in_current_typed_draft": true,
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metric_count": 4,
+              "physical_pages": [
+                17
+              ]
+            }
+          ]
+        }
+      ],
+      "wire_receipts": "data/checkpoints/company_profile_research_enrichment_20261124/000099/executions/6fe-000099-revenue-enrich/receipts/"
+    }
+  ]
+}

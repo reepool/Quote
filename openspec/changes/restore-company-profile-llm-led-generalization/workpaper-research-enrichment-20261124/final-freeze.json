@@ -1,0 +1,52 @@
+{
+  "baseline_head": "b5b8f55ef28ef9406e4667e67a7a1a9cb26167c7",
+  "business_source_changes": 0,
+  "frozen_sources_and_execution_plans_unchanged": true,
+  "original_two_question_plans_unchanged": true,
+  "six_parent_writer_bytes_unchanged": true,
+  "parent_V1_root": "data/research/company_profile_research_v1_20261123",
+  "A_protection_reference": "a-terminal.json",
+  "A_protected_files": 206,
+  "new_research_root": "/home/python/Quote/data/research/company_profile_research_enrichment_20261124",
+  "new_files_sha256": {
+    "data/research/company_profile_research_enrichment_20261124/annual-api.json": "4331a08d8fbc953fba2c21965dc9436ab6d6ab8156940879473a4c2ce8f4c336",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-75219f282a5b80afada802ac.json": "0d9f19d6b5a5f379b01a31690f58349ed1d137032f57e1806895314eb5d86e7a",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-fbfb92491eaa652a123d167a.json": "bba72f4410c5524de727d0c4e939378f11acfb941e938b65aa5bd5cdd99ea351",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-9a8e32721c350793252aa7c6.json": "0af019caf11611bef1565436681fb5df89524ff0feeba153f8661868b0a6bdd7",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-aeb6c2b53b6c62d3973c3a4c.json": "c1e1a32cd33fe7d5d39efa7f37e874274544cb66a6caa3df0cd0712918de15cc",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-2247fec2f7b4b6e55b990fbf.json": "8c42bfab31cdb0274ca33f43f66e10d3289757566c036b396a2febc2a88fb0e2",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-5470620ee9834702d5a05c32.json": "fa1415d30fc7e854e15305f67779193960d64ddea88b3116142a1e1bf4463466",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-c3af62070742e2c402bb4202.json": "a6d25f2b100683d382b1426b3687cf6f0dd0149bd5d9f229c0a73d8bb5e70d98",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/bp-work-016367c43308049bffc006bc.json": "1d53cf6eb8969561327ac855e9734d535d0ec18c836c1821ce631d2c5facc643",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/checkpoints/bp-work-75219f282a5b80afada802ac.json": "39d60af8ac40d4d9a363614c8031f864f66b9ce66a443208e73e476cc0f31508",
+    "data/research/company_profile_research_enrichment_20261124/company_profile_common_core.v1/checkpoints/bp-work-5470620ee9834702d5a05c32.json": "4bb50daab003eb3cb50099812912e82a77efed1020baad26fa67c246ab6cf037",
+    "data/research/company_profile_research_enrichment_20261124/exports/profiles.csv": "2eec2aa7fb9400311da0b00433b7c322cb44b89fcb86da09c9d8b673ae99f43a",
+    "data/research/company_profile_research_enrichment_20261124/exports/601377.SH_2025-12-31.json": "083b2b9990b3ad197693701d56550492fe9e654d81807edf3590215c1a28b71b",
+    "data/research/company_profile_research_enrichment_20261124/exports/annual_profiles.md": "4d5618d83ac2051513b1304f14cd80de8c2fb1005bb24e3fd375a63fb0eebb03",
+    "data/research/company_profile_research_enrichment_20261124/exports/000099.SZ_2025-12-31.json": "b2ebdb5b8be1cff993b1ac50f170d120acb9ee8e844c7451e239be063f23c07f",
+    "data/research/company_profile_research_enrichment_20261124/exports/601377.SH_2025-12-31.md": "49319e7c85a2de69cf312a92bf8aa69020f529ec15b63b71543818fb36279220",
+    "data/research/company_profile_research_enrichment_20261124/exports/000099.SZ_2025-12-31.md": "825c1752a785176e683a36c8a752f488a984afe886d1efb7eaaca38d131bc055",
+    "data/research/company_profile_research_enrichment_20261124/exports/profiles.md": "f1918838cf50e7999585f5200892acde247bb025e51f4d77945c90719afe9318",
+    "data/research/company_profile_research_enrichment_20261124/exports/annual_profiles.json": "ec511282dccc1a6b10da5700fd1a518099a814191265c6eb5a29556aa656d46f",
+    "data/research/company_profile_research_enrichment_20261124/exports/export_manifest.json": "51281239add15df5afbba2b6c568c5bfe2a8b8037b55ca57ff5f4fee3ac42cc4",
+    "data/research/company_profile_research_enrichment_20261124/exports/research_profiles.json": "c63782c442b326337c69bd1a5be5c9152f96484ea5b4e9d1cc20423ab099f20c"
+  },
+  "resource_summary": "final-consumption.json",
+  "source_index": "content-source-index.json",
+  "temporary_operator_hashes": {
+    "run_two.py": "1eaf125a3843baf60b0cf9fee9a4876e5b4dc86cbe7dc29e69a72192d5cbaf21",
+    "finalize.py": "16e4b3b9cf7823cd5cf774951dfa9ffeeb92e4a4713020225b1089c60dfc3536",
+    "prepare.py": "c4aaab4d84931a0c6b1f8ae4ff1a6efcd0c0cf44731b65d5cb5d0f0a30b4f2e4",
+    "deliver.py": "ccf0b6df9da705199efe0767b3ace3f071af8b58d5abeda0353cc3107f7adef0"
+  },
+  "cleanup": {
+    "root": "/home/python/Quote/data/QuoteBak/company-profile-6fe-b-Ysquhx9l",
+    "state": "removed",
+    "files_removed": 21,
+    "logical_bytes_released": 3792780,
+    "active_owned_python_processes": 0,
+    "other_roots_touched": false
+  },
+  "new_provider_requests": 7,
+  "new_recoveries": 0
+}

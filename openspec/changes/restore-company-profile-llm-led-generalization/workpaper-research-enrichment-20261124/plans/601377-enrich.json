@@ -1,0 +1,60 @@
+{
+  "schema_version": "company_profile_task_plan.v1",
+  "run_id": "6fe-601377-revenue-enrich",
+  "authorization_status": "authorized",
+  "approval_reference": "human-20261124-6FE-two-research-enrich-approved",
+  "action": "enrich",
+  "instrument_ids": [
+    "601377.SH"
+  ],
+  "document_versions": {
+    "601377.SH": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb"
+  },
+  "knowledge_cutoff": "2026-11-24",
+  "output_root": "/home/python/Quote/data/research/company_profile_research_enrichment_20261124",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_research_enrichment_20261124/601377",
+  "extract": {
+    "name": "semantic_extraction__deepseek",
+    "model": "deepseek-flash",
+    "host": "api.deepseek.com",
+    "attempt_seconds": 600,
+    "disable_thinking": true,
+    "max_output_tokens_field": "max_tokens"
+  },
+  "review": {
+    "name": "semantic_extraction__scorpio_grok",
+    "model": "grok-4.7",
+    "host": "scorpio.reepool.com",
+    "attempt_seconds": 1200,
+    "reasoning_effort": "high"
+  },
+  "budget": {
+    "seconds": 5950,
+    "tokens": 1000000,
+    "physical_requests": 10,
+    "recoveries": 3,
+    "logical_seconds": 2450,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6fc-601377-revenue",
+    "base_work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+    "base_workpaper_sha256": "cb21793fcd3f8d36f692f1a4ea6599b42af37cf83c59546c2285054c61765678",
+    "report": {
+      "instrument_id": "601377.SH",
+      "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-27T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "revenue_model",
+        "question": "在本报告已披露范围内，财富管理、机构服务、自营投资、海外四大业务的主要收入/权重是什么？优先核管理层讨论的主营业务分板块/分产品表，必要时收入/分部附注，保完整表头、期间、单位与内部抵消；会计科目手续费/利息/投资收益不冒充业务板块。未单列或不能安全归属就保原文/未获取，不强求精确占比。"
+      }
+    ]
+  }
+}

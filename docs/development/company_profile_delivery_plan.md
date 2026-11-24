@@ -1,5 +1,9 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-24 [6.FE两收入问题已交研究增量](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-research-enrichment-20261124/result.md)：A独立原PDF/B原enrich真实两股，14个目标API新增/47可用指标；兴证五业务表行已获取，模型自动限制另5个错scope指标不丢正文；海直结算及收入成本口径已获，跨行收入修订拒绝保缺项不追加调用。0业务源码变更、7物理/143802供应商total/293.958业务秒，原20根104与旧102不动，两股必要后继和导出在research_enrichment_20261124。实际收益/重复上下文/未获信息和原自动章节标签限制分列，额外离线/ASGI未完成不计通过；必要证据一套后清本人临时根，普通Git同卡收尾。本卡达到研究增量即结束，不再扩规则/平台或为全齐重跑，不自动授权100/生产。
+
+2026-11-24当前[6.FE真实研究增量卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-research-enrichment-card.md)获用户同意与实施授权。A冻结/独立源审，B原TaskService enrich连续跑兴业证券/中信海直两收入问题、源复核/必要一次修订/终核、API导出前后对照；原20研究版继续使用，不重抽整批/旧四家、不追121缺项或供应链细节。模型/累计资源按卡，仅获准联网环境且冻结不热修；新两股后继放research_enrichment_20261124，原104与旧102保持。先核6.FC/FD本人根已清，必要证据一套后清本轮库/脚本/重复物；卡末交研究收益及边界，不以工程回归替代真实增量或自动扩100/生产。
+
 2026-11-24 [6.FD工程收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-stable-review-closure-20261124/result.md)：新current-draft政策保当前修订和隔离、实际送审内容与原source hash绑定，旧原seed/default身份保兼容；新窄metric flag保方向原文/null及原因，5旧候选可备终核但0采纳。原正常任务/writer/新实例API/export/失败接续及最后72去重直接用例通过，4个基线旧版本断言分列；A独审源与保护，原20股633/1003不变。达到本卡行为即结束，不再做平台/字段扩展或追可选尾项；两收入问题仍planned，真实模型收益、正式99%和扩量/生产均未放行。本人QuoteBak先清后做/末端必要一套后清，详细限用与原失败不改。
 
 2026-11-24用户已授权[6.FD稳定研究版整卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-stable-review-closure-card.md)：A规划/独立审核，B沿原owner合并处理重核丢旧修订/隔离和数值格式连带拒绝正文，直接回归及保存真实响应回放同窗完成；不新建接口/平台或逐公司规则。原20股633/1003及104业务文件、两份planned问题保护，0新模型/联网/付费窗口/扩样或生产，旧质量不改；先核6.FC本人根已清、必要证据一套后清本轮QuoteBak，末端交实际行为及阶段使用边界，不再交纯准备卡。

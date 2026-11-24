@@ -1,0 +1,60 @@
+{
+  "schema_version": "company_profile_task_plan.v1",
+  "run_id": "6fe-000099-revenue-enrich",
+  "authorization_status": "authorized",
+  "approval_reference": "human-20261124-6FE-two-research-enrich-approved",
+  "action": "enrich",
+  "instrument_ids": [
+    "000099.SZ"
+  ],
+  "document_versions": {
+    "000099.SZ": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb"
+  },
+  "knowledge_cutoff": "2026-11-24",
+  "output_root": "/home/python/Quote/data/research/company_profile_research_enrichment_20261124",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_research_enrichment_20261124/000099",
+  "extract": {
+    "name": "semantic_extraction__deepseek",
+    "model": "deepseek-flash",
+    "host": "api.deepseek.com",
+    "attempt_seconds": 600,
+    "disable_thinking": true,
+    "max_output_tokens_field": "max_tokens"
+  },
+  "review": {
+    "name": "semantic_extraction__scorpio_grok",
+    "model": "grok-4.7",
+    "host": "scorpio.reepool.com",
+    "attempt_seconds": 1200,
+    "reasoning_effort": "high"
+  },
+  "budget": {
+    "seconds": 5950,
+    "tokens": 1000000,
+    "physical_requests": 10,
+    "recoveries": 3,
+    "logical_seconds": 2450,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "6fc-000099-revenue",
+    "base_work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+    "base_workpaper_sha256": "2235fed6c4353fa64829e01ea1e26ff7181fc02e950e7dc8d421be4dec30c894",
+    "report": {
+      "instrument_id": "000099.SZ",
+      "report_id": "asset_13cf072b922d15bcd81c755ac7b69d44",
+      "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-16T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "revenue_model",
+        "question": "主要通航运输业务的收入构成如何？优先核经营讨论中主营业务分行业/分产品表，恢复可安全归属的通航运输收入及主营/公司总额口径；如同章披露海上油气、应急救援、陆上通航等收入细分或主要收费模式则保其原文，不披露则明确，不能用地区收入、子公司收入或集团合计替代，不扩读所有子公司或追供应链。"
+      }
+    ]
+  }
+}

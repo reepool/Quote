@@ -1,0 +1,48 @@
+{
+  "task": "6.FE",
+  "author": "A/main",
+  "scope": "Independent original-PDF review of all 23 retained draft objects; 14 target-element API additions. This is not whole-profile or unseen-company quality scoring.",
+  "reference": "a-source-expectations.json",
+  "profiles": [
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-75219f282a5b80afada802ac",
+      "source_checked_objects": 8,
+      "api_additions": 8,
+      "api_states": {"reviewed": 7, "limited": 1},
+      "checks": [
+        {"fact_ids": ["RM-001", "RM-008"], "physical_pages": [47], "judgment": "Company revenue, growth and separate accounting-label amounts match the source. They repeat existing information and do not count as newly discovered business-segment contributions."},
+        {"fact_ids": ["RM-002", "RM-003", "RM-004", "RM-005", "RM-006"], "physical_pages": [48], "judgment": "Five business revenue/cost/margin/revenue-growth rows match the 2025 RMB ten-thousand table, including overseas revenue decline of 1.02%. Each uses business_segment scope. These rows provide the main research improvement."},
+        {"fact_ids": ["RM-007"], "physical_pages": [49], "judgment": "Narrative amounts are source-supported rounded versions of the five rows. Five metrics incorrectly use consolidated_group scope; model review automatically limited all five. Fresh API retains text and exposes five metric gaps with no ordinary metric values. No manual replacement or new model request."}
+      ],
+      "remaining_acquisition_boundary": "The actual packet includes segment-report introduction on physical page 221, not the numerical table on physical page 222. Original page 222 does contain segment revenue and eliminations. The draft wording that segment-report amounts were unavailable must be read as this run's acquisition limitation, not a claim that the annual report does not disclose them. No extra reading/call is required by this card.",
+      "source_label_limitation": "Automatic source labels incorrectly inherit 第九节证券公司信息披露; original physical pages 34/47–49 belong to 第三节管理层讨论与分析. Audit navigation uses the original chapter and physical page without rewriting frozen source labels.",
+      "outcome": "Useful business-income increment with locally limited metric metadata; exact weights/elimination reconciliation remain optional and unacquired."
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "work_id": "bp-work-5470620ee9834702d5a05c32",
+      "source_checked_objects": 15,
+      "api_additions": 6,
+      "api_states": {"reviewed": 6},
+      "checks": [
+        {"fact_ids": ["F-PS-01", "F-CC-01"], "physical_pages": [14], "judgment": "Named businesses, offshore oil/gas as core revenue source, trial-flight wording and customer/region statements match the original; non-target context is not counted as a new API acquisition."},
+        {"fact_ids": ["F-PS-02", "F-OI-01", "F-OI-02"], "physical_pages": [15], "judgment": "Integrated operating-role description and 87 helicopters/9 unmanned aircraft/4 heliports match the original; non-target context is not counted as a new API acquisition."},
+        {"fact_ids": ["F-RM-01", "F-RM-03", "F-RM-04", "F-SM-01", "F-CC-02", "F-OD-01", "F-OD-02"], "physical_pages": [16, 17], "judgment": "Company total, maintenance/other-business amounts, geographic share and cost/growth figures agree with the table. Margin change is percentage points. F-SM-01's 99.13% is supported raw context but not among this targeted revenue_model API increment's six objects; do not claim it as newly delivered API content."},
+        {"fact_ids": ["F-RM-05", "F-RM-06", "F-RM-07"], "physical_pages": [135], "judgment": "Revenue/cost account totals match note 35. Transport service uses progress settlement; maintenance uses advance/acceptance payments. Remaining performance-obligation amounts are explicitly expected future recognition, not realized 2025 revenue."}
+      ],
+      "repair_boundary": "REV-001 correctly identifies omitted transport revenue of 2,215,984,977.85 yuan in the original split-line table. The one allowed repair was locally rejected; no final source-check request or adoption followed. A does not write that amount into the model's accepted facts.",
+      "remaining_acquisition_boundary": "Selected operating sections do not separately disclose offshore oil/gas, rescue and land-aviation revenue. Segment total must not substitute for offshore oil/gas alone; geography and subsidiary amounts are not business breakdowns.",
+      "outcome": "Partial improvement: fees/payment mechanism and account composition now delivered, exact transport revenue remains an explicit unresolved gap. No further call to chase completeness."
+    }
+  ],
+  "manual_intervention": {
+    "source_audit": "A independently read the original PDFs and checked the new content.",
+    "business_values_written_by_A": 0,
+    "new_fact_restrictions_authored_by_A": 0,
+    "clarification": "A clarified acquisition scope and original chapter labels in the result; no frozen source/raw/model output was rewritten."
+  },
+  "verdict": "Finite research increment accepted. Useful content, original restrictions and unresolved gaps coexist; no new formal accuracy percentage or scale/production approval.",
+  "mechanical_checks": "a-terminal.json",
+  "historical_accuracy_unchanged": "97.8967%"
+}

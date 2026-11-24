@@ -1,0 +1,27 @@
+{
+  "task": "6.FE",
+  "owner": "A/main",
+  "removed_root": "/home/python/Quote/data/QuoteBak/company-profile-6fe-a-CaeaYyUP",
+  "removed_files": 11,
+  "removed_logical_bytes": 2906161,
+  "removed_names": [
+    "baseline.py",
+    "cleanup.py",
+    "current-card.patch",
+    "doc-0.before",
+    "doc-1.before",
+    "doc-2.before",
+    "doc-3.before",
+    "doc-4.before",
+    "doc-5.before",
+    "stage_patch.py",
+    "terminal.py"
+  ],
+  "root_absent_after": true,
+  "B_removed_files": 21,
+  "B_removed_logical_bytes": 3792780,
+  "B_cleanup_reference": "final-freeze.json",
+  "B_root_absent": true,
+  "total_removed_logical_bytes": 6698941,
+  "retained": "One persistent research increment, original wire/usage/failure history, compact A/B review evidence. Original 206 protected inputs and unrelated dirty work remain intact."
+}

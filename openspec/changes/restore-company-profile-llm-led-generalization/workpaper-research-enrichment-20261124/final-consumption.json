@@ -1,0 +1,139 @@
+{
+  "source_code_changes": 0,
+  "company_count": 2,
+  "api_json_profiles_equal": true,
+  "fresh_instance_equal": true,
+  "research_only": true,
+  "production_authorization": "not_authorized",
+  "companies": [
+    {
+      "instrument_id": "601377.SH",
+      "before": {
+        "facts": 44,
+        "metrics": 55,
+        "states": {
+          "superseded": 45,
+          "reviewed": 43,
+          "limited": 1,
+          "source_only": 1
+        }
+      },
+      "after": {
+        "facts": 52,
+        "metrics": 83,
+        "states": {
+          "superseded": 45,
+          "reviewed": 50,
+          "limited": 2,
+          "source_only": 1
+        }
+      },
+      "original_fact_entries_identical": true,
+      "new_reading_count": 1,
+      "new_visible_fact_ids": [
+        "RM-001",
+        "RM-002",
+        "RM-003",
+        "RM-004",
+        "RM-005",
+        "RM-006",
+        "RM-007",
+        "RM-008"
+      ],
+      "new_nonvisible_fact_ids": [],
+      "new_states": {
+        "reviewed": 7,
+        "limited": 1
+      },
+      "quality_statuses": [
+        "completed_with_open_findings"
+      ],
+      "active_gap_count": 8,
+      "resources": {
+        "ledger_path": "data/checkpoints/company_profile_research_enrichment_20261124/601377/executions/6fe-601377-revenue-enrich/budget.json",
+        "physical_requests": 3,
+        "charged_tokens": 73605,
+        "supplier_total_tokens": 73605,
+        "unknown_usage_attempts": 0,
+        "recoveries": 0,
+        "cost_status": "unknown",
+        "charged_cost_cny": "unknown",
+        "process_elapsed_seconds": 204.30692100524902,
+        "absolute_deadline_epoch": 1795497707.068098
+      }
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "before": {
+        "facts": 22,
+        "metrics": 22,
+        "states": {
+          "superseded": 22,
+          "reviewed": 22
+        }
+      },
+      "after": {
+        "facts": 28,
+        "metrics": 41,
+        "states": {
+          "superseded": 22,
+          "reviewed": 28
+        }
+      },
+      "original_fact_entries_identical": true,
+      "new_reading_count": 1,
+      "new_visible_fact_ids": [
+        "F-RM-01",
+        "F-RM-03",
+        "F-RM-04",
+        "F-RM-05",
+        "F-RM-06",
+        "F-RM-07"
+      ],
+      "new_nonvisible_fact_ids": [],
+      "new_states": {
+        "reviewed": 6
+      },
+      "quality_statuses": [
+        "completed_with_open_findings"
+      ],
+      "active_gap_count": 6,
+      "resources": {
+        "ledger_path": "data/checkpoints/company_profile_research_enrichment_20261124/000099/executions/6fe-000099-revenue-enrich/budget.json",
+        "physical_requests": 4,
+        "charged_tokens": 70197,
+        "supplier_total_tokens": 70197,
+        "unknown_usage_attempts": 0,
+        "recoveries": 0,
+        "cost_status": "unknown",
+        "charged_cost_cny": "unknown",
+        "process_elapsed_seconds": 290.3633031845093,
+        "absolute_deadline_epoch": 1795497707.0811954
+      }
+    }
+  ],
+  "group_resources": {
+    "physical_requests": 7,
+    "charged_tokens": 143802,
+    "supplier_total_tokens": 143802,
+    "cost_cny": "unknown",
+    "elapsed_seconds": 293.9579393863678
+  },
+  "additional_checks": {
+    "offline_controlled_CLI": {
+      "exit_code": 124,
+      "limit_seconds": 600,
+      "XML_produced": false,
+      "counted_passed": false
+    },
+    "in_process_ASGI_optional_check": {
+      "state": "terminated_after_read_only_wait",
+      "exit_code": 143,
+      "counted_passed": false,
+      "new_model_requests": 0
+    },
+    "valid_evidence": "Completed original enrich TaskService/writer, fresh ReadService, annual API snapshot=annual JSON profiles, A fresh terminal checks; 6.FD72 reused."
+  },
+  "normalized_direction_fallback_observed": false,
+  "semantic_audit_owner": "A; not a B accuracy score"
+}

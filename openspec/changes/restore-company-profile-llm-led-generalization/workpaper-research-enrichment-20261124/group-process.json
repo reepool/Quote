@@ -1,0 +1,12 @@
+{
+  "state": "ended",
+  "started_epoch": 1795491704.1825957,
+  "ended_epoch": 1795491998.1405342,
+  "elapsed_seconds": 293.9579393863678,
+  "process_exit_codes": {
+    "601377": 0,
+    "000099": 0
+  },
+  "max_group_seconds": 12600,
+  "no_automatic_new_run": true
+}

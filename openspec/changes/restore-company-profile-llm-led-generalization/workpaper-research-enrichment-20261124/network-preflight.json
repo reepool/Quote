@@ -1,0 +1,33 @@
+{
+  "environment": "require_escalated",
+  "timestamp_epoch": 1795491368.4262831,
+  "profiles": [
+    {
+      "profile": "semantic_extraction__deepseek",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "credentials_present": true,
+      "logical_seconds": 2450,
+      "physical_seconds": 600.0,
+      "reasoning_effort": "high",
+      "no_model_request": true,
+      "dns_ok": true,
+      "tls_ok": true,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "credentials_present": true,
+      "logical_seconds": 2450,
+      "physical_seconds": 1200.0,
+      "reasoning_effort": "high",
+      "no_model_request": true,
+      "dns_ok": true,
+      "tls_ok": true,
+      "tls_version": "TLSv1.3"
+    }
+  ],
+  "model_requests": 0
+}

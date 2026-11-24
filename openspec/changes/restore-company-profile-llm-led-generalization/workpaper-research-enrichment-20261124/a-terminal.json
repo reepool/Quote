@@ -1,0 +1,1282 @@
+{
+  "protected_files_checked": 206,
+  "protected_files_altered": [],
+  "unrelated_dirty_files_altered": [],
+  "frozen_persistent_files_drift": [],
+  "fresh_instance_delivered": 2,
+  "fresh_api_matches_saved": true,
+  "profiles": [
+    {
+      "instrument_id": "601377.SH",
+      "before_latest": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+      "after_latest": "bp-work-75219f282a5b80afada802ac",
+      "original_facts_removed": [],
+      "original_facts_changed": [],
+      "original_restrictions_relaxed": [],
+      "new_facts": [
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-001",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0012",
+            "source-0013"
+          ],
+          "fact": {
+            "fact_id": "RM-001",
+            "text": "2025年集团实现营业收入118.41亿元，同比增长21.03%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0012",
+              "source-0013"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "118.41",
+                "value": "118.41",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比增长率",
+                "raw_value": "21.03",
+                "value": "21.03",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-002",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "fact": {
+            "fact_id": "RM-002",
+            "text": "主营业务分行业情况表列示证券及期货经纪业务营业收入377,812.12万元，营业成本234,797.31万元，毛利率37.85%，营业收入比上年增减21.37%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "证券及期货经纪业务营业收入",
+                "raw_value": "377,812.12",
+                "value": "377812.12",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "证券及期货经纪业务营业成本",
+                "raw_value": "234,797.31",
+                "value": "234797.31",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "证券及期货经纪业务毛利率",
+                "raw_value": "37.85",
+                "value": "37.85",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "证券及期货经纪业务营业收入比上年增减",
+                "raw_value": "21.37",
+                "value": "21.37",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-003",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "fact": {
+            "fact_id": "RM-003",
+            "text": "主营业务分行业情况表列示资产管理业务营业收入319,408.12万元，营业成本99,295.94万元，毛利率68.91%，营业收入比上年增减25.04%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "资产管理业务营业收入",
+                "raw_value": "319,408.12",
+                "value": "319408.12",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务营业成本",
+                "raw_value": "99,295.94",
+                "value": "99295.94",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务毛利率",
+                "raw_value": "68.91",
+                "value": "68.91",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务营业收入比上年增减",
+                "raw_value": "25.04",
+                "value": "25.04",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-004",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "fact": {
+            "fact_id": "RM-004",
+            "text": "主营业务分行业情况表列示机构服务业务营业收入157,695.89万元，营业成本118,513.51万元，毛利率24.85%，营业收入比上年增减58.67%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "机构服务业务营业收入",
+                "raw_value": "157,695.89",
+                "value": "157695.89",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务营业成本",
+                "raw_value": "118,513.51",
+                "value": "118513.51",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务毛利率",
+                "raw_value": "24.85",
+                "value": "24.85",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务营业收入比上年增减",
+                "raw_value": "58.67",
+                "value": "58.67",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-005",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "fact": {
+            "fact_id": "RM-005",
+            "text": "主营业务分行业情况表列示自营投资业务营业收入321,443.92万元，营业成本138,054.78万元，毛利率57.05%，营业收入比上年增减2.98%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "自营投资业务营业收入",
+                "raw_value": "321,443.92",
+                "value": "321443.92",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务营业成本",
+                "raw_value": "138,054.78",
+                "value": "138054.78",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务毛利率",
+                "raw_value": "57.05",
+                "value": "57.05",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务营业收入比上年增减",
+                "raw_value": "2.98",
+                "value": "2.98",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-006",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "fact": {
+            "fact_id": "RM-006",
+            "text": "主营业务分行业情况表列示海外业务营业收入47,705.97万元，营业成本32,473.61万元，毛利率31.93%，营业收入比上年增减-1.02%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "海外业务营业收入",
+                "raw_value": "47,705.97",
+                "value": "47705.97",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务营业成本",
+                "raw_value": "32,473.61",
+                "value": "32473.61",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务毛利率",
+                "raw_value": "31.93",
+                "value": "31.93",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务营业收入比上年增减",
+                "raw_value": "-1.02",
+                "value": "-1.02",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-007",
+          "element": "revenue_model",
+          "state": "limited",
+          "label": "保真限用／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [
+            "模型源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+          ],
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "fact": {
+            "fact_id": "RM-007",
+            "text": "主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "metric_gaps": [
+            {
+              "metric_index": 0,
+              "name": "证券及期货经纪业务收入（说明段）",
+              "state": "withheld",
+              "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+              "review_basis": "model_source_check",
+              "model_finding_ids": [
+                "F-RM007-SCOPE"
+              ],
+              "model_reasons": [
+                "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+              ]
+            },
+            {
+              "metric_index": 1,
+              "name": "资产管理业务收入（说明段）",
+              "state": "withheld",
+              "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+              "review_basis": "model_source_check",
+              "model_finding_ids": [
+                "F-RM007-SCOPE"
+              ],
+              "model_reasons": [
+                "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+              ]
+            },
+            {
+              "metric_index": 2,
+              "name": "机构服务业务收入（说明段）",
+              "state": "withheld",
+              "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+              "review_basis": "model_source_check",
+              "model_finding_ids": [
+                "F-RM007-SCOPE"
+              ],
+              "model_reasons": [
+                "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+              ]
+            },
+            {
+              "metric_index": 3,
+              "name": "自营投资业务收入（说明段）",
+              "state": "withheld",
+              "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+              "review_basis": "model_source_check",
+              "model_finding_ids": [
+                "F-RM007-SCOPE"
+              ],
+              "model_reasons": [
+                "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+              ]
+            },
+            {
+              "metric_index": 4,
+              "name": "海外业务收入（说明段）",
+              "state": "withheld",
+              "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+              "review_basis": "model_source_check",
+              "model_finding_ids": [
+                "F-RM007-SCOPE"
+              ],
+              "model_reasons": [
+                "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+              ]
+            }
+          ],
+          "metric_source_indices": []
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "fact_id": "RM-008",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "fact": {
+            "fact_id": "RM-008",
+            "text": "利润表科目变动分析显示，手续费及佣金净收入63.71亿元，同比增长20.83%；利息净收入15.85亿元，同比增长11.75%；投资收益38.61亿元，同比增长69.46%。上述为会计科目口径，不等同于业务板块收入。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": [
+              {
+                "name": "手续费及佣金净收入",
+                "raw_value": "63.71",
+                "value": "63.71",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "手续费及佣金净收入同比增长率",
+                "raw_value": "20.83",
+                "value": "20.83",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "利息净收入",
+                "raw_value": "15.85",
+                "value": "15.85",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "利息净收入同比增长率",
+                "raw_value": "11.75",
+                "value": "11.75",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "投资收益",
+                "raw_value": "38.61",
+                "value": "38.61",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "投资收益同比增长率",
+                "raw_value": "69.46",
+                "value": "69.46",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        }
+      ],
+      "active_gaps": [
+        {
+          "reading_work_id": "bp-work-016367c43308049bffc006bc",
+          "active": true,
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "主营业务分行业、分产品、分地区、分销售模式表在所选章节中仅显示表头与单位，具体分板块收入金额未获取成功，故未列示各板块收入权重。"
+          ],
+          "supplemental_reading_work_ids": [
+            "bp-work-75219f282a5b80afada802ac"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        },
+        {
+          "reading_work_id": "bp-work-016367c43308049bffc006bc",
+          "active": true,
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "各业务板块收入构成表在所选章节中未显示具体金额，无法量化板块间收入权重。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-016367c43308049bffc006bc",
+          "active": true,
+          "element": "operating_drivers",
+          "status": "observed",
+          "reasons": [
+            "各业务板块收入金额未在所选章节中显示，无法量化板块收入贡献。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-016367c43308049bffc006bc",
+          "active": true,
+          "element": "upstream_inputs",
+          "status": "not_disclosed",
+          "reasons": [
+            "证券公司无制造业原材料采购，所选章节未披露具体的资金、技术或人才等投入资源明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-016367c43308049bffc006bc",
+          "active": true,
+          "element": "company_features",
+          "status": "observed",
+          "reasons": [
+            "独立源核：事实F34仅源参考，当前引文绑定不足以作为已确认结论。原因：F34前半句声称研究业务蝉联证券时报最佳分析师评选最佳研究团队第三名、连续十届前五。该断言确实逐字存在原PDF物理p39（印刷p38）研究服务/经营举措及业绩，故不是排名造假或数字错误；但当前仅绑定source-0002物理p35、source-0007物理p40，这两处未载第三名和连续十届前五，只支持第一梯队/托管排名等其他子句。当前事实的证据绑定未覆盖整个复合断言，不能按现绑定认作完全有据。 建议按需对本报告对应业务章节定向精读，核对主体、期间、表头、单位及完整引文覆盖；原稿保留，未补写确定值。"
+          ],
+          "supplemental_reading_work_ids": [
+            "bp-work-aeb6c2b53b6c62d3973c3a4c"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        },
+        {
+          "reading_work_id": "bp-work-aeb6c2b53b6c62d3973c3a4c",
+          "active": true,
+          "element": "company_features",
+          "status": "observed",
+          "reasons": [
+            "排名与评选描述均按原文摘录，未核实评选机构口径或统计期间细节。",
+            "部分复合描述（如兴全基金“管理总规模超8000亿元”与“主动权益类基金近三年收益率位列第一”）分属不同断言，本补充仅覆盖排名类子句，规模数据未在此重复。",
+            "兴证资本奖项名称含2024年度与2025年度不同评选年度，期间按原文标注，未统一为报告期。"
+          ],
+          "supplemental_reading_work_ids": [
+            "bp-work-016367c43308049bffc006bc"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "active": true,
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "分部报告章节仅提供分部名称与划分依据，未提供分部收入金额表，故无法用分部报告交叉验证各板块收入与内部抵消。",
+            "主营业务分行业表未列示合计行与内部抵消行，各板块收入合计与集团营业收入118.41亿元之间的差异及抵消关系未在所选章节披露，未计算占比。",
+            "管理层讨论中的业务板块收入（亿元口径）与分行业表（万元口径）数值一致，但分行业表未明确标注为合并口径，板块口径以原文为准。"
+          ],
+          "supplemental_reading_work_ids": [
+            "bp-work-016367c43308049bffc006bc"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        },
+        {
+          "reading_work_id": "bp-work-75219f282a5b80afada802ac",
+          "active": true,
+          "element": "revenue_model",
+          "fact_id": "RM-007",
+          "status": "unclear",
+          "metric_indices": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "metric_names": [
+            "证券及期货经纪业务收入（说明段）",
+            "资产管理业务收入（说明段）",
+            "机构服务业务收入（说明段）",
+            "自营投资业务收入（说明段）",
+            "海外业务收入（说明段）"
+          ],
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "reasons": [
+            "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+          ],
+          "review_basis": "model_source_check",
+          "model_finding_ids": [
+            "F-RM007-SCOPE"
+          ],
+          "suggested_reading": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。",
+          "supplemental_reading_work_ids": [
+            "bp-work-016367c43308049bffc006bc"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        }
+      ]
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "before_latest": "bp-work-2247fec2f7b4b6e55b990fbf",
+      "after_latest": "bp-work-5470620ee9834702d5a05c32",
+      "original_facts_removed": [],
+      "original_facts_changed": [],
+      "original_restrictions_relaxed": [],
+      "new_facts": [
+        {
+          "reading_work_id": "bp-work-5470620ee9834702d5a05c32",
+          "fact_id": "F-RM-01",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "fact": {
+            "fact_id": "F-RM-01",
+            "text": "公司营业收入合计2,235,378,155.32元，占营业收入比重100%，同比增减3.33%；增长原因为报告期合同机数量及飞行作业量增加，海油业务收入增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入合计",
+                "raw_value": "2,235,378,155.32",
+                "value": "2235378155.32",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入合计占营业收入比重",
+                "raw_value": "100%",
+                "value": "100",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入合计同比增减",
+                "raw_value": "3.33%",
+                "value": "3.33",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-5470620ee9834702d5a05c32",
+          "fact_id": "F-RM-03",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "fact": {
+            "fact_id": "F-RM-03",
+            "text": "分行业看，通航维修收入8,835,401.52元，占营业收入比重0.40%，同比增减-48.09%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "通航维修收入",
+                "raw_value": "8,835,401.52",
+                "value": "8835401.52",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航维修收入占营业收入比重",
+                "raw_value": "0.40%",
+                "value": "0.40",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航维修收入同比增减",
+                "raw_value": "-48.09%",
+                "value": "-48.09",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-5470620ee9834702d5a05c32",
+          "fact_id": "F-RM-04",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "fact": {
+            "fact_id": "F-RM-04",
+            "text": "分行业看，其他业务收入10,557,775.95元，占营业收入比重0.47%，同比增减-39.07%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "其他业务收入",
+                "raw_value": "10,557,775.95",
+                "value": "10557775.95",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入占营业收入比重",
+                "raw_value": "0.47%",
+                "value": "0.47",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入同比增减",
+                "raw_value": "-39.07%",
+                "value": "-39.07",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-5470620ee9834702d5a05c32",
+          "fact_id": "F-RM-05",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "fact": {
+            "fact_id": "F-RM-05",
+            "text": "财务报告附注显示，主营业务收入2,224,820,379.37元、成本1,700,253,570.91元；其他业务收入10,557,775.95元、成本3,604,291.85元；合计收入2,235,378,155.32元、成本1,703,857,862.76元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入",
+                "raw_value": "2,224,820,379.37",
+                "value": "2224820379.37",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "主营业务成本",
+                "raw_value": "1,700,253,570.91",
+                "value": "1700253570.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入",
+                "raw_value": "10,557,775.95",
+                "value": "10557775.95",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务成本",
+                "raw_value": "3,604,291.85",
+                "value": "3604291.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入合计",
+                "raw_value": "2,235,378,155.32",
+                "value": "2235378155.32",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本合计",
+                "raw_value": "1,703,857,862.76",
+                "value": "1703857862.76",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-5470620ee9834702d5a05c32",
+          "fact_id": "F-RM-06",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "fact": {
+            "fact_id": "F-RM-06",
+            "text": "通航运输服务在服务提供时按服务进度结算收款，公司为主要责任人，主要提供通航运输服务；通航维修服务在服务完成时以预付款、交付验收款结算，主要对直升机及部件提供修理服务，公司为主要责任人，并提供服务类质保。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "reading_work_id": "bp-work-5470620ee9834702d5a05c32",
+          "fact_id": "F-RM-07",
+          "element": "revenue_model",
+          "state": "reviewed",
+          "label": "已核（研究用途，非正式接受）／模型源核",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "fact": {
+            "fact_id": "F-RM-07",
+            "text": "本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为419,133,003.25元，其中206,841,119.73元预计于2026年度确认收入，132,933,802.73元预计于2027年度确认收入，79,358,080.79元预计于2028年度确认收入。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "尚未履行或尚未履行完毕的履约义务对应收入金额",
+                "raw_value": "419,133,003.25",
+                "value": "419133003.25",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "预计2026年度确认收入",
+                "raw_value": "206,841,119.73",
+                "value": "206841119.73",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2026年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "预计2027年度确认收入",
+                "raw_value": "132,933,802.73",
+                "value": "132933802.73",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2027年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "预计2028年度确认收入",
+                "raw_value": "79,358,080.79",
+                "value": "79358080.79",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2028年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        }
+      ],
+      "active_gaps": [
+        {
+          "reading_work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+          "active": true,
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "分产品收入构成在所选章节中未列示，仅有分行业与分地区数据。",
+            "事实F-RM-02已隔离，未作为结论采用：metric number is absent from cited source: 通航运输营业收入",
+            "事实F-RM-03已隔离，未作为结论采用：metric number is absent from cited source: 通航运输营业成本"
+          ],
+          "supplemental_reading_work_ids": [
+            "bp-work-5470620ee9834702d5a05c32"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        },
+        {
+          "reading_work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+          "active": true,
+          "element": "scale_and_mix",
+          "status": "unclear",
+          "reasons": [
+            "分产品收入构成未在所选章节列示。",
+            "事实F-SM-01已隔离，未作为结论采用：metric number is absent from cited source: 深圳地区营业收入",
+            "事实F-SM-02已隔离，未作为结论采用：metric number is absent from cited source: 海直通用航空有限责任公司营业收入"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+          "active": true,
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "客户与供应商名称按报告披露列示，未推断具体合同关系。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+          "active": true,
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "事实F-MC-03已隔离，未作为结论采用：metric number is absent from cited source: 其他业务营业收入同比增减"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+          "active": true,
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "供应商采购额仅列示前五名，未披露全部采购结构。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5470620ee9834702d5a05c32",
+          "active": true,
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，无法恢复通航运输收入内部细分。",
+            "分产品收入表在原文中为空，未披露分产品收入。",
+            "分地区收入为地区口径，不能替代通航运输业务收入构成。",
+            "事实F-RM-02已隔离，未作为结论采用：metric number is absent from cited source: 通航运输收入"
+          ],
+          "supplemental_reading_work_ids": [
+            "bp-work-2247fec2f7b4b6e55b990fbf"
+          ],
+          "follow_up_state": "supplemented_not_fully_reassessed"
+        }
+      ]
+    }
+  ],
+  "semantic_independent_audit": "See a-independent-review.json; these are mechanical checks only."
+}

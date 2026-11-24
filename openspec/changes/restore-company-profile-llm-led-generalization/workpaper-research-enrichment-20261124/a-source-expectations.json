@@ -1,0 +1,49 @@
+{
+  "task": "6.FE",
+  "author": "A/main independent reading",
+  "not_model_input": true,
+  "basis": "Original same-version PDF, concentrated business and revenue chapters; optional details are not mandatory.",
+  "profiles": [
+    {
+      "instrument_id": "601377.SH",
+      "pdf_path": "data/filings/financial_statements/broker_risk_control/SSE/601377/601377_2025-12-31_1225046462.pdf",
+      "pdf_sha256": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "section": "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 /（一）主营业务分析 / 2、收入和成本分析",
+      "physical_pages": [48, 49],
+      "printed_pages": [47, 48],
+      "table_currency_unit": "人民币万元",
+      "period": "2025年度",
+      "scope": "集团主营业务分行业",
+      "revenue_rows": [
+        {"business": "证券及期货经纪业务", "amount_raw": "377,812.12"},
+        {"business": "资产管理业务", "amount_raw": "319,408.12"},
+        {"business": "机构服务业务", "amount_raw": "157,695.89"},
+        {"business": "自营投资业务", "amount_raw": "321,443.92"},
+        {"business": "海外业务", "amount_raw": "47,705.97"}
+      ],
+      "narrative_on_page_49": "37.78、31.94、15.77、32.14、4.77亿元，分别对应上表五项。",
+      "interpretation": "物理34页说明财富管理包含证券及期货经纪、资产管理；不要求计算合并金额或收入占比，不将五项简单相加冒称公司营业收入。",
+      "distinct_company_total": {"physical_page": 47, "raw": "营业收入118.41亿元", "note": "同页投资收益/手续费佣金净收入/利息净收入是会计科目，不能代替业务板块。"},
+      "success_basis": "新增有源的主要业务收入贡献，或忠实说明可读取范围；不要求全部同比、毛利率、地区或附注尾项。"
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "pdf_path": "data/filings/announcements/blobs/67/6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb.pdf",
+      "pdf_sha256": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "pre_read_basis": "A已核同版本原PDF物理14–17页及sha；原旧source_text仅辅助比较。",
+      "section": "第三节 管理层讨论与分析 / 四、主营业务分析 / 2、收入与成本",
+      "physical_pages": [16, 17],
+      "period": "2025年度",
+      "scope": "公司营业收入与分行业通航运输",
+      "source_amounts_original_pdf_confirmed": [
+        {"name": "营业收入合计", "raw": "2,235,378,155.32", "unit": "元"},
+        {"name": "通航运输收入", "raw": "2,215,984,977.85", "unit": "元"},
+        {"name": "通航运输占营业收入", "raw": "99.13%", "unit": "%"},
+        {"name": "通航维修收入", "raw": "8,835,401.52", "unit": "元"},
+        {"name": "其他业务收入", "raw": "10,557,775.95", "unit": "元", "physical_page": 17}
+      ],
+      "interpretation": "旧布局把金额末位换行，不自动拼为模型答案。物理14页明确海上油气直升机服务为主要收入来源和核心业务，但通航运输总额不等于海上油气独立收入。",
+      "success_basis": "有源收入/构成或收费机制改善；允许未披露海上油气、应急救援、陆上通航各自金额，不以地区或子公司代替，不要求细分全齐。"
+    }
+  ]
+}
