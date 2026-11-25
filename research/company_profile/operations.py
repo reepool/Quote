@@ -687,7 +687,7 @@ class CompanyProfileTaskService:
         from .models import ReportIdentity
         from .runtime import CompanyProfileRuntimeRecordV3
         from .workpaper_review import (ReviewRecoveryLink, prepare_review_recovery, workpaper_hash,
-            CURRENT_DRAFT_REVIEW_POLICY, METRIC_LIMIT_POLICY)
+            CURRENT_DRAFT_REVIEW_POLICY, METRIC_LIMIT_POLICY, RECOVERED_REPAIR_POLICY)
 
         instrument = str(plan.get("instrument_id") or "")
         base = self.reads._latest_by_instrument(work_id=plan.get("reading_work_id"), include_enrichments=True).get(instrument)
@@ -697,14 +697,15 @@ class CompanyProfileTaskService:
             raise ValueError("review recovery reading/report/hash changed")
         source_recheck_policy = plan.get("source_recheck_policy")
         is_current = source_recheck_policy == CURRENT_DRAFT_REVIEW_POLICY
+        recovered = source_recheck_policy == RECOVERED_REPAIR_POLICY
         saved_identity = _record_processing_identity(base)
         continuing_current = source_recheck_policy is None and saved_identity.get("source_recheck_policy") == CURRENT_DRAFT_REVIEW_POLICY
-        old_link = ReviewRecoveryLink.model_validate(saved_identity["workpaper_review_recovery"]) if continuing_current else None
+        old_link = ReviewRecoveryLink.model_validate(saved_identity["workpaper_review_recovery"]) if continuing_current or recovered else None
         link = ReviewRecoveryLink(request_id=plan.get("request_id"), base_work_id=base.work_id,
             base_workpaper_sha256=workpaper_hash(base.workpaper), report=base.report,
             plan_sha256=_stable_hash(dict(plan)), prior_use_review=base.workpaper.use_review,
-            current_draft_policy=CURRENT_DRAFT_REVIEW_POLICY if is_current or continuing_current else None,
-            prior_quality_review=base.workpaper.quality_review if is_current or continuing_current else None,
+            current_draft_policy=RECOVERED_REPAIR_POLICY if recovered else CURRENT_DRAFT_REVIEW_POLICY if is_current or continuing_current else None,
+            prior_quality_review=base.workpaper.quality_review if is_current or continuing_current or recovered else None,
             current_seed_work_id=(old_link.current_seed_work_id or old_link.base_work_id) if old_link else None,
             current_seed_workpaper_sha256=(old_link.current_seed_workpaper_sha256 or old_link.base_workpaper_sha256) if old_link else None)
         for path in self.reads.namespace_root.glob("*.json"):
@@ -720,7 +721,7 @@ class CompanyProfileTaskService:
                 return {"action": "review_recovery", "state": "already_processed", "work_id": prior.work_id,
                     "review_status": prior.workpaper.quality_review.status if prior.workpaper.quality_review else "not_reviewed",
                     "production_authorization": PRODUCTION_AUTHORIZATION}
-        required_policy = METRIC_LIMIT_POLICY if is_current else source_recheck_policy
+        required_policy = METRIC_LIMIT_POLICY if is_current or recovered else source_recheck_policy
         if required_policy is not None and self.processing_identity.get("workpaper_metric_limit_policy") != required_policy:
             raise ValueError("explicit source recheck requires its new review processing policy")
         current = self.reads.plan_review_recovery(instrument, request_id=link.request_id, reading_work_id=base.work_id,
@@ -757,6 +758,11 @@ class CompanyProfileTaskService:
             if saved_policy is not None:
                 identity[METRIC_FORMAT_FLAG] = saved_policy
         if is_current:
+            identity.update(source_recheck_policy=CURRENT_DRAFT_REVIEW_POLICY,
+                current_review_binding=plan["current_review_binding"])
+        elif recovered:
+            # Replay the original source/input contract. The explicit new
+            # continuation policy is carried by the recovery link and plan.
             identity.update(source_recheck_policy=CURRENT_DRAFT_REVIEW_POLICY,
                 current_review_binding=plan["current_review_binding"])
         elif continuing_current:

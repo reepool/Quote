@@ -1,0 +1,12 @@
+{
+  "host": "scorpio.reepool.com",
+  "addresses": [
+    "176.126.114.194"
+  ],
+  "tls_version": "TLSv1.3",
+  "certificate_validated": true,
+  "model": "grok-4.7",
+  "reasoning_effort": "high",
+  "elapsed_seconds": 0.22363068908452988,
+  "provider_calls": 0
+}

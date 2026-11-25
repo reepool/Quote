@@ -1,0 +1,61 @@
+{
+  "task": "6.FJ",
+  "temporary_root": "/home/python/Quote/data/QuoteBak/b-6fj-restored-final-B7b2lV2g",
+  "parents": {
+    "bp-work-721e6851edbaa279f67917e5": "e2e19993aca14fd6a7dd977600ad7c12b042fac190b601c4b8452812848df67c",
+    "bp-work-88e327a6f594ec32aa9e05ec": "c9c278ed1f31f8ce528bd6a56bc767944377f83d53e17887a9c651e3d5c9b16a",
+    "bp-work-4dda16898fc774971368308e": "b4a93ec9f6ca19844b761e98f8550f28c6229f8468d44ea2f1f029edc057b4cc"
+  },
+  "baseline_head": "4ac28ff0c3ecbfc70fb3b46710d1130d1f7e2c3c",
+  "plan_sha256": "a6769c7c4d61a38651d14129e57075ecbd0619660d84eef5a9ede07dbf3de46b",
+  "source_callback": {
+    "pdf": "/home/python/Quote/data/filings/announcements/blobs/a8/a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4.pdf",
+    "pdf_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+    "cache": "/home/python/Quote/data/filings/announcements/blobs/a8/derived/business_profile_pdfium_recovery.v4/a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4_57e1dd4f16ef40ff.json.gz",
+    "cache_sha256": "6ac6068773e91a11e80a59d64b4390937f192ae7edb533b8487b59633fbd8d2d",
+    "native_pages": 227,
+    "adapter": "OfficialAnnualReportPageSource._source_result"
+  },
+  "callback_report_field_equal": true,
+  "seed_sha256": "cd9da10cc552ef8df7e1f36256452f3a0bb338fb1049004e987063ac0f39aa51",
+  "original_wire_source_text_equal": true,
+  "source_text_sha256": "f5da24485e8882181bb8ea8c53ab13c6e2831a4e6503864394e36154b4157d44",
+  "recovered_candidate_ids": [
+    "review-add:R4",
+    "review-add:R5"
+  ],
+  "actual_batch_candidate_ids": [
+    "F01",
+    "F10",
+    "F11",
+    "review-add:R4",
+    "review-add:R5",
+    "review-add:R6"
+  ],
+  "old_four_sha256": {
+    "F01": "a005943f80db9a749d293b4cdcf905f2d7c931a980163414711c616344a09218",
+    "F10": "46ebd1cf1e5ccc195ff8bd320b0a84cb93c76af765edb3aa787b6ea592b4b2b8",
+    "F11": "672a61bdbcaa5dafe75a7361e792007b8771b79768c04857c7f3ea366cea4684",
+    "review-add:R6": "539ec7eaecf175d93a8ac82d1c0c682faea6b2087db5fdad8bc74a758469648f"
+  },
+  "retained_receipts": [
+    {
+      "purpose": "select_profile_sections",
+      "request_id": "bp-work-4dda16898fc774971368308e:workpaper:sections",
+      "response_sha256": "3661943a7b08890c88b21de3f0bd6498e0de136d64ece924ebd679eb63585ee0"
+    },
+    {
+      "purpose": "extract_profile_workpaper",
+      "request_id": "bp-work-4dda16898fc774971368308e:workpaper:extract",
+      "response_sha256": "a3520bb94d27dd8a0d33ec080b7fd69d7fd66d41ecc7d863aabad7050a9482be"
+    },
+    {
+      "purpose": "verify_profile_workpaper_repair",
+      "request_id": "bp-work-721e6851edbaa279f67917e5:workpaper:repair-verify",
+      "response_sha256": "c928704aff7d00a47e3ffbe5126469209362a7393ddeac1973312ecc8771414e"
+    }
+  ],
+  "new_supplier_calls": 0,
+  "new_real_finals": 0,
+  "offline_deviation": "OpenSpec CLI attempted edge.openspec.dev telemetry despite disable variable; DNS failed, no business/provider payload. No further CLI use."
+}

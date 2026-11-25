@@ -1,0 +1,36 @@
+{
+  "task": "6.FJ",
+  "distinct_direct_cases_passed": 30,
+  "counting": "Reuse the valid first 21 cases from the compatibility/outcome run, the 8 successful binding cases from b-test-fixtures.xml, and the corrected source case from b-test-source-only.xml. Interrupted/repeated cases are not counted again.",
+  "original_compatibility_passed": {
+    "original_real_failed_seed": ["002027", "002352", "601111"],
+    "task_service_missing_stage_idempotency": ["final accepted", "final rejected", "initial accepted", "final retry"],
+    "stale_plan_before_queue_or_provider": 1,
+    "changed_fact_independent_disposition": ["source_checked", "source_only", "withheld", "duplicate"],
+    "original_seed_reconstruction_damage": ["missing", "hash", "model", "draft_hash"]
+  },
+  "new_full_six_candidate_final_outcomes_passed": ["accepted", "rejected", "empty", "wrong_targets", "old_fact_rejected"],
+  "each_outcome_asserts": [
+    "Only verify_profile_workpaper_repair is newly requested; actual input has all original six candidates",
+    "The exact original current-draft seed has hash cd9da10cc552ef8df7e1f36256452f3a0bb338fb1049004e987063ac0f39aa51",
+    "Original four fact contents, ordinary delivery facts, state and review_basis equal the old draft",
+    "Original initial checked hashes and valid original final call/receipt attribution survive failure",
+    "Recovered two are absent without their own valid accepting final",
+    "F12 independent withholding and the distinct inherited:R07 remain; no inherited:R4/R5 duplicate",
+    "Original selection/extraction/final raw bytes and hashes are retained",
+    "Fresh-instance query and JSON export agree; parent files remain byte-identical; same request does not resend"
+  ],
+  "new_binding_cases_passed": ["initial_raw", "repair_hash", "final_raw", "final_false", "no_candidate", "parent", "source", "candidate", "plan"],
+  "fixture_failures_preserved": [
+    {"run": "pytest-first", "failed": 14, "cause": "Test helper selected the default-ranked 88e3 parent rather than explicitly selecting current 721e; corrected helper, no provider send."},
+    {"run": "pytest-second", "normal_entry_failed": 5, "cause": "Recovered policy incorrectly replaced runtime CURRENT_DRAFT source binding; operations now replays original source binding and records recovery policy in its link. Strict dict-to-model fixture errors were also present."},
+    {"run": "pytest-final", "valid_prefix_passed": 21, "later_failures": "Old strict JSON fixtures in an already-started process; not application failures. A explicitly requested reuse and interruption instead of repeating valid cases."},
+    {"run": "pytest-fixture-fix", "passed": 8, "failed": 1, "cause": "source fixture accessed nonexistent Evidence.quote; corrected source_spans[0].quote. Original failure is in b-test-fixtures.xml."},
+    {"run": "pytest-source-fix", "status": "interrupted", "cause": "A broad -k source expression also matched the function name; stopped and reran the exact [source] node only. No extra cases counted."},
+    {"run": "pytest-source-only", "passed": 1, "failed": 0, "receipt": "b-test-source-only.xml"}
+  ],
+  "static_checks": {"ruff_E9_F63_F7_F82": "passed", "git_diff_check": "passed"},
+  "review": {"blocking_findings_fixed": ["normal runtime source-binding mismatch", "old final call attribution missing on fallback", "same-receipt findings must not re-inherit stale R4/R5 rejections"], "unrelated_scope_added": false},
+  "real_model_quality_claim": false,
+  "supplier_calls_from_these_tests": 0
+}

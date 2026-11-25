@@ -1,0 +1,21 @@
+{
+  "task": "6.FJ",
+  "stage": "A ready",
+  "protected_files_unchanged": 304,
+  "plan_sha256": "a6769c7c4d61a38651d14129e57075ecbd0619660d84eef5a9ede07dbf3de46b",
+  "recovered_candidate_ids": [
+    "review-add:R4",
+    "review-add:R5"
+  ],
+  "batch_fact_sha256": {
+    "F01": "a005943f80db9a749d293b4cdcf905f2d7c931a980163414711c616344a09218",
+    "F10": "46ebd1cf1e5ccc195ff8bd320b0a84cb93c76af765edb3aa787b6ea592b4b2b8",
+    "F11": "672a61bdbcaa5dafe75a7361e792007b8771b79768c04857c7f3ea366cea4684",
+    "review-add:R4": "4f3fe460eb7c255267dca4ece605ef3d76866967b43cc8e13382feb1e7003c76",
+    "review-add:R5": "0ec05f448e7d23da3f56ed97c239abfb9dbb7ee3ca09baea0632a7e8c381dd4b",
+    "review-add:R6": "539ec7eaecf175d93a8ac82d1c0c682faea6b2087db5fdad8bc74a758469648f"
+  },
+  "new_model_response_seen": false,
+  "final_only": true,
+  "original_scores_unchanged": true
+}

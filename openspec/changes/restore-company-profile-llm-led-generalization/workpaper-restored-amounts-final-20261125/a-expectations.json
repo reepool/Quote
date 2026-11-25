@@ -1,0 +1,117 @@
+{
+  "task": "6.FJ",
+  "reviewer": "A independent original-PDF reader",
+  "frozen_before_new_final": true,
+  "report": {
+    "instrument_id": "000526.SZ",
+    "report_id": "asset_4a4d1f962befae75d94117257218409b",
+    "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "original_current_record_work_id": "bp-work-721e6851edbaa279f67917e5",
+  "original_record_sha256": "e2e19993aca14fd6a7dd977600ad7c12b042fac190b601c4b8452812848df67c",
+  "original_seed_work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+  "original_reviewed_seed_sha256": "cd9da10cc552ef8df7e1f36256452f3a0bb338fb1049004e987063ac0f39aa51",
+  "source_pdf_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+  "source_physical_pages": [
+    10,
+    17,
+    18
+  ],
+  "page_text_sha256": {
+    "10": "9c38854d1f4775452e68ed43b79182d4c56b08d5c4f475784f1c3dcae34fc009",
+    "17": "6b9f5fc63c078ca57a22dbfea2249ef0e9ef8ee650010b590204ee8d8b263213",
+    "18": "021f519f7b2cbbd0a8291c0cf6bd6cd952476a3fb74de9b4a7d18be18dbe812a"
+  },
+  "original_receipts": {
+    "select_profile_sections": {
+      "request_id": "bp-work-4dda16898fc774971368308e:workpaper:sections",
+      "response_hash": "3661943a7b08890c88b21de3f0bd6498e0de136d64ece924ebd679eb63585ee0",
+      "raw_sha256": "3661943a7b08890c88b21de3f0bd6498e0de136d64ece924ebd679eb63585ee0",
+      "model": "deepseek-flash"
+    },
+    "extract_profile_workpaper": {
+      "request_id": "bp-work-4dda16898fc774971368308e:workpaper:extract",
+      "response_hash": "a3520bb94d27dd8a0d33ec080b7fd69d7fd66d41ecc7d863aabad7050a9482be",
+      "raw_sha256": "a3520bb94d27dd8a0d33ec080b7fd69d7fd66d41ecc7d863aabad7050a9482be",
+      "model": "deepseek-flash"
+    },
+    "review_profile_workpaper": {
+      "request_id": "bp-work-721e6851edbaa279f67917e5:workpaper:review",
+      "response_hash": "4bad7f2c15542c10cb2d6198d1b4b21a235f6afe9b17a2802c2f6b4c61abdaa3",
+      "raw_sha256": "4bad7f2c15542c10cb2d6198d1b4b21a235f6afe9b17a2802c2f6b4c61abdaa3",
+      "model": "grok-4.7"
+    },
+    "repair_profile_workpaper": {
+      "request_id": "bp-work-721e6851edbaa279f67917e5:workpaper:repair",
+      "response_hash": "5fc15b3419b00986e1699f1081349c9b7f63ac222ebeab2aa0a579e1165610a5",
+      "raw_sha256": "5fc15b3419b00986e1699f1081349c9b7f63ac222ebeab2aa0a579e1165610a5",
+      "model": "deepseek-flash"
+    },
+    "verify_profile_workpaper_repair": {
+      "request_id": "bp-work-721e6851edbaa279f67917e5:workpaper:repair-verify",
+      "response_hash": "c928704aff7d00a47e3ffbe5126469209362a7393ddeac1973312ecc8771414e",
+      "raw_sha256": "c928704aff7d00a47e3ffbe5126469209362a7393ddeac1973312ecc8771414e",
+      "model": "grok-4.7"
+    }
+  },
+  "candidates": [
+    {
+      "fact_id": "F01",
+      "fact_sha256": "a005943f80db9a749d293b4cdcf905f2d7c931a980163414711c616344a09218",
+      "new_target": false,
+      "prior_final_accepted": true,
+      "source_basis": "Physical10: four education businesses; traditional advantage phrase refers to full-time education."
+    },
+    {
+      "fact_id": "F10",
+      "fact_sha256": "46ebd1cf1e5ccc195ff8bd320b0a84cb93c76af765edb3aa787b6ea592b4b2b8",
+      "new_target": false,
+      "prior_final_accepted": true,
+      "source_basis": "Physical17–18: other revenue103329561.57元,3.20%,cost44643463.76元,margin56.80%; business row scope."
+    },
+    {
+      "fact_id": "F11",
+      "fact_sha256": "672a61bdbcaa5dafe75a7361e792007b8771b79768c04857c7f3ea366cea4684",
+      "new_target": false,
+      "prior_final_accepted": true,
+      "source_basis": "Physical17–18: equipment rental4000000.00元,0.12%,cost7285915.20元,margin-82.15%; business row scope."
+    },
+    {
+      "fact_id": "review-add:R4",
+      "fact_sha256": "4f3fe460eb7c255267dca4ece605ef3d76866967b43cc8e13382feb1e7003c76",
+      "new_target": true,
+      "prior_final_accepted": false,
+      "source_basis": "Physical17: education service fee revenue3119716159.11元,96.67% of revenue,year-over-year15.66%; business_segment, not group total."
+    },
+    {
+      "fact_id": "review-add:R5",
+      "fact_sha256": "0ec05f448e7d23da3f56ed97c239abfb9dbb7ee3ca09baea0632a7e8c381dd4b",
+      "new_target": true,
+      "prior_final_accepted": false,
+      "source_basis": "Physical17–18: education service cost2095400319.12元,margin32.83%. Keep the raw margin-change column-0.96% with the existing uncertainty note as percentage-point source wording, not an exact relative-growth claim."
+    },
+    {
+      "fact_id": "review-add:R6",
+      "fact_sha256": "539ec7eaecf175d93a8ac82d1c0c682faea6b2087db5fdad8bc74a758469648f",
+      "new_target": false,
+      "prior_final_accepted": true,
+      "source_basis": "Physical10: about300→about330 centres,more than5100 teachers,34 bases,more than7500 students; preserve approximate/greater-than wording and nulls."
+    }
+  ],
+  "new_target_count": 2,
+  "prior_accepted_consistency_count": 4,
+  "expected_final_candidate_ids": [
+    "F01",
+    "F10",
+    "F11",
+    "review-add:R4",
+    "review-add:R5",
+    "review-add:R6"
+  ],
+  "independent_F12_withheld_preserved": true,
+  "new_model_response_seen": false,
+  "old_scores_not_recomputed": true
+}

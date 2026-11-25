@@ -136,6 +136,13 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** the existing owner MUST bind the actual current draft and original source package rather than silently reconstructing an older extraction that discards prior accepted fixes or revives withdrawn facts
 - **AND** the new model input MUST exclude prior review opinions, independent use decisions and A-added advice; generation/source lineage, existing current content and inherited restrictions remain distinct, exact target/source mismatches fail before sending, and legacy original-seed policy/default fingerprints retain their prior behavior
 
+#### Scenario: A completed review has locally rejected repair candidates that become source-ready
+- **WHEN** a caller explicitly requests a newly supported recovered-repair batch continuation and unchanged saved repair candidates that were locally rejected now pass the current typed/source checks
+- **THEN** the existing read/task/review owner MAY plan a single final-only continuation from the exact original reviewed seed and original hash-bound initial-review/repair replies, preserving the old completed result and its rejection history
+- **AND** ordinary completed/default plans remain not-needed; absent recoverable candidates, changed raw responses, wrong source/parent/content bindings or forged completion state MUST prevent sending
+- **AND** the original full repair batch may be reverified once to keep the existing final contract; previously accepted candidates MUST remain content-identical and separately attributed rather than counted as new facts, with no invented combined model reply or repeated extraction/initial review/repair
+- **AND** only an actual valid content-matched final response may adopt recovered candidates; failures preserve existing usable content and independent restrictions, and the new plan/limited budget never reopens an ended run or authorizes production
+
 #### Scenario: A local numeric representation cannot be normalized without guessing
 - **WHEN** a new processing identity encounters the observed narrow metric-format incompatibility while preparing an otherwise source-bound fact or repair candidate
 - **THEN** the existing owner MAY retain its original narrative and raw metric spelling with a null normalized value and explicit local-format limitation after applicable typed/source checks, without guessing sign, amount, unit or subject or converting unknown to zero

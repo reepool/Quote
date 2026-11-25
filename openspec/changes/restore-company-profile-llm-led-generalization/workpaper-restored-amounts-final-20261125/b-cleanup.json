@@ -1,0 +1,24 @@
+{
+  "task": "6.FJ",
+  "authorization": "A actual independent audit passed; explicit permission to clean B checkpoint/DB/test root after persistence",
+  "removed": [
+    {
+      "root": "/home/python/Quote/data/QuoteBak/b-6fj-restored-final-B7b2lV2g",
+      "regular_files": 377,
+      "regular_file_bytes": 102266448
+    },
+    {
+      "root": "/home/python/Quote/data/checkpoints/company_profile_restored_amounts_final_20261125",
+      "regular_files": 6,
+      "regular_file_bytes": 111726
+    }
+  ],
+  "removed_regular_files": 383,
+  "removed_regular_file_bytes": 102378174,
+  "space_unit": "logical regular-file bytes, not a measured NFS free-space delta",
+  "authority_retained": "b-run/{receipts/001.json,budget.json,started.json,result.json}; b-export; b-validation and compact original development traces",
+  "new_runtime_root_retained": "data/research/company_profile_restored_amounts_final_20261125",
+  "old_roots_or_A_root_touched": false,
+  "root_absent_confirmed": true,
+  "one_use_drivers_removed_after_hash_freeze_and_audit": true
+}

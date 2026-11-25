@@ -1,0 +1,55 @@
+{
+  "work_id": "bp-work-c6a75b04b6703268cb518867",
+  "review_status": "completed_with_open_findings",
+  "old_four_hash_equal": true,
+  "recovered_present": [
+    "review-add:R4",
+    "review-add:R5"
+  ],
+  "findings": [
+    {
+      "finding_id": "R1",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R2",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R3",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R4",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R5",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R6",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "finding_id": "R7",
+      "resolution": "omission_candidate"
+    },
+    {
+      "finding_id": "inherited:R06",
+      "resolution": "unresolved"
+    },
+    {
+      "finding_id": "inherited:R07",
+      "resolution": "repair_rejected"
+    },
+    {
+      "finding_id": "inherited:R08",
+      "resolution": "omission_candidate"
+    }
+  ],
+  "generation_unchanged": true,
+  "source_unchanged": true,
+  "new_instance_query_equal": true,
+  "export_profile_equal": true
+}

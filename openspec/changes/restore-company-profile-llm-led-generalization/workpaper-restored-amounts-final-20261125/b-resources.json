@@ -1,0 +1,25 @@
+{
+  "physical_requests": 1,
+  "logical_requests": 1,
+  "recoveries": 0,
+  "charged_tokens": 22551,
+  "supplier_usage": {
+    "input_tokens": 13027,
+    "output_tokens": 700,
+    "total_tokens": 22551
+  },
+  "cost_cny": "unknown",
+  "cost_status": "unknown",
+  "actual_task_seconds": 125.00831,
+  "wire_seconds": 103.54151666723192,
+  "elapsed_limit_hit": false,
+  "token_limit_hit": false,
+  "request_limit_hit": false,
+  "authority_files_sha256": {
+    "receipts/001.json": "f07ba3e9c3c054e5d5593c493cf5954266811946c6c7574375a61e15be6b4acf",
+    "budget.json": "af37ba2b2b686ea8ba47284d854842425c14a1dcf3310859243c6ab141b45a6e",
+    "started.json": "472463f62812fd26665c5834c43568d9fbbf302d616f2c0482a5c0253ecc2780",
+    "result.json": "8f8615b1d2cc743be30e7b2ffef17038354b136844d5bc67cfb1b31bec34b55d"
+  },
+  "original_result_unchanged": true
+}

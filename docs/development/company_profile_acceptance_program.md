@@ -1,5 +1,9 @@
 # 公司画像分阶段验收计划
 
+2026-11-25 [6.FJ真实终核完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/result.md)：学大原6候选同批final全部接受，新恢复仅R4教育收入3,119,716,159.11元/96.67%/同比15.66%及R5成本2,095,400,319.12元/毛利率32.83%，变动列仍保原文和不确定说明。A按发送前原PDF期望逐hash核6项，原30对象的内容/交付状态/审核依据、原5回执及304文件均保持；新隔离后继31可读（29已核/2限用）、1隔离，F12限制及其余缺项不解除。1物理/0恢复/22551供应商total与账本、单请求103.542秒、费用unknown，无选章/抽取/初核/新修订；三读一致。直接工程用例有效并集30通过，早期夹具/接线失败另保，不重算旧97.8967%或开放规模/生产；必要一套后清本人产物与隔离Git沿同卡收尾。
+
+2026-11-25用户继续上一明确核验建议，当前[6.FJ学大两恢复项终核卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-restored-amounts-final-card.md)：原6候选同批一次final（2恢复目标+4旧项一致），复用原初核/修订/原v7源，默认完成不重发；只新增有据恢复接续的正常owner能力与直接验证，不造子集响应。新任务1逻辑/2物理含1恢复、3000秒/600000账本、高阶1200物理/2450逻辑，有价10元/无价unknown；既有公开学大材料/Grok通道、获准联网，原窗口不借额。A冻结4ac28ff0/304文件/49旧脏，B准备后冻并一窗实核交后继；实际2项结果/原4内容/资源与旧分分列，原20/三稿/API保持，必要一套后清/Git收口，不扩量/生产。
+
 2026-11-25 [6.FI工程就绪](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-wrapped-source-amounts-20261125/result.md)：原数字源检查已让学大R4收入3,119,716,159.11元与R5成本2,095,400,319.12元通过本地检查，原quote/raw/offset/旧拒绝不改；新绑定v8还拒已识别前缀及不完整千位组，legacy兼容。175相关回归及A19挑战最终通过，首成本残片误放/初夹具失败保留；受控原链证明无匹配final不采纳。A fresh20与3稿API完整相等、304原文件不变；0新模型/实际终核/采纳，源0007无单位的续表仍不独立复原，不为全版式扩引擎。两候选仍需自己的真实源核，旧97.8967%/正式阈值和生产边界不改，必要一套后清/Git同卡。
 
 2026-11-25用户继续后实施[6.FI断行金额消费修复](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-wrapped-source-amounts-card.md)：沿原numeric cell/source binding处理有明确单位/布局及唯一同列多列支持的续片，新处理身份标记接受集合变化；以6.FH学大2有据候选及现实负例/受控原入口证明source-ready。0新模型/外传，不改原raw/拒绝或20与三稿API；没有候选自己的真实final不采纳，不把本地修复算新99%。A冻结2a8a3083/304文件/49旧脏及前轮3根已清，B连续最小实现/回归、A独核原PDF/关键反例及清理/Git收口，不扩成PDF或校验平台。

@@ -1,0 +1,43 @@
+{
+  "task": "6.FJ",
+  "work_id": "bp-work-c6a75b04b6703268cb518867",
+  "protected_files_unchanged": 304,
+  "final_response_sha256": "affd61b3f72f945ad49275e999f96464aa46b91dea93a51bfa68b7ee1f2e42d5",
+  "actual_final_decisions": {
+    "F01": true,
+    "F10": true,
+    "F11": true,
+    "review-add:R4": true,
+    "review-add:R5": true,
+    "review-add:R6": true
+  },
+  "prior_fact_states_and_content_unchanged": 30,
+  "original_receipts_unchanged": 5,
+  "old_counts": {
+    "reviewed": 28,
+    "pending": 0,
+    "limited": 1,
+    "source_only": 0,
+    "withheld": 1,
+    "duplicate": 0
+  },
+  "new_counts": {
+    "reviewed": 29,
+    "pending": 0,
+    "limited": 2,
+    "source_only": 0,
+    "withheld": 1,
+    "duplicate": 0
+  },
+  "inherited_F12_withheld": true,
+  "fresh_query_equal": true,
+  "actual_wires": [
+    {
+      "name": "001.json",
+      "sha256": "f07ba3e9c3c054e5d5593c493cf5954266811946c6c7574375a61e15be6b4acf",
+      "same_original_source": true
+    }
+  ],
+  "independent_scope": "Original PDF checks frozen before final: physical10/17/18, all6 candidate content hashes; no whole-company new score.",
+  "old_scores_not_recomputed": true
+}

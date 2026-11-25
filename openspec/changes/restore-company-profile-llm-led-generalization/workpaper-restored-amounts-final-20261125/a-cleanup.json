@@ -1,0 +1,58 @@
+{
+  "task": "6.FJ",
+  "removed_duplicate_exports": [
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/b-export/000526.SZ_2025-12-31.json",
+      "bytes": 372912,
+      "sha256": "2f33ee64e84450566135dc0f55d732f156b2c26530bff01220360d9ddb5c8289",
+      "reason": "rebuildable duplicate export after equality checks"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/b-export/000526.SZ_2025-12-31.md",
+      "bytes": 58208,
+      "sha256": "9b909bc2f210bccae3d391d1c5c95ab1524a474a52cfe58768a050e5b905af32",
+      "reason": "rebuildable duplicate export after equality checks"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/b-export/research_profiles.json",
+      "bytes": 173441,
+      "sha256": "4fe6f206bfa847841cfe9560a1ab5053bb5c0dad5301f82d8370c2f85518a99f",
+      "reason": "rebuildable duplicate export after equality checks"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/b-export/profiles.csv",
+      "bytes": 1212,
+      "sha256": "ce49fcd85f8b3ff65e20d20f1d0ffc79ff991355f0657f323f51a6c952d5d4f5",
+      "reason": "rebuildable duplicate export after equality checks"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/b-export/profiles.md",
+      "bytes": 1374,
+      "sha256": "387363219c1af42d69965b9b714b78cb0c027968322ac6cf62dad8bf614f0480",
+      "reason": "rebuildable duplicate export after equality checks"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/b-export/export_manifest.json",
+      "bytes": 1842,
+      "sha256": "53595106a02aa0132893314a859ba73b5645f04055fec1b0e6cbf19db4789bb2",
+      "reason": "rebuildable duplicate export after equality checks"
+    }
+  ],
+  "duplicate_export_bytes": 608989,
+  "A_temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6fj-a-tx2jDtgf",
+  "A_temporary_files": 13,
+  "A_temporary_bytes": 3095430,
+  "retained": [
+    "b-export/annual_profiles.json",
+    "b-export/annual_profiles.md",
+    "b-run/receipts/001.json",
+    "b-run/budget.json",
+    "b-run/started.json",
+    "b-run/result.json",
+    "original protected research roots and new runtime root"
+  ],
+  "staged_doc_isolation_finished": true,
+  "historical_or_unowned_files_removed": false,
+  "root_absent_confirmed": true,
+  "space_unit": "logical regular-file bytes; not measured free-space change"
+}

@@ -1,0 +1,29 @@
+{
+  "task": "6.FJ",
+  "source_sha256": {
+    "research/company_profile/workpaper_review.py": "8adbafd87d6744fe9b33a6a0d549beb84b172ba887358babf4f3bfb5257af6db",
+    "research/company_profile/reads.py": "21c8c9bc2864b14d2df1e837307b55a673872f60a5950cdc31e54d8cda152ded",
+    "research/company_profile/operations.py": "987ecefaab6546ea153b7723dd9ad93df6a3618f59ec88fa2d1d5dbf1902b164",
+    "research/company_profile/runtime.py": "0ef9958ce9775b8c94fd77db6045319edc87431450233ddcf1ca8fb6aba70e42",
+    "research/company_profile/task_entry.py": "211a4fa34baa45f8270735a0bf4b460a83cdbe2c2337febaf99d12b364791132",
+    "research/company_profile/workpaper.py": "32e9fda6439466c1241cde1594cbc8145f856c20dd142cb39a9e6e6eb71ee011",
+    "research/company_profile/workpaper_llm.py": "1ffa851495b27e4062a89ba34c845a9d9574fae843265840e51b512681a0273c",
+    "research/company_profile/workpaper_delivery.py": "7b6f828fff5a2cba3d993d6bc9422e263fdb4b5c1ee8a33df03eb1df04ab7803",
+    "research/company_profile/workpaper_metric_format.py": "9c6e8d24da0838e60c7d67542abb515c842f3c186d59cd8c55d5872ddddc4c07",
+    "tests/unit/test_research/test_company_profile_review_execution.py": "99e7659062df19ae6706d04b2f0b7b277af083e2a464ac34ed5031b781e2ed20"
+  },
+  "driver_sha256": "07ea4a737dcc1c6b51b759ff0860bfa264a2c3cf05f36fc2e17d2317eb52f7c0",
+  "planned_sha256": "a6769c7c4d61a38651d14129e57075ecbd0619660d84eef5a9ede07dbf3de46b",
+  "candidate_sha256": {
+    "F01": "a005943f80db9a749d293b4cdcf905f2d7c931a980163414711c616344a09218",
+    "F10": "46ebd1cf1e5ccc195ff8bd320b0a84cb93c76af765edb3aa787b6ea592b4b2b8",
+    "F11": "672a61bdbcaa5dafe75a7361e792007b8771b79768c04857c7f3ea366cea4684",
+    "review-add:R4": "4f3fe460eb7c255267dca4ece605ef3d76866967b43cc8e13382feb1e7003c76",
+    "review-add:R5": "0ec05f448e7d23da3f56ed97c239abfb9dbb7ee3ca09baea0632a7e8c381dd4b",
+    "review-add:R6": "539ec7eaecf175d93a8ac82d1c0c682faea6b2087db5fdad8bc74a758469648f"
+  },
+  "ready_for_A_plan_review": true,
+  "actual_new_provider_calls": 0,
+  "new_network_provider_constructed": false,
+  "actual_real_final_count": 0
+}

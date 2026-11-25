@@ -1,0 +1,41 @@
+{
+  "protected_files_checked": 304,
+  "protected_files_changed": [],
+  "existing_dirty_files_checked": 49,
+  "dirty_changes_since_A_baseline": [
+    "docs/development/company_profile_acceptance_program.md",
+    "docs/development/company_profile_delivery_plan.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md"
+  ],
+  "note": "Management-document changes belong to A; B touched only the explicitly allowed three source files and direct test.",
+  "prior_delivery_objects_preserved": 30,
+  "new_delivery_counts": {
+    "reviewed": 29,
+    "pending": 0,
+    "limited": 2,
+    "source_only": 0,
+    "withheld": 1,
+    "duplicate": 0
+  },
+  "recovered_delivery": {
+    "review-add:R4": {
+      "state": "reviewed",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final"
+    },
+    "review-add:R5": {
+      "state": "limited",
+      "review_basis": "model_source_check",
+      "model_review_stage": "final"
+    }
+  },
+  "original_five_raw_receipts_preserved": true,
+  "fresh_export_profile_equal": true,
+  "source_frozen_unchanged": true,
+  "git_staged": false,
+  "git_committed": false,
+  "git_pushed": false
+}

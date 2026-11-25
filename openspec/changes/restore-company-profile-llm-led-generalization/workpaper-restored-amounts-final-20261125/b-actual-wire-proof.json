@@ -1,0 +1,23 @@
+{
+  "physical_receipt": "b-run/receipts/001.json",
+  "host": "scorpio.reepool.com",
+  "request_fields": [
+    "candidates",
+    "initial_findings",
+    "report",
+    "source_text"
+  ],
+  "actual_source_text_sha256": "f5da24485e8882181bb8ea8c53ab13c6e2831a4e6503864394e36154b4157d44",
+  "actual_candidate_sha256": {
+    "F01": "a005943f80db9a749d293b4cdcf905f2d7c931a980163414711c616344a09218",
+    "F10": "46ebd1cf1e5ccc195ff8bd320b0a84cb93c76af765edb3aa787b6ea592b4b2b8",
+    "F11": "672a61bdbcaa5dafe75a7361e792007b8771b79768c04857c7f3ea366cea4684",
+    "review-add:R4": "4f3fe460eb7c255267dca4ece605ef3d76866967b43cc8e13382feb1e7003c76",
+    "review-add:R5": "0ec05f448e7d23da3f56ed97c239abfb9dbb7ee3ca09baea0632a7e8c381dd4b",
+    "review-add:R6": "539ec7eaecf175d93a8ac82d1c0c682faea6b2087db5fdad8bc74a758469648f"
+  },
+  "all_six_equal_frozen": true,
+  "original_source_text_equal": true,
+  "draft_author_or_A_use_review_supplied": false,
+  "max_new_logical_requests": 1
+}

@@ -33,6 +33,7 @@ from .workpaper_metric_format import METRIC_FORMAT_FLAG, normalize_directional_m
 REVIEW_POLICY = "company_profile_workpaper_review.v12"
 METRIC_LIMIT_POLICY = "source_review_exact_metric_limits.v1"
 CURRENT_DRAFT_REVIEW_POLICY = "source_review_current_draft.v1"
+RECOVERED_REPAIR_POLICY = "source_review_recovered_repair_batch.v1"
 BATCH_STOP_POLICY = "consecutive_same_execution_failure.v1"
 
 
@@ -221,7 +222,7 @@ def current_review_binding(seed):
             "reading_scope": seed.reading_scope.model_dump(mode="json")})}
 
 
-def plan_review_follow_up(paper: CompanyProfileWorkpaper, receipts=()) -> dict:
+def plan_review_follow_up(paper: CompanyProfileWorkpaper, receipts=(), *, source_recheck_policy=None) -> dict:
     """Describe a bounded next stage, not execution authority or seed validation.
 
     Reuse refers only to hash-checked original replies. The existing seed/resume
@@ -238,12 +239,17 @@ def plan_review_follow_up(paper: CompanyProfileWorkpaper, receipts=()) -> dict:
         "requires": ["original_draft_and_source_binding", "preserve_current_use_restrictions",
                      "explicit_model_and_finite_budget", "publication_write_permission"],
     }
-    if review is not None and review.status in {"completed", "completed_with_open_findings"}:
+    recovered = source_recheck_policy == RECOVERED_REPAIR_POLICY
+    if recovered and (review is None or review.status not in {"completed", "completed_with_open_findings"}):
+        return {**result, "reason": "recovered_repair_requires_completed_review"}
+    if not recovered and review is not None and review.status in {"completed", "completed_with_open_findings"}:
         return {**result, "state": "not_needed", "reason": "review_execution_completed"}
     initial = "review_profile_workpaper"
     repair = "repair_profile_workpaper"
     final = "verify_profile_workpaper_repair"
-    if review is None:
+    if recovered:
+        purpose = final
+    elif review is None:
         purpose = initial
     elif review.execution_failure is not None:
         if review.execution_failure.kind == "contract_error":
@@ -261,7 +267,7 @@ def plan_review_follow_up(paper: CompanyProfileWorkpaper, receipts=()) -> dict:
     if review is not None:
         # A successful reply followed by a local contract failure is not an
         # invitation to blindly send that same stage again.
-        if any(call.purpose == purpose and call.contract_status == "accepted" for call in review.calls):
+        if not recovered and any(call.purpose == purpose and call.contract_status == "accepted" for call in review.calls):
             return {**result, "reason": "inconsistent_review_history"}
         for retained in required:
             calls = [call for call in review.calls if call.purpose == retained]
@@ -299,13 +305,54 @@ def plan_review_follow_up(paper: CompanyProfileWorkpaper, receipts=()) -> dict:
             })
         if purpose == final:
             result["candidate_ids"] = sorted({finding.revised_fact.fact_id for finding in review.findings
-                if finding.resolution == "verification_failed" and finding.revised_fact is not None})
+                if finding.resolution == ("repair_rejected" if recovered else "verification_failed")
+                and finding.revised_fact is not None
+                and (not recovered or not finding.finding_id.startswith("inherited:"))})
             if not result["candidate_ids"]:
                 return {**result, "reason": "no_locally_valid_candidates_for_final_check"}
+        if recovered:
+            try:
+                final_receipt = _retained_review_reply(review, receipts, final, WorkpaperRepairVerificationResponse)
+                old_final = WorkpaperRepairVerificationResponse.model_validate(final_receipt["response_payload"])
+            except ValueError:
+                return {**result, "reason": "original_final_receipt_invalid"}
+            if set(result["candidate_ids"]) & (set(old_final.checked_fact_ids) | {check.fact_id for check in old_final.checks}):
+                return {**result, "reason": "rejected_candidate_was_already_checked_by_final"}
+            if not result["candidate_ids"]:
+                return {**result, "reason": "no_unchecked_locally_rejected_candidates"}
     return {**result, "state": "planned", "next_purpose": purpose,
         "resume_mode": {initial: "review_saved_draft", repair: "repair_and_verify", final: "verify_only"}[purpose],
         "max_new_logical_requests": {initial: 3, repair: 2, final: 1}[purpose],
-        "reason": "review_not_started" if review is None else "resume_failed_review_stage"}
+        "reason": "locally_recovered_repair_requires_final" if recovered else "review_not_started" if review is None else "resume_failed_review_stage"}
+
+
+def _retained_review_reply(review, receipts, purpose, response_type):
+    """Validate one historical model call against its complete original bytes."""
+    calls = [call for call in review.calls if call.purpose == purpose]
+    if len(calls) != 1:
+        raise ValueError("historical review stage missing or duplicated")
+    call = calls[0]
+    rows = [r for r in receipts if r.get("request_id") == call.request_id and r.get("purpose") == purpose]
+    if len(rows) != 1:
+        raise ValueError("historical review receipt missing or duplicated")
+    row = rows[0]
+    raw = row.get("raw_content")
+    if (call.contract_status != "accepted" or row.get("contract_status") != "accepted"
+        or call.finish_reason != "stop" or row.get("finish_reason") != "stop"
+        or not isinstance(raw, str) or not call.response_hash
+        or hashlib.sha256(raw.encode()).hexdigest() != call.response_hash
+        or row.get("response_hash") != call.response_hash
+        or any(getattr(call, key) is not None and row.get(key) != getattr(call, key) for key in (
+            "request_hash", "source_label", "model", "selected_profile", "logical_profile", "route_fingerprint", "reasoning_effort"))):
+        raise ValueError("historical review receipt/hash/identity changed")
+    try:
+        payload = json.loads(raw)
+        if payload != row.get("response_payload"):
+            raise ValueError("historical response payload differs from raw bytes")
+        response_type.model_validate(payload)
+    except (ValueError, TypeError) as exc:
+        raise ValueError("historical review response is invalid") from exc
+    return row
 
 
 def review_execution_failure_signature(review: WorkpaperQualityReview | None) -> str | None:
@@ -338,11 +385,14 @@ def prepare_review_recovery(record, *, source_recheck_policy=None, current_draft
     paper = record.workpaper
     saved_identity = _record_processing_identity(record)
     metric_format_policy = saved_identity.get(METRIC_FORMAT_FLAG)
-    follow_up = plan_review_follow_up(paper, record.workpaper_receipts)
+    recovered = source_recheck_policy == RECOVERED_REPAIR_POLICY
+    follow_up = plan_review_follow_up(paper, record.workpaper_receipts,
+        source_recheck_policy=source_recheck_policy)
     if source_recheck_policy is not None:
-        if source_recheck_policy not in {METRIC_LIMIT_POLICY, CURRENT_DRAFT_REVIEW_POLICY}:
+        if source_recheck_policy not in {METRIC_LIMIT_POLICY, CURRENT_DRAFT_REVIEW_POLICY, RECOVERED_REPAIR_POLICY}:
             raise ValueError("unknown explicit source recheck policy")
-        follow_up = {**follow_up, "state": "planned", "resume_mode": "review_saved_draft"}
+        if not recovered:
+            follow_up = {**follow_up, "state": "planned", "resume_mode": "review_saved_draft"}
     if follow_up["state"] != "planned":
         raise ValueError("review recovery plan is blocked or not needed")
     generation = paper.generation
@@ -390,7 +440,7 @@ def prepare_review_recovery(record, *, source_recheck_policy=None, current_draft
         # This entry deliberately reviews the actual current draft, not the
         # earliest extraction. Original author receipts above remain verified.
         seed = paper.model_copy(update={"quality_review": None, "use_review": None})
-    elif source_recheck_policy is None and saved_identity.get("source_recheck_policy") == CURRENT_DRAFT_REVIEW_POLICY:
+    elif (source_recheck_policy is None or recovered) and saved_identity.get("source_recheck_policy") == CURRENT_DRAFT_REVIEW_POLICY:
         # A failed current-draft review resumes its exact saved parent input,
         # not an inverse semantic merge of the partially projected successor.
         link = ReviewRecoveryLink.model_validate(saved_identity["workpaper_review_recovery"])
@@ -431,6 +481,46 @@ def prepare_review_recovery(record, *, source_recheck_policy=None, current_draft
         for item in retained:
             key = "review_response" if item["purpose"] == "review_profile_workpaper" else "repair_response"
             resume[key] = item["response_payload"]
+    if recovered:
+        if saved_identity.get("source_recheck_policy") != CURRENT_DRAFT_REVIEW_POLICY:
+            raise ValueError("recovered repair requires its exact current-draft review parent")
+        old_final_receipt = _retained_review_reply(paper.quality_review, record.workpaper_receipts,
+            "verify_profile_workpaper_repair", WorkpaperRepairVerificationResponse)
+        generation_receipts.append(dict(old_final_receipt, receipt_origin="retained_receipt"))
+        # Recheck the entire original repair batch under today's literal rules.
+        # Neither a caller-written subset nor the old final can supply answers.
+        candidates = {}
+        sources = {item.evidence_id: item for item in seed.evidence}
+        raw_facts = resume["repair_response"]["repaired_facts"]
+        for raw_fact in raw_facts:
+            consumed, _ = normalize_directional_metric_format(raw_fact, policy=metric_format_policy)
+            fact = WorkpaperFact.model_validate(consumed)
+            notes = _check_fact_source(fact, sources, check_units=True)
+            if notes:
+                fact = qualify_workpaper_display(fact, notes)
+            if fact.fact_id in candidates:
+                raise ValueError("recovered repair batch has duplicate targets")
+            candidates[fact.fact_id] = fact
+        restored = set(follow_up["candidate_ids"]) & candidates.keys()
+        if not restored:
+            raise ValueError("no source-ready rejected repair candidates")
+        prior_facts = _fact_map(paper)
+        targets = {f.affected_fact_id or f"review-add:{f.finding_id}" for f in paper.quality_review.findings
+                   if not f.finding_id.startswith("inherited:") and f.revised_fact is not None}
+        if candidates.keys() != targets:
+            raise ValueError("recovered repair must retain the complete original batch")
+        for finding in paper.quality_review.findings:
+            if (finding.revised_fact is not None and finding.revised_fact.fact_id in restored
+                and workpaper_fact_hash(candidates[finding.revised_fact.fact_id]) != workpaper_fact_hash(finding.revised_fact)):
+                raise ValueError("recovered candidate differs from its saved rejected repair")
+            if finding.resolution != "corrected_pending_trust":
+                continue
+            fact = candidates.get(finding.revised_fact.fact_id)
+            current = prior_facts.get(finding.revised_fact.fact_id)
+            if (fact is None or current is None
+                or workpaper_fact_hash(fact) != workpaper_fact_hash(finding.revised_fact)
+                or workpaper_fact_hash(fact) != workpaper_fact_hash(current[1])):
+                raise ValueError("previously accepted repair content changed")
     return seed, resume, tuple(generation_receipts)
 
 
@@ -438,6 +528,21 @@ def inherit_recovery_use_review(paper, link: ReviewRecoveryLink):
     """Inherit decisions by content, never let model corrections lift a restriction."""
     from .workpaper_delivery import bind_workpaper_use_review
 
+    if link.current_draft_policy == RECOVERED_REPAIR_POLICY:
+        paper = _retain_verified_repair_batch(paper, link)
+        previous, review = link.prior_quality_review, paper.quality_review
+        if review.original_draft_hash != previous.original_draft_hash:
+            raise ValueError("recovered review checked a different original draft")
+        finals = tuple(c for c in previous.calls if c.purpose == "verify_profile_workpaper_repair"
+                       and c.contract_status == "accepted" and c.finish_reason == "stop")
+        if len(finals) != 1:
+            raise ValueError("recovered review requires its original valid final attribution")
+        retained_ids = tuple(dict.fromkeys((*review.retained_request_ids, finals[0].request_id)))
+        calls = (*review.calls, *(c for c in finals if c.request_id not in {x.request_id for x in review.calls}))
+        paper = paper.model_copy(update={"quality_review": review.model_copy(update={
+            "calls": calls, "retained_request_ids": retained_ids,
+            **({"checked_fact_hashes": dict(previous.checked_fact_hashes)}
+               if previous.checked_fact_hashes is not None else {})})})
     paper = _inherit_current_review_guards(paper, link)
     previous = link.prior_use_review
     if previous is None:
@@ -472,6 +577,45 @@ def inherit_recovery_use_review(paper, link: ReviewRecoveryLink):
     })
 
 
+def _retain_verified_repair_batch(paper, link):
+    """An unsuccessful new final cannot roll back the already verified draft.
+
+    Keep the actual new final and failure in its receipts/review. Retained facts
+    explicitly refer to the prior review; no composite model response is made.
+    """
+    previous, review = link.prior_quality_review, paper.quality_review
+    if previous is None or review is None:
+        raise ValueError("recovered repair requires the prior and current review")
+    prior = {f.revised_fact.fact_id: f for f in previous.findings
+             if f.resolution == "corrected_pending_trust" and f.revised_fact is not None}
+    current = {f.revised_fact.fact_id: f for f in review.findings if f.revised_fact is not None}
+    failed = review.status not in {"completed", "completed_with_open_findings"} or any(
+        fid not in current or current[fid].resolution != "corrected_pending_trust"
+        or workpaper_fact_hash(current[fid].revised_fact) != workpaper_fact_hash(old.revised_fact)
+        for fid, old in prior.items())
+    if not failed:
+        return paper
+    findings = []
+    for finding in review.findings:
+        fid = finding.revised_fact.fact_id if finding.revised_fact is not None else None
+        if fid in prior:
+            finding = prior[fid].model_copy(update={"explanation":
+                f"保留前稿{link.base_work_id}已终核修订（非本次新采纳）；" + prior[fid].explanation})
+        elif finding.resolution == "corrected_pending_trust":
+            finding = finding.model_copy(update={"resolution": "verification_failed"})
+        findings.append(finding)
+    payload = paper.model_dump(mode="json")
+    new_ids = {f.revised_fact.fact_id for f in review.findings if f.revised_fact is not None} - prior.keys()
+    for name, element in workpaper_element_payloads(payload).items():
+        element["facts"] = [f for f in element["facts"] if f["fact_id"] not in prior and f["fact_id"] not in new_ids]
+        element["facts"].extend(f.revised_fact.model_dump(mode="json") for f in prior.values() if f.element == name)
+        if element["facts"]:
+            element["status"] = "observed"
+    payload["quality_review"] = review.model_copy(update={"findings": tuple(findings), "status": "incomplete",
+        "error": review.error or "new final did not preserve the previously verified batch; retain prior draft"}).model_dump(mode="json")
+    return CompanyProfileWorkpaper.model_validate(payload)
+
+
 def _inherit_current_review_guards(paper, link):
     """Retain old model restrictions/gaps, not approvals or semantic repairs.
 
@@ -480,12 +624,14 @@ def _inherit_current_review_guards(paper, link):
     of guessing a mapping. Old source rechecks keep their previous behavior.
     """
     previous, review = link.prior_quality_review, paper.quality_review
-    if link.current_draft_policy != CURRENT_DRAFT_REVIEW_POLICY or previous is None or review is None:
+    if link.current_draft_policy not in {CURRENT_DRAFT_REVIEW_POLICY, RECOVERED_REPAIR_POLICY} or previous is None or review is None:
         return paper
     facts = _fact_map(paper)
     inherited = []
     existing_ids = {f.finding_id for f in review.findings}
     for finding in previous.findings:
+        if link.current_draft_policy == RECOVERED_REPAIR_POLICY and finding.finding_id in existing_ids:
+            continue  # The original initial reply was consumed again, unchanged.
         if finding.resolution == "corrected_pending_trust":
             continue  # The corrected current content is already in the seed.
         current = facts.get(finding.affected_fact_id)
@@ -500,7 +646,8 @@ def _inherit_current_review_guards(paper, link):
                     "metric_limit": None, "resolution": "quarantined"})
         else:
             item = finding
-        fid = "inherited:" + finding.finding_id
+        fid = (finding.finding_id if link.current_draft_policy == RECOVERED_REPAIR_POLICY
+               and finding.finding_id.startswith("inherited:") else "inherited:" + finding.finding_id)
         explanation = f"继承前稿{link.base_work_id}的模型意见{finding.finding_id}（非本次模型新判断）；" + finding.explanation
         if any(f.finding_id == fid and f.explanation == explanation for f in review.findings):
             continue

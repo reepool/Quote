@@ -400,7 +400,7 @@ class CompanyProfileReadService:
                              reading_work_id: str | None = None, source_recheck_policy: str | None = None) -> dict[str, Any]:
         """Bind a review-only follow-up plan; never enqueue or expose raw replies."""
         from .workpaper_review import (plan_review_follow_up, workpaper_hash,
-            CURRENT_DRAFT_REVIEW_POLICY, current_review_binding)
+            CURRENT_DRAFT_REVIEW_POLICY, RECOVERED_REPAIR_POLICY, current_review_binding)
 
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", request_id):
             raise ValueError("invalid review recovery request_id")
@@ -420,9 +420,14 @@ class CompanyProfileReadService:
         if source_recheck_policy is not None:
             seed, resume, receipts = self._prepare_review_recovery(record, source_recheck_policy=source_recheck_policy,
                 records=records)
-            if resume is not None:
+            if source_recheck_policy == RECOVERED_REPAIR_POLICY:
+                follow_up = plan_review_follow_up(record.workpaper, record.workpaper_receipts,
+                    source_recheck_policy=source_recheck_policy)
+                follow_up["batch_candidate_ids"] = sorted(f["fact_id"] for f in resume["repair_response"]["repaired_facts"])
+            elif resume is not None:
                 raise ValueError("explicit source recheck cannot reuse prior review opinions")
-            follow_up = plan_review_follow_up(seed, receipts)
+            else:
+                follow_up = plan_review_follow_up(seed, receipts)
         return {"schema_version": "company_profile_review_recovery_plan.v1", "request_id": request_id,
             "state": follow_up["state"], "execution_started": False,
             "instrument_id": instrument_id, "report": current["report"], "reading_work_id": chosen,
@@ -430,14 +435,14 @@ class CompanyProfileReadService:
             "research_only": True, "production_authorization": PRODUCTION_AUTHORIZATION,
             **({"source_recheck_policy": source_recheck_policy} if source_recheck_policy is not None else {}),
             **({"current_review_binding": current_review_binding(seed)}
-               if source_recheck_policy == CURRENT_DRAFT_REVIEW_POLICY else {})}
+               if source_recheck_policy in {CURRENT_DRAFT_REVIEW_POLICY, RECOVERED_REPAIR_POLICY} else {})}
 
     def _prepare_review_recovery(self, record, *, source_recheck_policy=None, records=None):
-        from .workpaper_review import CURRENT_DRAFT_REVIEW_POLICY, ReviewRecoveryLink, prepare_review_recovery
+        from .workpaper_review import CURRENT_DRAFT_REVIEW_POLICY, RECOVERED_REPAIR_POLICY, ReviewRecoveryLink, prepare_review_recovery
 
         saved = _record_processing_identity(record)
         parent = None
-        if source_recheck_policy is None and saved.get("source_recheck_policy") == CURRENT_DRAFT_REVIEW_POLICY:
+        if source_recheck_policy in {None, RECOVERED_REPAIR_POLICY} and saved.get("source_recheck_policy") == CURRENT_DRAFT_REVIEW_POLICY:
             link = ReviewRecoveryLink.model_validate(saved.get("workpaper_review_recovery"))
             parent = self._latest_by_instrument(work_id=link.current_seed_work_id or link.base_work_id, include_enrichments=True,
                 records=records).get(

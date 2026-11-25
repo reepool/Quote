@@ -1,0 +1,13 @@
+{
+  "task": "6.FJ",
+  "inherited_dirty_files_preserved": 49,
+  "protected_files_unchanged": 304,
+  "staged_code_matches_test_and_real_freeze": true,
+  "review": {
+    "blocking": "fixed and relevant verification passed",
+    "non_blocking": "optional completeness deferred",
+    "unrelated": "untouched"
+  },
+  "openspec_strict": "passed",
+  "git_diff_check": "passed"
+}
