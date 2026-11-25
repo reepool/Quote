@@ -10,7 +10,7 @@ from research.company_profile.workpaper_delivery import project_workpaper_delive
 from research.company_profile.workpaper import WorkpaperMetric, WorkpaperDraftResponse
 from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileStageRuntime, CompanyProfileRuntimeRecordV3
 from research.company_profile.reads import CompanyProfileReadService, _record_processing_identity
-from research.company_profile.workpaper_metric_format import METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICY
+from research.company_profile.workpaper_metric_format import METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICY, RAW_NULL_METRIC_FORMAT_POLICY
 from research.company_profile.workpaper_llm import METRIC_FORMAT_INSTRUCTIONS
 from research.company_profile.workpaper_review import review_workpaper, prepare_review_recovery, workpaper_hash
 from tests.unit.test_research.test_company_profile_review_failures import gateway
@@ -126,7 +126,7 @@ def test_new_format_failed_review_saved_plan_reconstructs_exact_seed_and_own_can
         for stage in ('acquire','parse','semantic','verify','publish'):
             assert runtime.run_stage(stage,item)['status']=='success'
         record=CompanyProfileRuntimeRecordV3.model_validate_json(writer.latest_path().read_text())
-        assert _record_processing_identity(record)[METRIC_FORMAT_FLAG]==METRIC_FORMAT_POLICY
+        assert _record_processing_identity(record)[METRIC_FORMAT_FLAG]==RAW_NULL_METRIC_FORMAT_POLICY
         before=writer.latest_path().read_bytes()
         plan=CompanyProfileReadService(tmp_path/'output').plan_review_recovery('600000.SH',request_id='planned-resume')
         assert plan['state']=='planned'

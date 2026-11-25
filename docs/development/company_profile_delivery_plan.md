@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-26当前[6.FN整体验收结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/result.md)已交，正式V1不通过、不进S3：首17/20、终18/20、核心90%，自动已明确判定383/391=97.954%另7未评、实际补充331不足400。18股研究稿400条/533指标可读，8对象A局部保护不改自动成绩；原21股继续保护。两模型前同文档别名误拒和raw/null格式连带丢失按同卡合并零调用修复，已保存响应只作源绑定候选，不冒领终核或重算首发。后续以这批真实画像/API研究消费和用户具体问题补读为主，不再派逐公司凑100%卡或滚动付费确认组，不自动扩100家/全市场/生产。本人临时库、重复导出和脚本核必要证据后清，首次失败/源/wire/原件和49既有脏改保护。
+
 2026-11-25 [6.FM真实研究与准确率审计完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/result.md)：海尔原HTTP首读/源核、王府井enrich均正常，10物理/321442供应商total与账本/0恢复/1141.497业务秒/unknown。A原文独核后统一21股682/1115，19其余完整profile保持，王府井净增8/17且新4尾项仅源参考。512/523原v12分数无跨轮累计，不能当当前准确率；当前整体未充分评估，原已知错指标15位置不外放。A/B同窗交原owner实物、完整21匹配/只读HTTP、Review/strict及49既有隔离；必要证据归一并清本人垃圾，不再重跑20或补齐尾项，不自动扩量/生产。
 
 2026-11-25 [6.FL显式研究任务HTTP交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-task-delivery-20261125/result.md)：已沿原task_entry/TaskService提供提交ID、后台进度/结果、首读/显式源核/按股补读。服务端一次有限策略及凭据、重复不重发、失败保稿和关停join；普通查询/计划不改变数据集或调用模型。6新直接用例及A实际依赖HTTP闭环通过，当前20股650/1059与365保护文件保持。0新真实模型/付费、不装实际策略或启生产；旧质量/规模边界不改。A规划独审/B实施，前后清本人开发物、必要证据一套并隔离普通Git；用法见docs/research/company_profile_http_tasks.md。

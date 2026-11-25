@@ -1,0 +1,85 @@
+{
+  "schema_version": "company_profile_6fn_ready_references.v1",
+  "references": {
+    "300124.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-main.json",
+      "sha256": "28148baa4d54d5529468c9af8f9672c3c516fe1c350f11a1e736e5f03541714f"
+    },
+    "601872.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-main.json",
+      "sha256": "28148baa4d54d5529468c9af8f9672c3c516fe1c350f11a1e736e5f03541714f"
+    },
+    "601328.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-main.json",
+      "sha256": "28148baa4d54d5529468c9af8f9672c3c516fe1c350f11a1e736e5f03541714f"
+    },
+    "000039.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-main.json",
+      "sha256": "28148baa4d54d5529468c9af8f9672c3c516fe1c350f11a1e736e5f03541714f"
+    },
+    "920006.BJ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-1.json",
+      "sha256": "6666c11c0134963f7e2000d55d6774190ff3252ab33fac570fef85b3a82102c2"
+    },
+    "920007.BJ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-1.json",
+      "sha256": "6666c11c0134963f7e2000d55d6774190ff3252ab33fac570fef85b3a82102c2"
+    },
+    "600887.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-1.json",
+      "sha256": "6666c11c0134963f7e2000d55d6774190ff3252ab33fac570fef85b3a82102c2"
+    },
+    "600893.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-1.json",
+      "sha256": "6666c11c0134963f7e2000d55d6774190ff3252ab33fac570fef85b3a82102c2"
+    },
+    "600754.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-1.json",
+      "sha256": "6666c11c0134963f7e2000d55d6774190ff3252ab33fac570fef85b3a82102c2"
+    },
+    "600350.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-1.json",
+      "sha256": "6666c11c0134963f7e2000d55d6774190ff3252ab33fac570fef85b3a82102c2"
+    },
+    "601788.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-2.json",
+      "sha256": "4d78c2d69281e30fb68b067a2fa1d05c753599de87f5134707c24cf49cf883bf"
+    },
+    "601628.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-2.json",
+      "sha256": "4d78c2d69281e30fb68b067a2fa1d05c753599de87f5134707c24cf49cf883bf"
+    },
+    "600390.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-2.json",
+      "sha256": "4d78c2d69281e30fb68b067a2fa1d05c753599de87f5134707c24cf49cf883bf"
+    },
+    "002736.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-2.json",
+      "sha256": "4d78c2d69281e30fb68b067a2fa1d05c753599de87f5134707c24cf49cf883bf"
+    },
+    "300012.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-2.json",
+      "sha256": "4d78c2d69281e30fb68b067a2fa1d05c753599de87f5134707c24cf49cf883bf"
+    },
+    "600704.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-3.json",
+      "sha256": "694be55cc5f6d23126bac96424f759ec2cf49c078c98d12eb7a0773b45321bd5"
+    },
+    "600153.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-3.json",
+      "sha256": "694be55cc5f6d23126bac96424f759ec2cf49c078c98d12eb7a0773b45321bd5"
+    },
+    "000652.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-3.json",
+      "sha256": "694be55cc5f6d23126bac96424f759ec2cf49c078c98d12eb7a0773b45321bd5"
+    },
+    "600177.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-3.json",
+      "sha256": "694be55cc5f6d23126bac96424f759ec2cf49c078c98d12eb7a0773b45321bd5"
+    },
+    "920003.BJ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-source-reference-group-3.json",
+      "sha256": "694be55cc5f6d23126bac96424f759ec2cf49c078c98d12eb7a0773b45321bd5"
+    }
+  }
+}

@@ -12,7 +12,7 @@ from research.company_profile.workpaper import (
     normalize_workpaper_draft, render_workpaper,
 )
 from research.company_profile.workpaper_metric_format import (
-    METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICY, normalize_directional_metric_format,
+    METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICY, RAW_NULL_METRIC_FORMAT_POLICY, normalize_directional_metric_format,
 )
 from research.company_profile.workpaper_llm import run_workpaper, workpaper_processing_identity
 from research.company_profile.workpaper_sections import build_section_packet, index_sections
@@ -110,7 +110,7 @@ def test_new_draft_policy_is_opt_in_and_the_wire_contract_already_supports_null(
     assert result.elements.scale_and_mix.facts[0].metrics[0].value is None
     assert "本地格式不能安全标准化" in "".join(result.elements.scale_and_mix.limitations)
     assert raw == before
-    assert workpaper_processing_identity(real=False)[METRIC_FORMAT_FLAG] == METRIC_FORMAT_POLICY
+    assert workpaper_processing_identity(real=False)[METRIC_FORMAT_FLAG] == RAW_NULL_METRIC_FORMAT_POLICY
     assert {"type": "null"} in workpaper_draft_wire_schema()["$defs"]["WorkpaperMetric"]["properties"]["value"]["anyOf"]
     with pytest.raises(ValueError, match="unknown"):
         normalize_workpaper_draft(raw, metric_format_policy="future")

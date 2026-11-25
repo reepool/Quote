@@ -263,7 +263,12 @@ def test_gateway_withholds_only_fact_with_invalid_metric_and_preserves_raw_respo
     provider = CommonGatewaySemanticProvider(client=client, profile='test', max_output_tokens=2500, timeout_seconds=10)
     provider.offline_only = True
     try:
-        result = run_workpaper(report=_report(), pages=PAGES, processing_identity=workpaper_processing_identity(real=False),
+        identity = workpaper_processing_identity(real=False)
+        if failure == 'null_reason':
+            from research.company_profile.workpaper_metric_format import METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICY
+
+            identity[METRIC_FORMAT_FLAG] = METRIC_FORMAT_POLICY  # Frozen v1 rejection contract.
+        result = run_workpaper(report=_report(), pages=PAGES, processing_identity=identity,
             provider=provider, work_id='metric-isolation')
         assert result.workpaper.elements.business_structure.facts[0].fact_id == 'main'
         assert result.workpaper.elements.scale_and_mix.facts == ()

@@ -2,6 +2,14 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Current-version acceptance separates automatic quality from independent protections
+A newly authorized version-specific acceptance cohort MUST freeze distinct previously unprocessed reports, code/model/prompt/preprocessing identities, independent source-first core references, sampling, cumulative company/group resources and stop rules before semantic execution. First-read and post-review execution MUST share the original company allowance through the authoritative application owner. Initial extraction, automatic review output and later independently restricted delivery MUST retain separate immutable results. Manual source restrictions MUST NOT retroactively improve automatic scores or hide required intervention. Historically failed cohorts remain unchanged and MUST NOT be silently continued as extra samples.
+
+#### Scenario: One fixed cohort reaches a V1 readiness decision
+- **WHEN** the authorized twenty-report current-version cohort finishes or irreversibly fails its frozen criteria
+- **THEN** the report distinguishes basic usable companies, source-derived core recall, independently audited unique object accuracy, actual consumer metric quality, missing/unevaluated coverage, manual interventions and total resources
+- **AND** the original18/20,19/20,95%/99% and400 unique supplemental audit requirements remain explicit; same-version success cannot be assembled from patched best results, and no extra company, confirmation cohort or production rollout is implied by a completed task
+
 ### Requirement: Accuracy claims bind the evaluated version and delivered content
 Every accuracy figure MUST identify its frozen cohort, processing/model policy, audited unit, numerator, denominator and independently checked content identity. Historical first-run scores MUST remain immutable but MUST NOT be presented as measured accuracy of a later current release. Current-release assessment MUST count each distinct audited fact or metric unit once under its stated protocol; superseded or repeated historical attempts MUST NOT silently dilute a new score. Changed content requires matching new evidence, while unchanged decisions may carry only across exact compatible content/source bindings. Unaudited observations MUST remain unevaluated rather than correct or erroneous. Excluded/withheld facts and missing coverage MUST be reported separately, so selective removal cannot establish whole-profile accuracy or generalization.
 
@@ -242,7 +250,7 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 
 #### Scenario: A returned fact has an invalid metric representation
 - **WHEN** a schema-valid draft contains a fact that fails local validation only within its metrics, such as an inconsistent raw qualifier or a null normalized value without the required reason
-- **THEN** the extraction adapter MUST withhold that complete fact and retain independent valid facts, its original raw response, affected fact ID and concrete validation reason
+- **THEN** the extraction adapter MUST withhold that complete fact and retain independent valid facts, its original raw response, affected fact ID and concrete validation reason, except for the explicitly opted-in conservative raw-null representation below
 - **AND** the adapter MUST NOT guess a missing qualifier, value, unit or source explanation; a literal approximate/bounded raw value with null MAY carry an explicit program-only non-normalization note rather than an invented source reason, while contradictory qualifiers, non-metric/source identity errors and unsourced original wording remain invalid, and program isolation notes survive later review scope changes
 
 ### Requirement: Metric standardization preserves source meaning and audit history
@@ -284,6 +292,16 @@ New workpaper binding and repaired projections MUST clear currency on dimensionl
 - **WHEN** an original metric explicitly retains 近/约/超/突破 and null but omits its explanation
 - **THEN** the local representation MAY add a program-only note that the original qualification was retained and no exact value was normalized, with the raw response and source wording still verified and unchanged
 - **AND** it MUST NOT fabricate a numeric value or source explanation, override a contradictory qualifier, or treat local decoding as a confirmed final review
+
+#### Scenario: A source-retaining metric has no normalized value or explanation
+- **WHEN** a new processing identity explicitly enables conservative raw-null consumption and a returned metric retains its original nonempty raw spelling but has no normalized value or model-authored uncertainty explanation
+- **THEN** the existing local format adapter MAY attach an explicit program-only note that the model did not supply a normalized value, preserving null, original content, units, scope and evidence through the ordinary typed and source checks
+- **AND** this note MUST NOT claim why the source is uncertain, infer any value or semantic ownership, repair conflicting qualifiers or invalid field types, or exempt the metric from actual model source review; old format identities and frozen first results remain unchanged
+
+#### Scenario: A proposed negative value repeats accounting parentheses
+- **WHEN** the same opted-in local format adapter sees one complete accounting-parenthesized numeric raw spelling beside an agreeing explicitly proposed negative decimal value
+- **THEN** it MAY preserve the original raw spelling with a null normalized value and a program-only local-format limitation instead of losing the correct enclosing narrative
+- **AND** a positive or changed proposed value, malformed parentheses, invalid unit/currency/scope or unsourced spelling remains invalid; no sign, amount, source explanation or successful final review may be invented
 
 #### Scenario: A literal percentage-point suffix repeats the declared unit
 - **WHEN** a returned raw value ends in 个百分点 while its declared unit is 百分点 and its same-unit decimal reference agrees

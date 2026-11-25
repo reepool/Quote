@@ -1,0 +1,25 @@
+{
+  "task": "6.FN",
+  "source_root": "/home/python/Quote/data/research/company_profile_v1_acceptance_20261125",
+  "delivery_root": "/home/python/Quote/data/research/company_profile_v1_acceptance_delivery_20261125",
+  "original_raw_and_automatic_snapshots_unchanged": true,
+  "supplier_calls": 0,
+  "source_records": 36,
+  "persisted_records": 36,
+  "profiles": 18,
+  "readable_objects": 400,
+  "visible_metrics": 533,
+  "A_intervention_companies": 6,
+  "A_intervention_objects": 8,
+  "A_intervention_metrics": 2,
+  "api_sha256": "f11ed465b6d00e4963c12578045d6fba1b10780d04ea33716e9eeb105d559599",
+  "export_verification": {
+    "state": "completed",
+    "all_current_profiles_equal": true,
+    "temporary_verification_root": "/home/python/Quote/data/QuoteBak/company-profile-6fn-a-r4B6Ktkx/safe-export-verification"
+  },
+  "readable_profile_file": "/home/python/Quote/data/research/company_profile_v1_acceptance_delivery_20261125/profiles.md",
+  "new_instance_readback_equal": true,
+  "formal_acceptance": "not_passed",
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,241 @@
+{
+  "schema_version": "6fn.independent_source_reference.group3.v1",
+  "card": "company-profile-current-version-acceptance-card.md",
+  "method": "reference-and-audit-method.md",
+  "role": "A-side independent source reviewer 3, not B implementation or self-check",
+  "stage": "source-first reference frozen before this reviewer sees any new model output",
+  "prepared_at_utc": "2026-11-25T15:37:27Z",
+  "frozen": true,
+  "instruments": ["600704.SH", "600153.SH", "000652.SZ", "600177.SH", "920003.BJ"],
+  "this_reviewer_model_requests": 0,
+  "this_reviewer_network_requests": 0,
+  "new_model_outputs_seen": false,
+  "reference_sent_to_model": false,
+  "global_pre_send_check_owner": "Main A must verify the reference hash and zero prior semantic calls for each assigned company before dispatch; this reviewer does not infer a global request count from its own zero calls.",
+  "scope": {
+    "source": "The five original formal 2025 annual-report PDF files, independently opened with pypdf and independently SHA256-checked against the frozen manifest.",
+    "reading": "Each report's own native outline or printed contents first; then concentrated business, operating discussion and revenue-composition subsections. Physical pages are 1-based report-local coordinates, not a fixed-page chapter strategy.",
+    "table_method": "pypdf extract_text(extraction_mode='layout'); retain column order, unit, period, row identity and adjacent continuation headers. Empty lines were omitted for reading. On anomalously wide lines only runs of spaces were compacted into visible separators; no numbers, words, row order or signs were edited. Dense ambiguous cells remain a later source-verification issue, not a guessed value.",
+    "human_scope": "Only the displayed contents, headings and substantive pages recorded below were semantically read. Programmatically inspecting the first eight PDF pages to locate a contents page is not claimed as reading those eight pages in full.",
+    "not_claimed": ["whole-report completeness", "model output accuracy", "all details mandatory", "all source content personally reviewed by Main A"],
+    "completion_policy": "Three fundamental questions need substantive source-supported answers. Key figures below are disclosed audit priorities, not additional compulsory fields. Supply chain, minor categories, company features and fine-grained numbers may be missing without rejecting a basic profile.",
+    "uncertainty_policy": "Faithful original wording, approximations, qualifiers, original units and null standardized values are allowed. Wrong entity, table column, reporting period or economically misleading unit is not excused as uncertainty.",
+    "freeze_policy": "Do not edit this reference after freeze. All later checks of first-read and automatic reviewed snapshots go to a-audit-group-3.json. No UseReview or safety restriction is written by this reference."
+  },
+  "companies": [
+    {
+      "instrument_id": "600704.SH",
+      "name": "物产中大",
+      "document_sha256": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/be/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd.pdf",
+      "page_count": 315,
+      "report_period": "2025-12-31",
+      "directory_read": {
+        "method": "Own PDF native outline and printed contents",
+        "physical_pages": [4],
+        "finding": "第三节管理层讨论与分析 starts at physical 10; 一、报告期内公司从事的业务情况 at 10; 三、经营情况讨论与分析 at 16; 五、报告期内主要经营情况 and income analysis at 21."
+      },
+      "actually_read_sections": [
+        {"source_id": "W-BUS", "chapter": "第三节 管理层讨论与分析", "section": "一、报告期内公司从事的业务情况：经营模式，智慧供应链集成服务、金融服务、高端制造", "physical_pages": [10,11,12,13,14], "printed_pages": "10–14 /315"},
+        {"source_id": "W-OPS", "chapter": "第三节 管理层讨论与分析", "section": "二、所处行业情况末段及三、经营情况讨论与分析开头", "physical_pages": [15,16], "printed_pages": "15–16 /315", "limitation": "Read only the returned pages, not the remaining operating discussion. Industry forecasts on these pages are not company operating results."},
+        {"source_id": "W-REV", "chapter": "第三节 管理层讨论与分析", "section": "五、报告期内主要经营情况；（一）主营业务分析1及2收入和成本分析、分行业/地区/销售模式和成本续表", "physical_pages": [21,22,23], "printed_pages": "21–23 /315"}
+      ],
+      "core_questions": [
+        {"question": "主营业务", "substantive_expectation": "以智慧供应链集成服务为主体，金融服务、高端制造为两翼；不能只把集团写成钢材贸易商，也不能用产业布局口号替代实质业务。", "source_ids": ["W-BUS","W-OPS"], "physical_pages": [10,13,14,16]},
+        {"question": "主要产品/服务", "substantive_expectation": "供应链服务围绕金属、能源、化工、汽车等，包含资源组织、采购配送、物流、价格及金融服务；制造涉及电线电缆、热电联产、轮胎、镁铝新材料；金融业务可用有源代表性服务概括，无须列全牌照。", "source_ids": ["W-BUS"], "physical_pages": [10,11,12,13,14]},
+        {"question": "赚钱方式/收入来源", "substantive_expectation": "通过大宗商品供应链集成经营及相关服务产生主要收入，另有金融和制造收入；说明供应链经营占主要收入，不能将其低毛利率误作收入占比，也不能把全部收入称为纯咨询手续费。", "source_ids": ["W-BUS","W-OPS","W-REV"], "physical_pages": [12,16,21,22]}
+      ],
+      "priority_disclosed_numbers": [
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "营业收入", "value": "596,462,522,203.07", "unit": "元人民币", "physical_pages": [21], "qualifier": "同页概述四舍五入为5964.63亿元，同比下降0.51%。"},
+        {"subject": "智慧供应链集成服务板块", "period": "2025年度", "metric": "营业收入及集团收入占比", "value": "5522.34；92.58", "unit": "亿元人民币；%", "physical_pages": [16,22]},
+        {"subject": "智慧供应链集成服务板块", "period": "2025年度", "metric": "利润总额及利润贡献占比", "value": "35.97；51.33", "unit": "亿元人民币；%", "physical_pages": [16], "qualifier": "51.33%是利润贡献，不是收入占比。"},
+        {"subject": "金融服务、高端制造", "period": "2025年度", "metric": "分行业营业收入", "values": [{"label":"金融服务","value":"106.74"},{"label":"高端制造","value":"335.54"}], "unit": "亿元人民币", "physical_pages": [21,22]},
+        {"subject": "供应链分项", "period": "2025年度", "metric": "营业收入", "values": [{"label":"金属材料","value":"3306.04"},{"label":"化工","value":"887.24"},{"label":"整车及后服务","value":"461.14"},{"label":"煤炭","value":"341.82"}], "unit": "亿元人民币", "physical_pages": [22]},
+        {"subject": "高端制造分项", "period": "2025年度", "metric": "营业收入", "values": [{"label":"线缆制造","value":"115.70"},{"label":"热电联产","value":"29.41"},{"label":"轮胎制造","value":"44.89"},{"label":"镁铝新材料","value":"27.87"}], "unit": "亿元人民币", "physical_pages": [22]},
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "归母净利润", "value": "36.23", "unit": "亿元人民币", "physical_pages": [21]},
+        {"subject": "主要大宗商品", "period": "2025年度", "metric": "经营货量", "value": "2.33", "unit": "亿吨", "physical_pages": [16]}
+      ],
+      "scope_and_table_traps": [
+        "21页利润及现金流表以元计，21页末/22页收入构成以亿元计。22页1.35、12.61、14.60是各业务毛利率。",
+        "22页供应链合计与其中金属/化工/整车/煤炭为包含关系；制造合计与其中制造类别同理，不能重复相加。",
+        "信泰保险33%是战略参股股权，不意味着将保险公司整体收入直接认作物产中大合并收入。",
+        "汽车近50品牌、近200网点、超200万累计用户位于汽车业务语境，不能当制造集团产品产量或全期新增用户；近/超允许保留。",
+        "布局养老床位规划数不等于已投入运营床位；物产物流数字和污水项目能力均有明确子业务范围。",
+        "金融资产公允价值表属于第二节结尾，不能误当第三节主营内容；行业轮胎产量/宏观GDP不属于公司。"
+      ],
+      "optional_features_and_supply_chain": "可从已读页说明金属/能源/化工上下游集成、汽车经销向综合服务转型、金融赋能及制造延伸；具名关系和物流细数不必全收。",
+      "concentration_decision": "业务10–14、主要经营及构成21–23足以组成主干；16补充主业权重。未为补满次要信息读财务附注或全文。"
+    },
+    {
+      "instrument_id": "600153.SH",
+      "name": "建发股份",
+      "document_sha256": "470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2",
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/47/470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2.pdf",
+      "page_count": 518,
+      "report_period": "2025-12-31",
+      "directory_read": {"method": "Own PDF native outline and printed contents", "physical_pages": [4], "finding": "Native outline locates company introduction at physical7, third chapter at17, operating discussion at28, main operating analysis44 and revenue45. Printed contents says second chapter starts5; use actual headings/native destinations, do not treat printed contents as exact physical locator."},
+      "actually_read_sections": [
+        {"source_id": "J-BUS", "chapter": "第三节 管理层讨论与分析", "section": "一、报告期内公司从事的业务情况：供应链运营、房地产、家居商场运营", "physical_pages": [17,18,19,20,21,22,23], "printed_pages": "17–23 /518"},
+        {"source_id": "J-IND", "chapter": "第三节 管理层讨论与分析", "section": "二、行业情况开头及28页末的行业尾段", "physical_pages": [24,25,28], "limitation": "Only these returned industry pages were read; industry-wide figures are not company operating data."},
+        {"source_id": "J-OPS", "chapter": "第三节 管理层讨论与分析", "section": "三、经营情况讨论与分析：（一）2025年主要经营成果及归母净利润分部构成", "physical_pages": [28,29], "printed_pages": "28–29 /518"},
+        {"source_id": "J-REV", "chapter": "第三节 管理层讨论与分析", "section": "五、报告期内主要经营情况；（一）主营业务分析1及2收入和成本分析（跨页）", "physical_pages": [44,45,46], "printed_pages": "44–46 /518"}
+      ],
+      "core_questions": [
+        {"question": "主营业务", "substantive_expectation": "集团以供应链运营、房地产为主营，并纳入美凯龙家居商场运营；描述需要反映多板块，而非仅供应链贸易或仅地产。", "source_ids": ["J-BUS","J-OPS"], "physical_pages": [17,22,23,28]},
+        {"question": "主要产品/服务", "substantive_expectation": "供应链LIFT服务结合物流、信息、金融、商务，服务金属/浆纸/农产品等品类；地产涵盖开发及配套运营服务；美凯龙经营管理家居商场和泛家居服务。代表性细项可选择，不强求产品名单齐全。", "source_ids": ["J-BUS"], "physical_pages": [17,18,19,21,22,23]},
+        {"question": "赚钱方式/收入来源", "substantive_expectation": "供应链采购分销和定制运营服务为收入主体，房地产交房结算及配套服务、家居商场运营构成其他主要来源；可定性回答，不要求穷尽数字，但不能把地产销售额或归母利润当营业收入。", "source_ids": ["J-BUS","J-OPS","J-REV"], "physical_pages": [19,22,23,28,44,45,46]}
+      ],
+      "priority_disclosed_numbers": [
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "营业收入", "value": "671,270,432,045.30", "unit": "元人民币", "physical_pages": [44], "qualifier": "28页四舍五入6712.70亿元，同比下降4.28%。"},
+        {"subject": "三业务分部", "period": "2025年度", "metric": "营业收入及占比", "values": [{"label":"供应链运营","value":"5083.42","share_percent":"75.73"},{"label":"房地产","value":"1563.59","share_percent":"23.29"},{"label":"家居商场运营","value":"65.69","share_percent":"0.98"}], "unit": "亿元人民币；%", "physical_pages": [28,45,46], "qualifier": "收入构成45页供应链行接46页另两行，单位/列头在45页。"},
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "归母净利润", "value": "-108.15", "unit": "亿元人民币", "physical_pages": [28,29]},
+        {"subject": "三业务分部", "period": "2025年度", "metric": "归母净利润", "values": [{"label":"供应链运营","value":"32.62"},{"label":"房地产","value":"-69.42"},{"label":"家居商场运营（美凯龙）","value":"-71.35"}], "unit": "亿元人民币", "physical_pages": [29]},
+        {"subject": "公司报告口径", "period": "2025年末", "metric": "总资产/净资产/归母净资产", "values": [{"label":"总资产","value":"7331.24"},{"label":"净资产","value":"1843.67"},{"label":"归母净资产","value":"614.04"}], "unit": "亿元人民币", "physical_pages": [28]},
+        {"subject": "主营业务产品类", "period": "2025年度", "metric": "营业收入", "values": [{"label":"冶金原材料","value":"2471.69"},{"label":"农林产品","value":"1564.31"},{"label":"住宅地产","value":"1440.76"}], "unit": "亿元人民币", "physical_pages": [45,46]},
+        {"subject": "美凯龙", "period": "2025年末", "metric": "商场经营网络", "values": [{"label":"自营商场","value":"74","unit":"家"},{"label":"委管商场","value":"218","unit":"家"},{"label":"自营/委管总经营面积","value":"19,134,757","unit":"平方米"}], "physical_pages": [23], "qualifier": "另有战略合作7家及特许19项目；这些分类不可冒称全部自有商场。"}
+      ],
+      "scope_and_table_traps": [
+        "集团归母亏损108.15亿元与供应链分部盈利32.62亿元同时成立；29页联发-89.07、美凯龙-71.35不得互换，两个负数业务归属不同。",
+        "三分部收入合计口径与住宅地产等产品子类是上下层级；地产签约销售不等于交房确认收入。",
+        "45–46页为同一分行业收入表跨页；亿元和44页元不得混读，毛利率不等于收入占比。",
+        "46页分行业家居商场收入和分产品‘美凯龙自营家居商场租金及管理费’出现相同65.69但同比列不同；忠实原表注明行名，不能仅凭同额自动合并口径或借另一行同比。",
+        "美凯龙商场、建发房产/联发商业项目、建发合诚合同各有子公司主体；在集团报告出现不意味着每个数都可标集团总计。",
+        "24–28页行业政策、社会零售和全国房地产趋势不能写成建发自身业绩。"
+      ],
+      "optional_features_and_supply_chain": "19页浆纸案例集中说明上游纸浆生产商、中游造纸厂、下游印刷包装企业的采购分销与服务关系，已读范围即可描述供应链位置，不需外查。",
+      "concentration_decision": "17–23业务、28–29主结果及44–46收入构成形成集中主干；未追到地产项目清单或财务附注。"
+    },
+    {
+      "instrument_id": "000652.SZ",
+      "name": "泰达股份",
+      "document_sha256": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/f9/f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce.pdf",
+      "page_count": 265,
+      "report_period": "2025-12-31",
+      "directory_read": {"method": "Own PDF native outline and printed contents", "physical_pages": [2,4,5], "finding": "第三节实际物理12、印刷11；主要业务12、主营业务分析28、营业收入构成29及毛利表30。物理页=印刷页+1，不沿用其他公司的页码。"},
+      "actually_read_sections": [
+        {"source_id": "T-BUS", "chapter": "第三节 管理层讨论与分析", "section": "一、主要业务：生态环保、区域开发、能源贸易、股权投资；产品、用途、经营模式及经营信息", "physical_pages": [12,13,14,15,16,17,18], "printed_pages": "11–17"},
+        {"source_id": "T-REV", "chapter": "第三节 管理层讨论与分析", "section": "三核心竞争力尾段；四、主营业务分析1概述及2收入与成本（跨页销售模式及电力表）", "physical_pages": [28,29,30], "printed_pages": "27–29"}
+      ],
+      "core_questions": [
+        {"question": "主营业务", "substantive_expectation": "多板块经营生态环保、区域开发、能源贸易及股权投资，聚焦资源循环/生态环保的战略与当前贸易收入占比较高应分开。", "source_ids": ["T-BUS","T-REV"], "physical_pages": [12,16,17,18,29]},
+        {"question": "主要产品/服务", "substantive_expectation": "生态环保含垃圾/生物质发电、固废和餐厨污泥处置、过滤材料及碳服务；区域开发含土地整理/配套建设与存量地产；能源贸易实为铜铝锌等有色金属及矿产贸易，不凭板块名写成煤油业务。", "source_ids": ["T-BUS"], "physical_pages": [12,13,14,16,17,18]},
+        {"question": "赚钱方式/收入来源", "substantive_expectation": "贸易商品购销贡献主要收入，环保以特许经营处理服务费和售电/供热，区域开发以土地出让收益安排及开发销售运营，滤材销售及投资分红为其他来源；不要求每机制逐条齐全，但要实质解释主要变现业务。", "source_ids": ["T-BUS","T-REV"], "physical_pages": [14,16,17,18,29,30]}
+      ],
+      "priority_disclosed_numbers": [
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "营业收入", "value": "17,867,333,108.61", "unit": "元人民币", "physical_pages": [29], "qualifier": "28页概述1786733.31万元，同比-6.29%。"},
+        {"subject": "分行业/对应分产品", "period": "2025年度", "metric": "营业收入及集团收入占比", "values": [{"label":"批发业/贸易商品","value":"14,207,542,473.05","share_percent":"79.52"},{"label":"区域开发业/广陵新城项目","value":"1,753,498,744.74","share_percent":"9.82"},{"label":"环境管理业/垃圾处理及发电","value":"1,770,271,144.13","share_percent":"9.91"},{"label":"房地产业/商品房","value":"70,309,344.10","share_percent":"0.39"},{"label":"纺织服装行业/纺织及滤材","value":"65,036,028.00","share_percent":"0.36"},{"label":"其他","value":"675,374.59","share_percent":"0.00"}], "unit": "元人民币；%", "physical_pages": [29]},
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "归属上市公司股东净利润", "value": "-28,611.37", "unit": "万元人民币", "physical_pages": [28], "qualifier": "利润总额-43663.17万元、营业利润-29853.78万元不是同一指标。"},
+        {"subject": "批发业、区域开发业、环境管理业", "period": "2025年度", "metric": "毛利率", "values": [{"label":"批发业","value":"0.65"},{"label":"区域开发业","value":"22.10"},{"label":"环境管理业","value":"25.74"}], "unit": "%", "physical_pages": [30]},
+        {"subject": "泰达环保及其代管项目", "period": "2025年末", "metric": "运营项目及生活垃圾日处理能力", "values": [{"label":"已运营项目","value":"28","unit":"个"},{"label":"生活垃圾项目日处理能力（含代管润泰环保）","value":"16,110","unit":"吨/日"}], "physical_pages": [12,15]},
+        {"subject": "泰达环保项目（含原文代管范围）", "period": "2025年度", "metric": "垃圾处理量及上网电量", "values": [{"label":"处理生活垃圾（含陈腐垃圾）","value":"约560.36","unit":"万吨"},{"label":"上网电量","value":"23.30","unit":"亿千瓦时"}], "physical_pages": [15,18]},
+        {"subject": "电力生产经营信息", "period": "2025年度/期末", "metric": "发电量/总装机容量", "values": [{"label":"发电量","value":"27.80","unit":"亿千瓦时"},{"label":"总装机容量","value":"50.8","unit":"万千瓦"}], "physical_pages": [18]},
+        {"subject": "泰达能源", "period": "2025年度", "metric": "营业收入", "value": "140.14", "unit": "亿元人民币", "physical_pages": [29], "qualifier": "子公司总收入不同于集团分行业批发业142.075亿元，不因相近就互换。"}
+      ],
+      "scope_and_table_traps": [
+        "能源贸易主要产品为有色金属；板块称谓不能代替原文产品语义。",
+        "环保战略重点与贸易79.52%收入占比并存；贸易收入不能错标环保收入。",
+        "泰达环保经营统计含代管润泰环保，不等于全部纳入上市公司合并主体；子公司利润、收入须保原范围。",
+        "泰达能源140.14亿元、南京新城17.69亿元、泰达洁净6612万元是子公司数据；对应合并分行业/产品数不同。",
+        "垃圾年度处理量与吨/日设计处理能力不能互换；发电量27.80与上网电量23.30不是同一指标。",
+        "28页万元、29–30页元、15页万吨/亿度及18页万千瓦各自保单位；近/约与含代管限定允许原样。",
+        "30页毛利率比上年增减与收入同比是不同表列；原表用%展示毛利率变化，不能借列生成收入方向。"
+      ],
+      "optional_features_and_supply_chain": "已读章节可描述固废/秸秆资源循环、售电供热、非织造滤材用途以及有色金属贸易上下游；电池回收合作是2025年形成的业务进展，不替代当前主业。",
+      "concentration_decision": "12–18业务机制与28–30收入成本集中；没有扩读行业背景或附注来凑满供应链。"
+    },
+    {
+      "instrument_id": "600177.SH",
+      "name": "雅戈尔",
+      "document_sha256": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/f7/f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a.pdf",
+      "page_count": 101,
+      "report_period": "2025-12-31",
+      "directory_read": {"method": "No native bookmarks; own printed contents, then actual section headings", "physical_pages": [6,7], "finding": "Printed contents has overlapping legacy-looking chapter text. Actual pages identify 2025 report, company name and headings: third chapter printed17=physical18; operating discussion physical19; revenue and cost physical27–29. Do not interpret overlapping contents text as multiple current business sections."},
+      "actually_read_sections": [
+        {"source_id": "Y-ID", "chapter": "封面、第二节 公司简介和主要财务指标", "section": "2025封面；公司信息；其他资料；主要会计数据及季度表", "physical_pages": [1,10,11,12,13,14], "printed_pages": "封面及9–13", "limitation": "Some extracted rows are extremely wide. Source order/period headers were read, not normalized into guessed columns."},
+        {"source_id": "Y-BUS", "chapter": "第三节 管理层讨论与分析", "section": "一、业务情况；二行业背景；三经营情况；四核心竞争力与品牌/渠道说明", "physical_pages": [18,19,20,21,22,23,24,25,26], "printed_pages": "17–25"},
+        {"source_id": "Y-REV", "chapter": "第三节 管理层讨论与分析", "section": "五、主要经营情况；（一）主营业务分析：利润表、分行业/产品/地区收入、产销存、成本和主要客户供应商", "physical_pages": [27,28,29,30], "printed_pages": "26–29"}
+      ],
+      "core_questions": [
+        {"question": "主营业务", "substantive_expectation": "核心为品牌服装时尚产业，同时保留地产开发和投资业务；不把集团描成单一服装加工厂，也不因投资盈利大于主业就改写其披露主业。", "source_ids": ["Y-BUS"], "physical_pages": [18,19,20]},
+        {"question": "主要产品/服务", "substantive_expectation": "品牌服装包括衬衫、西服、裤子、上衣等，七品牌矩阵覆盖商务、运动户外、童装、潮流和生活方式；地产及投资作为其他业务可以简要保留，无须每品牌每款齐全。", "source_ids": ["Y-BUS","Y-REV"], "physical_pages": [19,20,21,22,23,24,25,26,28]},
+        {"question": "赚钱方式/收入来源", "substantive_expectation": "通过多品牌服装及线上线下直营等渠道销售、地产交付结算等取得收入，另有投资收益；说明投资利润与经营营业收入不同，服装主营收入与时尚板块总收入口径不同。", "source_ids": ["Y-BUS","Y-REV"], "physical_pages": [19,20,26,27,28]}
+      ],
+      "priority_disclosed_numbers": [
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "营业收入", "value": "11,581,812,280.44", "unit": "元人民币", "physical_pages": [13], "qualifier": "19/27页四舍五入1158181.23万元，同比-18.37%。"},
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "归属上市公司股东净利润", "value": "2,447,339,231.76", "unit": "元人民币", "physical_pages": [13,19], "qualifier": "19页244733.92万元，同比-11.57%。"},
+        {"subject": "时尚板块", "period": "2025年度", "metric": "营业收入及归母净利润", "values": [{"label":"营业收入","value":"743,349.07"},{"label":"归母净利润","value":"9,593.09"}], "unit": "万元人民币", "physical_pages": [19]},
+        {"subject": "主营业务分行业", "period": "2025年度", "metric": "营业收入与毛利率", "values": [{"label":"品牌服装","value":"663,308.28","gross_margin_percent":"67.37"},{"label":"地产开发","value":"389,281.74","gross_margin_percent":"17.16"}], "unit": "万元人民币；%", "physical_pages": [27]},
+        {"subject": "品牌服装产品", "period": "2025年度", "metric": "主营业务收入", "values": [{"label":"品牌衬衫","value":"122,319.34"},{"label":"品牌西服","value":"104,278.24"},{"label":"品牌裤子","value":"82,333.79"},{"label":"品牌上衣","value":"238,814.78"},{"label":"品牌其他","value":"115,562.14"}], "unit": "万元人民币", "physical_pages": [27,28], "qualifier": "续表单位及分行业表在27页，28页保产品行头。"},
+        {"subject": "地产业务", "period": "2025年度", "metric": "预售收入/结转营业收入/全年亏损", "values": [{"label":"预售收入","value":"95,576.81","basis":"订单口径、合作项目按权益比例折算"},{"label":"结转营业收入","value":"415,688.70"},{"label":"全年亏损","value":"10,579.67","direction":"loss"}], "unit": "万元人民币", "physical_pages": [20]},
+        {"subject": "投资业务", "period": "2025年度", "metric": "归属于上市公司股东的净利润", "value": "247,051.62", "unit": "万元人民币", "physical_pages": [20], "qualifier": "不是集团营业收入，也不是现金回收额771352.76万元。"},
+        {"subject": "时尚板块渠道", "period": "2025年末", "metric": "直营门店/期末营业面积", "values": [{"label":"直营门店","value":"1884","unit":"家"},{"label":"期末营业面积","value":"55.86","unit":"万平方米"}], "physical_pages": [19]},
+        {"subject": "服装渠道讨论语境", "period": "报告期", "metric": "直营渠道销售收入占比", "value": "95%以上", "unit": "%", "physical_pages": [26], "qualifier": "保以上限定及服装渠道语境，不推广为集团全部业务直营比例。"}
+      ],
+      "scope_and_table_traps": [
+        "物理页比正文印刷页多1；printed17为physical18，不能用目录数字直接索引。",
+        "时尚板块743349.07万元与品牌服装主营663308.28万元不冲突；地产结转415688.70万元与主营地产389281.74万元也非同一口径。",
+        "地产预售95576.81万元是订单/权益折算口径，不是报告期已确认营业收入；投资归母利润不是收入。",
+        "2025/2024/2023列和本期增减在13页排版很宽，需按实际行头列头核，不按提取顺序借邻列。",
+        "多品牌162744.61万元、占比24.54%在时尚讨论中，不可直接认集团收入占比；不能忽略其分母语境。",
+        "27–29页金额单位万元，产销存28页按万件/万套/万条，不能把金额和数量互换。",
+        "品牌全球介绍（例如HH全球用户/雪场）不等于雅戈尔集团当期销量或持有品牌全部经营数据。",
+        "30页供应商表局部仍印作客户名称/销售额，周围正文才说明供应商；不能仅凭重复表头创造客户关系。"
+      ],
+      "optional_features_and_supply_chain": "可保多品牌矩阵、BONPOINT并表、渠道升级、供应链合作和收缩地产等有解释价值特色；面料材料/具名供应商非基础完成前提。",
+      "concentration_decision": "18–21及26–29集中提供业务、渠道和收入构成；22–25只为品牌用途语境阅读，未追附注投资组合和全报告。"
+    },
+    {
+      "instrument_id": "920003.BJ",
+      "name": "中诚咨询",
+      "document_sha256": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/e5/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101.pdf",
+      "page_count": 174,
+      "report_period": "2025-12-31",
+      "directory_read": {"method": "No native outline; own printed contents", "physical_pages": [3,4], "finding": "第四节管理层讨论与分析在12、第三节会计数据9、第九节行业信息69。选择第四节业务概要及收入构成，不用第九节行业史替代公司业务。印刷页与物理页在本范围相同。"},
+      "actually_read_sections": [
+        {"source_id": "Z-BUS", "chapter": "第四节 管理层讨论与分析", "section": "一业务概要（盈利、采购、营销）；二经营情况回顾开头、数字化服务及行业情况开头", "physical_pages": [12,13,14,15,16,17,18], "printed_pages": "12–18", "limitation": "17–18包含行业历史/发展趋势，不能据此认定公司逐项提供全部行业服务。"},
+        {"source_id": "Z-REV", "chapter": "第四节 管理层讨论与分析", "section": "营业情况分析（利润构成、收入构成、主要客户和供应商）及现金流开头", "physical_pages": [21,22,23,24,25], "printed_pages": "21–25"},
+        {"source_id": "Z-RD", "chapter": "第四节 管理层讨论与分析", "section": "税收政策尾段及（六）研发情况开头", "physical_pages": [28,29], "printed_pages": "28–29", "limitation": "Only displayed opening of R&D projects read; no claim of reading every project."}
+      ],
+      "core_questions": [
+        {"question": "主营业务", "substantive_expectation": "工程咨询专业技术及全过程一体化咨询，依托人员经验与项目服务，不是一般建筑施工承包商或纯软件销售公司。", "source_ids": ["Z-BUS"], "physical_pages": [12,17]},
+        {"question": "主要产品/服务", "substantive_expectation": "工程造价、招标代理、工程监理及管理、BIM服务、工程设计和全过程咨询为主要服务；数字化系统辅助专业交付，无须每系统/技术细目全列。", "source_ids": ["Z-BUS","Z-REV"], "physical_pages": [12,14,15,16,17,23]},
+        {"question": "赚钱方式/收入来源", "substantive_expectation": "向客户交付工程咨询技术服务，按合同金额或收费标准收费；以工程造价等业务收入为主，订单通过招投标或客户直接委托取得，不能把经手项目投资额当公司收入。", "source_ids": ["Z-BUS","Z-REV"], "physical_pages": [12,23]}
+      ],
+      "priority_disclosed_numbers": [
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "营业收入", "value": "369,492,413.83", "unit": "元人民币", "physical_pages": [21,22,23], "qualifier": "22利润表表头在21页；23页分类合计提供同额与当前期间。"},
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "主营业务收入/其他业务收入", "values": [{"label":"主营业务收入","value":"368,152,037.35"},{"label":"其他业务收入","value":"1,340,376.48"}], "unit": "元人民币", "physical_pages": [23]},
+        {"subject": "分产品服务", "period": "2025年度", "metric": "营业收入及毛利率", "values": [{"label":"工程造价","value":"182,416,579.30","gross_margin_percent":"52.97"},{"label":"工程监理及管理","value":"64,253,334.03","gross_margin_percent":"46.14"},{"label":"全过程咨询","value":"46,621,583.10","gross_margin_percent":"47.80"},{"label":"招标代理","value":"29,148,462.54","gross_margin_percent":"57.53"},{"label":"其他技术服务","value":"45,712,078.38","gross_margin_percent":"36.56"},{"label":"其他业务收入","value":"1,340,376.48","gross_margin_percent":"89.66"}], "unit": "元人民币；%", "physical_pages": [23]},
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "净利润", "value": "101,492,989.38", "unit": "元人民币", "physical_pages": [22], "qualifier": "原表叫净利润，不自行改成归母。"},
+        {"subject": "营业收入地域", "period": "2025年度", "metric": "江苏省内营业收入及占比", "value": "362,444,827.01；98.09", "unit": "元人民币；%", "physical_pages": [23,24]},
+        {"subject": "公司前五客户", "period": "2025年度", "metric": "销售额合计及占比", "value": "88,078,006.84；23.83", "unit": "元人民币；%", "physical_pages": [24]},
+        {"subject": "公司报告口径", "period": "2025年度", "metric": "研发支出及占营业收入比重", "value": "17,285,507.34；4.68", "unit": "元人民币；%", "physical_pages": [29]}
+      ],
+      "scope_and_table_traps": [
+        "23页52.97/46.14等是毛利率，不是各服务收入占比；同比列和百分点变化不得混淆。",
+        "2025/2024及增减列跨21–22页，23页同类表有独立表头；不能从2024列借数补2025。",
+        "其他技术服务收入不等于其他业务收入，368152037.35主营合计和369492413.83营业收入合计不同。",
+        "江苏省内98.09%是地域收入比例，不是市内占比或客户集中度；前五客户23.83%另有口径。",
+        "报告中的全国固定资产投资485186亿元和行业数据不是公司营收或项目储备。",
+        "24页苏州元脉等客户和诚来智等供应商角色分开；有比照关联交易等脚注，不能只用名称猜是否关联。",
+        "员工薪酬、外协服务费、场地、差旅办公是咨询服务成本，不强加制造企业原材料。",
+        "研发17,285,507.34元是研发支出，同页资本化金额明确0，空白栏不能泛化为零或把净利润改成研发金额。"
+      ],
+      "optional_features_and_supply_chain": "可描述工程建设价值链中的咨询/造价/监理角色，BIM和数字化造价/校核系统赋能；固定资产投资变化是报告披露的业务影响因素。供应链材料和完整客户列表不强求。",
+      "concentration_decision": "12页概述与盈利机制、23页收入构成最集中，14–17补数字化特色和服务语义；不阅读69页行业章节或全财务附注来补全画像。"
+    }
+  ],
+  "cleanup_and_protection": {
+    "previous_FM_exact_roots_checked_absent": ["/home/python/Quote/data/QuoteBak/company-profile-6fm-a-0k4BTyfY", "/home/python/Quote/data/QuoteBak/b1-6fm-http-DQxtKDkp"],
+    "no_unknown_or_parallel_root_deleted": true,
+    "existing_profiles_code_and_management_documents_modified": false,
+    "git_commit_or_push": false,
+    "temporary_owner_root": "/home/python/Quote/data/QuoteBak/a-6fn-group3-hl6TufhX",
+    "temporary_file_to_remove_after_reference_validation": "read_source.py",
+    "temporary_file_count": 1,
+    "temporary_logical_bytes": 1207,
+    "persistent_necessary_evidence": "Only this frozen reference; subsequent actual output audit belongs to the second assigned file."
+  }
+}

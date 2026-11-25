@@ -1,0 +1,77 @@
+{
+  "task": "6.FN",
+  "state": "verified_and_owned_development_artifacts_cleaned",
+  "review": {
+    "A_blocking_findings": 1,
+    "fixed": 1,
+    "remaining": 0,
+    "independent_followup_source_unit_cases": 6,
+    "nonblocking_scope_expansions": 0,
+    "unrelated_inherited_changes_untouched": true
+  },
+  "verification": {
+    "pytest_unique_cases": 82,
+    "pytest_failed": 0,
+    "pytest_seconds": 30.93,
+    "pytest_command": "source /home/python/Quote/scripts/quote_dev_env.sh\n/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_metric_format.py tests/unit/test_research/test_company_profile_repair_format_integration.py tests/unit/test_research/test_company_profile_raw_null_consumption.py tests/unit/test_research/test_company_profile_workpaper.py::test_gateway_withholds_only_fact_with_invalid_metric_and_preserves_raw_response",
+    "openspec_command": "OPENSPEC_TELEMETRY=0 DO_NOT_TRACK=1 openspec validate restore-company-profile-llm-led-generalization --strict",
+    "openspec_strict": "passed",
+    "correctness_ruff": "passed",
+    "cached_diff_check": "passed",
+    "safe_query_export_and_new_reader": "equal",
+    "safe_api_sha256": "f11ed465b6d00e4963c12578045d6fba1b10780d04ea33716e9eeb105d559599",
+    "protected_old_files": 417,
+    "protected_old_drift": [],
+    "original_first_and_auto_snapshots": 36,
+    "original_first_and_auto_drift": [],
+    "post_group_supplier_calls": 0
+  },
+  "git_isolation": {
+    "base_head": "0234df82a5752b1764458081f06a6000df11bea3",
+    "baseline_inherited_tracked_paths": 49,
+    "residual_unstaged_paths_equal_baseline": true,
+    "seven_management_documents_only_own_snapshot_diff_staged": true,
+    "normal_commit_push_authorized": true,
+    "no_history_rewrite": true
+  },
+  "cleanup": {
+    "B": {
+      "temporary_root": "/home/python/Quote/data/QuoteBak/b1-6fn-prepare-o8fwFycv",
+      "removed_files": 72,
+      "removed_logical_bytes": 26047385,
+      "removed_runtime_databases": 20,
+      "previously_removed_own_files": 5,
+      "previously_removed_logical_bytes": 4814607,
+      "total_owned_removed_files": 77,
+      "total_owned_removed_logical_bytes": 30861992,
+      "temporary_root_absent": true,
+      "retained_once": [
+        "first frozen acceptance-operator.py with dd7f hash",
+        "acceptance-operator-corrected.py with separate hash",
+        "b-plan/b-local-fix with actual receipts metadata and validation",
+        "all363 RAW/checkpoint files including real84 wires, first/final APIs, attempts, budgets and failures"
+      ],
+      "untouched": [
+        "old21 root",
+        "A safety delivery root",
+        "formal PDF sources and valid parser caches",
+        "inherited and parallel temporary roots"
+      ]
+    },
+    "A": {
+      "exact_root": "/home/python/Quote/data/QuoteBak/company-profile-6fn-a-r4B6Ktkx",
+      "earlier_duplicate_export_files": 42,
+      "earlier_duplicate_export_bytes": 16482723,
+      "remaining_owned_files_removed": 16,
+      "remaining_owned_logical_bytes_removed": 3248730,
+      "total_owned_logical_bytes_removed": 19731453,
+      "root_absent": true,
+      "contents": "baseline snapshots, local inspection/scoring/projection/staging helpers, owned bytecode and duplicate verification export"
+    },
+    "independent_review_assistants_removed_files": 10,
+    "independent_review_assistants_removed_logical_bytes": 145149,
+    "recovery": "Removed development artifacts are reconstructible from persistent sources, frozen raw/checkpoints and exact review decisions.",
+    "retained": "One authoritative frozen raw/checkpoint set, 18-profile research API/readable projection, source-first references, explicit audits/decisions/score/usage and corrected operator. Formal PDFs, useful parser cache and previous21/historical failures remain.",
+    "unknown_or_parallel_roots_removed": false
+  }
+}

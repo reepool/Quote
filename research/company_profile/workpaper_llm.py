@@ -11,7 +11,7 @@ from typing import Any
 
 from .models import ReportIdentity
 from .contracts import SemanticProviderError
-from .workpaper_metric_format import METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICY
+from .workpaper_metric_format import METRIC_FORMAT_FLAG, METRIC_FORMAT_POLICIES, RAW_NULL_METRIC_FORMAT_POLICY
 from .workpaper import (
     ELEMENT_LABELS, SUPPLY_CHAIN_LABELS, FEATURE_ELEMENT, CompanyProfileWorkpaper, WorkpaperDraftResponse,
     WorkpaperFormatNormalization, WorkpaperGenerationMetadata,
@@ -58,7 +58,7 @@ def workpaper_processing_identity(
         "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
         "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
         "workpaper_format_recovery": AUTO_FORMAT_RECOVERY,
-        METRIC_FORMAT_FLAG: METRIC_FORMAT_POLICY,
+        METRIC_FORMAT_FLAG: RAW_NULL_METRIC_FORMAT_POLICY,
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
         "execution_mode": "provider" if real else "offline_fake",
         "semantic_reuse": False,
@@ -368,7 +368,7 @@ def run_workpaper(
 ) -> WorkpaperRun:
     """One selection and one company extraction, never eight per-element loops."""
     metric_format_policy = processing_identity.get(METRIC_FORMAT_FLAG)
-    if metric_format_policy not in (None, METRIC_FORMAT_POLICY):
+    if metric_format_policy not in (None, *METRIC_FORMAT_POLICIES):
         raise ValueError(f"unknown workpaper metric format policy: {metric_format_policy!r}")
     real = processing_identity.get("execution_mode") == "provider"
     mode = extraction_resume.get("mode") if extraction_resume is not None else None

@@ -1,0 +1,36 @@
+{
+  "task":"6.FN",
+  "reference_type":"A_main_independent_original_PDF_reading_not_model_input",
+  "model_requests_when_frozen":0,
+  "scope":"Own TOC/bookmarks and concentrated business/revenue chapters; audit numbers guide independent checks, not new mandatory completion fields",
+  "companies":[
+    {
+      "instrument_id":"300124.SZ","name":"汇川技术","document_sha256":"622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "source_sections":[{"title":"第三节 管理层讨论与分析/公司从事的主要业务、主要产品及用途/经营模式","physical_pages":[12,13,14,15,16,17]},{"title":"第二节/主要会计数据；第三节/收入与成本/营业收入构成","physical_pages":[9,29]}],
+      "core_expectations":{"principal_business":"工业科技及智能制造核心部件/解决方案，主要工业自动化与数字化、新能源汽车动力系统，另布局智能机器人与数字能源；不是整车制造商或只做电梯","products_services":"变频器、伺服、PLC/工业软件等自动化产品，以及电驱/电源系统等新能源汽车部件和方案得到实质说明；机器人和储能可概括，不要求逐型号","revenue_model":"向工业设备/新能源汽车客户销售核心部件和综合解决方案，主营收入主要工业自动化数字化及新能源汽车动力系统；不把研发投入/投资理财当主营变现"},
+      "priority_numbers":{"company_revenue_CNY":"45104844200.13","product_revenue_CNY":{"工业自动化与数字化":"22245401986.97","新能源汽车动力系统":"20322581832.31","新兴产业":"1795019255.76","其他":"741841125.09"}},
+      "limits":["报告目录标示章节页码与实际正文起页不完全一致，来源定位以实际标题/物理页为准，不把TOC数字当已读正文","行业、产品、地区为交叉收入轴，不重复加总","中国市场份额与公司收入占比不同；人形机器人未来动能/厂商定点不等同全部已大规模量产","原文明示铜铝硅钢功率半导体及供应链风险可选，不要求全部原料量化"]
+    },
+    {
+      "instrument_id":"601872.SH","name":"招商轮船","document_sha256":"3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "source_sections":[{"title":"第三节/报告期内公司从事的业务情况","physical_pages":[12]},{"title":"第三节/主要经营情况/主营业务分析/收入和成本分析","physical_pages":[20,21]}],
+      "core_expectations":{"principal_business":"国际货物运输专业航运企业，油气运输和干散货为双核心，集装箱/汽车滚装为有机补充，不是造船或港口主营","products_services":"油轮、散货船、集装箱、滚装及LNG运输服务有实质说明，货物/船型不是公司制造销售的商品","revenue_model":"主要由运费和船舶租金收入构成，经营自有/租入船和运输协议；不把参股船队净利润或船舶处置收益当主营运费"},
+      "priority_numbers":{"company_revenue_CNY":"28177211131.95","segment_revenue_100million_CNY":{"油轮":"102.89","干散货":"87.69","集装箱":"61.49","滚装":"16.90","LNG":"0.55"}},
+      "limits":["LNG船队收入0.55亿元和净利润6.71亿元为不同指标，不把净利润当收入","p20分部与p21主营表部分成本数字不同，按各自表头原口径保留，不强行互相替换","燃料、港口、人工、折旧、租金是成本投入，不是销售收入；可选供应链不求明细"]
+    },
+    {
+      "instrument_id":"601328.SH","name":"交通银行","document_sha256":"df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "source_sections":[{"title":"目录；管理层讨论与分析/业务回顾/公司金融、个人金融、同业与金融市场、综合化经营","physical_pages":[2,19,20,22,26,28,29]},{"title":"管理层讨论与分析/财务报表分析/利润表构成和营业收入结构","physical_pages":[37,38]}],
+      "core_expectations":{"principal_business":"以商业银行业务为主体，提供公司和个人金融、同业与金融市场及综合金融服务；集团/本行和子公司范围区分","products_services":"公司/个人存贷款、财富管理、支付结算，以及同业/市场交易与托管等服务得到实质说明；不将所有细分子公司服务当必填","revenue_model":"利息净收入是主要来源，另手续费佣金及投资等非利息收入；客户存贷款余额、托管规模和交易量不当营业收入"},
+      "priority_numbers":{"unit":"人民币百万元","company_revenue":"265071","net_interest_income":"173075","net_non_interest_income":"91996","net_fee_commission":"38183","net_interest_revenue_share_percent":"65.29"},
+      "limits":["非利息净收入包含手续费佣金，不能与手续费再相加","汇兑收益损失为-867百万元，不丢括号负号；65.29为收入占比不是增速","2.05亿境内行零售客户含借记与信用卡，不等集团全部客户","脚注上标与金额分开；贷款增长基数调整保源注释","PDF本地pypdf有xref警告但原目录/文本可读，不能把警告当源已缺失或模型故障"]
+    },
+    {
+      "instrument_id":"000039.SZ","name":"中集集团","document_sha256":"438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "source_sections":[{"title":"第四章 董事会报告及管理层讨论与分析/公司业务概要/主营业务回顾","physical_pages":[16,17]},{"title":"第四章/财务数据分析/主营业务分析/按行业业务地区划分","physical_pages":[28]}],
+      "core_expectations":{"principal_business":"物流与能源行业设备和解决方案供应商；集装箱制造为核心并含道路运输车辆、能源化工液态食品装备、海工和物流服务，不是单一航运公司","products_services":"干货/冷藏/特种集装箱及车辆、能源食品装备、海工等主要装备和物流服务有实质说明；空港消防/循环载具/金融资产管理可按源补充","revenue_model":"主要装备制造销售及解决方案、物流服务等多业务获取收入，主要板块各有收入；合并抵消非普通经营板块，不把分部净利润或市场产量等同集团收入"},
+      "priority_numbers":{"unit":"人民币千元","company_revenue":"156611446","main_segment_revenue":{"集装箱制造":"43008947","道路运输车辆":"20177636","能源化工及液态食品装备":"27192470","海洋工程":"17938402","物流服务":"26793404"},"consolidation_elimination":"-2559532"},
+      "limits":["营业收入1566.11亿元是四舍五入叙述，与156611446千元表格不混精度","p28部分表格文字列位异常仍有表头，不能凭位置猜数；无法确定可保原文/null","国内国外按客户所在地而非生产所在地；国内52.38%国外47.62%不是集团增长率","报告期主要经营模式无重大变化有明示原句，但不能仅由不适用勾选推导其他事件未发生"]
+    }
+  ]
+}

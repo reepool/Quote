@@ -1,0 +1,143 @@
+{
+  "schema_version": "company_profile_6fn_A_release_decisions.v1",
+  "task": "6.FN",
+  "source_root": "/home/python/Quote/data/research/company_profile_v1_acceptance_20261125",
+  "delivery_root": "/home/python/Quote/data/research/company_profile_v1_acceptance_delivery_20261125",
+  "requested_instruments": [
+    "300124.SZ",
+    "920006.BJ",
+    "920007.BJ",
+    "600887.SH",
+    "600893.SH",
+    "601872.SH",
+    "600754.SH",
+    "300012.SZ",
+    "920003.BJ",
+    "600350.SH",
+    "601328.SH",
+    "601788.SH",
+    "601628.SH",
+    "600390.SH",
+    "002736.SZ",
+    "000039.SZ",
+    "600704.SH",
+    "600153.SH",
+    "000652.SZ",
+    "600177.SH"
+  ],
+  "delivered_instruments": [
+    "300124.SZ",
+    "920006.BJ",
+    "920007.BJ",
+    "600887.SH",
+    "600893.SH",
+    "601872.SH",
+    "600754.SH",
+    "300012.SZ",
+    "920003.BJ",
+    "600350.SH",
+    "601328.SH",
+    "601628.SH",
+    "600390.SH",
+    "000039.SZ",
+    "600704.SH",
+    "600153.SH",
+    "000652.SZ",
+    "600177.SH"
+  ],
+  "decisions": [
+    {
+      "instrument_id": "000039.SZ",
+      "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+      "fact_id": "f-023",
+      "raw_fact_sha256": "77ef92c6d8191237ddc27b0cfb2dddfeb31fa79817392ffc5d1d92afb58a6957",
+      "automatic_consumer_fact_sha256": "77ef92c6d8191237ddc27b0cfb2dddfeb31fa79817392ffc5d1d92afb58a6957",
+      "disposition": "source_checked",
+      "metric_restrictions": [
+        {
+          "metric_index": 1,
+          "reason": "原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。"
+        }
+      ],
+      "reason": "原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。"
+    },
+    {
+      "instrument_id": "920006.BJ",
+      "reading_work_id": "bp-work-9d9c2637afa2f4ffc35c6fcc",
+      "fact_id": "F009",
+      "raw_fact_sha256": "bdaab97cf6e0fdaf2f0618008b92ffe9f18f9bba8b6e3abeeb5009e3d7be1e4a",
+      "automatic_consumer_fact_sha256": "07a8d857095b742f944932021c90792fca99bba00b886f8ac9fe22f4bb09c625",
+      "disposition": "source_only",
+      "reason": "原PDF21页为合并口径主营业务收入合计，并非单独经营分部；模型虽已隔离指标，事实层仍确定标为business_segment。仅源参考，不改写范围或原值。"
+    },
+    {
+      "instrument_id": "920006.BJ",
+      "reading_work_id": "bp-work-9d9c2637afa2f4ffc35c6fcc",
+      "fact_id": "F021",
+      "raw_fact_sha256": "b8c262bcf089091c30af76a1090d896eb4084b5d9441fd88d6a8ac47fb5500d5",
+      "automatic_consumer_fact_sha256": "edde3ae1b5d74149aaad8b837b4edddce4116ff2824409c03d8665c0555aa258",
+      "disposition": "source_only",
+      "reason": "原PDF14页20名客户、49投标、15中标均属军用领域；模型已隔离原指标，事实层仍确定扩大为集团整体。仅源参考，其他公司内容保留。"
+    },
+    {
+      "instrument_id": "600704.SH",
+      "reading_work_id": "bp-work-e53470a4bfe65c83d9a82b89",
+      "fact_id": "F-CC-01",
+      "raw_fact_sha256": "3f2c82b29f99a5634d0d49b69be9d82edf783de255842f785251a8da003bdcf2",
+      "automatic_consumer_fact_sha256": "5c8d7fdae757a654ef66f0f6fa75c33ec96bc1a19a88c19699a7f42c46ba35ac",
+      "disposition": "source_only",
+      "reason": "原PDF22页按企业/个人客户销售模式分类，不是表中经营业务分部；模型已隔离两指标，但事实层确定business_segment仍无据。仅源参考，不猜替代范围。"
+    },
+    {
+      "instrument_id": "920003.BJ",
+      "reading_work_id": "bp-work-0788cd766ed03e2101c554ec",
+      "fact_id": "ccm-2",
+      "raw_fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf",
+      "automatic_consumer_fact_sha256": "d88b7180bc2baa8f40f26a6d885591d8f8431d4e79dd0a0e1c7941fcb64e0219",
+      "disposition": "source_only",
+      "reason": "原PDF23页江苏省内/省外为地区维度，不是上表工程造价/监理等经营分部；事实层business_segment错误仍对外。仅源参考，不改原数。"
+    },
+    {
+      "instrument_id": "600350.SH",
+      "reading_work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "fact_id": "sm-12",
+      "raw_fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+      "automatic_consumer_fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+      "disposition": "source_checked",
+      "metric_restrictions": [
+        {
+          "metric_index": 1,
+          "reason": "原PDF273页租赁收入是其中明确较窄业务行；原指标1却标集团整体。仅限制该指标，正文和其他业务合计原指标0保留。"
+        }
+      ],
+      "reason": "原PDF273页租赁收入是其中明确较窄业务行；原指标1却标集团整体。仅限制该指标，正文和其他业务合计原指标0保留。"
+    },
+    {
+      "instrument_id": "600350.SH",
+      "reading_work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "fact_id": "op-01",
+      "raw_fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+      "automatic_consumer_fact_sha256": "0501f8f87b130febb5e83a8ba815d153e639b396470a890889ff0a89a5518129",
+      "disposition": "source_only",
+      "reason": "原PDF17页路桥运营板块下的通行率和运营机制，原指标已自动隔离，但事实层仍集团整体；仅源参考，保留其余画像。"
+    },
+    {
+      "instrument_id": "600177.SH",
+      "reading_work_id": "bp-work-8316cdd34724f6bb6acdc31a",
+      "fact_id": "F005",
+      "raw_fact_sha256": "fb85adff68f80deeb5a62dafcc53320b9dea1da8b58c814b7e05df538878468c",
+      "automatic_consumer_fact_sha256": "fb85adff68f80deeb5a62dafcc53320b9dea1da8b58c814b7e05df538878468c",
+      "disposition": "source_only",
+      "reason": "原PDF20、36页预售明确为订单口径，交付结转收入另列；正文将两者并列为收入确认方式，无据。虽原数字有源，正文错误不能只删指标洗成正确结论，整条仅源参考。"
+    }
+  ],
+  "independent_review_limits": {
+    "not_assessed_objects": 7,
+    "reason": "Irreversible first-read failure triggered bounded audit stop; optional tail objects retained with actual model review labels, not counted independently supported.",
+    "formal_400_supplement_not_met": true,
+    "automatic_accuracy_not_rewritten": true,
+    "old_21_unchanged": true
+  },
+  "formal_acceptance": "not_passed",
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,4659 @@
+{
+  "schema_version": "company_profile_6fn_A_independent_audit.v1",
+  "auditor": "main A",
+  "task": "6.FN",
+  "reference": "a-source-reference-main.json",
+  "reference_sha256": "28148baa4d54d5529468c9af8f9672c3c516fe1c350f11a1e736e5f03541714f",
+  "assessment_scope": "Original PDF independently read before output; output-only sections checked from original PDF after draft. First and automatic consumer projections distinct; no B self-score.",
+  "companies": [
+    {
+      "instrument_id": "300124.SZ",
+      "name": "汇川技术",
+      "phases": {
+        "first": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/300124.SZ/execution/first-api.json",
+          "api_sha256": "8d04589f8035e9be85e04b97a81ece42903c73b074e6b864373e99ea63211f4a",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "BS-01",
+              "element": "business_structure",
+              "consumer_fact_sha256": "a123db6955fec6f6158ea48fd4a2473dde256ad9e9f6f116e723f22a8a400739",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                12,
+                25,
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "PS-01",
+              "element": "products_services",
+              "consumer_fact_sha256": "595070a0c014028b9ef86a01963dc4a7f85674c58cae7b35038d80ac2948b658",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                12,
+                13,
+                24,
+                25
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "PS-02",
+              "element": "products_services",
+              "consumer_fact_sha256": "ddcaddedd0fd722e5349692a1455bd8ef1c5c423c5de8ab3d2dd94d558885cd1",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                14,
+                25
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "PS-03",
+              "element": "products_services",
+              "consumer_fact_sha256": "ecae766d038e3c5bba8f714e742d45ac7d437b9457ebb9ae693bbeb37bf42d48",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                15,
+                27
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "PS-04",
+              "element": "products_services",
+              "consumer_fact_sha256": "46102f6a380bcb537b8975422de3af9912c4a5cf398fc8fdc2cb7ea7a3f7ad7f",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                16,
+                28
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "RM-01",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "51265639167453491d5ede864573ef682b77eccd4d87ba74b9abe311524eadab",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                17,
+                18,
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SM-01",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "2bd99067d835befa61d7f612bff48e36edb69941b67b242b206e5599b0ffed8f",
+              "metric_count": 2,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SM-02",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "18a0d775ec0e56d842e64414a85306cdfed3d4ec0cc91df64460474cf29a432e",
+              "metric_count": 4,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29,
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SM-03",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "f0315f61cd608b7747da203e9d2f4abdf7e4bab20fabf78141386ce4f82c32a2",
+              "metric_count": 4,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29,
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SM-04",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "bc95c40e7d650c50e32a443a57a2a14dbbfc26b3e227336f41cce09d049031db",
+              "metric_count": 3,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SM-05",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "eff574e599f8c6f57bce1dacfc6dbb432d82fc8a51373f64b943bf39a47a8f5b",
+              "metric_count": 3,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SM-06",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "badd98a3dcc6927cc42af32dc8c8f18e8456d517be1e573904da1710fdef69c6",
+              "metric_count": 7,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                },
+                {
+                  "index": 5,
+                  "status": "supported"
+                },
+                {
+                  "index": 6,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                25
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "OI-01",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "da39145260b15a61ac46285ba3cb69e78bf21a0d1f946ada672de6ae38ea92b7",
+              "metric_count": 2,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                32
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "OI-02",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "6aac4c76644031cda11cbc228c3127ef4650b0c730c3342dc6451d87ef38545d",
+              "metric_count": 4,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                31
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "CC-01",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "af3a4213e7fe87de69379a96ad8f134ef51ac7a2da91c82109630ce30a37b9aa",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                18
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "OD-01",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "f7157ee1707362793fbf20bc8dcb749e132b8ca1554ae131ee239961b9e6e1ac",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                23
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "OD-02",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "c9e3bbf15c827e2e0c89e478806576700e4a5f60aa32aecb9e977b1e7fe5218b",
+              "metric_count": 7,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                },
+                {
+                  "index": 5,
+                  "status": "supported"
+                },
+                {
+                  "index": 6,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                13,
+                15,
+                16
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "MC-01",
+              "element": "material_changes",
+              "consumer_fact_sha256": "c59507ee3b5045500edd8fec85907ab11a62dcd4c3b308ccd2029739b872bfba",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "MC-02",
+              "element": "material_changes",
+              "consumer_fact_sha256": "7fa8dbf62fd72afb3124bed4e31c90fd7a56f1f67abba99964c91dfbb1abd662",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                31
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SC-01",
+              "element": "position",
+              "consumer_fact_sha256": "eba8ebade19bdd2aa5be566820489ddcbed3ffcb23cc4f88f35fda192dad52a8",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                17,
+                26
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "SC-03",
+              "element": "downstream_customers",
+              "consumer_fact_sha256": "0798b324ad711433f7989b4e958435d189fa7659d5bcdfde02aa888ae77cb4df",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                23,
+                27,
+                28
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-19245b8818529e39de4597b1",
+              "fact_id": "CF-01",
+              "element": "company_features",
+              "consumer_fact_sha256": "e3e232cf9fd7ed187f3a4d0b36ad818795f7baf20c69d94874499004d5181d84",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                28,
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "BS-01"
+              ],
+              "physical_pages": [
+                12,
+                25,
+                30
+              ],
+              "reason": "四个业务生态及主要两大收入业务实质呈现，未写成整车制造。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "PS-01",
+                "PS-02"
+              ],
+              "physical_pages": [
+                12,
+                13,
+                14,
+                24,
+                25
+              ],
+              "reason": "工业自动化具体部件、软件方案和新能源汽车电驱/电源等主要供给均有实质内容；机器人与数字能源另列。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "RM-01"
+              ],
+              "physical_pages": [
+                17,
+                18,
+                29
+              ],
+              "reason": "标准/定制产品和解决方案销售形成收入，销售模式及分产品收入原文交叉支持；非将研发费用当收入。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "BS-01",
+            "PS-01",
+            "PS-02",
+            "RM-01"
+          ]
+        },
+        "automatic-final": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/300124.SZ/execution/automatic-final-api.json",
+          "api_sha256": "41f35cf6c5d915c3593f3f8672ff1db31ca6e9fa810515271b3011c49f05ac98",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "BS-01",
+              "element": "business_structure",
+              "consumer_fact_sha256": "a123db6955fec6f6158ea48fd4a2473dde256ad9e9f6f116e723f22a8a400739",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                12,
+                25,
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "PS-01",
+              "element": "products_services",
+              "consumer_fact_sha256": "595070a0c014028b9ef86a01963dc4a7f85674c58cae7b35038d80ac2948b658",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                12,
+                13,
+                24,
+                25
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "PS-02",
+              "element": "products_services",
+              "consumer_fact_sha256": "ddcaddedd0fd722e5349692a1455bd8ef1c5c423c5de8ab3d2dd94d558885cd1",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                14,
+                25
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "PS-03",
+              "element": "products_services",
+              "consumer_fact_sha256": "ecae766d038e3c5bba8f714e742d45ac7d437b9457ebb9ae693bbeb37bf42d48",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                15,
+                27
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "PS-04",
+              "element": "products_services",
+              "consumer_fact_sha256": "46102f6a380bcb537b8975422de3af9912c4a5cf398fc8fdc2cb7ea7a3f7ad7f",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                16,
+                28
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "RM-01",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "51265639167453491d5ede864573ef682b77eccd4d87ba74b9abe311524eadab",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                17,
+                18,
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SM-01",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "2bd99067d835befa61d7f612bff48e36edb69941b67b242b206e5599b0ffed8f",
+              "metric_count": 2,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SM-02",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "18a0d775ec0e56d842e64414a85306cdfed3d4ec0cc91df64460474cf29a432e",
+              "metric_count": 4,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29,
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SM-03",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "f0315f61cd608b7747da203e9d2f4abdf7e4bab20fabf78141386ce4f82c32a2",
+              "metric_count": 4,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29,
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SM-04",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "bc95c40e7d650c50e32a443a57a2a14dbbfc26b3e227336f41cce09d049031db",
+              "metric_count": 3,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SM-05",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "eff574e599f8c6f57bce1dacfc6dbb432d82fc8a51373f64b943bf39a47a8f5b",
+              "metric_count": 3,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SM-06",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "badd98a3dcc6927cc42af32dc8c8f18e8456d517be1e573904da1710fdef69c6",
+              "metric_count": 7,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                },
+                {
+                  "index": 5,
+                  "status": "supported"
+                },
+                {
+                  "index": 6,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                25
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "OI-01",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "da39145260b15a61ac46285ba3cb69e78bf21a0d1f946ada672de6ae38ea92b7",
+              "metric_count": 2,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                32
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "OI-02",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "6aac4c76644031cda11cbc228c3127ef4650b0c730c3342dc6451d87ef38545d",
+              "metric_count": 4,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                31
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "CC-01",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "af3a4213e7fe87de69379a96ad8f134ef51ac7a2da91c82109630ce30a37b9aa",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                18
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "OD-01",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "f7157ee1707362793fbf20bc8dcb749e132b8ca1554ae131ee239961b9e6e1ac",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                23
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "OD-02",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "c9e3bbf15c827e2e0c89e478806576700e4a5f60aa32aecb9e977b1e7fe5218b",
+              "metric_count": 7,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                },
+                {
+                  "index": 5,
+                  "status": "supported"
+                },
+                {
+                  "index": 6,
+                  "status": "supported"
+                }
+              ],
+              "physical_pages": [
+                13,
+                15,
+                16
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "MC-01",
+              "element": "material_changes",
+              "consumer_fact_sha256": "c59507ee3b5045500edd8fec85907ab11a62dcd4c3b308ccd2029739b872bfba",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                30
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "MC-02",
+              "element": "material_changes",
+              "consumer_fact_sha256": "7fa8dbf62fd72afb3124bed4e31c90fd7a56f1f67abba99964c91dfbb1abd662",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                31
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SC-01",
+              "element": "position",
+              "consumer_fact_sha256": "eba8ebade19bdd2aa5be566820489ddcbed3ffcb23cc4f88f35fda192dad52a8",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                17,
+                26
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "SC-03",
+              "element": "downstream_customers",
+              "consumer_fact_sha256": "0798b324ad711433f7989b4e958435d189fa7659d5bcdfde02aa888ae77cb4df",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                23,
+                27,
+                28
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            },
+            {
+              "reading_work_id": "bp-work-32edf60f200679548ba71b54",
+              "fact_id": "CF-01",
+              "element": "company_features",
+              "consumer_fact_sha256": "e3e232cf9fd7ed187f3a4d0b36ad818795f7baf20c69d94874499004d5181d84",
+              "metric_count": 0,
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "physical_pages": [
+                28,
+                29
+              ],
+              "source_section": "第三节 管理层讨论与分析/主要业务与经营模式、主营业务分析、收入与成本",
+              "reason": "A按原PDF业务描述及原表头、科目、期间、单位和数值独核；保留披露舍入、约数及其他类别不确定，不按格式统一增设失败。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "BS-01"
+              ],
+              "physical_pages": [
+                12,
+                25,
+                30
+              ],
+              "reason": "四个业务生态及主要两大收入业务实质呈现，未写成整车制造。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "PS-01",
+                "PS-02"
+              ],
+              "physical_pages": [
+                12,
+                13,
+                14,
+                24,
+                25
+              ],
+              "reason": "工业自动化具体部件、软件方案和新能源汽车电驱/电源等主要供给均有实质内容；机器人与数字能源另列。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "RM-01"
+              ],
+              "physical_pages": [
+                17,
+                18,
+                29
+              ],
+              "reason": "标准/定制产品和解决方案销售形成收入，销售模式及分产品收入原文交叉支持；非将研发费用当收入。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "BS-01",
+            "PS-01",
+            "PS-02",
+            "RM-01"
+          ]
+        }
+      },
+      "duplicates": [],
+      "manual_interventions": [],
+      "notes": [
+        "首读与自动源核最终事实内容22条一致；复核仅改变源审状态。",
+        "收入规模精确元值与正文亿元舍入并存，已明示；新兴产业/其他和市场份额不与公司收入混算。",
+        "主干与产品/模式/客户/供应链多角度叙述有增量语义，未为达到400拆对象或机械去重。"
+      ]
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "name": "中集集团",
+      "phases": {
+        "first": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/000039.SZ/execution/first-api.json",
+          "api_sha256": "67fc94aabc1839582a4e0a73e37b545f55c22d93abb4884d9b61c49bd1ed37e5",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-001",
+              "element": "business_structure",
+              "consumer_fact_sha256": "80f230d2ef0f410df3bded515970550a78fff3fd729443a9592d3689aa025f54",
+              "metric_count": 0,
+              "physical_pages": [
+                16
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-002",
+              "element": "products_services",
+              "consumer_fact_sha256": "63297f6c912b418640dd8d493040bbc83630689a6b029528c53c920394a0c284",
+              "metric_count": 0,
+              "physical_pages": [
+                16,
+                17,
+                18
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-003",
+              "element": "products_services",
+              "consumer_fact_sha256": "8887244bf090a55f9be066ff7e6b2ffb999a8195df3348a27f51ac57fa54f488",
+              "metric_count": 0,
+              "physical_pages": [
+                16,
+                19,
+                20
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%",
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-004",
+              "element": "products_services",
+              "consumer_fact_sha256": "7a819ffc8fbac68fd0393eca54138115bd56e364b090e3e8b7ff8aa1cd2d2a58",
+              "metric_count": 0,
+              "physical_pages": [
+                19,
+                21
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-005",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "83977732ef4808fe70eafbc09b7e24f8d20047af9313e752985825796e3fc797",
+              "metric_count": 0,
+              "physical_pages": [
+                16
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-008",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "e4a83c33bb19b1630116688647ca34bace09e261eb408464ac7da1dc95341fc9",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-009",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "ce5ab5eed513590130fc70ff9c524bc204c22dbd7a64da44e4ff5fb1c49bb0b4",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-010",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "b75639c22da493b218de067d383969305762a75c4fa434b4012269d68d639fa3",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-011",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "8a2ce563dc640461f6c06131a886e2bc4124a1e4949a3f8ccd4e5021c603099a",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-012",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "44140e257a7a29f197ed88b38d84d0efa50384c6b06db0bdd73f0330e323669c",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-013",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "5393944a9c6cf889ea67fbc17b70030113332010655ac50f6732ca0f866dc669",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-014",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "33c59173e058089be5a5ff89cc29465dd58ee3efaf7074a72de3e2c21b1395ce",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-021",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "48820a9ce46ac4c502351b8a834427df1f89a0806e3e58eff6ccb6ec4f086bf2",
+              "metric_count": 2,
+              "physical_pages": [
+                16,
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-016",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "6a5eddb79b3914df83e01427ca031236c08675158ac04543073774cef5edeb80",
+              "metric_count": 2,
+              "physical_pages": [
+                21,
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-017",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "2da06034da78572b1cba17a9d39a6d7fd60f4eea63351c4e1d214503eccb5d95",
+              "metric_count": 2,
+              "physical_pages": [
+                17,
+                29
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "error",
+              "narrative_status": "error",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "17页高基数解释产销量同比回落，竞争/汇率解释干箱毛利率；初稿把高基数一并写成毛利率因果，最终修订已拆开。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-018",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "a3ad92cafa86080fa0c2fa0641636b0b7881d9ef77ab8a539d7beda9250ef0a0",
+              "metric_count": 2,
+              "physical_pages": [
+                18,
+                29
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-019",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "45e9d7493ec60df55d65e3cdf6c50924d6663cce58a892d7f639e5e02e51e77f",
+              "metric_count": 2,
+              "physical_pages": [
+                20
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%"
+              ],
+              "status": "error",
+              "narrative_status": "error",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "error",
+                  "reason": "超190亿元属于水上清洁能源相关业务，不是清洁能源分部整体在手订单。"
+                }
+              ],
+              "reason": "20页其中限定被扩大；最终原文再核后已改回水上业务。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-020",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "9c90251d4a427ab7afc47c70139542cef48674dd5abfcf312a8a75bcf8970b73",
+              "metric_count": 2,
+              "physical_pages": [
+                20
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-023",
+              "element": "material_changes",
+              "consumer_fact_sha256": "77ef92c6d8191237ddc27b0cfb2dddfeb31fa79817392ffc5d1d92afb58a6957",
+              "metric_count": 2,
+              "physical_pages": [
+                22
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%"
+              ],
+              "status": "error",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "error",
+                  "reason": "将未来交易后比例45.04%标入2025年12月，原文只签约且使用将由。"
+                }
+              ],
+              "reason": "条件性正文按交易完成后理解有源支持，指标1期间错误；22页计划与19页年末62.70%交叉核。"
+            },
+            {
+              "reading_work_id": "bp-work-2d2d4d8fb14d282413fbbb1b",
+              "fact_id": "f-024",
+              "element": "upstream_inputs",
+              "consumer_fact_sha256": "9b33c8cb8530b610ff5961cec8661813b78abaa8605f3d31a0906f891222f98f",
+              "metric_count": 3,
+              "physical_pages": [
+                30
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "f-001"
+              ],
+              "physical_pages": [
+                16,
+                17
+              ],
+              "reason": "物流/能源装备及解决方案，集装箱为核心，同时保留多业务结构。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "f-002",
+                "f-003",
+                "f-004"
+              ],
+              "physical_pages": [
+                16,
+                17,
+                18,
+                19,
+                20,
+                21
+              ],
+              "reason": "集装箱/车辆、能源/海工装备及物流服务均有实质描述，未写成航运企业。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "f-005"
+              ],
+              "physical_pages": [
+                16,
+                28
+              ],
+              "reason": "装备销售和物流等服务取得收入；集团总收入缺项不影响此机制判断。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "f-001",
+            "f-002",
+            "f-003",
+            "f-004",
+            "f-005"
+          ]
+        },
+        "automatic-final": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/000039.SZ/execution/automatic-final-api.json",
+          "api_sha256": "8a650355d28bdcdcc669bb9d8a05d66e87355a6d67d3338e6ba4b60c05d83dec",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-001",
+              "element": "business_structure",
+              "consumer_fact_sha256": "80f230d2ef0f410df3bded515970550a78fff3fd729443a9592d3689aa025f54",
+              "metric_count": 0,
+              "physical_pages": [
+                16
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-002",
+              "element": "products_services",
+              "consumer_fact_sha256": "63297f6c912b418640dd8d493040bbc83630689a6b029528c53c920394a0c284",
+              "metric_count": 0,
+              "physical_pages": [
+                16,
+                17,
+                18
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-003",
+              "element": "products_services",
+              "consumer_fact_sha256": "8887244bf090a55f9be066ff7e6b2ffb999a8195df3348a27f51ac57fa54f488",
+              "metric_count": 0,
+              "physical_pages": [
+                16,
+                19,
+                20
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%",
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-004",
+              "element": "products_services",
+              "consumer_fact_sha256": "7a819ffc8fbac68fd0393eca54138115bd56e364b090e3e8b7ff8aa1cd2d2a58",
+              "metric_count": 0,
+              "physical_pages": [
+                19,
+                21
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-005",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "83977732ef4808fe70eafbc09b7e24f8d20047af9313e752985825796e3fc797",
+              "metric_count": 0,
+              "physical_pages": [
+                16
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-008",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "e4a83c33bb19b1630116688647ca34bace09e261eb408464ac7da1dc95341fc9",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-009",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "ce5ab5eed513590130fc70ff9c524bc204c22dbd7a64da44e4ff5fb1c49bb0b4",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-010",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "b75639c22da493b218de067d383969305762a75c4fa434b4012269d68d639fa3",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-011",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "8a2ce563dc640461f6c06131a886e2bc4124a1e4949a3f8ccd4e5021c603099a",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-012",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "44140e257a7a29f197ed88b38d84d0efa50384c6b06db0bdd73f0330e323669c",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-013",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "5393944a9c6cf889ea67fbc17b70030113332010655ac50f6732ca0f866dc669",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-014",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "33c59173e058089be5a5ff89cc29465dd58ee3efaf7074a72de3e2c21b1395ce",
+              "metric_count": 2,
+              "physical_pages": [
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-021",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "48820a9ce46ac4c502351b8a834427df1f89a0806e3e58eff6ccb6ec4f086bf2",
+              "metric_count": 2,
+              "physical_pages": [
+                16,
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 一、公司业务概要",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-016",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "6a5eddb79b3914df83e01427ca031236c08675158ac04543073774cef5edeb80",
+              "metric_count": 2,
+              "physical_pages": [
+                21,
+                28
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-017",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "01321cd826bbe33c3d3cc57e7100bb0f02f87fa6f550a81a2bbcbd1582c8de0f",
+              "metric_count": 2,
+              "physical_pages": [
+                17,
+                29
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-018",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "a3ad92cafa86080fa0c2fa0641636b0b7881d9ef77ab8a539d7beda9250ef0a0",
+              "metric_count": 2,
+              "physical_pages": [
+                18,
+                29
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 二、报告期主营业务回顾",
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-019",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "f54f19fe01917c48c2292d58e1a8b27135836dd24d409652505c653972334760",
+              "metric_count": 2,
+              "physical_pages": [
+                20
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-020",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "9c90251d4a427ab7afc47c70139542cef48674dd5abfcf312a8a75bcf8970b73",
+              "metric_count": 2,
+              "physical_pages": [
+                20
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-023",
+              "element": "material_changes",
+              "consumer_fact_sha256": "77ef92c6d8191237ddc27b0cfb2dddfeb31fa79817392ffc5d1d92afb58a6957",
+              "metric_count": 2,
+              "physical_pages": [
+                22
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 255.79 亿元），同比增长 6.31%"
+              ],
+              "status": "error",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "error",
+                  "reason": "将未来交易后比例45.04%标入2025年12月，原文只签约且使用将由。"
+                }
+              ],
+              "reason": "条件性正文按交易完成后理解有源支持，指标1期间错误；22页计划与19页年末62.70%交叉核。"
+            },
+            {
+              "reading_work_id": "bp-work-cd0afb1f99731027937f26cf",
+              "fact_id": "f-024",
+              "element": "upstream_inputs",
+              "consumer_fact_sha256": "9b33c8cb8530b610ff5961cec8661813b78abaa8605f3d31a0906f891222f98f",
+              "metric_count": 3,
+              "physical_pages": [
+                30
+              ],
+              "source_sections": [
+                "第四章 董事会报告及管理层讨论与分析 / 五、财务数据分析 / （一）主营业务分析 / 1、按照行业、业务及地区划分的各项指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "f-001"
+              ],
+              "physical_pages": [
+                16,
+                17
+              ],
+              "reason": "物流/能源装备及解决方案，集装箱为核心，同时保留多业务结构。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "f-002",
+                "f-003",
+                "f-004"
+              ],
+              "physical_pages": [
+                16,
+                17,
+                18,
+                19,
+                20,
+                21
+              ],
+              "reason": "集装箱/车辆、能源/海工装备及物流服务均有实质描述，未写成航运企业。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "f-005"
+              ],
+              "physical_pages": [
+                16,
+                28
+              ],
+              "reason": "装备销售和物流等服务取得收入；集团总收入缺项不影响此机制判断。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "f-001",
+            "f-002",
+            "f-003",
+            "f-004",
+            "f-005"
+          ]
+        }
+      },
+      "duplicates": [],
+      "manual_interventions": [
+        {
+          "fact_id": "f-023",
+          "mode": "metric_restriction",
+          "metric_indices": [
+            1
+          ],
+          "reason": "45.04%为交易完成后预计持股；报告只说明2025年12月签署协议，不能当作2025年12月或年末已实现比例。保留原来源、条件性描述和62.70%原指标。"
+        }
+      ],
+      "notes": [
+        "初核/修订/终核实际纠正f-017因果归并和f-019水上业务订单范围，最终已独核。",
+        "f-023叙述保留交易完成后条件，但指标1把未来交易后持股45.04%标为2025年12月已确定期间。原PDF22页为签约及将由，19页年末仍62.70%；这一个对外指标需A限制，自动成绩不回改。"
+      ]
+    },
+    {
+      "instrument_id": "601872.SH",
+      "name": "招商轮船",
+      "phases": {
+        "first": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/601872.SH/execution/first-api.json",
+          "api_sha256": "9f75f0c684e137cae9c7853f950a9911664a24c463b3561822a6c7a76e11eaaa",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "bs_overall",
+              "element": "business_structure",
+              "consumer_fact_sha256": "b52e61239488bc31c36be116ffc395debccecc7b18493e948911c0164a560c9e",
+              "metric_count": 0,
+              "physical_pages": [
+                12
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "ps_oil",
+              "element": "products_services",
+              "consumer_fact_sha256": "e4039aa30fbc26e1781421b3462f9512b1018dc964480c686046317353c4e8db",
+              "metric_count": 0,
+              "physical_pages": [
+                12
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "ps_dry_bulk_breakbulk",
+              "element": "products_services",
+              "consumer_fact_sha256": "692649b18ab2365bddac431010e503f4d73599e0b383893e0fd891bac99cf132",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "ps_lng",
+              "element": "products_services",
+              "consumer_fact_sha256": "aa95ace00ee5300c2fc8b5fedbb6ffff77a46723a419481f8d269a7b9fc1598a",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "ps_roro",
+              "element": "products_services",
+              "consumer_fact_sha256": "acd1a5097815060cf7c5d67506aad03243a95630f8183ed027c149d640bf2760",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "ps_container",
+              "element": "products_services",
+              "consumer_fact_sha256": "657bcaa14d58515317e042e8922db259a1eae1bea5a4977d3936a4f5504dfbfa",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "rm_revenue_sources",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "a3b38dd4bcb7a2140de85bb053bce90b4a972db062b1073a0f7f45b6e769402b",
+              "metric_count": 0,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "scale_company_revenue",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "d66b5b7ab82d051424e2063ce56e0a04e7e0802a224fb997e8d55440374ac5c8",
+              "metric_count": 1,
+              "physical_pages": [
+                9,
+                20
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况",
+                "第二节 公司简介和主要财务指标 / 七、 近三年主要会计数据和财务指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "scale_oil_tanker",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "de4b3056c8dfe1e38ba9e115584bf957531570535ebdd350199ffbd469c6b801",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "scale_dry_bulk",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "f168ce1d3399faa65603204c1c924d2840548da8736bfd077f466ec1f6a84937",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "scale_container",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "bb2ced8e4a82c3aafc5a6efe7476a68c267593e6a7d2ac610c7ebdc1f5ccbef2",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "scale_roro",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "c52bad2226b1e6b749a5d26eaa6023382df13bffb4e5701d3090f104cb8122b6",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "scale_lng",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "32e4d847701205c450529108753c375dd8324d363cf8652eb98e4d9af3edf9b3",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "scale_fleet",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "7c065fea64775db280c6a54e298fc33d05816fde910f192c6409d8166f066354",
+              "metric_count": 6,
+              "physical_pages": [
+                14,
+                15
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                },
+                {
+                  "index": 5,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "ops_modes_inputs",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "97d1d603a201f9e0949d8ba401d376429142e63f03a73e3376d812347a81d913",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16,
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "cust_oil_tanker",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "0478f9ecbe5375609670f3ea38e7726b2585e4cab9f8f43be5fb3060fcb432e2",
+              "metric_count": 0,
+              "physical_pages": [
+                12
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "cust_container",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "52d86d143725824171d726b4e8a8734d14d66d9c82b54d5579d38612b0e7f8fc",
+              "metric_count": 0,
+              "physical_pages": [
+                13
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "cust_roro",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "7e2cbfb977a25c297f1f3aba506149855bbe44840dc85fefb2d35b9153da45ea",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "drv_revenue_cost",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "2bea4ec0443037db4ab2835f6527192e84ab7b0589ea3e94082b1a4435d8f9e5",
+              "metric_count": 2,
+              "physical_pages": [
+                20
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "drv_oil_tanker",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "ac9d68509d05fee925276b214d1eb25d03226cc69eee7b9d3c417a0fb7cf99c1",
+              "metric_count": 0,
+              "physical_pages": [
+                15,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "drv_dry_bulk",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "a24939061c64504231d4a506d38147581717a313e60f52c6d2de48e9774e23ad",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "drv_container",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "12a3dccfbfec6a249485363189dd3cff6feca73878369c3993d57fd9ebbe4eaa",
+              "metric_count": 2,
+              "physical_pages": [
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+              "fact_id": "chg_fleet",
+              "element": "material_changes",
+              "consumer_fact_sha256": "cb371eef8f1293acdfdd7c839c2089c1ea5e861dbc06a702fed97cf4006ba391",
+              "metric_count": 2,
+              "physical_pages": [
+                14
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "bs_overall"
+              ],
+              "physical_pages": [
+                12
+              ],
+              "reason": "国际货物运输，油气/干散双核心，集装箱/滚装补充。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "ps_oil",
+                "ps_dry_bulk_breakbulk",
+                "ps_lng",
+                "ps_roro",
+                "ps_container"
+              ],
+              "physical_pages": [
+                12,
+                13,
+                16,
+                17
+              ],
+              "reason": "主要油轮和干散服务及LNG、滚装、班轮服务均有实质内容；不将货物/船型当销售商品。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "rm_revenue_sources"
+              ],
+              "physical_pages": [
+                21
+              ],
+              "reason": "原文明确营业收入主要由运费及船舶租金构成。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "bs_overall",
+            "ps_oil",
+            "ps_dry_bulk_breakbulk",
+            "rm_revenue_sources"
+          ]
+        },
+        "automatic-final": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/601872.SH/execution/automatic-final-api.json",
+          "api_sha256": "d077018069178ac715d7863c20f87c235a635c7709bfe6796e64d94c6a1b6750",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "bs_overall",
+              "element": "business_structure",
+              "consumer_fact_sha256": "b52e61239488bc31c36be116ffc395debccecc7b18493e948911c0164a560c9e",
+              "metric_count": 0,
+              "physical_pages": [
+                12
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "ps_oil",
+              "element": "products_services",
+              "consumer_fact_sha256": "e4039aa30fbc26e1781421b3462f9512b1018dc964480c686046317353c4e8db",
+              "metric_count": 0,
+              "physical_pages": [
+                12
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "ps_dry_bulk_breakbulk",
+              "element": "products_services",
+              "consumer_fact_sha256": "692649b18ab2365bddac431010e503f4d73599e0b383893e0fd891bac99cf132",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "ps_lng",
+              "element": "products_services",
+              "consumer_fact_sha256": "aa95ace00ee5300c2fc8b5fedbb6ffff77a46723a419481f8d269a7b9fc1598a",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "ps_roro",
+              "element": "products_services",
+              "consumer_fact_sha256": "acd1a5097815060cf7c5d67506aad03243a95630f8183ed027c149d640bf2760",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "ps_container",
+              "element": "products_services",
+              "consumer_fact_sha256": "657bcaa14d58515317e042e8922db259a1eae1bea5a4977d3936a4f5504dfbfa",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "rm_revenue_sources",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "a3b38dd4bcb7a2140de85bb053bce90b4a972db062b1073a0f7f45b6e769402b",
+              "metric_count": 0,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "scale_company_revenue",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "d66b5b7ab82d051424e2063ce56e0a04e7e0802a224fb997e8d55440374ac5c8",
+              "metric_count": 1,
+              "physical_pages": [
+                9,
+                20
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况",
+                "第二节 公司简介和主要财务指标 / 七、 近三年主要会计数据和财务指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "scale_oil_tanker",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "de4b3056c8dfe1e38ba9e115584bf957531570535ebdd350199ffbd469c6b801",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "scale_dry_bulk",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "f168ce1d3399faa65603204c1c924d2840548da8736bfd077f466ec1f6a84937",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "scale_container",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "bb2ced8e4a82c3aafc5a6efe7476a68c267593e6a7d2ac610c7ebdc1f5ccbef2",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "scale_roro",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "c52bad2226b1e6b749a5d26eaa6023382df13bffb4e5701d3090f104cb8122b6",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "scale_lng",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "32e4d847701205c450529108753c375dd8324d363cf8652eb98e4d9af3edf9b3",
+              "metric_count": 3,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 主营业务分行业情况",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "scale_fleet",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "7c065fea64775db280c6a54e298fc33d05816fde910f192c6409d8166f066354",
+              "metric_count": 6,
+              "physical_pages": [
+                14,
+                15
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                },
+                {
+                  "index": 5,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "review-add:omit_segment_net_profit",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "6e45176de8c69a4fe0cf65f06caf487675706edfe5c6a64b6fb838a7d5a2e69c",
+              "metric_count": 5,
+              "physical_pages": [
+                20
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "ops_modes_inputs",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "97d1d603a201f9e0949d8ba401d376429142e63f03a73e3376d812347a81d913",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16,
+                21
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析",
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "cust_oil_tanker",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "0478f9ecbe5375609670f3ea38e7726b2585e4cab9f8f43be5fb3060fcb432e2",
+              "metric_count": 0,
+              "physical_pages": [
+                12
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "cust_container",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "52d86d143725824171d726b4e8a8734d14d66d9c82b54d5579d38612b0e7f8fc",
+              "metric_count": 0,
+              "physical_pages": [
+                13
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "cust_roro",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "7e2cbfb977a25c297f1f3aba506149855bbe44840dc85fefb2d35b9153da45ea",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "drv_revenue_cost",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "2bea4ec0443037db4ab2835f6527192e84ab7b0589ea3e94082b1a4435d8f9e5",
+              "metric_count": 2,
+              "physical_pages": [
+                20
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 五、报告期内主要经营情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "drv_oil_tanker",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "ac9d68509d05fee925276b214d1eb25d03226cc69eee7b9d3c417a0fb7cf99c1",
+              "metric_count": 0,
+              "physical_pages": [
+                15,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "drv_dry_bulk",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "a24939061c64504231d4a506d38147581717a313e60f52c6d2de48e9774e23ad",
+              "metric_count": 0,
+              "physical_pages": [
+                13,
+                16
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "drv_container",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "12a3dccfbfec6a249485363189dd3cff6feca73878369c3993d57fd9ebbe4eaa",
+              "metric_count": 2,
+              "physical_pages": [
+                17
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-a62efc2b380d6db237e8a489",
+              "fact_id": "chg_fleet",
+              "element": "material_changes",
+              "consumer_fact_sha256": "cb371eef8f1293acdfdd7c839c2089c1ea5e861dbc06a702fed97cf4006ba391",
+              "metric_count": 2,
+              "physical_pages": [
+                14
+              ],
+              "source_sections": [
+                "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "bs_overall"
+              ],
+              "physical_pages": [
+                12
+              ],
+              "reason": "国际货物运输，油气/干散双核心，集装箱/滚装补充。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "ps_oil",
+                "ps_dry_bulk_breakbulk",
+                "ps_lng",
+                "ps_roro",
+                "ps_container"
+              ],
+              "physical_pages": [
+                12,
+                13,
+                16,
+                17
+              ],
+              "reason": "主要油轮和干散服务及LNG、滚装、班轮服务均有实质内容；不将货物/船型当销售商品。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "rm_revenue_sources"
+              ],
+              "physical_pages": [
+                21
+              ],
+              "reason": "原文明确营业收入主要由运费及船舶租金构成。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "bs_overall",
+            "ps_oil",
+            "ps_dry_bulk_breakbulk",
+            "rm_revenue_sources"
+          ]
+        }
+      },
+      "duplicates": [],
+      "manual_interventions": [],
+      "notes": [
+        "源核新增分部净利润5个指标并通过最终再核；A按20页原表核，未与营业收入或LNG收入混用。",
+        "散货成本以21页主营业务分行业表口径核，不强行替换为20页分部圆整数；增加18.4%保原文/null不算错误。"
+      ]
+    },
+    {
+      "instrument_id": "601328.SH",
+      "name": "交通银行",
+      "phases": {
+        "first": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/601328.SH/execution/first-api.json",
+          "api_sha256": "c8a35b0c0e60c9c35e0901dc7faa9f1d8bdaa44343348c618b779dae78ac47a5",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F01",
+              "element": "business_structure",
+              "consumer_fact_sha256": "983bd8008a5bc186858f44ce52bb6a62ad1acca73e1ee1a0d7d43a592df6ad5a",
+              "metric_count": 0,
+              "physical_pages": [
+                8
+              ],
+              "source_sections": [
+                "二、公司简介及主要业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F02",
+              "element": "business_structure",
+              "consumer_fact_sha256": "9f131fbee526a14b5cc55e2ca54a7a6bce2ccb1132f56d3f86dd515792be8de4",
+              "metric_count": 0,
+              "physical_pages": [
+                51
+              ],
+              "source_sections": [
+                "客户贷款信用减值准备情况 / （四）分部情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F03",
+              "element": "business_structure",
+              "consumer_fact_sha256": "7d698702098cb6279c73ed2459d63a75a17118aeddfd091e26adaad949b77b0a",
+              "metric_count": 0,
+              "physical_pages": [
+                8
+              ],
+              "source_sections": [
+                "二、公司简介及主要业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F04",
+              "element": "products_services",
+              "consumer_fact_sha256": "76257b069d165f35fdcad0846203ab2b11d7d234e253c8afc40a349847161489",
+              "metric_count": 0,
+              "physical_pages": [
+                22,
+                23,
+                24,
+                25
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F05",
+              "element": "products_services",
+              "consumer_fact_sha256": "bdb9fb650d9af835246915a5227124bf5762aaaa44f06b9b0c1e648e9b148779",
+              "metric_count": 0,
+              "physical_pages": [
+                26,
+                27
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F06",
+              "element": "products_services",
+              "consumer_fact_sha256": "b2f0c1044b3843892ccc5d7f00249d853293a35abd17fc8c209a1baa8f4e7bca",
+              "metric_count": 0,
+              "physical_pages": [
+                28,
+                29
+              ],
+              "source_sections": [
+                "1.3 个百分点、155% / （四）同业与金融市场业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F07",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "4c42128fa1b74d1417a8599006eacb90c48cb0b4f64e73603ba5f7e72a379175",
+              "metric_count": 1,
+              "physical_pages": [
+                11,
+                38
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标",
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F09",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "a86c15dbb540fd4378921cb3b486ad272a8ccd5cba2833d8f828ab307b98d46b",
+              "metric_count": 4,
+              "physical_pages": [
+                11,
+                37
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标",
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F10",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "633e8da322e9485766d4d6cda84422b1df9dca1e240a6da2feca09bd71a4d09f",
+              "metric_count": 1,
+              "physical_pages": [
+                11
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F11A",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "f23c668dbecea152f153ad37aad919e467b3f863329c01743ea0ef82f278bcef",
+              "metric_count": 3,
+              "physical_pages": [
+                44,
+                45
+              ],
+              "source_sections": [
+                "按产品类型划分的客户存款平均成本分析 / （二）资产负债表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F11B",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "369089473b65ba4b7afc68924b318720ab8a3b20289a802a55c90e3a419e3bd2",
+              "metric_count": 1,
+              "physical_pages": [
+                11
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F12",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "bbc4867f28e0010c2c1707a3d44efec8e01440d4c97152e79e98f7d575155d7e",
+              "metric_count": 4,
+              "physical_pages": [
+                51
+              ],
+              "source_sections": [
+                "客户贷款信用减值准备情况 / （四）分部情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F13",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "abf85ab5e857c1e703c822bba8b74dac61306ba3ba97ff09c48340ba0ba133f7",
+              "metric_count": 4,
+              "physical_pages": [
+                39
+              ],
+              "source_sections": [
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F14",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "a5ff5d4d37589d3bcb90ba1104070c75648c9c74a457a6e77ac215a1c6a5904a",
+              "metric_count": 2,
+              "physical_pages": [
+                44
+              ],
+              "source_sections": [
+                "按产品类型划分的客户存款平均成本分析 / （二）资产负债表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F15",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "d7aa7522ceb39da33a87c09e07d4896fd961044e4d4f61f582f15531aae53ce2",
+              "metric_count": 2,
+              "physical_pages": [
+                8,
+                24,
+                26
+              ],
+              "source_sections": [
+                "二、业务回顾",
+                "二、公司简介及主要业务"
+              ],
+              "status": "error",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "error",
+                  "reason": "境内行对公客户数不能结构化升为完整issuer口径。"
+                },
+                {
+                  "index": 1,
+                  "status": "error",
+                  "reason": "境内行零售客户数不能结构化升为完整issuer口径。"
+                }
+              ],
+              "reason": "24/26页明确境内行，初稿比较基础有原文范围但独立metric主体仍升格；最终模型已隔离。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F17",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "2513e5fafacc52953e967ac85c5f61fd1e110fc3b4d666993c98bf24467ad7ed",
+              "metric_count": 1,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F18",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "32cee49388d0b82634b4e24927862782bf2c4fab07ca47592bb5f4925b54c4f3",
+              "metric_count": 2,
+              "physical_pages": [
+                27
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F19",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "75afb06be546e910d9c875a2c83036555df68dcf13701b56c3c00db23377ee97",
+              "metric_count": 5,
+              "physical_pages": [
+                39
+              ],
+              "source_sections": [
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F20",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "9fef5811b69880976ab97c239c0538b50b1c9ef6abf03926812057e1e15a99b0",
+              "metric_count": 0,
+              "physical_pages": [
+                19,
+                20
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "unclear",
+              "narrative_status": "unclear",
+              "metric_checks": [],
+              "reason": "19/20页原文混合境内行、全行及未明主体；初稿统一issuer无法充分支持，最终保源限定可用。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F21",
+              "element": "material_changes",
+              "consumer_fact_sha256": "3cd36cf47bc849dbdacab6e244a13978be2967db9badeaaf41d39095f7755ac4",
+              "metric_count": 0,
+              "physical_pages": [
+                8
+              ],
+              "source_sections": [
+                "二、公司简介及主要业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F22",
+              "element": "material_changes",
+              "consumer_fact_sha256": "9b5d0fb55ae36ec3e020e319d6fcc22f2ab5c38f73bf5537889f5ccbf3b9e5b4",
+              "metric_count": 0,
+              "physical_pages": [
+                45
+              ],
+              "source_sections": [
+                "按产品类型划分的客户存款平均成本分析 / （二）资产负债表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f324eb47588bae02e1a52b84",
+              "fact_id": "F23",
+              "element": "company_features",
+              "consumer_fact_sha256": "4e105cc76a959022238e6ec27f34cb500e44e049e7592a38a8b3d1fa95243a7e",
+              "metric_count": 0,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "F01",
+                "F02",
+                "F03"
+              ],
+              "physical_pages": [
+                8,
+                51
+              ],
+              "reason": "商业银行主体及公司/个人/资金业务，综合金融子业务另列。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "F04",
+                "F05",
+                "F06"
+              ],
+              "physical_pages": [
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29
+              ],
+              "reason": "公司/个人存贷款、结算、财富、信用卡及市场业务实质呈现。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "F13",
+                "F19",
+                "F12"
+              ],
+              "physical_pages": [
+                39,
+                51
+              ],
+              "reason": "资金来源/成本、生息资产收益、净利差和净利息收益率，结合业务收入构成共同解释利差型银行盈利；不要求单一指定句或精确组成数齐全。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "F01",
+            "F04",
+            "F05",
+            "F13",
+            "F19"
+          ]
+        },
+        "automatic-final": {
+          "api_path": "/home/python/Quote/data/checkpoints/company_profile_v1_acceptance_20261125/601328.SH/execution/automatic-final-api.json",
+          "api_sha256": "ed55b534af0b032ae93cd24b788a471ce1d3d64c52eca75937feebe4f85fbe47",
+          "objects": [
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F01",
+              "element": "business_structure",
+              "consumer_fact_sha256": "983bd8008a5bc186858f44ce52bb6a62ad1acca73e1ee1a0d7d43a592df6ad5a",
+              "metric_count": 0,
+              "physical_pages": [
+                8
+              ],
+              "source_sections": [
+                "二、公司简介及主要业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F02",
+              "element": "business_structure",
+              "consumer_fact_sha256": "9f131fbee526a14b5cc55e2ca54a7a6bce2ccb1132f56d3f86dd515792be8de4",
+              "metric_count": 0,
+              "physical_pages": [
+                51
+              ],
+              "source_sections": [
+                "客户贷款信用减值准备情况 / （四）分部情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F03",
+              "element": "business_structure",
+              "consumer_fact_sha256": "7d698702098cb6279c73ed2459d63a75a17118aeddfd091e26adaad949b77b0a",
+              "metric_count": 0,
+              "physical_pages": [
+                8
+              ],
+              "source_sections": [
+                "二、公司简介及主要业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F04",
+              "element": "products_services",
+              "consumer_fact_sha256": "76257b069d165f35fdcad0846203ab2b11d7d234e253c8afc40a349847161489",
+              "metric_count": 0,
+              "physical_pages": [
+                22,
+                23,
+                24,
+                25
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F05",
+              "element": "products_services",
+              "consumer_fact_sha256": "bdb9fb650d9af835246915a5227124bf5762aaaa44f06b9b0c1e648e9b148779",
+              "metric_count": 0,
+              "physical_pages": [
+                26,
+                27
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F06",
+              "element": "products_services",
+              "consumer_fact_sha256": "b2f0c1044b3843892ccc5d7f00249d853293a35abd17fc8c209a1baa8f4e7bca",
+              "metric_count": 0,
+              "physical_pages": [
+                28,
+                29
+              ],
+              "source_sections": [
+                "1.3 个百分点、155% / （四）同业与金融市场业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F07",
+              "element": "revenue_model",
+              "consumer_fact_sha256": "4c42128fa1b74d1417a8599006eacb90c48cb0b4f64e73603ba5f7e72a379175",
+              "metric_count": 1,
+              "physical_pages": [
+                11,
+                38
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标",
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F09",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "a86c15dbb540fd4378921cb3b486ad272a8ccd5cba2833d8f828ab307b98d46b",
+              "metric_count": 4,
+              "physical_pages": [
+                11,
+                37
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标",
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F10",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "633e8da322e9485766d4d6cda84422b1df9dca1e240a6da2feca09bd71a4d09f",
+              "metric_count": 1,
+              "physical_pages": [
+                11
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F11A",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "f23c668dbecea152f153ad37aad919e467b3f863329c01743ea0ef82f278bcef",
+              "metric_count": 3,
+              "physical_pages": [
+                44,
+                45
+              ],
+              "source_sections": [
+                "按产品类型划分的客户存款平均成本分析 / （二）资产负债表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F11B",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "369089473b65ba4b7afc68924b318720ab8a3b20289a802a55c90e3a419e3bd2",
+              "metric_count": 1,
+              "physical_pages": [
+                11
+              ],
+              "source_sections": [
+                "一、主要会计数据和财务指标"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F12",
+              "element": "scale_and_mix",
+              "consumer_fact_sha256": "bbc4867f28e0010c2c1707a3d44efec8e01440d4c97152e79e98f7d575155d7e",
+              "metric_count": 4,
+              "physical_pages": [
+                51
+              ],
+              "source_sections": [
+                "客户贷款信用减值准备情况 / （四）分部情况"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F13",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "abf85ab5e857c1e703c822bba8b74dac61306ba3ba97ff09c48340ba0ba133f7",
+              "metric_count": 4,
+              "physical_pages": [
+                39
+              ],
+              "source_sections": [
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F14",
+              "element": "operations_and_inputs",
+              "consumer_fact_sha256": "a5ff5d4d37589d3bcb90ba1104070c75648c9c74a457a6e77ac215a1c6a5904a",
+              "metric_count": 2,
+              "physical_pages": [
+                44
+              ],
+              "source_sections": [
+                "按产品类型划分的客户存款平均成本分析 / （二）资产负债表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F15",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "0078c7c974ad7809cb62fe9e65308899e74271843931580e3d5879f7dd87b647",
+              "metric_count": 0,
+              "physical_pages": [
+                8,
+                24,
+                26
+              ],
+              "source_sections": [
+                "二、业务回顾",
+                "二、公司简介及主要业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F17",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "2513e5fafacc52953e967ac85c5f61fd1e110fc3b4d666993c98bf24467ad7ed",
+              "metric_count": 1,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F18",
+              "element": "customers_channels_markets",
+              "consumer_fact_sha256": "32cee49388d0b82634b4e24927862782bf2c4fab07ca47592bb5f4925b54c4f3",
+              "metric_count": 2,
+              "physical_pages": [
+                27
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F19",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "75afb06be546e910d9c875a2c83036555df68dcf13701b56c3c00db23377ee97",
+              "metric_count": 5,
+              "physical_pages": [
+                39
+              ],
+              "source_sections": [
+                "三、财务报表分析 / （一）利润表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [
+                {
+                  "index": 0,
+                  "status": "supported"
+                },
+                {
+                  "index": 1,
+                  "status": "supported"
+                },
+                {
+                  "index": 2,
+                  "status": "supported"
+                },
+                {
+                  "index": 3,
+                  "status": "supported"
+                },
+                {
+                  "index": 4,
+                  "status": "supported"
+                }
+              ],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F20",
+              "element": "operating_drivers",
+              "consumer_fact_sha256": "5fe9d8cea749d2fceec312dd6772529356f5023bb29f96d49b9272a75442d275",
+              "metric_count": 0,
+              "physical_pages": [
+                19,
+                20
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F21",
+              "element": "material_changes",
+              "consumer_fact_sha256": "3cd36cf47bc849dbdacab6e244a13978be2967db9badeaaf41d39095f7755ac4",
+              "metric_count": 0,
+              "physical_pages": [
+                8
+              ],
+              "source_sections": [
+                "二、公司简介及主要业务"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F22",
+              "element": "material_changes",
+              "consumer_fact_sha256": "9b5d0fb55ae36ec3e020e319d6fcc22f2ab5c38f73bf5537889f5ccbf3b9e5b4",
+              "metric_count": 0,
+              "physical_pages": [
+                45
+              ],
+              "source_sections": [
+                "按产品类型划分的客户存款平均成本分析 / （二）资产负债表主要项目分析"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            },
+            {
+              "reading_work_id": "bp-work-f1cba483b4bf6e44862a2468",
+              "fact_id": "F23",
+              "element": "company_features",
+              "consumer_fact_sha256": "4c7e3c843ab55aa360d1784d518fc5a9cb5a435da9a244c21f775b436daf17b2",
+              "metric_count": 0,
+              "physical_pages": [
+                21
+              ],
+              "source_sections": [
+                "二、业务回顾"
+              ],
+              "status": "supported",
+              "narrative_status": "supported",
+              "metric_checks": [],
+              "reason": "A按原PDF章节及原表头/科目/主体/期间/单位独核；忠实的原文、约数、null和混合范围允许交付。"
+            }
+          ],
+          "core": {
+            "principal_business": {
+              "status": "supported",
+              "fact_ids": [
+                "F01",
+                "F02",
+                "F03"
+              ],
+              "physical_pages": [
+                8,
+                51
+              ],
+              "reason": "商业银行主体及公司/个人/资金业务，综合金融子业务另列。"
+            },
+            "products_services": {
+              "status": "supported",
+              "fact_ids": [
+                "F04",
+                "F05",
+                "F06"
+              ],
+              "physical_pages": [
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29
+              ],
+              "reason": "公司/个人存贷款、结算、财富、信用卡及市场业务实质呈现。"
+            },
+            "revenue_model": {
+              "status": "supported",
+              "fact_ids": [
+                "F13",
+                "F19",
+                "F12"
+              ],
+              "physical_pages": [
+                39,
+                51
+              ],
+              "reason": "资金来源/成本、生息资产收益、净利差和净利息收益率，结合业务收入构成共同解释利差型银行盈利；不要求单一指定句或精确组成数齐全。"
+            }
+          },
+          "basic_usable": true,
+          "minimal_core_fact_ids": [
+            "F01",
+            "F04",
+            "F05",
+            "F13",
+            "F19"
+          ]
+        }
+      },
+      "duplicates": [],
+      "manual_interventions": [],
+      "notes": [
+        "F08利息/手续费等集中收入说明因原(867)金额格式导致整条隔离，初核未补回；作为真实缺项/程序消费限制，不用F07字段存在冒充机制完整。三问以F13/F19/F12的实际组合语义判断。",
+        "首读F15两指标将境内行范围标为issuer，源复核准确隔离两指标，最终API不计已隔离原位置为对外错误。",
+        "F20初稿的统一范围缺乏充分原文支持，初稿记unclear；模型最终保留混合范围和unclear标签，最终忠实原文，不强求统一。"
+      ]
+    }
+  ]
+}

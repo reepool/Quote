@@ -1,0 +1,260 @@
+{
+  "schema_version": "company_profile.independent_source_reference.v1",
+  "card": "6.FN",
+  "group": 1,
+  "role": "A-side independent source reviewer 1; not B development/self-check",
+  "created_on": "2026-11-25",
+  "state": "frozen_before_reading_new_model_outputs",
+  "assigned_instruments": ["920006.BJ", "920007.BJ", "600887.SH", "600893.SH", "600754.SH", "600350.SH"],
+  "method": "reference-and-audit-method.md",
+  "scope_and_limits": {
+    "source": "Each assigned original formal 2025 PDF, independently opened locally with pypdf; own native outline and printed contents followed by concentrated business/revenue sections.",
+    "extraction": "pypdf extraction_mode=layout for business pages and tables; row/column headers, units and continuation context read together. Native PDF outline and printed contents checked directly, not merely copied from B manifest.",
+    "page_numbering": "All physical_pages are one-based PDF pages. Printed page numbers are recorded separately where offset exists.",
+    "new_model_outputs_read": false,
+    "external_model_requests": 0,
+    "external_network_requests": 0,
+    "reference_may_be_sent_to_model": false,
+    "mandatory_questions": ["main_business", "main_products_or_services", "how_revenue_is_earned"],
+    "key_numbers_policy": "These are disclosed priority checks and scope traps, not additional mandatory fields. Optional detail/supply-chain omissions do not fail a company. Source-faithful uncertainty, approximately/over/near qualifiers, raw units and null normalization remain allowed.",
+    "reading_boundary": "Concentrated sections only; not full-report coverage, not a claim that all financial notes were read. Later output-specific source checks belong only in a-audit-group-1.json.",
+    "protected_assets": "No source PDF, existing profile, business code, management document, card, or inherited dirty file modified. No commit/push."
+  },
+  "companies": [
+    {
+      "instrument_id": "920006.BJ",
+      "company_name": "晟楠科技",
+      "document_sha256": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "document_hash_independently_verified": true,
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/74/74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b.pdf",
+      "report_period": "2025-01-01/2025-12-31",
+      "pdf_pages": 167,
+      "navigation_read": {"physical_pages": [3, 4], "native_outline_checked": true, "finding": "第四节管理层讨论与分析起于12，业务概要12—13；营业情况分析19起，收入构成21—22。目录和正文标题一致。"},
+      "actual_reading": [
+        {"chapter": "第二节 公司概况", "section": "一 基本信息、四 企业信息", "physical_pages": [6], "purpose": "确认原文主营产品概括为航空机械类及电源类产品"},
+        {"chapter": "第三节 会计数据和财务指标", "section": "一 盈利能力、二 营运情况", "physical_pages": [8], "purpose": "核公司收入、归母利润与净利润比较口径"},
+        {"chapter": "第四节 管理层讨论与分析", "section": "一 业务概要；二(一)经营计划", "physical_pages": [12, 13, 14], "purpose": "研发/采购/定制生产/项目直销及航空装备客户；区分已实现与未来经营目标"},
+        {"chapter": "第四节 管理层讨论与分析", "section": "二(三)财务分析—2 营业情况分析—利润构成、收入构成及客户", "physical_pages": [19, 20, 21, 22], "purpose": "同一集中子节核公司总收入、产品收入及军品审价的比较基数"}
+      ],
+      "core_expectations": {
+        "main_business": {"substantive_expectation": "面向国防装备供应单位，从事航空机械类及电源类产品研发、生产和销售；以航空装备配套为主，不只是泛称电子科技企业。", "source_pages": [6, 12, 13, 14, 21]},
+        "main_products_or_services": {"substantive_expectation": "主要业务/产品包括航空机械、综合电源，另有代加工劳务；已读经营综述还披露航空动力、电驱动、特种电源及无人机相关配套。核心不要求逐一抄出所有研发型号。", "source_pages": [6, 14, 21]},
+        "how_revenue_is_earned": {"substantive_expectation": "按军方/配套商需求研发及订单或定制生产，通过项目直接签约供货；价格按军方审价或双方议价执行。航空机械是主要收入来源，综合电源及代加工构成其他实际收入来源。", "source_pages": [12, 13, 20, 21]}
+      },
+      "disclosed_priority_numbers": [
+        {"item": "营业收入", "value": "112437270.64", "unit": "元", "period": "2025年度", "physical_pages": [19, 20, 21], "comparative": "2024年74317451.42元；同比51.29%"},
+        {"item": "主营业务收入", "value": "110497142.43", "unit": "元", "period": "2025年度", "physical_pages": [21], "comparative": "其他业务收入1940128.21元；不等同公司营业收入总额"},
+        {"item": "航空机械营业收入", "value": "82526296.78", "unit": "元", "period": "2025年度", "physical_pages": [21], "comparative": "收入同比-8.96%，毛利率58.80%"},
+        {"item": "综合电源营业收入", "value": "20510976.46", "unit": "元", "period": "2025年度", "physical_pages": [21], "comparative": "收入同比194.98%，毛利率24.48%，毛利率同比增加232.83个百分点"},
+        {"item": "代加工劳务营业收入", "value": "6782995.51", "unit": "元", "period": "2025年度", "physical_pages": [21], "comparative": "成本6821846.98元，毛利率-0.57%"},
+        {"item": "其他产品营业收入", "value": "2617001.89", "unit": "元", "period": "2025年度", "physical_pages": [21], "comparative": "产品分类的其他不等于收入构成表的其他业务收入"}
+      ],
+      "scope_and_error_traps": [
+        {"physical_pages": [20, 22], "warning": "6762.86万元是去年同期因审价/差价协议调减的收入，不能写成2025年新增销售或本期同额调减；2025收入增长主要受同比基数影响，不可推为产品销量同幅增长。"},
+        {"physical_pages": [8, 20], "warning": "本期归母净利润和净利润都为7949790.44元，但上期比较数不同，归母同比181.14%，净利润同比181.66%，不得串列。"},
+        {"physical_pages": [4, 22], "warning": "客户名称有保密代号，A单位合计并非其下属每家同额，不推断实名；前五名销售额99820531.96元、88.78%是客户集中度。"},
+        {"physical_pages": [14], "warning": "未来经营目标如关键节点达成率100%和突破2—3技术瓶颈，不写成本期已经完成；已完成首台套交付和处于试验的项目状态分开。"}
+      ],
+      "optional_source_opportunities": ["12—13页采购/合格供方、非核心外协、直接向军品配套商供货，足以形成粗粒度供应链描述，不需另补实名供应商。"],
+      "not_read": "未阅读全文及财务附注、行业专章；不要求为了可选细节扩读。"
+    },
+    {
+      "instrument_id": "920007.BJ",
+      "company_name": "酉立智能",
+      "document_sha256": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "document_hash_independently_verified": true,
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/1f/1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897.pdf",
+      "report_period": "2025-01-01/2025-12-31",
+      "pdf_pages": 151,
+      "navigation_read": {"physical_pages": [3, 4], "native_outline_checked": true, "finding": "第四节起于14，业务概要14—15；财务分析16起，利润构成17—18，收入构成19。"},
+      "actual_reading": [
+        {"chapter": "第四节 管理层讨论与分析", "section": "一 业务概要、二(一)经营计划", "physical_pages": [14, 15], "purpose": "核心零部件、下游光伏支架用途、国际市场、经营规模及上市事件"},
+        {"chapter": "第四节 管理层讨论与分析", "section": "二(三)财务分析—2 营业情况分析", "physical_pages": [17, 18, 19, 20], "purpose": "集中核利润构成、产品/地区收入、主要客户及供应商"}
+      ],
+      "core_expectations": {
+        "main_business": {"substantive_expectation": "深耕光伏支架核心零部件的研发、生产、销售；是光伏支架产业链部件制造供应商，不等同光伏发电运营商。", "source_pages": [14, 15]},
+        "main_products_or_services": {"substantive_expectation": "包括主体支撑扭矩管TTU、轴承组件BHA、组件安装结构件URA、檩条RAIL等；组装后用于固定/跟踪光伏支架，不把公司全部产品写成已包含电控和驱动的完整跟踪系统。", "source_pages": [14]},
+        "how_revenue_is_earned": {"substantive_expectation": "向国内外光伏支架客户销售核心零部件取得主要收入，境外销售为主，随下游支架客户特别是外销客户需求增长。可以定性说明主要变现方式，不要求补出各零件独立售价和收入。", "source_pages": [14, 19]}
+      },
+      "disclosed_priority_numbers": [
+        {"item": "营业收入", "value": "1031109601.89", "unit": "元", "period": "2025年度", "physical_pages": [15, 17, 19], "comparative": "2024年728842577.03元，同比41.47%"},
+        {"item": "光伏支架核心零部件收入/主营业务收入", "value": "1016969543.44", "unit": "元", "period": "2025年度", "physical_pages": [19], "comparative": "同比42.04%，成本861279002.28元，毛利率15.31%，毛利率同比减少3.40个百分点"},
+        {"item": "其他业务收入", "value": "14140058.45", "unit": "元", "period": "2025年度", "physical_pages": [19]},
+        {"item": "境内收入", "value": "123496836.85", "unit": "元", "period": "2025年度", "physical_pages": [19], "comparative": "同比-25.26%"},
+        {"item": "境外收入", "value": "907612765.04", "unit": "元", "period": "2025年度", "physical_pages": [19], "comparative": "同比61.04%"},
+        {"item": "前五名客户合计", "value": "979705112.51", "unit": "元", "period": "2025年度", "physical_pages": [20], "comparative": "95.01%年度销售占比；最大客户A为639015859.48元/61.97%"}
+      ],
+      "scope_and_error_traps": [
+        {"physical_pages": [14], "warning": "TTU/BHA/URA/RAIL是支架零部件；光伏跟踪系统的电控/驱动是该段介绍的系统组成，不能无据归为公司自产/销售产品。"},
+        {"physical_pages": [15, 18], "warning": "扣非归母净利润88743186.98元同比-0.53%；净利润91474644.63元同比1.80%，不能串主体与指标。"},
+        {"physical_pages": [19], "warning": "境外收入增长61.04%不是全公司增长；毛利率减少3.40个百分点不能写成增长3.40%或同比-3.40%。"},
+        {"physical_pages": [4, 20], "warning": "客户A—E及供应商G/H/I有意采用代称，不推断真实名称；客户C为合并口径，不能推导为每一家下属实体。"},
+        {"physical_pages": [20], "warning": "贸易业务收入比例超过10%披露为不适用，不能据此断言不存在任何贸易收入。"}
+      ],
+      "optional_source_opportunities": ["14页有巴西、智利、澳大利亚、加拿大、欧洲、中东等市场及下游光伏支架企业；采购原料精细名录未在本轮业务子节建立参考，不因缺少原料强求补读。"],
+      "not_read": "未读全部行业分析、未来展望和财务附注；没有以行业常识补齐钢材采购等事实。"
+    },
+    {
+      "instrument_id": "600887.SH",
+      "company_name": "伊利股份",
+      "document_sha256": "d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac",
+      "document_hash_independently_verified": true,
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/d1/d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac.pdf",
+      "report_period": "2025-01-01/2025-12-31",
+      "pdf_pages": 259,
+      "navigation_read": {"physical_pages": [4], "native_outline_checked": true, "finding": "目录印刷页6为管理层讨论，实际物理页10；此报告印刷页比物理页少4，不能照其他报告页数定位。"},
+      "actual_reading": [
+        {"chapter": "第三节 管理层讨论与分析", "section": "一 报告期内公司从事的业务情况", "physical_pages": [10], "printed_pages": [6], "purpose": "主要品类、六业务群、采购/生产/渠道和海外模式"},
+        {"chapter": "第三节 管理层讨论与分析", "section": "二 行业情况末段、三 经营情况讨论与分析", "physical_pages": [12], "printed_pages": [8], "purpose": "行业与公司份额区分；仅此页行业/综述，未冒称通读全部经营综述"},
+        {"chapter": "第三节 管理层讨论与分析", "section": "五 主要经营情况—(一)主营业务分析—1科目变动及2收入和成本", "physical_pages": [20, 21, 22, 23], "printed_pages": [16, 17, 18, 19], "purpose": "公司总收入及三主要产品收入、销售方式、产销量和成本构成；20—21同表延续、22—23产销续页一并读"},
+        {"chapter": "第三节 管理层讨论与分析", "section": "五(四)行业经营性信息分析—食品行业1主营业务构成", "physical_pages": [29], "printed_pages": [25], "purpose": "同表明确主营收入小计，与营业收入总额不同；避免重复出处重复计事实"}
+      ],
+      "core_expectations": {
+        "main_business": {"substantive_expectation": "各类乳品及健康饮品生产销售，国内销售为主并有海外生产和销售布局；不是仅一个奶粉单品公司。", "source_pages": [10]},
+        "main_products_or_services": {"substantive_expectation": "液态奶/乳饮料、奶粉、酸奶、冷冻饮品、奶酪、乳脂、包装饮用水等；经营主干应体现液体乳、奶粉及奶制品、冷饮产品三大披露收入类别，不要求细品牌全收。", "source_pages": [10, 21, 22]},
+        "how_revenue_is_earned": {"substantive_expectation": "组织乳品与健康饮品生产销售，以经销为主、直营为辅，覆盖商超、电商等渠道；液体乳是最大主营收入类别，奶粉及奶制品和冷饮是另两个主要收入来源。", "source_pages": [10, 21, 22, 29]}
+      },
+      "disclosed_priority_numbers": [
+        {"item": "营业收入", "value": "115636231250.05", "unit": "元人民币", "period": "2025年度", "physical_pages": [20], "comparative": "2024年115393310976.69元，同比增长0.21%"},
+        {"item": "主营业务收入合计", "value": "114545292837.39", "unit": "元人民币", "period": "2025年度", "physical_pages": [29], "comparative": "非全部营业收入；主营收入同比0.37%"},
+        {"item": "液体乳营业收入", "value": "70422480013.97", "unit": "元人民币", "period": "2025年度", "physical_pages": [21, 22, 29], "comparative": "同比-6.11%；毛利率31.43%；叙述以704.22亿元披露"},
+        {"item": "奶粉及奶制品营业收入", "value": "32768634710.63", "unit": "元人民币", "period": "2025年度", "physical_pages": [21, 22, 29], "comparative": "同比10.42%；毛利率41.58%；叙述以327.69亿元披露"},
+        {"item": "冷饮产品营业收入", "value": "9822498669.85", "unit": "元人民币", "period": "2025年度", "physical_pages": [21, 22, 29], "comparative": "同比12.63%；毛利率37.89%；叙述以98.22亿元披露"},
+        {"item": "经销主营收入", "value": "110308414722.79", "unit": "元人民币", "period": "2025年度", "physical_pages": [22, 29], "comparative": "直营4236878114.60元；二者是同一主营收入按销售方式分解，不能与产品分解重复加总"}
+      ],
+      "scope_and_error_traps": [
+        {"physical_pages": [20, 22, 29], "warning": "营业收入1156.36亿元不等于主营合计1145.45亿元；液体乳及乳制品制造业113013613394.45元与其他行业1531679442.94元仅为主营分行业，不能替代合并营业收入。"},
+        {"physical_pages": [22, 29], "warning": "产品、地区、销售模式是同一收入的不同分类；不能重复相加。表中其他产品1531679442.94元不代表全部其他业务收入。"},
+        {"physical_pages": [22], "warning": "吨为实物量：液体乳生产8670503、销售8755359、库存248699；奶粉及奶制品486427/473533/73854；冷饮640802/633289/29694。不要把销量同比或期末库存同比串到收入。"},
+        {"physical_pages": [10, 12], "warning": "六个经营业务群并非六个独立收入披露列；公司份额与全国行业数据、终端零售额份额与公司收入份额要区分。"},
+        {"physical_pages": [23], "warning": "成本直接材料等按各产品成本分母披露，不是全公司营业收入占比；不适用勾选不自动说明没有任何变化/交易。"}
+      ],
+      "optional_source_opportunities": ["10页原料奶利益联结、其他辅料集中招标、第三方物流与经销/直营渠道可直接形成供应链；20页海外乳品原料面向婴幼儿配方食品、运动营养、功能食品的供给也是可选特色。"],
+      "not_read": "未通读全部管理层讨论及财报附注；未为了市场份额、品牌排名等边际项扩大阅读。"
+    },
+    {
+      "instrument_id": "600893.SH",
+      "company_name": "航发动力",
+      "document_sha256": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "document_hash_independently_verified": true,
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/23/23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f.pdf",
+      "report_period": "2025-01-01/2025-12-31",
+      "pdf_pages": 200,
+      "navigation_read": {"physical_pages": [4], "native_outline_checked": true, "finding": "第三节管理层讨论与分析10起，主要业务10，主要经营情况14起，产品收入15、产销价值量16。"},
+      "actual_reading": [
+        {"chapter": "第三节 管理层讨论与分析", "section": "一 主要业务、产品及经营模式；二 行业；三 经营综述；四 核心竞争力", "physical_pages": [10, 11, 12, 13], "purpose": "集中确认三业务、产品用途、国家订货/外贸客户、研发及制造维修保障，不将行业前景作公司事实"},
+        {"chapter": "第三节 管理层讨论与分析", "section": "五 主要经营情况—(一)主营业务分析—1科目变动、2收入成本及产销/客户", "physical_pages": [14, 15, 16, 17], "purpose": "总收入与主营分产品、地区、直销、生产销售价值量及客户集中度"}
+      ],
+      "core_expectations": {
+        "main_business": {"substantive_expectation": "以航空发动机及衍生产品为主，另有外贸出口转包和非航空产品及其他业务，具备设计、制造、总装、试车及全寿命维修服务保障能力。", "source_pages": [10, 13, 14]},
+        "main_products_or_services": {"substantive_expectation": "航空发动机/燃气轮机整机、部件和零组件、维修保障；出口转包覆盖发动机/燃机零部件并延伸石油钻探、医疗器械等，非航含工艺装备和工业物业等。核心无需全部型号名单。", "source_pages": [10, 13]},
+        "how_revenue_is_earned": {"substantive_expectation": "通过研发制造、销售动力产品和全周期服务保障，以及出口加工/技术服务等变现。军品国家订货，销售模式为直销；航空发动机及衍生产品占绝大部分主营收入，同时保留另两类实际业务。", "source_pages": [10, 13, 14, 15]}
+      },
+      "disclosed_priority_numbers": [
+        {"item": "营业收入", "value": "46331495671.40", "unit": "元人民币", "period": "2025年度", "physical_pages": [14], "comparative": "叙述4633149.57万元，同比增长-3.23%"},
+        {"item": "主营业务收入", "value": "45658787811.56", "unit": "元人民币", "period": "2025年度", "physical_pages": [15], "comparative": "其他业务收入67270.79万元；主营同比-3.40%"},
+        {"item": "航空发动机及衍生产品营业收入", "value": "43476253945.25", "unit": "元人民币", "period": "2025年度", "physical_pages": [14, 15, 16], "comparative": "同比-3.37%；毛利率8.50%，同比减少1.04个百分点"},
+        {"item": "外贸出口转包营业收入", "value": "1950520200.78", "unit": "元人民币", "period": "2025年度", "physical_pages": [14, 15, 16], "comparative": "同比-5.94%；毛利率20.61%"},
+        {"item": "非航空产品及其他营业收入", "value": "232013665.53", "unit": "元人民币", "period": "2025年度", "physical_pages": [14, 15, 16], "comparative": "同比17.83%；毛利率25.61%"},
+        {"item": "航空发动机及衍生产品生产、销售和库存价值量", "values": ["4148919", "3978293", "460300"], "unit": "万元", "period": "2025年度生产/销售及期末库存", "physical_pages": [16], "comparative": "受保密要求不能披露实物量，此表价值量；不是台数，也不是营业收入"}
+      ],
+      "scope_and_error_traps": [
+        {"physical_pages": [14, 15], "warning": "万元叙述与元明细并列，允许保持原单位/舍入；三产品主营合计不等于公司总营业收入，不能混为营业总收入。"},
+        {"physical_pages": [16], "warning": "产销量标题下为价值量：航机为万元、外贸为按年度平均汇率折算的万美元；不能当台/件/实物量，也不能将生产价值替为营业收入。"},
+        {"physical_pages": [10, 13], "warning": "客户名称SAFRAN/RR/GE等绑定出口转包段，不能推为公司全部收入来源；不同型号研制、合作协议、获证/首飞的状态不等于全部商业批产。"},
+        {"physical_pages": [15], "warning": "非航空服务业行业行153215207.24元不等于非航空产品及其他产品行232013665.53元；地区和产品是不同划分，不重复加总。"},
+        {"physical_pages": [17], "warning": "前五名客户4206023.47万元/90.78%，前五名供应商1950629.19万元/55.05%，两类分母不同；不适用单客>50%不能推出不存在集中风险。"}
+      ],
+      "optional_source_opportunities": ["10页明确外贸处产业链中游、提供动力给航空器/舰船及油气电力设备，并列主要外贸客户；12页采购集采、供应商管理可作粗粒度供应链。"],
+      "not_read": "未读完整财务附注或国家保密内容；不追未披露实物数量。"
+    },
+    {
+      "instrument_id": "600754.SH",
+      "company_name": "锦江酒店",
+      "document_sha256": "836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30",
+      "document_hash_independently_verified": true,
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/83/836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30.pdf",
+      "report_period": "2025-01-01/2025-12-31",
+      "pdf_pages": 262,
+      "navigation_read": {"physical_pages": [4], "native_outline_checked": true, "finding": "第三节11起，业务11—12，酒店经营13—16，主要经营18起，收入分析19—20跨页。"},
+      "actual_reading": [
+        {"chapter": "第三节 管理层讨论与分析", "section": "一 公司从事业务；二 行业情况；三 经营情况—酒店业务", "physical_pages": [11, 12, 13, 14, 15], "purpose": "酒店及餐饮变现方式、开业/签约规模、境内境外业务、RevPAR口径；14—15境内酒店规模表跨页连读"},
+        {"chapter": "第三节 管理层讨论与分析", "section": "五 主要经营情况—(一)主营业务分析—科目变动及2收入和成本", "physical_pages": [18, 19, 20], "purpose": "合并营业收入、三业务/地区拆分及利润来源；19页表名接20页数据/单位"}
+      ],
+      "core_expectations": {
+        "main_business": {"substantive_expectation": "从事全服务型酒店、有限服务型酒店的营运及管理，以及食品餐饮业务；不是所有酒店都自有或直营。", "source_pages": [11, 12, 19, 20]},
+        "main_products_or_services": {"substantive_expectation": "高端至奢华酒店与中高端/中端/经济型连锁酒店的住宿、管理和品牌特许经营服务，另有餐厅投资经营管理。可保公司特色但不要求逐个品牌。", "source_pages": [11, 12, 13]},
+        "how_revenue_is_earned": {"substantive_expectation": "直营以客房及餐饮收入获益；委托管理收基本/奖励管理费；特许经营收品牌/系统等许可和加盟服务费。有限服务型酒店是收入主体；酒店与餐饮不同收入来源应有实质表述。", "source_pages": [11, 12, 13, 19, 20]}
+      },
+      "disclosed_priority_numbers": [
+        {"item": "合并营业收入", "value": "13810831633.88", "unit": "元人民币", "period": "2025年度", "physical_pages": [18, 20], "comparative": "同比-1.79%；营业成本8510758318.36元"},
+        {"item": "全服务型酒店营运及管理收入", "value": "254302170.49", "unit": "元人民币", "period": "2025年度", "physical_pages": [13, 20], "comparative": "同比6.71%；毛利率40.89%"},
+        {"item": "有限服务型酒店营运及管理收入", "value": "13346138431.95", "unit": "元人民币", "period": "2025年度", "physical_pages": [13, 20], "comparative": "同比-1.74%；毛利率38.68%"},
+        {"item": "食品及餐饮收入", "value": "210391031.44", "unit": "元人民币", "period": "2025年度", "physical_pages": [20], "comparative": "同比-13.05%；毛利率16.31%"},
+        {"item": "已开业酒店及客房", "values": ["14132", "1368057"], "units": ["家", "间"], "period": "2025-12-31", "physical_pages": [13], "comparative": "开业酒店含95家全服务、14037家有限服务；并非全部直营"},
+        {"item": "已签约酒店及客房", "values": ["18215", "1717385"], "units": ["家", "间"], "period": "2025-12-31", "physical_pages": [14], "comparative": "签约不等于开业；与开业规模不得相加"}
+      ],
+      "scope_and_error_traps": [
+        {"physical_pages": [13, 14, 15], "warning": "全球/境内/境外、全服务/有限服务、直营/加盟、开业/签约口径必须保留。13页有限服务其中直营612和加盟13425，不是全公司全服务+有限服务的同口径全部直营/加盟数；全服务另含1直营+94加盟及特许。"},
+        {"physical_pages": [13, 14], "warning": "酒店分部大陆境内974990万元不等同含餐饮的大陆境内总收入9960291456.23元；全球酒店收入1360044万元亦不等同全公司合并收入。"},
+        {"physical_pages": [14, 15], "warning": "境外有限服务业务48152万欧元及亏损8264万欧元不能写成人民币；境外人民币总收入3850540177.65元为另一个披露值。"},
+        {"physical_pages": [15], "warning": "RevPAR、平均房价、出租率为三个指标；1—12月与10—12月列不同。境内有限服务全年235.38元房价、64.93%出租率、152.83元RevPAR、同比-2.95%，不能串为全球或季度。"},
+        {"physical_pages": [11, 12], "warning": "肯德基/吉野家以合资公司形式从事相关特许经营，不能说集团拥有该品牌或把合资收入不经核对全额并入上市公司收入。"},
+        {"physical_pages": [20], "warning": "分地区上海成本等空栏/横线不得猜成确定零；分行业其他业务横线及-100%按原表保留，不据单个空栏把整条主营收入撤成未知。"}
+      ],
+      "optional_source_opportunities": ["11—12页酒店业主/受托酒店为品牌及管理服务客户，旅客为直营住宿客户；12页采购、预订会员和共享服务平台可以描述服务供应链。"],
+      "not_read": "未读16页境外各国完整续表、所有品牌清单或整份酒店财报附注；不声称完整全球运营指标审核。"
+    },
+    {
+      "instrument_id": "600350.SH",
+      "company_name": "山东高速",
+      "document_sha256": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "document_hash_independently_verified": true,
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf",
+      "report_period": "2025-01-01/2025-12-31",
+      "pdf_pages": 417,
+      "navigation_read": {"physical_pages": [4], "native_outline_checked": true, "finding": "第三节14起，业务14—17，经营17—19，主要经营20起、收入分行业21；无需先读长篇财报附注。"},
+      "actual_reading": [
+        {"chapter": "第三节 管理层讨论与分析", "section": "一 公司从事的业务情况及四大板块；二 行业情况；三 经营情况", "physical_pages": [14, 15, 16, 17, 18, 19], "purpose": "投资运营/收费机制、路产及产业链业务、通行费含税续表、投资收益与子公司口径；14—15路产表、17—18通行费表跨页连读"},
+        {"chapter": "第三节 管理层讨论与分析", "section": "五 主要经营情况—(一)主营业务分析—1科目变动及2收入成本", "physical_pages": [20, 21], "purpose": "合并总收入、主营九类收入，区分建造服务/机电施工及通行费税口径"}
+      ],
+      "core_expectations": {
+        "main_business": {"substantive_expectation": "交通基础设施投资运营以及高速产业链上下游股权投资，四板块为智慧运营、产业投资、工程建设、绿色低碳；核心是路桥运营，不把公司只写成工程承包商。", "source_pages": [14, 15, 16, 17]},
+        "main_products_or_services": {"substantive_expectation": "高速公路通行/受托运营管理，铁路运输，机电及工程建设、软件技术等产业链服务，产业投资及逐步布局的绿色低碳业务；不用把每个路段都做必填。", "source_pages": [14, 15, 16, 17, 19, 21]},
+        "how_revenue_is_earned": {"substantive_expectation": "收购经营性路桥资产，为车辆通行按政府标准收费；受托管理收服务费，铁路运输、机电工程、商品及相关服务产生其他主要收入。产业投资还贡献投资收益，投资收益不能冒充营业收入构成。", "source_pages": [14, 18, 20, 21]}
+      },
+      "disclosed_priority_numbers": [
+        {"item": "营业收入", "value": "23925458141.04", "unit": "元人民币", "period": "2025年度", "physical_pages": [17, 20], "comparative": "叙述239.25亿元，同比-16.03%；主要因建造服务下降"},
+        {"item": "高速公路通行费主营收入", "value": "10012165366.61", "unit": "元人民币", "period": "2025年度", "physical_pages": [20, 21], "comparative": "同比3.70%，毛利率55.72%；不同于经营数据含税通行费"},
+        {"item": "铁路运输收入", "value": "2735455363.31", "unit": "元人民币", "period": "2025年度", "physical_pages": [21], "comparative": "同比9.57%"},
+        {"item": "销售商品收入", "value": "2298005538.23", "unit": "元人民币", "period": "2025年度", "physical_pages": [21], "comparative": "同比-33.31%"},
+        {"item": "机电工程施工收入", "value": "3219046303.07", "unit": "元人民币", "period": "2025年度", "physical_pages": [21], "comparative": "同比7.27%；不同于工程施工367262242.96元"},
+        {"item": "建造服务收入", "value": "3100006510.91", "unit": "元人民币", "period": "2025年度", "physical_pages": [21], "comparative": "同比-58.59%，同表成本3100006510.91元；毛利率空白按原文保留，不强制归零"},
+        {"item": "运营通行费合计（含税）", "value": "1029969.88", "unit": "万元人民币，含税", "period": "2025年度", "physical_pages": [17, 18], "comparative": "叙述约103.00亿元；同比3.74%；不等同主营通行费100.12亿元"},
+        {"item": "运营管理路桥里程", "value": "约2917", "unit": "公里", "period": "报告期末现状", "physical_pages": [14, 15], "comparative": "约1601公里自有、约1316公里受托；路段表自有合计1600.783公里，保留约数及不同精度"}
+      ],
+      "scope_and_error_traps": [
+        {"physical_pages": [17, 18, 20, 21], "warning": "含税运营通行费约103.00亿元与财务收入100.12亿元口径不同，不因数近互换；表含税续页脚注不可丢。"},
+        {"physical_pages": [18], "warning": "投资收益合计186346.51万元/约18.63亿元，不是产业投资板块营业收入，也不应与营业收入相加当总收入。"},
+        {"physical_pages": [19, 21], "warning": "轨道交通集团收入50.56亿元、信息集团40.47亿元是具名主体的整组收入，不是合并铁路运输27.35亿元或机电工程32.19亿元的同义数。"},
+        {"physical_pages": [21], "warning": "同表工程施工、机电工程施工、建造服务为三行不能合并换名。下方分地区合计10012165366.61元只与高速通行费行对应，不能当全公司地区营业收入合计。"},
+        {"physical_pages": [14, 15, 17, 18], "warning": "路产自有和受托不混；收费期限、停收、改扩建和免费状态不同，不能用经营/收费结束日期冒充报告期。潍莱当期少量收入为前期拆账延迟到账，不是正常全年收费。"},
+        {"physical_pages": [19], "warning": "绿色项目已落地、中标、并网投用等阶段须保留；邯郸450MW项目不能无据写成已经全面运营产生当期收入。"}
+      ],
+      "optional_source_opportunities": ["14页路桥服务对象为过往车辆、受托管理对象为外部资产业主；15—19页交通产业链、铁路物流、工程和绿色投资适合保留公司特色，无需强凑制造原料供应链。"],
+      "not_read": "未读全部投资明细、财务附注与后续工程项目章；不追每条路段和子公司尾项。"
+    }
+  ],
+  "phase_one_cleanup": {
+    "previous_6fm_owned_roots_found": 0,
+    "removed_owned_root": "/home/python/Quote/data/QuoteBak/a1-6fn-source-4HdmctWm",
+    "files_removed": 1,
+    "logical_bytes_removed": 664,
+    "details": "Only this reviewer-created pypdf reading helper removed, then exact empty root rmdir. No extracted full-report copies or logs created. No unknown/parallel artifacts removed."
+  },
+  "phase_two": {
+    "status": "awaiting_main_A_notification_of_actual_outputs",
+    "only_future_write": "a-audit-group-1.json",
+    "rule": "This reference is frozen and must not be changed after model-output disclosure. Later actual first-read/automatic reviewed snapshots, raw hashes, per-work/fact and per-metric source judgments, duplicates and suggested restrictions go into the separate audit file only."
+  }
+}

@@ -617,21 +617,34 @@ def _check_explicit_money_unit(
     if not declared:
         return False
     reference = metric.value
-    if reference is None:
+    from .workpaper_metric_format import _ACCOUNTING_REASON, _RAW_NULL_REASON
+
+    # V2 preserves literal raw/null, including accounting parentheses. Its
+    # explicit source unit still governs even without a normalized number.
+    # Keep legacy null handling and deserialization unchanged.
+    raw_unit_check = reference is None and any(
+        note in (metric.uncertainty_reason or "") for note in (_ACCOUNTING_REASON, _RAW_NULL_REASON)
+    )
+    if reference is None and not raw_unit_check:
         literal = re.fullmatch(r"(?:近|约|超|突破)?\s*(-?\d[\d,，]*(?:\.\d+)?)\s*(?:万亿元|亿元|百万元|万元|千元|元)?", metric.raw_value)
         if literal is None:
             return False
         reference = literal.group(1).replace(",", "").replace("，", "")
-    reference = Decimal(reference)
+    reference = None if raw_unit_check else Decimal(reference)
     units, headerless = set(), False
     for eid in fact.evidence_ids:
         for span in sources[eid].source_spans:
             headers = list(_MONEY_HEADER.finditer(span.quote))
-            matches = _source_number_cells(span.quote)
-            matches.extend(cell for cell in _wrapped_table_cells(span.quote)
-                           if re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", cell[0]))
+            if raw_unit_check:
+                pattern = r"\s*".join(re.escape(part) for part in metric.raw_value.split())
+                matches = [(match.group(), match.start(), match.end())
+                           for match in re.finditer(pattern, span.quote)]
+            else:
+                matches = _source_number_cells(span.quote)
+                matches.extend(cell for cell in _wrapped_table_cells(span.quote)
+                               if re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", cell[0]))
             for text, start, end in matches:
-                if Decimal(text.replace(",", "")) != reference:
+                if not raw_unit_check and Decimal(text.replace(",", "")) != reference:
                     continue
                 # A paragraph may follow a table on the same source fragment.
                 # Its explicit amount suffix owns the unit, not that old header.
@@ -1064,9 +1077,9 @@ def workpaper_draft_wire_schema() -> dict:
 
 def normalize_workpaper_draft(data, *, metric_format_policy=None):
     """Withhold observed local failures, never guess missing facts or metric meaning."""
-    from .workpaper_metric_format import METRIC_FORMAT_POLICY, normalize_directional_metric_format
+    from .workpaper_metric_format import METRIC_FORMAT_POLICIES, normalize_directional_metric_format
 
-    if metric_format_policy not in (None, METRIC_FORMAT_POLICY):
+    if metric_format_policy not in (None, *METRIC_FORMAT_POLICIES):
         raise ValueError(f"unknown workpaper metric format policy: {metric_format_policy!r}")
     if not isinstance(data, Mapping):
         return data
