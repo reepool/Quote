@@ -1,5 +1,11 @@
 # 实施任务：A/B 连续开发与末端审核
 
+### 6.FL 显式研究任务HTTP入口（用户实施授权）
+
+- [x] 6.FL1 A冻结50e1df4a/49既有脏改、365保护文件及20完整profile，卡/规范/设计先行；B原task_entry/TaskService交有限策略、显式HTTP提交和后台状态/结果，普通查询/计划保持原路径，不触发调用。新端点默认禁用，服务端安装策略及凭据后才可使用。
+- [x] 6.FL2 原transport显式controlled_fixture沿首读待核→独立复核→成功按股补读，6个新直接用例通过；A无DI覆盖独立HTTP验证后台待核可读、review后继、补读失败保完整旧稿、重复/冲突/配额/重启不重发。0新真实模型/联网付费，不作为内容质量成绩。
+- [x] 6.FL3 A独核实际HTTP依赖/内容、20完整profile/365旧文件及49既有脏改，任务root与原读取隔离、后继归属/关停阻塞已修。41项回归40通过、1既有断言用HEAD原router及不变owner复现，末段2通过；strict/正确性ruff/diff通过，用法/结果一套、本人垃圾清理及隔离普通Git见result/a-close。0真实调用，不改旧质量或启生产。
+
 ### 6.FK 统一研究版、实际消费与复核改进（用户合并实施授权）
 
 - [x] 6.FK1 A冻结553e374a/49旧脏/310文件、20股旧API及三股完整profile期望，原FJ本人根已清；独立风险/正控、新有限观察资源、A/B disjoint写集与先清后做见company-profile-unified-review-release-card.md。

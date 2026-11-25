@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-25 [6.FL研究任务HTTP工程闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-task-delivery-20261125/result.md)：有限服务端策略、提交ID/进度/结果、原首读→显式复核→按股补读及失败保稿/防重发成立；6新增直接用例及A独立HTTP原依赖验证通过。0新真实模型/付费，不产生新质量分或正式阶段成绩；当前20股650/1059、365旧文件、原97.8967%和99%/扩量/生产边界保持。完整回归及基线差异如实单列，不以全部测试全绿冒称语义准确。
+
 2026-11-25 [6.FK合并交付完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/result.md)：原20根现650可读/1059指标，三已审稿及本卡3安全后继同卡发布；A两次独核20完整profile（17其余保持）、API/导出/新实例相等及310旧文件，实际只读router7次200/正常关闭。v13源先行分别核正文/metric及空白零义，8直接用例/3原入口证明后同三稿真实7物理/0恢复/188244供应商total与账本/493.822组秒/unknown费用；已知风险4/8指标+1整事实检出（前轮3/8+0），仍漏华阳4位置，9组正控保可用，2实际修订有源。范围澄清/措辞建议不算新错误，旧F12独立隔离不解禁；原97.8967%/99%/S2及规模生产不改，不追加校准/公司。子上下文2次进程前审批拒绝由主任务完整既有授权上下文获准同动作，0请求不记模型失败。必要一套后清重复probe/本人DB/脚本及隔离Git同卡，研究使用优先。
 
 2026-11-25用户明确批准[6.FK合并交付](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-unified-review-release-card.md)：先汇入三份已审后继到现20统一root并验证实际API/缺项/补读计划，B2并行一次通用源复核提示改进；仅同三份已有公开年报一次新当前稿review/必要一次修订/final，既有DeepSeek/Grok high及获准联网。每股6000秒/1000000保守账本/6物理含3恢复每逻辑1、高阶1200/2450，组12600秒/3000000/18并发3，有价每股10元/无价unknown；不借旧额、重抽、追加轮次/公司/生产。A独立冻结风险与正控，实际新检出/继承/漏检及当前研究用途分列，旧97.8967%和正式门槛不改；B1/B2连续实施与必要一套后清/Git同卡。

@@ -1,0 +1,37 @@
+{
+  "schema_version": "company_profile_http_task_close.v1",
+  "protected_files": 365,
+  "protected_changes": [],
+  "inherited_tracked_paths_preserved": 49,
+  "inherited_nonmanagement_hash_changes": [],
+  "management_inherited_bytes_verified": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/specs/company-profile-llm-led-delivery/spec.md": true,
+    "docs/development/company_profile_acceptance_program.md": true,
+    "docs/development/company_profile_delivery_plan.md": true
+  },
+  "new_real_model_requests": 0,
+  "business_network_calls": 0,
+  "paid_usage_added": 0,
+  "cleanup_a": {
+    "path": "data/QuoteBak/company-profile-6fl-a-ddX6fmfE",
+    "files": 220,
+    "logical_bytes": 20098795,
+    "scope": "owned isolated tests/DBs/requests/logs/snapshots/scripts; needed assertions persisted once",
+    "recoverability": "rebuild from committed code/fixtures; required assertions retained in this evidence root",
+    "removed": true
+  },
+  "cleanup_b": {
+    "files": 197,
+    "logical_bytes": 7182312,
+    "path": "data/QuoteBak/company-profile-6fl-b-DzcRyUGU plus four owned explicit compile caches"
+  },
+  "new_evidence_is_single_authoritative_set": true,
+  "known_legacy_test_failure_reproduced": true,
+  "production_enabled": false,
+  "total_cleaned_files": 417,
+  "total_cleaned_logical_bytes": 27281107
+}

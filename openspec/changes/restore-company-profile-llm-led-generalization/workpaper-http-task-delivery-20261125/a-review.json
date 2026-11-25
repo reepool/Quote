@@ -1,0 +1,43 @@
+{
+  "head": "50e1df4a619bb71287023edad230556008f8636f",
+  "same_failure_reproduced_without_new_http_import": true,
+  "source_owner_unchanged": {
+    "research/company_profile/reads.py": "21c8c9bc2864b14d2df1e837307b55a673872f60a5950cdc31e54d8cda152ded",
+    "research/company_profile/operations.py": "987ecefaab6546ea153b7723dd9ad93df6a3618f59ec88fa2d1d5dbf1902b164",
+    "research/company_profile/task_entry.py": "211a4fa34baa45f8270735a0bf4b460a83cdbe2c2337febaf99d12b364791132",
+    "tests/unit/test_research/test_company_profile_enrichment.py": "03dcf0642b942f142db28c308621712d0ee602e1de6151ffb5b7a1a3547722e9"
+  },
+  "new_direct_tests": 6,
+  "combined_run": {
+    "passed": 40,
+    "failed": 1,
+    "seconds": 276.13
+  },
+  "late_targeted_run": {
+    "passed": 2,
+    "seconds": 9.04
+  },
+  "baseline_single_run": {
+    "failed": 1,
+    "seconds": 53.42
+  },
+  "external_model_requests": 0,
+  "early_attempts_not_counted_as_pass": [
+    {
+      "scope": "compatibility set sandbox",
+      "exit": 130
+    },
+    {
+      "scope": "compatibility set approved IPC 150s",
+      "exit": 124
+    },
+    {
+      "scope": "A initial provider-mode fixture",
+      "reason": "missing official source PDF, 0 controlled sends"
+    },
+    {
+      "scope": "A import of unfinished B PDF helper",
+      "reason": "fitz absent; dependency not installed"
+    }
+  ]
+}

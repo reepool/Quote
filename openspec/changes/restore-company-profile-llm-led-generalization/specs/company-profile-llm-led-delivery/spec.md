@@ -2,6 +2,19 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Explicit bounded research-task HTTP commands reuse the original owner
+The HTTP adapter MUST accept explicit first_read, review_batch and single-stock enrich submissions with request identity and stock scope; enrich MUST include concrete targets. It MUST return a durable task ID, progress and result links independently of task duration. Only an operator-installed finite authorized policy may enable commands, binding actions, exact stock/report versions, configured model profiles, per-task limits and a maximum submission count. Requests MUST NOT control paths, endpoints, credentials or budgets. New endpoints MUST require a configured research-task credential. Execution MUST generate an original plan and dispatch task_entry/TaskService, without another semantic loop or fact store. The aggregate allowance MUST be finite and visible; each explicit action consumes one submission.
+
+#### Scenario: A client submits first read and later review
+- **WHEN** a permitted client explicitly submits stocks under an installed finite policy
+- **THEN** task identity and queued/running/terminal status remain readable, the original writer publishes a valid pending first-read draft, and explicit later review consumes saved report/hash-bound plans through the original owner
+- **AND** profile/query/plan/status/result reads never queue or send models, gaps/review limits remain visible, and completion does not establish semantic accuracy or production approval
+
+#### Scenario: Duplicate requests, failures and interrupted workers preserve useful work
+- **WHEN** a duplicate, conflicting request, concurrent worker or process interruption occurs
+- **THEN** identical requests reuse their task, conflicts are rejected, shared writer/control scopes execute serially, policy changes cannot refresh allowances, and interruptions are reported without reopening model budgets
+- **AND** useful existing profiles, original errors and source/model attribution remain; public failures never expose credentials, raw rejected content or arbitrary files
+
 ### Requirement: The existing job command accepts an explicit bounded workpaper plan
 The CLI and scheduled-task adapter MUST forward an explicitly supplied execution plan file to the company-profile application adapter. The adapter MUST reuse the existing configuration, gateway, budget, workpaper identity and published task owner for first_read, review_batch or enrich. It MUST require explicit authorized scope, stock/report versions, configured profile identities and finite limits before model construction; it MUST reject unknown plan fields, profile drift and out-of-scope report requests. Constructed model dependencies MUST remain local to this explicit invocation, without changing shared configuration, default routes or production schedules. It MUST NOT implement another extraction/review loop.
 
@@ -303,7 +316,7 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **AND** the same request identity MUST NOT resend completed work; recovery writes a distinct report/hash-bound successor, preserves original failures and source/model attribution, and does not expose a restored unreviewed original before the recovery review returns
 - **AND** API and combined exports MUST preserve predecessor metadata while marking superseded facts/gaps explicitly so unchanged content is not counted twice as newly extracted facts
 - **AND** unchanged independently source-checked facts may inherit their existing decision, restrictive source-only/withheld/duplicate decisions MUST NOT be cleared by model review, and changed or new facts MUST NOT inherit independent approval from a different content hash
-- **AND** planning/GET remain read-only, no new public paid executor or parallel fact store is created, and historical stage results, finite-call authority and production restrictions remain separate
+- **AND** planning/GET remain read-only and create no paid executor or parallel fact store; the separately submitted research-task HTTP commands follow their explicit finite-policy requirement, while historical stage results, finite-call authority and production restrictions remain separate
 
 #### Scenario: A final verification execution failure follows an initial review failure in a bounded batch
 - **WHEN** an explicitly enabled consecutive-same-execution-failure batch policy observes adjacent companies in actual processing order failing on the same review channel and gateway cause, whether at initial review or final verification

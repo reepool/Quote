@@ -1,0 +1,132 @@
+{
+  "schema_version": "company_profile_http_task_independent_a.v1",
+  "external_model_requests": 0,
+  "dependency_overrides": false,
+  "processing_identity": "explicit_controlled_fixture_not_real_annual_report",
+  "http": [
+    {
+      "method": "post",
+      "url": "/api/v1/research/company/annual-profile-tasks",
+      "status": 202
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/annual-profile-tasks/profile-http-b46ea55b48367d1630bcdb3f4401b108",
+      "status": 200
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/600000.SH/annual-profile",
+      "status": 200
+    },
+    {
+      "method": "post",
+      "url": "/api/v1/research/company/annual-profile-tasks",
+      "status": 202
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/annual-profile-tasks/profile-http-b1ab9db3fe3a6f3f522915de17ded059",
+      "status": 200
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/600000.SH/annual-profile",
+      "status": 200
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/600000.SH/annual-profile",
+      "status": 200
+    },
+    {
+      "method": "post",
+      "url": "/api/v1/research/company/annual-profile-tasks",
+      "status": 202
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/annual-profile-tasks/profile-http-a5889380029ce5d62912513422e0d004/result",
+      "status": 200
+    },
+    {
+      "method": "post",
+      "url": "/api/v1/research/company/annual-profile-tasks",
+      "status": 202
+    },
+    {
+      "method": "post",
+      "url": "/api/v1/research/company/annual-profile-tasks",
+      "status": 429
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/annual-profile-tasks/profile-http-b1ab9db3fe3a6f3f522915de17ded059",
+      "status": 200
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/annual-profile-tasks/profile-http-b1ab9db3fe3a6f3f522915de17ded059/result",
+      "status": 200
+    },
+    {
+      "method": "get",
+      "url": "/api/v1/research/company/annual-profiles",
+      "status": 200
+    }
+  ],
+  "accepted_tasks": 3,
+  "controlled_transport_sends": 3,
+  "stages": [
+    "select_profile_sections",
+    "extract_profile_workpaper",
+    "review_profile_workpaper"
+  ],
+  "pending_facts": [
+    {
+      "fact_id": "main",
+      "text": "公司提供存贷款和结算服务。",
+      "subject_scope": "consolidated_group",
+      "period": "2025",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "metrics": [],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "revenue",
+      "text": "报告表列本期营业收入100.00元。",
+      "subject_scope": "consolidated_group",
+      "period": "2025",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "metrics": [
+        {
+          "name": "营业收入",
+          "raw_value": "100.00",
+          "value": "100.00",
+          "unit": "元",
+          "source_unit": null,
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "comparison_basis": "本期列",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    }
+  ],
+  "reviewed_readings": 2,
+  "failed_enrich_kept_full_profile": true,
+  "old_record_bytes_preserved": true,
+  "reads_sent_zero": true,
+  "restart_sent_zero": true,
+  "quota_survives_restart": true,
+  "asynchronous_pending_read_verified": true,
+  "checks_passed": true
+}

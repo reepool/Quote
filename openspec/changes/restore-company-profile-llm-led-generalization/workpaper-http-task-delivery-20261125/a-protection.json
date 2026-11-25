@@ -1,0 +1,10 @@
+{
+  "schema_version": "company_profile_http_task_a_protection.v1",
+  "profiles": 20,
+  "full_api_sha256": "7ca084950baeddc8f82bce44d5d7b69cc481396584c77d3d1e08c43f7cc10c0a",
+  "matches_saved_current_api": true,
+  "protected_files": 365,
+  "protected_changes": [],
+  "new_model_requests": 0,
+  "full_profiles_unchanged": true
+}

@@ -1,0 +1,18 @@
+.............................F...........                                [100%]
+=================================== FAILURES ===================================
+_ test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock _
+tests/unit/test_research/test_company_profile_enrichment.py:154: in test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock
+    assert reader.query(('600000.SH',))['profiles'][0]['work_id'] == 'first-read'
+E   AssertionError: assert 'bp-work-a9b7...d62beb658d47c' == 'first-read'
+E
+E     - first-read
+E     + bp-work-a9b77a10856d62beb658d47c
+============================= slowest 5 durations ==============================
+69.10s call     tests/unit/test_research/test_company_profile_http_tasks.py::test_http_first_read_explicit_review_and_enrich_use_original_owner
+68.94s call     tests/unit/test_research/test_company_profile_enrichment.py::test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock
+60.12s call     tests/unit/test_research/test_company_profile_task_entry_modes.py::test_public_entry_first_read_then_saved_plans_on_new_service_without_resending
+51.45s call     tests/unit/test_research/test_company_profile_task_entry_modes.py::test_default_run_and_resume_keep_inline_review
+2.67s call     tests/unit/test_research/test_company_profile_http_tasks.py::test_scope_serialization_shutdown_join_and_restart_never_resends
+=========================== short test summary info ============================
+FAILED tests/unit/test_research/test_company_profile_enrichment.py::test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock - AssertionError: assert 'bp-work-a9b7...d62beb658d47c' == 'first-read'
+1 failed, 40 passed, 6 warnings in 276.13s (0:04:36)

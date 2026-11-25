@@ -1,5 +1,13 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+## 386. 6.FL显式研究任务HTTP入口
+
+用户授权前轮建议后，A按产品/验收/交付/A-B v3先写卡和OpenSpec delta，B沿原task_entry→execute_published_task→TaskService实现HTTP显式first_read/review_batch/enrich，返回任务ID、queued/running/terminal及原reader当前结果。服务端策略一次冻结动作/股票/报告版本/原profiles/每任务预算及有限任务数；请求不收路径/端点/凭据/预算。新端点凭据与默认禁用，原普通查询/计划保持原路径且无调用。任务账只存请求/计划/摘要，不另存事实；双root pin和范围锁、同ID幂等/冲突/配额、失去owner后的中断及关停真实线程join保原writer/control。A审中纠正任务policy污染原读root的问题，B末段修正后继稿归属和生命周期收尾，非阻塞风格后置。
+
+6新直接用例通过，成功首读/复核/补读沿原owner和ScriptedTransport分别2/1/3受控发送。A不覆盖路由DI，真实安装策略/凭据并用门控受控transport证明返回ID后执行、等待复核时可读待核、复核后后继、补读故障保完整旧稿、旧字节不改、重复/GET/重启不发以及有限额度；3接受任务/3受控发送、0真实模型/业务联网/付费。隔离identity明确controlled_fixture，首次real fixture缺PDF拒绝及测试依赖fitz缺失未算通过、未安装依赖或放宽真实源要求。
+
+现20股完整profile等保存current API（650/1059），365保护文件保持；49既有脏改按baseline隔离，原源/独立限制/97.8967%及正式规模生产边界不改。41项合并回归40通过、1旧enrich query断言失败；用50e1df4a原HTTP模块且不加载新适配，原owner/read/测试字节等HEAD，53.42秒复现相同旧失败。B末段2直接用例通过，不冒称全套全绿；实际结果/复现、有限Review/strict及清理/Git详唯一workpaper-http-task-delivery-20261125/result.md。本卡不装实际策略、不启动服务或扩付费批次，交付显式研究入口及用法，不再追字段或新架构。
+
 ## 385. 6.FK统一研究版、实际消费与通用复核改进
 
 2026-11-25用户明确“同意你的建议，授权实施”，A按产品/验收/交付/A-B v3及OpenSpec apply、business-first将统一研究版、实际消费、一次通用复核改进和阶段裁决合并为同一窗口。基线553e374a、49既有脏改及310保护文件；A冻结20完整profile期望、5已见风险对象（8指标位置+1整事实）及9组正控，复用原PDF独立判定前核当前fact/PDF hash精确一致，不向模型送旧审核或A答案。B1做原writer/读取交付，B2只改原review提示与政策身份/直接测试，写集分离；前轮FJ本人根已清，不新增全池重抽或扩100/生产。

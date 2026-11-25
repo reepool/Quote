@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-25 [6.FL显式研究任务HTTP交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-task-delivery-20261125/result.md)：已沿原task_entry/TaskService提供提交ID、后台进度/结果、首读/显式源核/按股补读。服务端一次有限策略及凭据、重复不重发、失败保稿和关停join；普通查询/计划不改变数据集或调用模型。6新直接用例及A实际依赖HTTP闭环通过，当前20股650/1059与365保护文件保持。0新真实模型/付费、不装实际策略或启生产；旧质量/规模边界不改。A规划独审/B实施，前后清本人开发物、必要证据一套并隔离普通Git；用法见docs/research/company_profile_http_tasks.md。
+
 2026-11-25 [6.FK四项同卡收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/result.md)：原20统一API现650/1059，既有三稿和3真实观察后继已发布、17其余保持，原router批量/详情/缺项/只读补读计划可用。v13共性源核仅本轮三份7物理/188244/493.822秒、0恢复/费用unknown；新抓此前1指标方向+1整事实矛盾，仍余华阳4指标靠原保护，非新99%或免人工。A原PDF/正控/完整profile审通过，阶段转研究使用与具体问题精读，不再自动派这三家/20整批校准或扩100/生产；旧分/源/限制保留。必要证据归一后清本轮重复probe、测试DB及临时脚本，有限Review/strict和正常Git同卡完成，详情见唯一result。
 
 2026-11-25当前执行[6.FK统一研究版与复核改进](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-unified-review-release-card.md)：用户已授权前轮四项合并建议，A冻553e374a/49旧脏/310文件；B1先将华阳/金租/学大已审新稿汇入原20股读取根、实际消费和统一导出，B2并行三类共性提示改进及同三稿一次真实观察，A末端裁决后可同卡发布安全有用后继。补充可缺、保原限制和旧分；新任务预算/联网/停止及自主范围见卡，不重抽20或开100/生产，不再拆字段返修卡。前轮本人临时根已清，必要证据一套后清本轮产物/普通Git同卡。

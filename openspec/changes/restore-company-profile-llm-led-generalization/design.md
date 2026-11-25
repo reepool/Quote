@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FL explicit research-task HTTP adapter
+
+An operator-installed finite policy binds actions, stocks/report versions, existing model profiles, approval, per-task limits and maximum submissions. HTTP commands supply request IDs, stocks and enrichment targets; the adapter builds an original execution file and dispatches task_entry/TaskService only. It persists request fingerprints/progress, serializes the shared writer/control scope across workers and leaves interrupted tasks inspectable without auto-resending. New endpoints require a configured credential, accept no caller paths/endpoints/secrets, and return ID/status/result links. Ordinary GET/query/plan stay local. This explicitly extends earlier plan-only HTTP scope without changing those routes or granting production permission. See company-profile-http-task-card.md.
+
 ### 6.FJ 完成后本地恢复候选沿原批次进入一次final
 
 现有默认completed→not_needed保兼容，显式恢复仅在原本地拒绝候选现已字面source-ready、原初核/修订/父seed/当前稿/源包和旧final等值绑定后生成verify_only计划。原6候选走既有final算法，不以在adapter合成4旧+2新模型响应代替真实回执，也不为了省4项载荷扩成候选子集框架。原4修订的内容hash与已有独立限制保持，新增仅评价R4/R5；新record和原read/export分级，旧结果不改。实现/计划先就绪再冻结发送，单任务/逻辑/物理及清理以6.FJ卡为准。

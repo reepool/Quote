@@ -20,7 +20,9 @@ from utils.llm import load_project_environment
 
 from .routes import router
 from .announcement_asset_routes import router as announcement_asset_router
-from .company_profile_routes import router as company_profile_router
+from .company_profile_routes import (
+    router as company_profile_router, initialize_annual_profile_tasks, close_annual_profile_tasks,
+)
 from .middleware import setup_middleware
 
 
@@ -39,16 +41,22 @@ async def lifespan(app: FastAPI):
         api_logger.error(f"[API] Failed to initialize DataManager: {e}")
         # 不阻止应用启动，但记录错误
 
-    yield
-
-    # 关闭时清理
-    api_logger.info("[API] Shutting down Quote System API...")
+    initialize_annual_profile_tasks(app)
     try:
-        from data_manager import data_manager
-        if hasattr(data_manager, 'close'):
-            await data_manager.close()
-    except Exception as e:
-        api_logger.error(f"[API] Error during shutdown: {e}")
+        yield
+    finally:
+        # Join the real task before DataManager/storage teardown; never leave a
+        # detached stage thread sending requests after the API worker exits.
+        try:
+            await close_annual_profile_tasks(app)
+        finally:
+            api_logger.info("[API] Shutting down Quote System API...")
+            try:
+                from data_manager import data_manager
+                if hasattr(data_manager, 'close'):
+                    await data_manager.close()
+            except Exception as e:
+                api_logger.error(f"[API] Error during shutdown: {e}")
 
 
 # 创建FastAPI应用

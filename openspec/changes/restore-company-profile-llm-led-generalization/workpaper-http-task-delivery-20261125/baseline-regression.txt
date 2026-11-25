@@ -1,0 +1,13 @@
+=================================== FAILURES ===================================
+_ test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock _
+tests/unit/test_research/test_company_profile_enrichment.py:154: in test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock
+    assert reader.query(('600000.SH',))['profiles'][0]['work_id'] == 'first-read'
+E   AssertionError: assert 'bp-work-a9b7...d62beb658d47c' == 'first-read'
+E
+E     - first-read
+E     + bp-work-a9b77a10856d62beb658d47c
+============================= slowest 1 durations ==============================
+52.07s call     tests/unit/test_research/test_company_profile_enrichment.py::test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock
+=========================== short test summary info ============================
+FAILED tests/unit/test_research/test_company_profile_enrichment.py::test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock - AssertionError: assert 'bp-work-a9b7...d62beb658d47c' == 'first-read'
+1 failed, 6 warnings in 53.42s

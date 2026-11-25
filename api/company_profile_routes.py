@@ -1,13 +1,17 @@
-"""Read-only annual-profile delivery and explicit supplemental-reading plans."""
+"""Annual-profile reads/plans and separate, explicitly authorized task commands."""
 from __future__ import annotations
 
 import asyncio
+import hmac
 import os
 from pathlib import Path
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
 from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.http_tasks import (
+    CompanyProfileHttpTaskRequest, CompanyProfileHttpTasks, HttpTaskError, load_http_task_policy,
+)
 from research.company_profile.workpaper_enrichment import EnrichmentTarget
 from utils.code_utils import convert_to_database_format
 
@@ -42,6 +46,72 @@ class ReviewRecoveryPlanRequest(BaseModel):
 class AnnualProfileBatchRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     instrument_ids: list[str] = Field(min_length=1, max_length=100)
+
+
+def initialize_annual_profile_tasks(app) -> None:
+    """Install once per API worker; initialization/restart never schedules work."""
+    if hasattr(app.state, "company_profile_http_tasks"):
+        return
+    app.state.company_profile_http_tasks = None
+    app.state.company_profile_http_task_error = "company_profile_tasks_not_configured"
+    if not os.environ.get("QUOTE_COMPANY_PROFILE_TASK_TOKEN", "").strip():
+        return
+    try:
+        app.state.company_profile_http_tasks = CompanyProfileHttpTasks(load_http_task_policy())
+    except (HttpTaskError, OSError, ValueError):
+        app.state.company_profile_http_task_error = "company_profile_tasks_unavailable"
+
+
+async def close_annual_profile_tasks(app) -> None:
+    service = getattr(app.state, "company_profile_http_tasks", None)
+    if service is not None:
+        await service.close()
+
+
+def annual_profile_tasks(request: Request, authorization: str | None = Header(default=None)) -> CompanyProfileHttpTasks:
+    expected = os.environ.get("QUOTE_COMPANY_PROFILE_TASK_TOKEN", "").strip()
+    if not expected:
+        raise HTTPException(status_code=503, detail="company_profile_task_credential_not_configured")
+    if not authorization or not hmac.compare_digest(authorization.encode(), ("Bearer " + expected).encode()):
+        raise HTTPException(status_code=401, detail="company_profile_task_credential_required",
+                            headers={"WWW-Authenticate": "Bearer"})
+    initialize_annual_profile_tasks(request.app)
+    service = request.app.state.company_profile_http_tasks
+    if service is None:
+        raise HTTPException(status_code=503, detail=request.app.state.company_profile_http_task_error)
+    return service
+
+
+@router.post("/research/company/annual-profile-tasks", status_code=202)
+async def submit_annual_company_profile_task(
+    request: CompanyProfileHttpTaskRequest,
+    service: CompanyProfileHttpTasks = Depends(annual_profile_tasks),
+):
+    """The only HTTP command that can schedule a finite research invocation."""
+    try:
+        return await service.submit(request)
+    except HttpTaskError as exc:
+        raise HTTPException(status_code=exc.status, detail=exc.code) from exc
+
+
+@router.get("/research/company/annual-profile-tasks/{task_id}")
+async def get_annual_company_profile_task(
+    task_id: str, service: CompanyProfileHttpTasks = Depends(annual_profile_tasks),
+):
+    try:
+        return await asyncio.to_thread(service.status, task_id)
+    except HttpTaskError as exc:
+        raise HTTPException(status_code=exc.status, detail=exc.code) from exc
+
+
+@router.get("/research/company/annual-profile-tasks/{task_id}/result")
+async def get_annual_company_profile_task_result(
+    task_id: str, service: CompanyProfileHttpTasks = Depends(annual_profile_tasks),
+):
+    try:
+        return await asyncio.to_thread(service.result, task_id)
+    except HttpTaskError as exc:
+        raise HTTPException(status_code=exc.status, detail=exc.code) from exc
 
 
 @router.get("/research/company/annual-profiles")
