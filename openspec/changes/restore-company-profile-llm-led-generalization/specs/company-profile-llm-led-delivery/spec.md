@@ -143,6 +143,16 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **AND** the original full repair batch may be reverified once to keep the existing final contract; previously accepted candidates MUST remain content-identical and separately attributed rather than counted as new facts, with no invented combined model reply or repeated extraction/initial review/repair
 - **AND** only an actual valid content-matched final response may adopt recovered candidates; failures preserve existing usable content and independent restrictions, and the new plan/limited budget never reopens an ended run or authorizes production
 
+#### Scenario: Reviewed successors are released through the existing research API
+- **WHEN** reviewed same-report successors exist in isolated development roots and are approved for research consumption
+- **THEN** the existing writer and read owner MUST expose them through the common research root with their exact parent lineage, preserving older files, author/source/model attribution and independent restrictions
+- **AND** the integrated profiles MUST equal the approved source profiles and unrelated companies MUST remain unchanged; queries and enrichment plans do not implicitly call a model
+
+#### Scenario: Source review checks narrative and numeric metadata separately
+- **WHEN** a source-backed narrative contains structured metrics or a financial absence assertion
+- **THEN** the reviewer MUST compare each original metric's subject and financial-column/comparison meaning with the source, without treating narrative correctness or a locatable number as proof of metadata correctness
+- **AND** blanks, unavailable values and applicability marks do not establish zero or economic absence; supported uncertainty and optional gaps remain deliverable, and local metric defects do not require rewriting supported independent narrative
+
 #### Scenario: A local numeric representation cannot be normalized without guessing
 - **WHEN** a new processing identity encounters the observed narrow metric-format incompatibility while preparing an otherwise source-bound fact or repair candidate
 - **THEN** the existing owner MAY retain its original narrative and raw metric spelling with a null normalized value and explicit local-format limitation after applicable typed/source checks, without guessing sign, amount, unit or subject or converting unknown to zero

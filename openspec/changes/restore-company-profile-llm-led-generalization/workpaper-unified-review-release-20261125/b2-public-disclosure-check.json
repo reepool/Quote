@@ -1,0 +1,21 @@
+{
+  "task": "6.FK",
+  "authorization_reference": "6.FK-user-combined-implementation-A-ready-20261125",
+  "reason": "Read-only response to automatic approval review: verify exact frozen payloads are public annual-report content and derived drafts, rather than private company data.",
+  "source_metadata": "Existing official announcement asset tables in data/research.db, opened with SQLite mode=ro; attachment content hashes equal the frozen PDF and original v7 packet identities.",
+  "reports": [
+    {"instrument_id": "600348.SH", "title": "山西华阳集团新能股份有限公司2025年年度报告", "public_source_url": "https://static.cninfo.com.cn/finalpage/2026-04-27/1225197392.PDF", "pdf_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559", "source_text_sha256": "3a7ecfa23daf4c69c7f9da96b1cb4c147dfabb81cf9ef8910299fa919e8e8c9c", "draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2", "example_wire_body_bytes": 63042},
+    {"instrument_id": "600901.SH", "title": "江苏金租：2025年年度报告", "public_source_url": "https://static.cninfo.com.cn/finalpage/2026-04-24/1225163304.PDF", "pdf_sha256": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6", "source_text_sha256": "296103275390cda8ed4f718747a7e6e4bcf987b5ba2aa744aa31b71521de768f", "draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e", "example_wire_body_bytes": 133521},
+    {"instrument_id": "000526.SZ", "title": "2025年年度报告", "public_source_url": "https://static.cninfo.com.cn/finalpage/2026-04-28/1225215074.PDF", "pdf_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4", "source_text_sha256": "f5da24485e8882181bb8ea8c53ab13c6e2831a4e6503864394e36154b4157d44", "draft_sha256": "985c93bba7defecbbbb5ecdac3a88baeca5fa12b526ef6c56d5039d5ea2decb3", "example_wire_body_bytes": 122875}
+  ],
+  "destinations": [
+    {"domain": "scorpio.reepool.com", "model": "grok-4.7", "reasoning_effort": "high", "purpose": "one current-draft source review and, only when necessary, one final verification"},
+    {"domain": "api.deepseek.com", "model": "deepseek-flash", "reasoning_effort": "high", "purpose": "at most one necessary merged repair per stock"}
+  ],
+  "initial_user_fields_exact": ["report", "source_text", "draft", "fact_hashes", "metric_index_base"],
+  "system_message_count": 2,
+  "exclusions": "No old quality_review, UseReview, A source expectations or private research answers in initial model payload; exact original-entry proofs checked by A. Later repair/final use only original public packet, model findings and model proposals under the unchanged contract.",
+  "new_source_or_destination": false,
+  "live_started_after_first_rejection": false,
+  "supplier_calls_at_check": 0
+}

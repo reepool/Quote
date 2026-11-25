@@ -1,0 +1,39 @@
+{
+  "task": "6.FK",
+  "phase": "approved_late_successor_consumption",
+  "requests": [
+    {
+      "request": "new_batch20",
+      "status": 200,
+      "payload_sha256": "7ca084950baeddc8f82bce44d5d7b69cc481396584c77d3d1e08c43f7cc10c0a",
+      "seconds": 9.682
+    },
+    {
+      "request": "new_representative_plan",
+      "instrument_id": "000526.SZ",
+      "status": 200,
+      "payload_sha256": "b4a37bcf32303f37c58003c16f50ed16f45ca7f6b72495567b531a4021076b47",
+      "base_work_id": "bp-work-36c6f5ea65d8e2084e4f07d3",
+      "base_workpaper_sha256": "8868a72778c3941a0822ab4fa9a22d3e4e575450b015e7401d424b298d772fbb",
+      "seconds": 8.094
+    }
+  ],
+  "client_closed": true,
+  "executor_closed": true,
+  "event_loop_closed": true,
+  "remaining_threads": [
+    "MainThread"
+  ],
+  "denied_initialization_attempts": [
+    "file_write_outside_own_temp",
+    "socket.__new__"
+  ],
+  "model_requests": 0,
+  "record_writes": 0,
+  "external_sends": 0,
+  "reused_initial_HTTP": "b1-consumption.json: previous 7 HTTP200/clean exit remains valid for unchanged route/ReadService paths",
+  "elapsed_seconds": 21.155,
+  "script_sha256": "77c20f3a32f5534722934b82af236b6fc9fb240d490a5651f596b80a1d32fba7",
+  "actual_command": "source scripts/quote_dev_env.sh; B1_LATE_VERIFY_ROOT=/home/python/Quote/data/QuoteBak/b1-6fk-late-ki3eujRc timeout 90s /home/python/miniconda3/envs/Quote/bin/python openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b1-late-http.py",
+  "environment": "tool-approved local IPC with external networking, subprocesses and non-own-temp writes denied"
+}

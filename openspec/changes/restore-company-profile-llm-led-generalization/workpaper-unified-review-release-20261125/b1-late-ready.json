@@ -1,0 +1,19 @@
+{
+  "task": "6.FK",
+  "phase": "approved_successors_MAIN_and_daily_exports_ready",
+  "approval": "a-approved-successors.json",
+  "new_records_appended": 3,
+  "existing_parent_records_equal_source": 12,
+  "all_source_runtime_records_preserved_in_MAIN": 15,
+  "complete_profiles_equal_approved_3_plus_previous_17": 20,
+  "api_file_sha256": "589f3f6907b10913bf0a14367ad81f0c1ce5916a8c333a3f1812fb0ecd6a283c",
+  "annual_json_sha256": "bb081365ab0e5ade6e51469f13278f31de9d4644bc8d3bc5184228f9a2bad1a2",
+  "annual_md_sha256": "d908ac2af8896059233a41247cf0ab03a3c03e308ff54913028bee563e7defc8",
+  "batch_payload_sha256": "7ca084950baeddc8f82bce44d5d7b69cc481396584c77d3d1e08c43f7cc10c0a",
+  "old_24th_snapshots_changed": false,
+  "F12_independent_withholding_retained": true,
+  "B1_future_checks_require_probe_runtime_root": false,
+  "cleanup_signal_scope": "B2 may clean its duplicate probe runtime root after retaining its required model/usage/failure evidence, and its own DB/checkpoint; B1 deletes no B2 assets.",
+  "remaining_B1": "compact final receipt, new batch20 and representative new plan HTTP, current page and own cleanup",
+  "model_requests_added_by_B1": 0
+}

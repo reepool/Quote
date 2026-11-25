@@ -1,0 +1,20 @@
+{
+  "elapsed_seconds": 493.82158335484564,
+  "children": [
+    {
+      "code": "600348",
+      "exit_code": 0,
+      "log": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI/live-600348.log"
+    },
+    {
+      "code": "600901",
+      "exit_code": 0,
+      "log": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI/live-600901.log"
+    },
+    {
+      "code": "000526",
+      "exit_code": 0,
+      "log": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI/live-000526.log"
+    }
+  ]
+}

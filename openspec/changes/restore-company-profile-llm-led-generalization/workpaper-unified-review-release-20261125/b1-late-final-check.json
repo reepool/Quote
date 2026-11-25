@@ -1,0 +1,41 @@
+{
+  "task": "6.FK",
+  "phase": "same_card_final_release",
+  "current_manifest": "b1-release.json",
+  "current_manifest_sha256": "41ac4d64c228209a0945912da76405c4692df0a36652d9d9f0ac75fd6efe760b",
+  "complete_profiles_equal_approved": 20,
+  "unrelated_profiles_unchanged": 17,
+  "new_records_appended": 3,
+  "existing_parents_reused": 12,
+  "A_audited_source_runtime_records_in_MAIN": 15,
+  "old_protected_files_unchanged": 310,
+  "original_dirty_files_checked": 49,
+  "B1_touched_original_dirty_files": false,
+  "A_managed_document_updates_during_late_finish": [
+    "docs/development/company_profile_acceptance_program.md",
+    "docs/development/company_profile_delivery_plan.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md"
+  ],
+  "B2_parallel_files_unchanged": true,
+  "current_page_sha256": "38e76a0418ac44ee37d7530df123a5abfacf420098953b45ef09fb7410167350",
+  "current_page_links_valid": 27,
+  "HTTP_new_requests_passed": 2,
+  "HTTP_initial_requests_reused": 7,
+  "HTTP_clean_exit": true,
+  "review_blocking_findings": 0,
+  "application_source_changes_by_B1": 0,
+  "cleanup": {
+    "root": "/home/python/Quote/data/QuoteBak/b1-6fk-late-ki3eujRc",
+    "root_absent": true,
+    "removed_regular_files": 58,
+    "removed_logical_file_bytes": 20653325,
+    "space_unit": "logical bytes, not measured NFS free-space delta",
+    "retained_temporary_items": [],
+    "includes": "temporary previous daily export backup, writer-byte copies, scripts and own logs",
+    "B2_or_other_roots_deleted_by_B1": false
+  },
+  "new_model_requests_added_by_B1": 0,
+  "staged": false,
+  "committed": false,
+  "pushed": false
+}

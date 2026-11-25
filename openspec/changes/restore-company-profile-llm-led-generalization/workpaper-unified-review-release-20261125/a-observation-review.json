@@ -1,0 +1,225 @@
+{
+  "task": "6.FK",
+  "independent_source_review": "A reused exact prior PDF decisions for5 known risks and9 controls, and directly reread original PDF Xueda17/18 and Huayang22 for both actual repair candidates.",
+  "risk_outcomes": [
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F007",
+      "fresh_finding_ids": [],
+      "fresh_metric_positions": [],
+      "outcome": "miss",
+      "A_source_basis": "Coal revenue metric0 still has group scope; original independent guard remains."
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F009",
+      "fresh_finding_ids": [
+        "WF001"
+      ],
+      "fresh_metric_positions": [
+        4,
+        5,
+        6
+      ],
+      "outcome": "detected",
+      "A_source_basis": "Coal table subtotal differs from group revenue/cost; original product metrics remain supported."
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F023",
+      "fresh_finding_ids": [],
+      "fresh_metric_positions": [],
+      "outcome": "miss",
+      "A_source_basis": "Coal-business cost metrics0/1/2 still have group scope; original independent guard remains."
+    },
+    {
+      "instrument_id": "600901.SH",
+      "fact_id": "F22",
+      "fresh_finding_ids": [
+        "WR-F22-01"
+      ],
+      "fresh_metric_positions": [
+        1
+      ],
+      "outcome": "detected",
+      "A_source_basis": "Source says a decrease0.03 percentage points; unsigned generic change loses direction."
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "F12",
+      "fresh_finding_ids": [
+        "REV-F12-001"
+      ],
+      "fresh_metric_positions": [],
+      "outcome": "detected_whole_fact",
+      "A_source_basis": "PDF17/18 explicitly gives house-rental zero values; a blank first table cannot justify a blanket cannot-confirm claim."
+    }
+  ],
+  "fresh_detected_metric_positions": 4,
+  "risk_metric_denominator": 8,
+  "fresh_detected_whole_facts": 1,
+  "risk_whole_denominator": 1,
+  "remaining_A_only_positions_in_this_risk_set": 4,
+  "previous_observation": {
+    "fresh_detected_metric_positions": 3,
+    "fresh_detected_whole_facts": 0
+  },
+  "additional_findings": [
+    {
+      "id": "WF002",
+      "fact": "F014",
+      "classification": "supported repeat of the existing FH restriction on positions4/5, not new protection"
+    },
+    {
+      "id": "WF003",
+      "fact": "F015",
+      "classification": "conservative scope clarification, not counted as a confirmed original factual error; the narrower repair is supported by PDF22"
+    },
+    {
+      "id": "WF004",
+      "fact": null,
+      "classification": "optional gap-wording suggestion; original limitation already specifies selected chapters/not acquired, so not counted as new factual error"
+    }
+  ],
+  "actual_repair_candidates_source_supported": [
+    "600348:F015",
+    "000526:F12"
+  ],
+  "original_F12_independent_withholding_retained": true,
+  "positive_controls": [
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F007",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F009",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "600901.SH",
+      "fact_id": "F22",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "F01",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "F10",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "F11",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "review-add:R4",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "review-add:R5",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "review-add:R6",
+      "original_fact_unchanged": true,
+      "supported_components_remain_consumable": true
+    }
+  ],
+  "actual_wire_checks": [
+    {
+      "instrument_id": "600348.SH",
+      "file": "001.json",
+      "sha256": "56c9fdb5d5cc35aeeceb1a8f0857defa23d45141f2f672a7a3a62920900282d1",
+      "model": "grok-4.7",
+      "source_and_initial_draft_match": true
+    },
+    {
+      "instrument_id": "600348.SH",
+      "file": "002.json",
+      "sha256": "c1f6fd451ec109a8b902109f698b1d3327a34e731c824bf5dbf25a407e4f9f9c",
+      "model": "deepseek-flash",
+      "source_and_initial_draft_match": true
+    },
+    {
+      "instrument_id": "600348.SH",
+      "file": "003.json",
+      "sha256": "e24bf3783106798f079e7ef8d600285dcdad0418dc435db3568994fb6ce35122",
+      "model": "grok-4.7",
+      "source_and_initial_draft_match": true
+    },
+    {
+      "instrument_id": "600901.SH",
+      "file": "001.json",
+      "sha256": "7c467e9aaea1391a6c35a8d929ccd1c61ecd6f9d10da188c60a19811f98e8dbe",
+      "model": "grok-4.7",
+      "source_and_initial_draft_match": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "file": "001.json",
+      "sha256": "488165a2c625807abffdb1ececd92ad0cd0cf8f826e5dbd732c2d069772710a5",
+      "model": "grok-4.7",
+      "source_and_initial_draft_match": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "file": "002.json",
+      "sha256": "f4f68d638c527b20785a34af93afd3869bed04f1c2f5b942cff49425e78663ea",
+      "model": "deepseek-flash",
+      "source_and_initial_draft_match": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "file": "003.json",
+      "sha256": "9fdcff0b5c561fd573fdb5566affc783d7c71ccdbbbddf1cbb91020d97d99eac",
+      "model": "grok-4.7",
+      "source_and_initial_draft_match": true
+    }
+  ],
+  "resources": [
+    {
+      "instrument_id": "600348.SH",
+      "physical_requests": 3,
+      "supplier_total_and_ledger": 67014,
+      "cost": "unknown",
+      "task_seconds": 456.4873532745987
+    },
+    {
+      "instrument_id": "600901.SH",
+      "physical_requests": 1,
+      "supplier_total_and_ledger": 46740,
+      "cost": "unknown",
+      "task_seconds": 240.93174559250474
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "physical_requests": 3,
+      "supplier_total_and_ledger": 74490,
+      "cost": "unknown",
+      "task_seconds": 384.424897165969
+    }
+  ],
+  "new_physical_requests": 7,
+  "new_supplier_total_and_ledger": 188244,
+  "new_recoveries": 0,
+  "known_model_quality_scope": "3 seen reports,5 known risk objects; no fresh99% or whole-company accuracy claim",
+  "release_decision": "All3 successors are safe for research release under their preserved restrictions. No further paid iteration or fourth company.",
+  "old_scores_or_production_authority_changed": false
+}

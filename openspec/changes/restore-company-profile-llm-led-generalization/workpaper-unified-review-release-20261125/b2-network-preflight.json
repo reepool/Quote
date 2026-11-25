@@ -1,0 +1,9 @@
+{
+  "authorization_reference": "6.FK-user-combined-implementation-A-ready-20261125",
+  "environment": "approved_network",
+  "dns_tls": [
+    {"host": "scorpio.reepool.com", "dns_addresses": ["176.126.114.194"], "tls_version": "TLSv1.3", "certificate_valid": true, "elapsed_seconds": 0.23713312484323978},
+    {"host": "api.deepseek.com", "dns_addresses": ["61.170.66.121", "61.170.82.99"], "tls_version": "TLSv1.3", "certificate_valid": true, "elapsed_seconds": 0.05647656135261059}
+  ],
+  "model_requests": 0
+}

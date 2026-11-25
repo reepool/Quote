@@ -1,0 +1,108 @@
+{
+  "task": "6.FK",
+  "temporary_root": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI",
+  "output_root": "/home/python/Quote/data/research/company_profile_review_strategy_probe_20261125",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_review_strategy_probe_20261125",
+  "entry": "task_entry.execute_configured_task -> CompanyProfileTaskService.execute(review_batch)",
+  "parents": {
+    "bp-work-52157e13cdbf80605eb26a27": "2b8f94cbf8c2a7e1028cd6c35b0abbb34e763d19266932f412a0020cc2893341",
+    "bp-work-c1ce1a5b541e1116b231a0ac": "3c952e56e8ef6cf3985f36054a1ff02171d0ac50325841f8bf93faa34495a51e",
+    "bp-work-7e4d48a5974e12bdbf850179": "c16f492181ff9e047cca84e6fd17baff5bd38cbf4a48266dc272921425b89800",
+    "bp-work-47b8196e8bb0fe8fb4b1b4d0": "0446ca2e89ce6faf7c15c91c3298b49e72eca4de1d219806414fcc7d9448b002",
+    "bp-work-9938c95dc5f968013098bf76": "450aee38aec6d36ffd5c336561175760e1d21ba617f13968765413d07a24aac8",
+    "bp-work-48d8b960832cda77a8f1a82f": "8d8bef406d0b674f3e8c396fbe2cb50d25789e85775ecbcfd916cdf1dfc3aaf8",
+    "bp-work-c6a75b04b6703268cb518867": "0f93d5e301069bf502f42e8c37ad2bee2cfd53d3257d91480dd308c30273172d",
+    "bp-work-721e6851edbaa279f67917e5": "e2e19993aca14fd6a7dd977600ad7c12b042fac190b601c4b8452812848df67c",
+    "bp-work-88e327a6f594ec32aa9e05ec": "c9c278ed1f31f8ce528bd6a56bc767944377f83d53e17887a9c651e3d5c9b16a",
+    "bp-work-4dda16898fc774971368308e": "b4a93ec9f6ca19844b761e98f8550f28c6229f8468d44ea2f1f029edc057b4cc",
+    "bp-work-1972712727ed295e4eb944eb": "4a8e430c6abeab800d4e2339597037193615bc282cf55250ed3b49df18c92f43",
+    "bp-work-2a5b3a9b1435fc7ccbf42d46": "d87e0e469983833d57e3aeb0f11718b46d0acc1f0b5b48fb143bb09458d74e78"
+  },
+  "targets": [
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-52157e13cdbf80605eb26a27",
+      "plan_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-600348-plan.json",
+      "plan_sha256": "1598395d5ba2a8f80f807b63ead36bf9ef422e7d36d98f56c88f1b9d7afdef47",
+      "current_record_sha256": "2b8f94cbf8c2a7e1028cd6c35b0abbb34e763d19266932f412a0020cc2893341",
+      "review_input_binding": {
+        "current_draft_sha256": "3cb6a260a51d994ade572624d81e24b29983b853d6c499498d184a812c1bf592",
+        "request_draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2",
+        "source_packet_sha256": "31925cb672b1ec9bc452383a76bc573afc1fa090852166c48cc148c511547e55"
+      },
+      "source_callback": {
+        "pdf": "/home/python/Quote/data/filings/announcements/blobs/82/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559.pdf",
+        "pdf_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+        "cache": "/home/python/Quote/data/filings/announcements/blobs/82/derived/business_profile_pdfium_recovery.v4/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559_57e1dd4f16ef40ff.json.gz",
+        "cache_sha256": "8b2fe3677d85e1517460cb250ef3aa260be855c4127c0f3f9a8c4e79a3b234a7",
+        "native_pages": 240,
+        "adapter": "OfficialAnnualReportPageSource._source_result",
+        "typed_report_equal": true,
+        "wrong_version_rejected": true
+      },
+      "source_text_sha256": "3a7ecfa23daf4c69c7f9da96b1cb4c147dfabb81cf9ef8910299fa919e8e8c9c",
+      "original_v7_wire_equal": true
+    },
+    {
+      "instrument_id": "600901.SH",
+      "reading_work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+      "plan_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-600901-plan.json",
+      "plan_sha256": "21e5640f2d0b2a95dac60f517a01560d40733b8cf2614f6be661c80564be0360",
+      "current_record_sha256": "0446ca2e89ce6faf7c15c91c3298b49e72eca4de1d219806414fcc7d9448b002",
+      "review_input_binding": {
+        "current_draft_sha256": "f9efe8c92808345397c7fa1f293b1b7c84b939c0ac8b55d0deba2543e77c8522",
+        "request_draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e",
+        "source_packet_sha256": "3466fb26c2a0e0769d24d9ff7068816fdd2ed57e1edffe7a8ed4c1e65b56f120"
+      },
+      "source_callback": {
+        "pdf": "/home/python/Quote/data/filings/announcements/blobs/e4/e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6.pdf",
+        "pdf_sha256": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+        "cache": "/home/python/Quote/data/filings/announcements/blobs/e4/derived/business_profile_pdfium_recovery.v4/e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6_57e1dd4f16ef40ff.json.gz",
+        "cache_sha256": "8e45e0695feb473dd0a5c31460fa543e4c3afc396313043a7ef6e1774510a498",
+        "native_pages": 214,
+        "adapter": "OfficialAnnualReportPageSource._source_result",
+        "typed_report_equal": true,
+        "wrong_version_rejected": true
+      },
+      "source_text_sha256": "296103275390cda8ed4f718747a7e6e4bcf987b5ba2aa744aa31b71521de768f",
+      "original_v7_wire_equal": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "reading_work_id": "bp-work-c6a75b04b6703268cb518867",
+      "plan_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-000526-plan.json",
+      "plan_sha256": "a539f21b476d1d9b214403b3e220fda17ef55b53323813aa7b895de3560278e1",
+      "current_record_sha256": "0f93d5e301069bf502f42e8c37ad2bee2cfd53d3257d91480dd308c30273172d",
+      "review_input_binding": {
+        "current_draft_sha256": "b8f69bbc76823ef2591670429d6c08b003a30b6b520dba48145fd5c1840e4885",
+        "request_draft_sha256": "985c93bba7defecbbbb5ecdac3a88baeca5fa12b526ef6c56d5039d5ea2decb3",
+        "source_packet_sha256": "aeb6f24ae554b70d8ba007d42867e9558996e94acc536b971b2f9efd37ec3bee"
+      },
+      "source_callback": {
+        "pdf": "/home/python/Quote/data/filings/announcements/blobs/a8/a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4.pdf",
+        "pdf_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+        "cache": "/home/python/Quote/data/filings/announcements/blobs/a8/derived/business_profile_pdfium_recovery.v4/a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4_57e1dd4f16ef40ff.json.gz",
+        "cache_sha256": "6ac6068773e91a11e80a59d64b4390937f192ae7edb533b8487b59633fbd8d2d",
+        "native_pages": 227,
+        "adapter": "OfficialAnnualReportPageSource._source_result",
+        "typed_report_equal": true,
+        "wrong_version_rejected": true
+      },
+      "source_text_sha256": "f5da24485e8882181bb8ea8c53ab13c6e2831a4e6503864394e36154b4157d44",
+      "original_v7_wire_equal": true
+    }
+  ],
+  "full_profiles_equal_A_expected": {
+    "600348.SH": "8c1ed203adaabaaf41595026cff67220cf5f7e50f20b95b53129ae5f23c5ffcb",
+    "600901.SH": "2986d85bb7c6dabd760304424cdf21f0719f5fbec65fbe87342a06be692c1f62",
+    "000526.SZ": "60a8f68e0185cf59d60e1e31d5c060ffd0e6542c1376a3c7a8958ab3e9de5b30"
+  },
+  "new_supplier_requests": 0,
+  "new_network_providers": 0,
+  "A_release_required_before_live": true,
+  "historical_cleanup": {
+    "prior_6fh_6fj_roots_absent": true,
+    "parallel_A_B1_roots_preserved": true,
+    "released_bytes": 0
+  }
+}

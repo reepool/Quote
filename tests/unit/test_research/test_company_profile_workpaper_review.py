@@ -91,6 +91,62 @@ def test_source_column_repair_preserves_unrelated_business_and_original():
     result.validate_pages(PAGES)
 
 
+@pytest.mark.parametrize("unreliable_metadata", [False, True])
+def test_source_first_review_gateway_keeps_original_metric_meaning_and_local_limits(unreliable_metadata):
+    """Scripted verdicts prove request/consumption wiring, not model detection."""
+    from research.company_profile.workpaper import workpaper_fact_hash
+    from research.company_profile.workpaper_delivery import project_workpaper_delivery
+    from tests.unit.test_research.test_company_profile_review_failures import gateway
+    from tests.unit.test_utils.test_llm_gateway import _response
+
+    pages = tuple({**p, "text": p["text"] + (
+        "分部甲收入60.00元。风险比率较上期下降2.00个百分点。\n"
+        if p["page"] == 3 else "")} for p in PAGES)
+    packet = build_section_packet(_report(), pages, index_sections(pages), _selection(index_sections(pages)))
+    raw = _draft(packet).model_dump(mode="json")
+    fact = raw["elements"]["scale_and_mix"]["facts"][0]
+    fact["text"] += "分部甲收入60.00元，风险比率较上期下降2.00个百分点。"
+    metric = fact["metrics"][0]
+    fact["metrics"] += [
+        {**metric, "name": "分部甲收入", "raw_value": "60.00", "value": "60.00",
+         "subject_scope": "consolidated_group" if unreliable_metadata else "business_segment"},
+        {**metric, "name": "风险比率下降幅度", "raw_value": "2.00", "value": "2.00",
+         "unit": "百分点", "currency": None, "comparison_basis": "较上期下降"},
+        {**metric, "name": "风险比率变动", "raw_value": "2.00", "value": "2.00",
+         "unit": "百分点", "currency": None,
+         "comparison_basis": None if unreliable_metadata else "较上期下降幅度"},
+    ]
+    paper = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
+        reading_scope=packet.reading_scope, evidence=packet.evidence, origin="llm_generated")
+    original = paper.elements.scale_and_mix.facts[0]
+    finding = dict(finding_id="metadata", element="scale_and_mix", severity="material",
+        issue_type="wrong_subject", action="limit_metrics", affected_fact_id=original.fact_id,
+        evidence_ids=list(original.evidence_ids), explanation="正文支持，原位置1主体及3比较方向不可靠。",
+        metric_limit=dict(narrative_supported=True, fact_sha256=workpaper_fact_hash(original), metric_indices=[1, 3]))
+    provider, identity, transport, client, _ = gateway([_response(dict(
+        reviewed_fact_ids=["main", "revenue"], findings=[finding] if unreliable_metadata else []))])
+    try:
+        result, _ = review_workpaper(paper, packet=packet, provider=provider,
+            work_id="source-first-policy", identity=identity)
+        assert len(transport.calls) == 1
+        messages = transport.calls[0]["payload"]["messages"]
+        instructions = messages[0]["content"]
+        payload = json.loads(messages[-1]["content"])
+        assert "EVERY original\nmetrics[] entry separately" in instructions
+        assert "positive decrease magnitude" in instructions
+        assert "same-scope tables/continuations" in instructions
+        assert payload["source_text"] == packet.model_text()
+        assert payload["draft"]["elements"]["scale_and_mix"]["facts"][0] == original.model_dump(mode="json")
+        assert result.quality_review.policy_version == "company_profile_workpaper_review.v13"
+        assert result.elements == paper.elements
+        delivered = next(f for f in project_workpaper_delivery(result)["facts"] if f["fact_id"] == "revenue")
+        assert delivered["fact"]["metrics"] == [m.model_dump(mode="json") for i, m in enumerate(original.metrics)
+            if not unreliable_metadata or i not in (1, 3)]
+        assert delivered["fact"]["metrics"][-1]["value"] == "2.00"
+    finally:
+        asyncio.run(client.close())
+
+
 @pytest.mark.parametrize("outcome", ["accepted", "rejected", "duplicate_candidate", "repair_failure"])
 def test_multiple_issues_on_one_fact_keep_all_findings_and_request_one_candidate(outcome):
     original, _, fixed, review, verify = material()

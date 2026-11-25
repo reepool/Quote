@@ -1,0 +1,559 @@
+{
+  "task": "6.FK",
+  "group_complete": true,
+  "cleanup": {
+    "driver_started_epochs": {"600348": 1795590192.5847726, "600901": 1795590192.4940581, "000526": 1795590192.851514},
+    "authority_execution_files": 16,
+    "authority_wire_hashes_equal_A": 7,
+    "removed_personal_tmp_root": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI",
+    "removed_checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_review_strategy_probe_20261125",
+    "removed_files_in_two_roots": 101,
+    "removed_logical_file_bytes_in_two_roots": 15729399,
+    "removed_redundant_driver_receipts": 6,
+    "removed_duplicate_success_test_xml": 1,
+    "probe_root_status": "deleted_after_A_final_MAIN_release_audit_and_15_record_byte_equality",
+    "probe_root_files": 30,
+    "probe_root_logical_file_bytes": 9676478,
+    "MAIN_three_record_bytes_and_live_profiles_independently_equal": true,
+    "MAIN_current_API_publish_confirmation_pending": false,
+    "MAIN_final_release_audit": {"file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/a-release-audit.json", "sha256": "74fd05ca582a51f8f38291ab2d2c7077241acc298aea4a5e5ad4f5011e84b027"},
+    "MAIN_current_API_sha256": "589f3f6907b10913bf0a14367ad81f0c1ce5916a8c333a3f1812fb0ecd6a283c",
+    "all_15_probe_records_byte_equal_MAIN_before_deletion": true,
+    "removed_files_in_all_three_development_roots": 131,
+    "removed_logical_file_bytes_in_all_three_development_roots": 25405877,
+    "temporary_retained_items": 0,
+    "old_sources_and_A_B1_materials_untouched": true
+  },
+  "authority": {
+    "raw_model_text": "Only the seven b2-runs/*/receipts/*.json authority wires; model text is not duplicated in this index.",
+    "runtime_and_consumption_root": "data/research/company_profile_research_v1_20261123",
+    "source_root_removed_after_MAIN_byte_and_full_profile_equality": "data/research/company_profile_review_strategy_probe_20261125",
+    "approved_successors": {
+      "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/a-approved-successors.json",
+      "sha256": "8b7b143b9ffe732d9c8146fd7f1caf3cc269d6578aef196f62fbd0274b53de87"
+    },
+    "independent_A_review": {
+      "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/a-observation-review.json",
+      "sha256": "96b3eb6cbb7d39c1cebebb290939b1a16e02aaee7386d2a3666bd20940c5f4ef"
+    }
+  },
+  "execution_history": {
+    "subagent_pre_process_auto_review_rejections": 2,
+    "rejections_supplier_sends": 0,
+    "real_first_run": "Main task approved the same frozen action with complete direct user authorization context; one group only.",
+    "rejection_detail": {
+      "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-execution-blocked.json",
+      "sha256": "a2549e42b0fcfb0254001cc4523ef26acaa04c69401012a4e32a4f4d02fd4634"
+    },
+    "group_result": {
+      "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-group-process-result.json",
+      "sha256": "22f76e016a448f3d96a93f9b1dc04620b5e888801948cd57dd47891aa938ff53"
+    }
+  },
+  "observations": [
+    {
+      "instrument_id": "600348.SH",
+      "base_work_id": "bp-work-52157e13cdbf80605eb26a27",
+      "published_work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+      "MAIN_record": {
+        "file": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ef3a65cc3407c6e9f844a7cc.json",
+        "sha256": "80381deaf54b336282ba402c6b1dcc73791510c5a8be03f9cf50530f54835d20"
+      },
+      "complete_profile_sha256": "241009db500564d21dab17d24f5b2ea4d5e866dcb6586ec379dfd41dff6b2fc4",
+      "review_status": "completed_with_open_findings",
+      "wire": [
+        {
+          "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/001.json",
+          "sha256": "56c9fdb5d5cc35aeeceb1a8f0857defa23d45141f2f672a7a3a62920900282d1",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "physical_timeout_seconds": 1200.0,
+          "source_text_equal_original_v7": true,
+          "initial_draft_and_fact_hashes_equal_current_seed": true
+        },
+        {
+          "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/002.json",
+          "sha256": "c1f6fd451ec109a8b902109f698b1d3327a34e731c824bf5dbf25a407e4f9f9c",
+          "model": "deepseek-flash",
+          "host": "api.deepseek.com",
+          "physical_timeout_seconds": 600.0,
+          "source_text_equal_original_v7": true,
+          "initial_draft_and_fact_hashes_equal_current_seed": null
+        },
+        {
+          "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/003.json",
+          "sha256": "e24bf3783106798f079e7ef8d600285dcdad0418dc435db3568994fb6ce35122",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "physical_timeout_seconds": 1200.0,
+          "source_text_equal_original_v7": true,
+          "initial_draft_and_fact_hashes_equal_current_seed": null
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "WF001",
+          "fact_id": "F009",
+          "element": "revenue_model",
+          "action": "limit_metrics",
+          "metric_positions": [
+            4,
+            5,
+            6
+          ],
+          "fact_sha256": "226e8c6823636244e8326e7d83239b23e5c71c0cb980ec17d68e51d484e93a52",
+          "resolution": "metrics_limited",
+          "initial_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/001.json",
+            "sha256": "56c9fdb5d5cc35aeeceb1a8f0857defa23d45141f2f672a7a3a62920900282d1"
+          },
+          "decoded_finding_index": 0,
+          "A_classification": "repeat_detection_of_existing_F009_metric_risk"
+        },
+        {
+          "finding_id": "WF002",
+          "fact_id": "F014",
+          "element": "scale_and_mix",
+          "action": "limit_metrics",
+          "metric_positions": [
+            4,
+            5
+          ],
+          "fact_sha256": "27fb9846f5f92cfddfcf30fff94376165618a534f2da435e6963de60767dfecf",
+          "resolution": "metrics_limited",
+          "initial_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/001.json",
+            "sha256": "56c9fdb5d5cc35aeeceb1a8f0857defa23d45141f2f672a7a3a62920900282d1"
+          },
+          "decoded_finding_index": 1,
+          "A_classification": "repeat_FH_F014_protection_not_new_gain"
+        },
+        {
+          "finding_id": "WF003",
+          "fact_id": "F015",
+          "element": "operations_and_inputs",
+          "action": "correct",
+          "metric_positions": [],
+          "fact_sha256": null,
+          "resolution": "corrected_pending_trust",
+          "initial_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/001.json",
+            "sha256": "56c9fdb5d5cc35aeeceb1a8f0857defa23d45141f2f672a7a3a62920900282d1"
+          },
+          "decoded_finding_index": 2,
+          "A_classification": "supported_scope_clarification_not_confirmed_original_error"
+        },
+        {
+          "finding_id": "WF004",
+          "fact_id": null,
+          "element": "limitations",
+          "action": "correct",
+          "metric_positions": [],
+          "fact_sha256": null,
+          "resolution": "unresolved",
+          "initial_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/001.json",
+            "sha256": "56c9fdb5d5cc35aeeceb1a8f0857defa23d45141f2f672a7a3a62920900282d1"
+          },
+          "decoded_finding_index": 3,
+          "A_classification": "optional_gap_wording_suggestion_not_new_fact_error"
+        }
+      ],
+      "revisions": [
+        {
+          "fact_id": "F015",
+          "finding_id": "WF003",
+          "original_sha256": "f8dc292af273a8b3b244449e51cfd7f52ef081e6be5c69c57d88e2fcc3ddbe89",
+          "revised_sha256": "9e0bb25563cdf153bcb75ffccbcb5085678992db5777db687f8f8469c0bf9de5",
+          "repair_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/002.json",
+            "sha256": "c1f6fd451ec109a8b902109f698b1d3327a34e731c824bf5dbf25a407e4f9f9c"
+          },
+          "final_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/003.json",
+            "sha256": "e24bf3783106798f079e7ef8d600285dcdad0418dc435db3568994fb6ce35122"
+          },
+          "resolution": "corrected_pending_trust",
+          "A_original_pdf_supported": true,
+          "independent_withheld_retained": false
+        },
+        {
+          "fact_id": "review-add:R003",
+          "finding_id": "inherited:inherited:R003",
+          "original_sha256": null,
+          "revised_sha256": "d0512af56c0f03c15f56da5edd26506a04605632756db538b6d69d6dd5d51ae0",
+          "repair_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/002.json",
+            "sha256": "c1f6fd451ec109a8b902109f698b1d3327a34e731c824bf5dbf25a407e4f9f9c"
+          },
+          "final_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/receipts/003.json",
+            "sha256": "e24bf3783106798f079e7ef8d600285dcdad0418dc435db3568994fb6ce35122"
+          },
+          "resolution": "repair_rejected",
+          "A_original_pdf_supported": true,
+          "independent_withheld_retained": false
+        }
+      ],
+      "budget": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/budget.json",
+        "sha256": "ee4c79e966ec8611a5543f3cd663b495992b6b0cec402db3385dfc5cc6133770"
+      },
+      "started": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/started.json",
+        "sha256": "d570b4b686bc2dce5fe03a3090371cd7992d885129bc1de9f66a61458cc94317"
+      },
+      "result": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600348/result.json",
+        "sha256": "27ec931cb546540e7f1122b2d87894e2c65e513b60e3674347644057ae624449"
+      }
+    },
+    {
+      "instrument_id": "600901.SH",
+      "base_work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+      "published_work_id": "bp-work-b4e5ee438be22f743e6ce1cd",
+      "MAIN_record": {
+        "file": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-b4e5ee438be22f743e6ce1cd.json",
+        "sha256": "32c67aa6a86e35c3ddc90768118bdf1ac6fb7abeb03c07d1229e19bf82f0371a"
+      },
+      "complete_profile_sha256": "1761b55e912abb4b06f1de71724889ba2bca678004ef657ea2ab56264ca47916",
+      "review_status": "completed_with_open_findings",
+      "wire": [
+        {
+          "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600901/receipts/001.json",
+          "sha256": "7c467e9aaea1391a6c35a8d929ccd1c61ecd6f9d10da188c60a19811f98e8dbe",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "physical_timeout_seconds": 1200.0,
+          "source_text_equal_original_v7": true,
+          "initial_draft_and_fact_hashes_equal_current_seed": true
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "WR-F22-01",
+          "fact_id": "F22",
+          "element": "material_changes",
+          "action": "limit_metrics",
+          "metric_positions": [
+            1
+          ],
+          "fact_sha256": "3355d9ce4a1ad65a984f6aa5375ca2c8519bf8497bf42ead4c5c071d39f50d6d",
+          "resolution": "metrics_limited",
+          "initial_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600901/receipts/001.json",
+            "sha256": "7c467e9aaea1391a6c35a8d929ccd1c61ecd6f9d10da188c60a19811f98e8dbe"
+          },
+          "decoded_finding_index": 0,
+          "A_classification": "new_detection_of_previously_A_only_metric_direction_risk"
+        }
+      ],
+      "revisions": [],
+      "budget": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600901/budget.json",
+        "sha256": "dd22109350e3a709cf40814ee268c2e75bcc4b698ccd6536db3578053a271c18"
+      },
+      "started": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600901/started.json",
+        "sha256": "88153ac3b976227f14e36eae9c24ba058a85a32b5e4a0c5f98e945cfefea7ad2"
+      },
+      "result": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/600901/result.json",
+        "sha256": "9a9d40b199a4e9da77fb9f598b7f094b55e2d5627a127e440dd935281e9ac335"
+      }
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "base_work_id": "bp-work-c6a75b04b6703268cb518867",
+      "published_work_id": "bp-work-36c6f5ea65d8e2084e4f07d3",
+      "MAIN_record": {
+        "file": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-36c6f5ea65d8e2084e4f07d3.json",
+        "sha256": "c4b87e130bdc2fab13fe3fdcdfe955c3f81317d195103e45278102f6469ebe6d"
+      },
+      "complete_profile_sha256": "76d897d71db3d063caf6b4f82705529f4152b2f46bd5204ee7b63f69ba36fcbc",
+      "review_status": "completed_with_open_findings",
+      "wire": [
+        {
+          "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/001.json",
+          "sha256": "488165a2c625807abffdb1ececd92ad0cd0cf8f826e5dbd732c2d069772710a5",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "physical_timeout_seconds": 1200.0,
+          "source_text_equal_original_v7": true,
+          "initial_draft_and_fact_hashes_equal_current_seed": true
+        },
+        {
+          "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/002.json",
+          "sha256": "f4f68d638c527b20785a34af93afd3869bed04f1c2f5b942cff49425e78663ea",
+          "model": "deepseek-flash",
+          "host": "api.deepseek.com",
+          "physical_timeout_seconds": 600.0,
+          "source_text_equal_original_v7": true,
+          "initial_draft_and_fact_hashes_equal_current_seed": null
+        },
+        {
+          "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/003.json",
+          "sha256": "9fdcff0b5c561fd573fdb5566affc783d7c71ccdbbbddf1cbb91020d97d99eac",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "physical_timeout_seconds": 1200.0,
+          "source_text_equal_original_v7": true,
+          "initial_draft_and_fact_hashes_equal_current_seed": null
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "REV-F12-001",
+          "fact_id": "F12",
+          "element": "revenue_model",
+          "action": "correct",
+          "metric_positions": [],
+          "fact_sha256": null,
+          "resolution": "corrected_pending_trust",
+          "initial_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/001.json",
+            "sha256": "488165a2c625807abffdb1ececd92ad0cd0cf8f826e5dbd732c2d069772710a5"
+          },
+          "decoded_finding_index": 0,
+          "A_classification": "new_whole_fact_detection_supported_repair_and_final_independent_withheld_retained"
+        }
+      ],
+      "revisions": [
+        {
+          "fact_id": "F12",
+          "finding_id": "REV-F12-001",
+          "original_sha256": "a260c8fa52822ee43e6fb3ef266caa29768fe5a6bbe08057f242d216fd0a237f",
+          "revised_sha256": "c2af8e2151a2ab701101fb76bed03c96573bb4afd67b07a6d026cc1b1377804d",
+          "repair_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/002.json",
+            "sha256": "f4f68d638c527b20785a34af93afd3869bed04f1c2f5b942cff49425e78663ea"
+          },
+          "final_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/003.json",
+            "sha256": "9fdcff0b5c561fd573fdb5566affc783d7c71ccdbbbddf1cbb91020d97d99eac"
+          },
+          "resolution": "corrected_pending_trust",
+          "A_original_pdf_supported": true,
+          "independent_withheld_retained": true
+        },
+        {
+          "fact_id": "review-add:R07",
+          "finding_id": "inherited:inherited:R07",
+          "original_sha256": null,
+          "revised_sha256": "1d6b50ec34337011aed4bea95b66112c5b2a3c10a1e54da392a703a5735fbaab",
+          "repair_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/002.json",
+            "sha256": "f4f68d638c527b20785a34af93afd3869bed04f1c2f5b942cff49425e78663ea"
+          },
+          "final_wire": {
+            "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/receipts/003.json",
+            "sha256": "9fdcff0b5c561fd573fdb5566affc783d7c71ccdbbbddf1cbb91020d97d99eac"
+          },
+          "resolution": "repair_rejected",
+          "A_original_pdf_supported": true,
+          "independent_withheld_retained": false
+        }
+      ],
+      "budget": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/budget.json",
+        "sha256": "347228f33ae6046d95772f1f36af1de54929e8de26494da74714b17350747860"
+      },
+      "started": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/started.json",
+        "sha256": "3525ca4d12c64759179e3c69ea903f7515e61fdc5e2d23a367b0809d92e1ec99"
+      },
+      "result": {
+        "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-runs/000526/result.json",
+        "sha256": "85c4deb4f60a53d2b5d538f854b98d4f5f8f54a77a12afce854d08e7b448d117"
+      }
+    }
+  ],
+  "risk_summary": {
+    "metric_positions": 8,
+    "exact_new_initial_metric_hits": 4,
+    "previous_model_risk_hits": 3,
+    "newly_detected_previously_A_only_positions": 1,
+    "remaining_A_only_metric_positions": 4,
+    "whole_fact_risks": 1,
+    "new_initial_whole_fact_hits": 1,
+    "positive_control_groups": 9,
+    "flags_on_frozen_positive_controls": 0
+  },
+  "risks": [
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F007",
+      "original_fact_sha256": "9005f4ea5ab0f6e487c6cddf32ce0b44dd13aa62bffd53b2cde3f4d8fa635bc1",
+      "metric_positions": [
+        0
+      ],
+      "whole_fact_problem": false,
+      "detected_positions": [],
+      "whole_finding_ids": [],
+      "still_A_only_positions": [
+        0
+      ]
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F009",
+      "original_fact_sha256": "226e8c6823636244e8326e7d83239b23e5c71c0cb980ec17d68e51d484e93a52",
+      "metric_positions": [
+        4,
+        5,
+        6
+      ],
+      "whole_fact_problem": false,
+      "detected_positions": [
+        4,
+        5,
+        6
+      ],
+      "whole_finding_ids": [],
+      "still_A_only_positions": []
+    },
+    {
+      "instrument_id": "600348.SH",
+      "fact_id": "F023",
+      "original_fact_sha256": "0b965f3da6d57c456c775d904dcf629c479ee440ab7d9bc1411a4b00d8fe9ecc",
+      "metric_positions": [
+        0,
+        1,
+        2
+      ],
+      "whole_fact_problem": false,
+      "detected_positions": [],
+      "whole_finding_ids": [],
+      "still_A_only_positions": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "instrument_id": "600901.SH",
+      "fact_id": "F22",
+      "original_fact_sha256": "3355d9ce4a1ad65a984f6aa5375ca2c8519bf8497bf42ead4c5c071d39f50d6d",
+      "metric_positions": [
+        1
+      ],
+      "whole_fact_problem": false,
+      "detected_positions": [
+        1
+      ],
+      "whole_finding_ids": [],
+      "still_A_only_positions": []
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "fact_id": "F12",
+      "original_fact_sha256": "a260c8fa52822ee43e6fb3ef266caa29768fe5a6bbe08057f242d216fd0a237f",
+      "metric_positions": [],
+      "whole_fact_problem": true,
+      "detected_positions": [],
+      "whole_finding_ids": [
+        "REV-F12-001"
+      ],
+      "still_A_only_positions": []
+    }
+  ],
+  "positive_controls": {
+    "groups": 9,
+    "original_hash_and_supported_component_projection_passed": 9,
+    "authority": {
+      "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/a-observation-review.json",
+      "sha256": "96b3eb6cbb7d39c1cebebb290939b1a16e02aaee7386d2a3666bd20940c5f4ef"
+    },
+    "original_F12_withheld_retained": true
+  },
+  "resources": {
+    "per_company": [
+      {
+        "instrument_id": "600348.SH",
+        "physical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 67014,
+        "supplier_total_tokens": 67014,
+        "unknown_usage_attempts": 0,
+        "cost_cny": "unknown",
+        "cost_status": "unknown",
+        "driver_elapsed_seconds": 456.4873532745987,
+        "physical_request_seconds": 421.1646081265062,
+        "stop_reason": null
+      },
+      {
+        "instrument_id": "600901.SH",
+        "physical_requests": 1,
+        "recoveries": 0,
+        "charged_tokens": 46740,
+        "supplier_total_tokens": 46740,
+        "unknown_usage_attempts": 0,
+        "cost_cny": "unknown",
+        "cost_status": "unknown",
+        "driver_elapsed_seconds": 240.93174559250474,
+        "physical_request_seconds": 204.38332593813539,
+        "stop_reason": null
+      },
+      {
+        "instrument_id": "000526.SZ",
+        "physical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 74490,
+        "supplier_total_tokens": 74490,
+        "unknown_usage_attempts": 0,
+        "cost_cny": "unknown",
+        "cost_status": "unknown",
+        "driver_elapsed_seconds": 384.424897165969,
+        "physical_request_seconds": 345.3784708660096,
+        "stop_reason": null
+      }
+    ],
+    "physical_requests": 7,
+    "recoveries": 0,
+    "charged_tokens": 188244,
+    "supplier_total_tokens": 188244,
+    "sum_driver_seconds": 1081.8439960330725,
+    "sum_physical_request_seconds": 970.9264049306512,
+    "group_wall_seconds": 493.82158335484564,
+    "cost_cny": "unknown",
+    "no_priced_cost_compliance_claim": true
+  },
+  "three_reads": {
+    "query_export_new_instance_equal": true,
+    "annual_profiles_equal": true,
+    "profile_sha256": {
+      "600348.SH": "241009db500564d21dab17d24f5b2ea4d5e866dcb6586ec379dfd41dff6b2fc4",
+      "600901.SH": "1761b55e912abb4b06f1de71724889ba2bca678004ef657ea2ab56264ca47916",
+      "000526.SZ": "76d897d71db3d063caf6b4f82705529f4152b2f46bd5204ee7b63f69ba36fcbc"
+    },
+    "MAIN_current_api": "data/research/company_profile_research_v1_20261123/current-api-20261125.json",
+    "MAIN_human_readable": "data/research/company_profile_research_v1_20261123/exports-current-20261125/annual_profiles.md",
+    "probe_three_stock_export": "Duplicate development output; remove after MAIN confirmation, do not retain another full API/export."
+  },
+  "input_protection": {
+    "baseline": {
+      "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/a-baseline.json",
+      "sha256": "308712da77948c9adb4165c381304c8a68aebced324445d2fde7b7e822fe9cef"
+    },
+    "freeze": {
+      "file": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/b2-execution-freeze.json",
+      "sha256": "931a35fe63bef5edbae4b9b4fc9d4291c00d075262f3d3364e76db03b964884c"
+    },
+    "frozen_file_differences": [],
+    "original_protected_differences": [],
+    "old_dirty_non_A_document_differences": [],
+    "B2_staged_committed_or_pushed": false,
+    "A_managed_document_changes": [
+      "docs/development/company_profile_acceptance_program.md",
+      "docs/development/company_profile_delivery_plan.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md"
+    ]
+  },
+  "semantic_limit": "Seen-report calibration; 4/8 risk positions detected (3 repeated,1 newly detected) plus1 whole fact; 4 remaining positions still depend on A. WF003/WF004 are not counted as new factual errors.",
+  "new_quality_score": null,
+  "unseen_generalization_claim": false,
+  "production_authorization": "not_authorized"
+}

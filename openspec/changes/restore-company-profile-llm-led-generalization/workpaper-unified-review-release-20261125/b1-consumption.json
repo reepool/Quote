@@ -1,0 +1,252 @@
+{
+  "task": "6.FK",
+  "direct": {
+    "mode": "ReadService",
+    "batch20_sha256": "d2115f42398879c9427764186345796a804a443eee67d1af785f2c11b1687a61",
+    "all_profiles_equal": true,
+    "details": {
+      "600348.SH": {
+        "profile_sha256": "8c1ed203adaabaaf41595026cff67220cf5f7e50f20b95b53129ae5f23c5ffcb",
+        "latest_work_id": "bp-work-52157e13cdbf80605eb26a27",
+        "facts": 34,
+        "metrics": 76,
+        "active_gaps": 14,
+        "information_gaps_sha256": "6f5b6730656dadecdc0aa77b5531546ab15ba1c65f96ddc41615ac1103c25080",
+        "review_status": "completed_with_open_findings"
+      },
+      "600901.SH": {
+        "profile_sha256": "2986d85bb7c6dabd760304424cdf21f0719f5fbec65fbe87342a06be692c1f62",
+        "latest_work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+        "facts": 25,
+        "metrics": 86,
+        "active_gaps": 7,
+        "information_gaps_sha256": "30f70f471bd028d9ab498a69744cd59c622d70344842f2460df028fcba8cb6a3",
+        "review_status": "completed_with_open_findings"
+      },
+      "000526.SZ": {
+        "profile_sha256": "60a8f68e0185cf59d60e1e31d5c060ffd0e6542c1376a3c7a8958ab3e9de5b30",
+        "latest_work_id": "bp-work-c6a75b04b6703268cb518867",
+        "facts": 31,
+        "metrics": 13,
+        "active_gaps": 9,
+        "information_gaps_sha256": "5ed5ba948c45a922dc7a63dfbe0a3073d7a27b505e7982eeccb613fa8ca98927",
+        "review_status": "completed_with_open_findings"
+      }
+    },
+    "plans": {
+      "600348.SH": {
+        "state": "planned",
+        "execution_started": false,
+        "action": "enrich",
+        "enrichment_plan": {
+          "schema_version": "company_profile_enrichment.v1",
+          "request_id": "6fk-b1-consumption-600348",
+          "base_work_id": "bp-work-52157e13cdbf80605eb26a27",
+          "base_workpaper_sha256": "bb2f8b36958f3b3f003302ad862f0607af239f01170bd7e0b74ab54bb8437b2b",
+          "report": {
+            "instrument_id": "600348.SH",
+            "report_id": "asset_f320e4e874bc2381e9f05bb662544a64",
+            "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-26T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "targets": [
+            {
+              "element": "scale_and_mix",
+              "question": "请区分所选年报中煤炭业务分品种表的产销量合计与公司原煤产量，保留各自主体、期间和表头口径；未读或无法核实的部分明确说明。"
+            }
+          ]
+        },
+        "requires": [
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "production_authorization": "not_authorized"
+      },
+      "600901.SH": {
+        "state": "planned",
+        "execution_started": false,
+        "action": "enrich",
+        "enrichment_plan": {
+          "schema_version": "company_profile_enrichment.v1",
+          "request_id": "6fk-b1-consumption-600901",
+          "base_work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+          "base_workpaper_sha256": "757f49993e023a098d028ad481ee6ce61981d679298c1418480b5e5343bfd73d",
+          "report": {
+            "instrument_id": "600901.SH",
+            "report_id": "asset_8c711b166add07b3ab8ace3c323c6dae",
+            "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "targets": [
+            {
+              "element": "material_changes",
+              "question": "请按年报原表核实不良融资租赁资产率相较上年末的变化方向与单位，区分比率本期值、上期值和变动；无法安全标准化则保原文和缺项。"
+            }
+          ]
+        },
+        "requires": [
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "production_authorization": "not_authorized"
+      },
+      "000526.SZ": {
+        "state": "planned",
+        "execution_started": false,
+        "action": "enrich",
+        "enrichment_plan": {
+          "schema_version": "company_profile_enrichment.v1",
+          "request_id": "6fk-b1-consumption-000526",
+          "base_work_id": "bp-work-c6a75b04b6703268cb518867",
+          "base_workpaper_sha256": "c84bef7a5aab0a8cb59ab2f344c08db9eb04fa7a2098a08462d46d1f98792ebd",
+          "report": {
+            "instrument_id": "000526.SZ",
+            "report_id": "asset_4a4d1f962befae75d94117257218409b",
+            "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-27T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "targets": [
+            {
+              "element": "scale_and_mix",
+              "question": "请从已披露经营章节核对教育培训服务费收入、成本和业务权重的金额、期间及主体，保留跨行金额的原始依据和仍未获取的细项，不用其他业务替代。"
+            }
+          ]
+        },
+        "requires": [
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "production_authorization": "not_authorized"
+      }
+    },
+    "new_reader_instance_equal": true,
+    "elapsed_seconds": 89.006,
+    "denied_initialization_attempts": [
+      "file_write_outside_own_temp",
+      "socket.__new__"
+    ],
+    "forbidden_provider_or_enqueue_calls": [],
+    "new_model_requests": 0,
+    "external_network_sends": 0,
+    "record_writes": 0,
+    "source_script_sha256": "42bac783c0f071fefd8268e0f7f44101dff8da534631755e0d25c80d8e32793b"
+  },
+  "http": {
+    "mode": "original_router_in_process_ASGI",
+    "requests": [
+      {
+        "request": "batch20",
+        "status": 200,
+        "seconds": 14.006,
+        "payload_sha256": "d2115f42398879c9427764186345796a804a443eee67d1af785f2c11b1687a61"
+      },
+      {
+        "request": "detail_and_gaps",
+        "instrument_id": "600348.SH",
+        "status": 200,
+        "seconds": 11.475,
+        "profile_sha256": "8c1ed203adaabaaf41595026cff67220cf5f7e50f20b95b53129ae5f23c5ffcb",
+        "latest_work_id": "bp-work-52157e13cdbf80605eb26a27",
+        "facts": 34,
+        "metrics": 76,
+        "active_gaps": 14,
+        "information_gaps_sha256": "6f5b6730656dadecdc0aa77b5531546ab15ba1c65f96ddc41615ac1103c25080",
+        "review_status": "completed_with_open_findings"
+      },
+      {
+        "request": "enrichment_plan_only",
+        "instrument_id": "600348.SH",
+        "status": 200,
+        "seconds": 10.873,
+        "payload_sha256": "84bf4cdf02c3a6ad73d2fba6768c216bc556048e1f6076b7db3ee6e364c38bb6"
+      },
+      {
+        "request": "detail_and_gaps",
+        "instrument_id": "600901.SH",
+        "status": 200,
+        "seconds": 11.802,
+        "profile_sha256": "2986d85bb7c6dabd760304424cdf21f0719f5fbec65fbe87342a06be692c1f62",
+        "latest_work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+        "facts": 25,
+        "metrics": 86,
+        "active_gaps": 7,
+        "information_gaps_sha256": "30f70f471bd028d9ab498a69744cd59c622d70344842f2460df028fcba8cb6a3",
+        "review_status": "completed_with_open_findings"
+      },
+      {
+        "request": "enrichment_plan_only",
+        "instrument_id": "600901.SH",
+        "status": 200,
+        "seconds": 11.659,
+        "payload_sha256": "97a487a922b537971b0ea0c41d7858bbe91520071288e224fc6b4b0787e30967"
+      },
+      {
+        "request": "detail_and_gaps",
+        "instrument_id": "000526.SZ",
+        "status": 200,
+        "seconds": 10.876,
+        "profile_sha256": "60a8f68e0185cf59d60e1e31d5c060ffd0e6542c1376a3c7a8958ab3e9de5b30",
+        "latest_work_id": "bp-work-c6a75b04b6703268cb518867",
+        "facts": 31,
+        "metrics": 13,
+        "active_gaps": 9,
+        "information_gaps_sha256": "5ed5ba948c45a922dc7a63dfbe0a3073d7a27b505e7982eeccb613fa8ca98927",
+        "review_status": "completed_with_open_findings"
+      },
+      {
+        "request": "enrichment_plan_only",
+        "instrument_id": "000526.SZ",
+        "status": 200,
+        "seconds": 11.13,
+        "payload_sha256": "b6795ca94560cc677f6ee6f29093559931abea78a45bea21a7b60a5acf2b978c"
+      }
+    ],
+    "client_closed": true,
+    "executor_closed": true,
+    "event_loop_closed": true,
+    "remaining_threads": [
+      "MainThread"
+    ],
+    "elapsed_seconds": 88.04,
+    "denied_initialization_attempts": [
+      "file_write_outside_own_temp",
+      "socket.__new__"
+    ],
+    "forbidden_provider_or_enqueue_calls": [],
+    "new_model_requests": 0,
+    "external_network_sends": 0,
+    "record_writes": 0,
+    "source_script_sha256": "42bac783c0f071fefd8268e0f7f44101dff8da534631755e0d25c80d8e32793b"
+  },
+  "actual_commands": [
+    "source scripts/quote_dev_env.sh; timeout 90s /home/python/miniconda3/envs/Quote/bin/python data/QuoteBak/b1-6fk-unified-7cWfTXUb/consume.py",
+    "source scripts/quote_dev_env.sh; timeout 180s /home/python/miniconda3/envs/Quote/bin/python data/QuoteBak/b1-6fk-unified-7cWfTXUb/consume.py --http"
+  ],
+  "http_environment": "tool-approved local IPC; audit guard denies external IP sockets/DNS/connect/bind/sendto and subprocesses",
+  "endpoint_scope": "original api.company_profile_routes.router under /api/v1 via in-process ASGITransport; no server/listener/production startup",
+  "timing_limit": "whole-call Python profiling is enabled; elapsed times are verification overhead, not a production performance measurement",
+  "first_attempt_failures": [
+    {
+      "mode": "direct",
+      "exit_code": 1,
+      "stage": "module import before business query",
+      "reason": "B1 guard overmatched ProviderCoordinatorRegistry as a provider"
+    },
+    {
+      "mode": "http",
+      "exit_code": 1,
+      "stage": "module import before HTTP requests",
+      "reason": "same B1 guard overmatch; not an application or IPC failure"
+    }
+  ],
+  "correction": "Only provider class constructors ending Provider plus LlmClient/TaskService and enqueue are blocked; internal coordinator registry is not a provider.",
+  "model_requests": 0,
+  "tokens": 0,
+  "model_cost": 0
+}

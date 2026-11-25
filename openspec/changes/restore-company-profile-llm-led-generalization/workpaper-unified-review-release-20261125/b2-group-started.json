@@ -1,0 +1,8 @@
+{
+  "epoch": 1795590155.914866,
+  "max_seconds": 12600,
+  "tokens": 3000000,
+  "physical_requests": 18,
+  "concurrency": 3,
+  "policy": "one same-version observation; all in flight finish within original limits"
+}

@@ -1,0 +1,43 @@
+{
+  "task": "6.FK",
+  "phase": "same_card_final_release",
+  "historical_snapshot": false,
+  "approval": "a-approved-successors.json",
+  "independent_release_audit": "a-release-audit.json",
+  "current_api": "data/research/company_profile_research_v1_20261123/current-api-20261125.json",
+  "current_API_sha256": "589f3f6907b10913bf0a14367ad81f0c1ce5916a8c333a3f1812fb0ecd6a283c",
+  "annual_json": "data/research/company_profile_research_v1_20261123/exports-current-20261125/annual_profiles.json",
+  "annual_JSON_sha256": "bb081365ab0e5ade6e51469f13278f31de9d4644bc8d3bc5184228f9a2bad1a2",
+  "annual_markdown": "data/research/company_profile_research_v1_20261123/exports-current-20261125/annual_profiles.md",
+  "annual_MD_sha256": "d908ac2af8896059233a41247cf0ab03a3c03e308ff54913028bee563e7defc8",
+  "batch_payload_sha256": "7ca084950baeddc8f82bce44d5d7b69cc481396584c77d3d1e08c43f7cc10c0a",
+  "final_release_receipt": "b1-late-release.json",
+  "full_output_hash_manifest": "b1-late-release.json.files_sha256",
+  "total": {
+    "readable": 650,
+    "metrics": 1059,
+    "active_gaps": 133,
+    "historical_gaps": 180
+  },
+  "complete_profiles_equal_approved": 20,
+  "unrelated_profiles_unchanged": 17,
+  "F12_independent_withholding_retained": true,
+  "historical_initial_integration": {
+    "phase": "initial_three_reviewed_successors_daily_release",
+    "evidence": [
+      "b1-integration.json",
+      "a-integrated-check.json",
+      "b1-final-check.json"
+    ],
+    "API_file_sha256": "d2039299a513cee5ddd44bfedcd175a5ef95de52ace1562fbe042c39eff14880",
+    "batch_payload_sha256": "d2115f42398879c9427764186345796a804a443eee67d1af785f2c11b1687a61",
+    "readable": 650,
+    "metrics": 1059,
+    "active_gaps": 132,
+    "historical_gaps": 152,
+    "current_paths_replaced_by_same_card_final": true,
+    "duplicate_complete_API_retained": false
+  },
+  "B1_added_model_requests": 0,
+  "production_authorization": "not_authorized"
+}

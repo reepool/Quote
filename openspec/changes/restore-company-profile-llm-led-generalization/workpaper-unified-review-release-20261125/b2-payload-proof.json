@@ -1,0 +1,51 @@
+{
+  "semantic_validation": false,
+  "proof": [
+    {
+      "instrument_id": "600348.SH",
+      "state": "completed",
+      "actual_entry": true,
+      "callback_typed_identity_equal": true,
+      "source_text_equal": true,
+      "draft_equal": true,
+      "original_metric_hashes_equal": true,
+      "no_old_review_or_A_answers_in_model_payload": true,
+      "scripted_requests": 1,
+      "supplier_requests": 0,
+      "reused_saved_scripted_wire": true,
+      "wire_sha256": "eeda349fd5b514093c893d1cc9a1b6584409d47703b3dae5f42d517822065953",
+      "scripted_wire_path": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI/dry-600348/checkpoints/executions/b2-dry-600348/receipts/001.json"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "state": "completed",
+      "actual_entry": true,
+      "callback_typed_identity_equal": true,
+      "source_text_equal": true,
+      "draft_equal": true,
+      "original_metric_hashes_equal": true,
+      "no_old_review_or_A_answers_in_model_payload": true,
+      "scripted_requests": 1,
+      "supplier_requests": 0,
+      "reused_saved_scripted_wire": false,
+      "wire_sha256": "3388e3221553efe7f656a271d4ec2536451bd62922a25ec1ba8161d49b238706",
+      "scripted_wire_path": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI/dry-600901/checkpoints/executions/b2-dry-600901/receipts/001.json"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "state": "completed",
+      "actual_entry": true,
+      "callback_typed_identity_equal": true,
+      "source_text_equal": true,
+      "draft_equal": true,
+      "original_metric_hashes_equal": true,
+      "no_old_review_or_A_answers_in_model_payload": true,
+      "scripted_requests": 1,
+      "supplier_requests": 0,
+      "reused_saved_scripted_wire": false,
+      "wire_sha256": "3e4e61e6e002691b00e80eaaaf749b8d9103e4663e9e5096918c398b2ba0fa3f",
+      "scripted_wire_path": "/home/python/Quote/data/QuoteBak/b2-6fk-review-2am9JpuI/dry-000526/checkpoints/executions/b2-dry-000526/receipts/001.json"
+    }
+  ],
+  "real_supplier_calls": 0
+}

@@ -1,0 +1,44 @@
+{
+  "task": "6.FK",
+  "state": "historical_subagent_automatic_approval_rejections_before_process_creation",
+  "current_resolution": {
+    "state": "main_task_approved_same_frozen_action_and_completed",
+    "context": "Main task supplied complete direct user authorization history; subagent did not retry or alter driver/routes/limits after A's instruction.",
+    "unique_real_group": "b2-group-started.json",
+    "real_group_result": "b2-group-process-result.json",
+    "real_physical_requests": 7,
+    "real_recoveries": 0,
+    "real_supplier_total_tokens": 188244,
+    "real_cost_cny": "unknown",
+    "rejection_fields_below_describe_only_the_pre_process_subagent_attempts": true
+  },
+  "authorization_reference": "6.FK-user-combined-implementation-A-ready-20261125",
+  "A_ready": "a-review-ready.json",
+  "requested_action": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python data/QuoteBak/b2-6fk-review-2am9JpuI/b2-driver.py run-group",
+  "permission_mode": "require_escalated approved-network execution",
+  "network_preflight": "Both exact destination hosts passed DNS and TLSv1.3 with valid certificates; see b2-network-preflight.json.",
+  "automatic_approval_rejections": [
+    {
+      "attempt": 1,
+      "process_created": false,
+      "reason_verbatim": "The driver will perform real model calls that may export sensitive company source packets and drafts to external endpoints; although the user authorized the bounded observation and named Grok/DeepSeek, the exact receiving domains and payload disclosure are not explicitly established in trusted user content."
+    },
+    {
+      "attempt": 2,
+      "process_created": false,
+      "additional_read_only_evidence": "b2-public-disclosure-check.json; official CNInfo public PDF URLs, exact original source/draft payload hashes and five-field scope; same original frozen driver, endpoints and finite budget.",
+      "reason_verbatim": "The read-only checks narrow the payload to public annual-report material and derived drafts, but the trusted user request still authorizes Grok/DeepSeek models rather than these exact receiving domains; sending the drafts and source text to those external endpoints remains sensitive egress without destination-specific authorization."
+    }
+  ],
+  "domains_requiring_explicit_trusted_user_confirmation_per_auto_reviewer": ["scorpio.reepool.com", "api.deepseek.com"],
+  "payload_scope": "Only the three already-authorized public annual-report original selected packets and current derived drafts; source review, at most one necessary merged repair and final check under the existing card. No old quality_review, independent UseReview or A expectations as model answers.",
+  "live_group_started": false,
+  "live_processes_created": 0,
+  "supplier_requests": 0,
+  "new_supplier_usage": 0,
+  "new_supplier_cost": "not incurred; no process or request",
+  "original_frozen_driver_changed": false,
+  "old_windows_reopened": false,
+  "fallback_or_indirect_execution_used": false,
+  "retained_pending_A_review": "Original prepared 12-record probe root, all3 exact plans, source/driver freeze, scripted wire proofs, test XML, local DB and driver remain available. No production/shared configuration/Git writes."
+}

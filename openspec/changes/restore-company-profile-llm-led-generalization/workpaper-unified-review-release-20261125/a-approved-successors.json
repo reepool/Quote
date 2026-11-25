@@ -1,0 +1,48 @@
+{
+  "task": "6.FK",
+  "approved": [
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+      "source_record": "data/research/company_profile_review_strategy_probe_20261125/company_profile_common_core.v1/bp-work-ef3a65cc3407c6e9f844a7cc.json",
+      "source_record_sha256": "80381deaf54b336282ba402c6b1dcc73791510c5a8be03f9cf50530f54835d20",
+      "complete_profile_sha256": "241009db500564d21dab17d24f5b2ea4d5e866dcb6586ec379dfd41dff6b2fc4"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "work_id": "bp-work-b4e5ee438be22f743e6ce1cd",
+      "source_record": "data/research/company_profile_review_strategy_probe_20261125/company_profile_common_core.v1/bp-work-b4e5ee438be22f743e6ce1cd.json",
+      "source_record_sha256": "32c67aa6a86e35c3ddc90768118bdf1ac6fb7abeb03c07d1229e19bf82f0371a",
+      "complete_profile_sha256": "1761b55e912abb4b06f1de71724889ba2bca678004ef657ea2ab56264ca47916"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "work_id": "bp-work-36c6f5ea65d8e2084e4f07d3",
+      "source_record": "data/research/company_profile_review_strategy_probe_20261125/company_profile_common_core.v1/bp-work-36c6f5ea65d8e2084e4f07d3.json",
+      "source_record_sha256": "c4b87e130bdc2fab13fe3fdcdfe955c3f81317d195103e45278102f6469ebe6d",
+      "complete_profile_sha256": "76d897d71db3d063caf6b4f82705529f4152b2f46bd5204ee7b63f69ba36fcbc"
+    }
+  ],
+  "source_root": "/home/python/Quote/data/research/company_profile_review_strategy_probe_20261125",
+  "destination_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "unrelated_17_expected_profile_sha256": {
+    "000049.SZ": "05b6f6524b6eb7a0938d0f0a6984a7a4ea2ef78d295d842ac4dcd8e0c3c9a56c",
+    "601006.SH": "737e8a86d27c936b9f88d813c895eeb1c7a87cf3183e6fdec1d080f0f0acff47",
+    "600015.SH": "9bcb729959b17e5d891644d6cc15f7091d20ab2683d6466ef409037b648bf852",
+    "000338.SZ": "db8e7d58ccb43718d7d12a6e951cbd2b78a0b82f279b49cdb63af7a6aa2f7cb5",
+    "600859.SH": "dbfa9524e0230dce712d4ef717e9d889a75db0ca4dcafee5641417c6aed5e17b",
+    "601166.SH": "8098cb8744ba732f51a0c65175276ee51debdaaf6e3cad7d4b58c7f3bf444db5",
+    "600900.SH": "972f4860866759b330f49de7bb7027286d970d6fc3cffb1275f3428fd5003e67",
+    "000651.SZ": "808e5bb12d63279b6d9da430f003df834cec018f5cca9f6520b40cc57eae4807",
+    "601377.SH": "187db1fbae58f292a29524d36552291fd2fae9c042c69e6bb4cc24a6bbcbf55f",
+    "000006.SZ": "a4bb8ce002a57521f73d6341388ab773efc9770b89bd0d55b1944e0461fc4ea1",
+    "600316.SH": "4673e2fbad65bae81a451df3e162be118b8fe83f8ecb380b1e09f633f1f20c46",
+    "000156.SZ": "2c7311e6b6cede1e686b0b217fb397f14bf88697eb44c1238a02d84b938a85eb",
+    "601668.SH": "faf9a999d0ca06a600e5d9fe850b161dadc91b8e49e155551187e8c69b6a7a60",
+    "920014.BJ": "07fe04cdc80a948804017ad7244932f0fce2fdb1ac822cd81f23830700853439",
+    "300015.SZ": "e614d6842d1a3bacfacfe7e031785d6e81451ed1d556f8bd31a6f3beba94e0bc",
+    "920017.BJ": "fff01f7c4fc5ebe031d251348fb9012f159ce3b372b0a40c7b53286b6cb693cf",
+    "000099.SZ": "71c374a72b4f4a883b35feb77af3a546c757297ab59ae1159641bb3892824948"
+  },
+  "scope": "Same-card research release only; retain every source record/old snapshot/use restriction; not production."
+}

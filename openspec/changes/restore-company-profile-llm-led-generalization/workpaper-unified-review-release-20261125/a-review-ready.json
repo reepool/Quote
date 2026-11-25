@@ -1,0 +1,64 @@
+{
+  "task": "6.FK",
+  "plans_independently_checked": [
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-52157e13cdbf80605eb26a27",
+      "plan_sha256": "1598395d5ba2a8f80f807b63ead36bf9ef422e7d36d98f56c88f1b9d7afdef47",
+      "review_input_binding": {
+        "current_draft_sha256": "3cb6a260a51d994ade572624d81e24b29983b853d6c499498d184a812c1bf592",
+        "request_draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2",
+        "source_packet_sha256": "31925cb672b1ec9bc452383a76bc573afc1fa090852166c48cc148c511547e55"
+      },
+      "source_text_sha256": "3a7ecfa23daf4c69c7f9da96b1cb4c147dfabb81cf9ef8910299fa919e8e8c9c"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "work_id": "bp-work-47b8196e8bb0fe8fb4b1b4d0",
+      "plan_sha256": "21e5640f2d0b2a95dac60f517a01560d40733b8cf2614f6be661c80564be0360",
+      "review_input_binding": {
+        "current_draft_sha256": "f9efe8c92808345397c7fa1f293b1b7c84b939c0ac8b55d0deba2543e77c8522",
+        "request_draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e",
+        "source_packet_sha256": "3466fb26c2a0e0769d24d9ff7068816fdd2ed57e1edffe7a8ed4c1e65b56f120"
+      },
+      "source_text_sha256": "296103275390cda8ed4f718747a7e6e4bcf987b5ba2aa744aa31b71521de768f"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "work_id": "bp-work-c6a75b04b6703268cb518867",
+      "plan_sha256": "a539f21b476d1d9b214403b3e220fda17ef55b53323813aa7b895de3560278e1",
+      "review_input_binding": {
+        "current_draft_sha256": "b8f69bbc76823ef2591670429d6c08b003a30b6b520dba48145fd5c1840e4885",
+        "request_draft_sha256": "985c93bba7defecbbbb5ecdac3a88baeca5fa12b526ef6c56d5039d5ea2decb3",
+        "source_packet_sha256": "aeb6f24ae554b70d8ba007d42867e9558996e94acc536b971b2f9efd37ec3bee"
+      },
+      "source_text_sha256": "f5da24485e8882181bb8ea8c53ab13c6e2831a4e6503864394e36154b4157d44"
+    }
+  ],
+  "actual_original_entry_payloads_checked": [
+    {
+      "instrument_id": "600348.SH",
+      "request_draft_sha256": "caab7b35558672a3a2ad4d9c288c47d891c15548d6bf186d7806f7598fb68fe2",
+      "original_entry_scripted_payload_independently_checked": true
+    },
+    {
+      "instrument_id": "600901.SH",
+      "request_draft_sha256": "c28ddbc8fb98b5d4576b979ecc58f5198131cc8b170af6735e0f539ff07a042e",
+      "original_entry_scripted_payload_independently_checked": true
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "request_draft_sha256": "985c93bba7defecbbbb5ecdac3a88baeca5fa12b526ef6c56d5039d5ea2decb3",
+      "original_entry_scripted_payload_independently_checked": true
+    }
+  ],
+  "A_first_check_corrected": "The actual gateway wire has five user fields and two system messages; the initial A checker incorrectly assumed an internal reading_scope field and first-system-only instructions. Source/draft digests were already equal; no supplier call or application change.",
+  "initial_only_reuses_no_old_review_answer": true,
+  "input_sources_unchanged": true,
+  "source_read_policy": "current actual drafts and original v7 packets",
+  "authorization_reference": "6.FK-user-combined-implementation-A-ready-20261125",
+  "release_conditions": "All3 scripted original-entry payload proofs pass; relevant direct checks pass; code/driver/plans freeze; then approved-network DNS/TLS and one bounded real run per3, no extra iteration.",
+  "independent_source_expectations_frozen": true,
+  "new_model_response_seen": false,
+  "old_scores_or_production_authority_changed": false
+}

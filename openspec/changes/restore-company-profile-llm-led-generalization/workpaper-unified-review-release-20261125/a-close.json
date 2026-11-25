@@ -1,0 +1,33 @@
+{
+  "task": "6.FK",
+  "existing_dirty_files_preserved": 49,
+  "protected_original_files_unchanged": 310,
+  "staged_source_and_tests_equal_real_run_freeze": true,
+  "review": {
+    "blocking_findings": "none remaining in this card",
+    "nonblocking": "optional completeness deferred",
+    "unrelated": "left untouched",
+    "known_semantic_limit": "4 observed risk positions still rely on preserved independent guards"
+  },
+  "validation": {
+    "distinct_direct_cases_passed": 8,
+    "actual_HTTP_requests_passed": 9,
+    "full_final_profiles_checked": 20,
+    "openspec_strict": "passed",
+    "diff_check": "passed"
+  },
+  "cleanup": {
+    "A_root": "/home/python/Quote/data/QuoteBak/company-profile-6fk-a-kV67HGBC",
+    "A_regular_files": 15,
+    "A_regular_file_bytes": 3118842,
+    "B_regular_files": 256,
+    "B_regular_file_bytes": 75467149,
+    "quantified_total_regular_files": 271,
+    "quantified_total_regular_file_bytes": 78585991,
+    "additional_duplicate_metadata": "B2 removed6 duplicated driver receipts and1 duplicate successful XML, not included in these byte totals",
+    "space_unit": "logical regular-file bytes, not measured free-space delta",
+    "all_owned_development_roots_absent": true,
+    "canonical_MAIN_business_records_retained": true,
+    "necessary_real_source_and_failure_evidence_retained": true
+  }
+}

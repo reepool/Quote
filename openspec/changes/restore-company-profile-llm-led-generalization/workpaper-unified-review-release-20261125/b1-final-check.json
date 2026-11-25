@@ -1,0 +1,47 @@
+{
+  "task": "6.FK",
+  "profiles_equal_A_expected": 20,
+  "other_profiles_unchanged": 17,
+  "protected_files_checked": 310,
+  "protected_changes": [],
+  "authorized_current_page_sha256": "1385e59bcac3d1a3ebbffec07ae1f55c0e80b4003e1d315e5a8599ce9695db68",
+  "original_dirty_files_checked": 49,
+  "original_baseline_deltas_only_A_managed_documents": [
+    "docs/development/company_profile_acceptance_program.md",
+    "docs/development/company_profile_delivery_plan.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md"
+  ],
+  "A_managed_documents_changed_after_B1_start": [],
+  "B1_touched_original_dirty_files": false,
+  "current_page_local_links_valid": 27,
+  "appended_record_bytes_still_equal_sources": 4,
+  "reused_record_bytes_still_equal_sources": 6,
+  "daily_API_export_hashes_equal_release_manifest": true,
+  "retained_consumption_script_sha256": "42bac783c0f071fefd8268e0f7f44101dff8da534631755e0d25c80d8e32793b",
+  "review": {
+    "blocking_findings": 0,
+    "harness_overmatch_fixed": true,
+    "repeated_receipt_bodies_removed_bytes": 111683,
+    "application_source_changes": 0
+  },
+  "cleanup": {
+    "root": "/home/python/Quote/data/QuoteBak/b1-6fk-unified-7cWfTXUb",
+    "root_absent": true,
+    "removed_regular_files": 67,
+    "removed_logical_file_bytes": 29407947,
+    "space_unit": "logical file bytes, not measured NFS free-space delta",
+    "prior_related_roots_absent": true,
+    "initial_removed_bytes": 0,
+    "retained_temporary_items": [],
+    "other_roots_or_shared_logs_deleted": false,
+    "all_owned_tool_processes_completed_before_cleanup": true,
+    "retained": "one daily API/export set, four appended original-writer records, b1 integration/consumption/release/final receipts, one exact consumption script and b1-result"
+  },
+  "staged": false,
+  "committed": false,
+  "pushed": false,
+  "new_model_requests": 0,
+  "B2_observation_successors_appended": 0
+}

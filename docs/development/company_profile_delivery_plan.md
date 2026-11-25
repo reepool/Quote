@@ -1,5 +1,9 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-25 [6.FK四项同卡收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/result.md)：原20统一API现650/1059，既有三稿和3真实观察后继已发布、17其余保持，原router批量/详情/缺项/只读补读计划可用。v13共性源核仅本轮三份7物理/188244/493.822秒、0恢复/费用unknown；新抓此前1指标方向+1整事实矛盾，仍余华阳4指标靠原保护，非新99%或免人工。A原PDF/正控/完整profile审通过，阶段转研究使用与具体问题精读，不再自动派这三家/20整批校准或扩100/生产；旧分/源/限制保留。必要证据归一后清本轮重复probe、测试DB及临时脚本，有限Review/strict和正常Git同卡完成，详情见唯一result。
+
+2026-11-25当前执行[6.FK统一研究版与复核改进](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-unified-review-release-card.md)：用户已授权前轮四项合并建议，A冻553e374a/49旧脏/310文件；B1先将华阳/金租/学大已审新稿汇入原20股读取根、实际消费和统一导出，B2并行三类共性提示改进及同三稿一次真实观察，A末端裁决后可同卡发布安全有用后继。补充可缺、保原限制和旧分；新任务预算/联网/停止及自主范围见卡，不重抽20或开100/生产，不再拆字段返修卡。前轮本人临时根已清，必要证据一套后清本轮产物/普通Git同卡。
+
 2026-11-25 [6.FJ两主要金额实际采纳](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-restored-amounts-final-20261125/result.md)：学大R4/R5取得自己的真实Grok final，收入/成本及业务权重得到补充；原4仅一致性通过，原30对象/5回执/304文件与20及三稿API保持。新研究根31可读（29已核/2限用）/1隔离，原F12及未决遗漏继续公开，不以completed宣称全稿准确。1物理/0恢复/22551供应商total、103.542秒请求、unknown费用；A原PDF期望和实发/新实例/导出独核通过。此链收口，现研究使用和具体问题补读优先，不续付费追其他尾项；必要一套后清本人根、有限Review/strict及普通Git同卡完成，旧质量分/规模生产权限不改。
 
 2026-11-25当前[6.FJ定向终核](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-restored-amounts-final-card.md)接用户继续：先让完成但本地恢复的真实候选在原owner安全计划verify_only，再原6候选同批一次Grok final，不重抽/初核/修订；新2恢复项实际接受才交研究后继，原4内容仅一致性检查不重复计成果。A冻4ac28ff0/304文件/49旧脏及新有限资源/模型数据范围，B准备/直接回归/冻结/真实交付/清理一窗完成，原20与三稿/API不改，不借旧额或再开公司/生产。前两已交接根已清，前B早期空根仅rmdir，末端必要一套后清和普通Git同卡。
