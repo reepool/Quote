@@ -282,7 +282,7 @@ def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
     """Read explicit same-column continuations, never arbitrary whitespace joins.
 
     Require a monetary header and either a wrapped change-in-points marker or
-    comparative columns with multiple uniquely aligned decimal continuations.
+    multiple uniquely supported same-column amount continuations.
     Original quotes/coordinates are untouched; other damaged tables stay unclear.
     """
     cells = []
@@ -335,6 +335,71 @@ def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
             else:
                 if len(joins) >= 2 and len({start for _, start, _ in joins}) == len(joins):
                     cells.extend(joins)
+        # Some native layouts shift a continuation inside its column rather
+        # than directly under the prefix. Explicit percent cells delimit those
+        # columns; their complete values must not be consumed as amount tails.
+        monetary_headers = list(_MONEY_HEADER.finditer(quote[:offset]))
+        if monetary_headers and not _MONEY_HEADER.search(lower):
+            context = quote[monetary_headers[-1].end():offset]
+            header_lines = []
+            for line in context.splitlines():
+                if re.search(r"\d{1,3},\d|\d+\.\d{2}(?!\d)", line):
+                    break
+                header_lines.append(line)
+            headings = "\n".join(header_lines)
+            body_lines = context.splitlines()[len(header_lines):]
+            contiguous = all(line.strip() and not (
+                not re.search(r"\d", line) and re.search(r"\S\s{2,}\S", line)
+            ) for line in body_lines)
+            comparative = (len(re.findall(r"\d{4}\s*年|本期|上期|本年|上年", headings)) >= 2
+                           and headings.count("金额") >= 2)
+            income_cost = "营业收入" in headings and "营业成本" in headings
+            token = r"(?<![\d.,])-?(?:\d[\d,]*(?:\.\d*)?|\.\d+)[%％]?(?![\d.,])"
+            top = list(re.finditer(token, upper))
+            bottom = list(re.finditer(token, lower))
+            rates = [m for m in (*top, *bottom) if m.group().endswith(("%", "％"))]
+            prefixes = [m for m in top if not m.group().endswith(("%", "％"))]
+            fragments = [m for m in bottom if not m.group().endswith(("%", "％"))]
+            joins, kinds = [], []
+            if (contiguous and (comparative or income_cost) and len(rates) >= 2
+                and len(prefixes) == len(fragments) >= 2):
+                # A named new row is not a continuation. A label fragment must
+                # be present in this table's headings or complete an already
+                # observed literal label; this supplies no economic inference.
+                label = lower[:fragments[0].start()].strip()
+                upper_label = upper[:prefixes[0].start()].strip()
+                label_bound = (not label or label in headings
+                               or upper_label + label in quote[:offset])
+                # After the leading row-label fragment, only complete numeric
+                # tokens and layout spaces may occur. A unit, note or heading
+                # attached to a tail is not an amount continuation.
+                if any(re.sub(token, "", line[tokens[0].start():]).strip()
+                       for line, tokens in ((upper, top), (lower, bottom))):
+                    label_bound = False
+                for index, prefix in enumerate(prefixes):
+                    right = min([m.start() for m in rates if m.start() >= prefix.end()]
+                                + [p.start() for p in prefixes[index + 1:]] + [len(lower)])
+                    aligned = [m for m in fragments
+                               if prefix.start() <= m.start() and m.end() <= right]
+                    if not label_bound or len(aligned) != 1:
+                        break
+                    fragment = aligned[0]
+                    value = prefix.group() + fragment.group()
+                    if not re.fullmatch(r"-?\d{1,3}(?:,\d{3})+\.\d{2}", value):
+                        break
+                    if re.fullmatch(r"-?\d{1,3}(?:,\d{3})*[,]\d{1,2}", prefix.group()):
+                        kind = "group"
+                    elif re.fullmatch(r"-?\d{1,3}(?:,\d{3})+\.\d?", prefix.group()):
+                        kind = "decimal"
+                    else:
+                        break
+                    kinds.append(kind)
+                    joins.append((value, offset + prefix.start(), offset + prefix.end()))
+                else:
+                    # In particular, an isolated regrouped integer cannot borrow
+                    # confirmation from unrelated decimal-only continuations.
+                    if len(set(kinds)) == 1 and len({start for _, start, _ in joins}) == len(prefixes):
+                        cells.extend(joins)
         offset += len(upper)
     return cells
 
@@ -379,7 +444,10 @@ def _source_number_cells(quote: str, *, legacy_fragments: bool = False) -> list[
     ordinary = [
         (match.group(), match.start(), match.end())
         for match in re.finditer(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", quote)
-        if legacy_fragments or not any(start <= match.start() < end for _, start, end in recovered)
+        if legacy_fragments or (
+            re.fullmatch(r"-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?", match.group())
+            and not any(start <= match.start() < end for _, start, end in recovered)
+        )
     ]
     return [*ordinary, *recovered]
 
@@ -389,14 +457,17 @@ def _check_fact_source(
 ) -> tuple[str, ...]:
     if set(fact.evidence_ids) - sources.keys():
         raise ValueError("fact cites unknown evidence")
-    numbers = {
-        Decimal(value.replace(",", ""))
-        for evidence_id in fact.evidence_ids
-        for span in sources[evidence_id].source_spans
-        for value, _, _ in _source_number_cells(span.quote, legacy_fragments=not check_units)
-    }
-    cells = [cell for eid in fact.evidence_ids for span in sources[eid].source_spans
-             for cell in _wrapped_table_cells(span.quote)]
+    numbers, cells = set(), []
+    for evidence_id in fact.evidence_ids:
+        for span in sources[evidence_id].source_spans:
+            wrapped = _wrapped_table_cells(span.quote)
+            prefixes = [(start, end) for text, start, end in wrapped
+                        if re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", text)]
+            for value, start, end in _source_number_cells(span.quote, legacy_fragments=not check_units):
+                if check_units and any(left < end and start < right for left, right in prefixes):
+                    continue  # Suppress only this confirmed prefix's original location.
+                numbers.add(Decimal(value.replace(",", "")))
+            cells.extend(wrapped)
     numbers.update(Decimal(text.replace(",", "")) for text, _, _ in cells
                    if re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", text))
     for metric in fact.metrics:

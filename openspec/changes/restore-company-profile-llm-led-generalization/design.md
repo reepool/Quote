@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FI 在原字面源绑定内识别有界的表格金额折行
+
+继续使用原_wrapped_table_cells及metric/prose/unit调用方，不另造数字或PDF owner。只识别明示货币表中相邻行、同列唯一且多列互证的完整金额写法，容许同一续行有其他完整列；原quote/坐标/raw不改，换位/歧义/跨新表或改变单位不成立。版本化新源绑定身份以记录接受集合变化；旧记录不重写。保存真实候选只得到source-ready，不复用其他final为它采纳；受控纵向只证明执行与隔离，实际模型效果仍未新评估。
+
 ### 6.FH 当前稿源核的隔离真实验证
 
 复用原三份计划的report/current/request/source绑定；仅新增approved副本及一次有限执行，不覆盖原planned/旧响应或将A判断送模型。独立probe根保原8父record的必要谱系，以原TaskService.review_batch及writer交后继；原20/API和独立保护不变。A按预冻原文与准确fact/metric位置核新供应商发现/漏检，继承findings和A保护不作新收益；同冻结代码/模型/预算连续执行，不热修/补样或重算旧分。

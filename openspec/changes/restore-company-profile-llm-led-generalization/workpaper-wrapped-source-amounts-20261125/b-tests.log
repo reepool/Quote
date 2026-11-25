@@ -1,0 +1,16 @@
+........................................................................ [ 41%]
+........................................................................ [ 82%]
+...............................                                          [100%]
+- generated xml file: /home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-wrapped-source-amounts-20261125/b-tests.xml -
+============================= slowest 10 durations =============================
+9.26s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_saved_ping_an_four_candidates_pass_only_local_source_binding
+2.96s call     tests/unit/test_research/test_company_profile_workpaper_review.py::test_runtime_seed_review_gateway_writer_and_three_reads[False]
+2.20s call     tests/unit/test_research/test_company_profile_workpaper_review.py::test_runtime_seed_review_gateway_writer_and_three_reads[True]
+1.58s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads[stale_final-group]
+1.57s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads[wrong_column-punctuation]
+1.50s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads[wrong_subject-group]
+1.49s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads[stale_final-punctuation]
+1.48s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads[accepted-fraction]
+1.47s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads[wrong_subject-fraction]
+1.47s call     tests/unit/test_research/test_company_profile_workpaper_source_cells.py::test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads[wrong_column-group]
+175 passed, 6 warnings in 59.02s

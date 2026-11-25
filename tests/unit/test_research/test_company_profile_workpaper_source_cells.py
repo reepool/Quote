@@ -125,14 +125,21 @@ def test_saved_ping_an_four_candidates_pass_only_local_source_binding():
     assert all(f.resolution == "repair_rejected" for f in paper.quality_review.findings if f.revised_fact in candidates)
 
 
+@pytest.mark.parametrize("layout", ["punctuation", "fraction", "group"])
 @pytest.mark.parametrize("outcome", ["accepted", "wrong_column", "wrong_subject", "interrupted", "stale_final"])
-def test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads(outcome, tmp_path):
+def test_numeric_recovery_still_requires_targeted_semantic_review_and_three_reads(outcome, layout, tmp_path):
     from research.company_profile.reads import CompanyProfileReadService
     from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileStageRuntime
     from research.company_profile.workpaper_llm import workpaper_processing_identity
     from tests.unit.test_research.test_company_profile_workpaper import PAGES, _Provider, _report
 
-    pages = tuple({**p, "text": p["text"].replace("100.00", "1,050,    506")} for p in PAGES)
+    raw = "1,050,506" if layout == "punctuation" else "1,234,567,890.11"
+    value = raw.replace(",", "")
+    if layout == "punctuation":
+        pages = tuple({**p, "text": p["text"].replace("100.00", "1,050,    506")} for p in PAGES)
+    else:
+        table = BUSINESS_FRACTION if layout == "fraction" else BUSINESS_GROUP
+        pages = tuple({**p, "text": p["text"].replace("营业收入    100.00    90.00\n", table)} for p in PAGES)
 
     class NumericProvider(_Provider):
         def workpaper_request(self, **kwargs):
@@ -141,8 +148,8 @@ def test_numeric_recovery_still_requires_targeted_semantic_review_and_three_read
                 return reply
             if kwargs["purpose"] == "extract_profile_workpaper":
                 fact = reply["elements"]["scale_and_mix"]["facts"][0]
-                fact.update(text="净利润1,050,506元。")  # Wrong column, even though the number is present.
-                fact["metrics"][0].update(name="净利润", raw_value="1,050,506", value="1050506")
+                fact.update(text="净利润" + raw + "元。")  # Wrong column, even though the number is present.
+                fact["metrics"][0].update(name="净利润", raw_value=raw, value=value)
                 self.original = copy.deepcopy(fact)
                 return reply
             if kwargs["purpose"] == "review_profile_workpaper":
@@ -153,7 +160,7 @@ def test_numeric_recovery_still_requires_targeted_semantic_review_and_three_read
             if kwargs["purpose"] == "repair_profile_workpaper":
                 fixed = copy.deepcopy(self.original)
                 if outcome != "wrong_column":
-                    fixed.update(text="营业收入1,050,506元。")
+                    fixed.update(text="营业收入" + raw + "元。")
                     fixed["metrics"][0]["name"] = "营业收入"
                 if outcome == "wrong_subject":
                     fixed["subject_scope"] = "issuer"
@@ -183,7 +190,7 @@ def test_numeric_recovery_still_requires_targeted_semantic_review_and_three_read
     assert paper["elements"]["business_structure"]["facts"][0]["fact_id"] == "main"
     facts = paper["elements"]["scale_and_mix"]["facts"]
     if outcome == "accepted":
-        assert facts[0]["metrics"][0]["value"] == "1050506" and facts[0]["text"].startswith("营业收入")
+        assert facts[0]["metrics"][0]["value"] == value and facts[0]["text"].startswith("营业收入")
         assert paper["quality_review"]["findings"][0]["resolution"] == "corrected_pending_trust"
     else:
         assert not facts  # Literal numeric support never overrides column/subject/final-target checks.
@@ -306,8 +313,155 @@ def test_new_processing_identity_versions_signed_source_rate_binding():
 
     for real in (False, True):
         identity = workpaper_processing_identity(real=real)
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.punctuated-numbers.v7"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.column-wrapped-amounts.v8"
         assert identity["semantic_reuse"] is False
+
+
+# Two layouts observed in native monetary tables. Spaces are column positions,
+# not an instruction to flatten the table or infer what any column represents.
+BUSINESS_FRACTION = (
+    "单位：元\n"
+    "                    2025年                                                      2024年\n"
+    "                    金额                占营业收入比重                          金额                占营业收入比重\n"
+    f"{'服务业务':20}{'1,234,567,890.1':35}{'62.34%':25}{'2,345,678,901.2':35}63.45%\n"
+    f"{'收入':40}{'1':60}2\n"
+)
+BUSINESS_GROUP = (
+    "单位：元\n"
+    "                    营业收入                                营业成本\n"
+    "服务业务费              100.00                                  50.00\n"
+    f"{'服务业务':20}{'1,234,567,89':40}2,345,678,90\n"
+    f"{'费':40}{'0.11':40}{'1.12':20}32.83%     15.66%     17.34%     -0.96%\n"
+)
+
+
+@pytest.mark.parametrize("quote,raw", [
+    (BUSINESS_FRACTION, "1,234,567,890.11"),
+    (BUSINESS_FRACTION, "2,345,678,901.22"),
+    (BUSINESS_GROUP, "1,234,567,890.11"),
+    (BUSINESS_GROUP, "2,345,678,901.12"),
+], ids=["fraction-left", "fraction-right", "group-left", "group-right"])
+def test_business_amount_wraps_have_two_unique_columns_and_keep_original_source(quote, raw):
+    _, source = source_check(metric(raw_value=raw, value=raw.replace(",", "")), quote)
+    assert source.source_spans[0].quote == quote
+    matches = [(text, start, end) for text, start, end in _wrapped_table_cells(quote) if text == raw]
+    assert len(matches) == 1
+    text, start, end = matches[0]
+    assert text.startswith(quote[start:end]) and 0 <= start < end <= len(quote)
+    assert not any("%" in text for text, _, _ in _wrapped_table_cells(quote))
+
+
+@pytest.mark.parametrize("failure", [
+    "unit", "header", "single", "cross_column", "ambiguous", "changed_digit",
+    "changed_sign", "new_unit", "new_row", "intervening_header", "new_table",
+    "trailing_word", "fragment_unit", "mixed_integer",
+])
+def test_business_amount_wraps_reject_unbounded_or_incomplete_shapes(failure):
+    quote = BUSINESS_GROUP
+    raw = "1,234,567,890.11"
+    if failure == "unit":
+        quote = quote.replace("单位：元", "单位未知")
+    elif failure == "header":
+        quote = quote.replace("营业收入", "项目甲").replace("营业成本", "项目乙")
+    elif failure == "single":
+        quote = quote.replace("1.12", "    ")
+    elif failure == "cross_column":
+        raw = "1,234,567,891.12"
+    elif failure == "ambiguous":
+        quote = quote.replace("0.11", "0.11 0.12")
+    elif failure == "changed_digit":
+        raw = "1,234,567,890.12"
+    elif failure == "changed_sign":
+        raw = "-" + raw
+    elif failure == "new_unit":
+        quote = quote.replace(f"{'费':40}", f"{'单位：万元':40}")
+    elif failure == "new_row":
+        quote = quote.replace(f"{'费':40}", f"{'其他业务':40}")
+    elif failure == "intervening_header":
+        quote = quote.replace(f"{'费':40}", "金额\n" + f"{'费':40}")
+    elif failure == "new_table":
+        quote = quote.replace(f"{'服务业务':20}", "\n另一张表\n" + f"{'服务业务':20}")
+    elif failure == "trailing_word":
+        quote = quote.replace("-0.96%", "-0.96% 新表说明")
+    elif failure == "fragment_unit":
+        quote = quote.replace("0.11", "0.11元")
+    else:
+        quote = quote.replace("2,345,678,90", "2,345,678,901.").replace("1.12", "12")
+    with pytest.raises(ValueError, match="absent"):
+        source_check(metric(raw_value=raw, value=raw.replace(",", "")), quote)
+
+
+@pytest.mark.parametrize("quote,prefix", [
+    (BUSINESS_FRACTION, "1,234,567,890.1"),
+    (BUSINESS_GROUP, "1,234,567,89"),
+], ids=["fraction-prefix", "group-prefix"])
+def test_restored_prefix_is_excluded_only_at_its_original_position_for_new_binding(quote, prefix):
+    data = metric(raw_value=prefix, value=prefix.replace(",", ""))
+    # Legacy reads preserve old fragments; new metric/prose binding rejects them.
+    evidence = WorkpaperEvidence(evidence_id="table", document_version="v1", section_path=("经营",),
+        physical_pages=(1,), source_spans=(WorkpaperSpan(page=1, start=0, end=len(quote), quote=quote),))
+    fact = WorkpaperFact(fact_id="prefix", text="原保留事实。", subject_scope="consolidated_group",
+        period="2025", evidence_ids=("table",), metrics=(WorkpaperMetric.model_validate(data),))
+    before = fact.model_dump_json()
+    _check_fact_source(fact, {"table": evidence})
+    assert fact.model_dump_json() == before
+    with pytest.raises(ValueError, match="absent"):
+        _check_fact_source(fact, {"table": evidence}, check_units=True)
+    with pytest.raises(ValueError, match="narrative"):
+        prose_check("营业收入" + prefix.replace(",", "") + "元。", quote)
+    # Another complete location with the same value remains valid.
+    complete = prefix if prefix.count(",") == 3 and len(prefix.split(",")[-1].split(".")[0]) == 3 else prefix.replace(",", "")
+    source_check(data, quote + "\n另一处金额 " + complete + "元。")
+
+
+@pytest.mark.parametrize("spelling", ["2,095,400,31", "1,23,456", "1234,567", "1,234,"])
+def test_incomplete_ordinary_groups_cannot_supply_new_numbers_even_without_a_table_header(spelling):
+    quote = "表格续页\n原保留行 " + spelling + "\n"
+    assert any(text == spelling for text, _, _ in _source_number_cells(quote, legacy_fragments=True))
+    assert not _source_number_cells(quote)
+    with pytest.raises(ValueError, match="absent"):
+        source_check(metric(raw_value=spelling, value=spelling.replace(",", "")), quote)
+    # The valid spelling in another position supplies the value independently.
+    value = spelling.replace(",", "")
+    source_check(metric(raw_value=value, value=value), quote + "另一完整金额 " + value + "元。")
+
+
+def test_saved_two_business_amount_candidates_are_source_ready_without_adoption_or_history_changes():
+    import hashlib
+    import json
+    from pathlib import Path
+    from research.company_profile.workpaper import CompanyProfileWorkpaper, workpaper_elements
+
+    path = Path(__file__).resolve().parents[3] / (
+        "data/research/company_profile_automation_probe_20261124/"
+        "company_profile_common_core.v1/bp-work-721e6851edbaa279f67917e5.json"
+    )
+    original = path.read_bytes()
+    paper = CompanyProfileWorkpaper.model_validate(json.loads(original)["workpaper"])
+    before = paper.model_dump_json()
+    sources = {e.evidence_id: e for e in paper.evidence}
+    wanted = {"review-add:R4": "3119716159.11", "review-add:R5": "2095400319.12"}
+    found = {}
+    for finding in paper.quality_review.findings:
+        candidate = finding.revised_fact
+        if candidate is None or candidate.fact_id not in wanted:
+            continue
+        assert finding.resolution == "repair_rejected"
+        assert candidate.metrics[0].value == wanted[candidate.fact_id]
+        _check_fact_source(candidate, sources, check_units=True)
+        # R5's damaged prefix also occurs on an unheaded continuation page.
+        broken = "3,119,716,159.1" if candidate.fact_id == "review-add:R4" else "2,095,400,31"
+        amount = WorkpaperMetric.model_validate(metric(raw_value=broken, value=broken.replace(",", "")))
+        altered = candidate.model_copy(update={"text": "原金额。", "metrics": (amount,)})
+        _check_fact_source(altered, sources)  # Historical read compatibility.
+        with pytest.raises(ValueError, match="absent"):
+            _check_fact_source(altered, sources, check_units=True)
+        found[candidate.fact_id] = candidate
+    assert found.keys() == wanted.keys()
+    delivered = {f.fact_id for element in workpaper_elements(paper).values() for f in element.facts}
+    assert not delivered.intersection(wanted)
+    assert paper.model_dump_json() == before
+    assert hashlib.sha256(path.read_bytes()).digest() == hashlib.sha256(original).digest()
 
 
 @pytest.mark.parametrize('raw,unit,display', [

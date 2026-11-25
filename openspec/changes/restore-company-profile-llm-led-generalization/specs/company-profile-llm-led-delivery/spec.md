@@ -226,6 +226,12 @@ New workpaper binding and repaired projections MUST clear currency on dimensionl
 - **THEN** source binding MAY restore their two-place decimal cells without changing the source quote or coordinates
 - **AND** unknown units, cross-column or ambiguous alignment, changed digits, integer-fragment regrouping and arbitrary whitespace joins remain unsupported; local success does not adopt a repair without its real final review
 
+#### Scenario: A monetary business table wraps the last thousands group or fractional digits
+- **WHEN** a cited fixed-layout monetary table has an explicit governing unit and at least two uniquely supported same-column amount continuations on adjacent physical text lines, including a last thousands-group fragment or decimal suffix, with each reconstructed token forming one complete monetary spelling
+- **THEN** the existing source binder MAY recognize those bounded original spellings for new processing identities without changing the quote, source coordinates, returned raw values, sign or unit; complete other columns on the continuation line MUST NOT be consumed as amount fragments
+- **AND** arbitrary whitespace flattening, ambiguous matches, cross-column/table/header or unrelated-row concatenation, isolated fragments and changed digits or units remain rejected; lexical presence MUST NOT be presented as proof of economic column, subject or period
+- **AND** saved rejected repair candidates that become locally source-ready MUST retain their original rejection history and still require their own content-matched final source review before adoption; local or controlled replay grants no new supplier result or production permission
+
 #### Scenario: Prose expresses the magnitude of a signed comparative decline
 - **WHEN** a cited table explicitly labels its comparative rate column and reports a negative percent, while prose explicitly states 同比/环比下降 with the same positive magnitude and percent unit
 - **THEN** source binding MAY retain that positive decline-magnitude metric without changing the signed source or original returned values

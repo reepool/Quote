@@ -1,5 +1,9 @@
 # 公司画像分阶段验收计划
 
+2026-11-25 [6.FI工程就绪](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-wrapped-source-amounts-20261125/result.md)：原数字源检查已让学大R4收入3,119,716,159.11元与R5成本2,095,400,319.12元通过本地检查，原quote/raw/offset/旧拒绝不改；新绑定v8还拒已识别前缀及不完整千位组，legacy兼容。175相关回归及A19挑战最终通过，首成本残片误放/初夹具失败保留；受控原链证明无匹配final不采纳。A fresh20与3稿API完整相等、304原文件不变；0新模型/实际终核/采纳，源0007无单位的续表仍不独立复原，不为全版式扩引擎。两候选仍需自己的真实源核，旧97.8967%/正式阈值和生产边界不改，必要一套后清/Git同卡。
+
+2026-11-25用户继续后实施[6.FI断行金额消费修复](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-wrapped-source-amounts-card.md)：沿原numeric cell/source binding处理有明确单位/布局及唯一同列多列支持的续片，新处理身份标记接受集合变化；以6.FH学大2有据候选及现实负例/受控原入口证明source-ready。0新模型/外传，不改原raw/拒绝或20与三稿API；没有候选自己的真实final不采纳，不把本地修复算新99%。A冻结2a8a3083/304文件/49旧脏及前轮3根已清，B连续最小实现/回归、A独核原PDF/关键反例及清理/Git收口，不扩成PDF或校验平台。
+
 2026-11-24 [6.FH三稿真实源核结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-draft-source-probe-20261124/result.md)：原TaskService三份后继交88可读/169指标；A核9实际意见、学大4采纳（3修正+1约330中心/教师/基地/学生网络信息），华阳5指标自动限用，其中2为本次额外保护。偏选已知风险8指标只检出3，另5与明确零整事实仍漏检且靠继承A保护，不能评全稿99%。学大主要教育收入/成本候选有原文但本地跨行金额匹配拒绝，未送终核；这才是下一通用消费阻塞，非必须补齐小项。5物理/0恢复/158954已知total及账本、418.605秒同原窗接续/unknown费用；首21.763秒0发送因operator类型比较失败不改判，A同窗裁决和原deadline/预算保持。原20/6471050/277文件与旧分保护，不扩100/生产，不重跑三家或整批。
 
 2026-11-24用户在6.FG结果后明确授权三份保存稿真实源复核，执行为6.FH：华阳600348(c1ce)、江苏金租600901(9938)、学大000526(88e3)，原v7源/当前稿/原planned hash绑定，预算和停止沿[6.FG卡授权执行段](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-automation-readiness-card.md)。A冻结c33bf2f4/277文件/49脏，B原review_batch在独立probe根各一次真实闭环；不重选章/抽取或将A/旧审核意见送模型。新检出/漏检/继承保护与修订原文独核分列，旧20/API/人工限制不改；已见三稿不是新20或正式99%，不扩100/生产。开工旧4根已清，末端必要一套后清/Git同卡完成，无逐字段审批。

@@ -1,5 +1,9 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-25 [6.FI两金额就绪](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-wrapped-source-amounts-20261125/result.md)：原typed/source binding已接住保存R4/R5两个完整有据金额，原数/quote/旧拒绝不变；半截数的strict误放已修、legacy读取保持，source-binding身份v8。175相关回归、A19挑战及20+3完整API快照相等，304文件保护成立，0新增模型/实际final或采纳。本轮不继续扩全部PDF版式、重跑公司或补供应链；两金额若后续采用只需自己的有界源核，现研究API继续使用已有已核内容。必要证据一套后清临时物和正常Git本卡收口，不改旧分/扩量/生产。
+
+2026-11-25当前[6.FI最小通用修复卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-wrapped-source-amounts-card.md)承接用户继续：先修两真实主要金额的单元格折行误拒，原numeric cell/source check→必要review/writer/read/export验证合在B连续窗口，A独核原PDF/关键反例。0新增模型/外传/公司，保存2候选只到source-ready、无自己的真实终核不采纳；现20根及6.FH三稿/API/raw/旧拒绝不变。冻结2a8a3083/304文件/49旧脏，原3临时根已清，所有新临时物仅QuoteBak，必要一套后清/Git同卡完成；不重抽、追尾项或造新PDF/校验owner。
+
 2026-11-24 [6.FH实际三稿交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-draft-source-probe-20261124/result.md)：隔离probe根交三股88可读/169指标，学大实际3修正+1经营网络新增、华阳5指标限用；已知8指标仅检出3，5位置和明确零仍漏，原A保护继续。两有据教育收入/成本候选被原v7跨行金额源检查拒绝、未送终核，不再付费盲重跑。下一主线优先用保存候选处理通用表格金额消费，非供应链/逐公司补齐或自动扩量；原20/API/原成绩不改。首operator0发送失败和A同原deadline唯一接续分列，5真实物理/158954已知total/418.605秒/unknown费用，原业务源码不改；A独审和原wire绑定成立，必要一套后清及普通Git本卡收尾。
 
 2026-11-24当前6.FH获用户具体授权：直接执行已备华阳/江苏金租/学大三份current-draft源核计划及原有限预算，入口/准确reading/模型/停止与清理沿[6.FG卡授权执行接续](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-automation-readiness-card.md)。冻结c33bf2f4，B原TaskService.review_batch连续交独立probe后继、真实请求/结果/API与资源；A同时核原文期望并末端独审新检出/漏检和继承边界。原20研究版及全部人工保护不改，不重抽/加窗/扩样或生产；开工4旧根已清，临时物只在QuoteBak、必要一套后清。此轮必须交实际模型结果及限制，不以又一份准备方案替代业务效果。

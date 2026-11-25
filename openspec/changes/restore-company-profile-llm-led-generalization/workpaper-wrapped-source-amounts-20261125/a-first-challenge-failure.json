@@ -1,0 +1,139 @@
+{
+  "task": "6.FI",
+  "scope": "A independent exact preserved candidates and realistic altered source/fact inputs; no semantic acceptance inferred.",
+  "cases": [
+    {
+      "case": "review-add:R4 real preserved candidate",
+      "expected_source_ready": true,
+      "actual_source_ready": true,
+      "error": null
+    },
+    {
+      "case": "review-add:R4 changed_cent",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "review-add:R4 opposite_sign",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "review-add:R4 conflicting monetary unit",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "source monetary unit conflict: 教育培训服务费收入金额; 原表元，返回万元；未猜测换算"
+    },
+    {
+      "case": "review-add:R4 synthetic different business label",
+      "expected_source_ready": true,
+      "actual_source_ready": true,
+      "error": null
+    },
+    {
+      "case": "review-add:R5 real preserved candidate",
+      "expected_source_ready": true,
+      "actual_source_ready": true,
+      "error": null
+    },
+    {
+      "case": "review-add:R5 changed_cent",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费营业成本"
+    },
+    {
+      "case": "review-add:R5 opposite_sign",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费营业成本"
+    },
+    {
+      "case": "review-add:R5 conflicting monetary unit",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "source monetary unit conflict: 教育培训服务费营业成本; 原表元，返回万元；未猜测换算"
+    },
+    {
+      "case": "review-add:R5 synthetic different business label",
+      "expected_source_ready": true,
+      "actual_source_ready": true,
+      "error": null
+    },
+    {
+      "case": "review-add:R4 broken prefix as full value",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "review-add:R5 broken prefix as full value",
+      "expected_source_ready": false,
+      "actual_source_ready": true,
+      "error": null
+    },
+    {
+      "case": "minimal preserved comparative row",
+      "expected_source_ready": true,
+      "actual_source_ready": true,
+      "error": null
+    },
+    {
+      "case": "no explicit monetary unit",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "new table header between fragments",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "fragments across source spans",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "fragments across physical pages",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "other column suffixes swapped",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    },
+    {
+      "case": "unrelated named row",
+      "expected_source_ready": false,
+      "actual_source_ready": false,
+      "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+    }
+  ],
+  "case_count": 19,
+  "mismatches": [
+    {
+      "case": "review-add:R5 broken prefix as full value",
+      "expected_source_ready": false,
+      "actual_source_ready": true,
+      "error": null
+    }
+  ],
+  "source_record_sha256": "e2e19993aca14fd6a7dd977600ad7c12b042fac190b601c4b8452812848df67c",
+  "source_record_unchanged": true,
+  "actual_original_final_review_targets_unchanged": [
+    "F01",
+    "F10",
+    "F11",
+    "review-add:R6"
+  ],
+  "new_model_calls": 0,
+  "actual_new_final_or_adoption": false
+}

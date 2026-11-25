@@ -1,0 +1,39 @@
+{
+  "task": "6.FI",
+  "review_scope": "Original numeric-source owner, exact two saved candidates,19 independent challenges,175 targeted regression receipts, original20+3 API compatibility and inherited dirty isolation.",
+  "blocking_issue_found_and_fixed": "Incomplete grouped cost prefix from an unheaded continuation span could pass as a complete new amount; strict token grammar now rejects it while legacy reads remain compatible.",
+  "remaining_blockers_for_this_bounded_engineering_change": 0,
+  "source_test_sha256": {
+    "research/company_profile/workpaper.py": "32e9fda6439466c1241cde1594cbc8145f856c20dd142cb39a9e6e6eb71ee011",
+    "research/company_profile/workpaper_llm.py": "1ffa851495b27e4062a89ba34c845a9d9574fae843265840e51b512681a0273c",
+    "tests/unit/test_research/test_company_profile_workpaper_source_cells.py": "525b04bae45eb3b48774641aa75e749b7bcbfe7d35e672a764337dcaca93fc99"
+  },
+  "protected_business_files_unchanged": 304,
+  "old_dirty_files": 49,
+  "old_API_profiles_equal": 23,
+  "two_candidates_source_ready": true,
+  "actual_new_final_reviews": 0,
+  "candidate_adoptions": 0,
+  "new_provider_calls": 0,
+  "new_quality_score": false,
+  "limitations": [
+    "Unheaded source0007 continuation is not independently reconstructed.",
+    "Supported lexical tokens do not establish subject/period/economic column.",
+    "Own real final review is still needed before adopting the two saved candidates."
+  ],
+  "new_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+  "git": "Only current owned increments; normal commit/push authorized; original dirty bytes protected.",
+  "cleanup": {
+    "A_root": "/home/python/Quote/data/QuoteBak/company-profile-6fi-a-tCRvU9z0",
+    "A_files": 11,
+    "A_logical_bytes": 3077581,
+    "A_root_removed_and_absent": true,
+    "B_root": "/home/python/Quote/data/QuoteBak/b-6fi-wrapped-source-amounts-20261125",
+    "B_files_including_removed_generators": 365,
+    "B_logical_bytes": 4185901,
+    "B_root_removed_and_absent": true,
+    "total_files": 376,
+    "total_logical_bytes": 7263482,
+    "recoverability": "Removed only reconstructible test/work files, document baselines, one-off scripts and redundant patch; source/tests, compact final/failure receipts and all304 original business files remain."
+  }
+}

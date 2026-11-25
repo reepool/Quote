@@ -1,0 +1,28 @@
+{
+  "task": "6.FI",
+  "read_compatibility": [
+    {
+      "root": "data/research/company_profile_research_v1_20261123",
+      "profiles": 20,
+      "full_API_equal_saved": true,
+      "elapsed_seconds": 6.781459
+    },
+    {
+      "root": "data/research/company_profile_automation_probe_20261124",
+      "profiles": 3,
+      "full_API_equal_saved": true,
+      "elapsed_seconds": 1.84673
+    }
+  ],
+  "protected_business_files": 304,
+  "changed_business_files": [],
+  "source_and_test_sha256": {
+    "research/company_profile/workpaper.py": "32e9fda6439466c1241cde1594cbc8145f856c20dd142cb39a9e6e6eb71ee011",
+    "research/company_profile/workpaper_llm.py": "1ffa851495b27e4062a89ba34c845a9d9574fae843265840e51b512681a0273c",
+    "tests/unit/test_research/test_company_profile_workpaper_source_cells.py": "525b04bae45eb3b48774641aa75e749b7bcbfe7d35e672a764337dcaca93fc99"
+  },
+  "A_independent_challenges_passed": 19,
+  "first_challenge_failure_retained": "a-first-challenge-failure.json",
+  "new_model_calls": 0,
+  "real_candidates_actual_new_final_or_adoption": false
+}

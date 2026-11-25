@@ -1,0 +1,172 @@
+{
+  "task": "6.FI",
+  "temporary_cleanup": {
+    "root": "/home/python/Quote/data/QuoteBak/b-6fi-wrapped-source-amounts-20261125",
+    "removed_regular_files": 363,
+    "removed_regular_file_bytes": 4157033,
+    "root_absent_confirmed": true,
+    "other_roots_touched": false
+  },
+  "one_shot_generator_removed_after_receipt_validation": {
+    "filename": "b-verify.py",
+    "sha256": "9c29e344a7350b9ef9156589562ec34e83483a70cf6dce2d956ae6774794871f",
+    "bytes": 7906,
+    "duplicate_patch_removed": {
+      "filename": "b-patch.diff",
+      "sha256": "54821f9600af400055832b5eb6875355c8fe0520e956d44ba421f75f279f19b0",
+      "bytes": 20962
+    },
+    "reason": "A requested compact evidence after persistence and reproducible source tests; avoid a permanent audit script and duplicate Git patch. Current three-file diff and source_cells tests reproduce the behavior."
+  },
+  "kind": "offline literal readiness, not new model/final acceptance",
+  "baseline_head": "2a8a3083be98cff4673a02c843e2a7575bfece03",
+  "input_path": "data/research/company_profile_automation_probe_20261124/company_profile_common_core.v1/bp-work-721e6851edbaa279f67917e5.json",
+  "input_sha256": "e2e19993aca14fd6a7dd977600ad7c12b042fac190b601c4b8452812848df67c",
+  "candidates": [
+    {
+      "fact_id": "review-add:R4",
+      "fact_sha256": "4f3fe460eb7c255267dca4ece605ef3d76866967b43cc8e13382feb1e7003c76",
+      "original_rejection": "metric number is absent from cited source: 教育培训服务费收入金额",
+      "original_resolution": "repair_rejected",
+      "amount": "3119716159.11",
+      "source_check": {
+        "source_ready": true,
+        "notes": []
+      },
+      "broken_prefix_check": {
+        "source_ready": false,
+        "error": "metric number is absent from cited source: 教育培训服务费收入金额"
+      },
+      "legacy_fragment_read": "accepted unchanged",
+      "evidence": [
+        {
+          "evidence_id": "source-0006",
+          "page": 17,
+          "start": 200,
+          "end": 10038,
+          "quote_sha256": "ba2089326db45a4733292569cc53e7039c1b01de20ddfee10db110f34c244654",
+          "amount_cells": [
+            {
+              "value": "3,119,716,159.11",
+              "prefix_start": 1498,
+              "prefix_end": 1513
+            },
+            {
+              "value": "3,119,716,159.11",
+              "prefix_start": 2960,
+              "prefix_end": 2975
+            },
+            {
+              "value": "3,119,716,159.11",
+              "prefix_start": 5578,
+              "prefix_end": 5593
+            },
+            {
+              "value": "3,119,716,159.11",
+              "prefix_start": 8093,
+              "prefix_end": 8105
+            }
+          ]
+        }
+      ],
+      "adopted": false,
+      "own_new_final": false
+    },
+    {
+      "fact_id": "review-add:R5",
+      "fact_sha256": "0ec05f448e7d23da3f56ed97c239abfb9dbb7ee3ca09baea0632a7e8c381dd4b",
+      "original_rejection": "metric number is absent from cited source: 教育培训服务费营业成本",
+      "original_resolution": "repair_rejected",
+      "amount": "2095400319.12",
+      "source_check": {
+        "source_ready": true,
+        "notes": []
+      },
+      "broken_prefix_check": {
+        "source_ready": false,
+        "error": "metric number is absent from cited source: 教育培训服务费营业成本"
+      },
+      "legacy_fragment_read": "accepted unchanged",
+      "evidence": [
+        {
+          "evidence_id": "source-0006",
+          "page": 17,
+          "start": 200,
+          "end": 10038,
+          "quote_sha256": "ba2089326db45a4733292569cc53e7039c1b01de20ddfee10db110f34c244654",
+          "amount_cells": [
+            {
+              "value": "2,095,400,319.12",
+              "prefix_start": 8140,
+              "prefix_end": 8152
+            }
+          ]
+        },
+        {
+          "evidence_id": "source-0007",
+          "page": 18,
+          "start": 0,
+          "end": 15091,
+          "quote_sha256": "a7ed76aaf7efca7b1f14132a8693e28150c7f1ea52be4ed2e846cf704eee11ae",
+          "amount_cells": []
+        }
+      ],
+      "adopted": false,
+      "own_new_final": false
+    }
+  ],
+  "source_record_and_in_memory_raw_quotes_and_history_unchanged": true,
+  "original_final_targets": [
+    "F01",
+    "F10",
+    "F11",
+    "review-add:R6"
+  ],
+  "original_final_raw_sha256": "c928704aff7d00a47e3ffbe5126469209362a7393ddeac1973312ecc8771414e",
+  "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+  "source_before_inherited_patch_sha256": {
+    "research/company_profile/workpaper.py": "be1186641639b25c76ffaa5341b1a74b6afae40669f312434a3d704c0665f722",
+    "tests/unit/test_research/test_company_profile_workpaper_source_cells.py": "73f39d25b8ca7a333c0f8338fa97836c5d15c6de920263d2931ff0f22708a0f2"
+  },
+  "final_source_sha256": {
+    "research/company_profile/workpaper.py": "32e9fda6439466c1241cde1594cbc8145f856c20dd142cb39a9e6e6eb71ee011",
+    "research/company_profile/workpaper_llm.py": "1ffa851495b27e4062a89ba34c845a9d9574fae843265840e51b512681a0273c",
+    "tests/unit/test_research/test_company_profile_workpaper_source_cells.py": "525b04bae45eb3b48774641aa75e749b7bcbfe7d35e672a764337dcaca93fc99"
+  },
+  "protection": {
+    "a_manifest": "a-baseline.json",
+    "files_checked": 304,
+    "changed": [],
+    "existing_dirty_files_checked": 49,
+    "unchanged_existing_dirty_count": 44,
+    "a_managed_document_drift_since_a_baseline_not_edited_by_b": [
+      "docs/development/company_profile_acceptance_program.md",
+      "docs/development/company_profile_delivery_plan.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md"
+    ],
+    "staged_diff": ""
+  },
+  "tests": {
+    "receipt": "b-tests.xml",
+    "log": "b-tests.log",
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "175",
+    "time": "58.793",
+    "timestamp": "2026-11-25T11:08:52.442675+08:00",
+    "hostname": "ComputeR"
+  },
+  "new_network_attempts": 0,
+  "new_provider_calls": 0,
+  "new_real_final_reviews": 0,
+  "real_candidates_written_to_api": 0,
+  "limits": [
+    "source-0007's unheaded continuation is not independently restored",
+    "only adjacent unique columns with common continuation shape and a monetary header",
+    "no proof of economic column, subject or period; no own matching final for R4/R5"
+  ]
+}

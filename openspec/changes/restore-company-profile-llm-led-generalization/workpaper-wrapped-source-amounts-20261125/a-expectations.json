@@ -1,0 +1,53 @@
+{
+  "task": "6.FI",
+  "reviewer": "A independent original-PDF reader",
+  "baseline_head": "2a8a3083",
+  "source_pdf_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+  "physical_pages": [
+    17,
+    18
+  ],
+  "source_page_text_sha256": {
+    "17": "6b9f5fc63c078ca57a22dbfea2249ef0e9ef8ee650010b590204ee8d8b263213",
+    "18": "021f519f7b2cbbd0a8291c0cf6bd6cd952476a3fb74de9b4a7d18be18dbe812a"
+  },
+  "cases": [
+    {
+      "fact_id": "review-add:R4",
+      "fact_sha256": "4f3fe460eb7c255267dca4ece605ef3d76866967b43cc8e13382feb1e7003c76",
+      "source_evidence_ids": [
+        "source-0006"
+      ],
+      "original_resolution": "repair_rejected",
+      "original_source_rejection": "metric number is absent from cited source: 教育培训服务费收入金额",
+      "amount": "3119716159.11",
+      "metric_name": "教育培训服务费收入金额",
+      "unit": "元",
+      "source_verdict": "Physical17 education-service revenue row gives3,119,716,159.11元,96.67%,15.66%. The printed fraction wraps on the comparative table and the final thousands group wraps on the major-business table. It is business_segment, not company total."
+    },
+    {
+      "fact_id": "review-add:R5",
+      "fact_sha256": "0ec05f448e7d23da3f56ed97c239abfb9dbb7ee3ca09baea0632a7e8c381dd4b",
+      "source_evidence_ids": [
+        "source-0006",
+        "source-0007"
+      ],
+      "original_resolution": "repair_rejected",
+      "original_source_rejection": "metric number is absent from cited source: 教育培训服务费营业成本",
+      "amount": "2095400319.12",
+      "metric_name": "教育培训服务费营业成本",
+      "unit": "元",
+      "source_verdict": "Physical17–18 major-business and cost tables give education cost2,095,400,319.12元 and margin32.83%. The cost cell wraps within its final thousands group. The source margin-change spelling-0.96% retains the candidate uncertainty note and is not silently normalized as an exact relative-growth rate."
+    }
+  ],
+  "old_rejections_reproduced": 2,
+  "candidates_and_sources_unchanged": true,
+  "requirements": [
+    "Complete same-column amount only; no guessed digits/sign/units or stock-specific rule.",
+    "Recognized broken prefixes must not become full new monetary values.",
+    "Unknown/misaligned/ambiguous/header/page joins stay unsupported.",
+    "Literal support is distinct from subject/column/period semantics.",
+    "No actual new final or adoption; protected current20 and three evaluation profiles unchanged."
+  ],
+  "new_provider_calls": 0
+}
