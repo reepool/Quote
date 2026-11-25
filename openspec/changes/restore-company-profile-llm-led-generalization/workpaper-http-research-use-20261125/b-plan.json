@@ -1,0 +1,102 @@
+{
+  "schema_version": "company_profile_http_research_use_plan.v1",
+  "card": "company-profile-real-http-research-card.md",
+  "state": "awaiting_A_source_reference_and_send_freeze",
+  "new_model_requests": 0,
+  "temporary_root": "/home/python/Quote/data/QuoteBak/b1-6fm-http-DQxtKDkp",
+  "prepared_driver": {
+    "path": "/home/python/Quote/data/QuoteBak/b1-6fm-http-DQxtKDkp/http_research.py",
+    "sha256": "7a3c54fa21f7704ffb3708f8c1e96a7a8e6562014251e9c93186fcec17995306",
+    "py_compile": "passed",
+    "policy_path": "/home/python/Quote/data/QuoteBak/b1-6fm-http-DQxtKDkp/policy.json",
+    "policy_semantic_sha256": "89a417a9d486f9f29122b0a1eef69539b7880cfbf440a86a1bc29fd190103bcd",
+    "policy_file_sha256": "dcf393c555bc9327a78796297a668a4cb030c5cc99aac2a8f372f59c8cfdcef9",
+    "network_preflight": {"execution_environment": "require_escalated", "model_requests": 0, "api.deepseek.com": "DNS and verified TLSv1.3 passed", "scorpio.reepool.com": "DNS and verified TLSv1.3 passed"},
+    "required_A_freeze_json": {"authorized": true, "new_stock": "600690.SH", "driver_sha256": "7a3c54fa21f7704ffb3708f8c1e96a7a8e6562014251e9c93186fcec17995306", "policy_sha256": "89a417a9d486f9f29122b0a1eef69539b7880cfbf440a86a1bc29fd190103bcd", "source_reference_path": "A's independent frozen source-reference file", "source_reference_sha256": "sha256 of that exact file"},
+    "run_command_after_A_freeze": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python data/QuoteBak/b1-6fm-http-DQxtKDkp/http_research.py run --new-stock 600690.SH --freeze A_FREEZE_FILE"
+  },
+  "cleanup_preflight": {"prior_6FL_roots_absent": true, "deleted_files": 0, "unknown_or_parallel_roots_untouched": true},
+  "fresh_company_candidate": {
+    "preferred_rejected": {
+      "instrument_id": "000333.SZ",
+      "document_version": "16f95f70527db59dcf2736f276a9479cf7ee917e5f71e4f6cbbe83acbad9f4b6",
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/16/16f95f70527db59dcf2736f276a9479cf7ee917e5f71e4f6cbbe83acbad9f4b6.pdf",
+      "public_url": "https://static.cninfo.com.cn/finalpage/2026-03-31/1225065145.PDF",
+      "local_pdf_sha256_verified": true,
+      "reason": "Prior completed company-profile work exists; cannot describe as a wholly unprocessed company.",
+      "database": "data/research.db",
+      "table": "business_profile_work_items",
+      "work_id": "bp-work-067e3ca9a30d47a0ade4bb29",
+      "stage": "publish",
+      "status": "completed",
+      "completed_at": "2026-08-29T11:49:17.329940+08:00",
+      "additional_evidence": "data/checkpoints/business_profile_semantic/artifacts/disclosure_plans/000333.SZ/2026-08-29/627be4d3ae50930572764ce4c44a71479311d959e0663b35ce364ed6a9c70b6c.json",
+      "additional_evidence_approved_count": 16
+    },
+    "proposed_replacement": {
+      "instrument_id": "600690.SH",
+      "company": "海尔智家",
+      "asset_id": "asset_16978fef041b470a81a464ffb4c2f2d6",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-26T16:00:00+00:00",
+      "document_version": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+      "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/14/14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660.pdf",
+      "public_url": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225038336.PDF",
+      "local_pdf_sha256_verified": true,
+      "asset_state": "current/local_valid/full annual report",
+      "prior_semantic_run_count": 0,
+      "prior_work_item_count": 0,
+      "prior_research_bp_work_record_search_matches": 0,
+      "chapter_strategy": "Model reads this report's own directory and chooses concentrated business/operating-review and revenue-composition sections; no supplied chapter answer or old semantic seed. A independently freezes a source reference before send."
+    }
+  },
+  "existing_company_enrichment": {
+    "instrument_id": "600859.SH",
+    "company": "王府井",
+    "asset_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+    "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "pdf_path": "/home/python/Quote/data/filings/announcements/blobs/e9/e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca.pdf",
+    "public_url": "https://static.cninfo.com.cn/finalpage/2026-04-23/1225156521.PDF",
+    "local_pdf_sha256_verified": true,
+    "base_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+    "base_workpaper_sha256": "8ec4ea844b584f23ec10aa306e411f882f9a8857bcc8d3d2a5810e9f8c2e04c8",
+    "api_gaps": [
+      {"element": "operations_and_inputs", "fact_id": "F18", "reason": "Original supplied table covers specified retail formats and building/leasing area; current statement overgeneralized to all company stores, so whole fact remains source-only."},
+      {"element": "operating_drivers", "fact_id": "F24", "reason": "Different source descriptions give five opened shops versus four at period end without resolving scope/time; original fact remains source-only."}
+    ],
+    "target": {
+      "element": "operations_and_inputs",
+      "question": "截至2025年末，王府井主要业态的经营网点构成、经营规模及自有、租赁、托管等运营方式分别如何？请按原文保留业态、主体、统计时点和面积口径，并说明购物中心租赁经营的特点；不要把部分业态门店、专业店及报告期后免税新店合成公司统一总数。原文口径不一致时分别列示并标明不确定。"
+    },
+    "necessary_source_chapters": [
+      {"section_path": ["第三节 管理层讨论与分析", "一、报告期内公司从事的业务情况"], "physical_pages": "11-13"},
+      {"section_path": ["第三节 管理层讨论与分析", "零售行业经营性信息分析"], "physical_pages": "24-29"}
+    ],
+    "scope_note": "Chapter titles guide source selection; physical page numbers are source coordinates, not a cross-company page strategy. Preserve complete table headers, units and continuation rows. Do not pursue F31's small traffic-growth metric or supply-chain detail."
+  },
+  "http_execution": {
+    "method": "Actual FastAPI router using httpx ASGITransport, actual CompanyProfileHttpTasks service and default real model transport; explicit isolated ResearchStorageManager plus shared official asset access injection only.",
+    "command_url": "/api/v1/research/company/annual-profile-tasks",
+    "submissions_in_order": [
+      {"request_id": "6fm-new-first-read", "action": "first_read", "stock": "A-frozen replacement"},
+      {"request_id": "6fm-new-review", "action": "review_batch", "stock": "same new stock"},
+      {"request_id": "6fm-existing-enrich", "action": "enrich", "stock": "600859.SH"}
+    ],
+    "policy_max_submissions": 3,
+    "output_root": "data/research/company_profile_http_research_20261125",
+    "checkpoint_root": "data/checkpoints/company_profile_http_research_20261125",
+    "root_preflight": "Both proposed roots absent at initial B preflight; require A ownership confirmation before creation.",
+    "base_input": "Only exact Wangfujing source lineage records copied byte-identically through existing writer to isolated root; no other 20-stock workpapers copied. New stock begins without old semantic data.",
+    "model_profiles": "Official DeepSeek extraction/at most one merged repair, existing Scorpio Grok grok-4.7 high initial/final source review; exact shared profile names and enabled config identity to be recorded in local frozen policy.",
+    "credentials": "Dedicated random HTTP token only process environment and Authorization headers; supplier keys via existing load_project_environment. Never print/persist tokens or headers.",
+    "preflight": "Require escalated network execution for DNS/TLS and actual calls in same environment; no sandbox network probes or provider paid probes.",
+    "per_submission": {"seconds": 6000, "tokens": 1000000, "physical_requests": 10, "recoveries": 3, "max_recoveries_per_logical": 1, "logical_seconds": 2450, "review_attempt_seconds": 1200, "extract_attempt_seconds": 600, "priced_cost_cny": "10", "unpriced_cost": "unknown"},
+    "aggregate": {"seconds": 18000, "tokens": 3000000, "physical_requests": 30, "recoveries": 9},
+    "receipt_policy": "Small HTTP transition/status/result evidence; original execution started/budget/result/wire one persistent set. Preserve errors and pending draft; reads never model-send. No fourth task or second first_read.",
+    "freeze_condition": "A-approved exact two stocks/report hashes, independent concentrated-source reference, driver/policy hashes and unchanged source code before any model send.",
+    "stop_conditions": ["Authorization/authentication or security failure", "Non-isolatable core pollution", "Same core execution failure in two consecutive tasks", "Existing per-task or aggregate finite allowance exhausted"],
+    "cleanup": "After A confirms durable results/receipts, delete own isolated DB, disposable scripts/logs and duplicate sources; keep business records/checkpoints once and report exact file count/bytes. No source PDFs, original20, inherited49 or parallel roots touched."
+  }
+}

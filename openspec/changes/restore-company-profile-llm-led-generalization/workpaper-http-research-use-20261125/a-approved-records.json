@@ -1,0 +1,41 @@
+{
+  "schema_version": "company_profile_6fm_A_approved.v1",
+  "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/a-content-review.json",
+  "reference_sha256": "dca9c2bf003192d6abfcbd5de3bfa2798a16f5576511849c0762dec38d9a627b",
+  "records": [
+    {
+      "work_id": "bp-work-e622431bbfb9b4320cab84f1",
+      "instrument_id": "600690.SH",
+      "source_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-e622431bbfb9b4320cab84f1.json",
+      "original_probe_path": "/home/python/Quote/data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-e622431bbfb9b4320cab84f1.json",
+      "original_probe_sha256": "371e715d2c01e1c022e2019c7bb39879b08481aa04c2817b01d6835bbb02d416",
+      "approved_sha256": "371e715d2c01e1c022e2019c7bb39879b08481aa04c2817b01d6835bbb02d416",
+      "independent_restrictions": 0
+    },
+    {
+      "work_id": "bp-work-59deb464f2f91ec0bd579c0b",
+      "instrument_id": "600690.SH",
+      "source_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-59deb464f2f91ec0bd579c0b.json",
+      "original_probe_path": "/home/python/Quote/data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-59deb464f2f91ec0bd579c0b.json",
+      "original_probe_sha256": "08c5a51bfa1f3cd6e595110a51a0edbf4b3560dbd2fb2ab9130f0956322fb075",
+      "approved_sha256": "08c5a51bfa1f3cd6e595110a51a0edbf4b3560dbd2fb2ab9130f0956322fb075",
+      "independent_restrictions": 0
+    },
+    {
+      "work_id": "bp-work-5189881c12bb58c6aa019be1",
+      "instrument_id": "600859.SH",
+      "source_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5189881c12bb58c6aa019be1.json",
+      "original_probe_path": "/home/python/Quote/data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-5189881c12bb58c6aa019be1.json",
+      "original_probe_sha256": "a2d83bf4d50ff6a65137578d1dd68853ec91aee69e47162fdbdfeb11057122ca",
+      "approved_sha256": "433951ba1a4d31317eed5d428029096b6b122ca12ce83ae3ba103ef30d8de73a",
+      "independent_restrictions": 4
+    }
+  ],
+  "approved_instruments": [
+    "600690.SH",
+    "600859.SH"
+  ],
+  "only_current_page_mutable": "data/research/company_profile_research_v1_20261123/research-current.md",
+  "new_api_filename": "current-api-6fm-20261125.json",
+  "new_export_directory": "exports-6fm-20261125"
+}

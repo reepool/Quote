@@ -1,0 +1,38 @@
+{
+  "schema_version": "6fm_A_close.v1",
+  "protected_files": 365,
+  "only_authorized_current_page_changed": [
+    "data/research/company_profile_research_v1_20261123/research-current.md"
+  ],
+  "inherited_tracked_paths_preserved": 49,
+  "inherited_nonmanagement_hash_changes": [],
+  "management_inherited_bytes_verified": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md": true,
+    "openspec/changes/restore-company-profile-llm-led-generalization/specs/company-profile-llm-led-delivery/spec.md": true,
+    "docs/development/company_profile_acceptance_program.md": true,
+    "docs/development/company_profile_delivery_plan.md": true
+  },
+  "business_application_code_edits": 0,
+  "A_temporary_cleanup": {
+    "path": "data/QuoteBak/company-profile-6fm-a-0k4BTyfY",
+    "files": 33,
+    "logical_bytes": 10243550,
+    "removed": true
+  },
+  "B1_cleanup": {
+    "files": 27,
+    "bytes": 6815543
+  },
+  "B2_cleanup": {
+    "files": 1,
+    "bytes": 26986
+  },
+  "necessary_historical_runtime_and_checkpoint_retained": true,
+  "sole_current_delivery": "data/research/company_profile_research_v1_20261123",
+  "production_enabled": false,
+  "total_removed_files": 61,
+  "total_removed_logical_bytes": 17086079
+}

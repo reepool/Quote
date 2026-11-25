@@ -1,0 +1,61 @@
+{
+  "task": "6.FM",
+  "scope": "Actual frozen HTTP run before A's new independent use restrictions and before unified publication",
+  "network_environment": "tool-approved require_escalated",
+  "service_closed": true,
+  "code_hotfixes": 0,
+  "accepted_HTTP_submissions": 3,
+  "new_model_requests_from_ordinary_HTTP_reads": 0,
+  "business_seconds": 1141.4966012071818,
+  "last_fresh_reader_complete_seconds": 1142.0870086848736,
+  "physical_requests": 10,
+  "supplier_total_tokens_and_charged_ledger": 321442,
+  "recoveries": 0,
+  "cost": "unknown",
+  "providers": {"official_DeepSeek_deepseek_flash": 6, "existing_Scorpio_grok_4_7_high": 4},
+  "tasks": [
+    {"action": "first_read", "instrument_id": "600690.SH", "task_id": "profile-http-21166683a6f840a039916f799dea7d7d", "http_submission": 202, "state": "completed", "seconds": 175.90080534294248, "physical_requests": 2, "tokens": 78241, "recoveries": 0, "result": "http-01-first_read-result.json", "result_sha256": "824cac5084ce928b19c88b057e89c2f5f44d9ca505c6b179eb9ba47906fbb6e7"},
+    {"action": "review_batch", "instrument_id": "600690.SH", "task_id": "profile-http-4a36ff2272b8790976109b0c2dac89d3", "http_submission": 202, "state": "completed", "seconds": 379.65222381427884, "physical_requests": 3, "tokens": 101976, "recoveries": 0, "result": "http-02-review_batch-result.json", "result_sha256": "af61106e802a1c9bb2e7db66bc7365801891742ddad4fc7a41e487ad8d58756e"},
+    {"action": "enrich", "instrument_id": "600859.SH", "task_id": "profile-http-8d3e856cf7ac87fe2fb1994d8692da57", "http_submission": 202, "state": "completed", "seconds": 581.5921528432518, "physical_requests": 5, "tokens": 141225, "recoveries": 0, "result": "http-03-enrich-result.json", "result_sha256": "b8873b76f0b248e257d27c991aa4b4e0e1028d115c80baa633198ebf8f72211f"}
+  ],
+  "haier_delta": {
+    "before": "No previous company-profile work item or research workpaper found; source was an existing official 2025 annual PDF",
+    "pending_work_id": "bp-work-e622431bbfb9b4320cab84f1",
+    "reviewed_work_id": "bp-work-59deb464f2f91ec0bd579c0b",
+    "visible_facts_before_review": 24,
+    "visible_metrics_before_review": 40,
+    "visible_facts_after_review": 24,
+    "visible_metrics_after_review": 39,
+    "reviewed_states": 10,
+    "limited_states": 14,
+    "merged_repaired_facts_accepted_by_real_final_review": ["chg-002", "chg-003"],
+    "locally_limited_original_metric": {"fact_id": "ops-002", "zero_based_metric_index": 3, "issue": "Original 2.6% growth was represented as percentage points; reviewer limits the original metric rather than guessing a replacement."},
+    "quality_scope": "Model source review plus explicit uncertainty; not a standalone new independent accuracy score"
+  },
+  "wangfujing_delta": {
+    "base_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+    "enrichment_work_id": "bp-work-5189881c12bb58c6aa019be1",
+    "before_readable_facts": 29,
+    "before_visible_metrics": 63,
+    "after_readable_facts": 41,
+    "after_visible_metrics": 91,
+    "new_reading_fact_objects": 12,
+    "new_reading_visible_metrics": 28,
+    "new_objects_are_not_deduplicated_information_gain": true,
+    "all_original_92_fact_view_objects_identical": true,
+    "all_original_readings_identical": true,
+    "accepted_omission_repair": "review-add:omit-ops-ending-area",
+    "rejected_before_final_review": {"fact_id": "review-add:omit-ops-property-tenure", "reason": "Two metric units written as 万平米 triggered source_unit cannot relabel a numeric magnitude; no new call/hotfix or substitute fact."},
+    "remaining_omission": "Professional-store subcategories and operation counts",
+    "pending_A_restrictions": ["ops-010", "ops-012", "ops-013", "ops-014"],
+    "pending_A_note": "Independent source_only decisions and exact approved record list are A-owned and are not yet applied to the probe or main root."
+  },
+  "protected_main_old_snapshot_sha256": "589f3f6907b10913bf0a14367ad81f0c1ce5916a8c333a3f1812fb0ecd6a283c",
+  "prepared_release": {
+    "state": "Not executed; waiting only for A exact approved records/use_review, no model calls required",
+    "driver": "data/QuoteBak/b1-6fm-http-DQxtKDkp/publish_reviewed.py",
+    "driver_sha256": "0dcb63ce82548ce9f1d993e6b2182c6a72cb6e69c6eab0e4e618820577c527c9",
+    "manifest_contract": {"destination_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123", "approved": [{"instrument_id": "exact approved canonical stock", "work_id": "exact approved work ID", "source_record": "exact approved record path relative to repo or absolute", "source_record_sha256": "exact immutable source record hash"}]},
+    "behavior": "Original writer appends approved files only; retain all preexisting bytes and 19 unrelated complete profiles, old Wangfujing facts and restrictions; create new current-api-6fm-20261125.json/exports-6fm-20261125, then verify real HTTP read projections against fresh reader and export. No task submission or LLM client."
+  }
+}

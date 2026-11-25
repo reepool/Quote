@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-25 [6.FM真实研究与准确率审计完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/result.md)：海尔原HTTP首读/源核、王府井enrich均正常，10物理/321442供应商total与账本/0恢复/1141.497业务秒/unknown。A原文独核后统一21股682/1115，19其余完整profile保持，王府井净增8/17且新4尾项仅源参考。512/523原v12分数无跨轮累计，不能当当前准确率；当前整体未充分评估，原已知错指标15位置不外放。A/B同窗交原owner实物、完整21匹配/只读HTTP、Review/strict及49既有隔离；必要证据归一并清本人垃圾，不再重跑20或补齐尾项，不自动扩量/生产。
+
 2026-11-25 [6.FL显式研究任务HTTP交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-task-delivery-20261125/result.md)：已沿原task_entry/TaskService提供提交ID、后台进度/结果、首读/显式源核/按股补读。服务端一次有限策略及凭据、重复不重发、失败保稿和关停join；普通查询/计划不改变数据集或调用模型。6新直接用例及A实际依赖HTTP闭环通过，当前20股650/1059与365保护文件保持。0新真实模型/付费、不装实际策略或启生产；旧质量/规模边界不改。A规划独审/B实施，前后清本人开发物、必要证据一套并隔离普通Git；用法见docs/research/company_profile_http_tasks.md。
 
 2026-11-25 [6.FK四项同卡收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-review-release-20261125/result.md)：原20统一API现650/1059，既有三稿和3真实观察后继已发布、17其余保持，原router批量/详情/缺项/只读补读计划可用。v13共性源核仅本轮三份7物理/188244/493.822秒、0恢复/费用unknown；新抓此前1指标方向+1整事实矛盾，仍余华阳4指标靠原保护，非新99%或免人工。A原PDF/正控/完整profile审通过，阶段转研究使用与具体问题精读，不再自动派这三家/20整批校准或扩100/生产；旧分/源/限制保留。必要证据归一后清本轮重复probe、测试DB及临时脚本，有限Review/strict和正常Git同卡完成，详情见唯一result。

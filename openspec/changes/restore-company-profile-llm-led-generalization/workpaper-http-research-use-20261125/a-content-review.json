@@ -1,0 +1,33 @@
+{
+  "schema_version": "company_profile_6fm_A_source_review.v1",
+  "reviewer": "A main, independent original-PDF reading; model agreement is not the source verdict",
+  "scope": "Actual new Haier narrative and displayed priority metrics, both adopted Haier scope repairs, and Wangfujing supplemental network/operating-mode content and its adopted repair; not a new population accuracy evaluation",
+  "haier": {
+    "work_id": "bp-work-59deb464f2f91ec0bd579c0b",
+    "source_document_sha256": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+    "physical_pages_independently_read": [4,5,16,17,18,23,24,25,27,33,35,41,42],
+    "core_profile": "Main business, principal product/service families and earning mechanism substantively supported. Company revenue302346783918.30yuan, the six main-business product rows and regional/channel numbers match their distinct source columns.",
+    "actual_model_review_value": ["Isolated the original ops-002 metric position3 that changed source2.6% into percentage points; narrative and other indicators preserved", "chg-002 now avoids asserting brandKwikot is a confirmed legal subsidiary", "chg-003 now scopes the PROFROID acquisition statement to company action, with unknown completion-date limitation retained"],
+    "accepted_repairs": ["chg-002","chg-003"],
+    "new_independent_restrictions": [],
+    "limits": ["Product/regional/channel money values whose cited fragments omit the unit line remain raw/null; A does not silently insert units despite the full page showing yuan", "Direction phrases remain original text/null rather than forcing signs", "Supply-chain detail and exhaustive subsidiary/product lists are optional", "A source support is bounded and does not establish whole-report completeness or a new99% population score"]
+  },
+  "wangfujing": {
+    "work_id": "bp-work-5189881c12bb58c6aa019be1",
+    "source_document_sha256": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+    "physical_pages_independently_read": [11,12,24,25,26,27,28],
+    "useful_supported_additions": ["The report states78large taxable retail stores in37cities, plus distinct formats; these are not aggregated with333specialty stores", "Outlet/department-store merchandise and joint-operation models versus shopping-centre rent/leasing explained", "Source-end duty-free counts conflict and are retained separately; 2026-02airport opening remains a post-period event", "Adopted review-add:omit-ops-ending-area preserves78and567.2with explicit mixed building/leasing area and inconsistent format labels instead of pretending a uniform company-wide property total"],
+    "adopted_repair": "review-add:omit-ops-ending-area",
+    "independent_source_only": {
+      "ops-010": "Displayed counts3/5and51.1/23.2match the table, but its uncertainty metadata definitively says duty-free is excluded while the same table's regional rows include duty-free. Keep source reference; do not assert a reconciled uniform business range.",
+      "ops-012": "Source gives named shopping-centre/store areas and ownership51% in a named company. Project/store area is not established as a legal subsidiary's whole-company metric; current fact/metric named_subsidiary labels lack a safe common subject. Keep source-only without guessing replacement scope.",
+      "ops-013": "Source gives project area20.9and50%ownership of a named property company, but does not establish that project area as a controlled subsidiary-wide metric. Keep literal source-only rather than guessing control or replacement scope.",
+      "ops-014": "Source expressly describes a third-party-owned entrusted project with18.7area/15-yearterm and a named managing subsidiary. Project characteristics cannot safely be treated as that subsidiary's whole-company metrics. Keep source-only; the entrusted-management narrative remains auditable."
+    },
+    "old_restrictions_preserved": ["F18","F24"],
+    "not_required_to_complete": ["All per-store details","Traffic-growth tail metric","Fine supply-chain data","Unifying contradictory source totals"]
+  },
+  "current_overall_accuracy": null,
+  "current_overall_accuracy_reason": "These are bounded source checks and manual safety restrictions on two real use cases, not an independently sampled whole-current or unseen quality score.",
+  "no_more_model_requests": true
+}

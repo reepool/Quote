@@ -1,0 +1,37 @@
+{
+  "schema_version": "company_profile_6fm_independent_source_reference.v1",
+  "purpose": "A source-first independent reference; never model input or a replacement for the actual selected chapter scope",
+  "frozen_before_new_model_send": true,
+  "processing_head": "0bfd931a668a04e5181f4b10d3a6e65750a5733e",
+  "new_company": {
+    "instrument_id": "600690.SH",
+    "name": "海尔智家",
+    "document_sha256": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+    "source": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225038336.PDF",
+    "chapters_read": [
+      {"section": "第三节 管理层讨论与分析/一、报告期内公司从事的业务情况", "physical_pages": [16,17,18]},
+      {"section": "第三节/五、报告期内主要经营情况/主营业务分析及收入和成本分析", "physical_pages": [41,42]}
+    ],
+    "core_expectations": [
+      "家电及智慧家庭解决方案，保鲜烹饪、衣物洗护、空气、水等主要业务线得到实质解释；不以行业排名或泛AI口号代替主营",
+      "冰箱冷柜/厨电、洗衣机和干衣等、家用空调/智慧楼宇、水家电等产品服务及用途；其他小家电/清洁机器人/渠道分销可作有源补充",
+      "制造和销售家电及增值服务；海外按当地需求生产销售自有品牌，另有面向海尔集团或第三方品牌的渠道分销，不能把所有产品都写为第三方代工"
+    ],
+    "priority_numbers_not_additional_completion_gates": {
+      "company_2025_revenue_CNY": "302346783918.30",
+      "main_business_product_revenue_CNY": {"空调":"53741784684.04","电冰箱":"84165111116.09","厨电":"41322769277.57","水家电":"17474406595.05","洗衣机":"64984973167.46","装备部品及渠道综合服务":"38892634649.73"},
+      "main_business_region_revenue_CNY": {"国内":"146036314128.81","海外":"154545365361.13"}
+    },
+    "critical_limits": ["公司营业收入和分产品主营业务构成是不同口径，不用加总替代公司总收入","分产品/地区/销售模式是交叉轴，不相加成重复收入","不同品牌/市场及公司/子公司主体保持原文；定量提升和未来计划不混成已实现集团结果","可选供应链和特色尽力而为，不要求所有尾项或指标齐全"]
+  },
+  "enrichment": {
+    "instrument_id":"600859.SH",
+    "name":"王府井",
+    "document_sha256":"e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+    "base_work_id":"bp-work-512bcf3ad6b3e44af3089b56",
+    "base_workpaper_sha256":"8ec4ea844b584f23ec10aa306e411f882f9a8857bcc8d3d2a5810e9f8c2e04c8",
+    "chapters_read":[{"section":"第三节/一、报告期内公司从事的业务情况","physical_pages":[11,12]},{"section":"第三节/零售行业经营性信息分析/报告期末已开业门店分布情况及跨页说明","physical_pages":[24,25,26,27]}],
+    "independent_expectations":["购物中心以租金及租赁经营为主，百货和奥莱商品零售以联营为主并含自营/租赁；表内有自有、租赁和托管项目","原文主要经营介绍分别说奥莱19、购物中心37、百货21、专业店333；大型有税零售门店78与其他业态数字不强行自行合计或统一范围","门店分布表的自有与租赁/托管为不同列；跨页经营面积567.2万平米有指定表内业态和建筑/租赁口径，不能描述为公司全部物业统一建筑面积","免税相关段落有开业数/期末数口径及2026年2月新店，保时间/原文不确定，不把期后新店算入2025年末","可以只交有源且有研究价值的部分；原F18/F24独立限用不因新模型意见自动解除"],
+    "not_targets":["客流小同比F31","全门店逐店清单","供应链精细化","为了凑齐字段自行补算/抹平来源差异"]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "authorized": true,
+  "authority": "User explicitly approved the preceding two real API research-use paths and added historical-accuracy review; bounded execution follows 6.FM, not a reused old allowance.",
+  "new_stock": "600690.SH",
+  "enrichment_stock": "600859.SH",
+  "driver_sha256": "7a3c54fa21f7704ffb3708f8c1e96a7a8e6562014251e9c93186fcec17995306",
+  "policy_sha256": "89a417a9d486f9f29122b0a1eef69539b7880cfbf440a86a1bc29fd190103bcd",
+  "source_reference_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/a-source-reference.json",
+  "source_reference_sha256": "75155cf4845a84ad5fd3e60694677050b3745a54903f992ccc0cf22a58ce1b34",
+  "reference_is_model_input": false,
+  "known_baseline": "0bfd931a668a04e5181f4b10d3a6e65750a5733e plus protected inherited 49 dirty paths",
+  "output_root": "data/research/company_profile_http_research_20261125",
+  "checkpoint_root": "data/checkpoints/company_profile_http_research_20261125",
+  "root_ownership_confirmed_absent": true,
+  "submissions": ["600690.SH:first_read", "600690.SH:review_batch", "600859.SH:enrich"],
+  "aggregate_limits": {"max_submissions":3,"seconds":18000,"tokens":3000000,"physical_requests":30,"recoveries":9},
+  "execution_environment": "tool-approved require_escalated network environment only",
+  "production_enabled": false
+}

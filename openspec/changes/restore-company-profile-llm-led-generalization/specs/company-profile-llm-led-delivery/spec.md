@@ -2,6 +2,14 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Accuracy claims bind the evaluated version and delivered content
+Every accuracy figure MUST identify its frozen cohort, processing/model policy, audited unit, numerator, denominator and independently checked content identity. Historical first-run scores MUST remain immutable but MUST NOT be presented as measured accuracy of a later current release. Current-release assessment MUST count each distinct audited fact or metric unit once under its stated protocol; superseded or repeated historical attempts MUST NOT silently dilute a new score. Changed content requires matching new evidence, while unchanged decisions may carry only across exact compatible content/source bindings. Unaudited observations MUST remain unevaluated rather than correct or erroneous. Excluded/withheld facts and missing coverage MUST be reported separately, so selective removal cannot establish whole-profile accuracy or generalization.
+
+#### Scenario: A fixed historical score remains after useful repairs
+- **WHEN** the current profile contains reviewed repairs or restrictions after a frozen evaluation
+- **THEN** the old score remains attributable to its original cohort, current matched audited coverage and limits are reported separately, and unavailable current accuracy is marked unmeasured rather than permanently copied from the old score
+- **AND** formal release thresholds stay unchanged and any new-version unseen evaluation requires its own prospective contract, without rewriting failed stages or treating a small known sample as a new pass
+
 ### Requirement: Explicit bounded research-task HTTP commands reuse the original owner
 The HTTP adapter MUST accept explicit first_read, review_batch and single-stock enrich submissions with request identity and stock scope; enrich MUST include concrete targets. It MUST return a durable task ID, progress and result links independently of task duration. Only an operator-installed finite authorized policy may enable commands, binding actions, exact stock/report versions, configured model profiles, per-task limits and a maximum submission count. Requests MUST NOT control paths, endpoints, credentials or budgets. New endpoints MUST require a configured research-task credential. Execution MUST generate an original plan and dispatch task_entry/TaskService, without another semantic loop or fact store. The aggregate allowance MUST be finite and visible; each explicit action consumes one submission.
 

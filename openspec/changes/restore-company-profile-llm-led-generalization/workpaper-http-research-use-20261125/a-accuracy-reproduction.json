@@ -1,0 +1,275 @@
+{
+  "schema_version": "6fm_A_independent_accuracy_reproduction.v1",
+  "historical": {
+    "correct": 512,
+    "audited_unique_objects": 523,
+    "errors": 11,
+    "percent": 97.89674952198853,
+    "micro_accuracy": 0.9789674952198852,
+    "macro_company_accuracy": 0.9778127705627705,
+    "semantic_duplicate_exclusions": 66,
+    "cohort_version": "6.EY v12 final first-run output only",
+    "cumulative_historical_error_append_found": false
+  },
+  "raw_original_companies": [
+    {
+      "instrument_id": "000049.SZ",
+      "work_id": "bp-work-4eff58b1460ad9bdccd0133d",
+      "total": 22,
+      "correct": 22,
+      "errors": 0
+    },
+    {
+      "instrument_id": "601006.SH",
+      "work_id": "bp-work-799fa5830dc8411f11f22ca6",
+      "total": 29,
+      "correct": 29,
+      "errors": 0
+    },
+    {
+      "instrument_id": "600015.SH",
+      "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "total": 30,
+      "correct": 29,
+      "errors": 1
+    },
+    {
+      "instrument_id": "600348.SH",
+      "work_id": "bp-work-c1ce1a5b541e1116b231a0ac",
+      "total": 24,
+      "correct": 21,
+      "errors": 3
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "work_id": "bp-work-bbd1db65c451d1d024bdb9b9",
+      "total": 28,
+      "correct": 27,
+      "errors": 1
+    },
+    {
+      "instrument_id": "600859.SH",
+      "work_id": "bp-work-d32507d43cbb1c885b6b4e34",
+      "total": 27,
+      "correct": 27,
+      "errors": 0
+    },
+    {
+      "instrument_id": "601166.SH",
+      "work_id": "bp-work-52d5b4c1992e90c91aa2c48c",
+      "total": 26,
+      "correct": 26,
+      "errors": 0
+    },
+    {
+      "instrument_id": "600900.SH",
+      "work_id": "bp-work-b9a21297ab8f537b8e62f19d",
+      "total": 23,
+      "correct": 23,
+      "errors": 0
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "work_id": "bp-work-8b886b28b2588fc228029832",
+      "total": 23,
+      "correct": 23,
+      "errors": 0
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "work_id": "bp-work-88e327a6f594ec32aa9e05ec",
+      "total": 25,
+      "correct": 24,
+      "errors": 1
+    },
+    {
+      "instrument_id": "601377.SH",
+      "work_id": "bp-work-016367c43308049bffc006bc",
+      "total": 30,
+      "correct": 29,
+      "errors": 1
+    },
+    {
+      "instrument_id": "000006.SZ",
+      "work_id": "bp-work-c5b84bd9a116e97c17f38b56",
+      "total": 30,
+      "correct": 30,
+      "errors": 0
+    },
+    {
+      "instrument_id": "600316.SH",
+      "work_id": "bp-work-1fd5914a27e798dd60b2a8e4",
+      "total": 29,
+      "correct": 29,
+      "errors": 0
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "work_id": "bp-work-397b2457dcdf688556762a2c",
+      "total": 36,
+      "correct": 36,
+      "errors": 0
+    },
+    {
+      "instrument_id": "600901.SH",
+      "work_id": "bp-work-9938c95dc5f968013098bf76",
+      "total": 25,
+      "correct": 24,
+      "errors": 1
+    },
+    {
+      "instrument_id": "601668.SH",
+      "work_id": "bp-work-cad604975f9f30adcb311c8e",
+      "total": 22,
+      "correct": 19,
+      "errors": 3
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "work_id": "bp-work-585dae6e4e3cb18f72fbb21e",
+      "total": 25,
+      "correct": 25,
+      "errors": 0
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "work_id": "bp-work-af0dd326e18daf7478fdb0e7",
+      "total": 24,
+      "correct": 24,
+      "errors": 0
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "work_id": "bp-work-c3c91c6c1880ec02db342d63",
+      "total": 26,
+      "correct": 26,
+      "errors": 0
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "work_id": "bp-work-2247fec2f7b4b6e55b990fbf",
+      "total": 19,
+      "correct": 19,
+      "errors": 0
+    }
+  ],
+  "B2_523_identities_equal_independent_union": true,
+  "current_api_sha256": "589f3f6907b10913bf0a14367ad81f0c1ce5916a8c333a3f1812fb0ecd6a283c",
+  "current_11_known_errors": {
+    "whole_isolated": [
+      {
+        "work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+        "fact_id": "F25",
+        "not_consumable": true
+      },
+      {
+        "work_id": "bp-work-36c6f5ea65d8e2084e4f07d3",
+        "fact_id": "F12",
+        "not_consumable": true
+      },
+      {
+        "work_id": "bp-work-016367c43308049bffc006bc",
+        "fact_id": "F34",
+        "not_consumable": true
+      }
+    ],
+    "limited_metric_positions": [
+      {
+        "work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+        "fact_id": "F007",
+        "wrong_positions": [
+          0
+        ],
+        "retained_positions": [
+          1
+        ],
+        "known_error_leaks": []
+      },
+      {
+        "work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+        "fact_id": "F009",
+        "wrong_positions": [
+          4,
+          5,
+          6
+        ],
+        "retained_positions": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "known_error_leaks": []
+      },
+      {
+        "work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+        "fact_id": "F023",
+        "wrong_positions": [
+          0,
+          1,
+          2
+        ],
+        "retained_positions": [],
+        "known_error_leaks": []
+      },
+      {
+        "work_id": "bp-work-a5c5ab569526287c392a7482",
+        "fact_id": "F-SM-02",
+        "wrong_positions": [
+          0
+        ],
+        "retained_positions": [],
+        "known_error_leaks": []
+      },
+      {
+        "work_id": "bp-work-ab8677d04a366e40efdf18c2",
+        "fact_id": "F15",
+        "wrong_positions": [
+          1
+        ],
+        "retained_positions": [
+          0
+        ],
+        "known_error_leaks": []
+      },
+      {
+        "work_id": "bp-work-ab8677d04a366e40efdf18c2",
+        "fact_id": "F20",
+        "wrong_positions": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "retained_positions": [],
+        "known_error_leaks": []
+      },
+      {
+        "work_id": "bp-work-ab8677d04a366e40efdf18c2",
+        "fact_id": "F26",
+        "wrong_positions": [
+          0
+        ],
+        "retained_positions": [],
+        "known_error_leaks": []
+      },
+      {
+        "work_id": "bp-work-b4e5ee438be22f743e6ce1cd",
+        "fact_id": "F22",
+        "wrong_positions": [
+          1
+        ],
+        "retained_positions": [
+          0,
+          2,
+          3
+        ],
+        "known_error_leaks": []
+      }
+    ],
+    "known_wrong_positions_not_consumed": 15
+  },
+  "current_all_content_accuracy": null,
+  "reason": "No same-current-version complete independent truth for all current content; the frozen old score is not current accuracy. Selected known-risk checks cannot establish unseen population quality.",
+  "new_model_calls": 0
+}

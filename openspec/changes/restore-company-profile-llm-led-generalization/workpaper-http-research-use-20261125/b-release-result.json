@@ -1,0 +1,57 @@
+{
+  "state": "completed",
+  "written": [
+    {
+      "instrument_id": "600690.SH",
+      "work_id": "bp-work-e622431bbfb9b4320cab84f1",
+      "path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-e622431bbfb9b4320cab84f1.json",
+      "sha256": "371e715d2c01e1c022e2019c7bb39879b08481aa04c2817b01d6835bbb02d416"
+    },
+    {
+      "instrument_id": "600690.SH",
+      "work_id": "bp-work-59deb464f2f91ec0bd579c0b",
+      "path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-59deb464f2f91ec0bd579c0b.json",
+      "sha256": "08c5a51bfa1f3cd6e595110a51a0edbf4b3560dbd2fb2ab9130f0956322fb075"
+    },
+    {
+      "instrument_id": "600859.SH",
+      "work_id": "bp-work-5189881c12bb58c6aa019be1",
+      "path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5189881c12bb58c6aa019be1.json",
+      "sha256": "433951ba1a4d31317eed5d428029096b6b122ca12ce83ae3ba103ef30d8de73a"
+    }
+  ],
+  "profiles": 21,
+  "expected_A_complete_profile_hashes_all_equal": true,
+  "old_other_19_profiles_unchanged": true,
+  "probe_original_record_hashes_unchanged": true,
+  "api_path": "/home/python/Quote/data/research/company_profile_research_v1_20261123/current-api-6fm-20261125.json",
+  "api_sha256": "60bd91819b82f8332f69da79d5dff3a90cc2580661697b02023e76f61e6708b7",
+  "export_json_sha256": "06198a04bb9edc3743d13be4633835e15de4545f7fd2d4c87a880970d61fe6d9",
+  "export_markdown_sha256": "1654a4f2c23f1b5709064d1bff6e4ac7c4395faed364f40f64f2ea680ea9392f",
+  "export_equals_API_and_fresh_reader": true,
+  "http_read_checks": [
+    {
+      "method": "GET",
+      "instrument_id": "600690.SH",
+      "status": 200,
+      "equals_fresh_reader": true
+    },
+    {
+      "method": "GET",
+      "instrument_id": "600859.SH",
+      "status": 200,
+      "equals_fresh_reader": true
+    },
+    {
+      "method": "POST query_read_only",
+      "requested_stocks": 21,
+      "status": 200,
+      "equals_fresh_reader": true
+    }
+  ],
+  "new_model_requests": 0,
+  "real_checkpoint_files_unchanged_across_final_reads": true,
+  "facts": 682,
+  "visible_metrics": 1115,
+  "environment_note": "Initial publication completed writes; its restricted-environment HTTP read check did not return and was stopped. This read-only final verification ran in tool-approved execution environment; no repeated writes or task/model calls."
+}

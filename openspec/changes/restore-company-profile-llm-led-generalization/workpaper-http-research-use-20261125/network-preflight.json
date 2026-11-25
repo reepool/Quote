@@ -1,0 +1,18 @@
+{
+  "network_environment": "tool_require_escalated",
+  "model_requests": 0,
+  "targets": [
+    {
+      "host": "api.deepseek.com",
+      "dns_count": 2,
+      "tls": "TLSv1.3",
+      "peer_verified": true
+    },
+    {
+      "host": "scorpio.reepool.com",
+      "dns_count": 1,
+      "tls": "TLSv1.3",
+      "peer_verified": true
+    }
+  ]
+}

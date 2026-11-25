@@ -1,0 +1,26 @@
+{
+  "schema_version": "6fm_A_release_check.v1",
+  "counts": {
+    "companies": 21,
+    "consumable_facts": 682,
+    "metrics": 1115
+  },
+  "complete_profile_expectations_matched": 21,
+  "old_other19_complete_profiles_unchanged": true,
+  "query_export_fresh_reader_equal_by_stock": true,
+  "ordering": "API preserves requested stock order; export uses its existing stable sorted stock order. Initial list-order assertion was corrected without application changes.",
+  "published_approved_record_bytes": [
+    "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-e622431bbfb9b4320cab84f1.json",
+    "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-59deb464f2f91ec0bd579c0b.json",
+    "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5189881c12bb58c6aa019be1.json"
+  ],
+  "protected_files_checked": 365,
+  "only_authorized_current_page_changed": [
+    "data/research/company_profile_research_v1_20261123/research-current.md"
+  ],
+  "api_sha256": "60bd91819b82f8332f69da79d5dff3a90cc2580661697b02023e76f61e6708b7",
+  "export_sha256": "06198a04bb9edc3743d13be4633835e15de4545f7fd2d4c87a880970d61fe6d9",
+  "new_model_calls": 0,
+  "current_overall_independent_accuracy": null,
+  "accuracy_scope": "historical v12 score is not assigned to this21-company current release;2 real observations are not a new formal pass"
+}

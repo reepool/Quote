@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FM real HTTP research use and accuracy scope
+
+Use the installed bounded HTTP task adapter for one fresh first_read/review_batch and one existing-stock enrich, with exact public reports and independent concentrated-source references frozen before sends. The adapter is exercised with real configured providers; ordinary reads and cumulative finite authorization remain separate. Accepted useful successors may be appended by the original writer, with distinct exports and predecessor bytes preserved. Accuracy review traces the original 512/523 units and compares exact current content identities. Frozen first-run accuracy, current independently audited delivered-content accuracy and new-version unseen evaluation are distinct; repeated historical errors never silently join a current denominator, while unaudited or excluded content cannot become correct observations. This does not lower the formal 99% requirement or recreate exhausted stages. See company-profile-real-http-research-card.md.
+
 ### 6.FL explicit research-task HTTP adapter
 
 An operator-installed finite policy binds actions, stocks/report versions, existing model profiles, approval, per-task limits and maximum submissions. HTTP commands supply request IDs, stocks and enrichment targets; the adapter builds an original execution file and dispatches task_entry/TaskService only. It persists request fingerprints/progress, serializes the shared writer/control scope across workers and leaves interrupted tasks inspectable without auto-resending. New endpoints require a configured credential, accept no caller paths/endpoints/secrets, and return ID/status/result links. Ordinary GET/query/plan stay local. This explicitly extends earlier plan-only HTTP scope without changing those routes or granting production permission. See company-profile-http-task-card.md.

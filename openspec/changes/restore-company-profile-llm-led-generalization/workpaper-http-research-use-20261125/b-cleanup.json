@@ -1,0 +1,217 @@
+{
+  "state": "completed",
+  "authority": "A confirmed complete21 profiles/main record hashes and authorized exact cleanup scope; preserve dependent historical runtime.",
+  "removed_now": {
+    "files": 22,
+    "bytes": 5524726,
+    "items": [
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/http-01-first_read-result.json",
+        "bytes": 153571,
+        "sha256": "824cac5084ce928b19c88b057e89c2f5f44d9ca505c6b179eb9ba47906fbb6e7",
+        "reason": "Reviewed full HTTP/profile snapshot duplicates preserved runtime and canonical main; retain compact HTTP states/hash and differences instead."
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/http-02-review_batch-result.json",
+        "bytes": 284914,
+        "sha256": "af61106e802a1c9bb2e7db66bc7365801891742ddad4fc7a41e487ad8d58756e",
+        "reason": "Reviewed full HTTP/profile snapshot duplicates preserved runtime and canonical main; retain compact HTTP states/hash and differences instead."
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/http-03-enrich-result.json",
+        "bytes": 546366,
+        "sha256": "b8873b76f0b248e257d27c991aa4b4e0e1028d115c80baa633198ebf8f72211f",
+        "reason": "Reviewed full HTTP/profile snapshot duplicates preserved runtime and canonical main; retain compact HTTP states/hash and differences instead."
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/http-current-profiles.json",
+        "bytes": 798108,
+        "sha256": "58f95b83d825c29b4cfd7ed8aed89f2c882d58826fa671318fc258501d5a21f4",
+        "reason": "Reviewed full HTTP/profile snapshot duplicates preserved runtime and canonical main; retain compact HTTP states/hash and differences instead."
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/wangfujing-before.json",
+        "bytes": 393429,
+        "sha256": "877bdce94ddf4d9f05736f4ea2d884e762fd546d24cb124ab4cace94ab7612d1",
+        "reason": "Reviewed full HTTP/profile snapshot duplicates preserved runtime and canonical main; retain compact HTTP states/hash and differences instead."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/profiles.csv",
+        "bytes": 2825,
+        "sha256": "f0247c20e8fdf43c8b68b275e8c5387ad86449c2f2f22fbfbac9482d106d0eca",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/600859.SH_2025-12-31.json",
+        "bytes": 254452,
+        "sha256": "283ea82a71ab93d1222c4ca9b482c42695a1ab181c50af3ed43acb2137886a40",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/annual_profiles.md",
+        "bytes": 209252,
+        "sha256": "04dd81e61d2f4cb2db3d9811596ed609d6c74188cffde1a30f17f119477fe277",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/600690.SH_2025-12-31.md",
+        "bytes": 92933,
+        "sha256": "635cfe1be6656a1236af3f2a9cab6eef81ca66e7a66f0bc66ee16451adbc328a",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/600690.SH_2025-12-31.json",
+        "bytes": 391158,
+        "sha256": "a64dd768946382ab04e0a96386bc631e24794904c3a795f25e68ebe8d78c637d",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/600859.SH_2025-12-31.md",
+        "bytes": 44200,
+        "sha256": "d3d627531ea118905948082dfe7a9046163bace41ed6a9f5cc82e5eb9a1bfa0e",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/profiles.md",
+        "bytes": 1637,
+        "sha256": "fee37da62797be9edd908eb5c8221cd4174b416174341d1a6cab2eee46f5522b",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/annual_profiles.json",
+        "bytes": 797904,
+        "sha256": "c63750f6f5d46b771c20d1759dddc489969c74838b0ed5bb5fc77adaad0f5372",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/export_manifest.json",
+        "bytes": 1892,
+        "sha256": "5f62628b5d789210d67fe6f27db28266c7978c0e7480f99ebb2aefab7df8f108",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/exports-6fm-20261125/research_profiles.json",
+        "bytes": 251612,
+        "sha256": "e01f5d0c69b7f81c72d572bd68989dfb804f0b7f823a07000e876996bf53803e",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/checkpoints/bp-work-5189881c12bb58c6aa019be1.json",
+        "bytes": 274638,
+        "sha256": "256a9dc33f9ada89e1b1ed3d2a648b804c282921386ec6c9610021278cedba1a",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/checkpoints/bp-work-e622431bbfb9b4320cab84f1.json",
+        "bytes": 401939,
+        "sha256": "3a308ce46a86f2c8aa55a3702ffac78aad61caa90f8dc2b26b5e79ac2fa57614",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/checkpoints/bp-work-59deb464f2f91ec0bd579c0b.json",
+        "bytes": 590777,
+        "sha256": "3ce64a63b89aae98e79d6e664219b55620fb609d9e4319b7c93909f77d5c9bb2",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/QuoteBak/b1-6fm-http-DQxtKDkp/verify_published.py",
+        "bytes": 4596,
+        "sha256": "b17ace5cce68fdef753d149c3e10333159bf3cffa2fcca1d59026ad6b7530d5d",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/QuoteBak/b1-6fm-http-DQxtKDkp/cleanup_owned.py",
+        "bytes": 4894,
+        "sha256": "34015e890ae222ad21011920705007f20060c8b2ee5ce6394092afe51d6156fd",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/QuoteBak/b1-6fm-http-DQxtKDkp/publish_reviewed.py",
+        "bytes": 6787,
+        "sha256": "05012612258ff2fa86b1b538c6774bdac71c0922cdd57b9fade850a24820b8d4",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      },
+      {
+        "path": "data/QuoteBak/b1-6fm-http-DQxtKDkp/http_research.py",
+        "bytes": 16842,
+        "sha256": "7a3c54fa21f7704ffb3708f8c1e96a7a8e6562014251e9c93186fcec17995306",
+        "reason": "Owned duplicate probe export, ended stage working checkpoint, or disposable development script; original task checkpoint root retained."
+      }
+    ]
+  },
+  "prior_removed": {
+    "files": 5,
+    "bytes": 1290817,
+    "scope": "Owned research.db, duplicate temporary policy/preflight and two compiled caches already removed before release."
+  },
+  "total_removed": {
+    "files": 27,
+    "bytes": 6815543
+  },
+  "preserved_historical_runtime": {
+    "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-512bcf3ad6b3e44af3089b56.json": {
+      "sha256": "d47e432e94edaaecf91bed82f668297cd62ae336aac9bfe5ed40cac4f750c85e",
+      "bytes": 335396
+    },
+    "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-5189881c12bb58c6aa019be1.json": {
+      "sha256": "a2d83bf4d50ff6a65137578d1dd68853ec91aee69e47162fdbdfeb11057122ca",
+      "bytes": 181104
+    },
+    "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-59deb464f2f91ec0bd579c0b.json": {
+      "sha256": "08c5a51bfa1f3cd6e595110a51a0edbf4b3560dbd2fb2ab9130f0956322fb075",
+      "bytes": 249709
+    },
+    "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-d07db9b1a9117cbd262a645d.json": {
+      "sha256": "363f1baa3a2c7c40eaebac2ff4f1839bbe9330358456da83e52c230a201fd8ec",
+      "bytes": 295543
+    },
+    "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-d32507d43cbb1c885b6b4e34.json": {
+      "sha256": "591cfabb2684cdf16a4ac441b11f02c480fd8ef4e467c5b25521c98887686f79",
+      "bytes": 347533
+    },
+    "data/research/company_profile_http_research_20261125/company_profile_common_core.v1/bp-work-e622431bbfb9b4320cab84f1.json": {
+      "sha256": "371e715d2c01e1c022e2019c7bb39879b08481aa04c2817b01d6835bbb02d416",
+      "bytes": 219454
+    }
+  },
+  "preserved_runtime_purpose": "Exact original three HTTP tasks/status/results and raw Wangfujing observation reconstruction require six runtime lineage records in the pinned output root. They are historical run material, not current safe profiles; Haier byte duplicates are kept only for this direct dependency.",
+  "preserved_checkpoint_files": {
+    "data/checkpoints/company_profile_http_research_20261125/http-policy.json": "dcf393c555bc9327a78796297a668a4cb030c5cc99aac2a8f372f59c8cfdcef9",
+    "data/checkpoints/company_profile_http_research_20261125/.http-profile-execution.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_http_research_20261125/.http-profile-install.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_http_research_20261125/.http-profile-policy.json": "3326b8d7e8e568cf31730fe460b9bf17f36a44c801695ebf64a519a2c4af81e7",
+    "data/checkpoints/company_profile_http_research_20261125/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/result.json": "3024858f9dfbd930fb3c049ffcc6f49121685cf511971c8be642fdb7ae95d0e0",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/budget.json": "60171569caa4b01f4c9c2477946acd109c0d6e17d1a5332cfcc4839f1fb0b013",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/started.json": "db6dba3edd0a0b93549fa31e66aff3d67a934b9be3de3bffd1fd7ffd0ef6e861",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/receipts/003.json": "b5135182da14376de47e1f1072c9eeea802eefa4c0103a0f4d5c19e453aa33de",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/receipts/001.json": "26dce466249a4fa6744a00d3fc95802a378278853e3f59ff0eef29fc0ef69257",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/receipts/005.json": "bfc3156c43f6b84390b7b9812bc0faa8f28c4cb912d059ee7235b1e69589a304",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/receipts/004.json": "fe484af36d6d60e966729ed95db8167bb024027e004ed59234eb5f541e68fba5",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/receipts/002.json": "1ba66f95e96a421ac720cdda2c6f5d0fd8296c79f5ab85df093e2d0806fbbc24",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-4a36ff2272b8790976109b0c2dac89d3/result.json": "0fbff0ecc7bd90e255e31a5004b0ea40974a386796fcd7da13bb2deab63913ec",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-4a36ff2272b8790976109b0c2dac89d3/budget.json": "629d1ab9353a89d1136369a3f83c89259ead23848cb621bbc57057dc2b703896",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-4a36ff2272b8790976109b0c2dac89d3/started.json": "cfe4f6b5bfb3859f803c58b1017e345963c38474076b1fb42021d58791e71f90",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-4a36ff2272b8790976109b0c2dac89d3/receipts/003.json": "4b6d9bc34bb1623bb7eee9d6b7eb470caac339bdcc37b396e4a7ba678025a8fd",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-4a36ff2272b8790976109b0c2dac89d3/receipts/001.json": "647c8629c743f8bf9bd944fe4da2fc6cb518da9c0337459e94fe33fa76de751b",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-4a36ff2272b8790976109b0c2dac89d3/receipts/002.json": "7bcaca0b3a9b11f367ecb022e4f10025b24095cbf158a3e7b1fa8d5bb7213e98",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-21166683a6f840a039916f799dea7d7d/result.json": "8dd2ae0abfe9ebfff188fccd70868c5bd596971d8f7693f0bd5912334c7f2117",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-21166683a6f840a039916f799dea7d7d/budget.json": "7b02df6b0b9d0214c9c79595d7580111a53ddcd34ee076ce4665009e523c0bec",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-21166683a6f840a039916f799dea7d7d/started.json": "db9de49ccfb1f05cf4f671f78ee663dc981a4a3cc7583fee060d27f9b4e3b17b",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-21166683a6f840a039916f799dea7d7d/receipts/001.json": "9be33078e0dc9ac23c0c58a11059f2ace278e4622d2f0c384e36f9b818b06b71",
+    "data/checkpoints/company_profile_http_research_20261125/executions/profile-http-21166683a6f840a039916f799dea7d7d/receipts/002.json": "c1bd06021af188634f7108253f780c13044d64c35344a4bb71bf8042349a95d4",
+    "data/checkpoints/company_profile_http_research_20261125/http_tasks/tasks.sqlite3": "8a7f7c3e665c70a93e5482046c9fbbc9bd0c9e1fca3678263e94ed93becffc56",
+    "data/checkpoints/company_profile_http_research_20261125/http_tasks/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/plan.json": "e581e3849aa78efb3cf018f8bee3849cd109ede60253488115733777b920f6c2",
+    "data/checkpoints/company_profile_http_research_20261125/http_tasks/profile-http-8d3e856cf7ac87fe2fb1994d8692da57/owner.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_http_research_20261125/http_tasks/profile-http-4a36ff2272b8790976109b0c2dac89d3/plan.json": "50b4ad08cf957cc3197dc04667a89d11ffdb234610ab3b664ef0f27d509b9322",
+    "data/checkpoints/company_profile_http_research_20261125/http_tasks/profile-http-4a36ff2272b8790976109b0c2dac89d3/owner.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_http_research_20261125/http_tasks/profile-http-21166683a6f840a039916f799dea7d7d/plan.json": "1d2bc6a95c4d03608476a1230500b248f780c201ab70833b3c5e3f319c34dd85",
+    "data/checkpoints/company_profile_http_research_20261125/http_tasks/profile-http-21166683a6f840a039916f799dea7d7d/owner.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_http_research_20261125/control/task_control.json": "d74e3847fb4bd9443e07163e161d8fd40d9d47e1e93e7a6a613658f2ccf118c3"
+  },
+  "preserved_checkpoint_purpose": "One original task store/policy/plans/started/budgets/10 provider wires/results/control. Prevent quota reopening and retain failure/usage history; do not migrate or delete.",
+  "sole_current_delivery": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "temporary_root_removed": true,
+  "new_model_requests": 0,
+  "source_PDFs_and_shared_caches_touched": false
+}
