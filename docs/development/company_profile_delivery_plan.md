@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-26[6.FP三项合并交付完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-fast-read-live-enrich-20261126/result.md)：实际8000端口热单股0.589–0.982秒、10股0.908秒、39股2.174秒/4并发2.917秒，冷23.604秒保留；B1内容hash严格验证复用，B2事实/metric独立scope/period源核v14。一次王府井真实HTTP enrich补回合并营收/上年收入/同比，9对象21指标中8对象重复，实质主要1项规模说明；同店收入段落未选仍缺，不追额外调用。现王府井46/101、39股1091/1669，原37/80和其余38完整保持。3物理/90243/0恢复/unknown，220.976秒已受理任务墙钟，专用有限窗用尽后429/原结果可读；B1的29及B2的108相关用例、A独核/实际服务通过，清理/Git沿[原卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-fast-read-live-enrich-card.md)收口，不重算V1或扩量。
+
 2026-11-26[6.FO统一研究使用已完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-39-research-20261126/result.md)：B原writer追加36安全记录，原唯一研究root现39股1082条/1648指标；A实际HTTP依赖8次200及完整39预期/API/export/fresh相等，原21/新18全部内容和限制保持，297旧文件不变、1导航获准更新。光大/国信无稿仍missing，两股具体缺项计划仅planned；0新模型/共享配置/生产，无新质量分或重开6.FN。当前以统一研究数据实际消费和按问题有界补读为主，先清后做/必要一套后清及隔离正常Git收口，具体边界见[原卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-unified-39-research-card.md)。
 
 2026-11-26当前[6.FN整体验收结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/result.md)已交，正式V1不通过、不进S3：首17/20、终18/20、核心90%，自动已明确判定383/391=97.954%另7未评、实际补充331不足400。18股研究稿400条/533指标可读，8对象A局部保护不改自动成绩；原21股继续保护。两模型前同文档别名误拒和raw/null格式连带丢失按同卡合并零调用修复，已保存响应只作源绑定候选，不冒领终核或重算首发。后续以这批真实画像/API研究消费和用户具体问题补读为主，不再派逐公司凑100%卡或滚动付费确认组，不自动扩100家/全市场/生产。本人临时库、重复导出和脚本核必要证据后清，首次失败/源/wire/原件和49既有脏改保护。

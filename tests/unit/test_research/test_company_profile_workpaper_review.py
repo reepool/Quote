@@ -137,7 +137,7 @@ def test_source_first_review_gateway_keeps_original_metric_meaning_and_local_lim
         assert "same-scope tables/continuations" in instructions
         assert payload["source_text"] == packet.model_text()
         assert payload["draft"]["elements"]["scale_and_mix"]["facts"][0] == original.model_dump(mode="json")
-        assert result.quality_review.policy_version == "company_profile_workpaper_review.v13"
+        assert result.quality_review.policy_version == "company_profile_workpaper_review.v14"
         assert result.elements == paper.elements
         delivered = next(f for f in project_workpaper_delivery(result)["facts"] if f["fact_id"] == "revenue")
         assert delivered["fact"]["metrics"] == [m.model_dump(mode="json") for i, m in enumerate(original.metrics)

@@ -1,4 +1,4 @@
-"""One strict record snapshot per read call, with fresh reads and export drift checks."""
+"""Content-bound strict record reuse, with fresh reads and export drift checks."""
 from copy import deepcopy
 import hashlib
 import json
@@ -73,7 +73,7 @@ def test_batch_and_export_reuse_all_strict_records_once_without_losing_lineage_o
     assert withheld['state']=='source_only' and withheld['fact'] is None
     counter.calls.clear()
     exported=reader.export(ids,tmp_path/'export')
-    assert len(counter.calls)==4
+    assert counter.calls==[]
     assert json.loads((tmp_path/'export/annual_profiles.json').read_text())['profiles']==expected
     assert exported['delivered']==2
 
@@ -114,6 +114,7 @@ def test_same_service_observes_changed_and_new_records_next_call(tmp_path):
 @pytest.mark.parametrize('drift',['content','add','remove'])
 def test_export_detects_disk_changes_before_writing(tmp_path,monkeypatch,drift):
     writer,bases,reader=two_lineages(tmp_path)
+    reader.research_profiles(['600000.SH','600001.SH'])
     original=reader.render_profile
     changed=False
     def mutate(record):
@@ -139,7 +140,7 @@ def test_catalog_and_enrichment_plan_each_validate_once(tmp_path,monkeypatch):
     counter.calls.clear()
     plan=reader.plan_enrichment('600000.SH',request_id='planned-only',targets=[{'element':'products_services','question':'具体服务是什么？'}])
     assert plan['state']=='planned' and plan['execution_started'] is False
-    assert plan['enrichment_plan']['base_work_id']=='supplement-0' and len(counter.calls)==4
+    assert plan['enrichment_plan']['base_work_id']=='supplement-0' and counter.calls==[]
 
 
 @pytest.mark.parametrize('mode',['stable_unreadable','becomes_unreadable','becomes_readable'])

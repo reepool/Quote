@@ -1,0 +1,15 @@
+{
+  "status": 202,
+  "body": {
+    "schema_version": "company_profile_http_task.v1",
+    "task_id": "profile-http-f2f27d6402ad6806e257b3e1c99719e2",
+    "request_id": "6fp-wangfujing-revenue-enrich",
+    "action": "enrich",
+    "state": "queued",
+    "status_url": "/api/v1/research/company/annual-profile-tasks/profile-http-f2f27d6402ad6806e257b3e1c99719e2",
+    "result_url": "/api/v1/research/company/annual-profile-tasks/profile-http-f2f27d6402ad6806e257b3e1c99719e2/result",
+    "research_only": true,
+    "production_authorization": "not_authorized"
+  },
+  "seconds": 23.711
+}

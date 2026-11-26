@@ -1,0 +1,44 @@
+{
+  "task": "6.FP",
+  "purpose": "Independent source-first reference; never included in model prompts or task request",
+  "instrument_id": "600859.SH",
+  "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+  "pdf": "data/filings/announcements/blobs/e9/e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca.pdf",
+  "public_url": "https://static.cninfo.com.cn/finalpage/2026-04-23/1225156521.PDF",
+  "navigation": {
+    "physical_page": 3,
+    "chapter": "第三节 管理层讨论与分析",
+    "chapter_start_page": 11,
+    "next_chapter_start_page": 38,
+    "strategy": "Concentrate on this report's operating overview and income analysis; page numbers are source coordinates, not a cross-company chapter rule."
+  },
+  "source_expectations": [
+    {
+      "section_path": ["第三节 管理层讨论与分析", "五、报告期内主要经营情况"],
+      "physical_page": 17,
+      "quote": "报告期内，公司实现营业收入101.50亿元，同比下降10.74%，剔除门店变动因素，同店同比下降3.75%；实现归属于上市公司股东的净利润-0.40亿元。",
+      "layout_note": "Quote collapses layout whitespace for independent reading only; extraction must use original source coordinates and table layout.",
+      "expected": [
+        {"item": "合并营业收入", "raw": "101.50", "unit": "亿元", "period": "2025年"},
+        {"item": "公司营业收入同比", "raw": "下降10.74%", "direction": "decrease"},
+        {"item": "剔除门店变动因素的同店同比", "raw": "下降3.75%", "scope": "same-store; distinct from total revenue growth"}
+      ]
+    },
+    {
+      "section_path": ["第三节 管理层讨论与分析", "五、报告期内主要经营情况", "利润表及现金流量表相关科目变动分析表"],
+      "physical_page": 18,
+      "table_context": "单位：元 币种：人民币；科目、本期数、上年同期数、变动比例（%）",
+      "quote": "营业收入 10,149,906,153.24 11,371,675,304.54 -10.74",
+      "expected": {"current_revenue_CNY": "10149906153.24", "prior_revenue_CNY": "11371675304.54", "change_percent": "-10.74"},
+      "priority": "Exact amount useful if complete source context is selected; faithful101.50亿元 is also useful, no requirement to duplicate both representations."
+    },
+    {
+      "section_path": ["第三节 管理层讨论与分析", "五、报告期内主要经营情况", "收入和成本分析"],
+      "physical_page": 18,
+      "quote": "剔除门店变动因素，营业收入同店同比下降3.75%。公司营业收入下降主要受消费市场结构性分化、公司门店数量减少以及百货业态业绩持续下滑等因素共同影响所致。",
+      "priority": "Separate sourced operating explanation; do not infer a uniform store scope, causality beyond this wording or omitted segment values."
+    }
+  ],
+  "acceptance": "Report actual supported new revenue/same-store information and remaining gaps. Existing37 readable facts/80 metrics and independent restrictions remain traceable; no forced full completion or new overall accuracy score.",
+  "independent_read_method": "Existing pypdf PdfReader layout extraction of TOC pages1-8 and operating pages13-18; no full-report extraction or model calls."
+}

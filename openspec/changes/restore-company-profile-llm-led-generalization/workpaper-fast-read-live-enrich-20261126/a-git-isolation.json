@@ -1,0 +1,93 @@
+{
+  "baseline_head": "a69cae4be516fede77afb0cb35ed7d76fdf4110e",
+  "inherited_paths_preserved": 49,
+  "owned_management_blocks_only": [
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+    "docs/development/company_profile_delivery_plan.md"
+  ],
+  "parallel_drift_untouched": {
+    "config/11_futures.json": {
+      "initial_sha256": "d9242989887a44b2fa88963c086462b59f589e31d489c724867ee81d0ecc6586",
+      "parallel_current_sha256": "54b71ec72442a61fe15391dd1ecb7df44f1152a5ba247144b41c01c4dbd5d290",
+      "owned_edits": false,
+      "included_in_commit": false
+    },
+    "tests/unit/test_research/test_special_commodity_market_data.py": {
+      "initial_sha256": "5e4285b29c3bb4c096ee9af81a49e3d1db533b5cd2ff538f58a3337d0dfe4b13",
+      "parallel_current_sha256": "5ad55daad90504a4558ebedad1821dca6f5926cc741e0727588ab2c985f451ec",
+      "owned_edits": false,
+      "included_in_commit": false
+    }
+  },
+  "current_residual_unstaged_paths": [
+    "docs/development/common_llm_gateway_architecture.md",
+    "docs/development/company_profile_acceptance_program.md",
+    "docs/development/company_profile_delivery_plan.md",
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json",
+    "openspec/changes/narrow-reconciliation-candidate-construction/design.md",
+    "openspec/changes/narrow-reconciliation-candidate-construction/proposal.md",
+    "openspec/changes/narrow-reconciliation-candidate-construction/specs/financial-readiness-query-performance/spec.md",
+    "openspec/changes/narrow-reconciliation-candidate-construction/tasks.md",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/design.md",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/proposal.md",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/tasks.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md",
+    "research/company_profile/core_evidence_selection.py",
+    "research/company_profile/core_skeleton.py",
+    "tests/unit/test_research/test_company_profile_core_skeleton.py",
+    "tests/unit/test_research/test_company_profile_owned_page_facts.py"
+  ],
+  "baseline_paths_committed_by_parallel_work": [
+    "config/05_scheduler.json",
+    "config/10_research.json",
+    "config/11_futures.json",
+    "config/12_fx.json",
+    "data_sources/akshare_source.py",
+    "docs/development/akshare_upgrade_runbook.md",
+    "docs/development/fx_market_data_requirements.md",
+    "docs/development/research_data_engine_execution.md",
+    "docs/development/special_commodity_market_data_requirements.md",
+    "implementation_plan.md",
+    "requirements.txt",
+    "research/fx_market_data.py",
+    "research/providers/akshare_financial_statements.py",
+    "research/providers/akshare_shenwan_industry.py",
+    "research/providers/akshare_valuation_inputs.py",
+    "research/risk_free_rate_sync.py",
+    "scheduler/tasks.py",
+    "scripts/akshare_smoke.py",
+    "scripts/upgrade_akshare.py",
+    "test_akshare.py",
+    "test_data_api.py",
+    "tests/fixtures/professional_dcf_cases.json",
+    "tests/unit/test_market_dependency_versions.py",
+    "tests/unit/test_research/test_akshare_financial_statements_provider.py",
+    "tests/unit/test_research/test_akshare_shenwan_industry_provider.py",
+    "tests/unit/test_research/test_fx_market_data.py",
+    "tests/unit/test_research/test_special_commodity_market_data.py",
+    "utils/akshare_upgrade.py",
+    "utils/market_dependency_versions.py"
+  ],
+  "parallel_commits_since_start": [
+    "7a05d593 feat(akshare): call current interfaces and smoke-gate dependency upgrades",
+    "2226c14c feat(commodity): continue oil sync when primary metadata requests fail"
+  ],
+  "private_credential_scan": "passed;credentials never printed or staged",
+  "application_source_and_test_files": [
+    "research/company_profile/reads.py",
+    "api/company_profile_routes.py",
+    "tests/unit/test_research/test_company_profile_read_call_snapshot.py",
+    "tests/unit/test_research/test_company_profile_fast_reads.py",
+    "research/company_profile/workpaper_review.py",
+    "tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py",
+    "tests/unit/test_research/test_company_profile_workpaper_review.py"
+  ],
+  "staged_files": 47,
+  "new_live_pin_and_one_task_ledger": "retained;not temporary development databases"
+}

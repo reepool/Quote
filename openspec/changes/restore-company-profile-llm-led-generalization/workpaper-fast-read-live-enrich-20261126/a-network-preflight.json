@@ -1,0 +1,14 @@
+{
+  "same_approved_network_environment": true,
+  "hosts": {
+    "api.deepseek.com": {
+      "DNS": true,
+      "TLS": "TLSv1.3"
+    },
+    "scorpio.reepool.com": {
+      "DNS": true,
+      "TLS": "TLSv1.3"
+    }
+  },
+  "model_requests": 0
+}

@@ -82,6 +82,11 @@ class CompanyProfileReadService:
         self.protected_export_roots = tuple(
             Path(path) for path in protected_export_roots
         )
+        self._snapshot_lock = threading.Lock()
+        self._validation_root: Path | None = None
+        self._validation_adapter = None
+        self._validation_schema = None
+        self._validated_records: dict[Path, tuple[bytes, CompanyProfileRuntimeRecord | None]] = {}
 
     def query(
         self,
@@ -562,23 +567,44 @@ class CompanyProfileReadService:
         return latest
 
     def _validated_snapshot(self):
-        """Strictly decode each file once for this call; retain no instance cache."""
-        records, versions = [], {}
-        for path in self.namespace_root.glob("*.json"):
-            if not path.is_file():
-                continue
-            try:
-                raw = path.read_bytes()
-            except OSError:
-                versions[path] = None
-                continue
-            versions[path] = hashlib.sha256(raw).digest()
-            try:
-                record = _RUNTIME_ADAPTER.validate_json(raw)
-            except ValueError:
-                continue  # Same local malformed/source-invalid isolation as before.
-            records.append(record)
-        return tuple(records), versions
+        """Read current bytes; reuse strict validation only for identical content.
+
+        Entries belong to this exact namespace and compiled validation policy.
+        Keep only the latest observed version of each readable file, including
+        source-invalid results. Never expose the retained mutable model graph.
+        """
+        with self._snapshot_lock:
+            root, adapter = self.namespace_root.resolve(), _RUNTIME_ADAPTER
+            schema = getattr(adapter, "validator", None)
+            if (root != self._validation_root or adapter is not self._validation_adapter
+                or schema is not self._validation_schema):
+                self._validated_records.clear()
+                self._validation_root, self._validation_adapter = root, adapter
+                self._validation_schema = schema
+            records, versions, current = [], {}, {}
+            for path in self.namespace_root.glob("*.json"):
+                if not path.is_file():
+                    continue
+                try:
+                    raw = path.read_bytes()
+                except OSError:
+                    versions[path] = None
+                    continue
+                digest = hashlib.sha256(raw).digest()
+                versions[path] = digest
+                cached = self._validated_records.get(path)
+                if cached is not None and cached[0] == digest:
+                    record = cached[1]
+                else:
+                    try:
+                        record = adapter.validate_json(raw)
+                    except ValueError:
+                        record = None  # Preserve local malformed/source-invalid isolation.
+                current[path] = (digest, record)
+                if record is not None:
+                    records.append(record.model_copy(deep=True))
+            self._validated_records = current
+            return tuple(records), versions
 
     def _record_versions(self):
         versions = {}

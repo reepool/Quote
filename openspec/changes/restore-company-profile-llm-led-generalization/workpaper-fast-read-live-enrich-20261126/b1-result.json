@@ -1,0 +1,147 @@
+{
+  "schema_version": "company_profile_6fp_b1_result.v1",
+  "task": "6.FP / B1",
+  "status": "local_reader_complete_pending_A_live_HTTP_and_independent_review",
+  "scope": {
+    "changed_paths": [
+      "research/company_profile/reads.py",
+      "api/company_profile_routes.py",
+      "tests/unit/test_research/test_company_profile_read_call_snapshot.py",
+      "tests/unit/test_research/test_company_profile_fast_reads.py"
+    ],
+    "implementation": "原reader实例按精确resolved namespace、adapter对象及compiled validator身份保存每文件最近一次内容SHA256的严格验证结果；每次重新枚举并读文件字节，变稿重校，删除/不可读条目退出复用，坏源继续局部隔离。快照深复制避免返回对象污染。薄API依赖最多保留4个root的惰性reader，不在启动阶段扫描/校验。原export字节漂移检查保持。",
+    "new_store_or_generic_cache_platform": false,
+    "fact_model_changes": false,
+    "mtime_or_TTL_used_as_content_identity": false,
+    "stage_commit_push": "none, explicitly prohibited by this task",
+    "model_calls_HTTP_calls_service_restarts_shared_configuration_writes": 0
+  },
+  "baseline": {
+    "head": "a69cae4be516fede77afb0cb35ed7d76fdf4110e",
+    "A_baseline": "data/QuoteBak/company-profile-6fp-a-77Xpzwye/baseline.json",
+    "A_baseline_sha256": "0d09d0a3f3d02adf1ca4564990bad649e336329675d5ea5263f1f769ec124ec2",
+    "expected": "data/QuoteBak/company-profile-6fp-a-77Xpzwye/expected.json",
+    "expected_sha256": "852ed1f0b78b15072add23b9eb6da22a7134e2fb3faa180c6f626323ff0dad04",
+    "research_root": "data/research/company_profile_research_v1_20261123",
+    "protected_original_files_checked": 381,
+    "protected_original_file_mismatches": 0,
+    "env_sha256_unchanged": true,
+    "preexisting_dirty_paths": 49,
+    "preexisting_dirty_paths_written_by_B1": 0,
+    "preexisting_dirty_hashes_still_matching_A_baseline": 45,
+    "observed_parallel_baseline_drift_outside_B1_write_set": [
+      "config/11_futures.json",
+      "docs/development/company_profile_delivery_plan.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md"
+    ],
+    "parallel_drift_handling": "仅记录交A核对；未写入、还原、暂存或清理这些文件。"
+  },
+  "acceptance": {
+    "complete_profile_equality_with_A_expected": "39/39, complete nested objects, both batch and individual reads",
+    "visible_facts": 1082,
+    "visible_metrics": 1648,
+    "all_fact_states_unchanged": {
+      "reviewed": 941,
+      "limited": 141,
+      "source_only": 14,
+      "withheld": 3,
+      "superseded": 1351
+    },
+    "metric_gap_entries_unchanged": 74,
+    "direct_challenges": [
+      "每次读取全部现存文件；热读零重复严格验证",
+      "同mtime、同大小原子替换仍触发重校",
+      "新增、删除、重新出现、坏源替换及恢复",
+      "跨root、同reader切root、adapter替换及同adapter重建schema",
+      "调用方修改嵌套事实、补读问题和model快照不污染后续读",
+      "4个并发冷读对每文件只执行一次严格校验",
+      "热快照export遇内容修改、增加、删除或可读性漂移仍在写入前拒绝",
+      "目录、补读计划、单股/批量及导出保原lineage/source_only/metric限制"
+    ]
+  },
+  "profiling": {
+    "original_single_cProfile_wall_seconds": 26.214785,
+    "original_snapshot_cumulative_seconds": 26.155,
+    "original_strict_validation_cumulative_seconds": 26.059,
+    "original_strict_validation_calls": 98,
+    "original_projection_approx_seconds": 0.04,
+    "read_bytes_only_seconds": 0.016483,
+    "JSON_decode_only_seconds": 0.165874,
+    "interpretation": "耗时在严格源/记录验证；JSON解码和投影不是主瓶颈。cProfile含探针开销，不据此宣称精确加速倍数。"
+  },
+  "final_source_performance_local_only": {
+    "cold_single_seconds": 23.119069,
+    "cold_single_strict_validation_calls": 98,
+    "cold_single_strict_validation_seconds": 22.339377,
+    "hot_single_seconds": [0.385026, 0.544614, 0.569425],
+    "hot_common_batch_10_seconds": 0.693605,
+    "hot_concurrent_4_total_seconds": 2.786578,
+    "hot_strict_validation_calls": 0,
+    "cold_common_batch_10_seconds": 22.316351,
+    "cold_concurrent_4_total_seconds": 23.905120,
+    "measurement_kind": "原真实研究root本地reader计时，非内存fixture、非HTTP；final代码最后增加schema原地重建失效条件后重测。",
+    "cold_limitation": "进程内首次读取仍需全量严格验证约23秒；未挪至服务启动，也未放松校验。正常重复单股与常见批量的本地目标已达到。",
+    "earlier_same_implementation_before_schema_rebuild_guard": {
+      "reader_construction_seconds": 0.000265,
+      "hot_complete_batch_39_seconds": 0.788586,
+      "hot_serial_individual_39_total_seconds": 20.589850
+    }
+  },
+  "verification": {
+    "command_prefix": "source scripts/quote_dev_env.sh",
+    "python": "/home/python/miniconda3/envs/Quote/bin/python",
+    "completed_pass_invocations": 33,
+    "distinct_completed_tests": 29,
+    "failures_or_errors_in_completed_runs": 0,
+    "runs": [
+      {
+        "command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_read_call_snapshot.py tests/unit/test_research/test_company_profile_batch_reads.py tests/unit/test_research/test_company_profile_fast_reads.py -k 'not http and not frozen_complete_acceptance' --basetemp=data/QuoteBak/company-profile-6fp-b1-mFIioHBn/pytest --junitxml=data/QuoteBak/company-profile-6fp-b1-mFIioHBn/pytest.xml",
+        "passed": 26,
+        "deselected": 2,
+        "seconds": 42.23
+      },
+      {
+        "command": "QUOTE_TEST_PROFILE_ROOT=/home/python/Quote/data/research/company_profile_research_v1_20261123 QUOTE_TEST_PROFILE_EXPECTED=/home/python/Quote/data/QuoteBak/company-profile-6fp-a-77Xpzwye/expected.json /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_fast_reads.py -k 'root_and_validation_identity or frozen_complete_acceptance' --basetemp=data/QuoteBak/company-profile-6fp-b1-mFIioHBn/pytest-final --junitxml=data/QuoteBak/company-profile-6fp-b1-mFIioHBn/final.xml",
+        "passed": 2,
+        "deselected": 5,
+        "seconds": 55.01
+      },
+      {
+        "command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_read_call_snapshot.py tests/unit/test_research/test_company_profile_reads.py -k 'test_export_detects_disk_changes_before_writing or test_accepted_facts' --basetemp=data/QuoteBak/company-profile-6fp-b1-mFIioHBn/pytest-direct --junitxml=data/QuoteBak/company-profile-6fp-b1-mFIioHBn/direct.xml",
+        "passed": 5,
+        "deselected": 15,
+        "seconds": 9.21
+      }
+    ],
+    "incomplete_optional_run": "额外选取旧reads任务流水线回归时，首项出现通过进度但运行过长，已主动中断(exit 130)，不计入上述完成数或声称全套通过；必要的纯reader/接受事实/热export挑战均有独立完成回执。",
+    "static_check": "ruff check --select E9,F63,F7,F82 on the four changed Python files; git diff --check",
+    "not_run": ["HTTP requests/deployment/restart", "previous 82-case numeric suite", "whole repository suite", "new model requests"]
+  },
+  "source_sha256": {
+    "research/company_profile/reads.py": "609cd005a7e088ad2796bd430f93023ed9b127ea5718319aa695ec21f5d1021d",
+    "api/company_profile_routes.py": "90b2800cb2a851cf46f6c1f5ee73979fcf1427ddbc82096481297cd1d16a8915",
+    "tests/unit/test_research/test_company_profile_read_call_snapshot.py": "99e3434466067ed81e495fe387903326b7e4bbd6ada8c9332800a193c959ed76",
+    "tests/unit/test_research/test_company_profile_fast_reads.py": "58570a83b6b3ba32dbbdc6890c95eb827b23dbb9f6ce1933b78ab2b3a05bc9c1"
+  },
+  "review": {
+    "method": "B1本地diff及直接调用链自检，未调用模型review",
+    "blocking_issue_fixed": "验证身份同时核adapter及compiled validator对象；原地重建schema也必须清除已校验记录，新增直接回归已通过。",
+    "remaining_known_B1_P0_P1_P2": [],
+    "A_remaining_work": "使用冻结源码部署后的实际8000端口冷/热/并发测量、唯一王府井真实enrich及独立语义审核；本地性能不替代该验收。"
+  },
+  "cleanup": {
+    "preflight": "未发现可确认归属本B1的前序6.FP临时根；6.FO/运行接线前序清理依据沿冻结卡，未知及并行对象未清。",
+    "owned_temp_root": "data/QuoteBak/company-profile-6fp-b1-mFIioHBn",
+    "status": "removed_after_persistent_result_and_all_four_source_hashes_verified; absence_checked",
+    "released_apparent_bytes": 12196921,
+    "removed_files_observed": 182,
+    "removed_contents": "本人可重建测试数据库/fixture副本、探针脚本、临时JUnit和重复中间输出；永久紧凑结果已保留。",
+    "retained": "仅本b1-result.json紧凑结果；A baseline/expected、正式研究root和并行产物保留。"
+  },
+  "efficiency": {
+    "active_development_time": "约25至30分钟，估算，含规则核对/实现/验证；非模型业务耗时",
+    "waiting_for_A": "0",
+    "business_model_usage_tokens": 0
+  }
+}

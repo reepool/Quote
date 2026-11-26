@@ -4,7 +4,7 @@
 普通画像 GET、批量查询和计划接口始终只读，不会因为缺项或未核状态自动调用模型。
 配置策略不会自动执行任务，也不代表取得付费、外传或生产授权。6.FL工程验证及后续真实任务各保原范围。
 
-## 当前39股研究读取（2026-11-26，6.FO）
+## 当前39股研究读取（2026-11-26，6.FP）
 
 API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_research_v1_20261123`。
 该变量必须在服务器端启动API的环境中设置；Postman请求或另一个终端里的export不会改变已运行的进程。
@@ -15,16 +15,27 @@ API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/dat
 `http://192.168.188.66:8000/api/v1/research/company/600350.SH/annual-profile`，
 目录为`http://192.168.188.66:8000/api/v1/research/company/annual-profiles`。
 重启后实际验证两接口均200：山东高速24条内容与已保存画像完整一致，目录39家公司、1082条内容/1648指标。
-此次两接口并发验证分别耗时121.647秒、123.768秒，完整读取仍偏慢；客户端可将请求等待设为180秒，不能据此承诺稳定延迟。
-原其余`.env`内容逐字节保持，不安装模型任务策略，不因目录接通而重抽数据。
+随后6.FP在原reader按原文件内容hash复用严格校验，实际8000端口冷单股23.604秒、重复单股0.589–0.982秒、10股批量0.908秒、39股完整读取2.174秒、4并发墙钟2.917秒。内容变化仍重校，源限制和原完整内容不变；冷读仍慢，客户端建议保留60秒等待。这是本次实测，不承诺稳定时延。
+6.FP只在原私有`.env`新增有限策略路径和专用凭据，其余原字节保持，不改共享模型或调度配置。
 
-共享默认配置未改；普通研究读取无需安装任务策略。当前统一39股、1082条可读内容/1648指标，
-原21股与新增18股的来源、模型、审核、独立限制、缺项及同报告链均保留。
+普通研究读取无需任务凭据。当前统一39股、1091条可读内容/1669指标，
+原来源、模型、审核、独立限制、缺项及同报告链均保留；数量包含多次读取的重复表述。
 光大证券601788.SH、国信证券002736.SZ尚无画像，显式批量查询列missing，单股返回404；不自动重跑。
 
 [当前研究入口](../../data/research/company_profile_research_v1_20261123/research-current.md) ·
-[39股人读版](../../data/research/company_profile_research_v1_20261123/exports-6fo-20261126/annual_profiles.md) ·
-[当前API快照](../../data/research/company_profile_research_v1_20261123/current-api-6fo-20261126.json)
+[王府井当前人读版](../../data/research/company_profile_research_v1_20261123/600859-current-6fp-20261126.md) ·
+[王府井当前API快照](../../data/research/company_profile_research_v1_20261123/600859-current-6fp-20261126.json) ·
+[6.FO历史39股快照](../../data/research/company_profile_research_v1_20261123/current-api-6fo-20261126.json)
+
+### 本次实际补读窗口
+
+仅王府井600859.SH、仅enrich、最多1次任务，已实际完成。任务ID为
+`profile-http-f2f27d6402ad6806e257b3e1c99719e2`，状态和结果沿下文GET端点读取。
+专用Bearer值仅保存在服务器私有`.env`的`QUOTE_COMPANY_PROFILE_TASK_TOKEN`，不写URL、请求体、文档或Git；调用者通过服务器既有安全方式取得后填写Postman的Bearer Token。
+
+补读补回公司合并营业收入10,149,906,153.24元、上年收入11,371,675,304.54元和同比-10.74%。王府井从37条/80指标变为46条/101指标，其中8条输出主要重复已有分业态及客流信息，不算8项独立新增。同店收入下降3.75%的段落未进入所选片段，仍是待获取项；同店客流不能代替同店收入。原稿和全部限制保持，其余38份画像完整不变。
+
+本窗现剩余额度0：同一请求ID/同内容复用原任务，新增请求返回429，原进度/结果和普通画像仍可读取；后续新补读需要新的明确授权窗口，不能改request_id或删除账本恢复额度。实际共3物理/90243供应商total及账本、0恢复、费用unknown，没有追加修订或第二次读取。此为研究增量，不重算旧V1或证明新版总体99%。
 
 只读目录：`GET /api/v1/research/company/annual-profiles`。
 单股：`GET /api/v1/research/company/600350.SH/annual-profile`。
@@ -43,7 +54,7 @@ API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/dat
 ```
 
 计划绑定当前work/report/hash，execution_started=false，不派任务或解除限制；真正执行仍须下述显式有限策略与授权。
-本轮只合并已保存安全稿，0新增模型/付费。6.FN正式V1未通过及原质量分不改，39股可读不等于99%、S3或生产启用。
+6.FO仅合并已有安全稿；6.FP实际补读的范围、资源和剩余缺项见上。6.FN正式V1未通过及原质量分不改，39股可读不等于99%、S3或全市场生产启用。
 
 ## 服务端一次配置
 

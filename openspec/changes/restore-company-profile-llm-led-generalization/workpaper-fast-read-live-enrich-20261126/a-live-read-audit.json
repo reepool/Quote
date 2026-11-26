@@ -1,0 +1,69 @@
+{
+  "actual_service": "http://192.168.188.66:8000",
+  "reader_dependency_override": false,
+  "single": [
+    {
+      "kind": "cold",
+      "seconds": 23.604,
+      "status": 200,
+      "profile_equal": true
+    },
+    {
+      "kind": "hot1",
+      "seconds": 0.982,
+      "status": 200,
+      "profile_equal": true
+    },
+    {
+      "kind": "hot2",
+      "seconds": 0.589,
+      "status": 200,
+      "profile_equal": true
+    }
+  ],
+  "catalog": {
+    "seconds": 1.389,
+    "profiles": 39,
+    "status": 200
+  },
+  "batches": [
+    {
+      "stocks": 10,
+      "seconds": 0.908,
+      "status": 200,
+      "complete_profiles_equal": true
+    },
+    {
+      "stocks": 39,
+      "seconds": 2.174,
+      "status": 200,
+      "complete_profiles_equal": true
+    }
+  ],
+  "concurrent4": [
+    {
+      "stock": "600350.SH",
+      "status": 200,
+      "seconds": 0.638
+    },
+    {
+      "stock": "600859.SH",
+      "status": 200,
+      "seconds": 2.913
+    },
+    {
+      "stock": "600704.SH",
+      "status": 200,
+      "seconds": 1.696
+    },
+    {
+      "stock": "601628.SH",
+      "status": 200,
+      "seconds": 2.287
+    }
+  ],
+  "concurrent_wall_seconds": 2.917,
+  "complete_profiles_equal": 39,
+  "new_model_calls": 0,
+  "cold_limit_retained": true
+}

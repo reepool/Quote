@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import hmac
 import os
+from functools import lru_cache
 from pathlib import Path
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
@@ -18,6 +19,12 @@ from utils.code_utils import convert_to_database_format
 router = APIRouter(tags=["Research"])
 
 
+@lru_cache(maxsize=4)
+def _annual_profile_reader_for_root(root: str) -> CompanyProfileReadService:
+    """Retain lazy reader validation across requests for this exact local root."""
+    return CompanyProfileReadService(root)
+
+
 def annual_profile_reader() -> CompanyProfileReadService:
     from research.company_profile.operations import DEFAULT_OUTPUT_ROOT
 
@@ -26,8 +33,8 @@ def annual_profile_reader() -> CompanyProfileReadService:
         root = Path(configured).expanduser()
         if not configured.strip() or not root.is_dir():
             raise HTTPException(status_code=503, detail="configured company-profile research root is unavailable")
-        return CompanyProfileReadService(root)
-    return CompanyProfileReadService(DEFAULT_OUTPUT_ROOT)
+        return _annual_profile_reader_for_root(str(root.resolve()))
+    return _annual_profile_reader_for_root(str(Path(DEFAULT_OUTPUT_ROOT).resolve()))
 
 
 class EnrichmentPlanRequest(BaseModel):

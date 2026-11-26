@@ -1,0 +1,54 @@
+{
+  "task": "6.FP",
+  "state": "all_owned_development_artifacts_removed_after_verification",
+  "previous_owned_roots_checked_absent": [
+    "data/QuoteBak/company-profile-6fo-a-N6lSpz6C",
+    "data/QuoteBak/company-profile-api-root-KQEhwUwv"
+  ],
+  "B1": {"root": "data/QuoteBak/company-profile-6fp-b1-mFIioHBn", "absent": true, "removed_files": 182, "removed_logical_bytes": 12196921},
+  "B2": {"root": "data/QuoteBak/company-profile-6fp-b2-wfnS2IBK", "absent": true, "removed_files": 56, "removed_logical_bytes": 3159351},
+  "A": {
+    "root": "data/QuoteBak/company-profile-6fp-a-77Xpzwye",
+    "absent": true,
+    "removed_files": 11,
+    "removed_logical_bytes": 9887388,
+    "removed_relative_paths": ["stage_owned.py", "after_read.py", "expected.json", "live_ops.py", "baseline.json", "staged-stat.txt", "owned-management.patch", "render_target.py", "freeze.py", "verify_allowance.py", "__pycache__/live_ops.cpython-311.pyc"]
+  },
+  "total_removed_files": 249,
+  "total_removed_logical_bytes": 25243660,
+  "retained_once": [
+    "Original99 writer records;old39 frozen snapshots remain history,only one new target current JSON and original-renderer Markdown",
+    "One live finite HTTP policy,task ledger,original execution started/budget/result and3 raw wire receipts in checkpoint root;not development database copies",
+    "Compact source-first reference,code freeze,read/content/allowance/resource audits andB1/B2 results in this evidence directory",
+    "Private server.env credential outsideGit;original config bytes preserved"
+  ],
+  "review": {
+    "blocking_findings_remaining": 0,
+    "nonblocking": "Original source Markdown line-end whitespace retained;first cold read remains23.604seconds;same-store revenue source segment not selected and no extra model task",
+    "old_V1_scores_unchanged": true,
+    "unrelated_parallel_changes_untouched": true
+  },
+  "validation": {
+    "B1_distinct_completed_tests": 29,
+    "B2_completed_tests": 108,
+    "A_actual_service_complete_profiles_equal_before": 39,
+    "A_unrelated_complete_profiles_equal_after": 38,
+    "A_prior_Wangfujing_fact_rows_unchanged": true,
+    "actual_HTTP_credential_quota_result": [401, 429, 200],
+    "new_model_requests": 3,
+    "model_recoveries": 0,
+    "cost": "unknown",
+    "openspec_strict": "passed",
+    "changed_Python_correctness_ruff": "passed"
+  },
+  "git_isolation": {
+    "owned_staged_paths": 47,
+    "original_dirty_paths": 49,
+    "parallel_tasks_committed_their_own_paths": 29,
+    "remaining_original_dirty_paths": 20,
+    "management_documents_only_owned_blocks_staged": 4,
+    "private_credential_scan": "passed",
+    "parallel_commits_preserved": ["2226c14c", "7a05d593"]
+  },
+  "recovery": "Discarded development copies and helpers can be reconstructed from preserved old/current records,original source PDF,task/wire checkpoints andcompact hash-bound evidence."
+}

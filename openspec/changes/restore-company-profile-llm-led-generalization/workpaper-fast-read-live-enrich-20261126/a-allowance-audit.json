@@ -1,0 +1,9 @@
+{
+  "unauthenticated_status": 401,
+  "new_request_after_allowance": 429,
+  "read_existing_result": 200,
+  "accepted_submissions": 1,
+  "remaining_submissions": 0,
+  "supplier_physical_requests_unchanged": 3,
+  "no_new_model_task": true
+}

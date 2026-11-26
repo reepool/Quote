@@ -1,0 +1,45 @@
+{
+  "schema_version": "company_profile_http_task_policy.v1",
+  "policy_id": "6fp-live-wangfujing-enrich-20261126",
+  "allowed_actions": ["enrich"],
+  "max_submissions": 1,
+  "template": {
+    "schema_version": "company_profile_task_plan.v1",
+    "run_id": "6fp-http-template",
+    "authorization_status": "authorized",
+    "approval_reference": "User approved combined fast read, live one-company enrichment and common source review implementation; exact scope and cumulative limits frozen in company-profile-fast-read-live-enrich-card.md.",
+    "action": "first_read",
+    "instrument_ids": ["600859.SH"],
+    "document_versions": {"600859.SH": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca"},
+    "knowledge_cutoff": "2026-11-26",
+    "output_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+    "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_http_6fp_20261126",
+    "extract": {
+      "name": "semantic_extraction__deepseek",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "attempt_seconds": 600.0,
+      "reasoning_effort": "high",
+      "disable_thinking": false,
+      "max_output_tokens_field": "max_completion_tokens"
+    },
+    "review": {
+      "name": "semantic_extraction__scorpio_grok",
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "attempt_seconds": 1200.0,
+      "reasoning_effort": "high",
+      "disable_thinking": false,
+      "max_output_tokens_field": "max_completion_tokens"
+    },
+    "budget": {
+      "seconds": 6000.0,
+      "tokens": 1000000,
+      "physical_requests": 10,
+      "recoveries": 3,
+      "logical_seconds": 2450.0,
+      "priced_cost_cny": "10",
+      "billing_mode": "development_unpriced"
+    }
+  }
+}

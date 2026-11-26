@@ -1,0 +1,64 @@
+{
+  "schema_version": "company_profile_task_plan.v1",
+  "run_id": "profile-http-f2f27d6402ad6806e257b3e1c99719e2",
+  "authorization_status": "authorized",
+  "approval_reference": "User approved combined fast read, live one-company enrichment and common source review implementation; exact scope and cumulative limits frozen in company-profile-fast-read-live-enrich-card.md.",
+  "action": "enrich",
+  "instrument_ids": [
+    "600859.SH"
+  ],
+  "document_versions": {
+    "600859.SH": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca"
+  },
+  "knowledge_cutoff": "2026-11-26",
+  "output_root": "/home/python/Quote/data/research/company_profile_research_v1_20261123",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_http_6fp_20261126",
+  "extract": {
+    "name": "semantic_extraction__deepseek",
+    "model": "deepseek-flash",
+    "host": "api.deepseek.com",
+    "attempt_seconds": 600.0,
+    "reasoning_effort": "high",
+    "disable_thinking": false,
+    "max_output_tokens_field": "max_completion_tokens"
+  },
+  "review": {
+    "name": "semantic_extraction__scorpio_grok",
+    "model": "grok-4.7",
+    "host": "scorpio.reepool.com",
+    "attempt_seconds": 1200.0,
+    "reasoning_effort": "high",
+    "disable_thinking": false,
+    "max_output_tokens_field": "max_completion_tokens"
+  },
+  "budget": {
+    "seconds": 6000.0,
+    "tokens": 1000000,
+    "physical_requests": 10,
+    "recoveries": 3,
+    "logical_seconds": 2450.0,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "review_plans": [],
+  "enrichment_plan": {
+    "schema_version": "company_profile_enrichment.v1",
+    "request_id": "profile-http-f2f27d6402ad6806e257b3e1c99719e2",
+    "base_work_id": "bp-work-5189881c12bb58c6aa019be1",
+    "base_workpaper_sha256": "bb1dcb0c4cba57da9f02225544b2def647d1266d2e2269a407506e6080b7fc9e",
+    "report": {
+      "instrument_id": "600859.SH",
+      "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "targets": [
+      {
+        "element": "scale_and_mix",
+        "question": "2025年公司合并营业收入、同比变动及有披露的同店变化分别如何？请区分公司总额、业态或区域分项与同店口径，保留单位、期间及原文限定，不据分项加总补值；未披露或无法确定的部分标记缺项或不确定。"
+      }
+    ]
+  }
+}

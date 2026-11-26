@@ -1,0 +1,17 @@
+{
+  "request": {
+    "request_id": "6fp-wangfujing-revenue-enrich",
+    "action": "enrich",
+    "instrument_ids": [
+      "600859.SH"
+    ],
+    "targets": [
+      {
+        "element": "scale_and_mix",
+        "question": "2025年公司合并营业收入、同比变动及有披露的同店变化分别如何？请区分公司总额、业态或区域分项与同店口径，保留单位、期间及原文限定，不据分项加总补值；未披露或无法确定的部分标记缺项或不确定。"
+      }
+    ]
+  },
+  "submission_started": true,
+  "contains_reference_answers": false
+}

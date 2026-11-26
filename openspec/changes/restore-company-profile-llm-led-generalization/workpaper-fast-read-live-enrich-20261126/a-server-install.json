@@ -1,0 +1,17 @@
+{
+  "environment_entry": ".env",
+  "prior_bytes_sha256": "89c6e7a9cab8aa6c47f2ea6062dd4352ed10bdd82348208fd65ab1d103a00353",
+  "added_keys": [
+    "QUOTE_COMPANY_PROFILE_TASK_POLICY",
+    "QUOTE_COMPANY_PROFILE_TASK_TOKEN"
+  ],
+  "prior_bytes_unchanged": true,
+  "credentials_printed_or_committed": false,
+  "policy": "data/checkpoints/company_profile_http_6fp_20261126/http-policy.json",
+  "max_new_submissions": 1,
+  "service_restart_pending": false,
+  "service_restart_count": 1,
+  "running_pid": 81196,
+  "health_HTTP": 200,
+  "installed_task_completed": true
+}

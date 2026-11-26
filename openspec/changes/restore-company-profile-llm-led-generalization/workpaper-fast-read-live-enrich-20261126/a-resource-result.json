@@ -1,0 +1,87 @@
+{
+  "task": "6.FP",
+  "physical_requests": 3,
+  "charged_tokens": 90243,
+  "cost_status": "unknown",
+  "stopped_reason": null,
+  "recoveries": 0,
+  "HTTP_task_created_at": "2026-11-26T09:38:30.273148+00:00",
+  "HTTP_task_final_at": "2026-11-26T09:42:11.248868+00:00",
+  "accepted_task_wall_seconds": 220.97572,
+  "initial_HTTP_submission_seconds": 23.711,
+  "wall_time_note": "Accepted-task wall time excludes pre-acceptance planning/read time and A independent audit/development. Provider request durations are reported separately.",
+  "receipts": [
+    {
+      "receipt": "data/checkpoints/company_profile_http_6fp_20261126/executions/profile-http-f2f27d6402ad6806e257b3e1c99719e2/receipts/001.json",
+      "sha256": "f53d21677c7651e9fb2aa9e89e2c1dcee335b5f04dd14edd78d2710d8ee00fe5",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "seconds": 29.925575810000737,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 27099,
+        "completion_tokens": 5758,
+        "total_tokens": 32857,
+        "prompt_tokens_details": {
+          "cached_tokens": 26880
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 5454
+        },
+        "prompt_cache_hit_tokens": 26880,
+        "prompt_cache_miss_tokens": 219
+      }
+    },
+    {
+      "receipt": "data/checkpoints/company_profile_http_6fp_20261126/executions/profile-http-f2f27d6402ad6806e257b3e1c99719e2/receipts/002.json",
+      "sha256": "7dc4880cb6a7b78f6ab1878a01284b2ff508e62d08f2b22916e0060c70278336",
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "seconds": 36.580160600000454,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 16925,
+        "completion_tokens": 8388,
+        "total_tokens": 25313,
+        "prompt_tokens_details": {
+          "cached_tokens": 3712
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 6024
+        },
+        "prompt_cache_hit_tokens": 3712,
+        "prompt_cache_miss_tokens": 13213
+      }
+    },
+    {
+      "receipt": "data/checkpoints/company_profile_http_6fp_20261126/executions/profile-http-f2f27d6402ad6806e257b3e1c99719e2/receipts/003.json",
+      "sha256": "b0f22ad0d451b14f94cfcba75aa665258f5da9711a6bfe5070bdc9c6a3ffd799",
+      "model": "grok-4.7",
+      "host": "scorpio.reepool.com",
+      "seconds": 103.92372274300033,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 22002,
+        "completion_tokens": 67,
+        "total_tokens": 32073,
+        "prompt_tokens_details": {
+          "text_tokens": 22002,
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 10004,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "num_sources_used": 0,
+        "cost_in_usd_ticks": 349186800
+      }
+    }
+  ],
+  "supplier_total_sum": 90243,
+  "provider_seconds_sum": 170.42945915300152,
+  "original_ledger": "data/checkpoints/company_profile_http_6fp_20261126/executions/profile-http-f2f27d6402ad6806e257b3e1c99719e2/budget.json"
+}

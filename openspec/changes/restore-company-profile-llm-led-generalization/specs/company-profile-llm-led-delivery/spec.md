@@ -98,6 +98,12 @@ The existing read owner MUST support a bounded explicit stock list and reuse the
 - **THEN** the response contains each found stock once in request order with the same complete content as its single-stock API and a separate not-found entry for each absent stock
 - **AND** hidden/withheld facts remain hidden, same-report successor chains stay intact, all-absent lists return a readable not-found result, and invalid empty/over-limit lists are rejected before reading
 
+#### Scenario: Unchanged local records avoid repeated strict decoding
+- **WHEN** successive reads observe the same original record bytes under the same exact root and validation policy
+- **THEN** the existing read owner MAY reuse its previously successful strict decoding for those bytes, without a second store or looser source contract
+- **AND** each new invocation MUST observe current file additions, replacements and removals, revalidate changed bytes, retain invalid-source isolation and reject export input drift; mtime or a time-to-live alone MUST NOT establish unchanged content
+- **AND** ordinary reads/plans MUST retain the same graded facts, source/model/review metadata, gaps and restrictions and MUST NOT execute models
+
 ### Requirement: Deferred source review does not block first-read research delivery
 An explicitly deferred-review workpaper MUST use the existing task/runtime/writer path to deliver its source-bound extraction without issuing review, repair or final-check requests. The deferred policy MUST be part of processing identity, preserve the default inline mode, and expose not-reviewed/deferred scope through the existing API and export. Useful missing or uncertain supplementary detail MUST NOT reject the draft; deferred content MUST NOT be counted as formally reviewed, accurate or production-approved.
 
@@ -181,6 +187,12 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **WHEN** a source-backed narrative contains structured metrics or a financial absence assertion
 - **THEN** the reviewer MUST compare each original metric's subject and financial-column/comparison meaning with the source, without treating narrative correctness or a locatable number as proof of metadata correctness
 - **AND** blanks, unavailable values and applicability marks do not establish zero or economic absence; supported uncertainty and optional gaps remain deliverable, and local metric defects do not require rewriting supported independent narrative
+
+#### Scenario: Fact scope and period remain wrong after a metric is withheld
+- **WHEN** a new-version source review, repair or final check evaluates a fact whose own subject_scope or period is not supported by its governing source context
+- **THEN** it MUST assess and correct or locally withhold that fact-level assertion independently of every metric, even when metrics are empty or already restricted
+- **AND** supported ambiguous wording MAY retain unclear scope and a specific reason, while unsupported definite scope, false prose or a future conditional result presented as already realized MUST NOT be rescued by removing metrics or adding an uncertainty label
+- **AND** metric-only limitation requires support for the fact's own scope, period, qualifications, prose and evidence; program code MUST NOT infer that semantic support from reason-text patterns or matching field names, and frozen historical identities/results remain unchanged
 
 #### Scenario: A local numeric representation cannot be normalized without guessing
 - **WHEN** a new processing identity encounters the observed narrow metric-format incompatibility while preparing an otherwise source-bound fact or repair candidate

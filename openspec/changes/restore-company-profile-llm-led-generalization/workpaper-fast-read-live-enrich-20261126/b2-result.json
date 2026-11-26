@@ -1,0 +1,98 @@
+{
+  "schema_version": "company_profile_6fp_b2_result.v1",
+  "task": "6.FP2 / B2",
+  "status": "implemented_verified_awaiting_A",
+  "baseline_head": "a69cae4be516fede77afb0cb35ed7d76fdf4110e",
+  "business_result": "初核、一次合并修订及终核共同要求独立核验事实自身subject_scope/period，再核各metric；指标隔离不能修复错误事实范围。地区/客户分类/销售模式、主业合计及交易后计划均按源语义判断；有源歧义保原文、unclear及具体原因，错误正文仍整条隔离。",
+  "files": {
+    "research/company_profile/workpaper_review.py": {
+      "change": "review v13→v14；三阶段复用事实范围/期间提示；limit_metrics要求事实自身范围、期间、限定及证据也得到源支持。消费算法和强schema未改。",
+      "sha256": "27002a6c8a3b5120ff1fd6228eaf6511115ba8eb55315266f7ded90d0f95904a"
+    },
+    "tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py": {
+      "change": "10项直接源核测试；完整保存响应/原供源回放及ScriptedTransport受控初核→修订→终核。",
+      "sha256": "38d71f2d3f0a73e081ef2350d90f04ebfa766b4fd0bf10765be86fb948796140"
+    },
+    "tests/unit/test_research/test_company_profile_workpaper_review.py": {
+      "change": "仅一处当前默认review身份断言v13→v14；原业务断言全部保留。",
+      "sha256": "8a32a7fa2160bbf139e65daf93a5ea4d1163119b9fc56616952d40ce6f685bb8"
+    }
+  },
+  "identity": {
+    "default_review_policy": "company_profile_workpaper_review.v14",
+    "wiring": "workpaper_processing_identity(review=True)沿既有动态导入获得v14，无需修改workpaper_llm.py。",
+    "unchanged_workpaper_llm_sha256": "4bfe9b8fe4a144fd61ee1b3681ee679210146537ae8fb38ca8d63e1a5e476104",
+    "unchanged_workpaper_schema_sha256": "fa1699a5266a90c4225f793ca3ceb4ce01d4232d4bbf358ef62b07f372203d2f",
+    "legacy": "保存v13反序列化/内容hash保持；未重写历史记录或解除A限制。"
+  },
+  "verification": {
+    "command": [
+      "source /home/python/Quote/scripts/quote_dev_env.sh",
+      "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py tests/unit/test_research/test_company_profile_workpaper_review.py tests/unit/test_research/test_company_profile_review_metric_limits.py tests/unit/test_research/test_company_profile_review_failures.py --basetemp=/home/python/Quote/data/QuoteBak/company-profile-6fp-b2-wfnS2IBK/regression -o cache_dir=/home/python/Quote/data/QuoteBak/company-profile-6fp-b2-wfnS2IBK/cache --junitxml=/home/python/Quote/data/QuoteBak/company-profile-6fp-b2-wfnS2IBK/regression.xml"
+    ],
+    "passed": 108,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 6,
+    "seconds": 292.61,
+    "new_direct_cases": 10,
+    "proof": [
+      "三家公司完整真实旧响应回放仍复现metric被隔离而错误fact.scope留存的旧缺口；程序不从解释文字推断语义答案。",
+      "受控新增独立fact范围意见后，每目标只进入一次合并修订；仅删metrics但保错误scope的候选经final拒绝，整条退出普通投影。",
+      "明确保留源原句/引用、unclear及原因的候选经受控final接受后为limited，其他真实事实投影逐对象保持。",
+      "无metrics的交易后计划仍独立核fact.period；2025已实现标签未修正则拒绝，计划时间及条件修正后可交。",
+      "已知错误正文即使改unclear、加原因并删光metrics仍拒绝；保存v13身份/hash不变。",
+      "既有runtime/writer/query/export、新实例读回、局部指标限用和失败接续回归通过。"
+    ],
+    "static_checks": [
+      "python -m ruff check --select E9,F63,F7,F82：3个变更Python文件通过",
+      "python -m ruff check --select F：workpaper_review.py及新增测试通过",
+      "git diff --check：通过"
+    ],
+    "first_attempts": [
+      "禁用cacheprovider与仓库严格cache_dir配置冲突，exit4、0测试执行；改为本任务QuoteBak缓存。",
+      "首轮新增测试4通过/6失败：夹具错误期待已移除事实保留API占位，以及完整真实源超出helper合成120000 context；修正为严格验证事实移除/拒绝审计，并仅扩大ScriptedTransport本地合成价格表context。生产预算/行为未改。",
+      "修正后新增10/10通过，最终上述108/108通过。"
+    ]
+  },
+  "saved_evidence": {
+    "record_root": "data/research/company_profile_v1_acceptance_20261125/company_profile_common_core.v1",
+    "wire_root": "data/checkpoints/company_profile_v1_acceptance_20261125",
+    "wire_files_per_stock": "execution/wires/003.json、004.json、005.json，完整初核/修订/终核响应；003保存原请求draft及source_text。",
+    "cases": [
+      {"stock": "920003.BJ", "work_id": "bp-work-0788cd766ed03e2101c554ec", "fact_id": "ccm-2", "record_sha256": "69134a0245b8e95f1c2ea9147986f7b1aa866660097508fb1e0a91dfc8198791", "initial_wire_sha256": "044b79b040b4ef5f7e071b7e87da5478679cc48f502f17f9cb1ac678987138ba"},
+      {"stock": "600704.SH", "work_id": "bp-work-e53470a4bfe65c83d9a82b89", "fact_id": "F-CC-01", "record_sha256": "540f057586067704aab9a9aa6438530b0d6273dcefbf3e8549d1c9af470443f3", "initial_wire_sha256": "5363af3c111ff4e952ecc0f528e388f0d4c2f50d25a7d5e627c197e2cbe914e9"},
+      {"stock": "920006.BJ", "work_id": "bp-work-9d9c2637afa2f4ffc35c6fcc", "fact_id": "F021", "record_sha256": "e0b5d73e351a281a15b07b5689cb8eb52ffd570e3b5cf5ba0a01c00680ca7a1e", "initial_wire_sha256": "76365bd7cef30b6f6abbc457a3a3585aac568da12a3f907d8cd97542d2b1ebe0"}
+    ],
+    "integrity": "测试核packet.model_text与保存真实请求逐字相等，且原record及9份wire前后原字节相等；未复制完整API。"
+  },
+  "protection": {
+    "A_baseline": "data/QuoteBak/company-profile-6fp-a-77Xpzwye/baseline.json",
+    "A_expected_sha256": "852ed1f0b78b15072add23b9eb6da22a7134e2fb3faa180c6f626323ff0dad04",
+    "protected_original_files": 381,
+    "protected_hash_mismatches": 0,
+    "preexisting_dirty_paths": 49,
+    "B2_edits_to_preexisting_dirty_paths": 0,
+    "deleted_baseline_paths_still_absent": 4,
+    "A_snapshot_differences_outside_B2": [
+      "config/11_futures.json",
+      "docs/development/company_profile_delivery_plan.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+      "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md"
+    ],
+    "snapshot_note": "上述4项mtime为16:46–16:47，早于B2代码修改；未编辑、暂存、还原或清理这些差异。其余45项含4删除项与A快照保持。完整39 API验收由B1/A完成，B2未重复全量API。"
+  },
+  "review": {"blocking_findings_remaining": [], "nonblocking_scope_added": false, "A_independent_review": "pending"},
+  "resources": {"new_real_model_calls": 0, "new_provider_tokens": 0, "new_provider_cost": 0, "service_restarts": 0, "shared_config_writes": 0},
+  "limits": "工程回放和受控判定只证明提示接线及消费隔离，不证明真实模型检错率提升或新99%。A负责实际HTTP/模型调用及原文独审；旧6.FN成绩、A保护、规模及生产边界保持。",
+  "git": {"staged": false, "committed": false, "pushed": false, "owner_for_integration": "A"},
+  "cleanup": {
+    "preflight": "未找到本人6.FO/6.FP旧B2临时根；A及未知/并行根保留。",
+    "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fp-b2-wfnS2IBK",
+    "status": "removed_and_absence_verified",
+    "removed_files": 56,
+    "removed_logical_bytes": 3159351,
+    "retain": "本紧凑结果、直接测试和既有权威真实source/wire；不另保临时库、XML、缓存或重复快照。"
+  },
+  "efficiency": {"active_development_seconds": "unknown", "handoff_wait_seconds": 0, "formal_live_reruns": 0}
+}
